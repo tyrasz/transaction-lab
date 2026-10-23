@@ -4,7 +4,9 @@ Build a transaction-preview and security system that can demonstrate stronger re
 
 ## Current foundation
 
-The initial work targets HyperEVM and Hyperlend USDC supply. The local application accepts public transaction input, uses read-only execution tracing, separates execution from security assessment, preserves raw evidence and reports coverage limits. The offline corpus checks four observed traces and four explicitly synthetic controls. Live checks cover current supply, historical supply, a real simulated balance failure, and partial HyperCore interpretation. The current supply adapter measures USDC/hUSDC balances before and after an ephemeral state diff at one pinned block. Broad protocol coverage and security detection remain open work.
+The current implementation covers HyperEVM Hyperlend USDC supply, withdrawal, variable-rate borrowing and repayment, with separate debt accounting and final USDC/hUSDC allowance measurements. It preserves raw evidence and uses shared pinned-state reconstruction for exact balance reads. Fourteen offline regression cases (ten observed, four synthetic), twelve live API checks and seven same-block two-provider comparisons pass at the 0.3.0 checkpoint. These are narrow development checks, not general accuracy or security scores.
+
+Historical transaction-position state is the next implementation target. Probes identified a supported state-context method after demonstrating that another provider parameter was silently ignored. The three researched security incident candidates remain unadmitted and unscored; no blind holdout or detector performance claim exists. See STATUS.md for evidence and research/security-corpus/PLAN.md for admission criteria.
 
 ## Execution correctness
 
@@ -17,7 +19,7 @@ Exit evidence: exact supported-asset amounts against independent state observati
 
 ## Coverage and reproducibility
 
-Add protocol adapters only with observed successful and failing examples: lending withdrawals and borrowing, swaps, approvals, bridges and smart-account execution. Expand chains after chain-specific replay and state assumptions are documented. CoreWriter requires a separate HyperCore model; decoding an EVM action alone cannot establish its eventual HyperCore result.
+Add protocol adapters only with observed successful and failing examples: additional lending assets, swaps, permits, bridges and smart-account execution. Expand chains after chain-specific replay and state assumptions are documented. CoreWriter requires a separate HyperCore model; decoding an EVM action alone cannot establish its eventual HyperCore result.
 
 Record input, block, engine/provider version when available, metadata provenance, output and limits for each result. Maintain separate training/development and held-out corpora. Refresh stale protocol assumptions and keep old cases as regression evidence.
 

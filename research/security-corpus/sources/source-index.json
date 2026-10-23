@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "1.0",
+  "createdAt": "2026-10-23T14:54:07Z",
+  "sources": [
+    {
+      "id": "lifi-official-2024",
+      "title": "Security Incident Report 16th July",
+      "publisher": "LI.FI",
+      "sourceType": "affected_protocol_postmortem",
+      "url": "https://li.fi/knowledge-hub/incident-report-16th-july",
+      "publishedDate": "2024-07-18",
+      "retrievedAt": "2026-10-23T14:54:07Z",
+      "readStatus": "reviewed",
+      "supports": [
+        "Incident and vulnerable facet attribution",
+        "Arbitrary-call validation omission",
+        "Ethereum and Arbitrum were affected"
+      ],
+      "limitations": [
+        "Does not identify the selected drain transaction in its text.",
+        "Statement that finite approvals were unaffected describes this incident's affected population; it is not a general proof that finite allowances cannot be drained."
+      ],
+      "notes": "The protocol attributes the incident to a new facet missing validation around arbitrary external calls. It links the affected facet at 0xf28a352377663ca134bd27b582b1a9a4dad7e534."
+    },
+    {
+      "id": "lifi-blocksec-2024",
+      "title": "Illicit Fund Flow Case Study: LI.FI Attack",
+      "publisher": "BlockSec / MetaSleuth",
+      "sourceType": "original_security_research",
+      "url": "https://blocksec.com/blog/illicit-fund-flow-case-study-lifi-attack-metasleuth",
+      "publishedDate": "2024-10-24",
+      "retrievedAt": "2026-10-23T14:54:07Z",
+      "readStatus": "reviewed",
+      "supports": [
+        "Explicitly links the selected 0xd82f...3873 transaction as an attack example",
+        "Identifies the incident actor and LI.FI diamond"
+      ],
+      "linkedTransactions": [
+        "0xd82fe84e63b1aa52e1ce540582ee0895ba4a71ec5e7a632a3faa1aff3e763873"
+      ],
+      "notes": "The article distinguishes attack transactions from later swaps and laundering. Only the attack example is a candidate here."
+    },
+    {
+      "id": "socket-certik-2024",
+      "title": "Socket Tech Incident Analysis",
+      "publisher": "CertiK",
+      "sourceType": "original_security_research",
+      "url": "https://www.certik.com/blog/3QR5sltpG4lmpau6S6mWcm-socket-tech-incident-analysis",
+      "publishedDate": "2024-01-18",
+      "retrievedAt": "2026-10-23T14:54:07Z",
+      "readStatus": "reviewed",
+      "supports": [
+        "Incident actor 0x50df5a2217588772471b84adbbe4194a2ed39066",
+        "SocketGateway 0x3a23f943181408eac424116af7b7790c94cb97a5",
+        "Prior approvals were consumed by arbitrary transferFrom calls",
+        "127 USDC victims reported"
+      ],
+      "linkedTransactions": [
+        {
+          "hash": "0x1df44e224c7a715da25fa33dcad2ca3a930d1a4dafd263e61c07b52673d505f4",
+          "role": "admin_addRoute_context_not_malicious_drain"
+        },
+        {
+          "hash": "0xac75adcc1cb3fef158c4f200c48fcbcbb9b6ce3250bdf3751d6231d41a9e604b",
+          "role": "disableRoute_mitigation_not_malicious_drain"
+        }
+      ],
+      "limitations": [
+        "Selected drain hash is independently checked through RPC, not directly linked as a transaction in the reviewed article.",
+        "One attack-contract anchor has inconsistent visible label/address; do not use that abbreviated anchor as transaction identity evidence."
+      ],
+      "notes": "The receipt matches the named actor, gateway emitter, and 127 nonzero USDC transfer sources. Trace-based attribution is still an admission requirement."
+    },
+    {
+      "id": "permit-darknavy-2026",
+      "title": "USDC Permit Phishing Drain",
+      "publisher": "DARKNAVY",
+      "sourceType": "security_research_postmortem",
+      "url": "https://www.darknavy.org/web3/exploits/usdc-permit-phishing-drain/",
+      "publishedDate": null,
+      "displayedDate": "2026-03-16",
+      "displayedDateMeaning": "Incident-date header; actual publication timestamp was not independently established and must not be used as a historical intelligence cutoff.",
+      "retrievedAt": "2026-10-23T14:54:07Z",
+      "readStatus": "reviewed",
+      "supports": [
+        "Exact transaction hash, chain, block, actor and reported permit-drain flow",
+        "Selected victim and max-uint256 Approval fields"
+      ],
+      "limitations": [
+        "Phishing page, social engineering, and EIP-7702 Poisoner attribution are source claims not independently established by the captured receipt.",
+        "The page banner says Flash Loan while its body says no flash loan; that category is excluded from our labels.",
+        "An original wallet prompt and signed typed-data request are not supplied."
+      ],
+      "notes": "The source describes a permit redemption followed by three USDC transfers. The RPC receipt independently confirms one maximum Approval event and three Transfer events, but does not itself prove phishing intent or the call mechanism."
+    },
+    {
+      "id": "permit-certik-alert-unread",
+      "title": "CertiKAlert incident alert linked by a secondary incident index",
+      "publisher": "CertiKAlert",
+      "sourceType": "potential_primary_alert_unreviewed",
+      "url": "https://x.com/CertiKAlert/status/2033613069062996152",
+      "publishedDate": null,
+      "retrievedAt": "2026-10-23T14:54:07Z",
+      "readStatus": "unavailable_http_403",
+      "usedForLabels": false,
+      "notes": "Link discovered through an incident index. Do not treat an unread alert as corroboration."
+    },
+    {
+      "id": "erc20",
+      "title": "ERC-20: Token Standard",
+      "publisher": "Ethereum Improvement Proposals",
+      "sourceType": "standard",
+      "url": "https://eips.ethereum.org/EIPS/eip-20",
+      "publishedDate": "2015-11-19",
+      "retrievedAt": "2026-10-23T14:54:07Z",
+      "readStatus": "reviewed",
+      "notes": "Approval and Transfer event semantics inform decoding; they do not establish informed consent or maliciousness."
+    }
+  ]
+}

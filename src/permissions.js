@@ -191,7 +191,7 @@ export function analyzePermissions({ request, trace, metadata = {} } = {}) {
     code: 'MAX_UINT256_APPROVAL_EVENT', severity: 'review', basis: 'approval_event',
     token: event.asset.address, owner: event.owner, spender: event.spender, amountRaw: event.amountRaw,
     observationIds: [event.id],
-    message: `An Approval event reported the maximum uint256 allowance from ${event.owner} to spender ${event.spender} for token ${event.asset.address}. This is commonly called unlimited approval; the final allowance and spender trustworthiness were not verified.`,
+    message: `An Approval event reported the maximum uint256 allowance from ${event.owner} to spender ${event.spender} for token ${event.asset.address}. This is commonly called unlimited approval. This event alone does not verify final allowance; consult allowanceChanges for measured state. Spender trustworthiness is not assessed.`,
   });
   for (const call of calls.filter(call => call.allowanceKind === 'uint256_max' && !call.matchedEventIds.length && call.returnStatus !== 'returned_false')) findings.push({
     code: 'MAX_UINT256_APPROVAL_REQUEST', severity: 'review', basis: 'approve_calldata',

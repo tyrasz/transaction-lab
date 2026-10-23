@@ -29,7 +29,7 @@ function assets(items, direction) {
 export function comparisonProjection(report) {
   const protocol = choose(report.protocol, ['name', 'operation', 'asset', 'amountRaw',
     'requestedDepositPrincipalRaw', 'transferredDepositPrincipalRaw', 'mintEventImpliedPrincipalRaw',
-    'roundingDifferenceRaw']);
+    'roundingDifferenceRaw', 'actualAmountRaw', 'positionToken', 'positionAccount', 'positionDeltaRaw']);
   protocol.principalReconciliation = choose(report.protocol?.principalReconciliation,
     ['status', 'model', 'minImpliedPrincipalRaw', 'maxImpliedPrincipalRaw', 'scaledAmountRaw', 'indexRaw', 'implementation']);
   return {
@@ -47,6 +47,11 @@ export function comparisonProjection(report) {
     principalAndRounding: protocol,
     interest: (report.interestAccruals ?? []).map(item => choose(item,
       ['address', 'caller', 'onBehalfOf', 'valueRaw', 'balanceIncreaseRaw', 'mintEventImpliedPrincipalRaw', 'indexRaw'])),
+    positions: (report.positionChanges ?? []).map(item=>choose(item,['token','account','event','role','valueRaw','accruedInterestRaw','indexRaw','deltaRaw'])),
+    allowances: report.allowanceChanges?.status==='measured' ? {
+      status:'measured', executionIdentity:report.allowanceChanges.executionIdentity,
+      values:report.allowanceChanges.allowances.map(item=>({address:item.asset.address,...choose(item,['owner','spender','beforeRaw','afterRaw','deltaRaw','changed'])})).sort((a,b)=>`${a.address}:${a.owner}:${a.spender}`.localeCompare(`${b.address}:${b.owner}:${b.spender}`)),
+    } : {status:report.allowanceChanges?.status??'not_present'},
   };
 }
 
@@ -88,7 +93,7 @@ export function compareReports(left, right, pinnedBlock) {
   checks.push({ name: 'pinned block identity', assessed: true, equal: blockIdentityMatches,
     expected: { chainId: 999, number: pinnedBlock.number, hash: lower(pinnedBlock.hash) },
     left: leftProjection.block, right: rightProjection.block });
-  for (const field of ['request', 'execution', 'eventMovements', 'incoming', 'outgoing', 'principalAndRounding', 'interest']) {
+  for (const field of ['request', 'execution', 'eventMovements', 'incoming', 'outgoing', 'principalAndRounding', 'interest', 'positions', 'allowances']) {
     checks.push({ name: field, assessed: true, equal: equal(leftProjection[field], rightProjection[field]),
       left: leftProjection[field], right: rightProjection[field] });
   }
@@ -150,17 +155,21 @@ function comparisonCases(block) {
   return [
     { id: 'hyperlend-supply', expectedExecution: 'success', request: { ...supply, block } },
     { id: 'hyperlend-excessive-supply', expectedExecution: 'reverted', request: { ...supply, data: excessiveData, block } },
+    ...['withdraw','borrow','repay'].map(operation=>({id:`hyperlend-${operation}`,operation,expectedExecution:'success',request:{...EXAMPLES.find(e=>e.id===`hyperlend-usdc-${operation}`).request,block}})),
+    ...['usdc-max-approval','usdc-revoke-approval'].map(id=>({id,operation:'approve',expectedExecution:'success',request:{...EXAMPLES.find(e=>e.id===id).request,block}})),
   ];
 }
 
 function outcomeMatches(item, report) {
   if (report.execution?.status !== item.expectedExecution) return false;
   if (item.expectedExecution === 'reverted') return report.inAssets?.length === 0 && report.outAssets?.length === 0;
-  return report.outAssets?.some(asset => lower(asset.asset?.address) === USDC &&
-    asset.transferOut?.some(transfer => exact(transfer.rawValue) === '15066115')) ?? false;
+  if(item.operation==='approve') return report.allowanceChanges?.status==='measured' && report.allowanceChanges.allowances.length===1 && report.allowanceChanges.allowances[0].afterKind===(item.id==='usdc-max-approval'?'uint256_max':'zero');
+  if(['withdraw','borrow','repay'].includes(item.operation)) return report.protocol?.operation===item.operation && report.protocol.reconciliation?.status==='reconciled' && report.balanceChanges?.status==='measured';
+  return report.balanceChanges?.status === 'measured' && (report.outAssets?.some(asset => lower(asset.asset?.address) === USDC &&
+    asset.transferOut?.some(transfer => exact(transfer.rawValue) === '15066115')) ?? false);
 }
 
-/** Bounded opt-in live check: exactly two cases and two fixed public providers. */
+/** Bounded opt-in live check: seven cases and two fixed public providers. */
 export async function runProviderComparison({ block, outputDirectory = DEFAULT_DIRECTORY, writeReport = true,
   rpcFactory = options => new RpcClient(options), simulateImpl = simulate } = {}) {
   if (block !== undefined && (typeof block !== 'string' || !/^0x(?:0|[1-9a-f][0-9a-f]{0,15})$/i.test(block))) {
@@ -172,9 +181,9 @@ export async function runProviderComparison({ block, outputDirectory = DEFAULT_D
   const report = {
     schemaVersion: '1.0', createdAt, kind: 'bounded_same_block_provider_comparison', status: 'incomplete',
     providers: PROVIDERS, selection: null, pinnedBlock: null, cases: [],
-    summary: { matched: 0, mismatched: 0, incomplete: 0, total: 2 },
+    summary: { matched: 0, mismatched: 0, incomplete: 0, total: 7 },
     limitations: [
-      'Two providers and two transaction inputs do not establish general accuracy, availability or security coverage.',
+      'Two providers and seven transaction inputs do not establish general accuracy, availability or security coverage.',
       'These providers may share infrastructure or use the same execution engine. Agreement is not proof of independent implementation correctness.',
       'Provider durations are individual observations, not a performance benchmark, percentile estimate or ranking.',
       'The excessive input is a read-only simulation, not a signed or broadcast transaction. Public wallet state may change the expected outcomes.',
@@ -196,7 +205,7 @@ export async function runProviderComparison({ block, outputDirectory = DEFAULT_D
     report.pinnedBlock = pinnedBlock;
     for (const item of comparisonCases(block)) {
       const runs = [];
-      // Run sequentially to avoid provider bursts and make this four-run bound
+      // Run sequentially to avoid provider bursts and make this fourteen-run bound
       // explicit. No retries, transactions or alternate blocks are hidden here.
       for (const provider of PROVIDERS) {
         const tracked = trackedClient(provider, rpcFactory);
@@ -264,8 +273,20 @@ export async function testComparisonHelpers() {
   assert.equal(compareReports(base, other, block).matches, false);
   other.balanceChanges = { status: 'unavailable', assets: [] };
   assert.equal(compareReports(base, other, block).matches, false);
+  other.balanceChanges = structuredClone(balances);
+  base.positionChanges = [{token:'debt',account:'a',role:'liability',event:'Mint',valueRaw:'10',accruedInterestRaw:'1',indexRaw:'100',deltaRaw:'9'}];
+  other.positionChanges = structuredClone(base.positionChanges);
+  assert.equal(compareReports(base,other,block).matches,true);
+  other.positionChanges[0].deltaRaw='10';
+  assert.equal(compareReports(base,other,block).matches,false);
+  other.positionChanges = structuredClone(base.positionChanges);
+  base.allowanceChanges = {status:'measured',executionIdentity:balances.executionIdentity,allowances:[{asset:{address:'token'},owner:'a',spender:'b',beforeRaw:'10',afterRaw:'0',deltaRaw:'-10',changed:true}]};
+  other.allowanceChanges=structuredClone(base.allowanceChanges);
+  assert.equal(compareReports(base,other,block).matches,true);
+  other.allowanceChanges.allowances[0].afterRaw='1';
+  assert.equal(compareReports(base,other,block).matches,false);
   assert.doesNotMatch(JSON.stringify(safeError(new RpcError('Bearer private-key', 'RPC_ERROR', {token:'private-key'}))), /private-key|Bearer/);
-  return 10;
+  return 14;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

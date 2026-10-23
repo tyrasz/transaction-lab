@@ -83,6 +83,87 @@ function addDefinition(list, label, value) {
   list.append(node('dt', '', label), node('dd', '', display(value)));
 }
 
+function rawDirection(raw) {
+  if (typeof raw !== 'string' || !/^-?[0-9]+$/.test(raw)) return 'unknown';
+  try { const value = BigInt(raw); return value > 0n ? 'positive' : value < 0n ? 'negative' : 'neutral'; }
+  catch { return 'unknown'; }
+}
+
+function exactAmount(value, raw, symbol = '') {
+  if (value !== null && value !== undefined) return `${value}${symbol ? ` ${symbol}` : ''}`;
+  return raw === null || raw === undefined ? 'Not available' : `${raw} raw units`;
+}
+
+function signedAmount(value, raw) {
+  const label = exactAmount(value, raw);
+  return rawDirection(raw) === 'positive' && !label.startsWith('+') ? `+${label}` : label;
+}
+
+function allowanceKindLabel(kind) {
+  return kind === 'uint256_max' ? 'Maximum uint256 (commonly called unlimited)'
+    : kind === 'zero' || kind === 'revoke' ? 'Zero allowance' : kind === 'bounded' ? 'Bounded amount' : 'Not available';
+}
+
+function measuredAllowance(changes, evidence) {
+  if (changes?.status !== 'measured') return null;
+  const token = evidence.asset?.address || evidence.token;
+  const sameAddress = (a, b) => typeof a === 'string' && typeof b === 'string' && /^0x[0-9a-f]{40}$/i.test(a) && a.toLowerCase() === b.toLowerCase();
+  return (changes.allowances || []).find(pair => sameAddress(pair.asset?.address, token) && sameAddress(pair.owner, evidence.owner) && sameAddress(pair.spender, evidence.spender)) || null;
+}
+
+function allowanceChangeLabel(pair) {
+  if (pair.changed === false) return pair.afterKind === 'uint256_max' ? 'Maximum allowance unchanged'
+    : pair.afterKind === 'zero' ? 'Zero allowance unchanged · no-op' : 'Allowance unchanged';
+  if (pair.changed !== true) return 'Allowance change not established';
+  if (pair.afterKind === 'zero') return 'Allowance reduced to zero';
+  if (pair.beforeKind === 'zero') return pair.afterKind === 'uint256_max' ? 'New maximum allowance' : 'New bounded allowance';
+  if (pair.afterKind === 'uint256_max') return 'Allowance increased to maximum';
+  if (pair.beforeKind === 'uint256_max') return 'Maximum allowance replaced with a bounded amount';
+  const direction = rawDirection(pair.deltaRaw);
+  return direction === 'positive' ? 'Allowance increased' : direction === 'negative' ? 'Allowance reduced' : 'Allowance changed';
+}
+
+function renderAllowances(changes, permissions) {
+  const relevant = permissions?.observations?.length || permissions?.findings?.length;
+  $('allowances-section').hidden = !changes || (changes.status === 'not_applicable' && !relevant);
+  $('allowance-pairs').replaceChildren();
+  $('allowance-warnings').replaceChildren();
+  if (!changes) return;
+  const measured = changes.status === 'measured';
+  $('allowances-section').classList.toggle('measured', measured);
+  $('allowances-badge').textContent = measured ? 'Before / after' : titleCase(changes.status);
+  $('allowances-description').textContent = measured
+    ? 'Allowance values read before and after the entire simulated transaction. Measurements apply only to the token, owner, and spender pairs below. Spender trustworthiness is not assessed.'
+    : changes.status === 'not_applicable'
+      ? 'Allowance measurement does not apply to this execution. Requests and emitted events do not establish final allowance state.'
+      : 'Final allowances could not be measured. Missing measurements do not mean zero permission or a successful revocation.';
+  for (const pair of measured && Array.isArray(changes.allowances) ? changes.allowances : []) {
+    const card = node('div', 'permission-observation');
+    const heading = node('div', 'permission-heading');
+    heading.append(node('h4', '', allowanceChangeLabel(pair)), node('span', 'basis-badge', pair.asset?.symbol || 'Configured token'));
+    card.append(heading);
+    const details = node('dl', 'permission-details');
+    addDefinition(details, 'Token', pair.asset?.address);
+    addDefinition(details, 'Owner', pair.owner);
+    addDefinition(details, 'Spender', pair.spender);
+    addDefinition(details, 'Before', exactAmount(pair.before, pair.beforeRaw, pair.asset?.symbol));
+    addDefinition(details, 'Before type', allowanceKindLabel(pair.beforeKind));
+    addDefinition(details, 'After', exactAmount(pair.after, pair.afterRaw, pair.asset?.symbol));
+    addDefinition(details, 'After type', allowanceKindLabel(pair.afterKind));
+    addDefinition(details, 'Change', signedAmount(pair.delta, pair.deltaRaw));
+    addDefinition(details, 'Before / after raw', `${display(pair.beforeRaw)} → ${display(pair.afterRaw)}`);
+    addDefinition(details, 'Event comparison', pair.consistency?.eventComparison ? readableKey(pair.consistency.eventComparison) : null);
+    addDefinition(details, 'Request comparison', pair.consistency?.requestComparison ? readableKey(pair.consistency.requestComparison) : null);
+    card.append(details);
+    if (pair.consistency?.explanation) card.append(node('p', 'measurement-note', pair.consistency.explanation));
+    $('allowance-pairs').append(card);
+  }
+  if (measured && !$('allowance-pairs').children.length) $('allowance-pairs').append(node('p', 'section-help', 'No measured token, owner, and spender pairs were returned.'));
+  const warnings = Array.isArray(changes.warnings) ? changes.warnings : [];
+  $('allowance-limits').hidden = !warnings.length;
+  $('allowance-warnings').replaceChildren(...warnings.map(warning => node('li', '', display(warning))));
+}
+
 function renderAssetList(id, assets, direction) {
   const container = $(id);
   container.replaceChildren();
@@ -112,6 +193,11 @@ function renderAssetList(id, assets, direction) {
 function renderInterest(accruals, protocol) {
   const entries = Array.isArray(accruals) ? accruals : accruals ? [accruals] : [];
   $('interest-section').hidden = !entries.length;
+  const deposit = protocol?.operation === 'supply';
+  $('interest-heading').textContent = deposit ? 'Deposit & interest accounting' : 'Receipt-token interest accounting';
+  $('interest-description').textContent = deposit
+    ? 'Receipt-token mint events include recognized interest and can reflect scaled-token rounding. The deposit and event-implied amounts are shown separately.'
+    : 'Receipt-token Mint events report recognized interest. The operation amount and implied position change are shown separately above.';
   const container = $('interest-details');
   container.replaceChildren();
   $('deposit-details').replaceChildren();
@@ -131,7 +217,7 @@ function renderInterest(accruals, protocol) {
     const definitions = node('dl');
     addDefinition(definitions, 'Mint-implied principal', accrual.mintEventImpliedPrincipal ?? accrual.principal);
     addDefinition(definitions, 'Accrued interest', accrual.balanceIncrease);
-    addDefinition(definitions, 'Receipt tokens minted', accrual.value);
+    addDefinition(definitions, 'Receipt-token Mint event amount', accrual.value);
     addDefinition(definitions, 'Beneficiary', accrual.onBehalfOf);
     addDefinition(definitions, 'Evidence', accrual.basis ? readableKey(accrual.basis) : null);
     if (!definitions.children.length) for (const [key, value] of Object.entries(accrual)) addDefinition(definitions, readableKey(key), value);
@@ -142,7 +228,9 @@ function renderInterest(accruals, protocol) {
 
 function renderBalanceChanges(changes) {
   $('balances-section').hidden = !changes;
-  $('balance-assets').replaceChildren();
+  for (const id of ['balance-assets', 'balance-debts', 'balance-custody']) $(id).replaceChildren();
+  $('balance-debts-group').hidden = true;
+  $('balance-custody-group').hidden = true;
   $('balance-warnings').replaceChildren();
   if (!changes) return;
   const measured = changes.status === 'measured';
@@ -158,21 +246,27 @@ function renderBalanceChanges(changes) {
     if (!assets.length) $('balance-assets').append(node('p', 'section-help', 'The balance probe returned no measured assets.'));
     for (const entry of assets) {
       const asset = entry.asset || {};
-      const card = node('div', 'balance-card');
+      const liability = asset.role === 'liability';
+      const custody = entry.accountRoles?.includes('reserve_custody');
+      const card = node('div', `balance-card${liability ? ' liability-card' : ''}${custody ? ' custody-card' : ''}`);
       const title = node('div', 'asset-name-row');
       title.append(node('span', 'token-icon', (asset.symbol || '?').slice(0, 1)), node('span', 'asset-symbol', asset.symbol || 'Unknown token'));
       card.append(title);
-      let direction = 'neutral';
-      try { const delta = BigInt(entry.deltaRaw); direction = delta > 0n ? 'positive' : delta < 0n ? 'negative' : 'neutral'; } catch { /* Preserve unavailable data below. */ }
-      const exact = entry.delta === null || entry.delta === undefined ? entry.deltaRaw === null || entry.deltaRaw === undefined ? 'Unavailable' : `${entry.deltaRaw} raw units` : `${direction === 'positive' ? '+' : ''}${entry.delta}`;
-      card.append(node('div', `balance-delta ${direction}`, exact));
+      const direction = rawDirection(entry.deltaRaw);
+      card.append(node('div', `balance-delta ${liability ? 'debt-' : custody ? 'custody-' : ''}${direction}`, signedAmount(entry.delta, entry.deltaRaw)));
+      const role = liability ? direction === 'positive' ? 'Debt increase' : direction === 'negative' ? 'Debt reduction' : direction === 'neutral' ? 'Debt unchanged' : 'Debt change unavailable'
+        : asset.role === 'receipt_token' ? 'Supplied position' : custody ? 'Reserve-held assets' : 'Token balance';
+      card.append(node('div', 'balance-role', role));
       const details = node('dl', 'balance-before-after');
       addDefinition(details, 'Before', entry.before ?? (entry.beforeRaw !== undefined ? `${entry.beforeRaw} raw units` : null));
       addDefinition(details, 'After', entry.after ?? (entry.afterRaw !== undefined ? `${entry.afterRaw} raw units` : null));
       card.append(details);
+      if (entry.accountRoles?.length) card.append(node('div', 'balance-account-role', entry.accountRoles.map(readableKey).join(' · ')));
       if (entry.account) card.append(node('div', 'asset-address', `Account ${entry.account}`));
       if (asset.address) card.append(node('div', 'asset-address', `Token ${asset.address}`));
-      $('balance-assets').append(card);
+      const target = custody ? 'balance-custody' : liability ? 'balance-debts' : 'balance-assets';
+      $(target).append(card);
+      if (target !== 'balance-assets') $(`${target}-group`).hidden = false;
     }
   }
   const warnings = Array.isArray(changes.warnings) ? changes.warnings : [];
@@ -180,7 +274,37 @@ function renderBalanceChanges(changes) {
   $('balance-warnings').replaceChildren(...warnings.map((warning) => node('li', '', display(warning))));
 }
 
-function renderPermissions(permissions) {
+function renderPositions(changes, result) {
+  const entries = Array.isArray(changes) ? changes : [];
+  $('positions-section').hidden = !entries.length;
+  $('position-changes').replaceChildren();
+  const knownAssets = [...(result.balanceChanges?.assets || []), ...(result.inAssets || []), ...(result.outAssets || [])].map(entry => entry.asset).filter(Boolean);
+  for (const entry of entries) {
+    const asset = knownAssets.find(item => typeof item.address === 'string' && item.address.toLowerCase() === String(entry.token).toLowerCase());
+    const liability = entry.role === 'liability';
+    const direction = rawDirection(entry.deltaRaw);
+    const role = liability ? 'Debt' : entry.role === 'receipt_token' ? 'Supplied position' : 'Position';
+    const movement = direction === 'positive' ? 'increase' : direction === 'negative' ? 'decrease' : direction === 'neutral' ? 'unchanged' : 'change unavailable';
+    const card = node('div', `permission-observation${liability ? ' liability-card' : ''}`);
+    const heading = node('div', 'permission-heading');
+    heading.append(node('h4', '', `${role} ${movement} · event-implied`), node('span', 'basis-badge', asset?.symbol || titleCase(entry.role)));
+    card.append(heading);
+    const details = node('dl', 'permission-details');
+    addDefinition(details, 'Implied change', `${signedAmount(entry.delta, entry.deltaRaw)}${entry.delta !== null && entry.delta !== undefined && asset?.symbol ? ` ${asset.symbol}` : ''}`);
+    addDefinition(details, 'Change raw units', entry.deltaRaw);
+    addDefinition(details, 'Position role', liability ? 'Liability · non-transferable debt' : titleCase(entry.role));
+    addDefinition(details, 'Account', entry.account);
+    addDefinition(details, 'Token', entry.token);
+    addDefinition(details, 'Event', entry.event);
+    addDefinition(details, 'Event raw amount', entry.valueRaw);
+    addDefinition(details, 'Accrued interest', entry.accruedInterestRaw === null || entry.accruedInterestRaw === undefined ? null : `${entry.accruedInterestRaw} raw units`);
+    addDefinition(details, 'Evidence', entry.basis ? readableKey(entry.basis) : null);
+    card.append(details);
+    $('position-changes').append(card);
+  }
+}
+
+function renderPermissions(permissions, allowanceChanges) {
   const observations = Array.isArray(permissions?.observations) ? permissions.observations : [];
   const findings = Array.isArray(permissions?.findings) ? permissions.findings : [];
   $('permissions-section').hidden = !observations.length && !findings.length;
@@ -188,13 +312,21 @@ function renderPermissions(permissions) {
   $('permission-observations').replaceChildren();
   $('permission-warnings').replaceChildren();
   if (!observations.length && !findings.length) return;
+  const hasMeasuredPairs = allowanceChanges?.status === 'measured' && allowanceChanges.allowances?.length;
+  $('permissions-description').textContent = hasMeasuredPairs
+    ? 'Approval requests and emitted events are shown separately. Final simulated allowances are measured only for the exact pairs identified above. Spender reputation and general transaction security remain not assessed.'
+    : 'Approval requests and emitted events are shown separately. Final allowances are not measured for these observations. Spender reputation and general transaction security remain not assessed.';
   for (const finding of findings) {
     const card = node('div', 'permission-finding');
     const label = finding.code === 'MAX_UINT256_APPROVAL_EVENT' ? 'Maximum allowance reported in an event'
       : finding.code === 'MAX_UINT256_APPROVAL_REQUEST' ? 'Maximum allowance requested'
       : finding.code === 'APPROVAL_EVENT_MISMATCH' ? 'Request and event do not match'
       : 'Approval evidence to review';
-    card.append(node('strong', '', label), node('p', '', finding.message || 'Review the recorded permission evidence.'));
+    const measured = measuredAllowance(allowanceChanges, finding);
+    let message = finding.message || 'Review the recorded permission evidence.';
+    if (measured && finding.code === 'MAX_UINT256_APPROVAL_REQUEST') message = `The call requested the maximum uint256 allowance for spender ${finding.spender}, but no matching Approval event was observed. The final simulated allowance for this token, owner, and spender was measured separately. Spender trustworthiness is not assessed.`;
+    card.append(node('strong', '', label), node('p', '', message));
+    if (measured) card.append(node('p', 'measured-permission-note', `${allowanceChangeLabel(measured)}. Measured after: ${exactAmount(measured.after, measured.afterRaw, measured.asset?.symbol)}.`));
     $('permission-findings').append(card);
   }
   for (const observation of observations) {
@@ -209,6 +341,7 @@ function renderPermissions(permissions) {
     const details = node('dl', 'permission-details');
     addDefinition(details, 'Token / contract', observation.asset?.address || observation.contract);
     if (verified) {
+      const measured = measuredAllowance(allowanceChanges, observation);
       const kind = observation.allowanceKind === 'uint256_max' ? 'Maximum uint256 (commonly called unlimited)'
         : observation.allowanceKind === 'revoke' ? 'Revoke · zero allowance' : 'Bounded amount';
       addDefinition(details, 'Allowance type', kind);
@@ -223,12 +356,15 @@ function renderPermissions(permissions) {
           : observation.eventCorrelation === 'mismatched' ? 'Observed Approval evidence does not match this request'
           : 'No matching Approval event observed';
         addDefinition(details, 'Event correlation', correlation);
-        const returned = observation.returnStatus === 'returned_false' ? 'Returned false · approval success is not established'
-          : observation.returnStatus === 'returned_true' ? 'Returned true · final allowance is not independently verified'
+        const returned = observation.returnStatus === 'returned_false' ? measured ? 'Returned false · use the separate final-state measurement for this pair' : 'Returned false · approval success is not established'
+          : observation.returnStatus === 'returned_true' ? measured ? 'Returned true · final allowance measured separately for this pair' : 'Returned true · final allowance is not independently verified'
           : observation.returnStatus ? readableKey(observation.returnStatus) : null;
         addDefinition(details, 'Call return', returned);
       } else addDefinition(details, 'Request correlation', observation.matchedRequestIds?.length
         ? 'Matches observed approve calldata' : 'No matching approve request identified');
+      addDefinition(details, 'Final allowance', measured
+        ? `${exactAmount(measured.after, measured.afterRaw, measured.asset?.symbol)} · measured after the whole simulated transaction`
+        : 'Not measured for this token, owner, and spender pair');
     } else {
       addDefinition(details, 'Selector / signature', observation.selector || observation.signature);
       card.append(node('p', 'permission-unverified', 'ERC20 ownership, spender, and allowance semantics are not inferred from an unverified contract.'));
@@ -240,6 +376,43 @@ function renderPermissions(permissions) {
   const warnings = [...new Set([...(permissions?.coverage?.reasons || []), ...(permissions?.warnings || [])])];
   $('permission-limits').hidden = !warnings.length;
   $('permission-warnings').replaceChildren(...warnings.map((warning) => node('li', '', display(warning))));
+}
+
+function renderProtocol(protocol, result) {
+  $('protocol-summary').hidden = !protocol;
+  $('protocol-summary').replaceChildren();
+  if (!protocol) return;
+  const label = [protocol.name, protocol.operation ? readableKey(protocol.operation) : null].filter(Boolean).join(' / ');
+  $('protocol-summary').append(node('strong', '', label));
+  const asset = [...(result.balanceChanges?.assets || []), ...(result.outAssets || []), ...(result.inAssets || [])].find(item => typeof protocol.asset === 'string' && item.asset?.address?.toLowerCase() === protocol.asset.toLowerCase())?.asset;
+  const symbol = protocol.symbol || asset?.symbol || (protocol.name === 'HyperCore' ? 'USDC' : '');
+  const lending = ['withdraw', 'borrow', 'repay'].includes(protocol.operation);
+  if (lending || protocol.amountMode || protocol.actualAmountRaw !== undefined) {
+    const details = node('dl', 'protocol-details');
+    const allAmount = protocol.operation === 'repay' ? 'All outstanding debt' : protocol.operation === 'withdraw' ? 'Entire supplied balance' : 'Protocol maximum amount';
+    addDefinition(details, 'Requested amount', protocol.amountMode === 'all' ? `${allAmount} · uint256 maximum sentinel` : exactAmount(protocol.amount, protocol.amountRaw, symbol));
+    addDefinition(details, 'Amount mode', protocol.amountMode ? titleCase(protocol.amountMode) : null);
+    addDefinition(details, 'Executed amount', protocol.actualAmount === null || protocol.actualAmount === undefined
+      ? protocol.actualAmountRaw === null || protocol.actualAmountRaw === undefined ? 'Not established' : exactAmount(null, protocol.actualAmountRaw)
+      : exactAmount(protocol.actualAmount, protocol.actualAmountRaw, symbol));
+    addDefinition(details, 'Requested raw', protocol.amountRaw);
+    addDefinition(details, 'Executed raw', protocol.actualAmountRaw);
+    addDefinition(details, 'Recipient', protocol.recipient);
+    addDefinition(details, 'Position owner', protocol.positionAccount || protocol.onBehalfOf);
+    addDefinition(details, 'Reconciliation', protocol.reconciliation?.status ? titleCase(protocol.reconciliation.status) : null);
+    $('protocol-summary').append(details);
+    if (protocol.actualAmountRaw !== null && protocol.actualAmountRaw !== undefined && protocol.amountRaw !== null && protocol.amountRaw !== undefined) {
+      let differs = false;
+      try { differs = BigInt(protocol.actualAmountRaw) !== BigInt(protocol.amountRaw); } catch { /* Keep raw evidence visible without inferring a comparison. */ }
+      if (differs) $('protocol-summary').append(node('p', 'protocol-amount-note', protocol.amountMode === 'all'
+        ? 'The maximum integer is a protocol instruction. The executed amount is shown separately.'
+        : 'The executed amount differs from the requested amount. Use the executed amount when reviewing the transfer and position evidence.'));
+    }
+  } else {
+    const principal = protocol.amount ?? protocol.principal ?? protocol.depositAmount;
+    if (principal !== undefined && principal !== null) $('protocol-summary').append(document.createTextNode(` · ${display(principal)}${symbol ? ` ${symbol}` : ''}${protocol.operation === 'supply' ? ' principal' : ''}`));
+  }
+  if (protocol.direction) $('protocol-summary').append(node('span', 'protocol-direction', readableKey(protocol.direction)));
 }
 
 function renderResult(result) {
@@ -264,21 +437,13 @@ function renderResult(result) {
   $('contract-revert').hidden = !execution.revert?.message;
   $('contract-revert').textContent = execution.revert?.message ? `Contract-reported reason (untrusted contract output): ${String(execution.revert.message).slice(0, 4096)}` : '';
   const protocol = result.protocol;
-  $('protocol-summary').hidden = !protocol;
-  $('protocol-summary').replaceChildren();
-  if (protocol) {
-    const label = [protocol.name, protocol.operation ? readableKey(protocol.operation) : null].filter(Boolean).join(' / ');
-    $('protocol-summary').append(node('strong', '', label));
-    const principal = protocol.amount || protocol.principal || protocol.depositAmount;
-    const asset = [...(result.outAssets || []), ...(result.inAssets || [])].find((item) => item.asset?.address?.toLowerCase() === protocol.asset?.toLowerCase())?.asset;
-    const symbol = protocol.symbol || asset?.symbol || (protocol.name === 'HyperCore' ? 'USDC' : '');
-    if (principal !== undefined && principal !== null) $('protocol-summary').append(document.createTextNode(` · ${display(principal)}${symbol ? ` ${symbol}` : ''}${protocol.operation === 'supply' ? ' principal' : ''}`));
-    if (protocol.direction) $('protocol-summary').append(document.createTextNode(` · ${readableKey(protocol.direction)}`));
-  }
+  renderProtocol(protocol, result);
   renderAssetList('out-assets', result.outAssets, 'transferOut');
   renderAssetList('in-assets', result.inAssets, 'transferIn');
-  renderPermissions(result.permissions);
+  renderAllowances(result.allowanceChanges, result.permissions);
+  renderPermissions(result.permissions, result.allowanceChanges);
   renderBalanceChanges(result.balanceChanges);
+  renderPositions(result.positionChanges, result);
   renderInterest(result.interestAccruals, protocol);
   const warnings = [...new Set([...(coverage.reasons || []), ...(result.warnings || [])])];
   $('warnings-section').hidden = !warnings.length;

@@ -1,0 +1,704 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-10-23T14:53:20.298317+00:00",
+  "description": "Three real successful Hyperlend USDC lending transactions, independently verified with original receipts and withLog historical traces; same calldata also simulated at one recorded current block. No signing or broadcasting.",
+  "user": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+  "chainId": 999,
+  "rpc": "https://hyperliquid.drpc.org",
+  "currentBlock": {
+    "number": "49318777",
+    "hash": "0x206b1f6b56dced1f90f742384ad84d74973a02d8bee8c07a823f394d1506a5a2",
+    "timestamp": "1792766945"
+  },
+  "metadata": {
+    "underlying": {
+      "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+      "symbol": "USDC",
+      "decimals": 6
+    },
+    "receiptToken": {
+      "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+      "symbol": "hHyperEvmUSDC",
+      "decimals": 6
+    },
+    "variableDebtToken": {
+      "address": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+      "name": "HyperLend HyperEVM Variable Debt USDC",
+      "symbol": "variableDebtHyperEvmUSDC",
+      "decimals": 6,
+      "implementation": "0x8158e5569475a443a5723ccac462930f590449ed",
+      "isSpendableAsset": false
+    },
+    "reserveTokensAddresses": {
+      "hToken": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+      "stableDebtToken": "0x0000000000000000000000000000000000000000",
+      "variableDebtToken": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d"
+    }
+  },
+  "currentPrerequisites": {
+    "USDCBalanceRaw": "569439069",
+    "hUSDCBalanceRaw": "5677678780",
+    "variableDebtBalanceRaw": "2",
+    "USDCAllowanceToPoolRaw": "115792089237316195423570985008687907853269984665640564039457584003408941280750",
+    "accountDataRawFields": [
+      "1796873976718",
+      "1495867",
+      "1132927546453",
+      "7535",
+      "6305",
+      "905222161034744933874468"
+    ],
+    "evidence": "current-prerequisites.json"
+  },
+  "operations": [
+    {
+      "operation": "withdraw",
+      "transactionHash": "0x94b5c4672e28cbeeab547c06f60e30afa02ac58b0cad4c7568a6ca9d8ac29ae7",
+      "explorerUrl": "https://hyperevmscan.io/tx/0x94b5c4672e28cbeeab547c06f60e30afa02ac58b0cad4c7568a6ca9d8ac29ae7",
+      "sender": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+      "pool": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+      "selector": "0x69328dec",
+      "asset": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+      "requestedAmountRaw": "503900226",
+      "usesUint256Max": false,
+      "historical": {
+        "status": "success",
+        "blockNumber": "49308543",
+        "blockHash": "0x30060bc79dcac7326ab5d722c720ee2321debe5d514da09d57680683b8a5f3ea",
+        "timestampUtc": "2026-10-23T12:01:19+00:00",
+        "gasUsed": "415253",
+        "actualUnderlyingAmountRaw": "503900226",
+        "actualUnderlyingAmount": "503.900226",
+        "events": [
+          {
+            "event": "Transfer",
+            "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "topics": [
+              "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x0000000000000000000000000000000000000000000000000000000000000000"
+            ],
+            "dataWords": [
+              "000000000000000000000000000000000000000000000000000000001e08ad86"
+            ],
+            "dataWordsDecimal": [
+              "503885190"
+            ]
+          },
+          {
+            "event": "Burn",
+            "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "topics": [
+              "0x4cf25bc1d991c17529c25213d3cc0cda295eeaad5f13f361969b12ea48015f90",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "dataWords": [
+              "000000000000000000000000000000000000000000000000000000001e08ad86",
+              "0000000000000000000000000000000000000000000000000000000000003abc",
+              "000000000000000000000000000000000000000003713bcd568caa6fecfd2f27"
+            ],
+            "dataWordsDecimal": [
+              "503885190",
+              "15036",
+              "1065346054522059704137232167"
+            ]
+          },
+          {
+            "event": "Transfer",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "topics": [
+              "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "0x000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "dataWords": [
+              "000000000000000000000000000000000000000000000000000000001e08e842"
+            ],
+            "dataWordsDecimal": [
+              "503900226"
+            ]
+          },
+          {
+            "event": "Withdraw",
+            "address": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "topics": [
+              "0x3115d1449a7b732c986cba18244e897a450f61e1bb8d589cd2e69e6c8924f9f7",
+              "0x000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "dataWords": [
+              "000000000000000000000000000000000000000000000000000000001e08e842"
+            ],
+            "dataWordsDecimal": [
+              "503900226"
+            ]
+          }
+        ]
+      },
+      "currentSimulation": {
+        "status": "success",
+        "blockNumber": "49318777",
+        "blockHash": "0x206b1f6b56dced1f90f742384ad84d74973a02d8bee8c07a823f394d1506a5a2",
+        "gasUsed": "415253",
+        "actualUnderlyingAmountRaw": "503900226",
+        "actualUnderlyingAmount": "503.900226",
+        "events": [
+          {
+            "event": "Withdraw",
+            "address": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "topics": [
+              "0x3115d1449a7b732c986cba18244e897a450f61e1bb8d589cd2e69e6c8924f9f7",
+              "0x000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "dataWords": [
+              "000000000000000000000000000000000000000000000000000000001e08e842"
+            ],
+            "dataWordsDecimal": [
+              "503900226"
+            ]
+          },
+          {
+            "event": "Transfer",
+            "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "topics": [
+              "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x0000000000000000000000000000000000000000000000000000000000000000"
+            ],
+            "dataWords": [
+              "000000000000000000000000000000000000000000000000000000001e076ebd"
+            ],
+            "dataWordsDecimal": [
+              "503803581"
+            ]
+          },
+          {
+            "event": "Burn",
+            "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "topics": [
+              "0x4cf25bc1d991c17529c25213d3cc0cda295eeaad5f13f361969b12ea48015f90",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "dataWords": [
+              "000000000000000000000000000000000000000000000000000000001e076ebd",
+              "0000000000000000000000000000000000000000000000000000000000017985",
+              "000000000000000000000000000000000000000003713fa469febec5c9432835"
+            ],
+            "dataWordsDecimal": [
+              "503803581",
+              "96645",
+              "1065364189072688953692465205"
+            ]
+          },
+          {
+            "event": "Transfer",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "topics": [
+              "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "0x000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "dataWords": [
+              "000000000000000000000000000000000000000000000000000000001e08e842"
+            ],
+            "dataWordsDecimal": [
+              "503900226"
+            ]
+          }
+        ]
+      },
+      "evidenceFile": "withdraw-evidence.json",
+      "evidenceSha256": "cf2d3b76967e39b8207392520a66e99e4e2f686fe728614ca8c11dfd9f8a082b",
+      "recipient": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+      "requirements": [
+        "Sender owns enough hUSDC for the requested or max withdrawal.",
+        "Withdrawing collateral must leave the account within the protocol health-factor/LTV constraints.",
+        "Underlying liquidity must be available. Direct Pool withdrawal does not require an ERC20 allowance from the hToken holder."
+      ]
+    },
+    {
+      "operation": "repay",
+      "transactionHash": "0x682c1d2f131715b8d4b04c71cd8e75ef56a107f0bbd992379a44bf426f22102f",
+      "explorerUrl": "https://hyperevmscan.io/tx/0x682c1d2f131715b8d4b04c71cd8e75ef56a107f0bbd992379a44bf426f22102f",
+      "sender": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+      "pool": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+      "selector": "0x573ade81",
+      "asset": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+      "requestedAmountRaw": "199626280",
+      "usesUint256Max": false,
+      "historical": {
+        "status": "success",
+        "blockNumber": "49313549",
+        "blockHash": "0x705f8f3af41d22dc8b9c9ec8d6de95565d41589e8a270ca04bf229c3766186b4",
+        "timestampUtc": "2026-10-23T13:23:23+00:00",
+        "gasUsed": "164961",
+        "actualUnderlyingAmountRaw": "199626280",
+        "actualUnderlyingAmount": "199.626280",
+        "events": [
+          {
+            "event": "Transfer",
+            "address": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+            "topics": [
+              "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x0000000000000000000000000000000000000000000000000000000000000000"
+            ],
+            "dataWords": [
+              "000000000000000000000000000000000000000000000000000000000be60d57"
+            ],
+            "dataWordsDecimal": [
+              "199626071"
+            ]
+          },
+          {
+            "event": "Burn",
+            "address": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+            "topics": [
+              "0x4cf25bc1d991c17529c25213d3cc0cda295eeaad5f13f361969b12ea48015f90",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x0000000000000000000000000000000000000000000000000000000000000000"
+            ],
+            "dataWords": [
+              "000000000000000000000000000000000000000000000000000000000be60d57",
+              "00000000000000000000000000000000000000000000000000000000000000d0",
+              "00000000000000000000000000000000000000000389a8b4ace55195dec8e702"
+            ],
+            "dataWordsDecimal": [
+              "199626071",
+              "208",
+              "1094874557192748419544311554"
+            ]
+          },
+          {
+            "event": "Transfer",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "topics": [
+              "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b"
+            ],
+            "dataWords": [
+              "000000000000000000000000000000000000000000000000000000000be60e28"
+            ],
+            "dataWordsDecimal": [
+              "199626280"
+            ]
+          },
+          {
+            "event": "Repay",
+            "address": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "topics": [
+              "0xa534c8dbe71f871f9f3530e97a74601fea17b426cae02e1c5aee42c96c784051",
+              "0x000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "dataWords": [
+              "000000000000000000000000000000000000000000000000000000000be60e28",
+              "0000000000000000000000000000000000000000000000000000000000000000"
+            ],
+            "dataWordsDecimal": [
+              "199626280",
+              "0"
+            ]
+          }
+        ]
+      },
+      "currentSimulation": {
+        "status": "success",
+        "blockNumber": "49318777",
+        "blockHash": "0x206b1f6b56dced1f90f742384ad84d74973a02d8bee8c07a823f394d1506a5a2",
+        "gasUsed": "168214",
+        "actualUnderlyingAmountRaw": "2",
+        "actualUnderlyingAmount": "0.000002",
+        "events": [
+          {
+            "event": "Repay",
+            "address": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "topics": [
+              "0xa534c8dbe71f871f9f3530e97a74601fea17b426cae02e1c5aee42c96c784051",
+              "0x000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "dataWords": [
+              "0000000000000000000000000000000000000000000000000000000000000002",
+              "0000000000000000000000000000000000000000000000000000000000000000"
+            ],
+            "dataWordsDecimal": [
+              "2",
+              "0"
+            ]
+          },
+          {
+            "event": "Transfer",
+            "address": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+            "topics": [
+              "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x0000000000000000000000000000000000000000000000000000000000000000"
+            ],
+            "dataWords": [
+              "0000000000000000000000000000000000000000000000000000000000000002"
+            ],
+            "dataWordsDecimal": [
+              "2"
+            ]
+          },
+          {
+            "event": "Burn",
+            "address": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+            "topics": [
+              "0x4cf25bc1d991c17529c25213d3cc0cda295eeaad5f13f361969b12ea48015f90",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x0000000000000000000000000000000000000000000000000000000000000000"
+            ],
+            "dataWords": [
+              "0000000000000000000000000000000000000000000000000000000000000002",
+              "0000000000000000000000000000000000000000000000000000000000000000",
+              "00000000000000000000000000000000000000000389ab303118a4a669b7e300"
+            ],
+            "dataWordsDecimal": [
+              "2",
+              "0",
+              "1094886280401284192443818752"
+            ]
+          },
+          {
+            "event": "Transfer",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "topics": [
+              "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b"
+            ],
+            "dataWords": [
+              "0000000000000000000000000000000000000000000000000000000000000002"
+            ],
+            "dataWordsDecimal": [
+              "2"
+            ]
+          }
+        ]
+      },
+      "evidenceFile": "repay-evidence.json",
+      "evidenceSha256": "0b3f401b5ef15e7967e670d868b09770afbe7c294cf2e6f08b0def4e750c5d02",
+      "interestRateMode": 2,
+      "onBehalfOf": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+      "requirements": [
+        "Repayer supplies underlying USDC and approves the Pool for the effective repayment amount.",
+        "onBehalfOf identifies the account whose variable debt is reduced; it need not equal the repayer for an explicit amount.",
+        "Actual repayment is capped at the debt: this captured current-state call requests199626280 raw but only spends2 raw because the debt is2."
+      ]
+    },
+    {
+      "operation": "borrow",
+      "transactionHash": "0x0b8ad0d98c96224bdd9e1ad6623292164278340b123feb45eee9c556ec259afb",
+      "explorerUrl": "https://hyperevmscan.io/tx/0x0b8ad0d98c96224bdd9e1ad6623292164278340b123feb45eee9c556ec259afb",
+      "sender": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+      "pool": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+      "selector": "0xa415bcad",
+      "asset": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+      "requestedAmountRaw": "835474410",
+      "usesUint256Max": false,
+      "historical": {
+        "status": "success",
+        "blockNumber": "49311508",
+        "blockHash": "0xbb99fad30176a34a5b276273743e4f9688dd40478004ccb61b40c23469291e88",
+        "timestampUtc": "2026-10-23T12:49:56+00:00",
+        "gasUsed": "426217",
+        "actualUnderlyingAmountRaw": "835474410",
+        "actualUnderlyingAmount": "835.474410",
+        "events": [
+          {
+            "event": "Transfer",
+            "address": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+            "topics": [
+              "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "dataWords": [
+              "0000000000000000000000000000000000000000000000000000000031cc5ab4"
+            ],
+            "dataWordsDecimal": [
+              "835476148"
+            ]
+          },
+          {
+            "event": "Mint",
+            "address": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+            "topics": [
+              "0x458f5fa412d0f69b08dd84872b0215675cc67bc1d5b6fd93300a1c3878b86196",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "dataWords": [
+              "0000000000000000000000000000000000000000000000000000000031cc5ab4",
+              "00000000000000000000000000000000000000000000000000000000000006ca",
+              "00000000000000000000000000000000000000000389a7b5de976637f4195f24"
+            ],
+            "dataWordsDecimal": [
+              "835476148",
+              "1738",
+              "1094869856853956963696467748"
+            ]
+          },
+          {
+            "event": "Transfer",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "topics": [
+              "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "0x000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "dataWords": [
+              "0000000000000000000000000000000000000000000000000000000031cc53ea"
+            ],
+            "dataWordsDecimal": [
+              "835474410"
+            ]
+          },
+          {
+            "event": "Borrow",
+            "address": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "topics": [
+              "0xb3d084820fb1a9decffb176436bd02558d15fac9b0ddfed8c465bc7359d7dce0",
+              "0x000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x0000000000000000000000000000000000000000000000000000000000000000"
+            ],
+            "dataWords": [
+              "0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0000000000000000000000000000000000000000000000000000000031cc53ea",
+              "0000000000000000000000000000000000000000000000000000000000000002",
+              "000000000000000000000000000000000000000000348da9cd9dd372bc4fe656"
+            ],
+            "dataWordsDecimal": [
+              "879847713644185872972971855217839629572603024592",
+              "835474410",
+              "2",
+              "63533128610024632831960662"
+            ]
+          }
+        ]
+      },
+      "currentSimulation": {
+        "status": "success",
+        "blockNumber": "49318777",
+        "blockHash": "0x206b1f6b56dced1f90f742384ad84d74973a02d8bee8c07a823f394d1506a5a2",
+        "gasUsed": "426217",
+        "actualUnderlyingAmountRaw": "835474410",
+        "actualUnderlyingAmount": "835.474410",
+        "events": [
+          {
+            "event": "Borrow",
+            "address": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "topics": [
+              "0xb3d084820fb1a9decffb176436bd02558d15fac9b0ddfed8c465bc7359d7dce0",
+              "0x000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x0000000000000000000000000000000000000000000000000000000000000000"
+            ],
+            "dataWords": [
+              "0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0000000000000000000000000000000000000000000000000000000031cc53ea",
+              "0000000000000000000000000000000000000000000000000000000000000002",
+              "000000000000000000000000000000000000000000347f721031800f1a961a56"
+            ],
+            "dataWordsDecimal": [
+              "879847713644185872972971855217839629572603024592",
+              "835474410",
+              "2",
+              "63465987258964145740323414"
+            ]
+          },
+          {
+            "event": "Transfer",
+            "address": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+            "topics": [
+              "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "dataWords": [
+              "0000000000000000000000000000000000000000000000000000000031cc53ea"
+            ],
+            "dataWordsDecimal": [
+              "835474410"
+            ]
+          },
+          {
+            "event": "Mint",
+            "address": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+            "topics": [
+              "0x458f5fa412d0f69b08dd84872b0215675cc67bc1d5b6fd93300a1c3878b86196",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "dataWords": [
+              "0000000000000000000000000000000000000000000000000000000031cc53ea",
+              "0000000000000000000000000000000000000000000000000000000000000000",
+              "00000000000000000000000000000000000000000389ab303118a4a669b7e300"
+            ],
+            "dataWordsDecimal": [
+              "835474410",
+              "0",
+              "1094886280401284192443818752"
+            ]
+          },
+          {
+            "event": "Transfer",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "topics": [
+              "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "0x000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "dataWords": [
+              "0000000000000000000000000000000000000000000000000000000031cc53ea"
+            ],
+            "dataWordsDecimal": [
+              "835474410"
+            ]
+          }
+        ]
+      },
+      "evidenceFile": "borrow-evidence.json",
+      "evidenceSha256": "102152aa23209503b4a0ce108cf8c92b5abdb340e3c31ea0343d3999b0b8b0be",
+      "interestRateMode": 2,
+      "onBehalfOf": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+      "referralCode": 0,
+      "requirements": [
+        "onBehalfOf account must have collateral and borrowing capacity; reserve must permit borrowing and have liquidity.",
+        "If caller differs from onBehalfOf, caller needs borrowAllowance credit delegation from that account on the variable debt token.",
+        "Self-borrowing does not require USDC allowance; borrowed USDC is transferred to the caller."
+      ]
+    }
+  ],
+  "sources": {
+    "contracts": "https://docs.hyperlend.finance/developer-documentation/contract-addresses",
+    "poolInterfaceDocs": "https://docs.hyperlend.finance/developer-documentation/core-pools/pool",
+    "verifiedPool": "https://hyperevmscan.io/address/0xbebb62c7ff8b96db4325d9481c44e09a92d49b06#code",
+    "verifiedVariableDebt": "https://hyperevmscan.io/address/0x8158e5569475a443a5723ccac462930f590449ed#code",
+    "githubReference": "https://github.com/hyperlendx/hyperlend-core/tree/v3.6.0",
+    "sourceManifest": "sources/manifest.json"
+  },
+  "limitations": [
+    "Current simulations are independent ephemeral calls against the same block, not a sequence of withdraw then repay then borrow.",
+    "The official indexer ignored the requested limit=5 and returned the complete event/user/reserve-filtered response. Only one query per operation was made; no log-range scan was used.",
+    "One initial ProtocolDataProvider request had a mistyped address and returned an RPC error; it is retained beside the corrected successful request.",
+    "Historical success does not imply future success. Current-state balances, liquidity, allowances, health factor and rates can change.",
+    "Transfer/Mint/Burn events are not automatically portfolio balance deltas. Variable debt token events represent liabilities, not received wealth.",
+    "Borrow/repay/withdraw same-block balance deltas were not separately measured here; the raw execution evidence is ready for adapter development."
+  ],
+  "abi": {
+    "withdraw": {
+      "signature": "withdraw(address,uint256,address)",
+      "selector": "0x69328dec",
+      "arguments": [
+        "asset",
+        "amount",
+        "to"
+      ],
+      "eventSignature": "Withdraw(address,address,address,uint256)",
+      "eventTopic": "0x3115d1449a7b732c986cba18244e897a450f61e1bb8d589cd2e69e6c8924f9f7",
+      "indexed": [
+        "reserve",
+        "user",
+        "to"
+      ],
+      "data": [
+        "amount:uint256"
+      ]
+    },
+    "repay": {
+      "signature": "repay(address,uint256,uint256,address)",
+      "selector": "0x573ade81",
+      "arguments": [
+        "asset",
+        "amount",
+        "interestRateMode",
+        "onBehalfOf"
+      ],
+      "eventSignature": "Repay(address,address,address,uint256,bool)",
+      "eventTopic": "0xa534c8dbe71f871f9f3530e97a74601fea17b426cae02e1c5aee42c96c784051",
+      "indexed": [
+        "reserve",
+        "user",
+        "repayer"
+      ],
+      "data": [
+        "amount:uint256",
+        "useATokens:bool"
+      ]
+    },
+    "borrow": {
+      "signature": "borrow(address,uint256,uint256,uint16,address)",
+      "selector": "0xa415bcad",
+      "arguments": [
+        "asset",
+        "amount",
+        "interestRateMode",
+        "referralCode",
+        "onBehalfOf"
+      ],
+      "eventSignature": "Borrow(address,address,address,uint256,uint8,uint256,uint16)",
+      "eventTopic": "0xb3d084820fb1a9decffb176436bd02558d15fac9b0ddfed8c465bc7359d7dce0",
+      "indexed": [
+        "reserve",
+        "onBehalfOf",
+        "referralCode"
+      ],
+      "data": [
+        "user:address",
+        "amount:uint256",
+        "interestRateMode:uint8",
+        "borrowRate:uint256"
+      ]
+    },
+    "positionMint": {
+      "eventSignature": "Mint(address,address,uint256,uint256,uint256)",
+      "eventTopic": "0x458f5fa412d0f69b08dd84872b0215675cc67bc1d5b6fd93300a1c3878b86196",
+      "indexed": [
+        "caller",
+        "onBehalfOf"
+      ],
+      "data": [
+        "value:uint256",
+        "balanceIncrease:uint256",
+        "index:uint256"
+      ]
+    },
+    "positionBurn": {
+      "eventSignature": "Burn(address,address,uint256,uint256,uint256)",
+      "eventTopic": "0x4cf25bc1d991c17529c25213d3cc0cda295eeaad5f13f361969b12ea48015f90",
+      "indexed": [
+        "from",
+        "target"
+      ],
+      "data": [
+        "value:uint256",
+        "balanceIncrease:uint256",
+        "index:uint256"
+      ]
+    }
+  },
+  "measuredBalanceEvidence": {
+    "path": "reports/lending-discovery/measured-current-balances.json",
+    "sha256": "549b97369980a8c0c24a7db4cfe22eb9e1114927a20860de7a9b7e6398ef459c",
+    "operations": [
+      "withdraw",
+      "borrow",
+      "repay"
+    ],
+    "status": "3 of 3 measured and reconciled",
+    "blockNumber": "49318777",
+    "blockHash": "0x206b1f6b56dced1f90f742384ad84d74973a02d8bee8c07a823f394d1506a5a2"
+  }
+}

@@ -1,12 +1,14 @@
 export const CHAIN_ID = 999;
-export const VERSION = '0.2.0';
+export const VERSION = '0.3.0';
 export const DEFAULT_RPC_URL = 'https://hyperliquid.drpc.org';
 export const POOL = '0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b';
 export const USDC = '0xb88339cb7199b77e23db6e890353e22632ba630f';
 export const HUSDC = '0x744e4f26ee30213989216e1632d9be3547c4885b';
+export const VUSDC = '0xd612513cb3b2c52abcd6d4b338374c09ada4657d';
 export const METADATA = {
   [USDC]: { address: USDC, decimals: 6, symbol: 'USDC', name: 'USDC' },
   [HUSDC]: { address: HUSDC, decimals: 6, symbol: 'hHyperEvmUSDC', name: 'HyperLend HyperEVM USDC' },
+  [VUSDC]: { address: VUSDC, decimals: 6, symbol: 'variableDebtHyperEvmUSDC', name: 'HyperLend HyperEVM Variable Debt USDC', role: 'liability', transferable: false },
 };
 export const EXAMPLES = [
   {
@@ -36,15 +38,18 @@ export const EXAMPLES = [
     description:'Preview an unsigned zero-allowance request. No allowance is changed on-chain.',
     request:{chainId:CHAIN_ID,from:'0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0',to:USDC,value:'0',data:`0x095ea7b3${POOL.slice(2).padStart(64,'0')}${'0'.repeat(64)}`},
   },
+  {"id":"hyperlend-usdc-withdraw","label":"Hyperlend · withdraw USDC","description":"Public historical transaction input; simulation uses the selected block state.","transactionHash":"0x94b5c4672e28cbeeab547c06f60e30afa02ac58b0cad4c7568a6ca9d8ac29ae7","request":{"chainId":999,"from":"0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0","to":"0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b","value":"0","data":"0x69328dec000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f000000000000000000000000000000000000000000000000000000001e08e8420000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"}},
+  {"id":"hyperlend-usdc-borrow","label":"Hyperlend · borrow USDC","description":"Public historical transaction input; simulation uses the selected block state.","transactionHash":"0x0b8ad0d98c96224bdd9e1ad6623292164278340b123feb45eee9c556ec259afb","request":{"chainId":999,"from":"0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0","to":"0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b","value":"0","data":"0xa415bcad000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000031cc53ea000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"}},
+  {"id":"hyperlend-usdc-repay","label":"Hyperlend · repay USDC","description":"Replay the original request or simulate it at current state; actual payment is capped by outstanding debt.","transactionHash":"0x682c1d2f131715b8d4b04c71cd8e75ef56a107f0bbd992379a44bf426f22102f","request":{"chainId":999,"from":"0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0","to":"0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b","value":"0","data":"0x573ade81000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f000000000000000000000000000000000000000000000000000000000be60e2800000000000000000000000000000000000000000000000000000000000000020000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"}},
 ];
 
 export const CAPABILITIES = {
   simulation: true, historicalTrace: true, chainIds: [CHAIN_ID],
   assetBasis: 'Successful ERC-20 Transfer events; not portfolio balance deltas',
-  balanceMeasurement: {supported:true,method:'prestate_diff_balanceOf',scope:'Current-state Hyperlend USDC supply; sender and beneficiary USDC/hUSDC balances only'},
+  balanceMeasurement: {supported:true,method:'prestate_diff_balanceOf',scope:'Current-state Hyperlend USDC supply, withdrawal, variable-rate borrow and repay; involved user USDC, receipt-token and debt balances'},
   securityAssessment: false, transactionBroadcast: false,
-  permissionObservations: {supported:true,scope:'ERC20 approve calls and Approval events for configured USDC/hUSDC',allowanceStateVerified:false},
-  supportedProtocols: ['Hyperlend USDC supply'],
+  permissionObservations: {supported:true,scope:'ERC20 approve calls and Approval events for configured USDC/hUSDC',allowanceStateVerified:true,scopeLimit:'Only verified USDC/hUSDC permission pairs observed in a successful simulation; no historical state measurement'},
+  supportedProtocols: ['Hyperlend USDC supply', 'Hyperlend USDC withdrawal', 'Hyperlend USDC variable-rate borrowing', 'Hyperlend USDC variable-rate repayment'],
   limitations: [
     'Unknown protocols have partial coverage even when token events can be decoded.',
     'HyperCore actions are not executed by the EVM tracing backend.',

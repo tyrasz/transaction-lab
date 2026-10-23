@@ -1,0 +1,2408 @@
+{
+  "capturedAt": "2026-10-23T14:52:57.506Z",
+  "purpose": "Unsigned read-only simulations. No approval was signed, broadcast, or persisted.",
+  "provider": "hyperliquid.drpc.org",
+  "block": {
+    "number": "49319010",
+    "hash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+    "timestamp": "1792767175"
+  },
+  "header": {
+    "hash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+    "parentHash": "0xf0034d0445f65e228ae5ec3ad134865bb9981207621b67b6e34644d99b364e9e",
+    "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+    "miner": "0x0000000000000000000000000000000000000000",
+    "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "transactionsRoot": "0xfea04480528284efcedcd8975e760665a52697b6d61f697bce302821a224f2a1",
+    "receiptsRoot": "0x4fcbd70abb2ecdf19429edc7afe4b597bcb3a884d2a779bfb5f2338f54beb7f5",
+    "logsBloom": "0x0000001000000010000000000400000a00000000002000200802000400400000000000000000000000000400800004000000001040020000000000000004000000100000000000000000000800200000000000000100000000000002000000000000000002000000000000000180084000000000000400008080001000000000000004000000003010000000001000000080048100000100000000200000000000000000100000000000000000000000001008000000000000000000001000010000000200000000000000000000000000000000000100000000000000c020200200000008000020000000000004000000001004000000001000000000000000",
+    "difficulty": "0x0",
+    "number": "0x2f08c62",
+    "gasLimit": "0x2dc6c0",
+    "gasUsed": "0x907ee",
+    "timestamp": "0x6adb74c7",
+    "extraData": "0x",
+    "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "nonce": "0x0000000000000000",
+    "baseFeePerGas": "0x5f5e100",
+    "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+    "blobGasUsed": "0x0",
+    "excessBlobGas": "0x0",
+    "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "size": "0x118c",
+    "uncles": [],
+    "transactions": [
+      "0xde64db17c518a36e6d8039c0e5d761badc94c18005ad04a93159869bd1c38851",
+      "0xf568361f623b121b7784b2f163a40386a1d8a4c3075cd2f08ba6c30aff4c1c69",
+      "0x528ef5f43c2b862071b329c4872cf81246abcde80687e8a63e5b5703ad5f8d73",
+      "0x8b4a1cbb8afc58ed657fc0550a63998658bc3f6587a2f015d968dc790a87547a",
+      "0xe60d3f340aa670b9b0bbe33821cc96c66d873d9dd861014c8ec15797e0a26757",
+      "0x75f7c86bef73ed6cb28d65541ff16c24b7d680bba3b839a477a95b96136110e5",
+      "0x08d9310594c171c7539692b818710574407e675a89f88fc4c51ceb381ca4f116",
+      "0x728022cc1551e13700ed998914b38233e13e75e6a365514f2abc7ba57eaac5fe"
+    ],
+    "withdrawals": []
+  },
+  "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+  "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+  "cases": [
+    {
+      "id": "usdc-max",
+      "request": {
+        "chainId": 999,
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+        "value": "0",
+        "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+      },
+      "traceEvidence": {
+        "request": {
+          "method": "debug_traceCall",
+          "params": [
+            {
+              "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "value": "0x0",
+              "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+              "gas": "0x4c4b40"
+            },
+            {
+              "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+              "requireCanonical": true
+            },
+            {
+              "tracer": "callTracer",
+              "timeout": "15s",
+              "tracerConfig": {
+                "withLog": true
+              }
+            }
+          ]
+        },
+        "response": {
+          "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "gas": "0x4c4b40",
+          "gasUsed": "0x9711",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "input": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "calls": [
+            {
+              "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "gas": "0x4aaa57",
+              "gasUsed": "0x2565",
+              "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+              "input": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+              "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+              "logs": [
+                {
+                  "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "topics": [
+                    "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+                    "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                    "0x00000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b"
+                  ],
+                  "data": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                  "position": "0x0",
+                  "index": "0x0"
+                }
+              ],
+              "value": "0x0",
+              "type": "DELEGATECALL"
+            }
+          ],
+          "value": "0x0",
+          "type": "CALL"
+        }
+      },
+      "permissions": {
+        "scope": {
+          "chainId": 999,
+          "verifiedTokenAddresses": [
+            "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "0x744e4f26ee30213989216e1632d9be3547c4885b"
+          ],
+          "standard": "ERC20",
+          "standardSource": "https://eips.ethereum.org/EIPS/eip-20"
+        },
+        "coverage": {
+          "status": "limited",
+          "reasons": [],
+          "allowanceStateVerified": false
+        },
+        "observations": [
+          {
+            "kind": "approval_request",
+            "asset": {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "type": "ERC20",
+              "decimals": 6,
+              "symbol": "USDC",
+              "name": "USDC"
+            },
+            "tokenVerified": true,
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "amountRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+            "amount": "115792089237316195423570985008687907853269984665640564039457584007913129.639935",
+            "allowanceKind": "uint256_max",
+            "basis": "approve_calldata",
+            "origin": "top_level_request",
+            "framePath": "0",
+            "returnStatus": "returned_true",
+            "matchedEventIds": [
+              "permission-2"
+            ],
+            "eventCorrelation": "matched",
+            "id": "permission-1"
+          },
+          {
+            "kind": "approval_event",
+            "asset": {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "type": "ERC20",
+              "decimals": 6,
+              "symbol": "USDC",
+              "name": "USDC"
+            },
+            "tokenVerified": true,
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "amountRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+            "amount": "115792089237316195423570985008687907853269984665640564039457584007913129.639935",
+            "allowanceKind": "uint256_max",
+            "basis": "approval_event",
+            "matchedRequestIds": [
+              "permission-1"
+            ],
+            "framePath": "0.0",
+            "logIndex": "0",
+            "logOffset": 0,
+            "id": "permission-2"
+          }
+        ],
+        "findings": [
+          {
+            "code": "MAX_UINT256_APPROVAL_EVENT",
+            "severity": "review",
+            "basis": "approval_event",
+            "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "amountRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+            "observationIds": [
+              "permission-2"
+            ],
+            "message": "An Approval event reported the maximum uint256 allowance from 0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0 to spender 0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b for token 0xb88339cb7199b77e23db6e890353e22632ba630f. This is commonly called unlimited approval; the final allowance and spender trustworthiness were not verified."
+          }
+        ],
+        "warnings": [
+          "Approval calldata describes a request; Approval events describe emitted evidence. Neither independently verifies the final on-chain allowance.",
+          "Maximum uint256 approval observations describe spender exposure, not maliciousness. No general security verdict or spender reputation assessment is provided."
+        ]
+      },
+      "result": {
+        "status": "measured",
+        "basis": "prestate_diff_allowance",
+        "allowances": [
+          {
+            "asset": {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "decimals": 6,
+              "symbol": "USDC",
+              "name": "USDC",
+              "type": "ERC20"
+            },
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003408941280750",
+            "afterRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+            "deltaRaw": "4504188359185",
+            "before": "115792089237316195423570985008687907853269984665640564039457584003408941.28075",
+            "after": "115792089237316195423570985008687907853269984665640564039457584007913129.639935",
+            "delta": "4504188.359185",
+            "beforeKind": "bounded",
+            "afterKind": "uint256_max",
+            "changed": true,
+            "observationIds": [
+              "permission-1",
+              "permission-2"
+            ],
+            "consistency": {
+              "eventComparison": "matches_last_observed_event",
+              "lastEventObservationId": "permission-2",
+              "lastEventAmountRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+              "requestComparison": "matches_requested_amount",
+              "falseReturnObservationIds": [],
+              "explanation": "The measured value is the final allowance after the whole transaction. Earlier approvals may be superseded or consumed later; an evidence difference is not a maliciousness verdict."
+            }
+          }
+        ],
+        "warnings": [
+          "Allowances are queried before and after the entire simulated transaction at one pinned block hash. They are not inferred from individual Approval events.",
+          "Maximum allowance describes spending permission, not spender trustworthiness. No transaction security verdict is provided."
+        ],
+        "evidence": {
+          "request": [
+            {
+              "method": "eth_getBlockByHash",
+              "params": [
+                "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                false
+              ]
+            },
+            {
+              "method": "debug_traceCall",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                  "value": "0x0",
+                  "gas": "0x4c4b40"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                },
+                {
+                  "tracer": "prestateTracer",
+                  "timeout": "15s",
+                  "tracerConfig": {
+                    "diffMode": true
+                  }
+                }
+              ]
+            },
+            {
+              "method": "eth_call",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                  "gas": "0x493e0"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                }
+              ]
+            },
+            {
+              "method": "eth_call",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                  "gas": "0x493e0"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                },
+                {
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "nonce": "0x13152"
+                  },
+                  "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+                    "stateDiff": {
+                      "0x4c44f4033f99ade2d97b117146cdbfb9a60d5f0e23e6790d98f1cd4778d9b58b": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "method": "eth_getBlockByNumber",
+              "params": [
+                "0x2f08c62",
+                false
+              ]
+            }
+          ],
+          "response": [
+            {
+              "method": "eth_getBlockByHash",
+              "result": {
+                "hash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                "parentHash": "0xf0034d0445f65e228ae5ec3ad134865bb9981207621b67b6e34644d99b364e9e",
+                "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+                "miner": "0x0000000000000000000000000000000000000000",
+                "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "transactionsRoot": "0xfea04480528284efcedcd8975e760665a52697b6d61f697bce302821a224f2a1",
+                "receiptsRoot": "0x4fcbd70abb2ecdf19429edc7afe4b597bcb3a884d2a779bfb5f2338f54beb7f5",
+                "logsBloom": "0x0000001000000010000000000400000a00000000002000200802000400400000000000000000000000000400800004000000001040020000000000000004000000100000000000000000000800200000000000000100000000000002000000000000000002000000000000000180084000000000000400008080001000000000000004000000003010000000001000000080048100000100000000200000000000000000100000000000000000000000001008000000000000000000001000010000000200000000000000000000000000000000000100000000000000c020200200000008000020000000000004000000001004000000001000000000000000",
+                "difficulty": "0x0",
+                "number": "0x2f08c62",
+                "gasLimit": "0x2dc6c0",
+                "gasUsed": "0x907ee",
+                "timestamp": "0x6adb74c7",
+                "extraData": "0x",
+                "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "nonce": "0x0000000000000000",
+                "baseFeePerGas": "0x5f5e100",
+                "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+                "blobGasUsed": "0x0",
+                "excessBlobGas": "0x0",
+                "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "size": "0x118c",
+                "uncles": [],
+                "transactions": [
+                  "0xde64db17c518a36e6d8039c0e5d761badc94c18005ad04a93159869bd1c38851",
+                  "0xf568361f623b121b7784b2f163a40386a1d8a4c3075cd2f08ba6c30aff4c1c69",
+                  "0x528ef5f43c2b862071b329c4872cf81246abcde80687e8a63e5b5703ad5f8d73",
+                  "0x8b4a1cbb8afc58ed657fc0550a63998658bc3f6587a2f015d968dc790a87547a",
+                  "0xe60d3f340aa670b9b0bbe33821cc96c66d873d9dd861014c8ec15797e0a26757",
+                  "0x75f7c86bef73ed6cb28d65541ff16c24b7d680bba3b839a477a95b96136110e5",
+                  "0x08d9310594c171c7539692b818710574407e675a89f88fc4c51ceb381ca4f116",
+                  "0x728022cc1551e13700ed998914b38233e13e75e6a365514f2abc7ba57eaac5fe"
+                ],
+                "withdrawals": []
+              }
+            },
+            {
+              "method": "debug_traceCall",
+              "result": {
+                "post": {
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "nonce": 78162
+                  },
+                  "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+                    "storage": {
+                      "0x4c44f4033f99ade2d97b117146cdbfb9a60d5f0e23e6790d98f1cd4778d9b58b": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+                    }
+                  }
+                },
+                "pre": {
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "balance": "0x702b7ad07202fb1",
+                    "nonce": 78161
+                  },
+                  "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+                    "balance": "0x0",
+                    "code": "0x60806040526004361061005a5760003560e01c80635c60da1b116100435780635c60da1b146101315780638f2839701461016f578063f851a440146101af5761005a565b80633659cfe6146100645780634f1ef286146100a4575b6100626101c4565b005b34801561007057600080fd5b506100626004803603602081101561008757600080fd5b503573ffffffffffffffffffffffffffffffffffffffff166101de565b610062600480360360408110156100ba57600080fd5b73ffffffffffffffffffffffffffffffffffffffff82351691908101906040810160208201356401000000008111156100f257600080fd5b82018360208201111561010457600080fd5b8035906020019184600183028401116401000000008311171561012657600080fd5b509092509050610232565b34801561013d57600080fd5b50610146610309565b6040805173ffffffffffffffffffffffffffffffffffffffff9092168252519081900360200190f35b34801561017b57600080fd5b506100626004803603602081101561019257600080fd5b503573ffffffffffffffffffffffffffffffffffffffff16610318565b3480156101bb57600080fd5b50610146610420565b6101cc610430565b6101dc6101d76104c4565b6104e9565b565b6101e661050d565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156102275761022281610532565b61022f565b61022f6101c4565b50565b61023a61050d565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156102fc5761027683610532565b60003073ffffffffffffffffffffffffffffffffffffffff16348484604051808383808284376040519201945060009350909150508083038185875af1925050503d80600081146102e3576040519150601f19603f3d011682016040523d82523d6000602084013e6102e8565b606091505b50509050806102f657600080fd5b50610304565b6103046101c4565b505050565b60006103136104c4565b905090565b61032061050d565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156102275773ffffffffffffffffffffffffffffffffffffffff81166103bf576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260368152602001806106606036913960400191505060405180910390fd5b7f7e644d79422f17c01e4894b5f4f588d331ebfa28653d42ae832dc59e38c9798f6103e861050d565b6040805173ffffffffffffffffffffffffffffffffffffffff928316815291841660208301528051918290030190a161022281610587565b600061031361050d565b3b151590565b61043861050d565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156104bc576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252603281526020018061062e6032913960400191505060405180910390fd5b6101dc6101dc565b7f7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c35490565b3660008037600080366000845af43d6000803e808015610508573d6000f35b3d6000fd5b7f10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b5490565b61053b816105ab565b6040805173ffffffffffffffffffffffffffffffffffffffff8316815290517fbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b9181900360200190a150565b7f10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b55565b6105b48161042a565b610609576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252603b815260200180610696603b913960400191505060405180910390fd5b7f7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c35556fe43616e6e6f742063616c6c2066616c6c6261636b2066756e6374696f6e2066726f6d207468652070726f78792061646d696e43616e6e6f74206368616e6765207468652061646d696e206f6620612070726f787920746f20746865207a65726f206164647265737343616e6e6f742073657420612070726f787920696d706c656d656e746174696f6e20746f2061206e6f6e2d636f6e74726163742061646472657373a26469706673582212206912698afeb8292e0377ff7ebcb7d711a6825aecdf904df29338deebe26b282864736f6c634300060c0033",
+                    "nonce": 1,
+                    "storage": {
+                      "0x4c44f4033f99ade2d97b117146cdbfb9a60d5f0e23e6790d98f1cd4778d9b58b": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffbe74973edee"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "method": "eth_call",
+              "result": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffbe74973edee"
+            },
+            {
+              "method": "eth_call",
+              "result": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+            },
+            {
+              "method": "eth_getBlockByNumber",
+              "result": {
+                "hash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                "parentHash": "0xf0034d0445f65e228ae5ec3ad134865bb9981207621b67b6e34644d99b364e9e",
+                "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+                "miner": "0x0000000000000000000000000000000000000000",
+                "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "transactionsRoot": "0xfea04480528284efcedcd8975e760665a52697b6d61f697bce302821a224f2a1",
+                "receiptsRoot": "0x4fcbd70abb2ecdf19429edc7afe4b597bcb3a884d2a779bfb5f2338f54beb7f5",
+                "logsBloom": "0x0000001000000010000000000400000a00000000002000200802000400400000000000000000000000000400800004000000001040020000000000000004000000100000000000000000000800200000000000000100000000000002000000000000000002000000000000000180084000000000000400008080001000000000000004000000003010000000001000000080048100000100000000200000000000000000100000000000000000000000001008000000000000000000001000010000000200000000000000000000000000000000000100000000000000c020200200000008000020000000000004000000001004000000001000000000000000",
+                "difficulty": "0x0",
+                "number": "0x2f08c62",
+                "gasLimit": "0x2dc6c0",
+                "gasUsed": "0x907ee",
+                "timestamp": "0x6adb74c7",
+                "extraData": "0x",
+                "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "nonce": "0x0000000000000000",
+                "baseFeePerGas": "0x5f5e100",
+                "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+                "blobGasUsed": "0x0",
+                "excessBlobGas": "0x0",
+                "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "size": "0x118c",
+                "uncles": [],
+                "transactions": [
+                  "0xde64db17c518a36e6d8039c0e5d761badc94c18005ad04a93159869bd1c38851",
+                  "0xf568361f623b121b7784b2f163a40386a1d8a4c3075cd2f08ba6c30aff4c1c69",
+                  "0x528ef5f43c2b862071b329c4872cf81246abcde80687e8a63e5b5703ad5f8d73",
+                  "0x8b4a1cbb8afc58ed657fc0550a63998658bc3f6587a2f015d968dc790a87547a",
+                  "0xe60d3f340aa670b9b0bbe33821cc96c66d873d9dd861014c8ec15797e0a26757",
+                  "0x75f7c86bef73ed6cb28d65541ff16c24b7d680bba3b839a477a95b96136110e5",
+                  "0x08d9310594c171c7539692b818710574407e675a89f88fc4c51ceb381ca4f116",
+                  "0x728022cc1551e13700ed998914b38233e13e75e6a365514f2abc7ba57eaac5fe"
+                ],
+                "withdrawals": []
+              }
+            }
+          ]
+        },
+        "limits": {
+          "maxPairs": 8,
+          "maxPermissionObservations": 256
+        },
+        "executionIdentity": {
+          "stateBlockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+          "blockNumber": "49319010",
+          "timestamp": "1792767175",
+          "stateBinding": "block_hash",
+          "headerContext": "unchanged",
+          "method": "debug_traceCall/prestateTracer + eth_call/stateDiff"
+        }
+      }
+    },
+    {
+      "id": "usdc-revoke",
+      "request": {
+        "chainId": 999,
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+        "value": "0",
+        "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "traceEvidence": {
+        "request": {
+          "method": "debug_traceCall",
+          "params": [
+            {
+              "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "value": "0x0",
+              "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000000000000",
+              "gas": "0x4c4b40"
+            },
+            {
+              "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+              "requireCanonical": true
+            },
+            {
+              "tracer": "callTracer",
+              "timeout": "15s",
+              "tracerConfig": {
+                "withLog": true
+              }
+            }
+          ]
+        },
+        "response": {
+          "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "gas": "0x4c4b40",
+          "gasUsed": "0x82d1",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "input": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000000000000",
+          "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "calls": [
+            {
+              "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "gas": "0x4aabd1",
+              "gasUsed": "0x2565",
+              "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+              "input": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000000000000",
+              "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+              "logs": [
+                {
+                  "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "topics": [
+                    "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+                    "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                    "0x00000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b"
+                  ],
+                  "data": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  "position": "0x0",
+                  "index": "0x0"
+                }
+              ],
+              "value": "0x0",
+              "type": "DELEGATECALL"
+            }
+          ],
+          "value": "0x0",
+          "type": "CALL"
+        }
+      },
+      "permissions": {
+        "scope": {
+          "chainId": 999,
+          "verifiedTokenAddresses": [
+            "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "0x744e4f26ee30213989216e1632d9be3547c4885b"
+          ],
+          "standard": "ERC20",
+          "standardSource": "https://eips.ethereum.org/EIPS/eip-20"
+        },
+        "coverage": {
+          "status": "limited",
+          "reasons": [],
+          "allowanceStateVerified": false
+        },
+        "observations": [
+          {
+            "kind": "approval_request",
+            "asset": {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "type": "ERC20",
+              "decimals": 6,
+              "symbol": "USDC",
+              "name": "USDC"
+            },
+            "tokenVerified": true,
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "amountRaw": "0",
+            "amount": "0",
+            "allowanceKind": "revoke",
+            "basis": "approve_calldata",
+            "origin": "top_level_request",
+            "framePath": "0",
+            "returnStatus": "returned_true",
+            "matchedEventIds": [
+              "permission-2"
+            ],
+            "eventCorrelation": "matched",
+            "id": "permission-1"
+          },
+          {
+            "kind": "approval_event",
+            "asset": {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "type": "ERC20",
+              "decimals": 6,
+              "symbol": "USDC",
+              "name": "USDC"
+            },
+            "tokenVerified": true,
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "amountRaw": "0",
+            "amount": "0",
+            "allowanceKind": "revoke",
+            "basis": "approval_event",
+            "matchedRequestIds": [
+              "permission-1"
+            ],
+            "framePath": "0.0",
+            "logIndex": "0",
+            "logOffset": 0,
+            "id": "permission-2"
+          }
+        ],
+        "findings": [],
+        "warnings": [
+          "Approval calldata describes a request; Approval events describe emitted evidence. Neither independently verifies the final on-chain allowance.",
+          "Maximum uint256 approval observations describe spender exposure, not maliciousness. No general security verdict or spender reputation assessment is provided."
+        ]
+      },
+      "result": {
+        "status": "measured",
+        "basis": "prestate_diff_allowance",
+        "allowances": [
+          {
+            "asset": {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "decimals": 6,
+              "symbol": "USDC",
+              "name": "USDC",
+              "type": "ERC20"
+            },
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003408941280750",
+            "afterRaw": "0",
+            "deltaRaw": "-115792089237316195423570985008687907853269984665640564039457584003408941280750",
+            "before": "115792089237316195423570985008687907853269984665640564039457584003408941.28075",
+            "after": "0",
+            "delta": "-115792089237316195423570985008687907853269984665640564039457584003408941.28075",
+            "beforeKind": "bounded",
+            "afterKind": "zero",
+            "changed": true,
+            "observationIds": [
+              "permission-1",
+              "permission-2"
+            ],
+            "consistency": {
+              "eventComparison": "matches_last_observed_event",
+              "lastEventObservationId": "permission-2",
+              "lastEventAmountRaw": "0",
+              "requestComparison": "matches_requested_amount",
+              "falseReturnObservationIds": [],
+              "explanation": "The measured value is the final allowance after the whole transaction. Earlier approvals may be superseded or consumed later; an evidence difference is not a maliciousness verdict."
+            }
+          }
+        ],
+        "warnings": [
+          "Allowances are queried before and after the entire simulated transaction at one pinned block hash. They are not inferred from individual Approval events.",
+          "Maximum allowance describes spending permission, not spender trustworthiness. No transaction security verdict is provided."
+        ],
+        "evidence": {
+          "request": [
+            {
+              "method": "eth_getBlockByHash",
+              "params": [
+                "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                false
+              ]
+            },
+            {
+              "method": "debug_traceCall",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000000000000",
+                  "value": "0x0",
+                  "gas": "0x4c4b40"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                },
+                {
+                  "tracer": "prestateTracer",
+                  "timeout": "15s",
+                  "tracerConfig": {
+                    "diffMode": true
+                  }
+                }
+              ]
+            },
+            {
+              "method": "eth_call",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                  "gas": "0x493e0"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                }
+              ]
+            },
+            {
+              "method": "eth_call",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                  "gas": "0x493e0"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                },
+                {
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "nonce": "0x13152"
+                  },
+                  "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+                    "stateDiff": {
+                      "0x4c44f4033f99ade2d97b117146cdbfb9a60d5f0e23e6790d98f1cd4778d9b58b": "0x0000000000000000000000000000000000000000000000000000000000000000"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "method": "eth_getBlockByNumber",
+              "params": [
+                "0x2f08c62",
+                false
+              ]
+            }
+          ],
+          "response": [
+            {
+              "method": "eth_getBlockByHash",
+              "result": {
+                "hash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                "parentHash": "0xf0034d0445f65e228ae5ec3ad134865bb9981207621b67b6e34644d99b364e9e",
+                "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+                "miner": "0x0000000000000000000000000000000000000000",
+                "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "transactionsRoot": "0xfea04480528284efcedcd8975e760665a52697b6d61f697bce302821a224f2a1",
+                "receiptsRoot": "0x4fcbd70abb2ecdf19429edc7afe4b597bcb3a884d2a779bfb5f2338f54beb7f5",
+                "logsBloom": "0x0000001000000010000000000400000a00000000002000200802000400400000000000000000000000000400800004000000001040020000000000000004000000100000000000000000000800200000000000000100000000000002000000000000000002000000000000000180084000000000000400008080001000000000000004000000003010000000001000000080048100000100000000200000000000000000100000000000000000000000001008000000000000000000001000010000000200000000000000000000000000000000000100000000000000c020200200000008000020000000000004000000001004000000001000000000000000",
+                "difficulty": "0x0",
+                "number": "0x2f08c62",
+                "gasLimit": "0x2dc6c0",
+                "gasUsed": "0x907ee",
+                "timestamp": "0x6adb74c7",
+                "extraData": "0x",
+                "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "nonce": "0x0000000000000000",
+                "baseFeePerGas": "0x5f5e100",
+                "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+                "blobGasUsed": "0x0",
+                "excessBlobGas": "0x0",
+                "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "size": "0x118c",
+                "uncles": [],
+                "transactions": [
+                  "0x528ef5f43c2b862071b329c4872cf81246abcde80687e8a63e5b5703ad5f8d73",
+                  "0x8b4a1cbb8afc58ed657fc0550a63998658bc3f6587a2f015d968dc790a87547a",
+                  "0xe60d3f340aa670b9b0bbe33821cc96c66d873d9dd861014c8ec15797e0a26757",
+                  "0x75f7c86bef73ed6cb28d65541ff16c24b7d680bba3b839a477a95b96136110e5",
+                  "0x08d9310594c171c7539692b818710574407e675a89f88fc4c51ceb381ca4f116",
+                  "0x728022cc1551e13700ed998914b38233e13e75e6a365514f2abc7ba57eaac5fe"
+                ],
+                "withdrawals": []
+              }
+            },
+            {
+              "method": "debug_traceCall",
+              "result": {
+                "post": {
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "nonce": 78162
+                  },
+                  "0xb88339cb7199b77e23db6e890353e22632ba630f": {}
+                },
+                "pre": {
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "balance": "0x702b7ad07202fb1",
+                    "nonce": 78161
+                  },
+                  "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+                    "balance": "0x0",
+                    "code": "0x60806040526004361061005a5760003560e01c80635c60da1b116100435780635c60da1b146101315780638f2839701461016f578063f851a440146101af5761005a565b80633659cfe6146100645780634f1ef286146100a4575b6100626101c4565b005b34801561007057600080fd5b506100626004803603602081101561008757600080fd5b503573ffffffffffffffffffffffffffffffffffffffff166101de565b610062600480360360408110156100ba57600080fd5b73ffffffffffffffffffffffffffffffffffffffff82351691908101906040810160208201356401000000008111156100f257600080fd5b82018360208201111561010457600080fd5b8035906020019184600183028401116401000000008311171561012657600080fd5b509092509050610232565b34801561013d57600080fd5b50610146610309565b6040805173ffffffffffffffffffffffffffffffffffffffff9092168252519081900360200190f35b34801561017b57600080fd5b506100626004803603602081101561019257600080fd5b503573ffffffffffffffffffffffffffffffffffffffff16610318565b3480156101bb57600080fd5b50610146610420565b6101cc610430565b6101dc6101d76104c4565b6104e9565b565b6101e661050d565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156102275761022281610532565b61022f565b61022f6101c4565b50565b61023a61050d565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156102fc5761027683610532565b60003073ffffffffffffffffffffffffffffffffffffffff16348484604051808383808284376040519201945060009350909150508083038185875af1925050503d80600081146102e3576040519150601f19603f3d011682016040523d82523d6000602084013e6102e8565b606091505b50509050806102f657600080fd5b50610304565b6103046101c4565b505050565b60006103136104c4565b905090565b61032061050d565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156102275773ffffffffffffffffffffffffffffffffffffffff81166103bf576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260368152602001806106606036913960400191505060405180910390fd5b7f7e644d79422f17c01e4894b5f4f588d331ebfa28653d42ae832dc59e38c9798f6103e861050d565b6040805173ffffffffffffffffffffffffffffffffffffffff928316815291841660208301528051918290030190a161022281610587565b600061031361050d565b3b151590565b61043861050d565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156104bc576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252603281526020018061062e6032913960400191505060405180910390fd5b6101dc6101dc565b7f7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c35490565b3660008037600080366000845af43d6000803e808015610508573d6000f35b3d6000fd5b7f10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b5490565b61053b816105ab565b6040805173ffffffffffffffffffffffffffffffffffffffff8316815290517fbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b9181900360200190a150565b7f10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b55565b6105b48161042a565b610609576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252603b815260200180610696603b913960400191505060405180910390fd5b7f7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c35556fe43616e6e6f742063616c6c2066616c6c6261636b2066756e6374696f6e2066726f6d207468652070726f78792061646d696e43616e6e6f74206368616e6765207468652061646d696e206f6620612070726f787920746f20746865207a65726f206164647265737343616e6e6f742073657420612070726f787920696d706c656d656e746174696f6e20746f2061206e6f6e2d636f6e74726163742061646472657373a26469706673582212206912698afeb8292e0377ff7ebcb7d711a6825aecdf904df29338deebe26b282864736f6c634300060c0033",
+                    "nonce": 1,
+                    "storage": {
+                      "0x4c44f4033f99ade2d97b117146cdbfb9a60d5f0e23e6790d98f1cd4778d9b58b": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffbe74973edee"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "method": "eth_call",
+              "result": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffbe74973edee"
+            },
+            {
+              "method": "eth_call",
+              "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            {
+              "method": "eth_getBlockByNumber",
+              "result": {
+                "hash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                "parentHash": "0xf0034d0445f65e228ae5ec3ad134865bb9981207621b67b6e34644d99b364e9e",
+                "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+                "miner": "0x0000000000000000000000000000000000000000",
+                "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "transactionsRoot": "0xfea04480528284efcedcd8975e760665a52697b6d61f697bce302821a224f2a1",
+                "receiptsRoot": "0x4fcbd70abb2ecdf19429edc7afe4b597bcb3a884d2a779bfb5f2338f54beb7f5",
+                "logsBloom": "0x0000001000000010000000000400000a00000000002000200802000400400000000000000000000000000400800004000000001040020000000000000004000000100000000000000000000800200000000000000100000000000002000000000000000002000000000000000180084000000000000400008080001000000000000004000000003010000000001000000080048100000100000000200000000000000000100000000000000000000000001008000000000000000000001000010000000200000000000000000000000000000000000100000000000000c020200200000008000020000000000004000000001004000000001000000000000000",
+                "difficulty": "0x0",
+                "number": "0x2f08c62",
+                "gasLimit": "0x2dc6c0",
+                "gasUsed": "0x907ee",
+                "timestamp": "0x6adb74c7",
+                "extraData": "0x",
+                "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "nonce": "0x0000000000000000",
+                "baseFeePerGas": "0x5f5e100",
+                "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+                "blobGasUsed": "0x0",
+                "excessBlobGas": "0x0",
+                "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "size": "0x118c",
+                "uncles": [],
+                "transactions": [
+                  "0xde64db17c518a36e6d8039c0e5d761badc94c18005ad04a93159869bd1c38851",
+                  "0xf568361f623b121b7784b2f163a40386a1d8a4c3075cd2f08ba6c30aff4c1c69",
+                  "0x528ef5f43c2b862071b329c4872cf81246abcde80687e8a63e5b5703ad5f8d73",
+                  "0x8b4a1cbb8afc58ed657fc0550a63998658bc3f6587a2f015d968dc790a87547a",
+                  "0xe60d3f340aa670b9b0bbe33821cc96c66d873d9dd861014c8ec15797e0a26757",
+                  "0x75f7c86bef73ed6cb28d65541ff16c24b7d680bba3b839a477a95b96136110e5",
+                  "0x08d9310594c171c7539692b818710574407e675a89f88fc4c51ceb381ca4f116",
+                  "0x728022cc1551e13700ed998914b38233e13e75e6a365514f2abc7ba57eaac5fe"
+                ],
+                "withdrawals": []
+              }
+            }
+          ]
+        },
+        "limits": {
+          "maxPairs": 8,
+          "maxPermissionObservations": 256
+        },
+        "executionIdentity": {
+          "stateBlockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+          "blockNumber": "49319010",
+          "timestamp": "1792767175",
+          "stateBinding": "block_hash",
+          "headerContext": "unchanged",
+          "method": "debug_traceCall/prestateTracer + eth_call/stateDiff"
+        }
+      }
+    },
+    {
+      "id": "usdc-bounded",
+      "request": {
+        "chainId": 999,
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+        "value": "0",
+        "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000005f5e100"
+      },
+      "traceEvidence": {
+        "request": {
+          "method": "debug_traceCall",
+          "params": [
+            {
+              "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "value": "0x0",
+              "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000005f5e100",
+              "gas": "0x4c4b40"
+            },
+            {
+              "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+              "requireCanonical": true
+            },
+            {
+              "tracer": "callTracer",
+              "timeout": "15s",
+              "tracerConfig": {
+                "withLog": true
+              }
+            }
+          ]
+        },
+        "response": {
+          "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "gas": "0x4c4b40",
+          "gasUsed": "0x95b5",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "input": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000005f5e100",
+          "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "calls": [
+            {
+              "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "gas": "0x4aabad",
+              "gasUsed": "0x2565",
+              "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+              "input": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000005f5e100",
+              "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+              "logs": [
+                {
+                  "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "topics": [
+                    "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+                    "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                    "0x00000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b"
+                  ],
+                  "data": "0x0000000000000000000000000000000000000000000000000000000005f5e100",
+                  "position": "0x0",
+                  "index": "0x0"
+                }
+              ],
+              "value": "0x0",
+              "type": "DELEGATECALL"
+            }
+          ],
+          "value": "0x0",
+          "type": "CALL"
+        }
+      },
+      "permissions": {
+        "scope": {
+          "chainId": 999,
+          "verifiedTokenAddresses": [
+            "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "0x744e4f26ee30213989216e1632d9be3547c4885b"
+          ],
+          "standard": "ERC20",
+          "standardSource": "https://eips.ethereum.org/EIPS/eip-20"
+        },
+        "coverage": {
+          "status": "limited",
+          "reasons": [],
+          "allowanceStateVerified": false
+        },
+        "observations": [
+          {
+            "kind": "approval_request",
+            "asset": {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "type": "ERC20",
+              "decimals": 6,
+              "symbol": "USDC",
+              "name": "USDC"
+            },
+            "tokenVerified": true,
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "amountRaw": "100000000",
+            "amount": "100",
+            "allowanceKind": "bounded",
+            "basis": "approve_calldata",
+            "origin": "top_level_request",
+            "framePath": "0",
+            "returnStatus": "returned_true",
+            "matchedEventIds": [
+              "permission-2"
+            ],
+            "eventCorrelation": "matched",
+            "id": "permission-1"
+          },
+          {
+            "kind": "approval_event",
+            "asset": {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "type": "ERC20",
+              "decimals": 6,
+              "symbol": "USDC",
+              "name": "USDC"
+            },
+            "tokenVerified": true,
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "amountRaw": "100000000",
+            "amount": "100",
+            "allowanceKind": "bounded",
+            "basis": "approval_event",
+            "matchedRequestIds": [
+              "permission-1"
+            ],
+            "framePath": "0.0",
+            "logIndex": "0",
+            "logOffset": 0,
+            "id": "permission-2"
+          }
+        ],
+        "findings": [],
+        "warnings": [
+          "Approval calldata describes a request; Approval events describe emitted evidence. Neither independently verifies the final on-chain allowance.",
+          "Maximum uint256 approval observations describe spender exposure, not maliciousness. No general security verdict or spender reputation assessment is provided."
+        ]
+      },
+      "result": {
+        "status": "measured",
+        "basis": "prestate_diff_allowance",
+        "allowances": [
+          {
+            "asset": {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "decimals": 6,
+              "symbol": "USDC",
+              "name": "USDC",
+              "type": "ERC20"
+            },
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003408941280750",
+            "afterRaw": "100000000",
+            "deltaRaw": "-115792089237316195423570985008687907853269984665640564039457584003408841280750",
+            "before": "115792089237316195423570985008687907853269984665640564039457584003408941.28075",
+            "after": "100",
+            "delta": "-115792089237316195423570985008687907853269984665640564039457584003408841.28075",
+            "beforeKind": "bounded",
+            "afterKind": "bounded",
+            "changed": true,
+            "observationIds": [
+              "permission-1",
+              "permission-2"
+            ],
+            "consistency": {
+              "eventComparison": "matches_last_observed_event",
+              "lastEventObservationId": "permission-2",
+              "lastEventAmountRaw": "100000000",
+              "requestComparison": "matches_requested_amount",
+              "falseReturnObservationIds": [],
+              "explanation": "The measured value is the final allowance after the whole transaction. Earlier approvals may be superseded or consumed later; an evidence difference is not a maliciousness verdict."
+            }
+          }
+        ],
+        "warnings": [
+          "Allowances are queried before and after the entire simulated transaction at one pinned block hash. They are not inferred from individual Approval events.",
+          "Maximum allowance describes spending permission, not spender trustworthiness. No transaction security verdict is provided."
+        ],
+        "evidence": {
+          "request": [
+            {
+              "method": "eth_getBlockByHash",
+              "params": [
+                "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                false
+              ]
+            },
+            {
+              "method": "debug_traceCall",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000005f5e100",
+                  "value": "0x0",
+                  "gas": "0x4c4b40"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                },
+                {
+                  "tracer": "prestateTracer",
+                  "timeout": "15s",
+                  "tracerConfig": {
+                    "diffMode": true
+                  }
+                }
+              ]
+            },
+            {
+              "method": "eth_call",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                  "gas": "0x493e0"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                }
+              ]
+            },
+            {
+              "method": "eth_call",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                  "gas": "0x493e0"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                },
+                {
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "nonce": "0x13152"
+                  },
+                  "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+                    "stateDiff": {
+                      "0x4c44f4033f99ade2d97b117146cdbfb9a60d5f0e23e6790d98f1cd4778d9b58b": "0x0000000000000000000000000000000000000000000000000000000005f5e100"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "method": "eth_getBlockByNumber",
+              "params": [
+                "0x2f08c62",
+                false
+              ]
+            }
+          ],
+          "response": [
+            {
+              "method": "eth_getBlockByHash",
+              "result": {
+                "hash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                "parentHash": "0xf0034d0445f65e228ae5ec3ad134865bb9981207621b67b6e34644d99b364e9e",
+                "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+                "miner": "0x0000000000000000000000000000000000000000",
+                "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "transactionsRoot": "0xfea04480528284efcedcd8975e760665a52697b6d61f697bce302821a224f2a1",
+                "receiptsRoot": "0x4fcbd70abb2ecdf19429edc7afe4b597bcb3a884d2a779bfb5f2338f54beb7f5",
+                "logsBloom": "0x0000001000000010000000000400000a00000000002000200802000400400000000000000000000000000400800004000000001040020000000000000004000000100000000000000000000800200000000000000100000000000002000000000000000002000000000000000180084000000000000400008080001000000000000004000000003010000000001000000080048100000100000000200000000000000000100000000000000000000000001008000000000000000000001000010000000200000000000000000000000000000000000100000000000000c020200200000008000020000000000004000000001004000000001000000000000000",
+                "difficulty": "0x0",
+                "number": "0x2f08c62",
+                "gasLimit": "0x2dc6c0",
+                "gasUsed": "0x907ee",
+                "timestamp": "0x6adb74c7",
+                "extraData": "0x",
+                "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "nonce": "0x0000000000000000",
+                "baseFeePerGas": "0x5f5e100",
+                "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+                "blobGasUsed": "0x0",
+                "excessBlobGas": "0x0",
+                "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "size": "0x118c",
+                "uncles": [],
+                "transactions": [
+                  "0xde64db17c518a36e6d8039c0e5d761badc94c18005ad04a93159869bd1c38851",
+                  "0xf568361f623b121b7784b2f163a40386a1d8a4c3075cd2f08ba6c30aff4c1c69",
+                  "0x528ef5f43c2b862071b329c4872cf81246abcde80687e8a63e5b5703ad5f8d73",
+                  "0x8b4a1cbb8afc58ed657fc0550a63998658bc3f6587a2f015d968dc790a87547a",
+                  "0xe60d3f340aa670b9b0bbe33821cc96c66d873d9dd861014c8ec15797e0a26757",
+                  "0x75f7c86bef73ed6cb28d65541ff16c24b7d680bba3b839a477a95b96136110e5",
+                  "0x08d9310594c171c7539692b818710574407e675a89f88fc4c51ceb381ca4f116",
+                  "0x728022cc1551e13700ed998914b38233e13e75e6a365514f2abc7ba57eaac5fe"
+                ],
+                "withdrawals": []
+              }
+            },
+            {
+              "method": "debug_traceCall",
+              "result": {
+                "post": {
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "nonce": 78162
+                  },
+                  "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+                    "storage": {
+                      "0x4c44f4033f99ade2d97b117146cdbfb9a60d5f0e23e6790d98f1cd4778d9b58b": "0x0000000000000000000000000000000000000000000000000000000005f5e100"
+                    }
+                  }
+                },
+                "pre": {
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "balance": "0x702b7ad07202fb1",
+                    "nonce": 78161
+                  },
+                  "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+                    "balance": "0x0",
+                    "code": "0x60806040526004361061005a5760003560e01c80635c60da1b116100435780635c60da1b146101315780638f2839701461016f578063f851a440146101af5761005a565b80633659cfe6146100645780634f1ef286146100a4575b6100626101c4565b005b34801561007057600080fd5b506100626004803603602081101561008757600080fd5b503573ffffffffffffffffffffffffffffffffffffffff166101de565b610062600480360360408110156100ba57600080fd5b73ffffffffffffffffffffffffffffffffffffffff82351691908101906040810160208201356401000000008111156100f257600080fd5b82018360208201111561010457600080fd5b8035906020019184600183028401116401000000008311171561012657600080fd5b509092509050610232565b34801561013d57600080fd5b50610146610309565b6040805173ffffffffffffffffffffffffffffffffffffffff9092168252519081900360200190f35b34801561017b57600080fd5b506100626004803603602081101561019257600080fd5b503573ffffffffffffffffffffffffffffffffffffffff16610318565b3480156101bb57600080fd5b50610146610420565b6101cc610430565b6101dc6101d76104c4565b6104e9565b565b6101e661050d565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156102275761022281610532565b61022f565b61022f6101c4565b50565b61023a61050d565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156102fc5761027683610532565b60003073ffffffffffffffffffffffffffffffffffffffff16348484604051808383808284376040519201945060009350909150508083038185875af1925050503d80600081146102e3576040519150601f19603f3d011682016040523d82523d6000602084013e6102e8565b606091505b50509050806102f657600080fd5b50610304565b6103046101c4565b505050565b60006103136104c4565b905090565b61032061050d565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156102275773ffffffffffffffffffffffffffffffffffffffff81166103bf576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260368152602001806106606036913960400191505060405180910390fd5b7f7e644d79422f17c01e4894b5f4f588d331ebfa28653d42ae832dc59e38c9798f6103e861050d565b6040805173ffffffffffffffffffffffffffffffffffffffff928316815291841660208301528051918290030190a161022281610587565b600061031361050d565b3b151590565b61043861050d565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156104bc576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252603281526020018061062e6032913960400191505060405180910390fd5b6101dc6101dc565b7f7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c35490565b3660008037600080366000845af43d6000803e808015610508573d6000f35b3d6000fd5b7f10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b5490565b61053b816105ab565b6040805173ffffffffffffffffffffffffffffffffffffffff8316815290517fbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b9181900360200190a150565b7f10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b55565b6105b48161042a565b610609576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252603b815260200180610696603b913960400191505060405180910390fd5b7f7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c35556fe43616e6e6f742063616c6c2066616c6c6261636b2066756e6374696f6e2066726f6d207468652070726f78792061646d696e43616e6e6f74206368616e6765207468652061646d696e206f6620612070726f787920746f20746865207a65726f206164647265737343616e6e6f742073657420612070726f787920696d706c656d656e746174696f6e20746f2061206e6f6e2d636f6e74726163742061646472657373a26469706673582212206912698afeb8292e0377ff7ebcb7d711a6825aecdf904df29338deebe26b282864736f6c634300060c0033",
+                    "nonce": 1,
+                    "storage": {
+                      "0x4c44f4033f99ade2d97b117146cdbfb9a60d5f0e23e6790d98f1cd4778d9b58b": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffbe74973edee"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "method": "eth_call",
+              "result": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffbe74973edee"
+            },
+            {
+              "method": "eth_call",
+              "result": "0x0000000000000000000000000000000000000000000000000000000005f5e100"
+            },
+            {
+              "method": "eth_getBlockByNumber",
+              "result": {
+                "hash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                "parentHash": "0xf0034d0445f65e228ae5ec3ad134865bb9981207621b67b6e34644d99b364e9e",
+                "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+                "miner": "0x0000000000000000000000000000000000000000",
+                "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "transactionsRoot": "0xfea04480528284efcedcd8975e760665a52697b6d61f697bce302821a224f2a1",
+                "receiptsRoot": "0x4fcbd70abb2ecdf19429edc7afe4b597bcb3a884d2a779bfb5f2338f54beb7f5",
+                "logsBloom": "0x0000001000000010000000000400000a00000000002000200802000400400000000000000000000000000400800004000000001040020000000000000004000000100000000000000000000800200000000000000100000000000002000000000000000002000000000000000180084000000000000400008080001000000000000004000000003010000000001000000080048100000100000000200000000000000000100000000000000000000000001008000000000000000000001000010000000200000000000000000000000000000000000100000000000000c020200200000008000020000000000004000000001004000000001000000000000000",
+                "difficulty": "0x0",
+                "number": "0x2f08c62",
+                "gasLimit": "0x2dc6c0",
+                "gasUsed": "0x907ee",
+                "timestamp": "0x6adb74c7",
+                "extraData": "0x",
+                "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "nonce": "0x0000000000000000",
+                "baseFeePerGas": "0x5f5e100",
+                "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+                "blobGasUsed": "0x0",
+                "excessBlobGas": "0x0",
+                "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "size": "0x118c",
+                "uncles": [],
+                "transactions": [
+                  "0xde64db17c518a36e6d8039c0e5d761badc94c18005ad04a93159869bd1c38851",
+                  "0xf568361f623b121b7784b2f163a40386a1d8a4c3075cd2f08ba6c30aff4c1c69",
+                  "0x528ef5f43c2b862071b329c4872cf81246abcde80687e8a63e5b5703ad5f8d73",
+                  "0x8b4a1cbb8afc58ed657fc0550a63998658bc3f6587a2f015d968dc790a87547a",
+                  "0xe60d3f340aa670b9b0bbe33821cc96c66d873d9dd861014c8ec15797e0a26757",
+                  "0x75f7c86bef73ed6cb28d65541ff16c24b7d680bba3b839a477a95b96136110e5",
+                  "0x08d9310594c171c7539692b818710574407e675a89f88fc4c51ceb381ca4f116",
+                  "0x728022cc1551e13700ed998914b38233e13e75e6a365514f2abc7ba57eaac5fe"
+                ],
+                "withdrawals": []
+              }
+            }
+          ]
+        },
+        "limits": {
+          "maxPairs": 8,
+          "maxPermissionObservations": 256
+        },
+        "executionIdentity": {
+          "stateBlockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+          "blockNumber": "49319010",
+          "timestamp": "1792767175",
+          "stateBinding": "block_hash",
+          "headerContext": "unchanged",
+          "method": "debug_traceCall/prestateTracer + eth_call/stateDiff"
+        }
+      }
+    },
+    {
+      "id": "husdc-max",
+      "request": {
+        "chainId": 999,
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+        "value": "0",
+        "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+      },
+      "traceEvidence": {
+        "request": {
+          "method": "debug_traceCall",
+          "params": [
+            {
+              "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+              "value": "0x0",
+              "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+              "gas": "0x4c4b40"
+            },
+            {
+              "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+              "requireCanonical": true
+            },
+            {
+              "tracer": "callTracer",
+              "timeout": "15s",
+              "tracerConfig": {
+                "withLog": true
+              }
+            }
+          ]
+        },
+        "response": {
+          "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "gas": "0x4c4b40",
+          "gasUsed": "0xc9f5",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "input": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+          "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "calls": [
+            {
+              "from": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+              "gas": "0x4ab23c",
+              "gasUsed": "0x6051",
+              "to": "0x410aa1ab680b886c875e99a7a4bfaf188508a7a3",
+              "input": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+              "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+              "logs": [
+                {
+                  "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+                  "topics": [
+                    "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+                    "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                    "0x00000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b"
+                  ],
+                  "data": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                  "position": "0x0",
+                  "index": "0x0"
+                }
+              ],
+              "value": "0x0",
+              "type": "DELEGATECALL"
+            }
+          ],
+          "value": "0x0",
+          "type": "CALL"
+        }
+      },
+      "permissions": {
+        "scope": {
+          "chainId": 999,
+          "verifiedTokenAddresses": [
+            "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "0x744e4f26ee30213989216e1632d9be3547c4885b"
+          ],
+          "standard": "ERC20",
+          "standardSource": "https://eips.ethereum.org/EIPS/eip-20"
+        },
+        "coverage": {
+          "status": "limited",
+          "reasons": [],
+          "allowanceStateVerified": false
+        },
+        "observations": [
+          {
+            "kind": "approval_request",
+            "asset": {
+              "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+              "type": "ERC20",
+              "decimals": 6,
+              "symbol": "hHyperEvmUSDC",
+              "name": "HyperLend HyperEVM USDC"
+            },
+            "tokenVerified": true,
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "amountRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+            "amount": "115792089237316195423570985008687907853269984665640564039457584007913129.639935",
+            "allowanceKind": "uint256_max",
+            "basis": "approve_calldata",
+            "origin": "top_level_request",
+            "framePath": "0",
+            "returnStatus": "returned_true",
+            "matchedEventIds": [
+              "permission-2"
+            ],
+            "eventCorrelation": "matched",
+            "id": "permission-1"
+          },
+          {
+            "kind": "approval_event",
+            "asset": {
+              "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+              "type": "ERC20",
+              "decimals": 6,
+              "symbol": "hHyperEvmUSDC",
+              "name": "HyperLend HyperEVM USDC"
+            },
+            "tokenVerified": true,
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "amountRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+            "amount": "115792089237316195423570985008687907853269984665640564039457584007913129.639935",
+            "allowanceKind": "uint256_max",
+            "basis": "approval_event",
+            "matchedRequestIds": [
+              "permission-1"
+            ],
+            "framePath": "0.0",
+            "logIndex": "0",
+            "logOffset": 0,
+            "id": "permission-2"
+          }
+        ],
+        "findings": [
+          {
+            "code": "MAX_UINT256_APPROVAL_EVENT",
+            "severity": "review",
+            "basis": "approval_event",
+            "token": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "amountRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+            "observationIds": [
+              "permission-2"
+            ],
+            "message": "An Approval event reported the maximum uint256 allowance from 0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0 to spender 0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b for token 0x744e4f26ee30213989216e1632d9be3547c4885b. This is commonly called unlimited approval; the final allowance and spender trustworthiness were not verified."
+          }
+        ],
+        "warnings": [
+          "Approval calldata describes a request; Approval events describe emitted evidence. Neither independently verifies the final on-chain allowance.",
+          "Maximum uint256 approval observations describe spender exposure, not maliciousness. No general security verdict or spender reputation assessment is provided."
+        ]
+      },
+      "result": {
+        "status": "measured",
+        "basis": "prestate_diff_allowance",
+        "allowances": [
+          {
+            "asset": {
+              "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+              "decimals": 6,
+              "symbol": "hHyperEvmUSDC",
+              "name": "HyperLend HyperEVM USDC",
+              "type": "ERC20"
+            },
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "beforeRaw": "0",
+            "afterRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+            "deltaRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+            "before": "0",
+            "after": "115792089237316195423570985008687907853269984665640564039457584007913129.639935",
+            "delta": "115792089237316195423570985008687907853269984665640564039457584007913129.639935",
+            "beforeKind": "zero",
+            "afterKind": "uint256_max",
+            "changed": true,
+            "observationIds": [
+              "permission-1",
+              "permission-2"
+            ],
+            "consistency": {
+              "eventComparison": "matches_last_observed_event",
+              "lastEventObservationId": "permission-2",
+              "lastEventAmountRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+              "requestComparison": "matches_requested_amount",
+              "falseReturnObservationIds": [],
+              "explanation": "The measured value is the final allowance after the whole transaction. Earlier approvals may be superseded or consumed later; an evidence difference is not a maliciousness verdict."
+            }
+          }
+        ],
+        "warnings": [
+          "Allowances are queried before and after the entire simulated transaction at one pinned block hash. They are not inferred from individual Approval events.",
+          "Maximum allowance describes spending permission, not spender trustworthiness. No transaction security verdict is provided."
+        ],
+        "evidence": {
+          "request": [
+            {
+              "method": "eth_getBlockByHash",
+              "params": [
+                "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                false
+              ]
+            },
+            {
+              "method": "debug_traceCall",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+                  "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8bffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                  "value": "0x0",
+                  "gas": "0x4c4b40"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                },
+                {
+                  "tracer": "prestateTracer",
+                  "timeout": "15s",
+                  "tracerConfig": {
+                    "diffMode": true
+                  }
+                }
+              ]
+            },
+            {
+              "method": "eth_call",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+                  "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                  "gas": "0x493e0"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                }
+              ]
+            },
+            {
+              "method": "eth_call",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+                  "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                  "gas": "0x493e0"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                },
+                {
+                  "0x744e4f26ee30213989216e1632d9be3547c4885b": {
+                    "stateDiff": {
+                      "0x4f3c71e0bb65d6ebe69695b3516f684a4b40d2611d2bbbc1253a135354e05a7d": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+                    }
+                  },
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "nonce": "0x13152"
+                  }
+                }
+              ]
+            },
+            {
+              "method": "eth_getBlockByNumber",
+              "params": [
+                "0x2f08c62",
+                false
+              ]
+            }
+          ],
+          "response": [
+            {
+              "method": "eth_getBlockByHash",
+              "result": {
+                "hash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                "parentHash": "0xf0034d0445f65e228ae5ec3ad134865bb9981207621b67b6e34644d99b364e9e",
+                "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+                "miner": "0x0000000000000000000000000000000000000000",
+                "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "transactionsRoot": "0xfea04480528284efcedcd8975e760665a52697b6d61f697bce302821a224f2a1",
+                "receiptsRoot": "0x4fcbd70abb2ecdf19429edc7afe4b597bcb3a884d2a779bfb5f2338f54beb7f5",
+                "logsBloom": "0x0000001000000010000000000400000a00000000002000200802000400400000000000000000000000000400800004000000001040020000000000000004000000100000000000000000000800200000000000000100000000000002000000000000000002000000000000000180084000000000000400008080001000000000000004000000003010000000001000000080048100000100000000200000000000000000100000000000000000000000001008000000000000000000001000010000000200000000000000000000000000000000000100000000000000c020200200000008000020000000000004000000001004000000001000000000000000",
+                "difficulty": "0x0",
+                "number": "0x2f08c62",
+                "gasLimit": "0x2dc6c0",
+                "gasUsed": "0x907ee",
+                "timestamp": "0x6adb74c7",
+                "extraData": "0x",
+                "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "nonce": "0x0000000000000000",
+                "baseFeePerGas": "0x5f5e100",
+                "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+                "blobGasUsed": "0x0",
+                "excessBlobGas": "0x0",
+                "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "size": "0x118c",
+                "uncles": [],
+                "transactions": [
+                  "0xde64db17c518a36e6d8039c0e5d761badc94c18005ad04a93159869bd1c38851",
+                  "0xf568361f623b121b7784b2f163a40386a1d8a4c3075cd2f08ba6c30aff4c1c69",
+                  "0x528ef5f43c2b862071b329c4872cf81246abcde80687e8a63e5b5703ad5f8d73",
+                  "0x8b4a1cbb8afc58ed657fc0550a63998658bc3f6587a2f015d968dc790a87547a",
+                  "0xe60d3f340aa670b9b0bbe33821cc96c66d873d9dd861014c8ec15797e0a26757",
+                  "0x75f7c86bef73ed6cb28d65541ff16c24b7d680bba3b839a477a95b96136110e5",
+                  "0x08d9310594c171c7539692b818710574407e675a89f88fc4c51ceb381ca4f116",
+                  "0x728022cc1551e13700ed998914b38233e13e75e6a365514f2abc7ba57eaac5fe"
+                ],
+                "withdrawals": []
+              }
+            },
+            {
+              "method": "debug_traceCall",
+              "result": {
+                "post": {
+                  "0x744e4f26ee30213989216e1632d9be3547c4885b": {
+                    "storage": {
+                      "0x4f3c71e0bb65d6ebe69695b3516f684a4b40d2611d2bbbc1253a135354e05a7d": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+                    }
+                  },
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "nonce": 78162
+                  }
+                },
+                "pre": {
+                  "0x744e4f26ee30213989216e1632d9be3547c4885b": {
+                    "balance": "0x0",
+                    "code": "0x60806040526004361061004d575f3560e01c80633659cfe6146100645780634f1ef286146100835780635c60da1b14610096578063d1f57894146100c6578063f851a440146100d95761005c565b3661005c5761005a6100ed565b005b61005a6100ed565b34801561006f575f80fd5b5061005a61007e366004610530565b610114565b61005a610091366004610550565b610158565b3480156100a1575f80fd5b506100aa610209565b6040516001600160a01b03909116815260200160405180910390f35b61005a6100d43660046105e0565b610258565b3480156100e4575f80fd5b506100aa61033d565b6100f5610393565b61011261010d5f805160206107118339815191525490565b61039b565b565b6001600160a01b037f0000000000000000000000008cb4310dd38f6fd59388c9de225f328092bdc3791633036101505761014d816103b9565b50565b61014d6100ed565b6001600160a01b037f0000000000000000000000008cb4310dd38f6fd59388c9de225f328092bdc3791633036101fc57610191836103b9565b5f836001600160a01b031683836040516101ac92919061069c565b5f60405180830381855af49150503d805f81146101e4576040519150601f19603f3d011682016040523d82523d5f602084013e6101e9565b606091505b50509050806101f6575f80fd5b50505050565b6102046100ed565b505050565b5f6001600160a01b037f0000000000000000000000008cb4310dd38f6fd59388c9de225f328092bdc37916330361024d57505f805160206107118339815191525490565b6102556100ed565b90565b5f61026e5f805160206107118339815191525490565b6001600160a01b031614610280575f80fd5b6102ab60017f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbd6106ab565b5f80516020610711833981519152146102c6576102c66106d0565b6102cf826103f8565b805115610339575f826001600160a01b0316826040516102ef91906106e4565b5f60405180830381855af49150503d805f8114610327576040519150601f19603f3d011682016040523d82523d5f602084013e61032c565b606091505b5050905080610204575f80fd5b5050565b5f6001600160a01b037f0000000000000000000000008cb4310dd38f6fd59388c9de225f328092bdc37916330361024d57507f0000000000000000000000008cb4310dd38f6fd59388c9de225f328092bdc37990565b610112610482565b365f80375f80365f845af43d5f803e8080156103b5573d5ff35b3d5ffd5b6103c2816103f8565b6040516001600160a01b038216907fbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b905f90a250565b803b6104715760405162461bcd60e51b815260206004820152603b60248201527f43616e6e6f742073657420612070726f787920696d706c656d656e746174696f60448201527f6e20746f2061206e6f6e2d636f6e74726163742061646472657373000000000060648201526084015b60405180910390fd5b5f8051602061071183398151915255565b6001600160a01b037f0000000000000000000000008cb4310dd38f6fd59388c9de225f328092bdc3791633036101125760405162461bcd60e51b815260206004820152603260248201527f43616e6e6f742063616c6c2066616c6c6261636b2066756e6374696f6e20667260448201527137b6903a343290383937bc3c9030b236b4b760711b6064820152608401610468565b80356001600160a01b038116811461052b575f80fd5b919050565b5f60208284031215610540575f80fd5b61054982610515565b9392505050565b5f805f60408486031215610562575f80fd5b61056b84610515565b9250602084013567ffffffffffffffff80821115610587575f80fd5b818601915086601f83011261059a575f80fd5b8135818111156105a8575f80fd5b8760208285010111156105b9575f80fd5b6020830194508093505050509250925092565b634e487b7160e01b5f52604160045260245ffd5b5f80604083850312156105f1575f80fd5b6105fa83610515565b9150602083013567ffffffffffffffff80821115610616575f80fd5b818501915085601f830112610629575f80fd5b81358181111561063b5761063b6105cc565b604051601f8201601f19908116603f01168101908382118183101715610663576106636105cc565b8160405282815288602084870101111561067b575f80fd5b826020860160208301375f6020848301015280955050505050509250929050565b818382375f9101908152919050565b818103818111156106ca57634e487b7160e01b5f52601160045260245ffd5b92915050565b634e487b7160e01b5f52600160045260245ffd5b5f82515f5b8181101561070357602081860181015185830152016106e9565b505f92019182525091905056fe360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbca164736f6c6343000814000a",
+                    "nonce": 1
+                  },
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "balance": "0x702b7ad07202fb1",
+                    "nonce": 78161
+                  }
+                }
+              }
+            },
+            {
+              "method": "eth_call",
+              "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            {
+              "method": "eth_call",
+              "result": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+            },
+            {
+              "method": "eth_getBlockByNumber",
+              "result": {
+                "hash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                "parentHash": "0xf0034d0445f65e228ae5ec3ad134865bb9981207621b67b6e34644d99b364e9e",
+                "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+                "miner": "0x0000000000000000000000000000000000000000",
+                "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "transactionsRoot": "0xfea04480528284efcedcd8975e760665a52697b6d61f697bce302821a224f2a1",
+                "receiptsRoot": "0x4fcbd70abb2ecdf19429edc7afe4b597bcb3a884d2a779bfb5f2338f54beb7f5",
+                "logsBloom": "0x0000001000000010000000000400000a00000000002000200802000400400000000000000000000000000400800004000000001040020000000000000004000000100000000000000000000800200000000000000100000000000002000000000000000002000000000000000180084000000000000400008080001000000000000004000000003010000000001000000080048100000100000000200000000000000000100000000000000000000000001008000000000000000000001000010000000200000000000000000000000000000000000100000000000000c020200200000008000020000000000004000000001004000000001000000000000000",
+                "difficulty": "0x0",
+                "number": "0x2f08c62",
+                "gasLimit": "0x2dc6c0",
+                "gasUsed": "0x907ee",
+                "timestamp": "0x6adb74c7",
+                "extraData": "0x",
+                "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "nonce": "0x0000000000000000",
+                "baseFeePerGas": "0x5f5e100",
+                "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+                "blobGasUsed": "0x0",
+                "excessBlobGas": "0x0",
+                "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "size": "0x118c",
+                "uncles": [],
+                "transactions": [
+                  "0xde64db17c518a36e6d8039c0e5d761badc94c18005ad04a93159869bd1c38851",
+                  "0xf568361f623b121b7784b2f163a40386a1d8a4c3075cd2f08ba6c30aff4c1c69",
+                  "0x528ef5f43c2b862071b329c4872cf81246abcde80687e8a63e5b5703ad5f8d73",
+                  "0x8b4a1cbb8afc58ed657fc0550a63998658bc3f6587a2f015d968dc790a87547a",
+                  "0xe60d3f340aa670b9b0bbe33821cc96c66d873d9dd861014c8ec15797e0a26757",
+                  "0x75f7c86bef73ed6cb28d65541ff16c24b7d680bba3b839a477a95b96136110e5",
+                  "0x08d9310594c171c7539692b818710574407e675a89f88fc4c51ceb381ca4f116",
+                  "0x728022cc1551e13700ed998914b38233e13e75e6a365514f2abc7ba57eaac5fe"
+                ],
+                "withdrawals": []
+              }
+            }
+          ]
+        },
+        "limits": {
+          "maxPairs": 8,
+          "maxPermissionObservations": 256
+        },
+        "executionIdentity": {
+          "stateBlockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+          "blockNumber": "49319010",
+          "timestamp": "1792767175",
+          "stateBinding": "block_hash",
+          "headerContext": "unchanged",
+          "method": "debug_traceCall/prestateTracer + eth_call/stateDiff"
+        }
+      }
+    },
+    {
+      "id": "husdc-revoke",
+      "request": {
+        "chainId": 999,
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+        "value": "0",
+        "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      "traceEvidence": {
+        "request": {
+          "method": "debug_traceCall",
+          "params": [
+            {
+              "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+              "value": "0x0",
+              "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000000000000",
+              "gas": "0x4c4b40"
+            },
+            {
+              "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+              "requireCanonical": true
+            },
+            {
+              "tracer": "callTracer",
+              "timeout": "15s",
+              "tracerConfig": {
+                "withLog": true
+              }
+            }
+          ]
+        },
+        "response": {
+          "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "gas": "0x4c4b40",
+          "gasUsed": "0x7ab9",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "input": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000000000000",
+          "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "calls": [
+            {
+              "from": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+              "gas": "0x4ab3b6",
+              "gasUsed": "0x1295",
+              "to": "0x410aa1ab680b886c875e99a7a4bfaf188508a7a3",
+              "input": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000000000000",
+              "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+              "logs": [
+                {
+                  "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+                  "topics": [
+                    "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+                    "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                    "0x00000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b"
+                  ],
+                  "data": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  "position": "0x0",
+                  "index": "0x0"
+                }
+              ],
+              "value": "0x0",
+              "type": "DELEGATECALL"
+            }
+          ],
+          "value": "0x0",
+          "type": "CALL"
+        }
+      },
+      "permissions": {
+        "scope": {
+          "chainId": 999,
+          "verifiedTokenAddresses": [
+            "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "0x744e4f26ee30213989216e1632d9be3547c4885b"
+          ],
+          "standard": "ERC20",
+          "standardSource": "https://eips.ethereum.org/EIPS/eip-20"
+        },
+        "coverage": {
+          "status": "limited",
+          "reasons": [],
+          "allowanceStateVerified": false
+        },
+        "observations": [
+          {
+            "kind": "approval_request",
+            "asset": {
+              "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+              "type": "ERC20",
+              "decimals": 6,
+              "symbol": "hHyperEvmUSDC",
+              "name": "HyperLend HyperEVM USDC"
+            },
+            "tokenVerified": true,
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "amountRaw": "0",
+            "amount": "0",
+            "allowanceKind": "revoke",
+            "basis": "approve_calldata",
+            "origin": "top_level_request",
+            "framePath": "0",
+            "returnStatus": "returned_true",
+            "matchedEventIds": [
+              "permission-2"
+            ],
+            "eventCorrelation": "matched",
+            "id": "permission-1"
+          },
+          {
+            "kind": "approval_event",
+            "asset": {
+              "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+              "type": "ERC20",
+              "decimals": 6,
+              "symbol": "hHyperEvmUSDC",
+              "name": "HyperLend HyperEVM USDC"
+            },
+            "tokenVerified": true,
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "amountRaw": "0",
+            "amount": "0",
+            "allowanceKind": "revoke",
+            "basis": "approval_event",
+            "matchedRequestIds": [
+              "permission-1"
+            ],
+            "framePath": "0.0",
+            "logIndex": "0",
+            "logOffset": 0,
+            "id": "permission-2"
+          }
+        ],
+        "findings": [],
+        "warnings": [
+          "Approval calldata describes a request; Approval events describe emitted evidence. Neither independently verifies the final on-chain allowance.",
+          "Maximum uint256 approval observations describe spender exposure, not maliciousness. No general security verdict or spender reputation assessment is provided."
+        ]
+      },
+      "result": {
+        "status": "measured",
+        "basis": "prestate_diff_allowance",
+        "allowances": [
+          {
+            "asset": {
+              "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+              "decimals": 6,
+              "symbol": "hHyperEvmUSDC",
+              "name": "HyperLend HyperEVM USDC",
+              "type": "ERC20"
+            },
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "beforeRaw": "0",
+            "afterRaw": "0",
+            "deltaRaw": "0",
+            "before": "0",
+            "after": "0",
+            "delta": "0",
+            "beforeKind": "zero",
+            "afterKind": "zero",
+            "changed": false,
+            "observationIds": [
+              "permission-1",
+              "permission-2"
+            ],
+            "consistency": {
+              "eventComparison": "matches_last_observed_event",
+              "lastEventObservationId": "permission-2",
+              "lastEventAmountRaw": "0",
+              "requestComparison": "matches_requested_amount",
+              "falseReturnObservationIds": [],
+              "explanation": "The measured value is the final allowance after the whole transaction. Earlier approvals may be superseded or consumed later; an evidence difference is not a maliciousness verdict."
+            }
+          }
+        ],
+        "warnings": [
+          "Allowances are queried before and after the entire simulated transaction at one pinned block hash. They are not inferred from individual Approval events.",
+          "Maximum allowance describes spending permission, not spender trustworthiness. No transaction security verdict is provided."
+        ],
+        "evidence": {
+          "request": [
+            {
+              "method": "eth_getBlockByHash",
+              "params": [
+                "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                false
+              ]
+            },
+            {
+              "method": "debug_traceCall",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+                  "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000000000000",
+                  "value": "0x0",
+                  "gas": "0x4c4b40"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                },
+                {
+                  "tracer": "prestateTracer",
+                  "timeout": "15s",
+                  "tracerConfig": {
+                    "diffMode": true
+                  }
+                }
+              ]
+            },
+            {
+              "method": "eth_call",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+                  "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                  "gas": "0x493e0"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                }
+              ]
+            },
+            {
+              "method": "eth_call",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+                  "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                  "gas": "0x493e0"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                },
+                {
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "nonce": "0x13152"
+                  }
+                }
+              ]
+            },
+            {
+              "method": "eth_getBlockByNumber",
+              "params": [
+                "0x2f08c62",
+                false
+              ]
+            }
+          ],
+          "response": [
+            {
+              "method": "eth_getBlockByHash",
+              "result": {
+                "hash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                "parentHash": "0xf0034d0445f65e228ae5ec3ad134865bb9981207621b67b6e34644d99b364e9e",
+                "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+                "miner": "0x0000000000000000000000000000000000000000",
+                "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "transactionsRoot": "0xfea04480528284efcedcd8975e760665a52697b6d61f697bce302821a224f2a1",
+                "receiptsRoot": "0x4fcbd70abb2ecdf19429edc7afe4b597bcb3a884d2a779bfb5f2338f54beb7f5",
+                "logsBloom": "0x0000001000000010000000000400000a00000000002000200802000400400000000000000000000000000400800004000000001040020000000000000004000000100000000000000000000800200000000000000100000000000002000000000000000002000000000000000180084000000000000400008080001000000000000004000000003010000000001000000080048100000100000000200000000000000000100000000000000000000000001008000000000000000000001000010000000200000000000000000000000000000000000100000000000000c020200200000008000020000000000004000000001004000000001000000000000000",
+                "difficulty": "0x0",
+                "number": "0x2f08c62",
+                "gasLimit": "0x2dc6c0",
+                "gasUsed": "0x907ee",
+                "timestamp": "0x6adb74c7",
+                "extraData": "0x",
+                "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "nonce": "0x0000000000000000",
+                "baseFeePerGas": "0x5f5e100",
+                "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+                "blobGasUsed": "0x0",
+                "excessBlobGas": "0x0",
+                "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "size": "0x118c",
+                "uncles": [],
+                "transactions": [
+                  "0x528ef5f43c2b862071b329c4872cf81246abcde80687e8a63e5b5703ad5f8d73",
+                  "0x8b4a1cbb8afc58ed657fc0550a63998658bc3f6587a2f015d968dc790a87547a",
+                  "0xe60d3f340aa670b9b0bbe33821cc96c66d873d9dd861014c8ec15797e0a26757",
+                  "0x75f7c86bef73ed6cb28d65541ff16c24b7d680bba3b839a477a95b96136110e5",
+                  "0x08d9310594c171c7539692b818710574407e675a89f88fc4c51ceb381ca4f116",
+                  "0x728022cc1551e13700ed998914b38233e13e75e6a365514f2abc7ba57eaac5fe"
+                ],
+                "withdrawals": []
+              }
+            },
+            {
+              "method": "debug_traceCall",
+              "result": {
+                "post": {
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "nonce": 78162
+                  }
+                },
+                "pre": {
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "balance": "0x702b7ad07202fb1",
+                    "nonce": 78161
+                  }
+                }
+              }
+            },
+            {
+              "method": "eth_call",
+              "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            {
+              "method": "eth_call",
+              "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            {
+              "method": "eth_getBlockByNumber",
+              "result": {
+                "hash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                "parentHash": "0xf0034d0445f65e228ae5ec3ad134865bb9981207621b67b6e34644d99b364e9e",
+                "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+                "miner": "0x0000000000000000000000000000000000000000",
+                "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "transactionsRoot": "0xfea04480528284efcedcd8975e760665a52697b6d61f697bce302821a224f2a1",
+                "receiptsRoot": "0x4fcbd70abb2ecdf19429edc7afe4b597bcb3a884d2a779bfb5f2338f54beb7f5",
+                "logsBloom": "0x0000001000000010000000000400000a00000000002000200802000400400000000000000000000000000400800004000000001040020000000000000004000000100000000000000000000800200000000000000100000000000002000000000000000002000000000000000180084000000000000400008080001000000000000004000000003010000000001000000080048100000100000000200000000000000000100000000000000000000000001008000000000000000000001000010000000200000000000000000000000000000000000100000000000000c020200200000008000020000000000004000000001004000000001000000000000000",
+                "difficulty": "0x0",
+                "number": "0x2f08c62",
+                "gasLimit": "0x2dc6c0",
+                "gasUsed": "0x907ee",
+                "timestamp": "0x6adb74c7",
+                "extraData": "0x",
+                "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "nonce": "0x0000000000000000",
+                "baseFeePerGas": "0x5f5e100",
+                "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+                "blobGasUsed": "0x0",
+                "excessBlobGas": "0x0",
+                "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "size": "0x118c",
+                "uncles": [],
+                "transactions": [
+                  "0xde64db17c518a36e6d8039c0e5d761badc94c18005ad04a93159869bd1c38851",
+                  "0xf568361f623b121b7784b2f163a40386a1d8a4c3075cd2f08ba6c30aff4c1c69",
+                  "0x528ef5f43c2b862071b329c4872cf81246abcde80687e8a63e5b5703ad5f8d73",
+                  "0x8b4a1cbb8afc58ed657fc0550a63998658bc3f6587a2f015d968dc790a87547a",
+                  "0xe60d3f340aa670b9b0bbe33821cc96c66d873d9dd861014c8ec15797e0a26757",
+                  "0x75f7c86bef73ed6cb28d65541ff16c24b7d680bba3b839a477a95b96136110e5",
+                  "0x08d9310594c171c7539692b818710574407e675a89f88fc4c51ceb381ca4f116",
+                  "0x728022cc1551e13700ed998914b38233e13e75e6a365514f2abc7ba57eaac5fe"
+                ],
+                "withdrawals": []
+              }
+            }
+          ]
+        },
+        "limits": {
+          "maxPairs": 8,
+          "maxPermissionObservations": 256
+        },
+        "executionIdentity": {
+          "stateBlockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+          "blockNumber": "49319010",
+          "timestamp": "1792767175",
+          "stateBinding": "block_hash",
+          "headerContext": "unchanged",
+          "method": "debug_traceCall/prestateTracer + eth_call/stateDiff"
+        }
+      }
+    },
+    {
+      "id": "husdc-bounded",
+      "request": {
+        "chainId": 999,
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+        "value": "0",
+        "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000005f5e100"
+      },
+      "traceEvidence": {
+        "request": {
+          "method": "debug_traceCall",
+          "params": [
+            {
+              "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+              "value": "0x0",
+              "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000005f5e100",
+              "gas": "0x4c4b40"
+            },
+            {
+              "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+              "requireCanonical": true
+            },
+            {
+              "tracer": "callTracer",
+              "timeout": "15s",
+              "tracerConfig": {
+                "withLog": true
+              }
+            }
+          ]
+        },
+        "response": {
+          "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "gas": "0x4c4b40",
+          "gasUsed": "0xc899",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "input": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000005f5e100",
+          "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "calls": [
+            {
+              "from": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+              "gas": "0x4ab393",
+              "gasUsed": "0x6051",
+              "to": "0x410aa1ab680b886c875e99a7a4bfaf188508a7a3",
+              "input": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000005f5e100",
+              "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+              "logs": [
+                {
+                  "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+                  "topics": [
+                    "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+                    "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                    "0x00000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b"
+                  ],
+                  "data": "0x0000000000000000000000000000000000000000000000000000000005f5e100",
+                  "position": "0x0",
+                  "index": "0x0"
+                }
+              ],
+              "value": "0x0",
+              "type": "DELEGATECALL"
+            }
+          ],
+          "value": "0x0",
+          "type": "CALL"
+        }
+      },
+      "permissions": {
+        "scope": {
+          "chainId": 999,
+          "verifiedTokenAddresses": [
+            "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "0x744e4f26ee30213989216e1632d9be3547c4885b"
+          ],
+          "standard": "ERC20",
+          "standardSource": "https://eips.ethereum.org/EIPS/eip-20"
+        },
+        "coverage": {
+          "status": "limited",
+          "reasons": [],
+          "allowanceStateVerified": false
+        },
+        "observations": [
+          {
+            "kind": "approval_request",
+            "asset": {
+              "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+              "type": "ERC20",
+              "decimals": 6,
+              "symbol": "hHyperEvmUSDC",
+              "name": "HyperLend HyperEVM USDC"
+            },
+            "tokenVerified": true,
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "amountRaw": "100000000",
+            "amount": "100",
+            "allowanceKind": "bounded",
+            "basis": "approve_calldata",
+            "origin": "top_level_request",
+            "framePath": "0",
+            "returnStatus": "returned_true",
+            "matchedEventIds": [
+              "permission-2"
+            ],
+            "eventCorrelation": "matched",
+            "id": "permission-1"
+          },
+          {
+            "kind": "approval_event",
+            "asset": {
+              "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+              "type": "ERC20",
+              "decimals": 6,
+              "symbol": "hHyperEvmUSDC",
+              "name": "HyperLend HyperEVM USDC"
+            },
+            "tokenVerified": true,
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "amountRaw": "100000000",
+            "amount": "100",
+            "allowanceKind": "bounded",
+            "basis": "approval_event",
+            "matchedRequestIds": [
+              "permission-1"
+            ],
+            "framePath": "0.0",
+            "logIndex": "0",
+            "logOffset": 0,
+            "id": "permission-2"
+          }
+        ],
+        "findings": [],
+        "warnings": [
+          "Approval calldata describes a request; Approval events describe emitted evidence. Neither independently verifies the final on-chain allowance.",
+          "Maximum uint256 approval observations describe spender exposure, not maliciousness. No general security verdict or spender reputation assessment is provided."
+        ]
+      },
+      "result": {
+        "status": "measured",
+        "basis": "prestate_diff_allowance",
+        "allowances": [
+          {
+            "asset": {
+              "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+              "decimals": 6,
+              "symbol": "hHyperEvmUSDC",
+              "name": "HyperLend HyperEVM USDC",
+              "type": "ERC20"
+            },
+            "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "beforeRaw": "0",
+            "afterRaw": "100000000",
+            "deltaRaw": "100000000",
+            "before": "0",
+            "after": "100",
+            "delta": "100",
+            "beforeKind": "zero",
+            "afterKind": "bounded",
+            "changed": true,
+            "observationIds": [
+              "permission-1",
+              "permission-2"
+            ],
+            "consistency": {
+              "eventComparison": "matches_last_observed_event",
+              "lastEventObservationId": "permission-2",
+              "lastEventAmountRaw": "100000000",
+              "requestComparison": "matches_requested_amount",
+              "falseReturnObservationIds": [],
+              "explanation": "The measured value is the final allowance after the whole transaction. Earlier approvals may be superseded or consumed later; an evidence difference is not a maliciousness verdict."
+            }
+          }
+        ],
+        "warnings": [
+          "Allowances are queried before and after the entire simulated transaction at one pinned block hash. They are not inferred from individual Approval events.",
+          "Maximum allowance describes spending permission, not spender trustworthiness. No transaction security verdict is provided."
+        ],
+        "evidence": {
+          "request": [
+            {
+              "method": "eth_getBlockByHash",
+              "params": [
+                "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                false
+              ]
+            },
+            {
+              "method": "debug_traceCall",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+                  "data": "0x095ea7b300000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b0000000000000000000000000000000000000000000000000000000005f5e100",
+                  "value": "0x0",
+                  "gas": "0x4c4b40"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                },
+                {
+                  "tracer": "prestateTracer",
+                  "timeout": "15s",
+                  "tracerConfig": {
+                    "diffMode": true
+                  }
+                }
+              ]
+            },
+            {
+              "method": "eth_call",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+                  "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                  "gas": "0x493e0"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                }
+              ]
+            },
+            {
+              "method": "eth_call",
+              "params": [
+                {
+                  "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                  "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+                  "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                  "gas": "0x493e0"
+                },
+                {
+                  "blockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                  "requireCanonical": true
+                },
+                {
+                  "0x744e4f26ee30213989216e1632d9be3547c4885b": {
+                    "stateDiff": {
+                      "0x4f3c71e0bb65d6ebe69695b3516f684a4b40d2611d2bbbc1253a135354e05a7d": "0x0000000000000000000000000000000000000000000000000000000005f5e100"
+                    }
+                  },
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "nonce": "0x13152"
+                  }
+                }
+              ]
+            },
+            {
+              "method": "eth_getBlockByNumber",
+              "params": [
+                "0x2f08c62",
+                false
+              ]
+            }
+          ],
+          "response": [
+            {
+              "method": "eth_getBlockByHash",
+              "result": {
+                "hash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                "parentHash": "0xf0034d0445f65e228ae5ec3ad134865bb9981207621b67b6e34644d99b364e9e",
+                "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+                "miner": "0x0000000000000000000000000000000000000000",
+                "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "transactionsRoot": "0xfea04480528284efcedcd8975e760665a52697b6d61f697bce302821a224f2a1",
+                "receiptsRoot": "0x4fcbd70abb2ecdf19429edc7afe4b597bcb3a884d2a779bfb5f2338f54beb7f5",
+                "logsBloom": "0x0000001000000010000000000400000a00000000002000200802000400400000000000000000000000000400800004000000001040020000000000000004000000100000000000000000000800200000000000000100000000000002000000000000000002000000000000000180084000000000000400008080001000000000000004000000003010000000001000000080048100000100000000200000000000000000100000000000000000000000001008000000000000000000001000010000000200000000000000000000000000000000000100000000000000c020200200000008000020000000000004000000001004000000001000000000000000",
+                "difficulty": "0x0",
+                "number": "0x2f08c62",
+                "gasLimit": "0x2dc6c0",
+                "gasUsed": "0x907ee",
+                "timestamp": "0x6adb74c7",
+                "extraData": "0x",
+                "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "nonce": "0x0000000000000000",
+                "baseFeePerGas": "0x5f5e100",
+                "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+                "blobGasUsed": "0x0",
+                "excessBlobGas": "0x0",
+                "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "size": "0x118c",
+                "uncles": [],
+                "transactions": [
+                  "0x528ef5f43c2b862071b329c4872cf81246abcde80687e8a63e5b5703ad5f8d73",
+                  "0x8b4a1cbb8afc58ed657fc0550a63998658bc3f6587a2f015d968dc790a87547a",
+                  "0xe60d3f340aa670b9b0bbe33821cc96c66d873d9dd861014c8ec15797e0a26757",
+                  "0x75f7c86bef73ed6cb28d65541ff16c24b7d680bba3b839a477a95b96136110e5",
+                  "0x08d9310594c171c7539692b818710574407e675a89f88fc4c51ceb381ca4f116",
+                  "0x728022cc1551e13700ed998914b38233e13e75e6a365514f2abc7ba57eaac5fe"
+                ],
+                "withdrawals": []
+              }
+            },
+            {
+              "method": "debug_traceCall",
+              "result": {
+                "post": {
+                  "0x744e4f26ee30213989216e1632d9be3547c4885b": {
+                    "storage": {
+                      "0x4f3c71e0bb65d6ebe69695b3516f684a4b40d2611d2bbbc1253a135354e05a7d": "0x0000000000000000000000000000000000000000000000000000000005f5e100"
+                    }
+                  },
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "nonce": 78162
+                  }
+                },
+                "pre": {
+                  "0x744e4f26ee30213989216e1632d9be3547c4885b": {
+                    "balance": "0x0",
+                    "code": "0x60806040526004361061004d575f3560e01c80633659cfe6146100645780634f1ef286146100835780635c60da1b14610096578063d1f57894146100c6578063f851a440146100d95761005c565b3661005c5761005a6100ed565b005b61005a6100ed565b34801561006f575f80fd5b5061005a61007e366004610530565b610114565b61005a610091366004610550565b610158565b3480156100a1575f80fd5b506100aa610209565b6040516001600160a01b03909116815260200160405180910390f35b61005a6100d43660046105e0565b610258565b3480156100e4575f80fd5b506100aa61033d565b6100f5610393565b61011261010d5f805160206107118339815191525490565b61039b565b565b6001600160a01b037f0000000000000000000000008cb4310dd38f6fd59388c9de225f328092bdc3791633036101505761014d816103b9565b50565b61014d6100ed565b6001600160a01b037f0000000000000000000000008cb4310dd38f6fd59388c9de225f328092bdc3791633036101fc57610191836103b9565b5f836001600160a01b031683836040516101ac92919061069c565b5f60405180830381855af49150503d805f81146101e4576040519150601f19603f3d011682016040523d82523d5f602084013e6101e9565b606091505b50509050806101f6575f80fd5b50505050565b6102046100ed565b505050565b5f6001600160a01b037f0000000000000000000000008cb4310dd38f6fd59388c9de225f328092bdc37916330361024d57505f805160206107118339815191525490565b6102556100ed565b90565b5f61026e5f805160206107118339815191525490565b6001600160a01b031614610280575f80fd5b6102ab60017f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbd6106ab565b5f80516020610711833981519152146102c6576102c66106d0565b6102cf826103f8565b805115610339575f826001600160a01b0316826040516102ef91906106e4565b5f60405180830381855af49150503d805f8114610327576040519150601f19603f3d011682016040523d82523d5f602084013e61032c565b606091505b5050905080610204575f80fd5b5050565b5f6001600160a01b037f0000000000000000000000008cb4310dd38f6fd59388c9de225f328092bdc37916330361024d57507f0000000000000000000000008cb4310dd38f6fd59388c9de225f328092bdc37990565b610112610482565b365f80375f80365f845af43d5f803e8080156103b5573d5ff35b3d5ffd5b6103c2816103f8565b6040516001600160a01b038216907fbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b905f90a250565b803b6104715760405162461bcd60e51b815260206004820152603b60248201527f43616e6e6f742073657420612070726f787920696d706c656d656e746174696f60448201527f6e20746f2061206e6f6e2d636f6e74726163742061646472657373000000000060648201526084015b60405180910390fd5b5f8051602061071183398151915255565b6001600160a01b037f0000000000000000000000008cb4310dd38f6fd59388c9de225f328092bdc3791633036101125760405162461bcd60e51b815260206004820152603260248201527f43616e6e6f742063616c6c2066616c6c6261636b2066756e6374696f6e20667260448201527137b6903a343290383937bc3c9030b236b4b760711b6064820152608401610468565b80356001600160a01b038116811461052b575f80fd5b919050565b5f60208284031215610540575f80fd5b61054982610515565b9392505050565b5f805f60408486031215610562575f80fd5b61056b84610515565b9250602084013567ffffffffffffffff80821115610587575f80fd5b818601915086601f83011261059a575f80fd5b8135818111156105a8575f80fd5b8760208285010111156105b9575f80fd5b6020830194508093505050509250925092565b634e487b7160e01b5f52604160045260245ffd5b5f80604083850312156105f1575f80fd5b6105fa83610515565b9150602083013567ffffffffffffffff80821115610616575f80fd5b818501915085601f830112610629575f80fd5b81358181111561063b5761063b6105cc565b604051601f8201601f19908116603f01168101908382118183101715610663576106636105cc565b8160405282815288602084870101111561067b575f80fd5b826020860160208301375f6020848301015280955050505050509250929050565b818382375f9101908152919050565b818103818111156106ca57634e487b7160e01b5f52601160045260245ffd5b92915050565b634e487b7160e01b5f52600160045260245ffd5b5f82515f5b8181101561070357602081860181015185830152016106e9565b505f92019182525091905056fe360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbca164736f6c6343000814000a",
+                    "nonce": 1
+                  },
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "balance": "0x702b7ad07202fb1",
+                    "nonce": 78161
+                  }
+                }
+              }
+            },
+            {
+              "method": "eth_call",
+              "result": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            {
+              "method": "eth_call",
+              "result": "0x0000000000000000000000000000000000000000000000000000000005f5e100"
+            },
+            {
+              "method": "eth_getBlockByNumber",
+              "result": {
+                "hash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+                "parentHash": "0xf0034d0445f65e228ae5ec3ad134865bb9981207621b67b6e34644d99b364e9e",
+                "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+                "miner": "0x0000000000000000000000000000000000000000",
+                "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "transactionsRoot": "0xfea04480528284efcedcd8975e760665a52697b6d61f697bce302821a224f2a1",
+                "receiptsRoot": "0x4fcbd70abb2ecdf19429edc7afe4b597bcb3a884d2a779bfb5f2338f54beb7f5",
+                "logsBloom": "0x0000001000000010000000000400000a00000000002000200802000400400000000000000000000000000400800004000000001040020000000000000004000000100000000000000000000800200000000000000100000000000002000000000000000002000000000000000180084000000000000400008080001000000000000004000000003010000000001000000080048100000100000000200000000000000000100000000000000000000000001008000000000000000000001000010000000200000000000000000000000000000000000100000000000000c020200200000008000020000000000004000000001004000000001000000000000000",
+                "difficulty": "0x0",
+                "number": "0x2f08c62",
+                "gasLimit": "0x2dc6c0",
+                "gasUsed": "0x907ee",
+                "timestamp": "0x6adb74c7",
+                "extraData": "0x",
+                "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "nonce": "0x0000000000000000",
+                "baseFeePerGas": "0x5f5e100",
+                "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+                "blobGasUsed": "0x0",
+                "excessBlobGas": "0x0",
+                "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "size": "0x118c",
+                "uncles": [],
+                "transactions": [
+                  "0xde64db17c518a36e6d8039c0e5d761badc94c18005ad04a93159869bd1c38851",
+                  "0xf568361f623b121b7784b2f163a40386a1d8a4c3075cd2f08ba6c30aff4c1c69",
+                  "0x528ef5f43c2b862071b329c4872cf81246abcde80687e8a63e5b5703ad5f8d73",
+                  "0x8b4a1cbb8afc58ed657fc0550a63998658bc3f6587a2f015d968dc790a87547a",
+                  "0xe60d3f340aa670b9b0bbe33821cc96c66d873d9dd861014c8ec15797e0a26757",
+                  "0x75f7c86bef73ed6cb28d65541ff16c24b7d680bba3b839a477a95b96136110e5",
+                  "0x08d9310594c171c7539692b818710574407e675a89f88fc4c51ceb381ca4f116",
+                  "0x728022cc1551e13700ed998914b38233e13e75e6a365514f2abc7ba57eaac5fe"
+                ],
+                "withdrawals": []
+              }
+            }
+          ]
+        },
+        "limits": {
+          "maxPairs": 8,
+          "maxPermissionObservations": 256
+        },
+        "executionIdentity": {
+          "stateBlockHash": "0xe1a79320e04e4c1c97a36b065f334da831d3c07b90367aa6c57203b9800bb59c",
+          "blockNumber": "49319010",
+          "timestamp": "1792767175",
+          "stateBinding": "block_hash",
+          "headerContext": "unchanged",
+          "method": "debug_traceCall/prestateTracer + eth_call/stateDiff"
+        }
+      }
+    }
+  ]
+}

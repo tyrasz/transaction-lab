@@ -8,11 +8,14 @@ import { RpcClient, RpcError, normalizeBlock } from './rpc.js';
 import { validateSimulation, validateReplay, InputError } from './validate.js';
 import { analyzeTrace } from './analyze.js';
 import { measureBalances } from './balances.js';
+import { measureLendingBalances } from './lending-balances.js';
+import { measureAllowances } from './allowances.js';
+import { createStateContext } from './state.js';
 import { analyzePermissions } from './permissions.js';
 import { EXAMPLES, METADATA, CAPABILITIES, VERSION } from './config.js';
 
 const ROOT = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
-const engineFiles = ['analyze.js','balances.js','config.js','permissions.js','revert.js','rpc.js','server.js','validate.js'];
+const engineFiles = ['allowances.js','analyze.js','balances.js','config.js','lending.js','lending-balances.js','permissions.js','revert.js','rpc.js','server.js','state.js','validate.js'];
 const engineHash = createHash('sha256');
 for (const name of engineFiles) engineHash.update(name+'\0').update(await readFile(path.join(ROOT,'src',name))).update('\0');
 const implementation = Object.freeze({name:'Transaction Lab',version:VERSION,sourceSha256:engineHash.digest('hex'),sourceFiles:engineFiles});
@@ -27,9 +30,15 @@ const isQuantity = value => typeof value === 'string' && QUANTITY.test(value);
 const sameHex = (left, right) => typeof left === 'string' && typeof right === 'string' && left.toLowerCase() === right.toLowerCase();
 const sameQuantity = (left, right) => isQuantity(left) && isQuantity(right) && BigInt(left) === BigInt(right);
 
-function includePermissionCoverage(analysis, permissions) {
+function includePermissionCoverage(analysis, permissions, allowanceChanges) {
+  if (allowanceChanges?.status === 'measured') {
+    permissions.coverage.allowanceStateVerified = true;
+    permissions.coverage.allowanceStateScope = 'Only the token, owner and spender pairs listed in allowanceChanges were measured after the whole transaction.';
+  }
   if (analysis.coverage.status === 'unsupported' && permissions.observations.some(item => item.tokenVerified === true)) {
-    analysis.coverage = {status:'partial',reasons:[...analysis.coverage.reasons,'Configured ERC20 approval requests and events were interpreted separately. Final allowance state and other effects remain unverified.']};
+    analysis.coverage = {status:'partial',reasons:[...analysis.coverage.reasons, allowanceChanges?.status === 'measured'
+      ? 'Configured ERC20 permission pairs have measured final allowance values. Other transaction effects remain outside full protocol coverage.'
+      : 'Configured ERC20 approval requests and events were interpreted separately. Final allowance state and other effects remain unverified.']};
   }
 }
 
@@ -114,13 +123,20 @@ export async function simulate(input, rpc) {
   validateRootTrace(trace, request);
   const analysis = analyzeTrace({request, trace, block, metadata:METADATA, mode:'simulation'});
   const permissions = analyzePermissions({request,trace,metadata:METADATA});
-  includePermissionCoverage(analysis,permissions);
-  const {evidence:balanceEvidence,...balanceChanges} = await measureBalances({request,block,rpc,metadata:METADATA,analysis});
+  const stateContext = createStateContext({request,block,rpc});
+  const balanceMethod = ['withdraw','borrow','repay'].includes(analysis.protocol?.operation) ? measureLendingBalances : measureBalances;
+  const [balanceResult,allowanceResult] = await Promise.all([
+    balanceMethod({request,block,rpc,metadata:METADATA,analysis,stateContext}),
+    measureAllowances({request,trace,block,rpc,metadata:METADATA,analysis,permissions,stateContext}),
+  ]);
+  const {evidence:balanceEvidence,...balanceChanges} = balanceResult;
+  const {evidence:allowanceEvidence,...allowanceChanges} = allowanceResult;
+  includePermissionCoverage(analysis,permissions,allowanceChanges);
   return {
     schemaVersion:'1.0', implementation, id:randomUUID(), createdAt:new Date().toISOString(), request,
     source:{provider:rpc.provider,chainId:999,blockNumber:block.number,blockHash:block.hash,timestamp:block.timestamp,mode:'simulation',blockBinding:'explicit_block_hash',requestedBlock:blockTag},
-    ...analysis, balanceChanges, permissions, timing:{totalMs:Math.round(performance.now()-start),rpcMs:Math.round(rpc.rpcMs)},
-    evidence:{traceMethod:traceRequest.method,traceRequest,traceResponse:trace,balanceMeasurement:balanceEvidence},
+    ...analysis, balanceChanges, allowanceChanges, permissions, timing:{totalMs:Math.round(performance.now()-start),rpcMs:Math.round(rpc.rpcMs)},
+    evidence:{traceMethod:traceRequest.method,traceRequest,traceResponse:trace,balanceMeasurement:balanceEvidence,allowanceMeasurement:allowanceEvidence},
   };
 }
 
@@ -167,6 +183,7 @@ export async function replay(input, rpc) {
     schemaVersion:'1.0',implementation,id:randomUUID(),createdAt:new Date().toISOString(),request,
     source:{provider:rpc.provider,chainId:999,blockNumber:block.number,blockHash:block.hash,timestamp:block.timestamp,mode:'historical_trace',blockBinding:'transaction_hash',transactionHash,transactionIndex:BigInt(tx.transactionIndex).toString()},
     ...analysis,permissions,balanceChanges:{status:'not_applicable',basis:null,assets:[],warnings:['Historical balance measurement requires state at the original transaction position. This replay currently returns execution and event evidence only.']},
+    allowanceChanges:{status:'not_applicable',basis:null,allowances:[],warnings:['Historical final allowance measurement requires state at the original transaction position. This replay returns permission observations only.']},
     timing:{totalMs:Math.round(performance.now()-start),rpcMs:Math.round(rpc.rpcMs)},
     evidence:{traceMethod:traceRequest.method,traceRequest,traceResponse:trace,receipt,receiptRechecked:true},
   };

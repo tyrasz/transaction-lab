@@ -54,6 +54,10 @@ export function evaluateFixture(fixture, analysis) {
   }
   if (expected.gasUsed) check('observed gas used', analysis.execution?.gasUsed, expected.gasUsed);
   if (expected.movementCount !== undefined) check('committed movement count', analysis.movements?.length, expected.movementCount);
+  if (expected.assetCounts) {
+    check('incoming spendable asset count', analysis.inAssets?.length, expected.assetCounts.in);
+    check('outgoing spendable asset count', analysis.outAssets?.length, expected.assetCounts.out);
+  }
   if (expected.emptyAssets) {
     check('no incoming assets', analysis.inAssets?.length, 0);
     check('no outgoing assets', analysis.outAssets?.length, 0);
@@ -69,6 +73,20 @@ export function evaluateFixture(fixture, analysis) {
   for (const interest of expected.interestAccruals ?? []) {
     const actual = analysis.interestAccruals?.find(item => item.address?.toLowerCase() === interest.address);
     for (const [key, wanted] of Object.entries(interest)) check(`interest ${key}`, actual?.[key], wanted);
+  }
+  if (expected.positionChanges) {
+    check('position event count', analysis.positionChanges?.length, expected.positionChanges.length);
+    for (const position of expected.positionChanges) {
+      const matches = (analysis.positionChanges ?? []).filter(item => item.token === position.token && item.account === position.account);
+      check(`position ${position.token} unique account event`, matches.length, 1);
+      checkFields(`position ${position.token}`, matches[0], position);
+    }
+  }
+  for (const token of expected.excludedSpendableAssets ?? []) {
+    for (const direction of ['in', 'out']) {
+      const entries = (analysis[`${direction}Assets`] ?? []).filter(item => item.asset?.address?.toLowerCase() === token.toLowerCase());
+      check(`liability ${token} excluded from ${direction}Assets`, entries.length, 0);
+    }
   }
   if (expected.warningIncludes) {
     const text = [...(analysis.warnings ?? []), ...(analysis.coverage?.reasons ?? [])].join(' ');
@@ -142,6 +160,7 @@ export async function runBenchmarks({ writeReport = true, outputPath = defaultRe
       'The historical CoreWriter trace covers EVM execution, not subsequent HyperCore processing, and was captured without trace logs.',
       'Transfer events are event-derived movements, not verified portfolio balance deltas. Accrued interest is identified separately where supported.',
       'The historical Hyperlend fixture separates the transferred deposit from the mint-event implied principal and checks a derived scaled-token rounding interval; it does not reconstruct an exact pre/post balance delta.',
+      'The six withdrawal/borrow/repay fixtures are a reviewed regression corpus from three historical transactions and three later unsigned simulations, not blind or held-out validation. They distinguish actual cash from requested amounts and non-transferable liability positions.',
       'Security detection, pricing quality, RPC availability and end-to-end live latency are not assessed by this offline benchmark.',
     ],
   };

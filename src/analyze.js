@@ -1,5 +1,6 @@
 // Event-derived previews are evidence of emitted logs, not measured balance deltas.
 import { decodeRevert } from './revert.js';
+import { decodeLendingCall, supportsLending, reconcileLending, isKnownLiability } from './lending.js';
 const TRANSFER = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
 const MINT = '0x458f5fa412d0f69b08dd84872b0215675cc67bc1d5b6fd93300a1c3878b86196';
 const POOL = '0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b';
@@ -104,12 +105,12 @@ function scaledMintCall(frame, path) {
   if (!args || !wordAddress(args[0]) || !wordAddress(args[1])) return null;
   // The verified implementation accepts scaled units. Do not apply this model
   // to another implementation, even if its external mint selector is identical.
-  const implementation = (Array.isArray(frame.calls) ? frame.calls : []).find(child =>
+  const implementationIndex = (Array.isArray(frame.calls) ? frame.calls : []).findIndex(child =>
     child?.type === 'DELEGATECALL' && address(child.from) === HUSDC &&
     address(child.to) === HUSDC_SCALED_IMPLEMENTATION && !frameError(child) &&
     child.input?.toLowerCase() === frame.input.toLowerCase());
-  if (!implementation) return null;
-  return { caller: wordAddress(args[0]), onBehalfOf: wordAddress(args[1]), scaledAmount: BigInt(args[2]), index: BigInt(args[3]), framePath: path };
+  if (implementationIndex < 0) return null;
+  return { caller: wordAddress(args[0]), onBehalfOf: wordAddress(args[1]), scaledAmount: BigInt(args[2]), index: BigInt(args[3]), framePath: path, implementationPath:`${path}.${implementationIndex}` };
 }
 
 function reconcileScaledPrincipal({ requested, implied, mintEvents, mintCalls, account, beneficiary }) {
@@ -118,7 +119,7 @@ function reconcileScaledPrincipal({ requested, implied, mintEvents, mintCalls, a
   const call = mintCalls[0];
   if (call.index <= 0n || call.caller !== account || call.onBehalfOf !== beneficiary ||
       event.caller !== call.caller || event.onBehalfOf !== call.onBehalfOf ||
-      BigInt(event.indexRaw) !== call.index || !event.framePath.startsWith(`${call.framePath}.`)) return null;
+      BigInt(event.indexRaw) !== call.index || event.framePath !== call.implementationPath) return null;
   const expectedScaled = requested * RAY / call.index;
   if (call.scaledAmount !== expectedScaled || expectedScaled === 0n) return null;
   // Let q=floor(A*R/I), s=the prior scaled balance, and P be Mint.value-interest.
@@ -148,7 +149,9 @@ export function analyzeTrace({ request, trace, block = null, metadata = {}, mode
   const reasons = new Set();
   const account = address(request?.from);
   const recognizedSupply = decodeSupply(request ?? {}, metadata);
-  let protocol = recognizedSupply;
+  const recognizedLending = decodeLendingCall(request ?? {}, metadata);
+  const supportedLending = supportsLending(recognizedLending);
+  let protocol = recognizedSupply ?? recognizedLending;
   const validTrace = trace && typeof trace === 'object' && !Array.isArray(trace) && typeof trace.type === 'string';
   const error = validTrace ? frameError(trace) : 'Missing or invalid callTracer result';
   const status = error ? (/revert/i.test(error) || trace?.revertReason ? 'reverted' : 'failed') : 'success';
@@ -159,7 +162,8 @@ export function analyzeTrace({ request, trace, block = null, metadata = {}, mode
   if (status === 'reverted') execution.revert = decodeRevert(execution.returnData);
   const supportedSupply = recognizedSupply?.asset === USDC;
   if (supportedSupply) warnings.add('Supported coverage means the Hyperlend supply adapter recognizes the call and, on success, reconciles its principal and mint events. It does not imply complete balance, fee, or security analysis.');
-  if (!supportedSupply) reasons.add('Protocol coverage is limited to Hyperlend USDC supply on HyperEVM; other executions are not fully interpreted.');
+  if (!supportedSupply && !supportedLending) reasons.add('Protocol coverage is limited to Hyperlend USDC supply, withdrawal, variable-rate borrowing and repayment on HyperEVM; other executions are not fully interpreted.');
+  if (supportedLending) warnings.add('Lending coverage reconciles cash and position events with the verified scaled-token implementation. Separately measured balanceChanges are required to verify actual balances.');
   if (!validTrace) reasons.add('The provider did not return a valid callTracer result.');
   if (!account) reasons.add('A valid account is required to determine the preview perspective.');
   if (mode === 'historical_trace') warnings.add('This is historical execution evidence, not a prediction of execution against current state.');
@@ -176,12 +180,14 @@ export function analyzeTrace({ request, trace, block = null, metadata = {}, mode
   const indexedLogs = new Map();
   const coreCalls = [];
   const scaledMintCalls = [];
+  const successfulFrames = [];
   let nativeValue = (quantity(request?.value) ?? 0n) > 0n;
   let revertedChildren = 0;
   function walk(frame, path = '0') {
     if (!frame || typeof frame !== 'object' || seenFrames.has(frame)) return;
     seenFrames.add(frame);
     if (frameError(frame)) { revertedChildren++; return; }
+    successfulFrames.push({frame,path});
     if (address(frame.to) === CORE_WRITER && quantity(request?.chainId) === 999n) coreCalls.push(frame);
     if (supportedSupply) {
       const mintCall = scaledMintCall(frame, path);
@@ -278,6 +284,10 @@ export function analyzeTrace({ request, trace, block = null, metadata = {}, mode
     });
   }
   for (const movement of movements) {
+    if (isKnownLiability(request.chainId,movement.address)) {
+      warnings.add('Variable-debt token events represent a non-transferable liability. They are preserved in raw movements and positionChanges, and excluded from spendable incoming/outgoing assets.');
+      continue;
+    }
     if (account && movement.from === account) addAsset(outgoing, movement, 'transferOut');
     if (account && movement.to === account) addAsset(incoming, movement, 'transferIn');
     if (account && movement.from === account && movement.to === account) warnings.add('Self-transfer events appear in both incoming and outgoing assets and are not a net balance change.');
@@ -308,17 +318,25 @@ export function analyzeTrace({ request, trace, block = null, metadata = {}, mode
     if (!mintEvents.length || minted !== receiptIn || (principalMinted !== requested && !scaledConsistent) || rounding?.status === 'outside_scaled_rounding_bounds') reasons.add('Receipt-token Transfer and Mint events do not fully reconcile to the supplied principal and verified scaled-token rounding model.');
     if (roundingDifference !== 0n && mintEvents.length) {
       warnings.add(scaledConsistent
-        ? `Mint-event implied principal differs from the requested deposit by ${roundingDifference} raw USDC unit(s), consistent with the verified scaled-token rounding interval. The USDC deposit amount is reported separately; exact pre/post token balances were not measured.`
+        ? `Mint-event implied principal differs from the requested deposit by ${roundingDifference} raw USDC unit(s), consistent with the verified scaled-token rounding interval. The USDC deposit amount is reported separately; balanceChanges reports whether exact pre/post balances were measured.`
         : `Mint-event implied principal differs from the requested deposit by ${roundingDifference} raw USDC unit(s). This difference has not been reconciled to a verified rounding model.`);
     }
     if (protocol.onBehalfOf !== account) warnings.add(`Receipt tokens are minted for ${protocol.onBehalfOf}; incoming assets are shown only for the submitting account ${account}.`);
     if (interestAccruals.some(m => BigInt(m.balanceIncreaseRaw) !== 0n)) warnings.add('The Hyperlend receipt-token mint includes accrued interest. Principal and interest are shown separately from the Transfer event total.');
   }
+  let positionChanges = [];
+  if (supportedLending && status === 'success') {
+    const lending = reconcileLending({protocol,logs,movements,frames:successfulFrames,returnData:execution.returnData});
+    positionChanges = lending.positionChanges;
+    for (const reason of lending.reasons) reasons.add(reason);
+    if (protocol.operation === 'repay' && protocol.actualAmountRaw !== protocol.amountRaw) warnings.add('Repayment used the executed amount, which can be capped by outstanding debt. The requested amount is shown separately.');
+    if (positionChanges.some(p=>BigInt(p.accruedInterestRaw)!==0n)) warnings.add('Position Mint/Burn totals include accrued interest already reflected in balanceOf. The implied position change removes this interest.');
+  }
   if (status !== 'success') warnings.add('The top-level transaction did not succeed; all event-derived asset movements were discarded.');
-  const coverageStatus = supportedSupply && !reasons.size ? 'supported' : (supportedSupply || protocol || movements.length ? 'partial' : 'unsupported');
+  const coverageStatus = (supportedSupply || supportedLending) && !reasons.size ? 'supported' : (supportedSupply || protocol || movements.length ? 'partial' : 'unsupported');
   return {
     execution, coverage: { status: coverageStatus, reasons: [...reasons] }, protocol,
-    inAssets: [...incoming.values()], outAssets: [...outgoing.values()], movements, interestAccruals,
+    inAssets: [...incoming.values()], outAssets: [...outgoing.values()], movements, interestAccruals, positionChanges,
     warnings: [...warnings], security: { status: 'not_assessed', findings: [] },
   };
 }

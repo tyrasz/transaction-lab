@@ -1,0 +1,491 @@
+{
+  "schemaVersion": "1.0",
+  "createdAt": "2026-10-23T14:54:07Z",
+  "status": "research_candidates_not_a_benchmark",
+  "purpose": "Prepare defensible incident-level evaluation candidates without conflating execution facts, permissions, signer intent, and retrospective maliciousness labels.",
+  "counts": {
+    "candidates": 3,
+    "admittedCases": 0,
+    "evaluatedCases": 0,
+    "blindHeldOutCases": 0
+  },
+  "featureLeakagePolicy": "Sources and labels were inspected during research. None of these cases is a sealed blind holdout. If implementation is tuned using a case, move the whole incident family to development; independent custodians must curate a fresh sealed evaluation split.",
+  "observedFactsLimits": [
+    "Receipt decoding uses ERC20 event structure and exact integers.",
+    "No event total is asserted to be an independently measured balance change.",
+    "A successful transaction or valid signature is not proof of informed consent.",
+    "No live phishing site, malware package, signing, simulation, or transaction broadcast was accessed in this research."
+  ],
+  "candidateTasksSeparate": [
+    "historical_execution_fidelity",
+    "multiactor_asset_and_permission_explanation",
+    "transaction_level_harm_classification",
+    "wallet_transaction_presign_detection",
+    "offchain_typed_data_presign_detection"
+  ],
+  "candidates": [
+    {
+      "admissionStatus": "candidate_not_admitted",
+      "futureSplit": "candidate_holdout_not_sealed",
+      "currentEngineSupported": false,
+      "observedFactsBasis": "Public Ethereum JSON-RPC transaction, receipt, and block; no trace or balance snapshots captured.",
+      "sourceFactsAreNotDetectorFeatures": true,
+      "labelConfidenceScale": "high = strong incident attribution with public chain corroboration; medium = chain facts strong but maliciousness/mechanism still needs corroboration. Neither means a blind or statistically valid test.",
+      "id": "lifi-2024-07-16",
+      "title": "LI.FI arbitrary-call approval drain",
+      "family": "existing_approval_drain",
+      "incidentGroup": "lifi-july-2024",
+      "transactionStage": "attacker_submitted_drain",
+      "evidenceSourceIds": [
+        "lifi-official-2024",
+        "lifi-blocksec-2024"
+      ],
+      "observedFacts": {
+        "chainId": 1,
+        "transactionHash": "0xd82fe84e63b1aa52e1ce540582ee0895ba4a71ec5e7a632a3faa1aff3e763873",
+        "blockNumber": "20318963",
+        "blockHash": "0x63781338b9e93916b9708787f3039244de3c7879e07b8f5df8baa841a265a3f0",
+        "transactionIndex": "168",
+        "timestamp": "2024-07-16T12:06:35.000Z",
+        "from": "0x8b3cb6bf982798fba233bca56749e22eec42dcf3",
+        "to": "0x986aca5f2ca6b120f4361c519d7a49c5ac50c240",
+        "createdContract": null,
+        "receiptStatus": "0x1",
+        "inputPrefix": "0x85b4a4fc",
+        "logsCount": 3,
+        "transferCount": 1,
+        "nonzeroTransferCount": 1,
+        "uniqueNonzeroTransferSources": 1,
+        "transferRawTotals": {
+          "0xdac17f958d2ee523a2206206994597c13d831ec7": "2276295880553"
+        },
+        "selectedTransferEvents": [
+          {
+            "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+            "from": "0xabe45ea636df7ac90fb7d8d8c74a081b169f92ef",
+            "to": "0x8b3cb6bf982798fba233bca56749e22eec42dcf3",
+            "amountRaw": "2276295880553",
+            "logIndex": "474"
+          }
+        ],
+        "approvalEvents": [],
+        "artifact": {
+          "path": "sources/lifi-2024-07-16-rpc.json",
+          "sha256": "05bdd5871580d03127a2a1bda7dcecf3875e04384ffc40cf844e9fe018077dc4",
+          "retrievedAt": "2026-10-23T14:49:21.333Z",
+          "provider": "https://ethereum-rpc.publicnode.com"
+        }
+      },
+      "labels": {
+        "incidentAttribution": {
+          "value": "documented_exploit_drain",
+          "confidence": "high",
+          "basis": [
+            "lifi-official-2024",
+            "lifi-blocksec-2024"
+          ],
+          "reason": "Affected-protocol report establishes the incident; original researcher report explicitly identifies this transaction as an attack example."
+        },
+        "victimSigningRequest": {
+          "value": "not_observed",
+          "confidence": "high"
+        },
+        "priorApprovalIntent": {
+          "value": "unknown_do_not_label_malicious",
+          "confidence": "high"
+        },
+        "maliciousnessIsAnAnnotationNotAChainField": true
+      },
+      "lifecycle": [
+        {
+          "stage": "victim_prior_approval",
+          "transactionHash": null,
+          "artifactAvailable": false,
+          "label": "intent_unknown",
+          "note": "No approval transaction or signing screen was captured. Prior authorization to a legitimate router is not automatically malicious."
+        },
+        {
+          "stage": "facet_deployment_or_upgrade",
+          "transactionHash": null,
+          "contract": "0xf28a352377663ca134bd27b582b1a9a4dad7e534",
+          "sourceId": "lifi-official-2024",
+          "label": "vulnerability_setup_not_a_victim_signature"
+        },
+        {
+          "stage": "drain",
+          "transactionHash": "0xd82fe84e63b1aa52e1ce540582ee0895ba4a71ec5e7a632a3faa1aff3e763873",
+          "label": "documented_exploit_drain"
+        },
+        {
+          "stage": "later_swaps_or_laundering",
+          "included": false
+        }
+      ],
+      "evaluation": {
+        "eligibleTaskAfterAdmission": "historical_execution_and_multiactor_harm_detection",
+        "notEligibleFor": "victim_wallet_presign_detection_without_original_prior_approval_request",
+        "perspectives": [
+          {
+            "role": "transaction_submitter",
+            "address": "0x8b3cb6bf982798fba233bca56749e22eec42dcf3"
+          },
+          {
+            "role": "affected_token_owner",
+            "address": "0xabe45ea636df7ac90fb7d8d8c74a081b169f92ef"
+          }
+        ],
+        "couldKnowBeforeAttackerSubmission": [
+          "Exact requested calldata, then-current contracts and approvals, and simulated movements for every affected address if an archive/mempool service has the transaction.",
+          "The call can transfer another account's tokens; this requires multi-address effects rather than submitter-only assets."
+        ],
+        "couldNotKnowFromEarlierVictimApprovalAlone": [
+          "A later facet upgrade and future attacker calldata.",
+          "That a maximum approval is malicious merely because the spender was later exploited."
+        ],
+        "requiredInputs": [
+          "Chain 1 support",
+          "Exact transaction prestate at block 20318963, transaction index 168",
+          "Original wrapper calldata; do not replace top-level recipient with the diamond",
+          "Execution trace and token balance/allowance evidence",
+          "Time-bounded threat-intelligence snapshot if reputation is evaluated"
+        ]
+      },
+      "uncertainties": [
+        "No archive replay or before/after balances were captured in this research task.",
+        "The receipt contains a token event, not independently measured balance loss.",
+        "Top-level recipient is 0x986a...c240; nested LI.FI execution needs trace confirmation.",
+        "Original victim approval transaction, original UI intent, and approval-time reputation are missing."
+      ],
+      "admissionGates": [
+        "Independent reviewer confirms primary source-to-transaction attribution.",
+        "Capture and hash trace, bytecode/proxy implementations, and exact prestate artifacts.",
+        "Confirm victim token outflow and consumed spender allowance independently of Transfer events.",
+        "Retain attacker and victim perspectives as distinct records.",
+        "Keep case out of aggregate scoring until required task-specific inputs exist."
+      ]
+    },
+    {
+      "admissionStatus": "candidate_not_admitted",
+      "futureSplit": "candidate_holdout_not_sealed",
+      "currentEngineSupported": false,
+      "observedFactsBasis": "Public Ethereum JSON-RPC transaction, receipt, and block; no trace or balance snapshots captured.",
+      "sourceFactsAreNotDetectorFeatures": true,
+      "labelConfidenceScale": "high = strong incident attribution with public chain corroboration; medium = chain facts strong but maliciousness/mechanism still needs corroboration. Neither means a blind or statistically valid test.",
+      "id": "socket-2024-01-16",
+      "title": "Socket constructor-triggered existing-approval drain",
+      "family": "existing_approval_drain",
+      "incidentGroup": "socket-january-2024",
+      "transactionStage": "attacker_contract_creation_and_drain",
+      "evidenceSourceIds": [
+        "socket-certik-2024"
+      ],
+      "observedFacts": {
+        "chainId": 1,
+        "transactionHash": "0xc6c3331fa8c2d30e1ef208424c08c039a89e510df2fb6ae31e5aa40722e28fd6",
+        "blockNumber": "19021454",
+        "blockHash": "0x3b32fad51069bb91ca40ed65afbbb6b0fe3512b873699c804765c9a286c58465",
+        "transactionIndex": "0",
+        "timestamp": "2024-01-16T19:11:23.000Z",
+        "from": "0x50df5a2217588772471b84adbbe4194a2ed39066",
+        "to": null,
+        "createdContract": "0xf2d5951bb0a4d14bdcc37b66f919f9a1009c05d1",
+        "receiptStatus": "0x1",
+        "inputPrefix": "0x60806040",
+        "logsCount": 384,
+        "transferCount": 256,
+        "nonzeroTransferCount": 127,
+        "uniqueNonzeroTransferSources": 127,
+        "transferRawTotals": {
+          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": "2569980189709"
+        },
+        "selectedTransferEvents": [
+          {
+            "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "from": "0x7d03149a2843e4200f07e858d6c0216806ca4242",
+            "to": "0x50df5a2217588772471b84adbbe4194a2ed39066",
+            "amountRaw": "656424984436",
+            "logIndex": "1"
+          },
+          {
+            "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "from": "0x38d2ca742b90ebd21dcceceb02ff6fd3d233b21e",
+            "to": "0x50df5a2217588772471b84adbbe4194a2ed39066",
+            "amountRaw": "276966710000",
+            "logIndex": "4"
+          },
+          {
+            "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "from": "0xcb33844b365c53d3462271cee9b719b6fc8ba06a",
+            "to": "0x50df5a2217588772471b84adbbe4194a2ed39066",
+            "amountRaw": "200000000000",
+            "logIndex": "7"
+          }
+        ],
+        "approvalEvents": [],
+        "artifact": {
+          "path": "sources/socket-2024-01-16-rpc.json",
+          "sha256": "349df4a63c10f9d2006e0e5613885ad61019c3e5bede3b80a96e40c10a8ef200",
+          "retrievedAt": "2026-10-23T14:49:21.993Z",
+          "provider": "https://ethereum-rpc.publicnode.com"
+        }
+      },
+      "labels": {
+        "incidentAttribution": {
+          "value": "documented_incident_drain_candidate",
+          "confidence": "high",
+          "basis": [
+            "socket-certik-2024",
+            "public_rpc"
+          ],
+          "reason": "RPC confirms the report's actor, gateway log emitter, and 127 distinct nonzero USDC transfer sources in the incident window. The source does not directly link this selected hash, so a second reviewer must complete attribution."
+        },
+        "victimSigningRequest": {
+          "value": "not_observed",
+          "confidence": "high"
+        },
+        "priorApprovalIntent": {
+          "value": "unknown_do_not_label_malicious",
+          "confidence": "high"
+        },
+        "maliciousnessIsAnAnnotationNotAChainField": true
+      },
+      "lifecycle": [
+        {
+          "stage": "admin_route_registration",
+          "transactionHash": "0x1df44e224c7a715da25fa33dcad2ca3a930d1a4dafd263e61c07b52673d505f4",
+          "sourceId": "socket-certik-2024",
+          "rpcCaptured": false,
+          "label": "configuration_context_not_labeled_malicious"
+        },
+        {
+          "stage": "victim_prior_approvals",
+          "transactionHash": null,
+          "artifactAvailable": false,
+          "label": "intent_unknown"
+        },
+        {
+          "stage": "constructor_and_drain",
+          "transactionHash": "0xc6c3331fa8c2d30e1ef208424c08c039a89e510df2fb6ae31e5aa40722e28fd6",
+          "label": "incident_drain_candidate"
+        },
+        {
+          "stage": "route_disabled",
+          "transactionHash": "0xac75adcc1cb3fef158c4f200c48fcbcbb9b6ce3250bdf3751d6231d41a9e604b",
+          "sourceId": "socket-certik-2024",
+          "rpcCaptured": false,
+          "label": "defensive_mitigation_not_malicious"
+        }
+      ],
+      "evaluation": {
+        "eligibleTaskAfterAdmission": "contract_creation_replay_and_multivictim_effect_extraction",
+        "notEligibleFor": "victim_wallet_presign_detection_without_original_approval_prompts",
+        "perspectives": [
+          {
+            "role": "transaction_submitter",
+            "address": "0x50df5a2217588772471b84adbbe4194a2ed39066"
+          },
+          {
+            "role": "selected_affected_owner",
+            "address": "0x7d03149a2843e4200f07e858d6c0216806ca4242"
+          }
+        ],
+        "couldKnowBeforeAttackerSubmission": [
+          "The submitted creation initcode and prestate can be executed on an isolated EVM to expose constructor-time effects.",
+          "All 127 affected owners must be examined; submitter-only outAssets cannot express this harm."
+        ],
+        "couldNotKnowFromEarlierVictimApprovalAlone": [
+          "A subsequently registered vulnerable route.",
+          "That every router approval is a malicious signature."
+        ],
+        "requiredInputs": [
+          "Chain 1 archive tracing and contract-creation support",
+          "Prestate for block 19021454, transaction index 0",
+          "Preserved original initcode and successful constructor execution",
+          "All zero and nonzero Transfer events, with independent balance checks",
+          "Router delegation trace and historical allowances"
+        ]
+      },
+      "uncertainties": [
+        "This is contract creation (to is null), unsupported by the current contract-call-only server.",
+        "No new Approval event appears in the receipt; detection cannot rely on seeing maximum approvals in the drain transaction.",
+        "Primary report's selected attack-contract anchor is inconsistent; do not substitute that address for the RPC-confirmed created contract.",
+        "Receipt transfers alone do not prove authorization intent or final balances."
+      ],
+      "admissionGates": [
+        "Independent incident attribution review beyond a matching actor label.",
+        "Archive trace confirms the original constructor's gateway calls and token movement.",
+        "Retain zero-value events but do not count them as separate losses or victims.",
+        "Verify historical allowance and balance effects for selected victims, then expand to the complete cohort.",
+        "Do not substitute a synthesized direct gateway call and call it the historical transaction."
+      ]
+    },
+    {
+      "admissionStatus": "candidate_not_admitted",
+      "futureSplit": "candidate_holdout_not_sealed",
+      "currentEngineSupported": false,
+      "observedFactsBasis": "Public Ethereum JSON-RPC transaction, receipt, and block; no trace or balance snapshots captured.",
+      "sourceFactsAreNotDetectorFeatures": true,
+      "labelConfidenceScale": "high = strong incident attribution with public chain corroboration; medium = chain facts strong but maliciousness/mechanism still needs corroboration. Neither means a blind or statistically valid test.",
+      "id": "usdc-permit-2026-03-16",
+      "title": "USDC permit redemption and three-recipient drain candidate",
+      "family": "permit_signature_abuse",
+      "incidentGroup": "usdc-permit-march-2026",
+      "transactionStage": "attacker_submitted_permit_redemption_and_drain",
+      "evidenceSourceIds": [
+        "permit-darknavy-2026"
+      ],
+      "observedFacts": {
+        "chainId": 1,
+        "transactionHash": "0xfd7417af8433e3d9bcbed3f965307c800a24eb4e98f42cebfab6ca6064f5a642",
+        "blockNumber": "24671606",
+        "blockHash": "0xf2e83ee047b57eef1e13a7ec3fccb99d9cbaf0899ad8f3612045d78a62394e9f",
+        "transactionIndex": "98",
+        "timestamp": "2026-03-16T17:38:59.000Z",
+        "from": "0xafb2423f447d3e16931164c9970b9741aab1723e",
+        "to": "0x0927ba1f2a31875b0dd7b28eec3a3e74b4620653",
+        "createdContract": null,
+        "receiptStatus": "0x1",
+        "inputPrefix": "0xcaa5c23f",
+        "logsCount": 4,
+        "transferCount": 3,
+        "nonzeroTransferCount": 3,
+        "uniqueNonzeroTransferSources": 1,
+        "transferRawTotals": {
+          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": "1766308432620"
+        },
+        "selectedTransferEvents": [
+          {
+            "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "from": "0x051bb76ff78366de530e293fdb1158c2079ab664",
+            "to": "0x6fe314fd4cf845f35fc461ed98e2fb8d9356b566",
+            "amountRaw": "88315421631",
+            "logIndex": "230"
+          },
+          {
+            "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "from": "0x051bb76ff78366de530e293fdb1158c2079ab664",
+            "to": "0xf1a50bbeba19a85db20432c6c201aa89604dfd2b",
+            "amountRaw": "264946264893",
+            "logIndex": "231"
+          },
+          {
+            "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "from": "0x051bb76ff78366de530e293fdb1158c2079ab664",
+            "to": "0x9f6f1ac48e4c7e53495a99ce49974cd1914fe17e",
+            "amountRaw": "1413046746096",
+            "logIndex": "232"
+          }
+        ],
+        "approvalEvents": [
+          {
+            "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "owner": "0x051bb76ff78366de530e293fdb1158c2079ab664",
+            "spender": "0x0927ba1f2a31875b0dd7b28eec3a3e74b4620653",
+            "amountRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+            "logIndex": "229"
+          }
+        ],
+        "artifact": {
+          "path": "sources/usdc-permit-2026-03-16-rpc.json",
+          "sha256": "75a1b94873fefa641f8fb7efb2ddbce5bb2c1999398156ac61d9ebf3b3a1227a",
+          "retrievedAt": "2026-10-23T14:49:23.003Z",
+          "provider": "https://ethereum-rpc.publicnode.com"
+        }
+      },
+      "labels": {
+        "incidentAttribution": {
+          "value": "reported_permit_phishing_drain_candidate",
+          "confidence": "medium",
+          "basis": [
+            "permit-darknavy-2026",
+            "public_rpc"
+          ],
+          "reason": "Exact transaction identity and reported approval/transfers match the receipt. Phishing and off-chain signature acquisition remain source-attributed and need independent corroboration."
+        },
+        "victimSigningRequest": {
+          "value": "missing_offchain_typed_data_prompt",
+          "confidence": "high"
+        },
+        "permitMechanism": {
+          "value": "source_reported_not_independently_traced",
+          "confidence": "medium"
+        },
+        "maliciousnessIsAnAnnotationNotAChainField": true
+      },
+      "lifecycle": [
+        {
+          "stage": "victim_offchain_signature",
+          "transactionHash": null,
+          "artifactAvailable": false,
+          "label": "reported_deceptive_signature_not_independently_observed",
+          "note": "An off-chain EIP-712 request is not an EVM transaction. No original domain, wallet-rendered prompt, or request timestamp was captured."
+        },
+        {
+          "stage": "permit_redemption_and_drain",
+          "transactionHash": "0xfd7417af8433e3d9bcbed3f965307c800a24eb4e98f42cebfab6ca6064f5a642",
+          "label": "reported_attack_submission_with_verified_event_sequence"
+        },
+        {
+          "stage": "later_swaps_or_cashout",
+          "included": false
+        }
+      ],
+      "evaluation": {
+        "eligibleTaskAfterAdmission": "permission_event_and_multiactor_effect_extraction; mechanism detection after trace verification",
+        "notEligibleFor": "pre-signature_phishing_recall_until_original_typed_data_and_context_are_verified",
+        "perspectives": [
+          {
+            "role": "transaction_submitter",
+            "address": "0xafb2423f447d3e16931164c9970b9741aab1723e"
+          },
+          {
+            "role": "signature_owner_and_affected_account",
+            "address": "0x051bb76ff78366de530e293fdb1158c2079ab664"
+          }
+        ],
+        "couldKnowBeforeVictimSignatureIfOriginalRequestIsAvailable": [
+          "Token/verifying contract, chain, spender, value, nonce, deadline, and requested typed-data schema.",
+          "A broad spending authorization can be explained without claiming the spender is malicious.",
+          "A separate, correctly modeled redemption scenario could illustrate capability; it is not the same as a signature being an EVM call."
+        ],
+        "couldNotKnowFromCurrentCapturedArtifacts": [
+          "The exact original signing prompt, front-end URL, numeric-address normalization, or user intent.",
+          "That the later drain transaction's attacker sender was the victim's wallet transaction.",
+          "That the report's EIP-7702 phishing-front attribution is established by the receipt."
+        ],
+        "requiredInputs": [
+          "Chain 1 archive trace at block 24671606, transaction index 98",
+          "Trace-confirmed permit method and historical token implementation",
+          "Independent verification of domain, nonce, signature owner and successful redemption",
+          "Original eth_signTypedData request for any pre-signature benchmark",
+          "Separate immutable label/attribution evidence and pre-sign feature snapshot"
+        ]
+      },
+      "uncertainties": [
+        "No original typed-data request or wallet UI is available.",
+        "No full execution trace was retrieved; Approval followed by Transfer events alone is insufficient to prove which authorization method was called.",
+        "The source has inconsistent flash-loan categorization; no flash-loan label is assigned.",
+        "The linked CertiKAlert post could not be read and is not counted as corroboration.",
+        "Approval maximum and transfer receipts are observed facts; deception and attacker control of recipient addresses remain attributed labels."
+      ],
+      "admissionGates": [
+        "Obtain a second reviewed primary incident account or victim-provided evidence.",
+        "Capture trace and verify permit redemption against the historical token implementation.",
+        "For signature scoring, capture/authenticate the original typed-data request; a reconstructed request must be explicitly labeled reconstructed and kept in a separate track.",
+        "Keep current case quarantined from maliciousness precision/recall until attribution review completes."
+      ]
+    }
+  ],
+  "excludedEvidence": [
+    {
+      "url": "https://metasleuth.io/report/549adeb79929b8e921a3b08d42af7325",
+      "status": "not_used_as_ground_truth",
+      "reason": "An automatic potential-phishing report labels canonical Permit2 as suspicious based on prior use. An approval to a shared legitimate spender is not by itself proof of maliciousness; independent intent and downstream evidence are required."
+    },
+    {
+      "sourceId": "permit-certik-alert-unread",
+      "status": "not_read_not_used_as_corroboration"
+    }
+  ]
+}
+

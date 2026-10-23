@@ -52,7 +52,8 @@ test('maximum uint256 approval yields one scoped event finding, without claiming
   assert.equal(result.findings[0].owner, OWNER);
   assert.equal(result.findings[0].spender, SPENDER);
   assert.equal(result.findings[0].token, USDC);
-  assert.match(result.findings[0].message, /final allowance and spender trustworthiness were not verified/);
+  assert.match(result.findings[0].message, /event alone does not verify final allowance/);
+  assert.match(result.findings[0].message, /Spender trustworthiness is not assessed/);
 });
 
 test('a calldata-only unlimited request never becomes a confirmed permission event', () => {
