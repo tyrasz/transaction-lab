@@ -16,11 +16,11 @@ npm start
 
 Open http://127.0.0.1:5174/. The existing Dynamic comparison demo remains separate on port 5173.
 
-With the server running, `npm run check:live` runs twelve read-only checks against public chain data and saves every API request and response in `reports/live/`. Wallet state and public-provider availability can change; a failed live check is retained for inspection. `npm run compare:providers` compares seven cases at one pinned block across the two documented public providers, preserving disagreements and evidence.
+With the server running, `npm run check:live` runs twelve read-only checks against public chain data and saves every API request and response in `reports/live/`. Wallet state and public-provider availability can change; a failed live check is retained for inspection. `npm run compare:providers` compares seven cases at one pinned block across the two documented public providers, preserving disagreements and evidence. `npm run check:historical` compares four fixed historical operations across those providers, retaining all eight calls and their underlying RPC evidence in `reports/historical-comparisons/` without retries.
 
 The default public RPC is `https://hyperliquid.drpc.org`. For dedicated infrastructure, set `HYPEREVM_RPC_URL` to an RPC with `debug_traceCall`, `debug_traceTransaction`, archive data, and callTracer log support. Provider credentials stay on the server and are not included in evidence. The service checks chain ID before each operation. Public endpoints can change limits or capabilities.
 
-Measured balances additionally require `prestateTracer` diff mode, `eth_call` state overrides, and block-hash queries. If those are unavailable, the response retains the execution trace and explicitly marks balance measurement unavailable.
+Measured current-state balances additionally require `prestateTracer` diff mode, `eth_call` state overrides, and block-hash queries. Historical measurements require archive `debug_traceCallMany` with block-hash and transaction-index state context. If these capabilities or validation checks fail, the response retains the execution trace and explicitly marks balance measurement unavailable.
 
 ```sh
 HYPEREVM_RPC_URL=https://your-provider.example npm start
@@ -32,17 +32,19 @@ HYPEREVM_RPC_URL=https://your-provider.example npm start
 - Current simulations select a block and request tracing by its hash. A provider that rejects this is reported as unavailable; there is no silent fallback to latest.
 - Historical traces use the original transaction hash and are separate from current-state simulations.
 - Asset arrays describe successful ERC-20 Transfer events involving the simulated sender. They are not a claim about exact portfolio balance changes.
-- `balanceChanges` measures exact balances before and after a successful, reconciled Hyperlend operation. Supply covers sender/beneficiary USDC and hUSDC; withdrawal, borrowing and repayment additionally cover variable USDC debt and reserve custody. Every read uses the same block hash and timestamp, with the supported complete state diff applied only to ephemeral reads. Reserve cash is labeled separately from user wealth.
+- `balanceChanges` measures exact balances before and after a successful, reconciled Hyperlend operation. Supply covers sender/beneficiary USDC and hUSDC; withdrawal, borrowing and repayment additionally cover variable USDC debt and reserve custody. Current-state reads use the same block hash and timestamp, with the supported complete state diff applied only to ephemeral reads. Historical reads use the original block and transaction position. Reserve cash is labeled separately from user wealth.
 - Hyperlend receipt-token mint events may include previously accrued interest. Principal and interest are reported separately when decoded.
 - Deposit rounding is checked against the verified hUSDC implementation and its traced scaled-mint inputs. The response preserves requested principal, transferred principal, mint-implied principal and the exact difference.
 - Security is `not_assessed`. EVM success must never become a `Benign` verdict.
 - `permissions` separately records approval requests and Approval events for configured USDC/hUSDC contracts. It identifies maximum allowances, revocations, false returns and calldata/event mismatches. Findings describe specific permission evidence. `allowanceChanges` separately queries final allowance before/after the whole simulated transaction for observed verified pairs, including unchanged allowances. It compares final state to ordered events without treating a mismatch as a maliciousness verdict. Spender reputation is not assessed.
 - Variable-debt token mints are liabilities and are excluded from spendable incoming assets. `positionChanges` separates cash, position events and accrued interest. Repayments use the actual executed amount, which may be capped by outstanding debt.
 - Unknown protocols and external HyperCore processing have explicit coverage limitations.
-- Historical replay returns original execution and event evidence. It does not yet measure balances or allowances at the original transaction's position inside its block.
+- Historical replay measures the configured token balances immediately before and after the original transaction. The original execution is independently replayed and compared with its recorded call trace and receipt events. Each balance query runs separately, with original block-header, sender-nonce and fee checks. Historical allowances remain unmeasured. Only supported legacy, access-list and fee-market transaction envelopes are accepted for measurement; blob and authorization-list semantics are outside scope.
 - Pricing, malicious-contract detection, signature validation, general NFT support, and general-purpose balance measurement are not implemented.
 
 The two public providers were also tested with stateful `eth_simulateV1`. That method is retained as capability evidence; the application uses the prestate-diff route so its primary trace and balance measurements share the original block context. See [capability evidence](reports/capabilities/STATEFUL-BALANCES.md).
+
+Historical reads use a different route because block-end state is insufficient for a transaction in the middle of a block. The providers silently ignored `debug_traceCall`'s tested `txIndex` option, so the adapter uses validated `debug_traceCallMany` state context. It never inserts balance probes into the original transaction's execution sequence. See [historical state evidence](reports/historical-state/README.md).
 
 ## API
 

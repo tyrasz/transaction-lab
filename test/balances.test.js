@@ -207,3 +207,30 @@ test('another beneficiary receives separate before/after observations for both c
   assert.equal(result.assets.find(a => a.asset.address === HUSDC && a.account === OTHER).delta, '15.066115');
   assert.equal(result.assets.find(a => a.asset.address === HUSDC && a.account === input.request.from).delta, '0');
 });
+
+test('supply for another beneficiary rejects unexpected changes outside the deposited position', async () => {
+  for (const unexpectedToken of [USDC,HUSDC]) {
+    const {input}=setup({
+      mutateInput: input=>{
+        const args=input.request.data.slice(10);
+        input.request.data=`0x617ba037${args.slice(0,128)}${OTHER.slice(2).padStart(64,'0')}${args.slice(192)}`;
+        input.analysis.protocol.onBehalfOf=OTHER;
+      },
+      overrideCall: (method,params,input)=>{
+        if(method!=='eth_call')return;
+        const account='0x'+params[0].data.slice(-40),token=params[0].to;
+        let value=100000000n;
+        if(params.length===3){
+          if(token===USDC && account===input.request.from)value-=15066115n;
+          if(token===HUSDC && account===OTHER)value+=15066115n;
+          if(token===unexpectedToken && account===(token===USDC?OTHER:input.request.from))value+=1n;
+        }
+        return amountWord(value);
+      },
+    });
+    const result=await measureBalances(input);
+    assert.equal(result.status,'unavailable');
+    assert.deepEqual(result.assets,[]);
+    assert.ok(result.warnings.some(w=>w.includes('unrelated sender or beneficiary')));
+  }
+});

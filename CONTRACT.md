@@ -40,9 +40,9 @@ Server owns request validation, read-only RPC method allowlist, block selection,
 
 ## Measured balances
 
-`src/balances.js` exports `measureBalances({request,block,rpc,metadata,analysis})` for supported current-state Hyperlend USDC supplies. Its public result becomes `balanceChanges`: `{status:'measured'|'unavailable'|'not_applicable',basis,assets,warnings,executionIdentity?}`. Each asset records token metadata, account, exact decimal-string `beforeRaw`, `afterRaw`, `deltaRaw`, and formatted `before`, `after`, `delta`. Raw integer fields use decimal notation; event `rawValue` fields retain hexadecimal notation for compatibility.
+`src/balances.js` exports `measureBalances({request,block,rpc,metadata,analysis,stateContext?})` for supported Hyperlend USDC supplies. Its public result becomes `balanceChanges`: `{status:'measured'|'unavailable'|'not_applicable',basis,assets,warnings,executionIdentity?}`. Each asset records token metadata, account, exact decimal-string `beforeRaw`, `afterRaw`, `deltaRaw`, and formatted `before`, `after`, `delta`. Raw integer fields use decimal notation; event `rawValue` fields retain hexadecimal notation for compatibility.
 
-The module traces state changes, constructs ephemeral overrides, reads balances at the same block hash and timestamp, and checks canonical block identity. Unsupported account/code changes, malformed results and inconsistent state return `unavailable`, never fabricated zero deltas. No on-chain state is changed. Historical replay currently reports `not_applicable` because it needs state at the original transaction position.
+For current simulations the module traces state changes, constructs ephemeral overrides, reads balances at the same block hash and timestamp, and checks canonical block identity. Unsupported account/code changes, malformed results and inconsistent state return `unavailable`, never fabricated zero deltas. No on-chain state is changed. Historical replay supplies the separate context described below.
 
 The module's RPC request/response evidence is stored at `evidence.balanceMeasurement`. `inAssets`, `outAssets` and `movements` remain event-based; consumers must select the appropriate field rather than summing both.
 
@@ -64,6 +64,16 @@ The module's RPC request/response evidence is stored at `evidence.balanceMeasure
 
 `positionChanges` records event-based position evidence. A variable-debt token has `role:liability` and `transferable:false` in measured asset metadata. Its events remain in raw movements but are excluded from spendable `inAssets`/`outAssets`. A repayment may emit Mint while reducing debt if accrued interest exceeds repayment; the signed position change determines direction.
 
-`src/lending-balances.js` measures all involved accounts across USDC, hUSDC and variable USDC debt, including labeled reserve custody. Exact deltas must reconcile to actual cash and event-implied position changes. Unexpected unrelated changes make measurement unavailable. Historical replay still requires original-transaction-position state before measurement is supported.
+`src/lending-balances.js` measures all involved accounts across USDC, hUSDC and variable USDC debt, including labeled reserve custody. Exact deltas must reconcile to actual cash and event-implied position changes. Unexpected unrelated changes make measurement unavailable. Both measurement modules accept the same lazy context interface for current or historical reads.
+
+## Historical position measurements
+
+`createHistoricalStateContext({request,block,rpc,transaction,receipt,trace})` in `src/historical-state.js` exposes `matches`, `prepare`, `readPair`, `verifyCanonical`, `snapshotEvidence`, `executionIdentity`, and immutable `measurementBasis`. A historical `balanceChanges.basis` is `historical_transaction_position_balanceOf`.
+
+The context binds the original transaction, receipt, full block transaction list and canonical header. It independently runs the original unsigned call at its zero-based transaction index with `debug_traceCallMany`, comparing semantic trace fields, per-frame gas used and receipt event content. Input-gas annotations may differ between RPC wrappers and are excluded from that comparison. Original account creation/deletion and code changes are outside scope.
+
+Before/after token reads run as independent single-call bundles at indexes `i` and `i+1`. They use the original effective gas price; block-header witnesses verify number, timestamp, gas limit, base fee, randomness, coinbase, chain ID and parent hash. Token query call shapes must match the configured proxy/implementation behavior, return one uint256, and produce only validated nonce and native-fee effects. Sender nonce must equal the original nonce before, and original nonce plus one after. Queries never run ahead of the original transaction in a shared bundle.
+
+Historical `executionIdentity` includes transactionHash, transactionIndex, postTransactionIndex, stateBlockHash, blockNumber, timestamp, `stateBinding:'block_hash_and_transaction_index'`, `headerContext:'original_block'`, `method:'debug_traceCallMany'`, and validation details. Limits are twelve token/account pairs, sixty-four RPC calls, 8 MiB per response and 32 MiB accumulated result evidence. Unknown token implementations, unsupported envelopes, provider capability failures and failed consistency checks produce unavailable measurements with empty assets and retained bounded evidence. Historical allowance measurement remains `not_applicable`.
 
 No credentials or authentication tokens belong in reports. Raw evidence is restricted to public blockchain requests/responses.

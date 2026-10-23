@@ -4,14 +4,14 @@ Build a transaction-preview and security system that can demonstrate stronger re
 
 ## Current foundation
 
-The current implementation covers HyperEVM Hyperlend USDC supply, withdrawal, variable-rate borrowing and repayment, with separate debt accounting and final USDC/hUSDC allowance measurements. It preserves raw evidence and uses shared pinned-state reconstruction for exact balance reads. Fourteen offline regression cases (ten observed, four synthetic), twelve live API checks and seven same-block two-provider comparisons pass at the 0.3.0 checkpoint. These are narrow development checks, not general accuracy or security scores.
+The current implementation covers HyperEVM Hyperlend USDC supply, withdrawal, variable-rate borrowing and repayment, with separate debt accounting and final USDC/hUSDC allowance measurements. It preserves raw evidence and uses shared pinned-state reconstruction for current balance reads. Historical balances are measured at the original transaction position, with independent execution and query validation. Fourteen offline regression cases (ten observed, four synthetic), twelve live API checks, seven same-block comparisons and four historical two-provider comparisons form the development checks. See STATUS.md for the latest completed results; these are not general accuracy or security scores.
 
-Historical transaction-position state is the next implementation target. Probes identified a supported state-context method after demonstrating that another provider parameter was silently ignored. The three researched security incident candidates remain unadmitted and unscored; no blind holdout or detector performance claim exists. See STATUS.md for evidence and research/security-corpus/PLAN.md for admission criteria.
+Historical transaction-position state uses a validated state-context method after probes demonstrated that another provider parameter was silently ignored. The next coverage targets are additional permissions and affected accounts. The three researched security incident candidates remain unadmitted and unscored; no blind holdout or detector performance claim exists. See STATUS.md for evidence and research/security-corpus/PLAN.md for admission criteria.
 
 ## Execution correctness
 
 1. Bind simulations to a recorded block hash and number, and detect a reorganization or provider state mismatch.
-2. Extend the implemented USDC/hUSDC pre/post balance strategy to more operations, historical transaction positions and assets. Keep transfer events, principal and accrued interest distinct from balance deltas.
+2. Extend the implemented pre/post balance strategy to more assets and affected accounts, and validate historical allowance measurements. Keep transfer events, principal and accrued interest distinct from balance deltas.
 3. Test allowances, transfer taxes, rebases, delegated accounts, proxies, reverted subcalls, unusual logs and failed execution.
 4. Cross-check a held-out transaction corpus against independent execution engines and receipts. Preserve disagreements as failures with raw evidence.
 

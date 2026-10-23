@@ -13,7 +13,7 @@ function readableKey(key) { return key.replace(/([a-z])([A-Z])/g, '$1 $2').repla
 function display(value) { return value === null || value === undefined ? 'Not available' : typeof value === 'object' ? JSON.stringify(value) : String(value); }
 function titleCase(value) { return String(value || 'unknown').replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase()); }
 function numberLabel(value) { try { return BigInt(value).toLocaleString('en-US'); } catch { return display(value); } }
-function formatTime(value) { if (!value) return null; const date = new Date(typeof value === 'string' && !/^\d+$/.test(value) ? value : Number(value) * 1000); return Number.isNaN(date.getTime()) ? String(value) : date.toISOString().replace('T', ' ').replace('.000Z', ' UTC'); }
+function formatTime(value) { if (value === null || value === undefined || value === '') return null; const date = new Date(typeof value === 'string' && !/^(?:\d+|0x[0-9a-f]+)$/i.test(value) ? value : Number(value) * 1000); return Number.isNaN(date.getTime()) ? String(value) : date.toISOString().replace('T', ' ').replace('.000Z', ' UTC'); }
 
 async function request(url, body) {
   const controller = new AbortController();
@@ -42,7 +42,7 @@ function setBusy(busy, mode) {
   for (const id of requestFieldIds) $(id).disabled = busy;
   document.querySelector('.results-panel').setAttribute('aria-busy', String(busy));
   $('run-status').classList.toggle('loading', busy);
-  $('run-status').textContent = busy ? mode === 'historical_trace' ? 'Retrieving the original execution trace and decoding its events…' : 'Pinning the block, executing the call, and decoding token events…' : '';
+  $('run-status').textContent = busy ? mode === 'historical_trace' ? 'Retrieving the original execution trace and checking available historical balance evidence…' : 'Pinning the block, executing the call, and decoding token events…' : '';
 }
 
 function clearResult({ inputsChanged = false } = {}) {
@@ -123,7 +123,7 @@ function allowanceChangeLabel(pair) {
   return direction === 'positive' ? 'Allowance increased' : direction === 'negative' ? 'Allowance reduced' : 'Allowance changed';
 }
 
-function renderAllowances(changes, permissions) {
+function renderAllowances(changes, permissions, historical = false) {
   const relevant = permissions?.observations?.length || permissions?.findings?.length;
   $('allowances-section').hidden = !changes || (changes.status === 'not_applicable' && !relevant);
   $('allowance-pairs').replaceChildren();
@@ -135,7 +135,7 @@ function renderAllowances(changes, permissions) {
   $('allowances-description').textContent = measured
     ? 'Allowance values read before and after the entire simulated transaction. Measurements apply only to the token, owner, and spender pairs below. Spender trustworthiness is not assessed.'
     : changes.status === 'not_applicable'
-      ? 'Allowance measurement does not apply to this execution. Requests and emitted events do not establish final allowance state.'
+      ? historical ? 'Historical allowance state is not measured. Approval requests and emitted events do not establish the final allowance; measured historical balances are separate evidence.' : 'Allowance measurement does not apply to this execution. Requests and emitted events do not establish final allowance state.'
       : 'Final allowances could not be measured. Missing measurements do not mean zero permission or a successful revocation.';
   for (const pair of measured && Array.isArray(changes.allowances) ? changes.allowances : []) {
     const card = node('div', 'permission-observation');
@@ -226,21 +226,43 @@ function renderInterest(accruals, protocol) {
   }
 }
 
-function renderBalanceChanges(changes) {
+function renderBalanceChanges(changes, source = {}) {
   $('balances-section').hidden = !changes;
+  $('balance-verification').hidden = true;
+  $('balance-verification-details').replaceChildren();
   for (const id of ['balance-assets', 'balance-debts', 'balance-custody']) $(id).replaceChildren();
   $('balance-debts-group').hidden = true;
   $('balance-custody-group').hidden = true;
   $('balance-warnings').replaceChildren();
   if (!changes) return;
   const measured = changes.status === 'measured';
+  const historical = source.mode === 'historical_trace';
+  const originalPosition = changes.basis === 'historical_transaction_position_balanceOf';
   $('balances-section').classList.toggle('measured', measured);
-  $('balances-badge').textContent = measured ? 'Before / after' : titleCase(changes.status);
+  $('balances-heading').textContent = historical ? 'Historical balance measurements' : 'Measured balance changes';
+  $('balances-badge').textContent = measured ? originalPosition ? 'Original transaction position' : 'Before / after' : titleCase(changes.status);
   $('balances-description').textContent = measured
-    ? 'Token balances read before and after the simulated call, independently of its transfer events.'
+    ? originalPosition
+      ? 'Balances read immediately before and after the original transaction, at its position and timestamp in the original block. Original transfer logs are decoded separately below.'
+      : historical
+        ? 'Measured balances were returned, but this response does not identify an original-transaction-position measurement. Review the measurement basis and execution evidence.'
+        : 'Token balances read before and after the simulated call, independently of its transfer events.'
     : changes.status === 'not_applicable'
-      ? 'Balance measurement does not apply to this execution mode. Event evidence remains available below.'
-      : 'Before-and-after balances could not be measured. No zero balance change is inferred from missing data.';
+      ? historical ? 'Historical balance measurement is not available for this execution. Original event evidence remains available below.' : 'Balance measurement does not apply to this execution mode. Event evidence remains available below.'
+      : historical ? 'Balances at the original transaction position could not be measured. Missing measurements do not imply zero balance change.' : 'Before-and-after balances could not be measured. No zero balance change is inferred from missing data.';
+  if (measured) {
+    const identity = changes.executionIdentity || {};
+    const context = $('balance-verification-details');
+    if (originalPosition) {
+      addDefinition(context, 'Original block', identity.blockNumber === null || identity.blockNumber === undefined ? 'Not provided' : numberLabel(identity.blockNumber));
+      addDefinition(context, 'Transaction index (zero-based)', identity.transactionIndex === null || identity.transactionIndex === undefined ? 'Not provided' : numberLabel(identity.transactionIndex));
+      addDefinition(context, 'Post-transaction state index', identity.postTransactionIndex === null || identity.postTransactionIndex === undefined ? 'Not provided' : numberLabel(identity.postTransactionIndex));
+      addDefinition(context, 'Original block time', formatTime(identity.timestamp) || 'Not provided');
+      addDefinition(context, 'State binding', identity.stateBinding === 'block_hash_and_transaction_index' ? 'Block hash and transaction index' : identity.stateBinding || 'Not provided');
+      addDefinition(context, 'Block hash', identity.stateBlockHash || 'Not provided');
+    } else if (historical) addDefinition(context, 'Measurement basis', changes.basis || 'Not provided');
+    $('balance-verification').hidden = !context.children.length;
+  }
   if (measured) {
     const assets = Array.isArray(changes.assets) ? changes.assets : [];
     if (!assets.length) $('balance-assets').append(node('p', 'section-help', 'The balance probe returned no measured assets.'));
@@ -438,11 +460,16 @@ function renderResult(result) {
   $('contract-revert').textContent = execution.revert?.message ? `Contract-reported reason (untrusted contract output): ${String(execution.revert.message).slice(0, 4096)}` : '';
   const protocol = result.protocol;
   renderProtocol(protocol, result);
+  $('movements-heading').textContent = historical ? 'Historical event-derived asset movements' : 'Event-derived asset movements';
+  $('movements-badge').textContent = historical ? 'Original transfer logs' : 'Transfer events';
+  $('movements-description').textContent = historical
+    ? 'Amounts decoded from the original execution logs. Event totals can include recognized interest and differ from before-and-after balance measurements.'
+    : 'Event totals may include recognized interest and differ from the actual change in token balances.';
   renderAssetList('out-assets', result.outAssets, 'transferOut');
   renderAssetList('in-assets', result.inAssets, 'transferIn');
-  renderAllowances(result.allowanceChanges, result.permissions);
+  renderAllowances(result.allowanceChanges, result.permissions, historical);
   renderPermissions(result.permissions, result.allowanceChanges);
-  renderBalanceChanges(result.balanceChanges);
+  renderBalanceChanges(result.balanceChanges, source);
   renderPositions(result.positionChanges, result);
   renderInterest(result.interestAccruals, protocol);
   const warnings = [...new Set([...(coverage.reasons || []), ...(result.warnings || [])])];
@@ -458,6 +485,10 @@ function renderResult(result) {
   addDefinition(details, 'State binding', source.blockBinding);
   addDefinition(details, 'RPC provider', source.provider);
   addDefinition(details, 'Trace method', result.evidence?.traceMethod);
+  if (historical && result.balanceChanges?.status === 'measured' && result.balanceChanges.basis === 'historical_transaction_position_balanceOf') {
+    addDefinition(details, 'Balance method', result.balanceChanges.executionIdentity?.method);
+    addDefinition(details, 'Balance state', 'Before and after the original transaction, with original block context');
+  }
   addDefinition(details, 'Transaction', source.transactionHash);
   addDefinition(details, 'Run ID', result.id);
   $('timing').textContent = result.timing?.totalMs !== undefined ? `${(result.timing.totalMs / 1000).toFixed(2)}s total` : '';
@@ -481,16 +512,21 @@ async function run(mode) {
     }
     renderResult(result);
     setBusy(false);
-    $('run-status').textContent = result.execution?.status === 'success' ? historicalRunMessage(mode) : 'The provider returned an execution failure. Review the error and trace below.';
+    $('run-status').textContent = result.execution?.status === 'success' ? historicalRunMessage(mode, result) : 'The provider returned an execution failure. Review the error and trace below.';
   } catch (error) {
     setBusy(false);
     $('request-error').hidden = false;
     $('request-error').textContent = `${error.code ? `${error.code}: ` : ''}${error.message}`;
-    $('run-status').textContent = 'No simulation result was produced. An API error is not an empty asset preview.';
+    $('run-status').textContent = mode === 'historical_trace' ? 'No historical execution result was produced. An API error is not an empty asset preview.' : 'No simulation result was produced. An API error is not an empty asset preview.';
   }
 }
 
-function historicalRunMessage(mode) { return mode === 'historical_trace' ? 'Original EVM execution retrieved. Later cross-system effects may require separate evidence.' : 'Execution completed. Review the balance, transfer, and permission evidence below.'; }
+function historicalRunMessage(mode, result) {
+  if (mode !== 'historical_trace') return 'Execution completed. Review the balance, transfer, and permission evidence below.';
+  return result.balanceChanges?.status === 'measured' && result.balanceChanges.basis === 'historical_transaction_position_balanceOf'
+    ? 'Original EVM execution retrieved. Balances measured at the original transaction position; transfer logs are shown separately.'
+    : 'Original EVM execution retrieved. Review the available historical evidence and coverage limits below.';
+}
 
 function benchmarkRows(report) {
   for (const key of ['cases', 'results', 'tests', 'checks']) if (Array.isArray(report[key])) return report[key];

@@ -22,13 +22,16 @@ function decodeScope(request, analysis) {
 
 /** Read token balances on the same pinned state, then its traced ephemeral post-state. */
 export async function measureBalances({ request, block, rpc, metadata = {}, analysis, stateContext }) {
+  const historical = stateContext?.measurementBasis === 'historical_transaction_position_balanceOf';
   const warnings = [
-    'Balances are measured by calling the configured USDC and hUSDC contracts before and after an ephemeral state diff at the same block hash and timestamp.',
+    historical
+      ? 'Configured USDC and hUSDC balances are queried independently immediately before and after the original transaction, at its exact position in the original block. The original call is validated separately; no balance probes are inserted into that replay.'
+      : 'Balances are measured by calling the configured USDC and hUSDC contracts before and after an ephemeral state diff at the same block hash and timestamp.',
     'This measurement covers the submitting account and deposit beneficiary for these two tokens. It does not assess transaction security or predict future blocks.',
   ];
-  const base = { status: 'not_applicable', basis: 'prestate_diff_balanceOf', assets: [], warnings, evidence: { request: [], response: [] } };
+  const base = { status: 'not_applicable', basis: historical ? 'historical_transaction_position_balanceOf' : 'prestate_diff_balanceOf', assets: [], warnings, evidence: { request: [], response: [] } };
   const scope = decodeScope(request, analysis);
-  if (!scope) return { ...base, warnings: ['Balance measurement is limited to successful, reconciled Hyperlend USDC supply simulations.'] };
+  if (!scope) return { ...base, warnings: ['Balance measurement is limited to successful, reconciled Hyperlend USDC supply executions.'] };
   let context;
   try {
     const candidateContext = stateContext ?? createStateContext({ request, block, rpc });
@@ -39,7 +42,7 @@ export async function measureBalances({ request, block, rpc, metadata = {}, anal
     for (const account of new Set([scope.sender, scope.beneficiary])) for (const token of [USDC, HUSDC]) {
       const { before, after, delta } = await context.readPair({ to: token, data: `0x70a08231${account.slice(2).padStart(64, '0')}` });
       assets.push({
-        asset: { ...metadata[token], address: token, type: 'ERC20' }, account,
+        asset: { ...metadata[token], address: token, type: 'ERC20', role: token===HUSDC?'receipt_token':'underlying_asset' }, account,
         beforeRaw: before.toString(), afterRaw: after.toString(), deltaRaw: delta.toString(),
         before: formatUnits(before, 6), after: formatUnits(after, 6), delta: formatUnits(delta, 6),
       });
@@ -49,6 +52,10 @@ export async function measureBalances({ request, block, rpc, metadata = {}, anal
     if (BigInt(senderUSDC.deltaRaw) !== -scope.amount) failState('Measured USDC balance change disagrees with the successful supply principal.');
     const impliedPrincipal = uint(analysis.protocol.mintEventImpliedPrincipalRaw);
     if (impliedPrincipal === null || BigInt(beneficiaryHUSDC.deltaRaw) !== impliedPrincipal) failState('Measured hUSDC change disagrees with the traced Mint value minus accrued interest at the pinned context.');
+    for (const item of assets) {
+      const expected = item.asset.address===USDC ? (item.account===scope.sender ? -scope.amount : 0n) : (item.account===scope.beneficiary ? impliedPrincipal : 0n);
+      if (BigInt(item.deltaRaw)!==expected) failState('An unrelated sender or beneficiary balance changed outside the reconciled supply.');
+    }
     if (impliedPrincipal !== scope.amount) warnings.push('The measured hUSDC change differs from the requested USDC deposit and exactly matches the trace-reconciled Mint value minus accrued interest. The measured delta is preserved.');
     await context.verifyCanonical();
     return { ...base, status: 'measured', assets, executionIdentity: context.executionIdentity, evidence: context.snapshotEvidence() };

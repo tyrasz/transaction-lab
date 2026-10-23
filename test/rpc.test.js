@@ -51,3 +51,46 @@ test('malformed JSON envelopes and invalid URL errors stay bounded and credentia
     return true;
   });
 });
+
+test('historical call-many is a permitted read method while destructive debug methods remain blocked',async()=>{
+  const requests=[];
+  const rpc=new RpcClient({fetchImpl:async(url,init)=>{
+    const request=JSON.parse(init.body);requests.push(request);
+    return new Response(JSON.stringify({jsonrpc:'2.0',id:request.id,result:[[{type:'CALL',output:'0x'}]]}));
+  }});
+  const params=[[{transactions:[{from:'0x'+'1'.repeat(40),to:'0x'+'2'.repeat(40),data:'0x'}]}],{blockNumber:{blockHash:'0x'+'a'.repeat(64),requireCanonical:true},transactionIndex:0},{tracer:'callTracer'}];
+  assert.deepEqual(await rpc.call('debug_traceCallMany',params),[[{type:'CALL',output:'0x'}]]);
+  assert.deepEqual(requests[0].params,params);
+  for(const method of ['debug_setHead','debug_clearTxpool','miner_start','engine_newPayloadV3'])await assert.rejects(rpc.call(method,[]),{code:'METHOD_NOT_ALLOWED'});
+  assert.equal(requests.length,1);
+});
+
+test('nested RPC error envelopes are sanitized before any successful result can be captured',async()=>{
+  const secret='REVIEW_ONLY_PROVIDER_CREDENTIAL';
+  const frame={type:'CALL',from:'0x'+'1'.repeat(40),to:'0x'+'2'.repeat(40),input:'0x',output:'0x',gasUsed:'0x5208'};
+  const error={code:-32603,message:`Upstream https://rpc.invalid/${secret} rejected request`,data:{requestUrl:secret}};
+  for(const [method,result] of [
+    ['debug_traceCallMany',[[{error}]]],
+    ['debug_traceCallMany',[[{error:secret}]]],
+    ['debug_traceCall',{error}],
+    ['debug_traceTransaction',{...frame,calls:[{...frame,error}]}],
+    ['eth_getBlockByHash',{error}],
+  ]) {
+    const rpc=new RpcClient({fetchImpl:async(url,init)=>new Response(JSON.stringify({jsonrpc:'2.0',id:JSON.parse(init.body).id,result}))});
+    await assert.rejects(rpc.call(method,[]),failure=>{
+      assert.equal(failure.code,'RPC_EXECUTION_ERROR');
+      assert.ok(failure.detail.rpcCode===-32603 || failure.detail.rpcCode===null);
+      assert.doesNotMatch(JSON.stringify({message:failure.message,detail:failure.detail}),new RegExp(`${secret}|requestUrl|rpc\\.invalid`));
+      return true;
+    });
+  }
+});
+
+test('valid EVM reverts and their raw output remain unchanged by the RPC envelope guard',async()=>{
+  const frame={type:'CALL',from:'0x'+'1'.repeat(40),to:'0x'+'2'.repeat(40),input:'0x',output:'0xdeadbeef',gasUsed:'0x5208',error:'execution reverted',revertReason:'Contract-defined public reason'};
+  for(const [method,result] of [['debug_traceCall',frame],['debug_traceTransaction',{...frame,error:undefined,calls:[frame]}],['debug_traceCallMany',[[frame]]]]) {
+    const serialized=JSON.parse(JSON.stringify(result));
+    const rpc=new RpcClient({fetchImpl:async(url,init)=>new Response(JSON.stringify({jsonrpc:'2.0',id:JSON.parse(init.body).id,result}))});
+    assert.deepEqual(await rpc.call(method,[]),serialized);
+  }
+});

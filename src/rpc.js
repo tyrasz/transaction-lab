@@ -4,7 +4,7 @@ import { DEFAULT_RPC_URL } from './config.js';
 const READ_METHODS = new Set([
   'eth_chainId', 'eth_getBlockByNumber', 'eth_getBlockByHash',
   'eth_getTransactionByHash', 'eth_getTransactionReceipt', 'eth_call',
-  'debug_traceCall', 'debug_traceTransaction', 'eth_simulateV1',
+  'debug_traceCall', 'debug_traceTransaction', 'debug_traceCallMany', 'eth_simulateV1',
 ]);
 
 export class RpcError extends Error {
@@ -25,6 +25,36 @@ function providerExecutionError(error) {
   else if (/insufficient funds/.test(message)) description = 'RPC execution was rejected for insufficient native balance.';
   else if (/execution reverted|revert/.test(message)) description = 'RPC execution reverted before a complete trace was returned.';
   return new RpcError(description, 'RPC_EXECUTION_ERROR', { rpcCode });
+}
+
+// Some tracing providers nest RPC errors inside a successful result envelope.
+// Reject those before callers can persist raw results. A real EVM call frame's
+// string error/revertReason and return data remain public execution evidence.
+export function assertNoProviderErrorResult(method, result) {
+  const traces = ['debug_traceCall', 'debug_traceTransaction', 'debug_traceCallMany'].includes(method);
+  const stack = [{ value: result, arrayDepth: method === 'debug_traceCallMany' ? 2 : 0 }];
+  let visited = 0;
+  while (stack.length) {
+    if (++visited > 20000) throw new RpcError('RPC result exceeds the error-validation limit.', 'RPC_INVALID_RESPONSE');
+    const { value, arrayDepth } = stack.pop();
+    if (!value || typeof value !== 'object') continue;
+    if (Array.isArray(value)) {
+      if (arrayDepth > 0) for (const item of value) stack.push({ value: item, arrayDepth: arrayDepth - 1 });
+      continue;
+    }
+    if (Object.hasOwn(value, 'error') && value.error !== null && value.error !== undefined) {
+      const identifiedFrame = traces && typeof value.type === 'string'
+        && ['CALL','STATICCALL','DELEGATECALL','CALLCODE','CREATE','CREATE2','SELFDESTRUCT'].includes(value.type)
+        && typeof value.from === 'string' && /^0x[0-9a-f]{40}$/i.test(value.from)
+        && (value.to === undefined || (typeof value.to === 'string' && /^0x[0-9a-f]{40}$/i.test(value.to)));
+      if (typeof value.error !== 'string' || !identifiedFrame) {
+        // Error text can contain credentials; only the local classification and
+        // bounded numeric code leave this function.
+        throw providerExecutionError(typeof value.error === 'object' ? value.error : null);
+      }
+    }
+    if (traces && Array.isArray(value.calls)) for (const child of value.calls) stack.push({ value: child, arrayDepth: 0 });
+  }
 }
 
 export class RpcClient {
@@ -61,6 +91,7 @@ export class RpcClient {
       if (!payload || typeof payload !== 'object' || Array.isArray(payload) || payload.id !== id || payload.jsonrpc !== '2.0') throw new RpcError('RPC response ID or version is invalid.', 'RPC_INVALID_RESPONSE');
       if (payload.error) throw providerExecutionError(payload.error);
       if (!Object.hasOwn(payload, 'result')) throw new RpcError('RPC response has no result.', 'RPC_INVALID_RESPONSE');
+      assertNoProviderErrorResult(method, payload.result);
       return payload.result;
     } catch (error) {
       if (error instanceof RpcError) throw error;

@@ -31,12 +31,15 @@ function decodeScope(request, analysis) {
 
 /** Measure involved user positions and reserve custody using one shared state diff. */
 export async function measureLendingBalances({ request, block, rpc, metadata = {}, analysis, stateContext }) {
+  const historical = stateContext?.measurementBasis === 'historical_transaction_position_balanceOf';
   const warnings = [
-    'Balances are measured before and after an ephemeral state diff at the same pinned block hash and timestamp.',
+    historical
+      ? 'Balances are queried independently immediately before and after the original transaction, at its exact position in the original block. The original call is validated separately; no balance probes are inserted into that replay.'
+      : 'Balances are measured before and after an ephemeral state diff at the same pinned block hash and timestamp.',
     'USDC cash, hUSDC supplied positions and non-transferable USDC debt are reported separately. Reserve custody balances are not user wealth.',
     'This measurement covers only the involved accounts and these three configured tokens; it does not assess transaction security or predict future blocks.',
   ];
-  const base = { status: 'not_applicable', basis: 'prestate_diff_balanceOf', assets: [], warnings, evidence: { request: [], response: [] } };
+  const base = { status: 'not_applicable', basis: historical ? 'historical_transaction_position_balanceOf' : 'prestate_diff_balanceOf', assets: [], warnings, evidence: { request: [], response: [] } };
   const scope = decodeScope(request, analysis);
   if (!scope) return { ...base, warnings: ['Balance measurement requires a successful, reconciled Hyperlend USDC withdrawal, variable-rate borrow or repayment with matching request arguments.'] };
   let context;

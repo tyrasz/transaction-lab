@@ -1,0 +1,15 @@
+# Historical state module validation
+
+`src/historical-state.js` is now implemented, limited to USDC, hUSDC and variable USDC debt `balanceOf` queries for original Hyperlend transaction positions. It exposes the same lazy context methods used by current-state measurements, plus immutable `measurementBasis: historical_transaction_position_balanceOf`.
+
+`module-validation.json` records six successful live runs: original withdrawal, borrowing and repayment on both public providers. Each measured USDC plus the affected position token using 15 read-only RPC calls. Observed duration was 0.56–0.84 seconds through drpc and 5.19–5.82 seconds through Hyperlend archive. These are sample timings, not latency guarantees.
+
+The reader verifies original request/transaction/receipt identity, the complete canonical block transaction array and index bounds, an isolated original execution against semantic callTracer fields, original state diff account/code constraints, and priced header witnesses before and after the original transaction. It only accepts legacy, type 1 or type 2 envelopes; blob and authorization-list fields are rejected. Original access lists are preserved and type 2 fee caps must reproduce the receipt's effective gas price. Signature validation is not performed by this read-only replay.
+
+Each balance query runs alone in one bundle at index `i` or `i+1`, with the original effective gas price. The call tree must match configured proxy, token implementation, and reserve-index calls exactly; logs, unexpected calls, failures and non-word outputs are rejected. A separate prestate-diff execution of the same query must show no storage/code/account change. Sender nonce must be the original transaction nonce at `i` and nonce+1 at `i+1`, before the temporary query increment. Native sender debit and beneficiary tip must equal the traced gas cost exactly. This detects ignored/clamped positions independently of the original call's event comparison.
+
+Gas-limit annotations are excluded from semantic original-trace comparison; gas used, call topology, callers, recipients, inputs, outputs, values, failures, event data and event positions are retained. Receipt comparison uses only committed logs, excluding reverted child subtrees. Unknown callTracer fields fail closed.
+
+Bounds are 12 distinct token/account pairs, 64 RPC requests, 1000 trace frames, depth 32, 2000 logs, 8 MiB per response and 32 MiB of captured response evidence. Normal maximum use is 55 calls for 12 pairs and a final canonical check. Existing state-diff account/storage bounds also apply. Repeated pairs share cached results; callers must perform a final canonical check. Each RPC remains subject to the client's own timeout.
+
+This is a narrow, provider-trusting historical reader. Unsupported token implementations, insufficient native funds for priced view calls, code/account changes, unsupported envelopes, malformed evidence, unavailable history or canonical changes produce unavailable measurements. There is no fallback to block end, parent-only state, latest state or a synthetic next block. No transaction is signed or broadcast.

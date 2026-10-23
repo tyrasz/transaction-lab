@@ -11,11 +11,12 @@ import { measureBalances } from './balances.js';
 import { measureLendingBalances } from './lending-balances.js';
 import { measureAllowances } from './allowances.js';
 import { createStateContext } from './state.js';
+import { createHistoricalStateContext } from './historical-state.js';
 import { analyzePermissions } from './permissions.js';
 import { EXAMPLES, METADATA, CAPABILITIES, VERSION } from './config.js';
 
 const ROOT = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
-const engineFiles = ['allowances.js','analyze.js','balances.js','config.js','lending.js','lending-balances.js','permissions.js','revert.js','rpc.js','server.js','state.js','validate.js'];
+const engineFiles = ['allowances.js','analyze.js','balances.js','config.js','historical-state.js','lending.js','lending-balances.js','permissions.js','revert.js','rpc.js','server.js','state.js','validate.js'];
 const engineHash = createHash('sha256');
 for (const name of engineFiles) engineHash.update(name+'\0').update(await readFile(path.join(ROOT,'src',name))).update('\0');
 const implementation = Object.freeze({name:'Transaction Lab',version:VERSION,sourceSha256:engineHash.digest('hex'),sourceFiles:engineFiles});
@@ -179,13 +180,16 @@ export async function replay(input, rpc) {
   const analysis = analyzeTrace({request,trace,block,metadata:METADATA,mode:'historical_trace'});
   const permissions = analyzePermissions({request,trace,metadata:METADATA});
   includePermissionCoverage(analysis,permissions);
+  const stateContext = createHistoricalStateContext({request,block,rpc,transaction:tx,receipt,trace});
+  const balanceMethod = ['withdraw','borrow','repay'].includes(analysis.protocol?.operation) ? measureLendingBalances : measureBalances;
+  const {evidence:balanceEvidence,...balanceChanges} = await balanceMethod({request,block,rpc,metadata:METADATA,analysis,stateContext});
   return {
     schemaVersion:'1.0',implementation,id:randomUUID(),createdAt:new Date().toISOString(),request,
     source:{provider:rpc.provider,chainId:999,blockNumber:block.number,blockHash:block.hash,timestamp:block.timestamp,mode:'historical_trace',blockBinding:'transaction_hash',transactionHash,transactionIndex:BigInt(tx.transactionIndex).toString()},
-    ...analysis,permissions,balanceChanges:{status:'not_applicable',basis:null,assets:[],warnings:['Historical balance measurement requires state at the original transaction position. This replay currently returns execution and event evidence only.']},
-    allowanceChanges:{status:'not_applicable',basis:null,allowances:[],warnings:['Historical final allowance measurement requires state at the original transaction position. This replay returns permission observations only.']},
+    ...analysis,permissions,balanceChanges,
+    allowanceChanges:{status:'not_applicable',basis:null,allowances:[],warnings:['Historical allowance measurement is not implemented. This replay returns permission observations only; its balance measurements do not verify allowances.']},
     timing:{totalMs:Math.round(performance.now()-start),rpcMs:Math.round(rpc.rpcMs)},
-    evidence:{traceMethod:traceRequest.method,traceRequest,traceResponse:trace,receipt,receiptRechecked:true},
+    evidence:{traceMethod:traceRequest.method,traceRequest,traceResponse:trace,receipt,receiptRechecked:true,balanceMeasurement:balanceEvidence},
   };
 }
 

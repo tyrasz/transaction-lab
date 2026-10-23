@@ -2,7 +2,7 @@
 
 Captured 2026-10-23. All RPC requests are public, read-only execution or lookup calls. No transaction was signed, broadcast, or persisted. Probe contract code exists only in temporary RPC state overrides.
 
-**Result: a narrow exact-position balance reader is feasible on both tested providers using `debug_traceCallMany`, with explicit validation.** It is not yet integrated into the engine. This finding does not establish general faithful replay for arbitrary contracts.
+**Result: a narrow exact-position balance reader works on both tested providers using `debug_traceCallMany`, with explicit validation.** It is integrated into engine version 0.4.0 for the configured Hyperlend operations and tokens. The latest HTTP comparison retained one archive-provider availability failure; see [checkpoint results](../../STATUS.md). These findings do not establish general faithful replay for arbitrary contracts.
 
 Providers tested:
 
@@ -67,7 +67,9 @@ The exploratory `[balance, balance, original, balance, balance]` bundle inserts 
 
 Multiple bundles are not interchangeable with independent calls: official Reth documentation describes block-number/timestamp advancement between bundles. Use exactly one bundle per historical query and do not override the header to the parent block. Block N−1 alone is not the transaction prestate when earlier transactions exist in block N.
 
-## Recommended next implementation
+## Implemented reader in 0.4.0
+
+The API now implements the following approach in `src/historical-state.js`. [Module validation](module-validation-notes.md) documents the additional nonce, fee, resource and implementation checks and six saved live regressions. The earlier probe files below remain evidence of discovery, including the limitations of unpriced and sequential exploratory calls.
 
 1. Limit initial support to reconciled Hyperlend USDC operations and configured position tokens; keep historical allowance queries separate until validated.
 2. Validate canonical block hash, header, original transaction hash at index, and index bounds before querying. Pass the pinned hash object to every request; re-check canonical identity afterward.
@@ -82,6 +84,7 @@ Multiple bundles are not interchangeable with independent calls: official Reth d
 - `call-many-probes.json`: index controls, out-of-range clamp, and exploratory balance/original-call sequence.
 - `position-validation.json`: three independent before/after position reads and isolated original replays on each provider, canonical checks and unpriced header probe.
 - `priced-header-validation.json`: all eight header fields match with the original gas price.
+- `module-validation.json`: six live runs through the implemented reader, with independently priced single-query calls, nonce and fee validation.
 - Adjacent `.mjs` scripts reproduce bounded read-only probes. Running them replaces their matching capture file.
 
 [Geth debug API](https://geth.ethereum.org/docs/interacting-with-geth/rpc/ns-debug) documents `TraceCallConfig.txIndex`; the [Geth implementation](https://github.com/ethereum/go-ethereum/blob/master/eth/tracers/api.go) routes it through transaction-position state reconstruction, and [state reconstruction source](https://github.com/ethereum/go-ethereum/blob/master/eth/state_accessor.go) stops before the target transaction. Those upstream semantics did not hold for the deployed endpoints' `debug_traceCall` option.

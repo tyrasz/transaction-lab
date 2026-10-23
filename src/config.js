@@ -1,5 +1,5 @@
 export const CHAIN_ID = 999;
-export const VERSION = '0.3.0';
+export const VERSION = '0.4.0';
 export const DEFAULT_RPC_URL = 'https://hyperliquid.drpc.org';
 export const POOL = '0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b';
 export const USDC = '0xb88339cb7199b77e23db6e890353e22632ba630f';
@@ -47,6 +47,7 @@ export const CAPABILITIES = {
   simulation: true, historicalTrace: true, chainIds: [CHAIN_ID],
   assetBasis: 'Successful ERC-20 Transfer events; not portfolio balance deltas',
   balanceMeasurement: {supported:true,method:'prestate_diff_balanceOf',scope:'Current-state Hyperlend USDC supply, withdrawal, variable-rate borrow and repay; involved user USDC, receipt-token and debt balances'},
+  historicalBalanceMeasurement: {supported:true,method:'debug_traceCallMany',basis:'historical_transaction_position_balanceOf',scope:'Reconciled Hyperlend USDC operations only; original block and transaction position, independent token reads and isolated original-call validation'},
   securityAssessment: false, transactionBroadcast: false,
   permissionObservations: {supported:true,scope:'ERC20 approve calls and Approval events for configured USDC/hUSDC',allowanceStateVerified:true,scopeLimit:'Only verified USDC/hUSDC permission pairs observed in a successful simulation; no historical state measurement'},
   supportedProtocols: ['Hyperlend USDC supply', 'Hyperlend USDC withdrawal', 'Hyperlend USDC variable-rate borrowing', 'Hyperlend USDC variable-rate repayment'],

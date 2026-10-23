@@ -1,4 +1,4 @@
-# Transaction Lab checkpoint — 0.3.0
+# Transaction Lab checkpoint — 0.4.0
 
 Updated October 23, 2026. The long-term goal remains active. This checkpoint does not establish superiority to Blockaid.
 
@@ -9,34 +9,38 @@ The app runs locally at http://127.0.0.1:5174/ and requires no wallet connection
 - HyperEVM simulations pinned to a block hash, with request/trace identity validation and canonical-state checks.
 - Historical execution by transaction hash, matching receipt/block/status/gas checks and receipt recheck.
 - Hyperlend USDC supply, withdrawal, variable-rate borrow and repay interpretation with exact amounts, accrued-interest separation, deployed-implementation provenance and derived rounding bounds.
-- Same-block before/after USDC, receipt-token and debt measurements for the supported operations. Reserve custody and non-transferable debt are labeled separately from user assets.
-- Final allowance measurements for observed USDC/hUSDC permission pairs. Maximum, bounded, revoked and unchanged values are distinct; events and requests remain separate evidence.
-- Shared lazy state reconstruction, bounded permission pairs, exact integer returns and fail-closed handling for unsupported state changes, malformed results, reorgs and inconsistent effects.
-- Revert explanations, explicit HyperCore limits, raw downloadable JSON and an implementation source fingerprint.
-- UI separates measured allowances, asset balances, debt, reserve custody and event evidence. Requested and actual lending amounts are distinct; inputs lock during requests and edits clear stale results.
+- Current-state before/after USDC, receipt-token and debt measurements for supported operations. Reserve custody and non-transferable debt are labeled separately from user assets.
+- **Historical balances at the original transaction position.** Independent single-call queries before and after the original transaction validate block headers, query implementations, sender nonce and exact native fee effects. A separate original-call replay must match the recorded execution. No probes are inserted into the original execution sequence.
+- Final current-state allowance measurements for observed USDC/hUSDC permission pairs. Maximum, bounded, revoked and unchanged values are distinct. Historical allowances remain unmeasured.
+- Bounded, lazy state contexts and fail-closed handling for unsupported state changes, malformed results, ignored indexes, reorgs and inconsistent effects. Deposit reconciliation checks all measured sender/beneficiary balances, including expected zero deltas.
+- Provider error envelopes are sanitized before raw-result retention, including nested tracing errors. Genuine EVM failure strings and return data remain execution evidence.
+- UI separates historical measurements, current simulation, debt, reserve custody, event evidence and unmeasured permissions. Raw downloadable JSON includes the implementation source fingerprint and measurement context.
 
 ## Evidence at this checkpoint
 
-- **138/138 regression tests passed.** Includes full-withdrawal/full-repayment exactness, capped repayment, Mint during repayment, false approval returns, malformed evidence, event provenance, and state consistency. `reports/latest-tests.txt`.
-- **14/14 recorded benchmark cases passed:** ten observed public RPC traces and four synthetic controls. These are development regression cases, not blind holdouts. `reports/latest-benchmark.json`.
-- **12/12 live API cases passed:** current and historical supply/withdraw/borrow/repay, partial HyperCore replay, insufficient-balance supply, maximum allowance and revocation. [Full requests and responses](reports/live/2026-10-23T15-05-25-680Z.json).
-- **7/7 same-block cases agreed across two public providers** at block 49,319,768: supply, failure, withdraw, borrow, repay, maximum allowance and revoke. [Comparison evidence](reports/comparisons/2026-10-23T15-05-25-866Z.json). Agreement does not establish engine independence or a performance ranking.
-- **14 comparison-helper checks passed.** Browser checks verified debt separation, measured approval pairs, zero-to-zero no-op, requested/actual repayment, disabled inputs and clearing stale results.
-- [Six allowance probes](reports/allowances/public-allowance-probes.json) and [three independently captured lending balance measurements](reports/lending-discovery/measured-current-balances.json) retain raw read-only RPC evidence.
+- **185/185 regression tests passed.** Includes seven full recorded historical replay sequences, the recorded archive failure, canonical-change controls, nested-error retention and six saved live reader sequences. `reports/latest-tests.txt`.
+- **14/14 recorded benchmark cases passed:** ten observed public RPC traces and four synthetic controls. Development regression cases, not blind holdouts. `reports/latest-benchmark.json`.
+- **12/12 live API cases passed:** current and historical supply/withdraw/borrow/repay, partial HyperCore replay, insufficient-balance supply, maximum allowance and revocation. Historical cases now require measured original-position balances. [Full requests and responses](reports/live/2026-10-23T15-35-55-289Z.json).
+- **7/7 current-state cases agreed across two public providers** at block 49,321,677. [Comparison evidence](reports/comparisons/2026-10-23T15-36-44-315Z.json). Agreement does not establish engine independence or a performance ranking.
+- **7/8 historical HTTP requests returned measured balances; 3/4 provider pairs matched, 1 incomplete.** The archive provider returned upstream HTTP 503 for the withdrawal receipt; the API returned HTTP 502 and no retry was performed. There were zero measured disagreements. [Full HTTP/RPC evidence](reports/historical-comparisons/2026-10-23T15-35-35-718Z-http.json), [notes](reports/historical-comparisons/2026-10-23T15-35-35-718Z-notes.md). All 230 RPC attempts are retained. An earlier harness-input failure is also retained and made zero public RPC calls.
+- [Six live reader checks](reports/historical-state/module-validation.json) and their [validation notes](reports/historical-state/module-validation-notes.md) cover independently priced query calls and exact nonce/fee checks.
+- Browser verification confirmed original repayment amount, transaction indexes 12 → 13, original block time/hash, historical balances and matching raw JSON. [Standalone response shown in the browser](reports/live/historical-repayment-response-0.4.0.json).
 
-Implementation source SHA-256: `db6184214fb90547f770d1297eb5b8f827532602f49a06f8d44a418240c80021`. The final live report's fingerprint matches the current source files.
+Implementation source SHA-256: `d82b3cc095e5f7d168fd9f530fd056b035f723f8fb510e0e14ee48fed2e778f0`. The final live and historical comparison reports match these source files.
 
 ## Concrete findings
 
-At the captured current state, the historical 199.626280 USDC repayment request pays only **0.000002 USDC**, matching outstanding debt. The model uses the executed amount. Borrowed USDC is accompanied by a separate debt increase. Withdrawal and partial-repayment position deltas can differ from the cash amount by contract-defined rounding; those differences are preserved and verified against balance reads.
+The historical repayment spent **199.626280 USDC**. Debt went from **199.626281 to 0.000002**, a reduction of **199.626279**. The one raw-unit difference is preserved and reconciled against contract rounding. Re-running the request against the captured current state instead pays only **0.000002 USDC**, matching remaining debt; this is a separate current-state simulation.
 
-Three incident candidates have been researched with public transaction/receipt evidence. **Zero are admitted security benchmark cases and zero are blind holdouts.** [Intake plan](research/security-corpus/PLAN.md) separates attacker drains from earlier victim signing requests and excludes post-incident labels from hypothetical pre-sign features. General security remains `not_assessed`.
+The historical deposit spent **15.066115 USDC** and increased hUSDC from **5718.512299 to 5733.578413**, a measured increase of **15.066114**. This agrees with event-implied principal after accrued interest is removed. Neither the mint event total nor the cash amount is substituted for measured receipt-token balance change.
+
+Three incident candidates have public transaction/receipt research. **Zero are admitted security benchmark cases and zero are blind holdouts.** [Intake plan](research/security-corpus/PLAN.md) separates attacker drains from earlier victim signing requests and excludes post-incident labels from hypothetical pre-sign features. General security remains `not_assessed`.
 
 ## Next work
 
-1. Implement historical balance measurement at the original transaction position. Capability probes show `debug_traceCall` silently ignores `txIndex` on these providers; `debug_traceCallMany` with an explicit state context reproduced the three original lending operations and their before/after balances on both providers. Header probes require the original gas price to preserve BASEFEE. This remains capability evidence, not an API feature yet.
-2. Expand exact affected-account and permission coverage, including permit/credit delegation, multi-call behavior and additional chains/protocols.
-3. Admit independently reviewed security cases and legitimate controls, then build narrowly scoped detectors and measure abstentions, false positives and false negatives.
-4. Establish broader independent-engine, availability and latency evaluations before making any comparative superiority claim.
+1. Expand affected-account and permission coverage, including permits, credit delegation and multicalls. Validate historical allowance queries separately from balance queries.
+2. Admit independently reviewed security cases and legitimate controls, then build narrowly scoped detectors and measure abstentions, false positives and false negatives.
+3. Expand chains/protocols only with chain-specific state and replay validation.
+4. Establish broader independent-engine, availability and latency evaluations before comparative superiority claims. The retained archive failure is a reliability observation, not a passing case.
 
-Historical API replay still returns execution/event evidence only. Current measurements cover the listed tokens/accounts, not total portfolio value, fees, every permission, or future chain state. No paid infrastructure, external publication, signing or fund movement has been performed.
+Measurements cover the listed tokens/accounts, not total portfolio value, every fee or permission, or future chain state. Unknown implementations and unsupported transaction envelopes return unavailable measurements. No paid infrastructure, external publication, signing or fund movement has been performed.
