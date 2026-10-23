@@ -1,0 +1,91 @@
+{
+  "status": "observed_supported",
+  "methods": [
+    "eth_simulateV1",
+    "debug_traceCall/prestateTracer/diffMode",
+    "eth_call/stateDiff"
+  ],
+  "evidence": "poststate-capability-probes.json",
+  "conclusions": [
+    {
+      "provider": "drpc",
+      "block": {
+        "number": "0x2f084d6",
+        "hash": "0xac82ec80c795f82716d2456cca9e9b4c161fea4bcc93323ac97c9945d3eb55d8",
+        "timestamp": "0x6adb6d5a"
+      },
+      "stateful": {
+        "success": true,
+        "simulatedBlock": "0x2f084d7",
+        "simulatedTimestamp": "0x6adb6d5b",
+        "usdcBeforeRaw": "569439069",
+        "usdcAfterRaw": "554372954",
+        "usdcDeltaRaw": "-15066115",
+        "husdcBeforeRaw": "5677663061",
+        "husdcAfterRaw": "5692729176",
+        "husdcDeltaRaw": "15066115",
+        "parentHash": "0xac82ec80c795f82716d2456cca9e9b4c161fea4bcc93323ac97c9945d3eb55d8",
+        "parentHashMatchesPinned": true,
+        "allCallsSucceeded": true,
+        "mintEventValueRaw": "15147041",
+        "mintBalanceIncreaseRaw": "80926",
+        "balanceDeltaIsPrincipal": true
+      },
+      "poststate": {
+        "success": true,
+        "basis": "balanceOf before and after applying all changed storage slots from prestateTracer diff at identical block hash and timestamp",
+        "limits": "Storage-only reconstruction is justified for this observed deposit: no account creations, deletions, code changes, or changed native balances were present. Do not generalize to arbitrary transactions without handling all diff fields.",
+        "usdcBeforeRaw": "569439069",
+        "usdcAfterRaw": "554372954",
+        "usdcDeltaRaw": "-15066115",
+        "husdcBeforeRaw": "5677663051",
+        "husdcAfterRaw": "5692729166",
+        "husdcDeltaRaw": "15066115"
+      },
+      "mintEventAtPinnedBlock": {
+        "valueRaw": "15147031",
+        "balanceIncreaseRaw": "80916"
+      }
+    },
+    {
+      "provider": "hyperlend-archive",
+      "block": {
+        "number": "0x2f084d6",
+        "hash": "0xac82ec80c795f82716d2456cca9e9b4c161fea4bcc93323ac97c9945d3eb55d8",
+        "timestamp": "0x6adb6d5a"
+      },
+      "stateful": {
+        "success": true,
+        "simulatedBlock": "0x2f084d7",
+        "simulatedTimestamp": "0x6adb6d5b",
+        "usdcBeforeRaw": "569439069",
+        "usdcAfterRaw": "554372954",
+        "usdcDeltaRaw": "-15066115",
+        "husdcBeforeRaw": "5677663061",
+        "husdcAfterRaw": "5692729176",
+        "husdcDeltaRaw": "15066115",
+        "parentHash": "0xac82ec80c795f82716d2456cca9e9b4c161fea4bcc93323ac97c9945d3eb55d8",
+        "parentHashMatchesPinned": true,
+        "allCallsSucceeded": true,
+        "mintEventValueRaw": "15147041",
+        "mintBalanceIncreaseRaw": "80926",
+        "balanceDeltaIsPrincipal": true
+      },
+      "poststate": {
+        "success": true,
+        "basis": "balanceOf before and after applying all changed storage slots from prestateTracer diff at identical block hash and timestamp",
+        "limits": "Storage-only reconstruction is justified for this observed deposit: no account creations, deletions, code changes, or changed native balances were present. Do not generalize to arbitrary transactions without handling all diff fields.",
+        "usdcBeforeRaw": "569439069",
+        "usdcAfterRaw": "554372954",
+        "usdcDeltaRaw": "-15066115",
+        "husdcBeforeRaw": "5677663051",
+        "husdcAfterRaw": "5692729166",
+        "husdcDeltaRaw": "15066115"
+      },
+      "mintEventAtPinnedBlock": {
+        "valueRaw": "15147031",
+        "balanceIncreaseRaw": "80916"
+      }
+    }
+  ]
+}

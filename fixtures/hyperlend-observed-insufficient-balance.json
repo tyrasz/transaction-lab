@@ -1,0 +1,209 @@
+{
+  "id": "hyperlend-observed-insufficient-balance",
+  "label": "Observed RPC simulation rejected for insufficient USDC balance",
+  "kind": "observed_rpc_trace",
+  "provenance": {
+    "sourceArtifact": "reports/live/2026-10-23T14-21-41-661Z.json",
+    "sourceSha256": "c56d1f509ce94a86c3229da52459ec58e6d084775b122c64239225733137a6ef",
+    "sourceResultId": "excessive-supply-reverts",
+    "recordedAt": "2026-10-23T14:21:41.658Z",
+    "rpcProvider": "hyperliquid.drpc.org",
+    "rpcMethod": "debug_traceCall",
+    "rpcRequest": {
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "data": "0x617ba037000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f000000000000000000000000000000000000000000000000000000e8d4a510000000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d00000000000000000000000000000000000000000000000000000000000000000",
+          "value": "0x0",
+          "gas": "0x4c4b40"
+        },
+        "0x909d2d78b9952ac31d643fbc8059ad80e76209aaafbd1c99fd065a99c3acac60",
+        {
+          "tracer": "callTracer",
+          "timeout": "15s",
+          "tracerConfig": {
+            "withLog": true
+          }
+        }
+      ]
+    },
+    "traceCanonicalJsonSha256": "17ab713530c9ef3f18bcbf6c43fdba3caea6ac0554c9308eae7276024d0baa57",
+    "blockBinding": "explicit_block_hash",
+    "block": {
+      "number": "49317105",
+      "hash": "0x909d2d78b9952ac31d643fbc8059ad80e76209aaafbd1c99fd065a99c3acac60",
+      "timestamp": "1792765301"
+    },
+    "httpStatus": 200,
+    "limitations": [
+      "Raw public RPC evidence captured by the local API; analyzer fields from that saved report are not used as benchmark input.",
+      "Offline replay of recorded evidence does not perform a new live RPC request.",
+      "This was a live read-only simulation of an intentionally excessive supply amount, not a transaction signed or broadcast onchain."
+    ],
+    "isExecutedTransaction": false
+  },
+  "input": {
+    "request": {
+      "chainId": 999,
+      "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+      "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+      "data": "0x617ba037000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f000000000000000000000000000000000000000000000000000000e8d4a510000000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d00000000000000000000000000000000000000000000000000000000000000000",
+      "value": "0"
+    },
+    "trace": {
+      "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+      "gas": "0x4c4b40",
+      "gasUsed": "0x1e0ef",
+      "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+      "input": "0x617ba037000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f000000000000000000000000000000000000000000000000000000e8d4a510000000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d00000000000000000000000000000000000000000000000000000000000000000",
+      "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002645524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63650000000000000000000000000000000000000000000000000000",
+      "error": "execution reverted",
+      "revertReason": "ERC20: transfer amount exceeds balance",
+      "calls": [
+        {
+          "from": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "gas": "0x4ab187",
+          "gasUsed": "0x17686",
+          "to": "0xbebb62c7ff8b96db4325d9481c44e09a92d49b06",
+          "input": "0x617ba037000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f000000000000000000000000000000000000000000000000000000e8d4a510000000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d00000000000000000000000000000000000000000000000000000000000000000",
+          "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002645524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63650000000000000000000000000000000000000000000000000000",
+          "error": "execution reverted",
+          "revertReason": "ERC20: transfer amount exceeds balance",
+          "calls": [
+            {
+              "from": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+              "gas": "0x496dfb",
+              "gasUsed": "0x15d29",
+              "to": "0x33654b16a4de97bce05d7dd06803bf1066f3123c",
+              "input": "0x73f2367000000000000000000000000000000000000000000000000000000000000000340000000000000000000000000000000000000000000000000000000000000036000000000000000000000000000000000000000000000000000000000000003786be71d44e1126a9724fd89f92d964d5525c8b7fc2b27a6205b778ec738d7d1b0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f000000000000000000000000d01e9aa0ba6a4a06e756bc8c79579e6cef070822000000000000000000000000000000000000000000000000000000e8d4a510000000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+              "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002645524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63650000000000000000000000000000000000000000000000000000",
+              "error": "execution reverted",
+              "revertReason": "ERC20: transfer amount exceeds balance",
+              "calls": [
+                {
+                  "from": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                  "gas": "0x4804ff",
+                  "gasUsed": "0x1d37",
+                  "to": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+                  "input": "0xb1bf962d",
+                  "output": "0x000000000000000000000000000000000000000000000000000027bdfef41b36",
+                  "calls": [
+                    {
+                      "from": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+                      "gas": "0x46d170",
+                      "gasUsed": "0x945",
+                      "to": "0x8158e5569475a443a5723ccac462930f590449ed",
+                      "input": "0xb1bf962d",
+                      "output": "0x000000000000000000000000000000000000000000000000000027bdfef41b36",
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "type": "STATICCALL"
+                },
+                {
+                  "from": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                  "gas": "0x479815",
+                  "gasUsed": "0x1d63",
+                  "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+                  "input": "0xb1bf962d",
+                  "output": "0x00000000000000000000000000000000000000000000000000002cec98b6e9aa",
+                  "calls": [
+                    {
+                      "from": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+                      "gas": "0x466639",
+                      "gasUsed": "0x971",
+                      "to": "0x410aa1ab680b886c875e99a7a4bfaf188508a7a3",
+                      "input": "0xb1bf962d",
+                      "output": "0x00000000000000000000000000000000000000000000000000002cec98b6e9aa",
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "type": "STATICCALL"
+                },
+                {
+                  "from": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                  "gas": "0x476ae4",
+                  "gasUsed": "0x1649",
+                  "to": "0xd01e9aa0ba6a4a06e756bc8c79579e6cef070822",
+                  "input": "0xb90db31b0000000000000000000000000000000000000000000000000000000000000cf2000000000000000000000000000000000000000000000000000000e8d4a51000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002b8354d7648d00000000000000000000000000000000000000000000000000000000000003e8000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000459118fde43",
+                  "output": "0x0000000000000000000000000000000000000000001fda71e21840d2d4abd65900000000000000000000000000000000000000000027ab385132b8920590a5fe",
+                  "type": "STATICCALL"
+                },
+                {
+                  "from": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                  "gas": "0x473a09",
+                  "gasUsed": "0x4a7b",
+                  "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "input": "0x23b872dd0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b000000000000000000000000000000000000000000000000000000e8d4a51000",
+                  "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002645524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63650000000000000000000000000000000000000000000000000000",
+                  "error": "execution reverted",
+                  "revertReason": "ERC20: transfer amount exceeds balance",
+                  "calls": [
+                    {
+                      "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                      "gas": "0x4601b4",
+                      "gasUsed": "0x2e65",
+                      "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                      "input": "0x23b872dd0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b000000000000000000000000000000000000000000000000000000e8d4a51000",
+                      "output": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002645524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63650000000000000000000000000000000000000000000000000000",
+                      "error": "execution reverted",
+                      "revertReason": "ERC20: transfer amount exceeds balance",
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "value": "0x0",
+                  "type": "CALL"
+                }
+              ],
+              "value": "0x0",
+              "type": "DELEGATECALL"
+            }
+          ],
+          "value": "0x0",
+          "type": "DELEGATECALL"
+        }
+      ],
+      "value": "0x0",
+      "type": "CALL"
+    },
+    "block": {
+      "number": "49317105",
+      "hash": "0x909d2d78b9952ac31d643fbc8059ad80e76209aaafbd1c99fd065a99c3acac60",
+      "timestamp": "1792765301"
+    },
+    "metadata": {
+      "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+        "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+        "decimals": 6,
+        "symbol": "USDC",
+        "name": "USDC"
+      },
+      "0x744e4f26ee30213989216e1632d9be3547c4885b": {
+        "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+        "decimals": 6,
+        "symbol": "hHyperEvmUSDC",
+        "name": "HyperLend HyperEVM USDC"
+      }
+    },
+    "mode": "simulation"
+  },
+  "expected": {
+    "executionStatus": "reverted",
+    "coverageStatus": "supported",
+    "gasUsed": "123119",
+    "movementCount": 0,
+    "emptyAssets": true,
+    "assetTransfers": [],
+    "revert": {
+      "selector": "0x08c379a0",
+      "kind": "error_string",
+      "message": "ERC20: transfer amount exceeds balance",
+      "source": "contract_return_data"
+    }
+  }
+}

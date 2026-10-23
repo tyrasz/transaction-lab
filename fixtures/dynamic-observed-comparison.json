@@ -1,0 +1,86 @@
+{
+  "id": "dynamic-observed-comparison",
+  "kind": "observed_hosted_service_response",
+  "provenance": {
+    "sourceArtifact": "dynamic-hyperlend-deposit-simulation.json",
+    "sourceSha256": "bc3c3893ea9afad9a6eccd90645cc5bb40cf0bd493a32b66eadcbff41232dbe3",
+    "recordedAt": "2026-10-23T06:24:28.189Z",
+    "service": "Dynamic simulateEVMTransaction endpoint",
+    "method": "POST",
+    "endpointPath": "/evm/simulateTransaction",
+    "httpStatus": 200,
+    "block": null,
+    "blockBinding": "not_exposed_by_response",
+    "limitations": [
+      "Authentication headers and environment identifiers were omitted.",
+      "This response and the RPC fixture were captured at different times and have no shared known block.",
+      "Security classification cannot be compared: this prototype does not perform security assessment."
+    ]
+  },
+  "request": {
+    "chainId": "999",
+    "data": "0x617ba037000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000000e5e4030000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d00000000000000000000000000000000000000000000000000000000000000000",
+    "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+    "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+    "value": "0"
+  },
+  "response": {
+    "assetExposures": [],
+    "counterparties": [
+      "0x744E4f26ee30213989216E1632D9BE3547C4885b",
+      "0x0000000000000000000000000000000000000000"
+    ],
+    "inAssets": [
+      {
+        "asset": {
+          "address": "0x744E4f26ee30213989216E1632D9BE3547C4885b",
+          "decimals": 6,
+          "logoUrl": "https://dm8wquhbuh2eq.cloudfront.net/token/0x744E4f26ee30213989216E1632D9BE3547C4885b/hyperevm/sec/c0b716a6-4684-400d-8476-f02ad3b5ca8a",
+          "name": "HyperLend HyperEVM USDC",
+          "symbol": "hHyperEvmUSDC",
+          "type": "ERC20"
+        },
+        "transferIn": [
+          {
+            "rawValue": "0xe5e69d",
+            "summary": "Receiving 15.067 hHyperEvmUSDC",
+            "usdPrice": "15.058870939974999814",
+            "value": "15.066781000000000645"
+          }
+        ],
+        "transferOut": []
+      }
+    ],
+    "outAssets": [
+      {
+        "asset": {
+          "address": "0xb88339CB7199b77E23DB6E890353E22632Ba630f",
+          "decimals": 6,
+          "logoUrl": "https://dm8wquhbuh2eq.cloudfront.net/token/0xb88339CB7199b77E23DB6E890353E22632Ba630f/hyperevm/sec/c0b716a6-4684-400d-8476-f02ad3b5ca8a",
+          "name": "USDC",
+          "symbol": "USDC",
+          "type": "ERC20"
+        },
+        "transferIn": [],
+        "transferOut": [
+          {
+            "rawValue": "0xe5e403",
+            "summary": "Sending 15.066 USDC",
+            "usdPrice": "15.058205289625000489",
+            "value": "15.066114999999999924"
+          }
+        ]
+      }
+    ],
+    "validation": {
+      "classification": "",
+      "description": "",
+      "reason": "",
+      "result": "Benign"
+    },
+    "priceData": {
+      "nativeTokenUsdPrice": 78.32
+    },
+    "showTotalFiat": true
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "id": "synthetic-caught-revert",
+  "label": "Synthetic: successful parent excludes reverted child logs",
+  "kind": "synthetic_adversarial_fixture",
+  "provenance": {
+    "source": "Hand-constructed callTracer-shaped data for deterministic fault and coverage tests.",
+    "isRealTransaction": false,
+    "limitations": [
+      "Not a blockchain observation and not evidence of live RPC or protocol support."
+    ]
+  },
+  "input": {
+    "request": {
+      "chainId": 999,
+      "from": "0x1111111111111111111111111111111111111111",
+      "to": "0x4444444444444444444444444444444444444444",
+      "data": "0xdeadbeef",
+      "value": "0"
+    },
+    "trace": {
+      "from": "0x1111111111111111111111111111111111111111",
+      "to": "0x4444444444444444444444444444444444444444",
+      "input": "0xdeadbeef",
+      "value": "0x0",
+      "type": "CALL",
+      "gasUsed": "0x5208",
+      "calls": [
+        {
+          "from": "0x1111111111111111111111111111111111111111",
+          "to": "0x4444444444444444444444444444444444444444",
+          "input": "0xdeadbeef",
+          "value": "0x0",
+          "type": "CALL",
+          "gasUsed": "0x5208",
+          "error": "execution reverted",
+          "logs": [
+            {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000001111111111111111111111111111111111111111",
+                "0x0000000000000000000000002222222222222222222222222222222222222222"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000000000000005e69ec0"
+            }
+          ]
+        },
+        {
+          "from": "0x1111111111111111111111111111111111111111",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "input": "0xdeadbeef",
+          "value": "0x0",
+          "type": "CALL",
+          "gasUsed": "0x5208",
+          "logs": [
+            {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000001111111111111111111111111111111111111111",
+                "0x0000000000000000000000002222222222222222222222222222222222222222"
+              ],
+              "data": "0x00000000000000000000000000000000000000000000000000000000000f4240"
+            }
+          ]
+        }
+      ]
+    },
+    "block": null,
+    "metadata": {
+      "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+        "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+        "decimals": 6,
+        "symbol": "USDC",
+        "name": "USDC"
+      },
+      "0x744e4f26ee30213989216e1632d9be3547c4885b": {
+        "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+        "decimals": 6,
+        "symbol": "hHyperEvmUSDC",
+        "name": "HyperLend HyperEVM USDC"
+      }
+    },
+    "mode": "simulation"
+  },
+  "expected": {
+    "executionStatus": "success",
+    "allowedCoverageStatuses": [
+      "partial",
+      "unsupported"
+    ],
+    "movementCount": 1,
+    "assetTransfers": [
+      {
+        "direction": "out",
+        "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+        "amountRaw": "1000000",
+        "value": "1"
+      }
+    ]
+  }
+}

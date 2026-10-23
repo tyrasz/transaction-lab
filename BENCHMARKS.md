@@ -1,0 +1,40 @@
+# Evidence and benchmarks
+
+This project is an early transaction-preview implementation. Its benchmark reports whether a small local corpus is interpreted correctly. It is not a score against Blockaid or a claim of equivalent security coverage.
+
+Run `npm run benchmark` from this directory. The command reads saved fixtures, writes `reports/latest-benchmark.json`, prints case counts and exits nonzero if any case fails. It does not contact an RPC or Dynamic. `npm test` also verifies that analyzer failures produce a failing persisted report.
+
+## Corpus
+
+| Fixture | Evidence type | What it checks |
+|---|---|---|
+| Hyperlend USDC supply | Recorded public `debug_traceCall` | 15.066115 USDC principal; 15.066912 hUSDC mint; 0.000797 accrued interest; exact decimal formatting |
+| Historical Hyperlend USDC supply | Recorded public `debug_traceTransaction` | 15.066115 USDC principal; 15.066497 hUSDC mint; 0.000383 interest; a -0.000001 difference between mint-event implied principal and deposit, consistent with the verified scaled-token rounding interval |
+| Excessive Hyperlend supply | Recorded public `debug_traceCall` | Real insufficient-USDC-balance revert; contract-provided Error(string) decoded; no successful asset movements |
+| CoreWriter Perps → Spot | Recorded public `debug_traceTransaction` | Historical EVM execution succeeds; HyperCore coverage remains partial; no invented ERC-20 asset movement |
+| Root revert | Hand-constructed negative control | A reverted transaction contributes no successful token movements |
+| Caught child revert | Hand-constructed negative control | Reverted child logs are excluded while a successful sibling transfer remains |
+| Unknown successful call | Hand-constructed coverage control | Success without a known interpretation is not promoted to full support |
+| Very large token amount | Hand-constructed precision control | Integers larger than JavaScript's safe Number range retain exact raw and decimal values |
+
+The four observed fixtures were copied from the public RPC evidence already collected for this project. Each records the original artifact name, SHA-256, capture time, endpoint or provider, and exact RPC request. Only public chain data and the supplied transaction bodies are retained. The Dynamic reference omits authentication headers and the environment identifier. Synthetic fixtures explicitly set `isRealTransaction: false`; they must never be described as live transactions.
+
+The historical Hyperlend deposit and insufficient-balance cases come from `reports/live/2026-10-23T14-21-41-661Z.json`. Their fixture inputs contain the captured raw trace, not the analyzer interpretation saved in that report; expectations were reviewed against the raw event fields and revert bytes. Their source result IDs, whole-artifact hashes and canonical trace JSON hashes identify the evidence. The excessive-supply case is an actual read-only RPC simulation of a deliberately large amount. It is not an executed onchain transaction and was never signed or broadcast. Both new fixtures have recorded block identities.
+
+Historical rounding is checked against the deployed hToken implementation and traced scaled mint input. The analyzer distinguishes the 15.066115 USDC deposited from the 15.066114 principal implied by Mint.value minus interest. The latter lies inside the mathematically derived floor/ceil interval. This confirms consistency with the model; it is not an independently measured token balance delta. Revert text is attributed to contract return data rather than presented as an independent diagnosis.
+
+The original Hyperlend request used `latest` without recording a block number or hash. Its fixture therefore has `block: null`, rather than borrowing the block of the original deposit. The CoreWriter trace is bound to transaction `0xe4b9861a0fcda1cfda2414178b80e8646b2d9d24e6f01222cc8ad81b2ba65b36`, block 19185860. It did not enable callTracer logs. Its separate historical HyperCore ledger confirmation is not input to the EVM analyzer.
+
+## Limited Dynamic comparison
+
+A saved Dynamic response reports the same 15.066115 USDC outgoing principal. It reports 15.066781 incoming hUSDC; the independent RPC trace reports 15.066912. The requests were captured at different times without a shared recorded block. Accrued interest changes with state, so this difference is not an accuracy verdict.
+
+The comparison preserves raw token amounts and the returned display strings. Our output formats integers exactly. Dynamic's saved decimal strings contain floating-point artifacts while its `rawValue` fields still encode exact amounts.
+
+Dynamic's saved security verdict is `Benign`. This project returns `security.status: not_assessed`. The benchmark does not rank these classifications or substitute execution success for a safety decision. The public Dynamic response also does not establish the complete underlying Blockaid request or configuration.
+
+## What passing means
+
+A passing result means the analyzer satisfies the specific assertions in these fixtures. It says nothing about malicious-contract detection, unrelated protocols, chain coverage, live RPC availability, pricing, balance-state correctness, or latency under load. The corpus is small and partly synthetic. Adding more fixtures that resemble existing successful examples does not by itself establish generality.
+
+Next evidence should include independently labeled failures, supply on behalf of another account, allowance changes, fee-on-transfer and rebasing tokens, unusual proxy behavior, omitted trace logs, missing metadata, chain reorganizations, and provider disagreements. Same-block comparisons should use block-bound input and independently measured pre/post state. New protocol cases belong in a held-out corpus before being used to tune decoders.

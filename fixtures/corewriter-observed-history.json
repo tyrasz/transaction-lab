@@ -1,0 +1,112 @@
+{
+  "id": "corewriter-observed-history",
+  "label": "Observed historical CoreWriter Perps to Spot action",
+  "kind": "observed_rpc_trace",
+  "provenance": {
+    "sourceArtifact": "hyperliquid-historical-replay.json",
+    "sourceSha256": "7eaddc04ea5e4826eac86548e597607b1780f636fc87dfd2aafd3a77c9bd1bb9",
+    "recordedAt": "2026-10-23T04:02:00.222194+00:00",
+    "rpcEndpoint": "https://hyperliquid.drpc.org",
+    "rpcMethod": "debug_traceTransaction",
+    "transactionHash": "0xe4b9861a0fcda1cfda2414178b80e8646b2d9d24e6f01222cc8ad81b2ba65b36",
+    "blockBinding": "historical_transaction",
+    "block": {
+      "number": "19185860",
+      "hash": "0x034e8dd7eff7eba7c1e762196d80e215cff87d48330e5f8de7d1b1ef4ab033eb",
+      "timestamp": "1763124600"
+    },
+    "limitations": [
+      "The saved callTracer request did not enable withLog. It proves the CoreWriter call, not a complete event inventory.",
+      "HyperCore execution is outside the EVM trace. The separate ledger proof is not simulated by this analyzer."
+    ],
+    "rpcRequest": {
+      "jsonrpc": "2.0",
+      "id": 1,
+      "method": "debug_traceTransaction",
+      "params": [
+        "0xe4b9861a0fcda1cfda2414178b80e8646b2d9d24e6f01222cc8ad81b2ba65b36",
+        {
+          "tracer": "callTracer",
+          "timeout": "15s"
+        }
+      ]
+    }
+  },
+  "input": {
+    "request": {
+      "chainId": 999,
+      "from": "0x8a2e870e8283594c1bed3f50b65bf83a086a8c08",
+      "to": "0x73b8523109e2d570978c008916bcb1d7f752a0fe",
+      "data": "0xdfccd8e50000000000000000000000000000000000000000000000000000000001aeef490000000000000000000000000000000000000000000000000000000000000000",
+      "value": "0"
+    },
+    "trace": {
+      "from": "0x8a2e870e8283594c1bed3f50b65bf83a086a8c08",
+      "gas": "0xf9e4",
+      "gasUsed": "0xf6a3",
+      "to": "0x73b8523109e2d570978c008916bcb1d7f752a0fe",
+      "input": "0xdfccd8e50000000000000000000000000000000000000000000000000000000001aeef490000000000000000000000000000000000000000000000000000000000000000",
+      "calls": [
+        {
+          "from": "0x73b8523109e2d570978c008916bcb1d7f752a0fe",
+          "gas": "0x9948",
+          "gasUsed": "0x942",
+          "to": "0x1fb1c24cbdc1f60a59a94212d58c08c759d59d3e",
+          "input": "0xbe544b9c",
+          "output": "0x000000000000000000000000a7b61b4286e76a3a65d8898381fca3c641083792",
+          "type": "STATICCALL"
+        },
+        {
+          "from": "0x73b8523109e2d570978c008916bcb1d7f752a0fe",
+          "gas": "0x8525",
+          "gasUsed": "0x83de",
+          "to": "0xa7b61b4286e76a3a65d8898381fca3c641083792",
+          "input": "0xdfccd8e50000000000000000000000000000000000000000000000000000000001aeef490000000000000000000000000000000000000000000000000000000000000000",
+          "calls": [
+            {
+              "from": "0x73b8523109e2d570978c008916bcb1d7f752a0fe",
+              "gas": "0x6aef",
+              "gasUsed": "0x6463",
+              "to": "0x3333333333333333333333333333333333333333",
+              "input": "0x17938e1300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000044010000070000000000000000000000000000000000000000000000000000000001aeef49000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+              "value": "0x0",
+              "type": "CALL"
+            }
+          ],
+          "value": "0x0",
+          "type": "DELEGATECALL"
+        }
+      ],
+      "value": "0x0",
+      "type": "CALL"
+    },
+    "block": {
+      "number": "19185860",
+      "hash": "0x034e8dd7eff7eba7c1e762196d80e215cff87d48330e5f8de7d1b1ef4ab033eb",
+      "timestamp": "1763124600"
+    },
+    "metadata": {
+      "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+        "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+        "decimals": 6,
+        "symbol": "USDC",
+        "name": "USDC"
+      },
+      "0x744e4f26ee30213989216e1632d9be3547c4885b": {
+        "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+        "decimals": 6,
+        "symbol": "hHyperEvmUSDC",
+        "name": "HyperLend HyperEVM USDC"
+      }
+    },
+    "mode": "historical_trace"
+  },
+  "expected": {
+    "executionStatus": "success",
+    "coverageStatus": "partial",
+    "gasUsed": "63139",
+    "movementCount": 0,
+    "assetTransfers": [],
+    "warningIncludes": "HyperCore"
+  }
+}
