@@ -1,0 +1,1666 @@
+{
+  "retrievedAt": "2026-10-23T15:45:03.761Z",
+  "kind": "observed_public_historical_transaction",
+  "rpc": "https://hyperliquid.drpc.org",
+  "explorerUrl": "https://hyperevmscan.io/tx/0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+  "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+  "checks": {
+    "chain999": true,
+    "transactionHash": true,
+    "receiptHash": true,
+    "blockHash": true,
+    "transactionIndex": true,
+    "successfulReceipt": true,
+    "traceGasMatchesReceipt": true,
+    "traceRootMatches": true
+  },
+  "captures": {
+    "chainId": {
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "eth_chainId",
+        "params": []
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "result": "0x3e7"
+      }
+    },
+    "transaction": {
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "method": "eth_getTransactionByHash",
+        "params": [
+          "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": {
+          "type": "0x2",
+          "chainId": "0x3e7",
+          "nonce": "0x17e",
+          "gas": "0xc734a",
+          "maxFeePerGas": "0x264a3f00",
+          "maxPriorityFeePerGas": "0x1dcd6500",
+          "to": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+          "value": "0x0",
+          "accessList": [],
+          "input": "0x48519be800000000000000000000000053195a1c4e664ac09eb72892516f8f85ec80000000000000000000000000000000000000000000000000000000000000017d7840000000000000000000000000000000000000000000001c0df636224734347c2e0000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006a079d9a000000000000000000000000000000000000000000000000000000000000001bc7b60c1bd267ac7348356cdefb7f3478399bfefe8e52c4a1226b4985d5e5c00a3616b0b1956e4b2ce3026d7048b93d73fbdf55c568b3eefdfc104dd44ae93bca",
+          "r": "0xd70d94911904e83ee3b8bcb3a2c4a23caf2895432b01a06d12e1c15cf34461f5",
+          "s": "0x27d3562a4c9a99d3161039440503482bbf04a6608b26a5c9a399cdd67225c98b",
+          "yParity": "0x0",
+          "v": "0x0",
+          "hash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+          "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+          "blockNumber": "0x2192cbb",
+          "transactionIndex": "0x0",
+          "from": "0x0c71073344e27e33cb57fcb587fc412d689dfd1d",
+          "gasPrice": "0x23c34600"
+        }
+      }
+    },
+    "receipt": {
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "method": "eth_getTransactionReceipt",
+        "params": [
+          "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d"
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "result": {
+          "type": "0x2",
+          "status": "0x1",
+          "cumulativeGasUsed": "0x6d5dd",
+          "logs": [
+            {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "topics": [
+                "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+                "0x0000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d",
+                "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6"
+              ],
+              "data": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+              "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+              "blockNumber": "0x2192cbb",
+              "blockTimestamp": "0x6a0796a2",
+              "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+              "transactionIndex": "0x0",
+              "logIndex": "0x0",
+              "removed": false
+            },
+            {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d",
+                "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6"
+              ],
+              "data": "0x00000000000000000000000000000000000000000000000000000000017d7840",
+              "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+              "blockNumber": "0x2192cbb",
+              "blockTimestamp": "0x6a0796a2",
+              "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+              "transactionIndex": "0x0",
+              "logIndex": "0x1",
+              "removed": false
+            },
+            {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "topics": [
+                "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+                "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6",
+                "0x00000000000000000000000004de1ef694923844bae419d4f832196f21767f86"
+              ],
+              "data": "0x00000000000000000000000000000000000000000000000000000000017a9bd4",
+              "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+              "blockNumber": "0x2192cbb",
+              "blockTimestamp": "0x6a0796a2",
+              "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+              "transactionIndex": "0x0",
+              "logIndex": "0x2",
+              "removed": false
+            },
+            {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x00000000000000000000000004de1ef694923844bae419d4f832196f21767f86",
+                "0x0000000000000000000000007fe37fc2f987eb981a0fc63cf1eabf04463550d4"
+              ],
+              "data": "0x00000000000000000000000000000000000000000000000000000000000000c4",
+              "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+              "blockNumber": "0x2192cbb",
+              "blockTimestamp": "0x6a0796a2",
+              "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+              "transactionIndex": "0x0",
+              "logIndex": "0x3",
+              "removed": false
+            },
+            {
+              "address": "0x04de1ef694923844bae419d4f832196f21767f86",
+              "topics": [
+                "0x5885488fd06cc72e4cb7e8da47b6e2d92d1bf43e80342e2d21c126c92c3a1035"
+              ],
+              "data": "0x00000000000000000000000000000000000000000000000000000000000000c4",
+              "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+              "blockNumber": "0x2192cbb",
+              "blockTimestamp": "0x6a0796a2",
+              "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+              "transactionIndex": "0x0",
+              "logIndex": "0x4",
+              "removed": false
+            },
+            {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6",
+                "0x00000000000000000000000004de1ef694923844bae419d4f832196f21767f86"
+              ],
+              "data": "0x00000000000000000000000000000000000000000000000000000000017a9bd4",
+              "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+              "blockNumber": "0x2192cbb",
+              "blockTimestamp": "0x6a0796a2",
+              "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+              "transactionIndex": "0x0",
+              "logIndex": "0x5",
+              "removed": false
+            },
+            {
+              "address": "0x04de1ef694923844bae419d4f832196f21767f86",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000015f8f226f54c17d15",
+              "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+              "blockNumber": "0x2192cbb",
+              "blockTimestamp": "0x6a0796a2",
+              "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+              "transactionIndex": "0x0",
+              "logIndex": "0x6",
+              "removed": false
+            },
+            {
+              "address": "0x04de1ef694923844bae419d4f832196f21767f86",
+              "topics": [
+                "0x2f00e3cdd69a77be7ed215ec7b2a36784dd158f921fca79ac29deffa353fe6ee",
+                "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6",
+                "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6"
+              ],
+              "data": "0x00000000000000000000000000000000000000000000000000000000017a9bd40000000000000000000000000000000000000000000000015f8f226f54c17d15",
+              "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+              "blockNumber": "0x2192cbb",
+              "blockTimestamp": "0x6a0796a2",
+              "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+              "transactionIndex": "0x0",
+              "logIndex": "0x7",
+              "removed": false
+            },
+            {
+              "address": "0x04de1ef694923844bae419d4f832196f21767f86",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6",
+                "0x000000000000000000000000db6301a47cb72e4c6662083453a21b6f27bad8fb"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000015f8f226f54c17d15",
+              "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+              "blockNumber": "0x2192cbb",
+              "blockTimestamp": "0x6a0796a2",
+              "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+              "transactionIndex": "0x0",
+              "logIndex": "0x8",
+              "removed": false
+            },
+            {
+              "address": "0x53195a1c4e664ac09eb72892516f8f85ec800000",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x000000000000000000000000db6301a47cb72e4c6662083453a21b6f27bad8fb",
+                "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6"
+              ],
+              "data": "0x000000000000000000000000000000000000000000001fca141c1a9b8ea331d1",
+              "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+              "blockNumber": "0x2192cbb",
+              "blockTimestamp": "0x6a0796a2",
+              "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+              "transactionIndex": "0x0",
+              "logIndex": "0x9",
+              "removed": false
+            },
+            {
+              "address": "0xdb6301a47cb72e4c6662083453a21b6f27bad8fb",
+              "topics": [
+                "0x1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000003b16e691ece0d23d183000000000000000000000000000000000000000000559f515fdad3aca25f694b",
+              "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+              "blockNumber": "0x2192cbb",
+              "blockTimestamp": "0x6a0796a2",
+              "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+              "transactionIndex": "0x0",
+              "logIndex": "0xa",
+              "removed": false
+            },
+            {
+              "address": "0xdb6301a47cb72e4c6662083453a21b6f27bad8fb",
+              "topics": [
+                "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822",
+                "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6",
+                "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000015f8f226f54c17d1500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001fca141c1a9b8ea331d1",
+              "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+              "blockNumber": "0x2192cbb",
+              "blockTimestamp": "0x6a0796a2",
+              "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+              "transactionIndex": "0x0",
+              "logIndex": "0xb",
+              "removed": false
+            },
+            {
+              "address": "0x53195a1c4e664ac09eb72892516f8f85ec800000",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6",
+                "0x0000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d"
+              ],
+              "data": "0x000000000000000000000000000000000000000000001fca141c1a9b8ea331d1",
+              "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+              "blockNumber": "0x2192cbb",
+              "blockTimestamp": "0x6a0796a2",
+              "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+              "transactionIndex": "0x0",
+              "logIndex": "0xc",
+              "removed": false
+            },
+            {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6",
+                "0x000000000000000000000000b4894380282533a86cb241145fac54aaac995f18"
+              ],
+              "data": "0x000000000000000000000000000000000000000000000000000000000002dc6c",
+              "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+              "blockNumber": "0x2192cbb",
+              "blockTimestamp": "0x6a0796a2",
+              "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+              "transactionIndex": "0x0",
+              "logIndex": "0xd",
+              "removed": false
+            },
+            {
+              "address": "0xb4894380282533a86cb241145fac54aaac995f18",
+              "topics": [
+                "0x92b5cc8b0a54f78189073c1d42e4af11495ff3a84356e9c798d0981f4021698a",
+                "0x00000000000000000000000053195a1c4e664ac09eb72892516f8f85ec800000",
+                "0x00000000000000000000000088b7ab321dcd42751a5cdc616be79383c77e03d3"
+              ],
+              "data": "0x000000000000000000000000000000000000000000000000000000000000f41d000000000000000000000000000000000000000000000000000000000001e84f0000000000000000000000000000000000000000000000000000000000000001",
+              "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+              "blockNumber": "0x2192cbb",
+              "blockTimestamp": "0x6a0796a2",
+              "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+              "transactionIndex": "0x0",
+              "logIndex": "0xe",
+              "removed": false
+            },
+            {
+              "address": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+              "topics": [
+                "0x89f5adc174562e07c9c9b1cae7109bbecb21cf9d1b2847e550042b8653c54a0e",
+                "0x00000000000000000000000053195a1c4e664ac09eb72892516f8f85ec800000",
+                "0x0000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d"
+              ],
+              "data": "0x00000000000000000000000000000000000000000000000000000000017d7840000000000000000000000000000000000000000000001fca141c1a9b8ea331d1",
+              "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+              "blockNumber": "0x2192cbb",
+              "blockTimestamp": "0x6a0796a2",
+              "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+              "transactionIndex": "0x0",
+              "logIndex": "0xf",
+              "removed": false
+            }
+          ],
+          "logsBloom": "0x00200000000000400000000080000002000000010010000000000000000000000000004000000020000004000000000400000088000010000000002800201010000000400000000000000008000002200000000001000000200000000000000000200000020000001000000000000800000000010000000080000810040080000000004000200000000200040000000000000000000080080000004002000000020000080100000800000000000020080001020120000040000000000000000000000002000000000000000080000000000004000001001000000000000020200010000010004000000000000000000000000000000100040000000000001000",
+          "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+          "transactionIndex": "0x0",
+          "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+          "blockNumber": "0x2192cbb",
+          "gasUsed": "0x6d5dd",
+          "effectiveGasPrice": "0x23c34600",
+          "from": "0x0c71073344e27e33cb57fcb587fc412d689dfd1d",
+          "to": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+          "contractAddress": null
+        }
+      }
+    },
+    "block": {
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 4,
+        "method": "eth_getBlockByHash",
+        "params": [
+          "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+          false
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 4,
+        "result": {
+          "hash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+          "parentHash": "0x86ec3e764c6331c20bdedfa0d647222f548db8ba927b7de7e4b4f055193f9c22",
+          "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+          "miner": "0x0000000000000000000000000000000000000000",
+          "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "transactionsRoot": "0x1b9b6a952ebfb449b532c1f51dd54a5a64e020f9b2ca2dcbccb836ca2d54ec41",
+          "receiptsRoot": "0xfc3f4dced392f242ebb51986200947cb528e636f732d2c0d475c673f83fe0045",
+          "logsBloom": "0x00200000000000400000000080000002000000010010000000000000000000000000004000000020000004000000000400000088000010000000002800201010000000400000000000000008000002200000000001000000200000000000000000200000020000001000000000000800000000010000000080000810040080000000004000200000000200040000000000000000000080080000004002000000020000080100000800000000000020080001020120000040000000000000000000000002000000000000000080000000000004000001001000000000000020200010000010004000000000000000000000000000000100040000000000001000",
+          "difficulty": "0x0",
+          "number": "0x2192cbb",
+          "gasLimit": "0x2dc6c0",
+          "gasUsed": "0x7600a",
+          "timestamp": "0x6a0796a2",
+          "extraData": "0x",
+          "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "nonce": "0x0000000000000000",
+          "baseFeePerGas": "0x5f5e100",
+          "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "blobGasUsed": "0x0",
+          "excessBlobGas": "0x0",
+          "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "size": "0x90d",
+          "uncles": [],
+          "transactions": [
+            "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+            "0xef5fb32f975c28e06965065ce9065cfb595e8e7439c481880b2610542ce90523"
+          ],
+          "withdrawals": []
+        }
+      }
+    },
+    "callTrace": {
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 5,
+        "method": "debug_traceTransaction",
+        "params": [
+          "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+          {
+            "tracer": "callTracer",
+            "timeout": "15s",
+            "tracerConfig": {
+              "withLog": true
+            }
+          }
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 5,
+        "result": {
+          "from": "0x0c71073344e27e33cb57fcb587fc412d689dfd1d",
+          "gas": "0xc734a",
+          "gasUsed": "0x6d5dd",
+          "to": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+          "input": "0x48519be800000000000000000000000053195a1c4e664ac09eb72892516f8f85ec80000000000000000000000000000000000000000000000000000000000000017d7840000000000000000000000000000000000000000000001c0df636224734347c2e0000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006a079d9a000000000000000000000000000000000000000000000000000000000000001bc7b60c1bd267ac7348356cdefb7f3478399bfefe8e52c4a1226b4985d5e5c00a3616b0b1956e4b2ce3026d7048b93d73fbdf55c568b3eefdfc104dd44ae93bca",
+          "output": "0x000000000000000000000000000000000000000000001fca141c1a9b8ea331d1",
+          "calls": [
+            {
+              "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+              "gas": "0xbd31d",
+              "gasUsed": "0x7b265",
+              "to": "0xb318e2ab995d805cb0c5b97c39edda0aa8758feb",
+              "input": "0x48519be800000000000000000000000053195a1c4e664ac09eb72892516f8f85ec80000000000000000000000000000000000000000000000000000000000000017d7840000000000000000000000000000000000000000000001c0df636224734347c2e0000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006a079d9a000000000000000000000000000000000000000000000000000000000000001bc7b60c1bd267ac7348356cdefb7f3478399bfefe8e52c4a1226b4985d5e5c00a3616b0b1956e4b2ce3026d7048b93d73fbdf55c568b3eefdfc104dd44ae93bca",
+              "output": "0x000000000000000000000000000000000000000000001fca141c1a9b8ea331d1",
+              "calls": [
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0xb795e",
+                  "gasUsed": "0x10827",
+                  "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "input": "0xd505accf0000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006a079d9a000000000000000000000000000000000000000000000000000000000000001bc7b60c1bd267ac7348356cdefb7f3478399bfefe8e52c4a1226b4985d5e5c00a3616b0b1956e4b2ce3026d7048b93d73fbdf55c568b3eefdfc104dd44ae93bca",
+                  "calls": [
+                    {
+                      "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                      "gas": "0xb2fd4",
+                      "gasUsed": "0xebec",
+                      "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                      "input": "0xd505accf0000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006a079d9a000000000000000000000000000000000000000000000000000000000000001bc7b60c1bd267ac7348356cdefb7f3478399bfefe8e52c4a1226b4985d5e5c00a3616b0b1956e4b2ce3026d7048b93d73fbdf55c568b3eefdfc104dd44ae93bca",
+                      "calls": [
+                        {
+                          "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                          "gas": "0xa892c",
+                          "gasUsed": "0x1119",
+                          "to": "0x0e5951d92e872d63eb849594f5e8f395c2cfb7a8",
+                          "input": "0x6ccea6520000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d7563d7fc1e7450c79c6017a01cb428ca730462c4aed997e9522af23e68ca86fb00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000041c7b60c1bd267ac7348356cdefb7f3478399bfefe8e52c4a1226b4985d5e5c00a3616b0b1956e4b2ce3026d7048b93d73fbdf55c568b3eefdfc104dd44ae93bca1b00000000000000000000000000000000000000000000000000000000000000",
+                          "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                          "calls": [
+                            {
+                              "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                              "gas": "0xa5a94",
+                              "gasUsed": "0xbb8",
+                              "to": "0x0000000000000000000000000000000000000001",
+                              "input": "0x7563d7fc1e7450c79c6017a01cb428ca730462c4aed997e9522af23e68ca86fb000000000000000000000000000000000000000000000000000000000000001bc7b60c1bd267ac7348356cdefb7f3478399bfefe8e52c4a1226b4985d5e5c00a3616b0b1956e4b2ce3026d7048b93d73fbdf55c568b3eefdfc104dd44ae93bca",
+                              "output": "0x0000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d",
+                              "type": "STATICCALL"
+                            }
+                          ],
+                          "value": "0x0",
+                          "type": "DELEGATECALL"
+                        }
+                      ],
+                      "logs": [
+                        {
+                          "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                          "topics": [
+                            "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+                            "0x0000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d",
+                            "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6"
+                          ],
+                          "data": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                          "position": "0x1",
+                          "index": "0x0"
+                        }
+                      ],
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "value": "0x0",
+                  "type": "CALL"
+                },
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0xa620e",
+                  "gasUsed": "0x1db2",
+                  "to": "0xb68811bcc0e4fcd825aa49f9453b065ddf752fcb",
+                  "input": "0xdea5c2e000000000000000000000000053195a1c4e664ac09eb72892516f8f85ec800000",
+                  "output": "0x00000000000000000000000088b7ab321dcd42751a5cdc616be79383c77e03d3",
+                  "calls": [
+                    {
+                      "from": "0xb68811bcc0e4fcd825aa49f9453b065ddf752fcb",
+                      "gas": "0xa25e2",
+                      "gasUsed": "0xa9b",
+                      "to": "0x7f44439721b295c58cc032bb344973c4b066d2b5",
+                      "input": "0xdea5c2e000000000000000000000000053195a1c4e664ac09eb72892516f8f85ec800000",
+                      "output": "0x00000000000000000000000088b7ab321dcd42751a5cdc616be79383c77e03d3",
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "type": "STATICCALL"
+                },
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0xa4300",
+                  "gasUsed": "0xcab",
+                  "to": "0xb68811bcc0e4fcd825aa49f9453b065ddf752fcb",
+                  "input": "0x17701f3500000000000000000000000053195a1c4e664ac09eb72892516f8f85ec800000",
+                  "output": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  "calls": [
+                    {
+                      "from": "0xb68811bcc0e4fcd825aa49f9453b065ddf752fcb",
+                      "gas": "0xa189e",
+                      "gasUsed": "0xb28",
+                      "to": "0x7f44439721b295c58cc032bb344973c4b066d2b5",
+                      "input": "0x17701f3500000000000000000000000053195a1c4e664ac09eb72892516f8f85ec800000",
+                      "output": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "type": "STATICCALL"
+                },
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0xa3439",
+                  "gasUsed": "0xc4f",
+                  "to": "0xb68811bcc0e4fcd825aa49f9453b065ddf752fcb",
+                  "input": "0x8c2007b200000000000000000000000053195a1c4e664ac09eb72892516f8f85ec800000",
+                  "output": "0x00000000000000000000000004de1ef694923844bae419d4f832196f21767f86",
+                  "calls": [
+                    {
+                      "from": "0xb68811bcc0e4fcd825aa49f9453b065ddf752fcb",
+                      "gas": "0xa0a12",
+                      "gasUsed": "0xacc",
+                      "to": "0x7f44439721b295c58cc032bb344973c4b066d2b5",
+                      "input": "0x8c2007b200000000000000000000000053195a1c4e664ac09eb72892516f8f85ec800000",
+                      "output": "0x00000000000000000000000004de1ef694923844bae419d4f832196f21767f86",
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "type": "STATICCALL"
+                },
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0xa1c8d",
+                  "gasUsed": "0x8168",
+                  "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "input": "0x23b872dd0000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d600000000000000000000000000000000000000000000000000000000017d7840",
+                  "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                  "calls": [
+                    {
+                      "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                      "gas": "0x9f1ac",
+                      "gasUsed": "0x7ec6",
+                      "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                      "input": "0x23b872dd0000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d600000000000000000000000000000000000000000000000000000000017d7840",
+                      "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                      "logs": [
+                        {
+                          "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                          "topics": [
+                            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                            "0x0000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d",
+                            "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6"
+                          ],
+                          "data": "0x00000000000000000000000000000000000000000000000000000000017d7840",
+                          "position": "0x0",
+                          "index": "0x1"
+                        }
+                      ],
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "value": "0x0",
+                  "type": "CALL"
+                },
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0x99b86",
+                  "gasUsed": "0x527",
+                  "to": "0xb68811bcc0e4fcd825aa49f9453b065ddf752fcb",
+                  "input": "0x68a4c8b700000000000000000000000053195a1c4e664ac09eb72892516f8f85ec800000",
+                  "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                  "calls": [
+                    {
+                      "from": "0xb68811bcc0e4fcd825aa49f9453b065ddf752fcb",
+                      "gas": "0x973c2",
+                      "gasUsed": "0x3a4",
+                      "to": "0x7f44439721b295c58cc032bb344973c4b066d2b5",
+                      "input": "0x68a4c8b700000000000000000000000053195a1c4e664ac09eb72892516f8f85ec800000",
+                      "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "type": "STATICCALL"
+                },
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0x99436",
+                  "gasUsed": "0x62fd",
+                  "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "input": "0x095ea7b300000000000000000000000004de1ef694923844bae419d4f832196f21767f8600000000000000000000000000000000000000000000000000000000017a9bd4",
+                  "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                  "calls": [
+                    {
+                      "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                      "gas": "0x96b7c",
+                      "gasUsed": "0x6061",
+                      "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                      "input": "0x095ea7b300000000000000000000000004de1ef694923844bae419d4f832196f21767f8600000000000000000000000000000000000000000000000000000000017a9bd4",
+                      "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                      "logs": [
+                        {
+                          "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                          "topics": [
+                            "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+                            "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6",
+                            "0x00000000000000000000000004de1ef694923844bae419d4f832196f21767f86"
+                          ],
+                          "data": "0x00000000000000000000000000000000000000000000000000000000017a9bd4",
+                          "position": "0x0",
+                          "index": "0x2"
+                        }
+                      ],
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "value": "0x0",
+                  "type": "CALL"
+                },
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0x927e6",
+                  "gasUsed": "0x27582",
+                  "to": "0x04de1ef694923844bae419d4f832196f21767f86",
+                  "input": "0x156e29f6000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d600000000000000000000000000000000000000000000000000000000017a9bd40000000000000000000000000000000000000000000000000000000000000000",
+                  "output": "0x0000000000000000000000000000000000000000000000015f8f226f54c17d15",
+                  "calls": [
+                    {
+                      "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                      "gas": "0x8f8bc",
+                      "gasUsed": "0x942",
+                      "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                      "input": "0xbe544b9c",
+                      "output": "0x000000000000000000000000c92c434aa77b98807108e038871b3caba654e84e",
+                      "type": "STATICCALL"
+                    },
+                    {
+                      "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                      "gas": "0x8e497",
+                      "gasUsed": "0x2562f",
+                      "to": "0xc92c434aa77b98807108e038871b3caba654e84e",
+                      "input": "0x156e29f6000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d600000000000000000000000000000000000000000000000000000000017a9bd40000000000000000000000000000000000000000000000000000000000000000",
+                      "output": "0x0000000000000000000000000000000000000000000000015f8f226f54c17d15",
+                      "calls": [
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x8adf1",
+                          "gasUsed": "0x986",
+                          "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                          "input": "0x3855a382",
+                          "output": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x8a1f8",
+                          "gasUsed": "0x93a",
+                          "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                          "input": "0x40acfcb0",
+                          "output": "0x0000000000000000000000000000000000000000000000000000000000989680",
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x88c7a",
+                          "gasUsed": "0x94f",
+                          "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                          "input": "0xcb545364",
+                          "output": "0x00000000000000000000000000000000000000000000000000470de4df820000",
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x87872",
+                          "gasUsed": "0x984",
+                          "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                          "input": "0xcdf456e1",
+                          "output": "0x000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f",
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x86d4c",
+                          "gasUsed": "0xcb2",
+                          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                          "input": "0x70a0823100000000000000000000000004de1ef694923844bae419d4f832196f21767f86",
+                          "output": "0x00000000000000000000000000000000000000000000000000000000f4542f84",
+                          "calls": [
+                            {
+                              "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                              "gas": "0x84912",
+                              "gasUsed": "0x9f9",
+                              "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                              "input": "0x70a0823100000000000000000000000004de1ef694923844bae419d4f832196f21767f86",
+                              "output": "0x00000000000000000000000000000000000000000000000000000000f4542f84",
+                              "value": "0x0",
+                              "type": "DELEGATECALL"
+                            }
+                          ],
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x85e4d",
+                          "gasUsed": "0x944",
+                          "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                          "input": "0x0076e2f0",
+                          "output": "0x000000000000000000000000efb3fc14d8e0c6e72d087fc69ac267a0d9608de6",
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x849d5",
+                          "gasUsed": "0x20bd",
+                          "to": "0xefb3fc14d8e0c6e72d087fc69ac267a0d9608de6",
+                          "input": "0xc6bbb05700000000000000000000000004de1ef694923844bae419d4f832196f21767f86",
+                          "output": "0x00000000000000000000000000000000000000000000000000000000000a1ddc",
+                          "calls": [
+                            {
+                              "from": "0xefb3fc14d8e0c6e72d087fc69ac267a0d9608de6",
+                              "gas": "0x82577",
+                              "gasUsed": "0x1888",
+                              "to": "0x0000000000000000000000000000000000000801",
+                              "input": "0x00000000000000000000000004de1ef694923844bae419d4f832196f21767f860000000000000000000000000000000000000000000000000000000000000000",
+                              "output": "0x0000000000000000000000000000000000000000000000000000000003f3a9f000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                              "type": "STATICCALL"
+                            }
+                          ],
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x81ff6",
+                          "gasUsed": "0x233f",
+                          "to": "0xefb3fc14d8e0c6e72d087fc69ac267a0d9608de6",
+                          "input": "0x085a2e4200000000000000000000000004de1ef694923844bae419d4f832196f21767f860000000000000000000000000000000000000000000000000000000000000001",
+                          "output": "0x00000000000000000000000000000000000000000000000000000003dca698b3",
+                          "calls": [
+                            {
+                              "from": "0xefb3fc14d8e0c6e72d087fc69ac267a0d9608de6",
+                              "gas": "0x7fc30",
+                              "gasUsed": "0x1ca8",
+                              "to": "0x000000000000000000000000000000000000080f",
+                              "input": "0x000000000000000000000000000000000000000000000000000000000000000100000000000000000000000004de1ef694923844bae419d4f832196f21767f86",
+                              "output": "0x00000000000000000000000000000000000000000000000000000003dca698b300000000000000000000000000000000000000000000000000000003dca698b30000000000000000000000000000000000000000000000000000001819cbfd140000000000000000000000000000000000000000000000000000001bf67295c7",
+                              "type": "STATICCALL"
+                            }
+                          ],
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x7efb9",
+                          "gasUsed": "0x942",
+                          "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                          "input": "0x61d027b3",
+                          "output": "0x0000000000000000000000007fe37fc2f987eb981a0fc63cf1eabf04463550d4",
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x7e4d7",
+                          "gasUsed": "0x923",
+                          "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                          "input": "0x94c3e914",
+                          "output": "0x00000000000000000000000000000000000000000000000000b1a2bc2ec50000",
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x7da7d",
+                          "gasUsed": "0x9b1",
+                          "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                          "input": "0x3c93adee",
+                          "output": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x7cd6f",
+                          "gasUsed": "0x1b4",
+                          "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                          "input": "0xcdf456e1",
+                          "output": "0x000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f",
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x7c93c",
+                          "gasUsed": "0x32a3",
+                          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                          "input": "0xa9059cbb0000000000000000000000007fe37fc2f987eb981a0fc63cf1eabf04463550d400000000000000000000000000000000000000000000000000000000000000c4",
+                          "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                          "calls": [
+                            {
+                              "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                              "gas": "0x7a78f",
+                              "gasUsed": "0x2fe7",
+                              "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                              "input": "0xa9059cbb0000000000000000000000007fe37fc2f987eb981a0fc63cf1eabf04463550d400000000000000000000000000000000000000000000000000000000000000c4",
+                              "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                              "logs": [
+                                {
+                                  "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                                  "topics": [
+                                    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                                    "0x00000000000000000000000004de1ef694923844bae419d4f832196f21767f86",
+                                    "0x0000000000000000000000007fe37fc2f987eb981a0fc63cf1eabf04463550d4"
+                                  ],
+                                  "data": "0x00000000000000000000000000000000000000000000000000000000000000c4",
+                                  "position": "0x0",
+                                  "index": "0x3"
+                                }
+                              ],
+                              "value": "0x0",
+                              "type": "DELEGATECALL"
+                            }
+                          ],
+                          "value": "0x0",
+                          "type": "CALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x78531",
+                          "gasUsed": "0x1b4",
+                          "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                          "input": "0xcdf456e1",
+                          "output": "0x000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f",
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x781d5",
+                          "gasUsed": "0xbe3",
+                          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                          "input": "0x313ce567",
+                          "output": "0x0000000000000000000000000000000000000000000000000000000000000006",
+                          "calls": [
+                            {
+                              "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                              "gas": "0x7616b",
+                              "gasUsed": "0x94d",
+                              "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                              "input": "0x313ce567",
+                              "output": "0x0000000000000000000000000000000000000000000000000000000000000006",
+                              "value": "0x0",
+                              "type": "DELEGATECALL"
+                            }
+                          ],
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x7685d",
+                          "gasUsed": "0x1b4",
+                          "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                          "input": "0xcdf456e1",
+                          "output": "0x000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f",
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x76501",
+                          "gasUsed": "0x413",
+                          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                          "input": "0x313ce567",
+                          "output": "0x0000000000000000000000000000000000000000000000000000000000000006",
+                          "calls": [
+                            {
+                              "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                              "gas": "0x7450a",
+                              "gasUsed": "0x17d",
+                              "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                              "input": "0x313ce567",
+                              "output": "0x0000000000000000000000000000000000000000000000000000000000000006",
+                              "value": "0x0",
+                              "type": "DELEGATECALL"
+                            }
+                          ],
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x75d94",
+                          "gasUsed": "0x1b4",
+                          "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                          "input": "0xcdf456e1",
+                          "output": "0x000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f",
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x75a22",
+                          "gasUsed": "0x4e2",
+                          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                          "input": "0x70a0823100000000000000000000000004de1ef694923844bae419d4f832196f21767f86",
+                          "output": "0x00000000000000000000000000000000000000000000000000000000f4542ec0",
+                          "calls": [
+                            {
+                              "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                              "gas": "0x73a34",
+                              "gasUsed": "0x229",
+                              "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                              "input": "0x70a0823100000000000000000000000004de1ef694923844bae419d4f832196f21767f86",
+                              "output": "0x00000000000000000000000000000000000000000000000000000000f4542ec0",
+                              "value": "0x0",
+                              "type": "DELEGATECALL"
+                            }
+                          ],
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x752d1",
+                          "gasUsed": "0x174",
+                          "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                          "input": "0x0076e2f0",
+                          "output": "0x000000000000000000000000efb3fc14d8e0c6e72d087fc69ac267a0d9608de6",
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x74faa",
+                          "gasUsed": "0x20bd",
+                          "to": "0xefb3fc14d8e0c6e72d087fc69ac267a0d9608de6",
+                          "input": "0xc6bbb05700000000000000000000000004de1ef694923844bae419d4f832196f21767f86",
+                          "output": "0x00000000000000000000000000000000000000000000000000000000000a1ddc",
+                          "calls": [
+                            {
+                              "from": "0xefb3fc14d8e0c6e72d087fc69ac267a0d9608de6",
+                              "gas": "0x72f35",
+                              "gasUsed": "0x1888",
+                              "to": "0x0000000000000000000000000000000000000801",
+                              "input": "0x00000000000000000000000004de1ef694923844bae419d4f832196f21767f860000000000000000000000000000000000000000000000000000000000000000",
+                              "output": "0x0000000000000000000000000000000000000000000000000000000003f3a9f000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                              "type": "STATICCALL"
+                            }
+                          ],
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x72d7b",
+                          "gasUsed": "0x233f",
+                          "to": "0xefb3fc14d8e0c6e72d087fc69ac267a0d9608de6",
+                          "input": "0x085a2e4200000000000000000000000004de1ef694923844bae419d4f832196f21767f860000000000000000000000000000000000000000000000000000000000000001",
+                          "output": "0x00000000000000000000000000000000000000000000000000000003dca698b3",
+                          "calls": [
+                            {
+                              "from": "0xefb3fc14d8e0c6e72d087fc69ac267a0d9608de6",
+                              "gas": "0x70d7f",
+                              "gasUsed": "0x1ca8",
+                              "to": "0x000000000000000000000000000000000000080f",
+                              "input": "0x000000000000000000000000000000000000000000000000000000000000000100000000000000000000000004de1ef694923844bae419d4f832196f21767f86",
+                              "output": "0x00000000000000000000000000000000000000000000000000000003dca698b300000000000000000000000000000000000000000000000000000003dca698b30000000000000000000000000000000000000000000000000000001819cbfd140000000000000000000000000000000000000000000000000000001bf67295c7",
+                              "type": "STATICCALL"
+                            }
+                          ],
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x7035a",
+                          "gasUsed": "0x1b4",
+                          "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                          "input": "0xcdf456e1",
+                          "output": "0x000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f",
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x6ff19",
+                          "gasUsed": "0x191c",
+                          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                          "input": "0x23b872dd000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d600000000000000000000000004de1ef694923844bae419d4f832196f21767f8600000000000000000000000000000000000000000000000000000000017a9bd4",
+                          "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                          "calls": [
+                            {
+                              "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                              "gas": "0x6e0ae",
+                              "gasUsed": "0x167a",
+                              "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                              "input": "0x23b872dd000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d600000000000000000000000004de1ef694923844bae419d4f832196f21767f8600000000000000000000000000000000000000000000000000000000017a9bd4",
+                              "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                              "logs": [
+                                {
+                                  "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                                  "topics": [
+                                    "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                                    "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6",
+                                    "0x00000000000000000000000004de1ef694923844bae419d4f832196f21767f86"
+                                  ],
+                                  "data": "0x00000000000000000000000000000000000000000000000000000000017a9bd4",
+                                  "position": "0x0",
+                                  "index": "0x5"
+                                }
+                              ],
+                              "value": "0x0",
+                              "type": "DELEGATECALL"
+                            }
+                          ],
+                          "value": "0x0",
+                          "type": "CALL"
+                        }
+                      ],
+                      "logs": [
+                        {
+                          "address": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "topics": [
+                            "0x5885488fd06cc72e4cb7e8da47b6e2d92d1bf43e80342e2d21c126c92c3a1035"
+                          ],
+                          "data": "0x00000000000000000000000000000000000000000000000000000000000000c4",
+                          "position": "0xd",
+                          "index": "0x4"
+                        },
+                        {
+                          "address": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "topics": [
+                            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                            "0x0000000000000000000000000000000000000000000000000000000000000000",
+                            "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6"
+                          ],
+                          "data": "0x0000000000000000000000000000000000000000000000015f8f226f54c17d15",
+                          "position": "0x18",
+                          "index": "0x6"
+                        },
+                        {
+                          "address": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "topics": [
+                            "0x2f00e3cdd69a77be7ed215ec7b2a36784dd158f921fca79ac29deffa353fe6ee",
+                            "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6",
+                            "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6"
+                          ],
+                          "data": "0x00000000000000000000000000000000000000000000000000000000017a9bd40000000000000000000000000000000000000000000000015f8f226f54c17d15",
+                          "position": "0x18",
+                          "index": "0x7"
+                        }
+                      ],
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "value": "0x0",
+                  "type": "CALL"
+                },
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0x6ba09",
+                  "gasUsed": "0xc4a",
+                  "to": "0xb68811bcc0e4fcd825aa49f9453b065ddf752fcb",
+                  "input": "0xabb8491700000000000000000000000004de1ef694923844bae419d4f832196f21767f86",
+                  "output": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  "calls": [
+                    {
+                      "from": "0xb68811bcc0e4fcd825aa49f9453b065ddf752fcb",
+                      "gas": "0x69dcb",
+                      "gasUsed": "0xac7",
+                      "to": "0x7f44439721b295c58cc032bb344973c4b066d2b5",
+                      "input": "0xabb8491700000000000000000000000004de1ef694923844bae419d4f832196f21767f86",
+                      "output": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "type": "STATICCALL"
+                },
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0x6ac1a",
+                  "gasUsed": "0xc4a",
+                  "to": "0xb68811bcc0e4fcd825aa49f9453b065ddf752fcb",
+                  "input": "0xabb8491700000000000000000000000053195a1c4e664ac09eb72892516f8f85ec800000",
+                  "output": "0x000000000000000000000000db6301a47cb72e4c6662083453a21b6f27bad8fb",
+                  "calls": [
+                    {
+                      "from": "0xb68811bcc0e4fcd825aa49f9453b065ddf752fcb",
+                      "gas": "0x69014",
+                      "gasUsed": "0xac7",
+                      "to": "0x7f44439721b295c58cc032bb344973c4b066d2b5",
+                      "input": "0xabb8491700000000000000000000000053195a1c4e664ac09eb72892516f8f85ec800000",
+                      "output": "0x000000000000000000000000db6301a47cb72e4c6662083453a21b6f27bad8fb",
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "type": "STATICCALL"
+                },
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0x694b8",
+                  "gasUsed": "0xa21",
+                  "to": "0xdb6301a47cb72e4c6662083453a21b6f27bad8fb",
+                  "input": "0x0902f1ac",
+                  "output": "0x0000000000000000000000000000000000000000000003b00ed9fc5eb862546e00000000000000000000000000000000000000000055bf1b73f6ee4831029b1c000000000000000000000000000000000000000000000000000000000000012c000000000000000000000000000000000000000000000000000000000000012c",
+                  "type": "STATICCALL"
+                },
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0x6885d",
+                  "gasUsed": "0x94f",
+                  "to": "0xdb6301a47cb72e4c6662083453a21b6f27bad8fb",
+                  "input": "0x0dfe1681",
+                  "output": "0x00000000000000000000000004de1ef694923844bae419d4f832196f21767f86",
+                  "type": "STATICCALL"
+                },
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0x67b49",
+                  "gasUsed": "0x2390",
+                  "to": "0x04de1ef694923844bae419d4f832196f21767f86",
+                  "input": "0xa9059cbb000000000000000000000000db6301a47cb72e4c6662083453a21b6f27bad8fb0000000000000000000000000000000000000000000000015f8f226f54c17d15",
+                  "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                  "calls": [
+                    {
+                      "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                      "gas": "0x6606e",
+                      "gasUsed": "0x172",
+                      "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                      "input": "0xbe544b9c",
+                      "output": "0x000000000000000000000000c92c434aa77b98807108e038871b3caba654e84e",
+                      "type": "STATICCALL"
+                    },
+                    {
+                      "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                      "gas": "0x65d9a",
+                      "gasUsed": "0x1f98",
+                      "to": "0xc92c434aa77b98807108e038871b3caba654e84e",
+                      "input": "0xa9059cbb000000000000000000000000db6301a47cb72e4c6662083453a21b6f27bad8fb0000000000000000000000000000000000000000000000015f8f226f54c17d15",
+                      "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                      "logs": [
+                        {
+                          "address": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "topics": [
+                            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                            "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6",
+                            "0x000000000000000000000000db6301a47cb72e4c6662083453a21b6f27bad8fb"
+                          ],
+                          "data": "0x0000000000000000000000000000000000000000000000015f8f226f54c17d15",
+                          "position": "0x0",
+                          "index": "0x8"
+                        }
+                      ],
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "value": "0x0",
+                  "type": "CALL"
+                },
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0x65535",
+                  "gasUsed": "0xf270",
+                  "to": "0xdb6301a47cb72e4c6662083453a21b6f27bad8fb",
+                  "input": "0x022c0d9f0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001fca141c1a9b8ea331d1000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d600000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000",
+                  "calls": [
+                    {
+                      "from": "0xdb6301a47cb72e4c6662083453a21b6f27bad8fb",
+                      "gas": "0x60ccd",
+                      "gasUsed": "0x7fa3",
+                      "to": "0x53195a1c4e664ac09eb72892516f8f85ec800000",
+                      "input": "0xa9059cbb000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6000000000000000000000000000000000000000000001fca141c1a9b8ea331d1",
+                      "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                      "calls": [
+                        {
+                          "from": "0x53195a1c4e664ac09eb72892516f8f85ec800000",
+                          "gas": "0x5ea72",
+                          "gasUsed": "0x752d",
+                          "to": "0xfbec3d3c42427dc2c08a2401e53758f02cecb540",
+                          "input": "0xa9059cbb000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6000000000000000000000000000000000000000000001fca141c1a9b8ea331d1",
+                          "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                          "logs": [
+                            {
+                              "address": "0x53195a1c4e664ac09eb72892516f8f85ec800000",
+                              "topics": [
+                                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                                "0x000000000000000000000000db6301a47cb72e4c6662083453a21b6f27bad8fb",
+                                "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6"
+                              ],
+                              "data": "0x000000000000000000000000000000000000000000001fca141c1a9b8ea331d1",
+                              "position": "0x0",
+                              "index": "0x9"
+                            }
+                          ],
+                          "value": "0x0",
+                          "type": "DELEGATECALL"
+                        }
+                      ],
+                      "value": "0x0",
+                      "type": "CALL"
+                    },
+                    {
+                      "from": "0xdb6301a47cb72e4c6662083453a21b6f27bad8fb",
+                      "gas": "0x58caf",
+                      "gasUsed": "0x693",
+                      "to": "0x04de1ef694923844bae419d4f832196f21767f86",
+                      "input": "0x70a08231000000000000000000000000db6301a47cb72e4c6662083453a21b6f27bad8fb",
+                      "output": "0x0000000000000000000000000000000000000000000003b16e691ece0d23d183",
+                      "calls": [
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x5758f",
+                          "gasUsed": "0x172",
+                          "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                          "input": "0xbe544b9c",
+                          "output": "0x000000000000000000000000c92c434aa77b98807108e038871b3caba654e84e",
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x572bd",
+                          "gasUsed": "0x29e",
+                          "to": "0xc92c434aa77b98807108e038871b3caba654e84e",
+                          "input": "0x70a08231000000000000000000000000db6301a47cb72e4c6662083453a21b6f27bad8fb",
+                          "output": "0x0000000000000000000000000000000000000000000003b16e691ece0d23d183",
+                          "value": "0x0",
+                          "type": "DELEGATECALL"
+                        }
+                      ],
+                      "type": "STATICCALL"
+                    },
+                    {
+                      "from": "0xdb6301a47cb72e4c6662083453a21b6f27bad8fb",
+                      "gas": "0x58488",
+                      "gasUsed": "0x360",
+                      "to": "0x53195a1c4e664ac09eb72892516f8f85ec800000",
+                      "input": "0x70a08231000000000000000000000000db6301a47cb72e4c6662083453a21b6f27bad8fb",
+                      "output": "0x000000000000000000000000000000000000000000559f515fdad3aca25f694b",
+                      "calls": [
+                        {
+                          "from": "0x53195a1c4e664ac09eb72892516f8f85ec800000",
+                          "gas": "0x56df0",
+                          "gasUsed": "0x2b4",
+                          "to": "0xfbec3d3c42427dc2c08a2401e53758f02cecb540",
+                          "input": "0x70a08231000000000000000000000000db6301a47cb72e4c6662083453a21b6f27bad8fb",
+                          "output": "0x000000000000000000000000000000000000000000559f515fdad3aca25f694b",
+                          "value": "0x0",
+                          "type": "DELEGATECALL"
+                        }
+                      ],
+                      "type": "STATICCALL"
+                    },
+                    {
+                      "from": "0xdb6301a47cb72e4c6662083453a21b6f27bad8fb",
+                      "gas": "0x574d5",
+                      "gasUsed": "0x693",
+                      "to": "0x04de1ef694923844bae419d4f832196f21767f86",
+                      "input": "0x70a08231000000000000000000000000db6301a47cb72e4c6662083453a21b6f27bad8fb",
+                      "output": "0x0000000000000000000000000000000000000000000003b16e691ece0d23d183",
+                      "calls": [
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x55e14",
+                          "gasUsed": "0x172",
+                          "to": "0xa07d06383c1863c8a54d427ac890643d76cc03ff",
+                          "input": "0xbe544b9c",
+                          "output": "0x000000000000000000000000c92c434aa77b98807108e038871b3caba654e84e",
+                          "type": "STATICCALL"
+                        },
+                        {
+                          "from": "0x04de1ef694923844bae419d4f832196f21767f86",
+                          "gas": "0x55b42",
+                          "gasUsed": "0x29e",
+                          "to": "0xc92c434aa77b98807108e038871b3caba654e84e",
+                          "input": "0x70a08231000000000000000000000000db6301a47cb72e4c6662083453a21b6f27bad8fb",
+                          "output": "0x0000000000000000000000000000000000000000000003b16e691ece0d23d183",
+                          "value": "0x0",
+                          "type": "DELEGATECALL"
+                        }
+                      ],
+                      "type": "STATICCALL"
+                    }
+                  ],
+                  "logs": [
+                    {
+                      "address": "0xdb6301a47cb72e4c6662083453a21b6f27bad8fb",
+                      "topics": [
+                        "0x1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1"
+                      ],
+                      "data": "0x0000000000000000000000000000000000000000000003b16e691ece0d23d183000000000000000000000000000000000000000000559f515fdad3aca25f694b",
+                      "position": "0x4",
+                      "index": "0xa"
+                    },
+                    {
+                      "address": "0xdb6301a47cb72e4c6662083453a21b6f27bad8fb",
+                      "topics": [
+                        "0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822",
+                        "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6",
+                        "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6"
+                      ],
+                      "data": "0x0000000000000000000000000000000000000000000000015f8f226f54c17d1500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001fca141c1a9b8ea331d1",
+                      "position": "0x4",
+                      "index": "0xb"
+                    }
+                  ],
+                  "value": "0x0",
+                  "type": "CALL"
+                },
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0x5651c",
+                  "gasUsed": "0x631f",
+                  "to": "0x53195a1c4e664ac09eb72892516f8f85ec800000",
+                  "input": "0xa9059cbb0000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d000000000000000000000000000000000000000000001fca141c1a9b8ea331d1",
+                  "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                  "calls": [
+                    {
+                      "from": "0x53195a1c4e664ac09eb72892516f8f85ec800000",
+                      "gas": "0x54efc",
+                      "gasUsed": "0x626d",
+                      "to": "0xfbec3d3c42427dc2c08a2401e53758f02cecb540",
+                      "input": "0xa9059cbb0000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d000000000000000000000000000000000000000000001fca141c1a9b8ea331d1",
+                      "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                      "logs": [
+                        {
+                          "address": "0x53195a1c4e664ac09eb72892516f8f85ec800000",
+                          "topics": [
+                            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                            "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6",
+                            "0x0000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d"
+                          ],
+                          "data": "0x000000000000000000000000000000000000000000001fca141c1a9b8ea331d1",
+                          "position": "0x0",
+                          "index": "0xc"
+                        }
+                      ],
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "value": "0x0",
+                  "type": "CALL"
+                },
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0x4fece",
+                  "gasUsed": "0x44e",
+                  "to": "0xb68811bcc0e4fcd825aa49f9453b065ddf752fcb",
+                  "input": "0xdea5c2e000000000000000000000000053195a1c4e664ac09eb72892516f8f85ec800000",
+                  "output": "0x00000000000000000000000088b7ab321dcd42751a5cdc616be79383c77e03d3",
+                  "calls": [
+                    {
+                      "from": "0xb68811bcc0e4fcd825aa49f9453b065ddf752fcb",
+                      "gas": "0x4e97d",
+                      "gasUsed": "0x2cb",
+                      "to": "0x7f44439721b295c58cc032bb344973c4b066d2b5",
+                      "input": "0xdea5c2e000000000000000000000000053195a1c4e664ac09eb72892516f8f85ec800000",
+                      "output": "0x00000000000000000000000088b7ab321dcd42751a5cdc616be79383c77e03d3",
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "type": "STATICCALL"
+                },
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0x4e6d6",
+                  "gasUsed": "0x27b3",
+                  "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "input": "0xa9059cbb000000000000000000000000b4894380282533a86cb241145fac54aaac995f18000000000000000000000000000000000000000000000000000000000002dc6c",
+                  "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                  "calls": [
+                    {
+                      "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                      "gas": "0x4d0b2",
+                      "gasUsed": "0x24f7",
+                      "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                      "input": "0xa9059cbb000000000000000000000000b4894380282533a86cb241145fac54aaac995f18000000000000000000000000000000000000000000000000000000000002dc6c",
+                      "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                      "logs": [
+                        {
+                          "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                          "topics": [
+                            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                            "0x000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6",
+                            "0x000000000000000000000000b4894380282533a86cb241145fac54aaac995f18"
+                          ],
+                          "data": "0x000000000000000000000000000000000000000000000000000000000002dc6c",
+                          "position": "0x0",
+                          "index": "0xd"
+                        }
+                      ],
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "value": "0x0",
+                  "type": "CALL"
+                },
+                {
+                  "from": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "gas": "0x4b3c4",
+                  "gasUsed": "0x9c75",
+                  "to": "0xb4894380282533a86cb241145fac54aaac995f18",
+                  "input": "0xe01a57bc00000000000000000000000053195a1c4e664ac09eb72892516f8f85ec80000000000000000000000000000088b7ab321dcd42751a5cdc616be79383c77e03d3000000000000000000000000000000000000000000000000000000000000f41d000000000000000000000000000000000000000000000000000000000001e84f0000000000000000000000000000000000000000000000000000000000000001",
+                  "calls": [
+                    {
+                      "from": "0xb4894380282533a86cb241145fac54aaac995f18",
+                      "gas": "0x48e3d",
+                      "gasUsed": "0x894c",
+                      "to": "0xebe048d9478d2e6b9edebb5030928326af9befa2",
+                      "input": "0xe01a57bc00000000000000000000000053195a1c4e664ac09eb72892516f8f85ec80000000000000000000000000000088b7ab321dcd42751a5cdc616be79383c77e03d3000000000000000000000000000000000000000000000000000000000000f41d000000000000000000000000000000000000000000000000000000000001e84f0000000000000000000000000000000000000000000000000000000000000001",
+                      "calls": [
+                        {
+                          "from": "0xb4894380282533a86cb241145fac54aaac995f18",
+                          "gas": "0x403cd",
+                          "gasUsed": "0x4e2",
+                          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                          "input": "0x70a08231000000000000000000000000b4894380282533a86cb241145fac54aaac995f18",
+                          "output": "0x00000000000000000000000000000000000000000000000000000002a4e9bddf",
+                          "calls": [
+                            {
+                              "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                              "gas": "0x3f139",
+                              "gasUsed": "0x229",
+                              "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                              "input": "0x70a08231000000000000000000000000b4894380282533a86cb241145fac54aaac995f18",
+                              "output": "0x00000000000000000000000000000000000000000000000000000002a4e9bddf",
+                              "value": "0x0",
+                              "type": "DELEGATECALL"
+                            }
+                          ],
+                          "type": "STATICCALL"
+                        }
+                      ],
+                      "logs": [
+                        {
+                          "address": "0xb4894380282533a86cb241145fac54aaac995f18",
+                          "topics": [
+                            "0x92b5cc8b0a54f78189073c1d42e4af11495ff3a84356e9c798d0981f4021698a",
+                            "0x00000000000000000000000053195a1c4e664ac09eb72892516f8f85ec800000",
+                            "0x00000000000000000000000088b7ab321dcd42751a5cdc616be79383c77e03d3"
+                          ],
+                          "data": "0x000000000000000000000000000000000000000000000000000000000000f41d000000000000000000000000000000000000000000000000000000000001e84f0000000000000000000000000000000000000000000000000000000000000001",
+                          "position": "0x1",
+                          "index": "0xe"
+                        }
+                      ],
+                      "value": "0x0",
+                      "type": "DELEGATECALL"
+                    }
+                  ],
+                  "value": "0x0",
+                  "type": "CALL"
+                }
+              ],
+              "logs": [
+                {
+                  "address": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                  "topics": [
+                    "0x89f5adc174562e07c9c9b1cae7109bbecb21cf9d1b2847e550042b8653c54a0e",
+                    "0x00000000000000000000000053195a1c4e664ac09eb72892516f8f85ec800000",
+                    "0x0000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d"
+                  ],
+                  "data": "0x00000000000000000000000000000000000000000000000000000000017d7840000000000000000000000000000000000000000000001fca141c1a9b8ea331d1",
+                  "position": "0x12",
+                  "index": "0xf"
+                }
+              ],
+              "value": "0x0",
+              "type": "DELEGATECALL"
+            }
+          ],
+          "value": "0x0",
+          "type": "CALL"
+        }
+      }
+    },
+    "prestateDiff": {
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 6,
+        "method": "debug_traceTransaction",
+        "params": [
+          "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+          {
+            "tracer": "prestateTracer",
+            "timeout": "15s",
+            "tracerConfig": {
+              "diffMode": true
+            }
+          }
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 6,
+        "result": {
+          "post": {
+            "0x0000000000000000000000000000000000000000": {
+              "balance": "0x354974978c95a42cc7b9"
+            },
+            "0x04de1ef694923844bae419d4f832196f21767f86": {
+              "storage": {
+                "0x308983bdf75389e7a3bc73dfa9e8cc5174cc0148cdb570998150a02ae8083001": "0x000000000000000000000000000000000000000000000000000000006a0796a2",
+                "0x3603d33cf6aa939198cc357a41e9027d8afc7ace13819dec1a1d30eaf47ad453": "0x0000000000000000000000000000000000000000000003b16e691ece0d23d183",
+                "0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace02": "0x00000000000000000000000000000000000000000000047a4cbaa62db9b86be7"
+              }
+            },
+            "0x0c71073344e27e33cb57fcb587fc412d689dfd1d": {
+              "balance": "0x44095db881a94a4",
+              "nonce": 383
+            },
+            "0x53195a1c4e664ac09eb72892516f8f85ec800000": {
+              "storage": {
+                "0x3603d33cf6aa939198cc357a41e9027d8afc7ace13819dec1a1d30eaf47ad453": "0x000000000000000000000000000000000000000000559f515fdad3aca25f694b",
+                "0x938c9e529e953a7fc3ed38d66ffa86c43e9a39c399e13bf3f3b225e3446e7e34": "0x000000000000000000000000000000000000000000001fca141c1a9b8ea331d1"
+              }
+            },
+            "0xb4894380282533a86cb241145fac54aaac995f18": {
+              "storage": {
+                "0x00fd557c8b07a88a5e5fce88a958be2677eb3ba9a2a3d98b7964e4c7552e5c40": "0x0000000000000000000000000000000000000000000000000000000023642abc",
+                "0xa926bb40d5eda4681728c5a36d6763beef85e2d2279081fc5cff7e744da2d705": "0x00000000000000000000000000000000000000000000000000000001fc4caf1d",
+                "0xa926bb40d5eda4681728c5a36d6763beef85e2d2279081fc5cff7e744da2d707": "0x0000000000000000000000000000000000000000000000000000000bb6e81dd1",
+                "0xa926bb40d5eda4681728c5a36d6763beef85e2d2279081fc5cff7e744da2d708": "0x00000000000000000000000000000000000000000000000000000000a89d0ec2",
+                "0xf9f4e112d6f6f0a1c096707e8266a45be0bb0b93a0b5127da39636d3fc1093cd": "0x0000000000000000000000000000000000000000000000000000000023642abc"
+              }
+            },
+            "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+              "storage": {
+                "0x45ed741d8d4e8a080d5af46d8880af2788890355cd9f0fe3dd37f41d0cd72f2d": "0x00000000000000000000000000000000000000000000000000000000f5ceca94",
+                "0x59587723ba9dbb47b8d5d5d0ae7fedbab41129aeb8787a97456d5171a43066ab": "0x0000000000000000000000000000000000000000000000000000000ef622578b",
+                "0x6a5c52688b6339d530ae6778e45d371b1e347da116e95d990be6b0f349ddbe32": "0x00000000000000000000000000000000000000000000000000000000017d7840",
+                "0x9680168146881e775ee76b3518c1b5813c19a8f50ac445b9621184efdf42f729": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffe8287bf",
+                "0x9e7e98336a44046eb5f5691b3f921d702ff34731e1c379d2e5e8012687c0aa57": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                "0xd37bf22d1dcbb355b910067bc8d4a686423ed6952e3a2f6fc372959f7cb1edbd": "0x00000000000000000000000000000000000000000000000000000002a4e9bddf"
+              }
+            },
+            "0xdb6301a47cb72e4c6662083453a21b6f27bad8fb": {
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000008": "0x012c012c000000559f515fdad3aca25f694b0000000003b16e691ece0d23d183"
+              }
+            }
+          },
+          "pre": {
+            "0x0000000000000000000000000000000000000000": {
+              "balance": "0x35497496c0dfa6d396b9"
+            },
+            "0x04de1ef694923844bae419d4f832196f21767f86": {
+              "balance": "0x0",
+              "code": "0x6080604052600a600c565b005b60186014601a565b609d565b565b5f7f000000000000000000000000a07d06383c1863c8a54d427ac890643d76cc03ff6001600160a01b031663be544b9c6040518163ffffffff1660e01b8152600401602060405180830381865afa1580156076573d5f5f3e3d5ffd5b505050506040513d601f19601f820116820180604052508101906098919060ba565b905090565b365f5f375f5f365f845af43d5f5f3e80801560b6573d5ff35b3d5ffd5b5f6020828403121560c9575f5ffd5b81516001600160a01b038116811460de575f5ffd5b939250505056fea2646970667358221220a4c884e0d08c4be647995b68d4a791f8825a9fe3013fc798b97044c606fdfc7364736f6c634300081c0033",
+              "nonce": 1,
+              "storage": {
+                "0x308983bdf75389e7a3bc73dfa9e8cc5174cc0148cdb570998150a02ae8083001": "0x000000000000000000000000000000000000000000000000000000006a07969f",
+                "0x3603d33cf6aa939198cc357a41e9027d8afc7ace13819dec1a1d30eaf47ad453": "0x0000000000000000000000000000000000000000000003b00ed9fc5eb862546e",
+                "0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace02": "0x000000000000000000000000000000000000000000000478ed2b83be64f6eed2"
+              }
+            },
+            "0x0c71073344e27e33cb57fcb587fc412d689dfd1d": {
+              "balance": "0x4418a4f84ec02a4",
+              "nonce": 382
+            },
+            "0x53195a1c4e664ac09eb72892516f8f85ec800000": {
+              "balance": "0x0",
+              "code": "0x363d3d373d3d3d363d73fbec3d3c42427dc2c08a2401e53758f02cecb5405af43d82803e903d91602b57fd5bf3",
+              "nonce": 1,
+              "storage": {
+                "0x3603d33cf6aa939198cc357a41e9027d8afc7ace13819dec1a1d30eaf47ad453": "0x00000000000000000000000000000000000000000055bf1b73f6ee4831029b1c"
+              }
+            },
+            "0xb4894380282533a86cb241145fac54aaac995f18": {
+              "balance": "0x0",
+              "code": "0x6080604052600a600c565b005b60186014601a565b6050565b565b5f604b7f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc546001600160a01b031690565b905090565b365f80375f80365f845af43d5f803e8080156069573d5ff35b3d5ffdfea2646970667358221220b1b5a158838b07ec7ff4718fd170a4c885d0f6389a1e92d591b85d5ec68e604864736f6c63430008180033",
+              "nonce": 1,
+              "storage": {
+                "0x00fd557c8b07a88a5e5fce88a958be2677eb3ba9a2a3d98b7964e4c7552e5c40": "0x000000000000000000000000000000000000000000000000000000002363369f",
+                "0xa926bb40d5eda4681728c5a36d6763beef85e2d2279081fc5cff7e744da2d705": "0x00000000000000000000000000000000000000000000000000000001fc4ac6ce",
+                "0xa926bb40d5eda4681728c5a36d6763beef85e2d2279081fc5cff7e744da2d707": "0x0000000000000000000000000000000000000000000000000000000bb6e63582",
+                "0xa926bb40d5eda4681728c5a36d6763beef85e2d2279081fc5cff7e744da2d708": "0x00000000000000000000000000000000000000000000000000000000a89c1aa5",
+                "0xf9f4e112d6f6f0a1c096707e8266a45be0bb0b93a0b5127da39636d3fc1093cd": "0x000000000000000000000000000000000000000000000000000000002363369f"
+              }
+            },
+            "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+              "balance": "0x0",
+              "code": "0x60806040526004361061005a5760003560e01c80635c60da1b116100435780635c60da1b146101315780638f2839701461016f578063f851a440146101af5761005a565b80633659cfe6146100645780634f1ef286146100a4575b6100626101c4565b005b34801561007057600080fd5b506100626004803603602081101561008757600080fd5b503573ffffffffffffffffffffffffffffffffffffffff166101de565b610062600480360360408110156100ba57600080fd5b73ffffffffffffffffffffffffffffffffffffffff82351691908101906040810160208201356401000000008111156100f257600080fd5b82018360208201111561010457600080fd5b8035906020019184600183028401116401000000008311171561012657600080fd5b509092509050610232565b34801561013d57600080fd5b50610146610309565b6040805173ffffffffffffffffffffffffffffffffffffffff9092168252519081900360200190f35b34801561017b57600080fd5b506100626004803603602081101561019257600080fd5b503573ffffffffffffffffffffffffffffffffffffffff16610318565b3480156101bb57600080fd5b50610146610420565b6101cc610430565b6101dc6101d76104c4565b6104e9565b565b6101e661050d565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156102275761022281610532565b61022f565b61022f6101c4565b50565b61023a61050d565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156102fc5761027683610532565b60003073ffffffffffffffffffffffffffffffffffffffff16348484604051808383808284376040519201945060009350909150508083038185875af1925050503d80600081146102e3576040519150601f19603f3d011682016040523d82523d6000602084013e6102e8565b606091505b50509050806102f657600080fd5b50610304565b6103046101c4565b505050565b60006103136104c4565b905090565b61032061050d565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156102275773ffffffffffffffffffffffffffffffffffffffff81166103bf576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260368152602001806106606036913960400191505060405180910390fd5b7f7e644d79422f17c01e4894b5f4f588d331ebfa28653d42ae832dc59e38c9798f6103e861050d565b6040805173ffffffffffffffffffffffffffffffffffffffff928316815291841660208301528051918290030190a161022281610587565b600061031361050d565b3b151590565b61043861050d565b73ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614156104bc576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252603281526020018061062e6032913960400191505060405180910390fd5b6101dc6101dc565b7f7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c35490565b3660008037600080366000845af43d6000803e808015610508573d6000f35b3d6000fd5b7f10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b5490565b61053b816105ab565b6040805173ffffffffffffffffffffffffffffffffffffffff8316815290517fbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b9181900360200190a150565b7f10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b55565b6105b48161042a565b610609576040517f08c379a000000000000000000000000000000000000000000000000000000000815260040180806020018281038252603b815260200180610696603b913960400191505060405180910390fd5b7f7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c35556fe43616e6e6f742063616c6c2066616c6c6261636b2066756e6374696f6e2066726f6d207468652070726f78792061646d696e43616e6e6f74206368616e6765207468652061646d696e206f6620612070726f787920746f20746865207a65726f206164647265737343616e6e6f742073657420612070726f787920696d706c656d656e746174696f6e20746f2061206e6f6e2d636f6e74726163742061646472657373a26469706673582212206912698afeb8292e0377ff7ebcb7d711a6825aecdf904df29338deebe26b282864736f6c634300060c0033",
+              "nonce": 1,
+              "storage": {
+                "0x45ed741d8d4e8a080d5af46d8880af2788890355cd9f0fe3dd37f41d0cd72f2d": "0x00000000000000000000000000000000000000000000000000000000f4542f84",
+                "0x59587723ba9dbb47b8d5d5d0ae7fedbab41129aeb8787a97456d5171a43066ab": "0x0000000000000000000000000000000000000000000000000000000ef62256c7",
+                "0x6a5c52688b6339d530ae6778e45d371b1e347da116e95d990be6b0f349ddbe32": "0x0000000000000000000000000000000000000000000000000000000002faf080",
+                "0xd37bf22d1dcbb355b910067bc8d4a686423ed6952e3a2f6fc372959f7cb1edbd": "0x00000000000000000000000000000000000000000000000000000002a4e6e173"
+              }
+            },
+            "0xdb6301a47cb72e4c6662083453a21b6f27bad8fb": {
+              "balance": "0x0",
+              "code": "0x608060405234801561001057600080fd5b50600436106102635760003560e01c806367d8174011610156578063b6200b07116100d3578063d505accf11610097578063f140a35a11610071578063f140a35a146107ce578063f39ac11f146107fa578063fff6cae91461082857610263565b8063d505accf14610747578063d73792a914610798578063dd62ed3e146107a057610263565b8063b6200b0714610701578063ba9a7a5614610709578063bc25cf7714610711578063c45a015514610737578063d21220a71461073f57610263565b80637ecebe001161011a5780637ecebe001461066057806389afcb441461068657806395d89b41146106c55780639e548b7f146106cd578063a9059cbb146106d557610263565b806367d817401461056f5780636a627842146105775780636e1fdd7f1461059d57806370a08231146106325780637464fc3d1461065857610263565b80632fcd1692116101e45780633b9f1dc0116101a85780633b9f1dc0146105005780633ba1707714610508578063485cc9551461051057806348e5d2601461053e57806362ecec031461056757610263565b80632fcd16921461047d5780633029e5d41461049c57806330adf81f146104d2578063313ce567146104da5780633644e515146104f857610263565b80630dfe16811161022b5780630dfe1681146103f9578063158ef93e1461041d57806318160ddd1461042557806323b872dd1461043f578063288e5d021461047557610263565b8063022c0d9f1461026857806306fdde03146102f65780630902f1ac14610373578063095ea7b3146103b15780630a0ef8b5146103f1575b600080fd5b6102f46004803603608081101561027e57600080fd5b8135916020810135916001600160a01b0360408301351691908101906080810160608201356401000000008111156102b557600080fd5b8201836020820111156102c757600080fd5b803590602001918460018302840111640100000000831117156102e957600080fd5b509092509050610830565b005b6102fe6108d1565b6040805160208082528351818301528351919283929083019185019080838360005b83811015610338578181015183820152602001610320565b50505050905090810190601f1680156103655780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b61037b6108f9565b604080516001600160701b03958616815293909416602084015261ffff9182168385015216606082015290519081900360800190f35b6103dd600480360360408110156103c757600080fd5b506001600160a01b03813516906020013561092c565b604080519115158252519081900360200190f35b6102f4610943565b610401610b57565b604080516001600160a01b039092168252519081900360200190f35b6103dd610b66565b61042d610b76565b60408051918252519081900360200190f35b6103dd6004803603606081101561045557600080fd5b506001600160a01b03813581169160208101359091169060400135610b7c565b61042d610c53565b610485610c59565b6040805161ffff9092168252519081900360200190f35b6102f4600480360360608110156104b257600080fd5b5080351515906001600160701b0360208201358116916040013516610c6a565b61042d610f62565b6104e2610f86565b6040805160ff9092168252519081900360200190f35b61042d610f8b565b61042d610f91565b6102f4610f97565b6102f46004803603604081101561052657600080fd5b506001600160a01b038135811691602001351661113d565b6102f46004803603604081101561055457600080fd5b5061ffff813581169160200135166112e5565b61048561152a565b61042d61153b565b61042d6004803603602081101561058d57600080fd5b50356001600160a01b0316611541565b6102f4600480360360a08110156105b357600080fd5b8135916020810135916001600160a01b0360408301351691908101906080810160608201356401000000008111156105ea57600080fd5b8201836020820111156105fc57600080fd5b8035906020019184600183028401116401000000008311171561061e57600080fd5b9193509150356001600160a01b0316611849565b61042d6004803603602081101561064857600080fd5b50356001600160a01b03166118ed565b61042d6118ff565b61042d6004803603602081101561067657600080fd5b50356001600160a01b0316611905565b6106ac6004803603602081101561069c57600080fd5b50356001600160a01b0316611917565b6040805192835260208301919091528051918290030190f35b6102fe611cb9565b6103dd611cdc565b6103dd600480360360408110156106eb57600080fd5b506001600160a01b038135169060200135611ce5565b6103dd611cf2565b61042d611d00565b6102f46004803603602081101561072757600080fd5b50356001600160a01b0316611d06565b610401611e9d565b610401611eac565b6102f4600480360360e081101561075d57600080fd5b506001600160a01b03813581169160208101359091169060408101359060608101359060ff6080820135169060a08101359060c00135611ebb565b61042d6120c8565b61042d600480360360408110156107b657600080fd5b506001600160a01b03813581169160200135166120cf565b61042d600480360360408110156107e457600080fd5b50803590602001356001600160a01b03166120ec565b6102f46004803603604081101561081057600080fd5b506001600160a01b038135811691602001351661215c565b6102f46123b9565b610838613c02565b5060408051610100810182526006546001600160a01b039081168252600754166020808301919091528183018890526060820187905260006080830181905260a0830181905260c0830181905260e08301528251601f850182900482028101820190935283835290916108c99183918791879087908190840183828082843760009201829052509250612560915050565b505050505050565b6040518060400160405280600c81526020016b0487970657273776170204c560a41b81525081565b6008546001600160701b0380821692600160701b83049091169161ffff600160e01b8204811692600160f01b9092041690565b6000610939338484612f31565b5060015b92915050565b600560009054906101000a90046001600160a01b03166001600160a01b0316638da5cb5b6040518163ffffffff1660e01b815260040160206040518083038186803b15801561099157600080fd5b505afa1580156109a5573d6000803e3d6000fd5b505050506040513d60208110156109bb57600080fd5b50516001600160a01b03163314610a035760405162461bcd60e51b8152600401808060200182810382526022815260200180613c5a6022913960400191505060405180910390fd5b600080610a0e6108f9565b5050915091506000610a208383612f93565b600654604080516370a0823160e01b815230600482015290519293506000926001600160a01b03909216916370a0823191602480820192602092909190829003018186803b158015610a7157600080fd5b505afa158015610a85573d6000803e3d6000fd5b505050506040513d6020811015610a9b57600080fd5b5051600754604080516370a0823160e01b815230600482015290519293506000926001600160a01b03909216916370a0823191602480820192602092909190829003018186803b158015610aee57600080fd5b505afa158015610b02573d6000803e3d6000fd5b505050506040513d6020811015610b1857600080fd5b50519050610b26828261314c565b8215610b5057600854610b4c906001600160701b0380821691600160701b90041661324f565b600b555b5050505050565b6006546001600160a01b031681565b600754600160a01b900460ff1681565b60005481565b6001600160a01b038316600090815260026020908152604080832033845290915281205460001914610c3d576001600160a01b0384166000908152600260209081526040808320338452909152812054610bdc908463ffffffff61336516565b6001600160a01b038616600081815260026020908152604080832033808552908352928190208590558051858152905194955091937f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b9259281900390910190a3505b610c488484846133a7565b5060015b9392505050565b600a5481565b600854600160f01b900461ffff1681565b600d54600114610cb8576040805162461bcd60e51b8152602060048201526014602482015273121e5c195c9cddd85c14185a5c881313d0d2d15160621b604482015290519081900360640190fd5b6000600d5560055460408051637e1c813560e11b815290516001600160a01b039092169163fc39026a91600480820192602092909190829003018186803b158015610d0257600080fd5b505afa158015610d16573d6000803e3d6000fd5b505050506040513d6020811015610d2c57600080fd5b50516001600160a01b03163314610d745760405162461bcd60e51b815260040180806020018281038252602b815260200180613d1c602b913960400191505060405180910390fd5b600c54610100900460ff1615610dd1576040805162461bcd60e51b815260206004820152601760248201527f4879706572737761705061697220696d6d757461626c65000000000000000000604482015290519081900360640190fd5b600c5460ff1615158315151415610e2f576040805162461bcd60e51b815260206004820152601760248201527f48797065727377617050616972206e6f20757064617465000000000000000000604482015290519081900360640190fd5b6008546001600160701b038381169116148015610e6057506008546001600160701b03828116600160701b90920416145b610eb1576040805162461bcd60e51b815260206004820152601460248201527f48797065727377617050616972206661696c6564000000000000000000000000604482015290519081900360640190fd5b600854600090610ed4906001600160701b0380821691600160701b900416612f93565b600c546040805160ff90921615158252861515602083015280519293507fb6a86710bde53aa7fb1b3856279e2af5b476d53e2dd0902cf17a0911b5a43a8b92918290030190a1600c805460ff191685151517905580610f34576000610f54565b600854610f54906001600160701b0380821691600160701b90041661324f565b600b5550506001600d555050565b7f6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c981565b601281565b60035481565b60095481565b600d54600114610fe5576040805162461bcd60e51b8152602060048201526014602482015273121e5c195c9cddd85c14185a5c881313d0d2d15160621b604482015290519081900360640190fd5b6000600d5560055460408051638da5cb5b60e01b815290516001600160a01b0390921691638da5cb5b91600480820192602092909190829003018186803b15801561102f57600080fd5b505afa158015611043573d6000803e3d6000fd5b505050506040513d602081101561105957600080fd5b50516001600160a01b031633146110a15760405162461bcd60e51b8152600401808060200182810382526022815260200180613c5a6022913960400191505060405180910390fd5b600c54610100900460ff16156110fe576040805162461bcd60e51b815260206004820152601f60248201527f4879706572737761705061697220616c726561647920696d6d757461626c6500604482015290519081900360640190fd5b600c805461ff0019166101001790556040517f09122c41ae733a4d7740324d50e35fbd6ee85be3c1312a45596d8045150ab2f290600090a16001600d55565b6005546001600160a01b0316331480156111615750600754600160a01b900460ff16155b6111b2576040805162461bcd60e51b815260206004820152601760248201527f4879706572737761705061697220464f5242494444454e000000000000000000604482015290519081900360640190fd5b600680546001600160a01b0380851673ffffffffffffffffffffffffffffffffffffffff19928316811790935560078054918516919092161790556040805163313ce56760e01b8152905163313ce56791600480820192602092909190829003018186803b15801561122357600080fd5b505afa158015611237573d6000803e3d6000fd5b505050506040513d602081101561124d57600080fd5b505160ff16600a0a6009556040805163313ce56760e01b815290516001600160a01b0383169163313ce567916004808301926020929190829003018186803b15801561129857600080fd5b505afa1580156112ac573d6000803e3d6000fd5b505050506040513d60208110156112c257600080fd5b505160ff16600a90810a905550506007805460ff60a01b1916600160a01b179055565b600d54600114611333576040805162461bcd60e51b8152602060048201526014602482015273121e5c195c9cddd85c14185a5c881313d0d2d15160621b604482015290519081900360640190fd5b6000600d5560055460408051634c21771560e01b815290516001600160a01b0390921691634c21771591600480820192602092909190829003018186803b15801561137d57600080fd5b505afa158015611391573d6000803e3d6000fd5b505050506040513d60208110156113a757600080fd5b50516001600160a01b031633146113ef5760405162461bcd60e51b815260040180806020018281038252602b815260200180613e24602b913960400191505060405180910390fd5b6107d08261ffff161115801561140b57506107d08161ffff1611155b6114465760405162461bcd60e51b8152600401808060200182810382526033815260200180613dc66033913960400191505060405180910390fd5b60008261ffff1611801561145e575060008161ffff16115b6114995760405162461bcd60e51b8152600401808060200182810382526033815260200180613d936033913960400191505060405180910390fd5b6008805461ffff60e01b1916600160e01b61ffff858116918202929092177dffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff16600160f01b9285169283021790925560408051928352602083019190915280517fa4877b8ecb5a00ba277e4bceeeb187a669e7113649774dfbea05c259ce27f17b9281900390910190a150506001600d55565b600854600160e01b900461ffff1681565b6107d081565b6000600d54600114611591576040805162461bcd60e51b8152602060048201526014602482015273121e5c195c9cddd85c14185a5c881313d0d2d15160621b604482015290519081900360640190fd5b6000600d819055806115a16108f9565b5050600654604080516370a0823160e01b815230600482015290519395509193506000926001600160a01b03909116916370a08231916024808301926020929190829003018186803b1580156115f657600080fd5b505afa15801561160a573d6000803e3d6000fd5b505050506040513d602081101561162057600080fd5b5051600754604080516370a0823160e01b815230600482015290519293506000926001600160a01b03909216916370a0823191602480820192602092909190829003018186803b15801561167357600080fd5b505afa158015611687573d6000803e3d6000fd5b505050506040513d602081101561169d57600080fd5b5051905060006116bc836001600160701b03871663ffffffff61336516565b905060006116d9836001600160701b03871663ffffffff61336516565b905060006116e78787612f93565b600054909150806117305761171c6103e861171061170b878763ffffffff61346116565b6134ba565b9063ffffffff61336516565b985061172b60006103e861350c565b61177f565b61177c6001600160701b03891661174d868463ffffffff61346116565b8161175457fe5b046001600160701b03891661176f868563ffffffff61346116565b8161177657fe5b046135a2565b98505b600089116117be5760405162461bcd60e51b815260040180806020018281038252602b815260200180613d47602b913960400191505060405180910390fd5b6117c88a8a61350c565b6117d2868661314c565b81156117fc576008546117f8906001600160701b0380821691600160701b90041661324f565b600b555b6040805185815260208101859052815133927f4c209b5fc8ad50758f13e2e1088ba56a560dff690a1c6fef26394f4c03821c4f928290030190a250506001600d5550949695505050505050565b611851613c02565b5060408051610100810182526006546001600160a01b039081168252600754166020808301919091528183018990526060820188905260006080830181905260a0830181905260c0830181905260e08301528251601f860182900482028101820190935284835290916118e491839188918890889081908401838280828437600092019190915250889250612560915050565b50505050505050565b60016020526000908152604090205481565b600b5481565b60046020526000908152604090205481565b600080600d54600114611968576040805162461bcd60e51b8152602060048201526014602482015273121e5c195c9cddd85c14185a5c881313d0d2d15160621b604482015290519081900360640190fd5b6000600d819055806119786108f9565b5050600654600754604080516370a0823160e01b815230600482015290519496509294506001600160a01b039182169391169160009184916370a08231916024808301926020929190829003018186803b1580156119d557600080fd5b505afa1580156119e9573d6000803e3d6000fd5b505050506040513d60208110156119ff57600080fd5b5051604080516370a0823160e01b815230600482015290519192506000916001600160a01b038516916370a08231916024808301926020929190829003018186803b158015611a4d57600080fd5b505afa158015611a61573d6000803e3d6000fd5b505050506040513d6020811015611a7757600080fd5b505130600090815260016020526040812054919250611a968888612f93565b60005490915080611aad848763ffffffff61346116565b81611ab457fe5b049a5080611ac8848663ffffffff61346116565b81611acf57fe5b04995060008b118015611ae2575060008a115b611b1d5760405162461bcd60e51b815260040180806020018281038252602b815260200180613df9602b913960400191505060405180910390fd5b611b2730846135b8565b611b32878d8d613656565b611b3d868d8c613656565b604080516370a0823160e01b815230600482015290516001600160a01b038916916370a08231916024808301926020929190829003018186803b158015611b8357600080fd5b505afa158015611b97573d6000803e3d6000fd5b505050506040513d6020811015611bad57600080fd5b5051604080516370a0823160e01b815230600482015290519196506001600160a01b038816916370a0823191602480820192602092909190829003018186803b158015611bf957600080fd5b505afa158015611c0d573d6000803e3d6000fd5b505050506040513d6020811015611c2357600080fd5b50519350611c31858561314c565b8115611c5b57600854611c57906001600160701b0380821691600160701b90041661324f565b600b555b604080518c8152602081018c905281516001600160a01b038f169233927fdccd412f0b1252819cb1fd330b93224ca42612892bb3f4f789976e6d81936496929081900390910190a35050505050505050506001600d81905550915091565b604051806040016040528060078152602001660535741502d4c560cc1b81525081565b600c5460ff1681565b60006109393384846133a7565b600c54610100900460ff1681565b6103e881565b600d54600114611d54576040805162461bcd60e51b8152602060048201526014602482015273121e5c195c9cddd85c14185a5c881313d0d2d15160621b604482015290519081900360640190fd5b6000600d55600654600754600854604080516370a0823160e01b815230600482015290516001600160a01b039485169490931692611e039285928792611dfe926001600160701b03169185916370a0823191602480820192602092909190829003018186803b158015611dc657600080fd5b505afa158015611dda573d6000803e3d6000fd5b505050506040513d6020811015611df057600080fd5b50519063ffffffff61336516565b613656565b600854604080516370a0823160e01b81523060048201529051611e6a9284928792611dfe92600160701b90046001600160701b0316916001600160a01b038616916370a0823191602480820192602092909190829003018186803b158015611dc657600080fd5b6040517f21ad22495c9c75cd1c94756f91824e779c0c8a8e168b267c790df464fe056b7990600090a150506001600d5550565b6005546001600160a01b031681565b6007546001600160a01b031681565b42841015611f10576040805162461bcd60e51b815260206004820152601160248201527f4879706572737761702045585049524544000000000000000000000000000000604482015290519081900360640190fd5b6003546001600160a01b0380891660008181526004602090815260408083208054600180820190925582517f6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c98186015280840196909652958d166060860152608085018c905260a085019590955260c08085018b90528151808603909101815260e08501825280519083012061190160f01b6101008601526101028501969096526101228085019690965280518085039096018652610142840180825286519683019690962095839052610162840180825286905260ff89166101828501526101a284018890526101c28401879052519193926101e280820193601f1981019281900390910190855afa15801561202b573d6000803e3d6000fd5b5050604051601f1901519150506001600160a01b038116158015906120615750886001600160a01b0316816001600160a01b0316145b6120b2576040805162461bcd60e51b815260206004820152601b60248201527f48797065727377617020494e56414c49445f5349474e41545552450000000000604482015290519081900360640190fd5b6120bd898989612f31565b505050505050505050565b620186a081565b600260209081526000928352604080842090915290825290205481565b60065460009081906001600160a01b0384811691161461211957600854600160f01b900461ffff16612128565b600854600160e01b900461ffff165b60085490915061215490859085906001600160701b0380821691600160701b90041661ffff86166137fe565b949350505050565b600d546001146121aa576040805162461bcd60e51b8152602060048201526014602482015273121e5c195c9cddd85c14185a5c881313d0d2d15160621b604482015290519081900360640190fd5b6000600d5560055460408051638da5cb5b60e01b815290516001600160a01b0390921691638da5cb5b91600480820192602092909190829003018186803b1580156121f457600080fd5b505afa158015612208573d6000803e3d6000fd5b505050506040513d602081101561221e57600080fd5b50516001600160a01b031633146122665760405162461bcd60e51b8152600401808060200182810382526022815260200180613c5a6022913960400191505060405180910390fd5b6006546001600160a01b0383811691161480159061229257506007546001600160a01b03838116911614155b6122e3576040805162461bcd60e51b815260206004820152601b60248201527f4879706572737761705061697220696e76616c696420746f6b656e0000000000604482015290519081900360640190fd5b61236f8282846001600160a01b03166370a08231306040518263ffffffff1660e01b815260040180826001600160a01b03166001600160a01b0316815260200191505060206040518083038186803b15801561233e57600080fd5b505afa158015612352573d6000803e3d6000fd5b505050506040513d602081101561236857600080fd5b5051613656565b604080516001600160a01b0383811682529151918416917f368a9dc863ecb94b5ba32a682e26295b10d9c2666fad7d785ebdf262c3c524139181900360200190a250506001600d55565b600d54600114612407576040805162461bcd60e51b8152602060048201526014602482015273121e5c195c9cddd85c14185a5c881313d0d2d15160621b604482015290519081900360640190fd5b6000600d819055600654604080516370a0823160e01b815230600482015290516001600160a01b03909216916370a0823191602480820192602092909190829003018186803b15801561245957600080fd5b505afa15801561246d573d6000803e3d6000fd5b505050506040513d602081101561248357600080fd5b5051600754604080516370a0823160e01b815230600482015290519293506000926001600160a01b03909216916370a0823191602480820192602092909190829003018186803b1580156124d657600080fd5b505afa1580156124ea573d6000803e3d6000fd5b505050506040513d602081101561250057600080fd5b50519050811580159061251257508015155b61254d5760405162461bcd60e51b815260040180806020018281038252602d815260200180613c7c602d913960400191505060405180910390fd5b612557828261314c565b50506001600d55565b600d546001146125ae576040805162461bcd60e51b8152602060048201526014602482015273121e5c195c9cddd85c14185a5c881313d0d2d15160621b604482015290519081900360640190fd5b6000600d5560408401511515806125c9575060008460600151115b6126045760405162461bcd60e51b8152600401808060200182810382526028815260200180613ccd6028913960400191505060405180910390fd5b6000806000806126126108f9565b9350935093509350836001600160701b031688604001511080156126425750826001600160701b03168860600151105b61267d5760405162461bcd60e51b8152600401808060200182810382526024815260200180613ca96024913960400191505060405180910390fd5b87516001600160a01b038881169116148015906126b0575087602001516001600160a01b0316876001600160a01b031614155b612701576040805162461bcd60e51b815260206004820152601860248201527f4879706572737761705061697220494e56414c49445f544f0000000000000000604482015290519081900360640190fd5b60408801511561271e5761271e8860000151888a60400151613656565b60608801511561273b5761273b8860200151888a60600151613656565b85511561283557866001600160a01b03166310d1e85c338a604001518b606001518a6040518563ffffffff1660e01b815260040180856001600160a01b03166001600160a01b0316815260200184815260200183815260200180602001828103825283818151815260200191508051906020019080838360005b838110156127cd5781810151838201526020016127b5565b50505050905090810190601f1680156127fa5780820380516001836020036101000a031916815260200191505b5095505050505050600060405180830381600087803b15801561281c57600080fd5b505af1158015612830573d6000803e3d6000fd5b505050505b8751604080516370a0823160e01b815230600482015290516001600160a01b03909216916370a0823191602480820192602092909190829003018186803b15801561287f57600080fd5b505afa158015612893573d6000803e3d6000fd5b505050506040513d60208110156128a957600080fd5b50516080890152602088810151604080516370a0823160e01b815230600482015290516001600160a01b03909216926370a0823192602480840193829003018186803b1580156128f857600080fd5b505afa15801561290c573d6000803e3d6000fd5b505050506040513d602081101561292257600080fd5b505160a0890152604088015160808901516000916001600160701b038716031061294d576000612964565b8860400151856001600160701b0316038960800151035b905060008960600151856001600160701b0316038a60a00151116129895760006129a0565b8960600151856001600160701b0316038a60a00151035b905060008211806129b15750600081115b6129ec5760405162461bcd60e51b8152600401808060200182810382526027815260200180613cf56027913960400191505060405180910390fd5b620186a0612a048361ffff871663ffffffff61346116565b81612a0b57fe5b0460c08b0152620186a0612a298261ffff861663ffffffff61346116565b81612a3057fe5b0460e08b01526000806001600160a01b038916612a4e576000612ac8565b60055460408051631c60f51f60e21b81526001600160a01b038c8116600483015291519190921691637183d47c916024808301926020929190829003018186803b158015612a9b57600080fd5b505afa158015612aaf573d6000803e3d6000fd5b505050506040513d6020811015612ac557600080fd5b50515b90508015612b8d578315612b33576402540be400612b0061ffff8816612af4878563ffffffff61346116565b9063ffffffff61346116565b81612b0757fe5b049150612b21828d60c0015161336590919063ffffffff16565b60c08d01528b51612b33908a84613656565b8215612b8d576402540be400612b5761ffff8716612af4868563ffffffff61346116565b81612b5e57fe5b049150612b78828d60e0015161336590919063ffffffff16565b60e08d015260208c0151612b8d908a84613656565b600c5460ff1615612cf55760055460408051634cadad5760e11b8152815160009384936001600160a01b039091169263995b5aae9260048083019392829003018186803b158015612bdd57600080fd5b505afa158015612bf1573d6000803e3d6000fd5b505050506040513d6040811015612c0757600080fd5b50805160209091015190925090506001600160a01b03811615612cf257612c3b82612af4620186a08663ffffffff61336516565b91508515612c965766038d7ea4c68000612c6361ffff8a16612af4898663ffffffff61346116565b81612c6a57fe5b049350612c84848f60c0015161336590919063ffffffff16565b60c08f01528d51612c96908286613656565b8415612cf25766038d7ea4c68000612cbc61ffff8916612af4888663ffffffff61346116565b81612cc357fe5b049350612cdd848f60e0015161336590919063ffffffff16565b60e08f015260208e0151612cf2908286613656565b50505b8315612d77578b51604080516370a0823160e01b815230600482015290516001600160a01b03909216916370a0823191602480820192602092909190829003018186803b158015612d4557600080fd5b505afa158015612d59573d6000803e3d6000fd5b505050506040513d6020811015612d6f57600080fd5b505160808d01525b8215612df7576020808d0151604080516370a0823160e01b815230600482015290516001600160a01b03909216926370a0823192602480840193829003018186803b158015612dc557600080fd5b505afa158015612dd9573d6000803e3d6000fd5b505050506040513d6020811015612def57600080fd5b505160a08d01525b50506000612e168b60c001518c6080015161336590919063ffffffff16565b90506000612e358c60e001518d60a0015161336590919063ffffffff16565b9050612e53886001600160701b0316886001600160701b031661324f565b612e5d838361324f565b1015612eb0576040805162461bcd60e51b815260206004820152600f60248201527f48797065727377617050616972204b0000000000000000000000000000000000604482015290519081900360640190fd5b5050612ec48a608001518b60a0015161314c565b6040808b01516060808d0151835186815260208101869052808501939093529082015290516001600160a01b038b169133917fd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d8229181900360800190a350506001600d555050505050505050565b6001600160a01b03808416600081815260026020908152604080832094871680845294825291829020859055815185815291517f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b9259281900390910190a3505050565b600c5460009060ff1615612fa95750600061093d565b60055460408051634cadad5760e11b8152815160009384936001600160a01b039091169263995b5aae9260048083019392829003018186803b158015612fee57600080fd5b505afa158015613002573d6000803e3d6000fd5b505050506040513d604081101561301857600080fd5b508051602090910151600b546001600160a01b03821615801596509294509092509061313757801561313257600061306561170b886001600160701b0316886001600160701b031661324f565b90506000613072836134ba565b90508082111561312f5760006130ab606487613097620186a08363ffffffff61346116565b8161309e57fe5b049063ffffffff61336516565b905060006130d66064612af46130c7878763ffffffff61336516565b6000549063ffffffff61346116565b9050600061310a6130ee85606463ffffffff61346116565b6130fe878663ffffffff61346116565b9063ffffffff6139cc16565b9050600081838161311757fe5b049050801561312a5761312a888261350c565b505050505b50505b613143565b8015613143576000600b555b50505092915050565b6001600160701b03821180159061316a57506001600160701b038111155b6131bb576040805162461bcd60e51b815260206004820152601660248201527f48797065727377617050616972204f564552464c4f5700000000000000000000604482015290519081900360640190fd5b600880546dffffffffffffffffffffffffffff19166001600160701b038481169182177fffffffff0000000000000000000000000000ffffffffffffffffffffffffffff16600160701b9185169182021790925560408051918252602082019290925281517f1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1929181900390910190a15050565b600c5460009060ff16156133555760095460009061327b85670de0b6b3a764000063ffffffff61346116565b8161328257fe5b0490506000600a546132a5670de0b6b3a76400008661346190919063ffffffff16565b816132ac57fe5b0490506000670de0b6b3a76400006132ca848463ffffffff61346116565b816132d157fe5b0490506000613327670de0b6b3a76400006132f2858063ffffffff61346116565b816132f957fe5b04670de0b6b3a7640000613313878063ffffffff61346116565b8161331a57fe5b049063ffffffff6139cc16565b9050670de0b6b3a7640000613342838363ffffffff61346116565b8161334957fe5b0494505050505061093d565b610c4c838363ffffffff61346116565b6000610c4c83836040518060400160405280601e81526020017f536166654d6174683a207375627472616374696f6e206f766572666c6f770000815250613a26565b6001600160a01b0383166000908152600160205260409020546133d0908263ffffffff61336516565b6001600160a01b038085166000908152600160205260408082209390935590841681522054613405908263ffffffff6139cc16565b6001600160a01b0380841660008181526001602090815260409182902094909455805185815290519193928716927fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef92918290030190a3505050565b6000826134705750600061093d565b8282028284828161347d57fe5b0414610c4c5760405162461bcd60e51b8152600401808060200182810382526021815260200180613d726021913960400191505060405180910390fd5b600060038211156134fd575080600160028204015b818110156134f7578091506002818285816134e657fe5b0401816134ef57fe5b0490506134cf565b50613507565b8115613507575060015b919050565b60005461351f908263ffffffff6139cc16565b60009081556001600160a01b03831681526001602052604090205461354a908263ffffffff6139cc16565b6001600160a01b03831660008181526001602090815260408083209490945583518581529351929391927fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef9281900390910190a35050565b60008183106135b15781610c4c565b5090919050565b6001600160a01b0382166000908152600160205260409020546135e1908263ffffffff61336516565b6001600160a01b0383166000908152600160205260408120919091555461360e908263ffffffff61336516565b60009081556040805183815290516001600160a01b038516917fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef919081900360200190a35050565b604080518082018252601981527f7472616e7366657228616464726573732c75696e74323536290000000000000060209182015281516001600160a01b0385811660248301526044808301869052845180840390910181526064909201845291810180517bffffffffffffffffffffffffffffffffffffffffffffffffffffffff1663a9059cbb60e01b1781529251815160009460609489169392918291908083835b602083106137185780518252601f1990920191602091820191016136f9565b6001836020036101000a0380198251168184511680821785525050505050509050019150506000604051808303816000865af19150503d806000811461377a576040519150601f19603f3d011682016040523d82523d6000602084013e61377f565b606091505b50915091508180156137ad5750805115806137ad57508080602001905160208110156137aa57600080fd5b50515b610b50576040805162461bcd60e51b815260206004820152601d60248201527f48797065727377617050616972205452414e534645525f4641494c4544000000604482015290519081900360640190fd5b600c5460009060ff161561394157613839620186a0613823888563ffffffff61346116565b8161382a57fe5b8891900463ffffffff61336516565b95506000613847858561324f565b905060095485670de0b6b3a7640000028161385e57fe5b049450600a5484670de0b6b3a7640000028161387657fe5b600654919004945060009081906001600160a01b0389811691161461389c57858761389f565b86865b60065491935091506001600160a01b038981169116146138d457600a5489670de0b6b3a764000002816138ce57fe5b046138eb565b60095489670de0b6b3a764000002816138e957fe5b045b985060006138fc838b018584613abd565b6006549083039150670de0b6b3a7640000906001600160a01b038b81169116146139285760095461392c565b600a545b82028161393557fe5b049450505050506139c3565b60065460009081906001600160a01b03888116911614613962578486613965565b85855b909250905061398d613980620186a08663ffffffff61336516565b899063ffffffff61346116565b97506139a6886130fe84620186a063ffffffff61346116565b6139b6898363ffffffff61346116565b816139bd57fe5b04925050505b95945050505050565b600082820183811015610c4c576040805162461bcd60e51b815260206004820152601b60248201527f536166654d6174683a206164646974696f6e206f766572666c6f770000000000604482015290519081900360640190fd5b60008184841115613ab55760405162461bcd60e51b81526004018080602001828103825283818151815260200191508051906020019080838360005b83811015613a7a578181015183820152602001613a62565b50505050905090810190601f168015613aa75780820380516001836020036101000a031916815260200191505b509250505060405180910390fd5b505050900390565b6000805b60ff811015613b7557826000613ad78783613b7e565b905085811015613b0d576000613aed8887613bce565b828803670de0b6b3a76400000281613b0157fe5b04959095019450613b34565b6000613b198887613bce565b878303670de0b6b3a76400000281613b2d57fe5b0490950394505b81851115613b5657600182860311613b5157849350505050610c4c565b613b6b565b600185830311613b6b57849350505050610c4c565b5050600101613ac1565b50909392505050565b6000670de0b6b3a764000082818581818002040281613b9957fe5b040281613ba257fe5b04670de0b6b3a7640000808481818002040281613bbb57fe5b04850281613bc557fe5b04019392505050565b6000670de0b6b3a76400008381818002040281613be757fe5b04670de0b6b3a76400008084800204856003020281613bc557fe5b60405180610100016040528060006001600160a01b0316815260200160006001600160a01b03168152602001600081526020016000815260200160008152602001600081526020016000815260200160008152509056fe48797065727377617050616972206f6e6c7920666163746f72792773206f776e657248797065727377617050616972206c697175696469747920726174696f206e6f7420696e697469616c697a65644879706572737761705061697220494e53554646494349454e545f4c49515549444954594879706572737761705061697220494e53554646494349454e545f4f55545055545f414d4f554e544879706572737761705061697220494e53554646494349454e545f494e5055545f414d4f554e5448797065727377617050616972206f6e6c7920666163746f7279277320736574537461626c654f776e65724879706572737761705061697220494e53554646494349454e545f4c49515549444954595f4d494e544544536166654d6174683a206d756c7469706c69636174696f6e206f766572666c6f77487970657273776170506169722066656550657263656e74206d7573746e27742065786365656420746865206d696e696d756d487970657273776170506169722066656550657263656e74206d7573746e27742065786365656420746865206d6178696d756d4879706572737761705061697220494e53554646494349454e545f4c49515549444954595f4255524e454448797065727377617050616972206f6e6c7920666163746f7279277320666565416d6f756e744f776e6572a265627a7a723158201cf5d65a01e9791fb45931c5192766e2433a34c6e11b2641cf8ad169e931125764736f6c63430005100032",
+              "nonce": 1,
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000008": "0x012c012c00000055bf1b73f6ee4831029b1c0000000003b00ed9fc5eb862546e"
+              }
+            }
+          }
+        }
+      }
+    },
+    "canonicalBlock": {
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 7,
+        "method": "eth_getBlockByNumber",
+        "params": [
+          "0x2192cbb",
+          false
+        ]
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 7,
+        "result": {
+          "hash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+          "parentHash": "0x86ec3e764c6331c20bdedfa0d647222f548db8ba927b7de7e4b4f055193f9c22",
+          "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+          "miner": "0x0000000000000000000000000000000000000000",
+          "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "transactionsRoot": "0x1b9b6a952ebfb449b532c1f51dd54a5a64e020f9b2ca2dcbccb836ca2d54ec41",
+          "receiptsRoot": "0xfc3f4dced392f242ebb51986200947cb528e636f732d2c0d475c673f83fe0045",
+          "logsBloom": "0x00200000000000400000000080000002000000010010000000000000000000000000004000000020000004000000000400000088000010000000002800201010000000400000000000000008000002200000000001000000200000000000000000200000020000001000000000000800000000010000000080000810040080000000004000200000000200040000000000000000000080080000004002000000020000080100000800000000000020080001020120000040000000000000000000000002000000000000000080000000000004000001001000000000000020200010000010004000000000000000000000000000000100040000000000001000",
+          "difficulty": "0x0",
+          "number": "0x2192cbb",
+          "gasLimit": "0x2dc6c0",
+          "gasUsed": "0x7600a",
+          "timestamp": "0x6a0796a2",
+          "extraData": "0x",
+          "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "nonce": "0x0000000000000000",
+          "baseFeePerGas": "0x5f5e100",
+          "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "blobGasUsed": "0x0",
+          "excessBlobGas": "0x0",
+          "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "size": "0x90d",
+          "uncles": [],
+          "transactions": [
+            "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+            "0xef5fb32f975c28e06965065ce9065cfb595e8e7439c481880b2610542ce90523"
+          ],
+          "withdrawals": []
+        }
+      }
+    }
+  },
+  "limitations": [
+    "Raw public historical calldata and traces may contain consumed historical signatures. No new signature was obtained and no transaction was broadcast.",
+    "Earlier Python transport attempt returned HTTP 403; retained separately. This capture uses the existing public RPC client."
+  ]
+}

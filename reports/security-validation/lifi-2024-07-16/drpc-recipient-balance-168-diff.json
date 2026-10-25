@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0",
+  "candidateId": "lifi-2024-07-16",
+  "capturedAt": "2026-10-23T15:45:13.018Z",
+  "endpoint": "https://eth.drpc.org",
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 7,
+    "method": "debug_traceCallMany",
+    "params": [
+      [
+        {
+          "transactions": [
+            {
+              "from": "0x8b3cb6bf982798fba233bca56749e22eec42dcf3",
+              "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+              "data": "0x70a082310000000000000000000000008b3cb6bf982798fba233bca56749e22eec42dcf3",
+              "value": "0x0",
+              "gas": "0x493e0",
+              "gasPrice": "0x2a761b743"
+            }
+          ]
+        }
+      ],
+      {
+        "blockNumber": {
+          "blockHash": "0x63781338b9e93916b9708787f3039244de3c7879e07b8f5df8baa841a265a3f0",
+          "requireCanonical": true
+        },
+        "transactionIndex": 168
+      },
+      {
+        "tracer": "prestateTracer",
+        "timeout": "20s",
+        "tracerConfig": {
+          "diffMode": true
+        }
+      }
+    ]
+  },
+  "httpStatus": 200,
+  "responseBodySha256": "d59c8748b2f1aaeeeb575f77d46c09f533f9174bc7999d239b0954eb36998ad5",
+  "response": {
+    "id": 7,
+    "jsonrpc": "2.0",
+    "result": [
+      [
+        {
+          "post": {
+            "0x8b3cb6bf982798fba233bca56749e22eec42dcf3": {
+              "nonce": 9
+            }
+          },
+          "pre": {
+            "0x8b3cb6bf982798fba233bca56749e22eec42dcf3": {
+              "balance": "0xab358bb2e7d0e9b",
+              "nonce": 8
+            }
+          }
+        }
+      ]
+    ]
+  }
+}

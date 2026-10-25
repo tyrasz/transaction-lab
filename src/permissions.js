@@ -4,9 +4,14 @@
 import { CHAIN_ID, USDC, HUSDC } from './config.js';
 
 const APPROVE = '0x095ea7b3';
+const PERMIT = '0xd505accf'; // ERC-2612 permit(address,address,uint256,uint256,uint8,bytes32,bytes32)
 const APPROVAL = '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925';
 const MAX_UINT256 = (1n << 256n) - 1n;
 const VERIFIED_TOKENS = new Set([USDC, HUSDC]);
+const PERMIT_IMPLEMENTATIONS = {
+  [USDC]: '0x003f73f58ca78880da3642c5cb71d7459b3fe4f8',
+  [HUSDC]: '0x410aa1ab680b886c875e99a7a4bfaf188508a7a3',
+};
 const ADDRESS = /^0x[0-9a-f]{40}$/i;
 const WORD = /^0x[0-9a-f]{64}$/i;
 const HEX = /^0x(?:[0-9a-f]{2})*$/i;
@@ -44,7 +49,7 @@ function amountFields(amount, asset) {
 function returnStatus(output) {
   if (output === undefined || output === null) return 'unavailable';
   if (output === '0x') return 'empty';
-  if (!WORD.test(output)) return 'malformed';
+  if (typeof output !== 'string' || !WORD.test(output)) return 'malformed';
   const value = BigInt(output);
   return value === 1n ? 'returned_true' : value === 0n ? 'returned_false' : 'malformed';
 }
@@ -57,8 +62,20 @@ function sameCallBranch(call, event) {
   return event.framePath === call.framePath || event.framePath.startsWith(`${call.framePath}.`);
 }
 
+function permitImplementation(frame, token) {
+  // Known proxy execution is required to interpret this selector as ERC-2612.
+  // This is implementation provenance, not independent signature verification.
+  if (!Array.isArray(frame.calls) || frame.calls.length !== 1) return null;
+  const delegated = frame.calls[0];
+  return delegated?.type === 'DELEGATECALL' && !failed(delegated)
+    && address(delegated.from) === token && address(delegated.to) === PERMIT_IMPLEMENTATIONS[token]
+    && typeof delegated.input === 'string' && delegated.input.toLowerCase() === frame.input.toLowerCase()
+    && quantity(delegated.value ?? '0x0') === 0n
+    ? PERMIT_IMPLEMENTATIONS[token] : null;
+}
+
 /** Analyze permission evidence from a completed callTracer result, without RPC IO. */
-export function analyzePermissions({ request, trace, metadata = {} } = {}) {
+export function analyzePermissions({ request, trace, block, metadata = {} } = {}) {
   const observations = [];
   const findings = [];
   const reasons = new Set();
@@ -124,6 +141,40 @@ export function analyzePermissions({ request, trace, metadata = {} } = {}) {
       }
     }
 
+    if (frame.type === 'CALL' && selector === PERMIT) {
+      const implementation = verified(token) ? permitImplementation(frame, token) : null;
+      if (!implementation) {
+        reasons.add('A matching permit selector occurred without configured token and implementation provenance; ERC-2612 arguments were not inferred.');
+        add({ kind: 'unverified_permission_call', contract: token, selector, framePath: path, basis: 'selector_only', tokenVerified: false });
+      } else if (!HEX.test(frame.input) || frame.input.length !== 458 || !address(frame.from) || quantity(frame.value ?? '0x0') !== 0n) {
+        reasons.add('A malformed or nonzero-value ERC-2612 permit call was omitted.');
+      } else {
+        const words = Array.from({ length: 7 }, (_, i) => `0x${frame.input.slice(10 + i * 64, 74 + i * 64)}`);
+        const owner = canonicalWordAddress(words[0]), spender = canonicalWordAddress(words[1]);
+        const recoveryId = BigInt(words[4]);
+        if (!owner || owner === '0x' + '0'.repeat(40) || !spender || recoveryId > 255n) reasons.add('Noncanonical owner, spender or uint8 encoding in a permit call was omitted.');
+        else {
+          const asset = assetFor(token, metadata), deadline = BigInt(words[3]);
+          const timestamp = quantity(block?.timestamp);
+          const relation = deadline === MAX_UINT256 ? 'unbounded' : timestamp === null ? 'unavailable' : deadline < timestamp ? 'expired_at_execution' : 'not_expired_at_execution';
+          add({
+            kind: 'permit_request', asset, tokenVerified: true, implementation,
+            owner, spender, submitter: address(request?.from ?? trace.from), permitCaller: address(frame.from),
+            relayed: address(request?.from ?? trace.from) ? address(request?.from ?? trace.from) !== owner : null,
+            ...amountFields(BigInt(words[2]), asset), deadlineRaw: deadline.toString(), deadlineRelation: relation,
+            signatureVerification: 'not_independently_verified', signatureEvidence: 'public_execution_calldata', recoveryId: recoveryId.toString(),
+            basis: 'erc2612_permit_calldata', standardSource: 'https://eips.ethereum.org/EIPS/eip-2612',
+            origin: path === '0' ? 'top_level_request' : 'nested_call', framePath: path,
+            returnStatus: frame.output === undefined || frame.output === '0x' ? 'empty' : 'unexpected_data',
+            matchedEventIds: [], eventCorrelation: 'not_observed',
+          });
+          warnings.add('Permit owner comes from calldata. The transaction submitter and immediate permit caller are reported separately; a relayed permit is not, by itself, evidence of maliciousness.');
+          warnings.add('A permit deadline limits redemption of the signature; it does not make the resulting allowance expire. Domain, nonce, signature validity and original signing intent are not independently verified here.');
+          if (relation === 'expired_at_execution') reasons.add('A successful permit trace has a deadline earlier than the recorded block time; this contradicts the configured ERC-2612 semantics.');
+        }
+      }
+    }
+
     if (frame.logs != null && !Array.isArray(frame.logs)) reasons.add('Malformed trace logs prevent complete permission-event interpretation.');
     for (const [logOffset, log] of (Array.isArray(frame.logs) ? frame.logs : []).entries()) {
       if (!log || typeof log !== 'object' || logsSeen.has(log) || log.removed === true) continue;
@@ -149,7 +200,7 @@ export function analyzePermissions({ request, trace, metadata = {} } = {}) {
       }
       const owner = canonicalWordAddress(log.topics?.[1]);
       const spender = canonicalWordAddress(log.topics?.[2]);
-      if (!Array.isArray(log.topics) || log.topics.length !== 3 || !owner || !spender || !WORD.test(log.data ?? '')) {
+      if (!Array.isArray(log.topics) || log.topics.length !== 3 || !owner || !spender || typeof log.data !== 'string' || !WORD.test(log.data)) {
         reasons.add('A malformed ERC20 Approval event was omitted.');
         continue;
       }
@@ -163,11 +214,11 @@ export function analyzePermissions({ request, trace, metadata = {} } = {}) {
   walk(trace);
   if (discardedSubtrees) warnings.add(`${discardedSubtrees} failed or reverted call subtree(s) were excluded from permission observations.`);
 
-  const calls = observations.filter(observation => observation.kind === 'approval_request');
+  const calls = observations.filter(observation => ['approval_request', 'permit_request'].includes(observation.kind));
   const events = observations.filter(observation => observation.kind === 'approval_event');
   for (const call of calls) {
-    // Attribute an event to its nearest observed approve call for that token;
-    // a parent call must not borrow a nested approve's event as its own evidence.
+    // Attribute an event to its nearest observed permission call for that token;
+    // a parent must not borrow a nested approve or permit event as its own.
     const candidates = events.filter(event => event.asset.address === call.asset.address && sameCallBranch(call, event) && !calls.some(nested =>
       nested !== call && nested.asset.address === call.asset.address &&
       nested.framePath.startsWith(`${call.framePath}.`) && sameCallBranch(nested, event)));
@@ -175,7 +226,7 @@ export function analyzePermissions({ request, trace, metadata = {} } = {}) {
     call.matchedEventIds = matches.map(event => event.id);
     call.eventCorrelation = matches.length ? 'matched' : candidates.length ? 'mismatched' : 'not_observed';
     for (const event of matches) event.matchedRequestIds.push(call.id);
-    if (call.returnStatus === 'returned_false') {
+    if (call.kind === 'approval_request' && call.returnStatus === 'returned_false') {
       warnings.add(`approve for ${call.spender} returned false; EVM call success does not establish approval success.`);
       if (candidates.length) reasons.add('An approve call returned false while its call subtree emitted Approval evidence; final allowance requires separate verification.');
     }
@@ -194,10 +245,16 @@ export function analyzePermissions({ request, trace, metadata = {} } = {}) {
     message: `An Approval event reported the maximum uint256 allowance from ${event.owner} to spender ${event.spender} for token ${event.asset.address}. This is commonly called unlimited approval. This event alone does not verify final allowance; consult allowanceChanges for measured state. Spender trustworthiness is not assessed.`,
   });
   for (const call of calls.filter(call => call.allowanceKind === 'uint256_max' && !call.matchedEventIds.length && call.returnStatus !== 'returned_false')) findings.push({
-    code: 'MAX_UINT256_APPROVAL_REQUEST', severity: 'review', basis: 'approve_calldata',
+    code: call.kind === 'permit_request' ? 'MAX_UINT256_PERMIT_REQUEST' : 'MAX_UINT256_APPROVAL_REQUEST', severity: 'review', basis: call.basis,
     token: call.asset.address, owner: call.owner, spender: call.spender, amountRaw: call.amountRaw,
     observationIds: [call.id],
-    message: `The call requested a maximum uint256 allowance for spender ${call.spender}, but no matching Approval event was observed. Permission activation and spender trustworthiness were not verified.`,
+    message: `The call requested a maximum uint256 allowance for spender ${call.spender}, but no matching Approval event was observed. The request alone does not verify final allowance; consult allowanceChanges for measured state. Spender trustworthiness is not assessed.`,
+  });
+  for (const call of calls.filter(call => call.kind === 'permit_request' && call.deadlineRelation === 'unbounded')) findings.push({
+    code: 'PERMIT_UNBOUNDED_DEADLINE', severity: 'review', basis: 'erc2612_permit_calldata',
+    token: call.asset.address, owner: call.owner, spender: call.spender, deadlineRaw: call.deadlineRaw,
+    observationIds: [call.id],
+    message: 'The permit request uses the maximum uint256 redemption deadline. Nonce consumption or other contract rules may still prevent reuse. This observation does not establish signature validity or maliciousness, and the deadline is not an allowance-expiration time.',
   });
   return result();
 }

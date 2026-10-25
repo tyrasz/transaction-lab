@@ -1,0 +1,280 @@
+{
+  "capturedAt": "2026-10-25T15:28:59.175Z",
+  "purpose": "Single diagnostic after HTTP502; earlier failure remains saved",
+  "input": {
+    "chainId": 999,
+    "from": "0xe9755d57f1b933b152b5b1ef43af64a657b58ddd",
+    "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+    "value": "0",
+    "data": "0xd505accf0000000000000000000000003e248867a2a2ddd1d901f7d595c4d02c6519b32a0000000000000000000000008a0f75a499c17632e5ee6cc4156099292f3e68f9ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006ac3c161000000000000000000000000000000000000000000000000000000000000001c6ebccf5c857d6c6364f9f62a42ade3c60345dbc45e462832635866032acd99f15049b760d260964dd6a9921f729f4f6f0fd084cc03c3d3668f60e15bff3b1da3",
+    "block": "latest"
+  },
+  "calls": [
+    {
+      "method": "eth_chainId",
+      "params": [],
+      "result": "0x3e7"
+    },
+    {
+      "method": "eth_getBlockByNumber",
+      "params": [
+        "latest",
+        false
+      ],
+      "result": {
+        "hash": "0x1924eae374acb69b8e28846c4f85c3fe2c617351d8d55c74db19d59c5586b69d",
+        "parentHash": "0x2caad630d28403a032f80665bc9dde04de2a7d1b302bc50f69039670ad057e3d",
+        "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "miner": "0x0000000000000000000000000000000000000000",
+        "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "transactionsRoot": "0x8893c0701b1b459b9f7aa30dd595150c92485597cae744b92d75d184c6dd4f17",
+        "receiptsRoot": "0xb3b73cf6691f307c4096af2395ba87f470f6bf6b3ef956dc2ceaddce1e986821",
+        "logsBloom": "0x0020000000000092000000000080000810000000000000000202000400000000000000000400000000000500800000000000000000002000000004040000c0000014010000000008000000080100010008000002000400000400020000000000000000000200000000000000008008000080000100001004880000100089000000800408000002000800000400100000208100000000030040000000000008000000000010000008020000000800040100900a0100010001004000080000000000005002100000000200080000000800040000000400008100000002800020600240000008080000020008000004000000000020800041401040000000000100",
+        "difficulty": "0x0",
+        "number": "0x2f34302",
+        "gasLimit": "0x2dc6c0",
+        "gasUsed": "0x111518",
+        "timestamp": "0x6ade203a",
+        "extraData": "0x",
+        "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "nonce": "0x0000000000000000",
+        "baseFeePerGas": "0x5f5e100",
+        "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "blobGasUsed": "0x0",
+        "excessBlobGas": "0x0",
+        "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "size": "0x129a",
+        "uncles": [],
+        "transactions": [
+          "0x1a9c6ee01c474d267cd2289ed7f398fd30a31efbc3d2b8bbdc31825199138d3e",
+          "0xfe4363660df73a5547269a77be26a74e33b354002cbee748e3fbfb93af099ded",
+          "0xd0711e0d63284f7f966504766bd73cf236935731e50b794df16698d2e379d4e2",
+          "0x1079bf5f53b6ce7d42938af748ff4ce1db92f223480a1cd64e92741358a66ba5",
+          "0xe31c8fec88e240a95777a3d0cd9092ee00a6ca207b3065f1cf62ca766a341e76"
+        ],
+        "withdrawals": []
+      }
+    },
+    {
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0xe9755d57f1b933b152b5b1ef43af64a657b58ddd",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "data": "0xd505accf0000000000000000000000003e248867a2a2ddd1d901f7d595c4d02c6519b32a0000000000000000000000008a0f75a499c17632e5ee6cc4156099292f3e68f9ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006ac3c161000000000000000000000000000000000000000000000000000000000000001c6ebccf5c857d6c6364f9f62a42ade3c60345dbc45e462832635866032acd99f15049b760d260964dd6a9921f729f4f6f0fd084cc03c3d3668f60e15bff3b1da3",
+          "value": "0x0",
+          "gas": "0x4c4b40"
+        },
+        "0x1924eae374acb69b8e28846c4f85c3fe2c617351d8d55c74db19d59c5586b69d",
+        {
+          "tracer": "callTracer",
+          "timeout": "15s",
+          "tracerConfig": {
+            "withLog": true
+          }
+        }
+      ],
+      "result": {
+        "from": "0xe9755d57f1b933b152b5b1ef43af64a657b58ddd",
+        "gas": "0x4c4b40",
+        "gasUsed": "0x736f",
+        "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+        "input": "0xd505accf0000000000000000000000003e248867a2a2ddd1d901f7d595c4d02c6519b32a0000000000000000000000008a0f75a499c17632e5ee6cc4156099292f3e68f9ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006ac3c161000000000000000000000000000000000000000000000000000000000000001c6ebccf5c857d6c6364f9f62a42ade3c60345dbc45e462832635866032acd99f15049b760d260964dd6a9921f729f4f6f0fd084cc03c3d3668f60e15bff3b1da3",
+        "output": "0xfb2a6752",
+        "error": "execution reverted",
+        "calls": [
+          {
+            "from": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "gas": "0x4aab82",
+            "gasUsed": "0x2f4",
+            "to": "0x410aa1ab680b886c875e99a7a4bfaf188508a7a3",
+            "input": "0xd505accf0000000000000000000000003e248867a2a2ddd1d901f7d595c4d02c6519b32a0000000000000000000000008a0f75a499c17632e5ee6cc4156099292f3e68f9ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006ac3c161000000000000000000000000000000000000000000000000000000000000001c6ebccf5c857d6c6364f9f62a42ade3c60345dbc45e462832635866032acd99f15049b760d260964dd6a9921f729f4f6f0fd084cc03c3d3668f60e15bff3b1da3",
+            "output": "0xfb2a6752",
+            "error": "execution reverted",
+            "value": "0x0",
+            "type": "DELEGATECALL"
+          }
+        ],
+        "value": "0x0",
+        "type": "CALL"
+      }
+    }
+  ],
+  "response": {
+    "schemaVersion": "1.0",
+    "implementation": {
+      "name": "Transaction Lab",
+      "version": "0.5.0",
+      "sourceSha256": "02f8ab5584ff7ca5fabd18a2a9a969280211b54b4b14382e2091ef353738cc9f",
+      "sourceFiles": [
+        "allowances.js",
+        "analyze.js",
+        "balances.js",
+        "config.js",
+        "historical-state.js",
+        "lending.js",
+        "lending-balances.js",
+        "permissions.js",
+        "revert.js",
+        "rpc.js",
+        "server.js",
+        "state.js",
+        "validate.js"
+      ]
+    },
+    "id": "95793cd5-7cd5-49eb-9956-fd67d4a9a53b",
+    "createdAt": "2026-10-25T15:28:59.354Z",
+    "request": {
+      "chainId": 999,
+      "from": "0xe9755d57f1b933b152b5b1ef43af64a657b58ddd",
+      "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+      "data": "0xd505accf0000000000000000000000003e248867a2a2ddd1d901f7d595c4d02c6519b32a0000000000000000000000008a0f75a499c17632e5ee6cc4156099292f3e68f9ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006ac3c161000000000000000000000000000000000000000000000000000000000000001c6ebccf5c857d6c6364f9f62a42ade3c60345dbc45e462832635866032acd99f15049b760d260964dd6a9921f729f4f6f0fd084cc03c3d3668f60e15bff3b1da3",
+      "value": "0"
+    },
+    "source": {
+      "provider": "hyperliquid.drpc.org",
+      "chainId": 999,
+      "blockNumber": "49496834",
+      "blockHash": "0x1924eae374acb69b8e28846c4f85c3fe2c617351d8d55c74db19d59c5586b69d",
+      "timestamp": "1792942138",
+      "mode": "simulation",
+      "blockBinding": "explicit_block_hash",
+      "requestedBlock": "latest"
+    },
+    "execution": {
+      "status": "reverted",
+      "gasUsed": "29551",
+      "returnData": "0xfb2a6752",
+      "error": "execution reverted",
+      "revert": {
+        "selector": "0xfb2a6752",
+        "source": "contract_return_data",
+        "kind": "custom_error",
+        "message": "Custom error; no verified ABI is configured for this selector."
+      }
+    },
+    "coverage": {
+      "status": "unsupported",
+      "reasons": [
+        "Protocol coverage is limited to Hyperlend USDC supply, withdrawal, variable-rate borrowing and repayment on HyperEVM; other executions are not fully interpreted."
+      ]
+    },
+    "protocol": null,
+    "inAssets": [],
+    "outAssets": [],
+    "movements": [],
+    "interestAccruals": [],
+    "positionChanges": [],
+    "warnings": [
+      "The inAssets, outAssets and movements fields describe ERC20 Transfer events, not measured before-and-after balances. Separately measured balanceChanges, when available, describe those balances. Events alone are not proof of a balance change.",
+      "Security has not been assessed. Successful execution is not a safety verdict.",
+      "The top-level transaction did not succeed; all event-derived asset movements were discarded."
+    ],
+    "security": {
+      "status": "not_assessed",
+      "findings": []
+    },
+    "balanceChanges": {
+      "status": "not_applicable",
+      "basis": "prestate_diff_balanceOf",
+      "assets": [],
+      "warnings": [
+        "Balance measurement is limited to successful, reconciled Hyperlend USDC supply executions."
+      ]
+    },
+    "allowanceChanges": {
+      "status": "not_applicable",
+      "basis": "prestate_diff_allowance",
+      "allowances": [],
+      "warnings": [
+        "Final allowance measurement requires a successful HyperEVM execution and verified token permission observations."
+      ],
+      "limits": {
+        "maxPairs": 8,
+        "maxPermissionObservations": 256
+      }
+    },
+    "permissions": {
+      "scope": {
+        "chainId": 999,
+        "verifiedTokenAddresses": [
+          "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "0x744e4f26ee30213989216e1632d9be3547c4885b"
+        ],
+        "standard": "ERC20",
+        "standardSource": "https://eips.ethereum.org/EIPS/eip-20"
+      },
+      "coverage": {
+        "status": "limited",
+        "reasons": [],
+        "allowanceStateVerified": false
+      },
+      "observations": [],
+      "findings": [],
+      "warnings": [
+        "Approval calldata describes a request; Approval events describe emitted evidence. Neither independently verifies the final on-chain allowance.",
+        "Maximum uint256 approval observations describe spender exposure, not maliciousness. No general security verdict or spender reputation assessment is provided.",
+        "The top-level call failed. All permission calls and events were discarded; no effective permission change is inferred."
+      ]
+    },
+    "timing": {
+      "totalMs": 178,
+      "rpcMs": 177
+    },
+    "evidence": {
+      "traceMethod": "debug_traceCall",
+      "traceRequest": {
+        "method": "debug_traceCall",
+        "params": [
+          {
+            "from": "0xe9755d57f1b933b152b5b1ef43af64a657b58ddd",
+            "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "data": "0xd505accf0000000000000000000000003e248867a2a2ddd1d901f7d595c4d02c6519b32a0000000000000000000000008a0f75a499c17632e5ee6cc4156099292f3e68f9ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006ac3c161000000000000000000000000000000000000000000000000000000000000001c6ebccf5c857d6c6364f9f62a42ade3c60345dbc45e462832635866032acd99f15049b760d260964dd6a9921f729f4f6f0fd084cc03c3d3668f60e15bff3b1da3",
+            "value": "0x0",
+            "gas": "0x4c4b40"
+          },
+          "0x1924eae374acb69b8e28846c4f85c3fe2c617351d8d55c74db19d59c5586b69d",
+          {
+            "tracer": "callTracer",
+            "timeout": "15s",
+            "tracerConfig": {
+              "withLog": true
+            }
+          }
+        ]
+      },
+      "traceResponse": {
+        "from": "0xe9755d57f1b933b152b5b1ef43af64a657b58ddd",
+        "gas": "0x4c4b40",
+        "gasUsed": "0x736f",
+        "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+        "input": "0xd505accf0000000000000000000000003e248867a2a2ddd1d901f7d595c4d02c6519b32a0000000000000000000000008a0f75a499c17632e5ee6cc4156099292f3e68f9ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006ac3c161000000000000000000000000000000000000000000000000000000000000001c6ebccf5c857d6c6364f9f62a42ade3c60345dbc45e462832635866032acd99f15049b760d260964dd6a9921f729f4f6f0fd084cc03c3d3668f60e15bff3b1da3",
+        "output": "0xfb2a6752",
+        "error": "execution reverted",
+        "calls": [
+          {
+            "from": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "gas": "0x4aab82",
+            "gasUsed": "0x2f4",
+            "to": "0x410aa1ab680b886c875e99a7a4bfaf188508a7a3",
+            "input": "0xd505accf0000000000000000000000003e248867a2a2ddd1d901f7d595c4d02c6519b32a0000000000000000000000008a0f75a499c17632e5ee6cc4156099292f3e68f9ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006ac3c161000000000000000000000000000000000000000000000000000000000000001c6ebccf5c857d6c6364f9f62a42ade3c60345dbc45e462832635866032acd99f15049b760d260964dd6a9921f729f4f6f0fd084cc03c3d3668f60e15bff3b1da3",
+            "output": "0xfb2a6752",
+            "error": "execution reverted",
+            "value": "0x0",
+            "type": "DELEGATECALL"
+          }
+        ],
+        "value": "0x0",
+        "type": "CALL"
+      },
+      "balanceMeasurement": {
+        "request": [],
+        "response": []
+      },
+      "allowanceMeasurement": {
+        "request": [],
+        "response": []
+      }
+    }
+  }
+}

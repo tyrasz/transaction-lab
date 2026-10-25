@@ -1,0 +1,105 @@
+{
+  "retrievedAt": "2026-10-23T15:44:03.968526+00:00",
+  "kind": "observed_public_historical_transaction",
+  "rpc": "https://hyperliquid.drpc.org",
+  "explorerUrl": "https://hyperevmscan.io/tx/0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+  "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+  "checks": {
+    "chain999": false,
+    "transactionHash": false,
+    "receiptHash": false,
+    "blockHash": false,
+    "transactionIndex": false,
+    "successfulReceipt": false,
+    "traceGasMatchesReceipt": false,
+    "traceRootMatches": false
+  },
+  "captures": {
+    "chainId": {
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 1,
+        "method": "eth_chainId",
+        "params": []
+      },
+      "error": {
+        "kind": "HTTPError",
+        "status": 403
+      }
+    },
+    "transaction": {
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "method": "eth_getTransactionByHash",
+        "params": [
+          "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d"
+        ]
+      },
+      "error": {
+        "kind": "HTTPError",
+        "status": 403
+      }
+    },
+    "receipt": {
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "method": "eth_getTransactionReceipt",
+        "params": [
+          "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d"
+        ]
+      },
+      "error": {
+        "kind": "HTTPError",
+        "status": 403
+      }
+    },
+    "callTrace": {
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 4,
+        "method": "debug_traceTransaction",
+        "params": [
+          "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+          {
+            "tracer": "callTracer",
+            "timeout": "15s",
+            "tracerConfig": {
+              "withLog": true
+            }
+          }
+        ]
+      },
+      "error": {
+        "kind": "HTTPError",
+        "status": 403
+      }
+    },
+    "prestateDiff": {
+      "request": {
+        "jsonrpc": "2.0",
+        "id": 5,
+        "method": "debug_traceTransaction",
+        "params": [
+          "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+          {
+            "tracer": "prestateTracer",
+            "timeout": "15s",
+            "tracerConfig": {
+              "diffMode": true
+            }
+          }
+        ]
+      },
+      "error": {
+        "kind": "HTTPError",
+        "status": 403
+      }
+    }
+  },
+  "limitations": [
+    "Public historical raw calldata and traces may contain historical signatures. No new signature was obtained and no transaction was broadcast.",
+    "Only these two candidate hashes were queried; this is not a chain-wide scan."
+  ]
+}

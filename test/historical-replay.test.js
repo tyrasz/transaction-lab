@@ -33,13 +33,23 @@ for (const item of capture.cases) for (const run of item.runs.filter(run => run.
     const rpc = recordedRpc(run);
     const report = await replay(run.request, rpc);
     assert.equal(rpc.consumed, run.rpcCalls.length);
-    for (const field of ['request','source','execution','coverage','protocol','inAssets','outAssets','movements','interestAccruals','positionChanges','balanceChanges','allowanceChanges','permissions','security','evidence']) {
-      assert.deepEqual(report[field], run.response[field], `Original ${field} is preserved`);
+    const expected = structuredClone(run.response);
+    // The adapter now permits separately validated allowance queries as well.
+    // Preserve every prior balance amount, witness, limit and RPC observation.
+    expected.balanceChanges.executionIdentity.validation.queryScope = 'configured_USDC_hUSDC_variable_debt_balanceOf_and_USDC_hUSDC_allowance';
+    for (const field of ['request','source','execution','coverage','protocol','inAssets','outAssets','movements','interestAccruals','positionChanges','balanceChanges','permissions','security']) {
+      assert.deepEqual(report[field], expected[field], `Original ${field} is preserved`);
     }
+    // 0.5 adds historical allowance evidence; these original lending traces
+    // contain no approval/permit candidates, so no additional RPC is warranted.
+    const { allowanceMeasurement, ...originalEvidence } = report.evidence;
+    assert.deepEqual(originalEvidence, run.response.evidence);
+    assert.deepEqual(allowanceMeasurement, { request: [], response: [] });
     assert.equal(report.balanceChanges.status, 'measured');
     assert.equal(report.balanceChanges.basis, 'historical_transaction_position_balanceOf');
     assert.equal(report.permissions.coverage.allowanceStateVerified, false);
     assert.equal(report.allowanceChanges.status, 'not_applicable');
+    assert.deepEqual(report.allowanceChanges.allowances, []);
   });
 }
 

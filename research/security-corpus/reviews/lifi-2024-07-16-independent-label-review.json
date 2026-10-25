@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0",
+  "reviewedAt": "2026-10-25T15:30:28.883Z",
+  "reviewer": "codex-root",
+  "reviewKind": "independent_internal_label_review",
+  "candidateId": "lifi-2024-07-16",
+  "transactionHash": "0xd82fe84e63b1aa52e1ce540582ee0895ba4a71ec5e7a632a3faa1aff3e763873",
+  "decision": "supports_retrospective_incident_drain_annotation_for_development_only",
+  "reviewIndependence": "Separate review of primary source pages and raw selected trace by the root agent; internal AI-assisted review, not external human or organizational validation.",
+  "sources": [
+    {
+      "title": "Illicit Fund Flow Case Study: LI.FI Attack",
+      "publisher": "BlockSec",
+      "url": "https://blocksec.com/blog/illicit-fund-flow-case-study-lifi-attack-metasleuth",
+      "publishedAt": "2024-10-24",
+      "observedFacts": [
+        "The original research explicitly links the selected transaction hash as an attack example.",
+        "The reported actor and diamond addresses match the captured transaction sender and nested spending context."
+      ],
+      "linkedTransactionUrl": "https://etherscan.io/tx/0xd82fe84e63b1aa52e1ce540582ee0895ba4a71ec5e7a632a3faa1aff3e763873",
+      "linkedPageFetch": "403; linked target was independently verified from the report. Chain facts were inspected from retained public RPC captures."
+    },
+    {
+      "title": "Security Incident Report 16th July",
+      "publisher": "LI.FI",
+      "url": "https://li.fi/knowledge-hub/incident-report-16th-july",
+      "publishedAt": "2024-07-18",
+      "observedFacts": [
+        "The project acknowledges an arbitrary-call validation omission affecting previously approved user tokens.",
+        "The identified Ethereum facet 0xf28a352377663ca134bd27b582b1a9a4dad7e534 matches the captured DELEGATECALL target."
+      ]
+    }
+  ],
+  "rawTraceChecks": [
+    "Original wrapper remains the top-level recipient; the diamond is not substituted as root.",
+    "USDT transferFrom names affected owner 0xabe45ea636df7ac90fb7d8d8c74a081b169f92ef and recipient/submitter 0x8b3cb6bf982798fba233bca56749e22eec42dcf3.",
+    "Two temporary CREATE and SELFDESTRUCT paths are retained; unfamiliar token-like selectors are not accepted as verified ERC20 semantics."
+  ],
+  "proposedLabels": {
+    "transactionStage": "attacker_submitted_drain",
+    "incidentAttribution": "documented_incident_drain",
+    "victimSigningRequest": "not_observed",
+    "priorApprovalIntent": "unknown",
+    "allowanceConsumption": "permission_exercised_but_numeric_maximum_unchanged"
+  },
+  "scope": {
+    "use": "development_execution_and_USDT_effects_reference",
+    "securityScoring": false,
+    "blindHoldout": false,
+    "presignDetection": false,
+    "sourceReportsMayBeDetectorInputs": false,
+    "currentEngineChain1Supported": false
+  },
+  "limitations": [
+    "Both primary reports postdate the transaction; their annotations cannot be historical pre-sign features.",
+    "No original victim approval prompt, informed-consent evidence or dated reputation snapshot is available.",
+    "The reviews do not establish that every approval to the shared spender was malicious.",
+    "Independent-chain review is recorded separately; a one-provider effects oracle is not cross-engine accuracy evidence."
+  ],
+  "packetReviewed": {
+    "path": "reports/security-validation/lifi-2024-07-16/validation.json",
+    "sha256": "4da1fd173499395694a1870ae093ecd56d05d11a4560ce45b109fee65acf7a40"
+  }
+}

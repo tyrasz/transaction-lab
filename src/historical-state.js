@@ -1,4 +1,4 @@
-// Original-position Hyperlend balance reads. Every execution is ephemeral;
+// Original-position Hyperlend balance and configured-token allowance reads. Every execution is ephemeral;
 // this module never signs, submits, or persists a transaction.
 import { CHAIN_ID, POOL, USDC, HUSDC, VUSDC } from './config.js';
 import { StateValidationError, failState, uint, hex, UINT256_MAX, buildStateOverrides } from './state.js';
@@ -8,6 +8,7 @@ const ADDRESS = /^0x[0-9a-f]{40}$/i;
 const WORD = /^0x[0-9a-f]{64}$/i;
 const BYTES = /^0x(?:[0-9a-f]{2})*$/i;
 const BALANCE = /^0x70a082310{24}[0-9a-f]{40}$/i;
+const ALLOWANCE = /^0xdd62ed3e0{24}[0-9a-f]{40}0{24}[0-9a-f]{40}$/i;
 const IMPLEMENTATIONS = {
   [USDC]: '0x003f73f58ca78880da3642c5cb71d7459b3fe4f8',
   [HUSDC]: '0x410aa1ab680b886c875e99a7a4bfaf188508a7a3',
@@ -27,6 +28,29 @@ const quantity = (value, max = UINT256_MAX) => { const n = uint(value); return n
 const bytes = value => typeof value === 'string' && BYTES.test(value);
 const failed = frame => Boolean(frame?.error || frame?.revertReason);
 const identityKey = (request, block) => JSON.stringify({ chainId: uint(request?.chainId)?.toString(), from: lower(request?.from), to: lower(request?.to), data: lower(request?.data), value: uint(request?.value)?.toString(), hash: lower(block?.hash), number: uint(block?.number)?.toString(), timestamp: uint(block?.timestamp)?.toString() });
+
+function rootScope(request) {
+  if (!bytes(request?.data)) return null;
+  const data = lower(request.data), target = lower(request.to), selector = data.slice(0, 10);
+  const fields = count => data.length === 10 + count * 64 ? Array.from({ length: count }, (_, i) => '0x' + data.slice(10 + i * 64, 74 + i * 64)) : null;
+  const paddedAddress = value => typeof value === 'string' && /^0x0{24}[0-9a-f]{40}$/.test(value);
+  const generic = () => isAddress(target) ? { operation: 'confirmed_contract_call', token: null, requiresCodeProof: true } : null;
+  if ([USDC, HUSDC].includes(target) && ['0x095ea7b3', '0xd505accf'].includes(selector)) {
+    const args = fields(selector === '0x095ea7b3' ? 2 : selector === '0xd505accf' ? 7 : -1);
+    if (!args || !paddedAddress(args[0]) || (selector === '0xd505accf' && (!paddedAddress(args[1]) || BigInt(args[4]) > 255n))) return null;
+    return { operation: selector === '0x095ea7b3' ? 'approve' : 'permit', token: target };
+  }
+  if (target !== POOL) return generic();
+  const operation = { '0x617ba037': 'supply', '0x69328dec': 'withdraw', '0xa415bcad': 'borrow', '0x573ade81': 'repay' }[selector];
+  if (!operation) return generic();
+  const args = fields({ supply: 4, withdraw: 3, borrow: 5, repay: 4 }[operation]);
+  if (!args || args[0] !== '0x' + USDC.slice(2).padStart(64, '0')) return null;
+  if (operation === 'supply' && (!paddedAddress(args[2]) || BigInt(args[3]) > 65535n)) return null;
+  if (operation === 'withdraw' && !paddedAddress(args[2])) return null;
+  if (operation === 'borrow' && (BigInt(args[2]) !== 2n || BigInt(args[3]) > 65535n || !paddedAddress(args[4]))) return null;
+  if (operation === 'repay' && (BigInt(args[2]) !== 2n || !paddedAddress(args[3]))) return null;
+  return { operation, token: null };
+}
 
 function rpcFailure(error) {
   const known = new Set(['RPC_TIMEOUT', 'RPC_CONNECTION_ERROR', 'RPC_HTTP_ERROR', 'RPC_EXECUTION_ERROR', 'RPC_INVALID_RESPONSE', 'RPC_RESPONSE_TOO_LARGE', 'METHOD_NOT_ALLOWED']);
@@ -63,6 +87,9 @@ function semanticTrace(trace) {
 }
 
 function allLogs(trace) { return failed(trace) ? [] : [...trace.logs, ...trace.calls.flatMap(allLogs)]; }
+function hasContractLifecycle(trace) {
+  return ['CREATE', 'CREATE2', 'SELFDESTRUCT'].includes(trace.type) || trace.calls.some(hasContractLifecycle);
+}
 function sortedEventContent(logs) {
   return logs.map(log => JSON.stringify({ address: lower(log.address), topics: log.topics.map(lower), data: lower(log.data) })).sort();
 }
@@ -71,15 +98,16 @@ function oneTrace(result) {
   return result[0][0];
 }
 function assertFrame(frame, { type, from, to, input, output, childCount }) {
-  if (failed(frame) || frame.type !== type || frame.from !== lower(from) || frame.to !== lower(to) || frame.input !== lower(input) || (output !== undefined && frame.output !== lower(output)) || frame.value !== '0' || frame.logs.length || frame.calls.length !== childCount) failState('Historical balance query does not match the verified token call behavior.');
+  if (failed(frame) || frame.type !== type || frame.from !== lower(from) || frame.to !== lower(to) || frame.input !== lower(input) || (output !== undefined && frame.output !== lower(output)) || frame.value !== '0' || frame.logs.length || frame.calls.length !== childCount) failState('Historical state query does not match the verified token call behavior.');
 }
 function validateQuery(result, query, sender) {
   const root = semanticTrace(oneTrace(result));
-  if (!isWord(root.output)) failState('Historical balance query did not return exactly one uint256 word.');
+  if (!isWord(root.output)) failState('Historical state query did not return exactly one uint256 word.');
   assertFrame(root, { type: 'CALL', from: sender, to: query.to, input: query.data, childCount: 1 });
   const implementation = root.calls[0];
-  assertFrame(implementation, { type: 'DELEGATECALL', from: query.to, to: IMPLEMENTATIONS[query.to], input: query.data, output: root.output, childCount: query.to === USDC ? 0 : 1 });
-  if (query.to !== USDC) {
+  const positionBalance = query.to !== USDC && BALANCE.test(query.data);
+  assertFrame(implementation, { type: 'DELEGATECALL', from: query.to, to: IMPLEMENTATIONS[query.to], input: query.data, output: root.output, childCount: positionBalance ? 1 : 0 });
+  if (positionBalance) {
     const indexInput = (query.to === HUSDC ? '0xd15e0053' : '0x386497fd') + USDC.slice(2).padStart(64, '0');
     const pool = implementation.calls[0];
     assertFrame(pool, { type: 'STATICCALL', from: query.to, to: POOL, input: indexInput, childCount: 1 });
@@ -92,20 +120,20 @@ function validateReadDiff(result, { sender, miner, nonce, gasUsed, gasPrice, bas
   const diff = oneTrace(result);
   buildStateOverrides(diff); // Includes bounded storage/account/code validation.
   const normalized = Object.fromEntries(Object.entries(diff.pre).map(([address, record]) => [lower(address), { before: record, after: diff.post[address] }]));
-  if (sender === miner || !normalized[sender] || gasUsed <= 0n || gasUsed > 300000n) failState('Historical balance query fee context is outside the verified scope.');
+  if (sender === miner || !normalized[sender] || gasUsed <= 0n || gasUsed > 300000n) failState('Historical state query fee context is outside the verified scope.');
   for (const [address, before] of Object.entries(diff.pre)) {
     const after = diff.post[address];
-    if (![sender, miner].includes(lower(address)) || Object.keys(before.storage ?? {}).length || Object.keys(after.storage ?? {}).length || before.code !== undefined || after.code !== undefined) failState('Historical balance query changed contract state outside permitted fee and nonce effects.');
-    if (lower(address) !== sender && (before.nonce !== undefined || after.nonce !== undefined)) failState('Historical balance query changed an unrelated account nonce.');
+    if (![sender, miner].includes(lower(address)) || Object.keys(before.storage ?? {}).length || Object.keys(after.storage ?? {}).length || before.code !== undefined || after.code !== undefined) failState('Historical state query changed contract state outside permitted fee and nonce effects.');
+    if (lower(address) !== sender && (before.nonce !== undefined || after.nonce !== undefined)) failState('Historical state query changed an unrelated account nonce.');
     if (before.nonce !== undefined || after.nonce !== undefined) {
-      if (quantity(before.nonce) === null || quantity(after.nonce) !== quantity(before.nonce) + 1n) failState('Historical balance query returned unexpected sender nonce effects.');
+      if (quantity(before.nonce) === null || quantity(after.nonce) !== quantity(before.nonce) + 1n) failState('Historical state query returned unexpected sender nonce effects.');
     }
   }
   const senderState = normalized[sender];
-  if (quantity(senderState.before.nonce) !== nonce || quantity(senderState.after.nonce) !== nonce + 1n) failState('Historical balance query did not execute at the original transaction position.');
-  if (quantity(senderState.before.balance) === null || quantity(senderState.after.balance) === null || quantity(senderState.before.balance) - quantity(senderState.after.balance) !== gasUsed * gasPrice) failState('Historical balance query returned unexpected native fee effects.');
+  if (quantity(senderState.before.nonce) !== nonce || quantity(senderState.after.nonce) !== nonce + 1n) failState('Historical state query did not execute at the original transaction position.');
+  if (quantity(senderState.before.balance) === null || quantity(senderState.after.balance) === null || quantity(senderState.before.balance) - quantity(senderState.after.balance) !== gasUsed * gasPrice) failState('Historical state query returned unexpected native fee effects.');
   const tip = gasUsed * (gasPrice - baseFee), minerState = normalized[miner];
-  if (tip === 0n ? Boolean(minerState) : !minerState || quantity(minerState.before.balance) === null || quantity(minerState.after.balance) === null || quantity(minerState.after.balance) - quantity(minerState.before.balance) !== tip) failState('Historical balance query returned unexpected beneficiary fee effects.');
+  if (tip === 0n ? Boolean(minerState) : !minerState || quantity(minerState.before.balance) === null || quantity(minerState.after.balance) === null || quantity(minerState.after.balance) - quantity(minerState.before.balance) !== tip) failState('Historical state query returned unexpected beneficiary fee effects.');
 }
 
 /** Lazy context compatible with createStateContext consumers, for verified tokens only. */
@@ -158,13 +186,21 @@ export function createHistoricalStateContext({ request, block, rpc, transaction,
   }
   async function prepare() {
     if (!preparation) preparation = (async () => {
-      if (uint(req?.chainId) !== BigInt(CHAIN_ID) || !isAddress(req?.from) || lower(req?.to) !== POOL || !bytes(req?.data) || quantity(req?.value) !== 0n || !isWord(pinnedBlock?.hash) || uint(pinnedBlock?.number) === null || uint(pinnedBlock.number) === 0n || uint(pinnedBlock?.timestamp) === null) failState('Historical measurement requires a valid Hyperlend request and pinned block.');
+      const scope = rootScope(req);
+      if (uint(req?.chainId) !== BigInt(CHAIN_ID) || !isAddress(req?.from) || !scope || quantity(req?.value) !== 0n || !isWord(pinnedBlock?.hash) || uint(pinnedBlock?.number) === null || uint(pinnedBlock.number) === 0n || uint(pinnedBlock?.timestamp) === null) failState('Historical measurement requires a supported zero-value contract request and pinned block.');
       if (!object(tx) || !object(txReceipt) || !isWord(tx.hash) || lower(tx.blockHash) !== lower(pinnedBlock.hash) || uint(tx.blockNumber) !== uint(pinnedBlock.number) || lower(tx.from) !== lower(req.from) || lower(tx.to) !== lower(req.to) || lower(tx.input) !== lower(req.data) || uint(tx.value) !== uint(req.value) || uint(tx.chainId) !== BigInt(CHAIN_ID) || quantity(tx.nonce, (1n << 64n) - 1n) === null || quantity(tx.gas, 30000000n) === null || uint(tx.gas) === 0n || quantity(tx.transactionIndex, 4999n) === null || !['0x0', '0x1', '0x2'].includes(lower(tx.type ?? '0x0'))) failState('Historical transaction does not match the bound unsigned request.');
       if (['authorizationList', 'blobVersionedHashes', 'maxFeePerBlobGas', 'blobs', 'sidecar'].some(field => tx[field] !== undefined && tx[field] !== null)) failState('Blob or authorization-list transaction semantics are outside historical measurement scope.');
       index = Number(uint(tx.transactionIndex));
       if (lower(txReceipt.transactionHash) !== lower(tx.hash) || lower(txReceipt.blockHash) !== lower(pinnedBlock.hash) || uint(txReceipt.blockNumber) !== uint(pinnedBlock.number) || uint(txReceipt.transactionIndex) !== BigInt(index) || uint(txReceipt.status) !== 1n || lower(txReceipt.from) !== lower(req.from) || lower(txReceipt.to) !== lower(req.to) || quantity(txReceipt.gasUsed) === null || quantity(txReceipt.effectiveGasPrice) === null || quantity(tx.gasPrice) !== quantity(txReceipt.effectiveGasPrice) || !Array.isArray(txReceipt.logs) || txReceipt.logs.length > 2000) failState('Successful historical receipt does not match the bound transaction.');
       const expectedTrace = semanticTrace(originalTrace);
       if (failed(expectedTrace) || expectedTrace.type !== 'CALL' || expectedTrace.from !== lower(req.from) || expectedTrace.to !== lower(req.to) || expectedTrace.input !== lower(req.data) || expectedTrace.value !== '0' || BigInt(expectedTrace.gasUsed) !== uint(txReceipt.gasUsed)) failState('Original historical trace does not match the transaction and receipt.');
+      // Final diffs can omit temporary creations/destructions and reverted
+      // lifecycle operations. Check every normalized frame before any RPC.
+      if (hasContractLifecycle(expectedTrace)) failState('Contract creation or destruction, including reverted subtrees, is outside historical measurement scope.');
+      if (scope.token) {
+        const implementation = expectedTrace.calls[0];
+        if (expectedTrace.calls.length !== 1 || !implementation || failed(implementation) || implementation.type !== 'DELEGATECALL' || implementation.from !== scope.token || implementation.to !== IMPLEMENTATIONS[scope.token] || implementation.input !== expectedTrace.input || implementation.value !== '0') failState('Historical permission execution does not use the verified token implementation.');
+      }
       const receiptLogs = txReceipt.logs.map(log => {
         if (!object(log) || !isAddress(log.address) || !Array.isArray(log.topics) || log.topics.length > 4 || log.topics.some(topic => !isWord(topic)) || !bytes(log.data) || log.removed || lower(log.transactionHash) !== lower(tx.hash) || lower(log.blockHash) !== lower(pinnedBlock.hash) || uint(log.blockNumber) !== uint(pinnedBlock.number) || uint(log.transactionIndex) !== BigInt(index) || quantity(log.logIndex) === null) failState('Historical receipt contains malformed event identity.');
         return log;
@@ -189,18 +225,24 @@ export function createHistoricalStateContext({ request, block, rpc, transaction,
       if (JSON.stringify(replay) !== JSON.stringify(expectedTrace)) failState('Original-position replay does not match the historical execution trace.');
       const diff = await call('debug_traceTransaction', [tx.hash, { tracer: 'prestateTracer', timeout: '15s', tracerConfig: { diffMode: true } }]);
       buildStateOverrides(diff); // Reject original account creation/deletion/code changes.
+      if (scope.requiresCodeProof) {
+        const prestate = await call('debug_traceTransaction', [tx.hash, { tracer: 'prestateTracer', timeout: '15s', tracerConfig: { disableStorage: true } }]);
+        if (!object(prestate) || Object.keys(prestate).length > 1000 || Object.keys(prestate).some(account => !isAddress(account)) || !object(prestate[lower(req.to)]) || !bytes(prestate[lower(req.to)].code) || prestate[lower(req.to)].code === '0x') failState('Historical root runtime code is unavailable or outside the confirmed-contract scope.');
+      }
       await headerWitness(index);
       await headerWitness(index + 1);
-      executionIdentity = { transactionHash: lower(tx.hash), transactionIndex: String(index), postTransactionIndex: String(index + 1), stateBlockHash: pinned.blockHash, blockNumber: uint(pinnedBlock.number).toString(), timestamp: uint(pinnedBlock.timestamp).toString(), stateBinding: 'block_hash_and_transaction_index', headerContext: 'original_block', method: 'debug_traceCallMany', validation: { originalReplay: 'semantic_trace_and_receipt_match', inputGasAnnotations: 'excluded_from_comparison', headerFields: ['number', 'timestamp', 'gasLimit', 'baseFee', 'prevRandao', 'coinbase', 'chainId', 'parentHash'], feeRepresentation: 'original_effective_gas_price', queryScope: 'configured_USDC_hUSDC_variable_debt_balanceOf', maxPairs: MAX_PAIRS, maxRpcCalls: MAX_CALLS } };
+      executionIdentity = { transactionHash: lower(tx.hash), transactionIndex: String(index), postTransactionIndex: String(index + 1), stateBlockHash: pinned.blockHash, blockNumber: uint(pinnedBlock.number).toString(), timestamp: uint(pinnedBlock.timestamp).toString(), stateBinding: 'block_hash_and_transaction_index', headerContext: 'original_block', method: 'debug_traceCallMany', validation: { originalReplay: 'semantic_trace_and_receipt_match', inputGasAnnotations: 'excluded_from_comparison', headerFields: ['number', 'timestamp', 'gasLimit', 'baseFee', 'prevRandao', 'coinbase', 'chainId', 'parentHash'], feeRepresentation: 'original_effective_gas_price', queryScope: 'configured_USDC_hUSDC_variable_debt_balanceOf_and_USDC_hUSDC_allowance', maxPairs: MAX_PAIRS, maxRpcCalls: MAX_CALLS } };
     })();
     return preparation;
   }
   return Object.freeze({
     measurementBasis: 'historical_transaction_position_balanceOf',
+    allowanceMeasurementBasis: 'historical_transaction_position_allowance',
     matches(candidate) { return candidate.rpc === rpc && identityKey(candidate.request, candidate.block) === key; },
     prepare,
     async readPair(query) {
-      if (!object(query) || !Object.hasOwn(IMPLEMENTATIONS, lower(query.to)) || typeof query.data !== 'string' || !BALANCE.test(query.data)) failState('Historical balance queries are restricted to configured token balanceOf calls.');
+      const supportedQuery = object(query) && typeof query.data === 'string' && ((Object.hasOwn(IMPLEMENTATIONS, lower(query.to)) && BALANCE.test(query.data)) || ([USDC, HUSDC].includes(lower(query.to)) && ALLOWANCE.test(query.data)));
+      if (!supportedQuery) failState('Historical state queries are restricted to configured token balanceOf and USDC/hUSDC allowance calls.');
       const q = { to: lower(query.to), data: lower(query.data) }, pairKey = q.to + ':' + q.data;
       if (!pairs.has(pairKey)) {
         if (pairs.size >= MAX_PAIRS) failState('Historical measurement exceeds its 12 token/account pair limit.');

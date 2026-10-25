@@ -1,0 +1,61 @@
+{
+  "schemaVersion": "1.0",
+  "candidateId": "lifi-2024-07-16",
+  "capturedAt": "2026-10-23T15:46:22.078Z",
+  "endpoint": "https://eth.drpc.org",
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 2,
+    "method": "debug_traceCallMany",
+    "params": [
+      [
+        {
+          "transactions": [
+            {
+              "from": "0x8b3cb6bf982798fba233bca56749e22eec42dcf3",
+              "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+              "data": "0x95d89b41",
+              "value": "0x0",
+              "gas": "0x493e0",
+              "gasPrice": "0x2a761b743"
+            }
+          ]
+        }
+      ],
+      {
+        "blockNumber": {
+          "blockHash": "0x63781338b9e93916b9708787f3039244de3c7879e07b8f5df8baa841a265a3f0",
+          "requireCanonical": true
+        },
+        "transactionIndex": 168
+      },
+      {
+        "tracer": "callTracer",
+        "timeout": "20s",
+        "tracerConfig": {
+          "withLog": true
+        }
+      }
+    ]
+  },
+  "httpStatus": 200,
+  "responseBodySha256": "dc6933d871cc3498055866593f5d782e9e2b96037d35ae2ad2e0222b8d3869ef",
+  "response": {
+    "id": 2,
+    "jsonrpc": "2.0",
+    "result": [
+      [
+        {
+          "from": "0x8b3cb6bf982798fba233bca56749e22eec42dcf3",
+          "gas": "0x493e0",
+          "gasUsed": "0x6026",
+          "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "input": "0x95d89b41",
+          "output": "0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000045553445400000000000000000000000000000000000000000000000000000000",
+          "value": "0x0",
+          "type": "CALL"
+        }
+      ]
+    ]
+  }
+}

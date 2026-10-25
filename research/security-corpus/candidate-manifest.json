@@ -1,20 +1,22 @@
 {
-  "schemaVersion": "1.0",
+  "schemaVersion": "1.1",
   "createdAt": "2026-10-23T14:54:07Z",
-  "status": "research_candidates_not_a_benchmark",
+  "status": "research_candidates_and_development_effects_reference",
   "purpose": "Prepare defensible incident-level evaluation candidates without conflating execution facts, permissions, signer intent, and retrospective maliciousness labels.",
   "counts": {
     "candidates": 3,
-    "admittedCases": 0,
+    "admittedCases": 1,
+    "admittedDevelopmentEffectsCases": 1,
+    "admittedSecurityBenchmarkCases": 0,
     "evaluatedCases": 0,
     "blindHeldOutCases": 0
   },
   "featureLeakagePolicy": "Sources and labels were inspected during research. None of these cases is a sealed blind holdout. If implementation is tuned using a case, move the whole incident family to development; independent custodians must curate a fresh sealed evaluation split.",
   "observedFactsLimits": [
-    "Receipt decoding uses ERC20 event structure and exact integers.",
-    "No event total is asserted to be an independently measured balance change.",
+    "Receipt events and independently queried state are distinct evidence types.",
+    "The admitted LI.FI reference has original-position state evidence from one successful archive provider; remaining candidates still have metadata/event research only.",
     "A successful transaction or valid signature is not proof of informed consent.",
-    "No live phishing site, malware package, signing, simulation, or transaction broadcast was accessed in this research."
+    "Only public read-only RPC and offline analysis were used; no signing, broadcast, live phishing site or malicious package was needed."
   ],
   "candidateTasksSeparate": [
     "historical_execution_fidelity",
@@ -25,10 +27,10 @@
   ],
   "candidates": [
     {
-      "admissionStatus": "candidate_not_admitted",
-      "futureSplit": "candidate_holdout_not_sealed",
+      "admissionStatus": "admitted_development_effects_reference_only",
+      "futureSplit": "development_incident_family_exposed",
       "currentEngineSupported": false,
-      "observedFactsBasis": "Public Ethereum JSON-RPC transaction, receipt, and block; no trace or balance snapshots captured.",
+      "observedFactsBasis": "Public original transaction, receipt and block; complete trace, full prestate/diff, runtime identities and separate exact-position USDT balance/allowance queries. One successful archive provider; two internal reviews.",
       "sourceFactsAreNotDetectorFeatures": true,
       "labelConfidenceScale": "high = strong incident attribution with public chain corroboration; medium = chain facts strong but maliciousness/mechanism still needs corroboration. Neither means a blind or statistically valid test.",
       "id": "lifi-2024-07-16",
@@ -122,8 +124,8 @@
         }
       ],
       "evaluation": {
-        "eligibleTaskAfterAdmission": "historical_execution_and_multiactor_harm_detection",
-        "notEligibleFor": "victim_wallet_presign_detection_without_original_prior_approval_request",
+        "eligibleTaskAfterAdmission": "development_execution_and_USDT_effects_reference_only",
+        "notEligibleFor": "general_security_scoring_or_victim_presign_detection",
         "perspectives": [
           {
             "role": "transaction_submitter",
@@ -151,18 +153,84 @@
         ]
       },
       "uncertainties": [
-        "No archive replay or before/after balances were captured in this research task.",
-        "The receipt contains a token event, not independently measured balance loss.",
-        "Top-level recipient is 0x986a...c240; nested LI.FI execution needs trace confirmation.",
-        "Original victim approval transaction, original UI intent, and approval-time reputation are missing."
+        "One successful archive execution provider; no state proofs or source recompilation.",
+        "Keep the complete original wrapper transaction, including temporary CREATE/SELFDESTRUCT paths.",
+        "The query wrapper native-fee variation is not resolved; token effects are the admitted scope.",
+        "Permission exercise did not reduce numeric maximum allowance; do not invent consumption or a new owner approval.",
+        "Original victim signing intent and matched legitimate controls remain unavailable."
       ],
       "admissionGates": [
-        "Independent reviewer confirms primary source-to-transaction attribution.",
-        "Capture and hash trace, bytecode/proxy implementations, and exact prestate artifacts.",
-        "Confirm victim token outflow and consumed spender allowance independently of Transfer events.",
-        "Retain attacker and victim perspectives as distinct records.",
-        "Keep case out of aggregate scoring until required task-specific inputs exist."
-      ]
+        {
+          "gate": "Separate chain and primary-attribution review",
+          "status": "complete_internal_reviews",
+          "externalHumanReview": false
+        },
+        {
+          "gate": "Retain trace, runtime/proxy identity and original-position state evidence",
+          "status": "complete_with_recorded_single_provider_limits"
+        },
+        {
+          "gate": "Verify affected-owner loss and actual final allowance",
+          "status": "complete_maximum_allowance_unchanged"
+        },
+        {
+          "gate": "Keep owner and submitter perspectives distinct",
+          "status": "complete"
+        },
+        {
+          "gate": "Aggregate security scoring and victim pre-sign evaluation",
+          "status": "not_admitted_required_inputs_missing"
+        }
+      ],
+      "developmentReference": {
+        "admissionRecord": "reviews/lifi-2024-07-16-admission.json",
+        "artifacts": [
+          {
+            "path": "reviews/lifi-2024-07-16-independent-chain-review.json",
+            "sha256": "110dc68d6fc8f4b4cd8475dd2d724ffcc1c0847660a4277e107ceda82881fcb7"
+          },
+          {
+            "path": "reviews/lifi-2024-07-16-independent-label-review.json",
+            "sha256": "b1405d9bad3971a736c27015805f052163d4880126b56527c0b9c505b81d9918"
+          },
+          {
+            "path": "../../reports/security-validation/lifi-2024-07-16/validation.json",
+            "sha256": "4da1fd173499395694a1870ae093ecd56d05d11a4560ce45b109fee65acf7a40"
+          },
+          {
+            "path": "../../reports/security-validation/lifi-2024-07-16/effects-oracle.json",
+            "sha256": "93209698f448ca8a0d8f60573d5eb8abb60c4cfbdd934be15a38986d00147c32"
+          },
+          {
+            "path": "../../reports/security-validation/lifi-2024-07-16/feature-input.json",
+            "sha256": "4135fb0c6513948489694106abd4f54163728bddb80e9fb1ebfc5e79554fea74"
+          },
+          {
+            "path": "../../reports/security-validation/lifi-2024-07-16/bytecode-identities.json",
+            "sha256": "f2ba78b7509db13bdbe0d7819e0e16b7ebcf4a8a847794d4597d8a268c83f2c4"
+          }
+        ],
+        "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "ownerBalance": {
+          "beforeRaw": "2276295880553",
+          "afterRaw": "0",
+          "deltaRaw": "-2276295880553"
+        },
+        "submitterBalance": {
+          "beforeRaw": "5383523674",
+          "afterRaw": "2281679404227",
+          "deltaRaw": "2276295880553"
+        },
+        "allowance": {
+          "owner": "0xabe45ea636df7ac90fb7d8d8c74a081b169f92ef",
+          "spender": "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae",
+          "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+          "afterRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+          "changed": false
+        },
+        "currentEngineSupported": false,
+        "scored": false
+      }
     },
     {
       "admissionStatus": "candidate_not_admitted",
@@ -486,6 +554,6 @@
       "sourceId": "permit-certik-alert-unread",
       "status": "not_read_not_used_as_corroboration"
     }
-  ]
+  ],
+  "updatedAt": "2026-10-25T15:36:10.606Z"
 }
-

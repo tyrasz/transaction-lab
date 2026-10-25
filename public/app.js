@@ -113,7 +113,7 @@ function measuredAllowance(changes, evidence) {
 
 function allowanceChangeLabel(pair) {
   if (pair.changed === false) return pair.afterKind === 'uint256_max' ? 'Maximum allowance unchanged'
-    : pair.afterKind === 'zero' ? 'Zero allowance unchanged · no-op' : 'Allowance unchanged';
+    : pair.afterKind === 'zero' ? 'Final allowance unchanged at zero' : 'Allowance unchanged';
   if (pair.changed !== true) return 'Allowance change not established';
   if (pair.afterKind === 'zero') return 'Allowance reduced to zero';
   if (pair.beforeKind === 'zero') return pair.afterKind === 'uint256_max' ? 'New maximum allowance' : 'New bounded allowance';
@@ -130,10 +130,11 @@ function renderAllowances(changes, permissions, historical = false) {
   $('allowance-warnings').replaceChildren();
   if (!changes) return;
   const measured = changes.status === 'measured';
+  const historicalMeasured = measured && changes.basis === 'historical_transaction_position_allowance';
   $('allowances-section').classList.toggle('measured', measured);
-  $('allowances-badge').textContent = measured ? 'Before / after' : titleCase(changes.status);
+  $('allowances-badge').textContent = historicalMeasured ? 'Original transaction position' : measured ? 'Before / after' : titleCase(changes.status);
   $('allowances-description').textContent = measured
-    ? 'Allowance values read before and after the entire simulated transaction. Measurements apply only to the token, owner, and spender pairs below. Spender trustworthiness is not assessed.'
+    ? historicalMeasured ? 'Allowances read immediately before and after the original transaction, at its position in the original block. Measurements apply only to the token, owner, and spender pairs below. Spender trustworthiness is not assessed.' : 'Allowance values read before and after the entire simulated transaction. Measurements apply only to the token, owner, and spender pairs below. Spender trustworthiness is not assessed.'
     : changes.status === 'not_applicable'
       ? historical ? 'Historical allowance state is not measured. Approval requests and emitted events do not establish the final allowance; measured historical balances are separate evidence.' : 'Allowance measurement does not apply to this execution. Requests and emitted events do not establish final allowance state.'
       : 'Final allowances could not be measured. Missing measurements do not mean zero permission or a successful revocation.';
@@ -154,6 +155,10 @@ function renderAllowances(changes, permissions, historical = false) {
     addDefinition(details, 'Before / after raw', `${display(pair.beforeRaw)} → ${display(pair.afterRaw)}`);
     addDefinition(details, 'Event comparison', pair.consistency?.eventComparison ? readableKey(pair.consistency.eventComparison) : null);
     addDefinition(details, 'Request comparison', pair.consistency?.requestComparison ? readableKey(pair.consistency.requestComparison) : null);
+    if (historicalMeasured) {
+      addDefinition(details, 'Original block', changes.executionIdentity?.blockNumber);
+      addDefinition(details, 'Transaction / post-state index', `${display(changes.executionIdentity?.transactionIndex)} → ${display(changes.executionIdentity?.postTransactionIndex)}`);
+    }
     card.append(details);
     if (pair.consistency?.explanation) card.append(node('p', 'measurement-note', pair.consistency.explanation));
     $('allowance-pairs').append(card);
@@ -336,28 +341,30 @@ function renderPermissions(permissions, allowanceChanges) {
   if (!observations.length && !findings.length) return;
   const hasMeasuredPairs = allowanceChanges?.status === 'measured' && allowanceChanges.allowances?.length;
   $('permissions-description').textContent = hasMeasuredPairs
-    ? 'Approval requests and emitted events are shown separately. Final simulated allowances are measured only for the exact pairs identified above. Spender reputation and general transaction security remain not assessed.'
-    : 'Approval requests and emitted events are shown separately. Final allowances are not measured for these observations. Spender reputation and general transaction security remain not assessed.';
+    ? 'Approval and permit requests are shown separately from emitted events. Final allowances are measured only for the exact pairs identified above. Spender reputation and general transaction security remain not assessed.'
+    : 'Approval and permit requests are shown separately from emitted events. Final allowances are not measured for these observations. Spender reputation and general transaction security remain not assessed.';
   for (const finding of findings) {
     const card = node('div', 'permission-finding');
     const label = finding.code === 'MAX_UINT256_APPROVAL_EVENT' ? 'Maximum allowance reported in an event'
-      : finding.code === 'MAX_UINT256_APPROVAL_REQUEST' ? 'Maximum allowance requested'
+      : ['MAX_UINT256_APPROVAL_REQUEST','MAX_UINT256_PERMIT_REQUEST'].includes(finding.code) ? 'Maximum allowance requested'
+      : finding.code === 'PERMIT_UNBOUNDED_DEADLINE' ? 'Permit has no bounded redemption deadline'
       : finding.code === 'APPROVAL_EVENT_MISMATCH' ? 'Request and event do not match'
       : 'Approval evidence to review';
     const measured = measuredAllowance(allowanceChanges, finding);
     let message = finding.message || 'Review the recorded permission evidence.';
-    if (measured && finding.code === 'MAX_UINT256_APPROVAL_REQUEST') message = `The call requested the maximum uint256 allowance for spender ${finding.spender}, but no matching Approval event was observed. The final simulated allowance for this token, owner, and spender was measured separately. Spender trustworthiness is not assessed.`;
+    if (measured && ['MAX_UINT256_APPROVAL_REQUEST','MAX_UINT256_PERMIT_REQUEST'].includes(finding.code)) message = `The call requested the maximum uint256 allowance for spender ${finding.spender}, but no matching Approval event was observed. The final allowance after the whole transaction for this token, owner, and spender was measured separately. Spender trustworthiness is not assessed.`;
     card.append(node('strong', '', label), node('p', '', message));
     if (measured) card.append(node('p', 'measured-permission-note', `${allowanceChangeLabel(measured)}. Measured after: ${exactAmount(measured.after, measured.afterRaw, measured.asset?.symbol)}.`));
     $('permission-findings').append(card);
   }
   for (const observation of observations) {
     const card = node('div', 'permission-observation');
-    const requested = observation.kind === 'approval_request';
+    const permit = observation.kind === 'permit_request';
+    const requested = observation.kind === 'approval_request' || permit;
     const emitted = observation.kind === 'approval_event';
     const verified = observation.tokenVerified === true && (requested || emitted);
     const heading = node('div', 'permission-heading');
-    const title = requested ? 'Requested approval' : emitted ? 'Emitted Approval event' : 'Unverified permission signature';
+    const title = permit ? 'Permit authorization request' : requested ? 'Requested approval' : emitted ? 'Emitted Approval event' : 'Unverified permission signature';
     heading.append(node('h4', '', title), node('span', 'basis-badge', verified ? observation.asset?.symbol || 'Configured token' : 'Unverified contract'));
     card.append(heading);
     const details = node('dl', 'permission-details');
@@ -369,6 +376,14 @@ function renderPermissions(permissions, allowanceChanges) {
       addDefinition(details, 'Allowance type', kind);
       addDefinition(details, 'Owner', observation.owner);
       addDefinition(details, 'Spender', observation.spender);
+      if (permit) {
+        addDefinition(details, 'Transaction submitter', observation.submitter);
+        addDefinition(details, 'Immediate permit caller', observation.permitCaller);
+        addDefinition(details, 'Submitted by owner', observation.relayed === true ? 'No · relayed transaction' : observation.relayed === false ? 'Yes' : null);
+        addDefinition(details, 'Signature redemption deadline', observation.deadlineRelation === 'unbounded' ? 'Maximum uint256 · no bounded deadline' : observation.deadlineRaw ? `${observation.deadlineRaw} Unix seconds` : null);
+        addDefinition(details, 'Deadline at execution', observation.deadlineRelation ? readableKey(observation.deadlineRelation) : null);
+        addDefinition(details, 'Independent signature verification', 'Not performed');
+      }
       addDefinition(details, requested ? 'Requested amount' : 'Event amount', observation.amount === null || observation.amount === undefined
         ? `${observation.amountRaw} raw units`
         : `${observation.amount}${observation.asset?.symbol ? ` ${observation.asset.symbol}` : ''}`);
@@ -380,12 +395,13 @@ function renderPermissions(permissions, allowanceChanges) {
         addDefinition(details, 'Event correlation', correlation);
         const returned = observation.returnStatus === 'returned_false' ? measured ? 'Returned false · use the separate final-state measurement for this pair' : 'Returned false · approval success is not established'
           : observation.returnStatus === 'returned_true' ? measured ? 'Returned true · final allowance measured separately for this pair' : 'Returned true · final allowance is not independently verified'
+          : permit && observation.returnStatus === 'empty' ? 'No return value · expected for this permit function'
           : observation.returnStatus ? readableKey(observation.returnStatus) : null;
         addDefinition(details, 'Call return', returned);
       } else addDefinition(details, 'Request correlation', observation.matchedRequestIds?.length
-        ? 'Matches observed approve calldata' : 'No matching approve request identified');
+        ? 'Matches an observed approval or permit request' : 'No matching approval or permit request identified');
       addDefinition(details, 'Final allowance', measured
-        ? `${exactAmount(measured.after, measured.afterRaw, measured.asset?.symbol)} · measured after the whole simulated transaction`
+        ? `${exactAmount(measured.after, measured.afterRaw, measured.asset?.symbol)} · measured after the whole ${allowanceChanges.basis === 'historical_transaction_position_allowance' ? 'original' : 'simulated'} transaction`
         : 'Not measured for this token, owner, and spender pair');
     } else {
       addDefinition(details, 'Selector / signature', observation.selector || observation.signature);
@@ -489,6 +505,10 @@ function renderResult(result) {
     addDefinition(details, 'Balance method', result.balanceChanges.executionIdentity?.method);
     addDefinition(details, 'Balance state', 'Before and after the original transaction, with original block context');
   }
+  if (historical && result.allowanceChanges?.status === 'measured' && result.allowanceChanges.basis === 'historical_transaction_position_allowance') {
+    addDefinition(details, 'Allowance method', result.allowanceChanges.executionIdentity?.method);
+    addDefinition(details, 'Allowance state', 'Before and after the whole original transaction, with original block context');
+  }
   addDefinition(details, 'Transaction', source.transactionHash);
   addDefinition(details, 'Run ID', result.id);
   $('timing').textContent = result.timing?.totalMs !== undefined ? `${(result.timing.totalMs / 1000).toFixed(2)}s total` : '';
@@ -525,7 +545,9 @@ function historicalRunMessage(mode, result) {
   if (mode !== 'historical_trace') return 'Execution completed. Review the balance, transfer, and permission evidence below.';
   return result.balanceChanges?.status === 'measured' && result.balanceChanges.basis === 'historical_transaction_position_balanceOf'
     ? 'Original EVM execution retrieved. Balances measured at the original transaction position; transfer logs are shown separately.'
-    : 'Original EVM execution retrieved. Review the available historical evidence and coverage limits below.';
+    : result.allowanceChanges?.status === 'measured' && result.allowanceChanges.basis === 'historical_transaction_position_allowance'
+      ? 'Original EVM execution retrieved. Allowances measured before and after the whole transaction; intermediate requests and events are shown separately.'
+      : 'Original EVM execution retrieved. Review the available historical evidence and coverage limits below.';
 }
 
 function benchmarkRows(report) {

@@ -1,0 +1,115 @@
+LI.FI evidence review — prepared for independent review, not admitted
+
+This investigation establishes a concrete development effects case from the
+attacker-submitted transaction d82fe84e...63873. It does not recover a victim's
+signing request or establish a pre-sign protection result. Existing manifest,
+PLAN, engine and UI files were not changed.
+
+Observed result
+
+On Ethereum block 20318963, transaction index 168, at 2024-07-16 12:06:35 UTC:
+
+• Owner 0xabe45ea636df7ac90fb7d8d8c74a081b169f92ef:
+  2,276,295.880553 USDT before; 0 after.
+• Submitter 0x8b3cb6bf982798fba233bca56749e22eec42dcf3:
+  5,383.523674 USDT before; 2,281,679.404227 after.
+• Owner allowance to 0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae:
+  uint256 maximum before AND after. The permission was exercised but its numeric
+  allowance did not decrease. No new owner Approval event was emitted.
+
+These are direct original-position balanceOf/allowance results, corroborated by
+the original transaction's prestate and storage diff. They are not derived only
+from Transfer logs. Values are exact integers with six decimals verified at the
+original position.
+
+Execution identity
+
+The original wrapper 0x986aca5f2ca6b120f4361c519d7a49c5ac50c240 calls the LI.FI
+diamond, which delegates to 0xf28a352377663ca134bd27b582b1a9a4dad7e534. The diamond
+then calls USDT transferFrom with the observed owner, recipient and amount.
+The complete 21-frame CallMany replay at index 168 is JSON-equal to the historical
+debug_traceTransaction response. Its three event contents match the receipt and
+gas used is 227147. The original block and receipt were rechecked.
+
+Balance/allowance probes ran in separate one-call bundles at indexes 168 and 169.
+No probes were inserted into the original transaction replay. Both header
+witnesses match number, timestamp, gas limit, base fee, prevRandao, coinbase,
+chain ID and parent hash. Query diffs show the expected original sender nonce
+and native prebalance at each position, and no token-storage or code changes.
+
+The trace also contains two temporary CREATE/SELFDESTRUCT paths. The token-like
+contract 0xf929ba2aeec16cffcfc66858a9434e194baaf80d returns approve-shaped values
+while driving those paths. Its selectors must not automatically be interpreted
+as verified ERC20 permission state. Six existing runtime bytecodes and two
+temporary CREATE outputs are retained with SHA-256 and Keccak-256 fingerprints.
+The diamond's original observed storage points to the same facet used by the
+DELEGATECALL. Source-to-runtime recompilation has not been completed.
+
+Provider limits
+
+PublicNode identified chain 1 but rejected debug_traceTransaction with -32601.
+The successful trace, full prestate, diff and position queries all came from
+Ethereum dRPC. They cross-check different RPC observations, not independent
+providers or cryptographic state proofs.
+
+Five query diffs show a nonce-only wrapper. One pre-position allowance query
+also charges the exact gas fee and beneficiary tip. Both were checked explicitly
+and leave token storage untouched. This variation is recorded, not smoothed
+away. It prevents a claim of consistent native-fee simulation on this endpoint.
+The proposed case is limited to the observed USDT effects and permissions.
+
+Attribution and feature boundary
+
+LI.FI's original postmortem identifies the incident and vulnerable facet:
+https://li.fi/knowledge-hub/incident-report-16th-july
+
+BlockSec's original research explicitly links the selected hash as an attack:
+https://blocksec.com/blog/illicit-fund-flow-case-study-lifi-attack-metasleuth
+
+These reports postdate the transaction. Their labels are retrospective review
+evidence and must never be passed as historical pre-sign detector features.
+The separate feature-input.json contains historical execution inputs, not a
+recovered signing screen. The separate effects-oracle.json contains development
+expectations; neither that oracle nor incident-named file paths belong in model
+inputs. The entire incident family is development-only once used for tuning.
+
+Files and reproduction
+
+Reports are under reports/security-validation/lifi-2024-07-16/:
+  validation.json — 71 offline evidence assertions and hashes of 28 RPC artifacts
+  bytecode-identities.json — retained code and fingerprints
+  feature-input.json — historical execution reproduction inputs
+  effects-oracle.json — narrow development expectations
+  capture.mjs — bounded public read-only capture utility, never broadcasts
+  verify.mjs — offline validation, no network calls
+
+From outputs/transaction-lab, run:
+  node reports/security-validation/lifi-2024-07-16/verify.mjs --check
+
+The offline verifier was run with Node v22.23.2 and requires @noble/hashes 2.4.0
+at work/dynamic-cctp-app/node_modules/@noble/hashes in this workspace. It uses
+createRequire rooted at work/dynamic-cctp-app/package.json to import sha3.js;
+that path is resolved relative to verify.mjs, not the invocation directory.
+This forensic utility therefore has an explicit workspace dependency and is not
+standalone. It does not add a dependency to the transaction-lab core. A reviewer
+copying this packet must also provide that dependency at the documented path or
+deliberately adapt the import to an independently installed pinned copy.
+No package was installed or fetched. Raw RPC evidence was captured on October 23,
+2026; this review was completed October 25. The assertions validate this evidence
+packet and are not a security score.
+
+Independent review still required
+
+1. Verify primary-source attribution to the exact hash, actor, diamond and facet.
+2. Inspect transaction/receipt/block identity and the original wrapper calldata.
+3. Re-run the offline checks and inspect trace equality and intermediate lifecycle.
+4. Inspect both position/header witnesses and the native-fee limitation.
+5. Independently check USDT balances, allowance and storage-slot derivations.
+6. Decide whether source recompilation and a second archive source are admission
+   requirements for this narrowly scoped development test.
+7. Approve a scoped label and split decision separately from execution evidence.
+
+Original victim approval intent, signing prompt, historical reputation and a
+matched legitimate control set remain missing. Chain 1 is outside the current
+chain-999 engine. No admission gate is marked complete by this preparer, and no
+claim of blind evaluation or security-platform superiority follows from this case.

@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "1.0",
+  "use": "development_effects_only_not_security_scoring",
+  "transactionHash": "0xd82fe84e63b1aa52e1ce540582ee0895ba4a71ec5e7a632a3faa1aff3e763873",
+  "execution": {
+    "status": "success",
+    "gasUsed": "227147"
+  },
+  "balanceChanges": [
+    {
+      "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+      "account": "0xabe45ea636df7ac90fb7d8d8c74a081b169f92ef",
+      "beforeRaw": "2276295880553",
+      "afterRaw": "0",
+      "deltaRaw": "-2276295880553"
+    },
+    {
+      "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+      "account": "0x8b3cb6bf982798fba233bca56749e22eec42dcf3",
+      "beforeRaw": "5383523674",
+      "afterRaw": "2281679404227",
+      "deltaRaw": "2276295880553"
+    }
+  ],
+  "allowances": [
+    {
+      "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+      "owner": "0xabe45ea636df7ac90fb7d8d8c74a081b169f92ef",
+      "spender": "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae",
+      "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+      "afterRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+      "changed": false,
+      "kind": "uint256_max"
+    }
+  ],
+  "semanticRequirements": [
+    "Keep submitting and affected accounts separate.",
+    "Do not infer a new owner approval or numerical allowance consumption from the transfer.",
+    "Do not assign ERC20 semantics to the unverified token-like contract 0xf929ba2aeec16cffcfc66858a9434e194baaf80d solely from selectors.",
+    "Retain intermediate CREATE and SELFDESTRUCT behavior even if final account diffs omit the temporary contracts."
+  ],
+  "labelInputPolicy": "This oracle is retrospective development ground truth. Do not pass it, source reports, incident labels, or file paths into detector inputs."
+}

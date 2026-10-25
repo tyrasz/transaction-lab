@@ -1,0 +1,235 @@
+{
+  "schemaVersion": "1.0",
+  "kind": "development_historical_permission_http_capture",
+  "capturedAt": "2026-10-25T15:26:52.549Z",
+  "sourceFingerprint": {
+    "name": "Transaction Lab",
+    "version": "0.5.0",
+    "sourceSha256": "02f8ab5584ff7ca5fabd18a2a9a969280211b54b4b14382e2091ef353738cc9f",
+    "sourceFiles": [
+      "allowances.js",
+      "analyze.js",
+      "balances.js",
+      "config.js",
+      "historical-state.js",
+      "lending.js",
+      "lending-balances.js",
+      "permissions.js",
+      "revert.js",
+      "rpc.js",
+      "server.js",
+      "state.js",
+      "validate.js"
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "2026-10-25T15-26-52-549Z-http.json",
+      "sha256": "e305f6b98a5c3ef3deee207d5b463c2f1ad8bb0cbc30577d9336084805a7f824",
+      "bytes": 4943054
+    },
+    {
+      "path": "run-http-check.mjs",
+      "sha256": "3ecc555e5f1843d962bf9b5f60101fbead86a48013aba2895397321c1e5ce394",
+      "bytes": 2557
+    },
+    {
+      "path": "2026-10-25T15-26-52-549Z-notes.md",
+      "sha256": "65d3b19365f1f2b7f62d5b2c4f46ed679eb614ecbfd4bef03f85cb2cf8ef31f8",
+      "bytes": 4938
+    }
+  ],
+  "transport": {
+    "kind": "ephemeral_local_http",
+    "route": "POST /api/replay",
+    "httpAttempts": 6,
+    "http200": 6,
+    "rpcCalls": 103,
+    "retries": 0,
+    "readOnly": true
+  },
+  "summary": {
+    "matched": 2,
+    "mismatched": 0,
+    "incomplete": 1,
+    "total": 3,
+    "runs": {
+      "planned": 6,
+      "attempted": 6,
+      "completed": 6,
+      "measured": 5,
+      "unavailable": 1,
+      "failed": 0
+    }
+  },
+  "runs": [
+    {
+      "caseId": "usdc-approve-hyperlend",
+      "provider": "drpc",
+      "providerHost": "hyperliquid.drpc.org",
+      "transactionHash": "0x371bf6c3af982636caa9874bb107a7d3d967cea340678b5dfb856ff35f9923b5",
+      "blockNumber": "36762812",
+      "blockHash": "0xe7417c655c72faa190e5ef46d246c94e9ffc995d25962567e9fbdcb6523bbf35",
+      "originalTransactionIndex": "1",
+      "status": "unavailable",
+      "rpcCalls": 8,
+      "pairs": [],
+      "reason": "dRPC canonical block-by-number transaction array disagrees with the original receipt index; original execution is retained, final allowance is unavailable."
+    },
+    {
+      "caseId": "usdc-approve-hyperlend",
+      "provider": "hyperlend-archive",
+      "providerHost": "rpc.hyperlend.finance",
+      "transactionHash": "0x371bf6c3af982636caa9874bb107a7d3d967cea340678b5dfb856ff35f9923b5",
+      "blockNumber": "36762812",
+      "blockHash": "0xe7417c655c72faa190e5ef46d246c94e9ffc995d25962567e9fbdcb6523bbf35",
+      "originalTransactionIndex": "1",
+      "status": "measured",
+      "rpcCalls": 17,
+      "pairs": [
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "owner": "0xc6bf059aabef5668c32ebeef3dae82e59d4ebc4a",
+          "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "beforeRaw": "0",
+          "afterRaw": "1660000000",
+          "deltaRaw": "1660000000",
+          "lastEventAmountRaw": "1660000000",
+          "eventComparison": "matches_last_observed_event"
+        }
+      ]
+    },
+    {
+      "caseId": "husdc-relayed-permit",
+      "provider": "drpc",
+      "providerHost": "hyperliquid.drpc.org",
+      "transactionHash": "0x8793c27ee5aa623de4e2131296ad54d4e1276dd3e5d28b7b493f4d2080f4556e",
+      "blockNumber": "47125178",
+      "blockHash": "0xacb8aa2c1c44a6833b8016a46c061bbebb40c60d33972f4667f257c447ee32f7",
+      "originalTransactionIndex": "6",
+      "status": "measured",
+      "rpcCalls": 17,
+      "pairs": [
+        {
+          "token": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "owner": "0x3e248867a2a2ddd1d901f7d595c4d02c6519b32a",
+          "spender": "0x8a0f75a499c17632e5ee6cc4156099292f3e68f9",
+          "beforeRaw": "0",
+          "afterRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+          "deltaRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+          "lastEventAmountRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+          "eventComparison": "matches_last_observed_event"
+        }
+      ]
+    },
+    {
+      "caseId": "husdc-relayed-permit",
+      "provider": "hyperlend-archive",
+      "providerHost": "rpc.hyperlend.finance",
+      "transactionHash": "0x8793c27ee5aa623de4e2131296ad54d4e1276dd3e5d28b7b493f4d2080f4556e",
+      "blockNumber": "47125178",
+      "blockHash": "0xacb8aa2c1c44a6833b8016a46c061bbebb40c60d33972f4667f257c447ee32f7",
+      "originalTransactionIndex": "6",
+      "status": "measured",
+      "rpcCalls": 17,
+      "pairs": [
+        {
+          "token": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "owner": "0x3e248867a2a2ddd1d901f7d595c4d02c6519b32a",
+          "spender": "0x8a0f75a499c17632e5ee6cc4156099292f3e68f9",
+          "beforeRaw": "0",
+          "afterRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+          "deltaRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+          "lastEventAmountRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+          "eventComparison": "matches_last_observed_event"
+        }
+      ]
+    },
+    {
+      "caseId": "usdc-router-permit-consumed",
+      "provider": "drpc",
+      "providerHost": "hyperliquid.drpc.org",
+      "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+      "blockNumber": "35204283",
+      "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+      "originalTransactionIndex": "0",
+      "status": "measured",
+      "rpcCalls": 22,
+      "pairs": [
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "owner": "0x0c71073344e27e33cb57fcb587fc412d689dfd1d",
+          "spender": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+          "beforeRaw": "0",
+          "afterRaw": "115792089237316195423570985008687907853269984665640564039457584007913104639935",
+          "deltaRaw": "115792089237316195423570985008687907853269984665640564039457584007913104639935",
+          "lastEventAmountRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+          "eventComparison": "differs_from_last_observed_event"
+        },
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "owner": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+          "spender": "0x04de1ef694923844bae419d4f832196f21767f86",
+          "beforeRaw": "0",
+          "afterRaw": "0",
+          "deltaRaw": "0",
+          "lastEventAmountRaw": "24812500",
+          "eventComparison": "differs_from_last_observed_event"
+        }
+      ]
+    },
+    {
+      "caseId": "usdc-router-permit-consumed",
+      "provider": "hyperlend-archive",
+      "providerHost": "rpc.hyperlend.finance",
+      "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+      "blockNumber": "35204283",
+      "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+      "originalTransactionIndex": "0",
+      "status": "measured",
+      "rpcCalls": 22,
+      "pairs": [
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "owner": "0x0c71073344e27e33cb57fcb587fc412d689dfd1d",
+          "spender": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+          "beforeRaw": "0",
+          "afterRaw": "115792089237316195423570985008687907853269984665640564039457584007913104639935",
+          "deltaRaw": "115792089237316195423570985008687907853269984665640564039457584007913104639935",
+          "lastEventAmountRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+          "eventComparison": "differs_from_last_observed_event"
+        },
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "owner": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+          "spender": "0x04de1ef694923844bae419d4f832196f21767f86",
+          "beforeRaw": "0",
+          "afterRaw": "0",
+          "deltaRaw": "0",
+          "lastEventAmountRaw": "24812500",
+          "eventComparison": "differs_from_last_observed_event"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "offlineTest": "../../test/permission-replay.test.js",
+    "testsPassed": 7,
+    "testsTotal": 7,
+    "fullRawEvidencePreserved": true,
+    "excludedFromEquality": [
+      "id",
+      "createdAt",
+      "timing",
+      "implementation.sourceSha256"
+    ],
+    "currentImplementationFingerprint": "independently_recomputed_from_source_files"
+  },
+  "limitations": [
+    "Development regression corpus of three reviewed public transactions; not held-out evaluation.",
+    "Two providers may share infrastructure or an execution engine.",
+    "No performance benchmark, vendor ranking or security verdict.",
+    "One provider measurement is unavailable and one transaction comparison is incomplete; neither is counted as a success.",
+    "No live retries, signatures, broadcasts or provider substitutions."
+  ]
+}

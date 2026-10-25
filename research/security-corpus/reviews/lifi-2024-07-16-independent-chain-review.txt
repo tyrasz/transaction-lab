@@ -1,0 +1,148 @@
+Independent LI.FI chain-evidence review
+
+Disposition: the narrow development-only USDT effects oracle is defensible,
+subject to a separate primary-source label and admission decision. This is not
+full Ethereum support, a security verdict or score, a victim pre-sign result,
+or a blind holdout. I made no new RPC calls and changed no existing manifests
+or evidence packets.
+
+I inspected the saved original request, signed type-2 transaction, receipt,
+complete block transaction array, trace, prestate, state diff, and every
+original-position balance/allowance request and response. I reran the
+preparer's 71 offline assertions and independently executed 91 checks recorded
+in the companion JSON. I did not rely on validation.json alone. The independent
+checks recompute the signed transaction hash, the 20-field Cancun block-header
+hash, eight runtime fingerprints, token mapping keys, and the diamond's
+dispatcher storage key. These establish internal consistency of the captured
+evidence; they do not verify trie inclusion, consensus, or signer recovery.
+
+Execution identity
+
+Transaction:
+0xd82fe84e63b1aa52e1ce540582ee0895ba4a71ec5e7a632a3faa1aff3e763873
+
+Ethereum block 20318963, original transaction index 168, post index 169.
+The original and rechecked blocks contain the same 222 unique transaction
+hashes, with this transaction at index 168. All header metadata fields agree.
+The original and rechecked receipts are structurally identical, disregarding
+JSON object-key order. The complete 21-frame replay at the original index is
+JSON-equal to the historical call trace, including child calls and gas fields.
+The receipt succeeds, uses 227147 gas, and contains the same three events in
+the same order as the trace.
+
+The actual top-level recipient is wrapper:
+0x986aca5f2ca6b120f4361c519d7a49c5ac50c240
+
+It must not be replaced with the LI.FI diamond in a reproduction request.
+Original calldata, nonce, access list, gas limit, zero native value, and
+effective gasPrice are preserved in the isolated replay. Effective gasPrice
+also reconciles the receipt, header base fee, and original type-2 fee caps.
+
+USDT effects and account attribution
+
+Affected owner:
+0xabe45ea636df7ac90fb7d8d8c74a081b169f92ef
+Before: 2276295880553 raw USDT; after: 0.
+Change: -2276295.880553 USDT.
+
+Submitting wallet and USDT recipient:
+0x8b3cb6bf982798fba233bca56749e22eec42dcf3
+Before: 5383523674 raw USDT; after: 2281679404227.
+Change: +2276295.880553 USDT.
+
+The submitter is not the affected owner. Raw USDT transferFrom calldata, the
+Transfer event, exact-position balanceOf calls, and independently derived
+storage slots corroborate these distinct roles and amounts. Six decimals,
+symbol USDT, and inactive deprecation forwarding were queried at the original
+position. This establishes observed effects, not informed victim intent.
+
+The owner's allowance to diamond:
+0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae
+is uint256 maximum before AND after the whole transaction. There is no USDT
+approve call and no Approval event anywhere in the receipt. Permission was
+exercised without a numerical allowance reduction. The approve-shaped calls
+instead target unverified token-like contract:
+0xf929ba2aeec16cffcfc66858a9434e194baaf80d
+Those selectors must not become verified ERC20 permission observations.
+
+Original-position query evidence
+
+All six balance/allowance reads are independent one-call bundles at indexes
+168 or 169 under the original canonical block hash and effective gasPrice.
+No read was prepended to the original transaction or another query. Each
+state-diff probe uses the same isolated call and position as its paired view.
+The sender nonce is 8 before and 9 after the original transaction, with the
+matching native prebalance in each read diff. Query diffs contain no token
+storage/code changes. Every token read succeeds directly with one uint256
+output and no child calls or logs.
+
+Two isolated temporary-code witnesses return the original number, timestamp,
+gas limit, base fee, prevRandao, coinbase, chain ID and parent hash. I checked
+their bytecode and pinned requests as well as the returned words.
+
+Independently hashing the conventional USDT mapping keys yields:
+Owner balance:
+0x82a012be0f33fffbd277b684d1a58b1e4beb67b3d7d686a655bad49c2663331c
+Recipient balance:
+0x5954731bd05ccc7d60b6beaf5cfca14720f119ee611227ef81aa441b9eb61757
+Owner-to-diamond allowance:
+0xaf02e83ea95bdd931aa0d9240494aae130bd70b5db85730610419af765eeeb6d
+
+The original prestate and diff corroborate the balance clearing and credit;
+the unchanged maximum allowance is present in original full prestate and
+absent from changed storage. Mapping interpretation is corroboration of the
+direct reads, not a compiler-to-runtime or cryptographic state proof.
+
+Code identity and temporary lifecycle
+
+The captured diamond runtime masks the first four calldata bytes, combines
+the padded selector with its fixed storage slot, hashes the pair and SLOADs
+the result. Independently deriving the key for selector 0x3d86ea87 gives:
+0xa5b9829b98c8de228bae21a0c67c7edd99079f381fed21392089a89b91e158f5
+Its value and the actual DELEGATECALL both identify facet:
+0xf28a352377663ca134bd27b582b1a9a4dad7e534
+
+All six existing runtimes and both temporary CREATE outputs match their saved
+SHA-256 and Keccak-256 fingerprints. This is execution provenance. No source
+compilation or immutable source revision was independently verified.
+
+Two temporary contracts are created, called with one wei each, and then
+self-destruct to the diamond within the same transaction. The diamond passes
+two wei onward. Both temporary accounts are absent from the final pre/post
+diff. Unchanged final account sets or absent post.code alone therefore cannot
+establish that no intermediate creation/deletion occurred. Preserve the full
+trace and its lifecycle limitations in any fixture or coverage result.
+
+Native-fee limitation and provider dependence
+
+Five read diffs report nonce-only effects; the pre-position allowance query
+reports the exact effective gas fee and beneficiary tip. The original
+transaction's fee and tip independently reconcile, but the query wrappers
+are inconsistent. Direct token reads and original token storage corroborate
+the narrow USDT oracle. They do not establish arbitrary-contract native-balance,
+gas-context, or fee fidelity. Do not weaken production historical-context
+validation merely to force this case through the current engine.
+
+Only dRPC supplies successful execution/state/position evidence. PublicNode
+supplies transaction metadata and chain ID but returns -32601 for the requested
+transaction tracers. There are no Merkle proofs or independent execution-client
+results. The companion JSON fingerprints 33 retained JSON artifacts, including
+the original transaction metadata packet. Stored responseBodySha256 fields
+cannot independently reconstruct original JSON whitespace from parsed data.
+
+A second archive execution source and reproducible compilation would improve
+corroboration, but are not admission requirements I would impose on this
+explicitly limited single-provider development effects regression. Primary
+incident attribution is outside this chain review and requires the separate
+source review and admission decision.
+
+Use boundary
+
+Use only the recorded USDT effects, separate account roles, unchanged maximum
+allowance, and lifecycle/selector interpretation requirements. Keep incident
+labels, postmortems, effects-oracle contents and incident-bearing file paths
+out of detector inputs. The full incident family belongs to development after
+exposure. The missing victim approval intent/signing screen, matched legitimate
+controls and untouched incidents prevent claims of victim pre-sign performance
+or blind security evaluation. This evidence does not add chain-1 coverage to
+the current chain-999 engine.

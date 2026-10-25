@@ -4,14 +4,14 @@ Build a transaction-preview and security system that can demonstrate stronger re
 
 ## Current foundation
 
-The current implementation covers HyperEVM Hyperlend USDC supply, withdrawal, variable-rate borrowing and repayment, with separate debt accounting and final USDC/hUSDC allowance measurements. It preserves raw evidence and uses shared pinned-state reconstruction for current balance reads. Historical balances are measured at the original transaction position, with independent execution and query validation. Fourteen offline regression cases (ten observed, four synthetic), twelve live API checks, seven same-block comparisons and four historical two-provider comparisons form the development checks. See STATUS.md for the latest completed results; these are not general accuracy or security scores.
+The current implementation covers HyperEVM Hyperlend USDC supply, withdrawal, variable-rate borrowing and repayment, with separate debt accounting and final USDC/hUSDC allowance measurements. It preserves raw evidence and uses shared pinned-state reconstruction for current balance reads. Historical balances and observed USDC/hUSDC allowances are measured at the original transaction position, with independent execution and query validation. Standard ERC-2612 permits preserve owner, external sender, immediate caller and deadline distinctions, with separate whole-transaction final allowances. Fourteen offline regression cases (ten observed, four synthetic), twelve live API checks, seven same-block comparisons and four historical two-provider comparisons form the development checks. See STATUS.md for the latest completed results; these are not general accuracy or security scores.
 
-Historical transaction-position state uses a validated state-context method after probes demonstrated that another provider parameter was silently ignored. The next coverage targets are additional permissions and affected accounts. The three researched security incident candidates remain unadmitted and unscored; no blind holdout or detector performance claim exists. See STATUS.md for evidence and research/security-corpus/PLAN.md for admission criteria.
+Historical transaction-position state uses a validated state-context method after probes demonstrated that another provider parameter was silently ignored. The next coverage targets are additional permissions and affected accounts. Of three researched security incident candidates, LI.FI is admitted as a narrow development effects reference after separate internal chain and attribution reviews. It remains unsupported by the current chain-999 engine; no security score or blind holdout result exists. See STATUS.md for evidence and research/security-corpus/PLAN.md for admission criteria.
 
 ## Execution correctness
 
 1. Bind simulations to a recorded block hash and number, and detect a reorganization or provider state mismatch.
-2. Extend the implemented pre/post balance strategy to more assets and affected accounts, and validate historical allowance measurements. Keep transfer events, principal and accrued interest distinct from balance deltas.
+2. Extend the implemented pre/post balance strategy to more assets and affected accounts, and expand validated permission types. Keep transfer events, principal and accrued interest distinct from balance deltas.
 3. Test allowances, transfer taxes, rebases, delegated accounts, proxies, reverted subcalls, unusual logs and failed execution.
 4. Cross-check a held-out transaction corpus against independent execution engines and receipts. Preserve disagreements as failures with raw evidence.
 
@@ -19,7 +19,7 @@ Exit evidence: exact supported-asset amounts against independent state observati
 
 ## Coverage and reproducibility
 
-Add protocol adapters only with observed successful and failing examples: additional lending assets, swaps, permits, bridges and smart-account execution. Expand chains after chain-specific replay and state assumptions are documented. CoreWriter requires a separate HyperCore model; decoding an EVM action alone cannot establish its eventual HyperCore result.
+Add protocol adapters only with observed successful and failing examples: additional lending assets, swaps, alternate permits, credit delegation, bridges and smart-account execution. Expand chains after chain-specific replay and state assumptions are documented. CoreWriter requires a separate HyperCore model; decoding an EVM action alone cannot establish its eventual HyperCore result.
 
 Record input, block, engine/provider version when available, metadata provenance, output and limits for each result. Maintain separate training/development and held-out corpora. Refresh stale protocol assumptions and keep old cases as regression evidence.
 

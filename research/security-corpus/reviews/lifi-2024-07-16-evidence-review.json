@@ -1,0 +1,168 @@
+{
+  "schemaVersion": "1.0",
+  "candidateId": "lifi-2024-07-16",
+  "completedAt": "2026-10-25T15:20:39Z",
+  "evidenceCaptureWindow": { "from": "2026-10-23T15:43:27.384Z", "to": "2026-10-23T15:46:22.314Z" },
+  "reviewer": "codex-agent-build_preview_ui",
+  "status": "evidence_advancement_for_independent_review_not_admission",
+  "existingManifestModified": false,
+  "proposedUse": "Narrow development-only historical USDT effects and permission interpretation test",
+  "prohibitedClaims": [
+    "Recovered victim signing request or victim pre-sign protection result",
+    "All maximum approvals are malicious",
+    "A maximum allowance was newly granted or numerically consumed in this transaction",
+    "Two independent admission reviews completed by this evidence preparer",
+    "Blind holdout result, security detection score, or commercial superiority",
+    "Consistent native-fee simulation across the archive endpoint"
+  ],
+  "observedFacts": {
+    "chainId": 1,
+    "transactionHash": "0xd82fe84e63b1aa52e1ce540582ee0895ba4a71ec5e7a632a3faa1aff3e763873",
+    "blockNumber": "20318963",
+    "blockHash": "0x63781338b9e93916b9708787f3039244de3c7879e07b8f5df8baa841a265a3f0",
+    "transactionIndex": 168,
+    "postTransactionIndex": 169,
+    "timestamp": "2024-07-16T12:06:35Z",
+    "transactionSender": "0x8b3cb6bf982798fba233bca56749e22eec42dcf3",
+    "topLevelRecipient": "0x986aca5f2ca6b120f4361c519d7a49c5ac50c240",
+    "affectedTokenOwner": "0xabe45ea636df7ac90fb7d8d8c74a081b169f92ef",
+    "spenderDiamond": "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae",
+    "observedDelegateImplementation": "0xf28a352377663ca134bd27b582b1a9a4dad7e534",
+    "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "tokenSymbolAtPosition": "USDT",
+    "tokenDecimalsAtPosition": 6,
+    "ownerBalanceBeforeRaw": "2276295880553",
+    "ownerBalanceAfterRaw": "0",
+    "ownerDeltaRaw": "-2276295880553",
+    "ownerDelta": "-2276295.880553",
+    "senderTokenBalanceBeforeRaw": "5383523674",
+    "senderTokenBalanceAfterRaw": "2281679404227",
+    "senderTokenDeltaRaw": "2276295880553",
+    "ownerToDiamondAllowanceBeforeRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+    "ownerToDiamondAllowanceAfterRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+    "allowanceChanged": false,
+    "receiptApprovalEventCount": 0,
+    "callTraceFrames": 21,
+    "receiptAndTraceLogs": 3,
+    "gasUsed": "227147",
+    "createFrames": 2,
+    "selfdestructFrames": 2,
+    "bytecodeRecords": 8,
+    "rpcArtifacts": 28
+  },
+  "executionEvidence": {
+    "archiveProvider": "https://eth.drpc.org",
+    "otherProvider": { "endpoint": "https://ethereum-rpc.publicnode.com", "chainIdVerified": 1, "debugTraceTransactionResult": "-32601 method unavailable" },
+    "originalReplay": "debug_traceCallMany at canonical block hash, transaction index 168; the resulting complete call trace is JSON-equal to debug_traceTransaction",
+    "balanceAndAllowanceReads": "Separate one-call bundles at transaction indexes 168 and 169; no probes were inserted into the original transaction replay",
+    "headerWitness": "Both positions match original block number, timestamp, gas limit, base fee, prevRandao, coinbase, chain ID and parent hash",
+    "queryIdentity": "Query state diffs corroborate sender nonce 8 before the original transaction and 9 after it, and exact historical sender native balance at each position",
+    "queryMutationScope": "No query changed token storage or code. Five query diffs show sender nonce only; one allowance query also shows exactly reconciled gas fee and beneficiary tip",
+    "storageCorroboration": "USDT balance mapping slot 2 and allowance mapping slot 5 derived with Keccak; prestate and diff corroborate owner balance clearing, recipient gain, and unchanged maximum allowance",
+    "proxyIdentity": "Original full prestate includes diamond runtime code and its observed selector-storage value pointing to the facet; the call trace delegates to that same facet, whose runtime is captured",
+    "codeHashes": "SHA-256 and Keccak-256 are stored for six existing contracts and two temporary CREATE outputs",
+    "sourceCompilationVerified": false,
+    "cryptographicStateProof": false,
+    "independentArchiveProviders": 1,
+    "offlineEvidenceAssertions": 71
+  },
+  "retrospectiveLabels": {
+    "proposedLabel": "documented_incident_attacker_submitted_drain",
+    "confidence": "high attribution confidence, pending independent reviewer disposition",
+    "sourceFactsSeparatedFromChainFacts": true,
+    "priorApprovalIntent": "unknown",
+    "originalVictimSigningPrompt": "not recovered",
+    "reason": "BlockSec explicitly links this exact hash as an attack example; the original protocol postmortem identifies the vulnerable facet, which is present in the original execution trace."
+  },
+  "sources": [
+    {
+      "id": "lifi-original-postmortem",
+      "url": "https://li.fi/knowledge-hub/incident-report-16th-july",
+      "publisher": "LI.FI",
+      "publishedDate": "2024-07-18",
+      "reviewedDuringUTCDate": "2026-10-23",
+      "supports": "Protocol incident attribution, omitted call validation, and Ethereum facet address",
+      "preSignFeatureEligible": false
+    },
+    {
+      "id": "blocksec-original-research",
+      "url": "https://blocksec.com/blog/illicit-fund-flow-case-study-lifi-attack-metasleuth",
+      "publisher": "BlockSec / MetaSleuth",
+      "publishedDate": "2024-10-24",
+      "reviewedDuringUTCDate": "2026-10-23",
+      "supports": "Explicit link to exact selected transaction, submitter, diamond and facet mechanism",
+      "exactTransactionLink": "https://etherscan.io/tx/0xd82fe84e63b1aa52e1ce540582ee0895ba4a71ec5e7a632a3faa1aff3e763873",
+      "linkFetchNote": "The researcher page link target was visible; the explorer page fetch returned HTTP 403. Chain identity comes from saved RPC evidence.",
+      "preSignFeatureEligible": false
+    },
+    {
+      "id": "tether-published-contract-source",
+      "url": "https://github.com/tethercoin/USDT/blob/main/TetherToken.sol",
+      "publisher": "tethercoin",
+      "reviewedDuringUTCDate": "2026-10-23",
+      "supports": "Balance and allowance mapping interpretation and maximum-allowance behavior",
+      "limitations": "Mutable source reference; a pinned source revision and compiler-to-runtime verification remain outstanding. Raw balances and allowances are established by captured historical contract calls."
+    },
+    {
+      "id": "geth-tracer-semantics",
+      "url": "https://geth.ethereum.org/docs/developers/evm-tracing/built-in-tracers",
+      "publisher": "go-ethereum",
+      "supports": "Call frame semantics, prestate/diff meaning, and storage clearing representation",
+      "limitations": "Documentation is not a cryptographic authenticity proof for a provider response."
+    },
+    {
+      "id": "erigon-callmany-api",
+      "url": "https://docs.erigon.tech/interacting-with-erigon/debug",
+      "publisher": "Erigon",
+      "supports": "CallMany bundle and execution-context interface",
+      "limitations": "Endpoint behavior was checked with explicit witnesses; native fee behavior differed between recorded queries."
+    }
+  ],
+  "artifactRoot": "../../../reports/security-validation/lifi-2024-07-16/",
+  "reproductionDependencies": {
+    "nodeVersionUsed": "v22.23.2",
+    "package": "@noble/hashes",
+    "packageVersionUsed": "2.4.0",
+    "importedModule": "@noble/hashes/sha3.js",
+    "workspacePackagePath": "work/dynamic-cctp-app/node_modules/@noble/hashes",
+    "requireAnchorRelativeToVerifier": "../../../../../work/dynamic-cctp-app/package.json",
+    "standalone": false,
+    "networkRequiredForVerification": false,
+    "packageInstalledDuringThisReview": false,
+    "scope": "Offline forensic verifier only; transaction-lab core remains dependency-free.",
+    "portabilityRequirement": "Provide the pinned existing dependency at the documented workspace path, or deliberately adapt the verifier import to an independently installed pinned copy."
+  },
+  "artifacts": [
+    { "file": "validation.json", "sha256": "4da1fd173499395694a1870ae093ecd56d05d11a4560ce45b109fee65acf7a40" },
+    { "file": "bytecode-identities.json", "sha256": "f2ba78b7509db13bdbe0d7819e0e16b7ebcf4a8a847794d4597d8a268c83f2c4" },
+    { "file": "feature-input.json", "sha256": "4135fb0c6513948489694106abd4f54163728bddb80e9fb1ebfc5e79554fea74" },
+    { "file": "effects-oracle.json", "sha256": "93209698f448ca8a0d8f60573d5eb8abb60c4cfbdd934be15a38986d00147c32" },
+    { "file": "capture.mjs", "sha256": "3668e93e99df88c852a216863532a7a14c96a9b257ce7754f754993f59ff5579" },
+    { "file": "verify.mjs", "sha256": "5d0f37894b11390da5785ee53a9c6493df883055134c1cb13fcc3ce1910e64a9" }
+  ],
+  "featureBoundary": {
+    "featureFile": "feature-input.json",
+    "featureFileMeaning": "Historical execution reproduction inputs, not a recovered victim signing request. Original block context and effective gas price are historical execution facts, not a claim of knowledge at a victim signing screen.",
+    "excluded": ["Incident reports", "Retrospective maliciousness labels", "Affected-owner role labels", "Effects oracle", "Contemporary explorer reputation", "Incident-named file paths"],
+    "expectedEffectsFile": "effects-oracle.json",
+    "split": "development_only_after_review_never_blind_holdout"
+  },
+  "independentReviewerChecklist": [
+    { "id": "label", "status": "pending_independent_record", "action": "Open both original reports and verify the exact hash/actor/diamond/facet attribution; approve only the retrospective attacker-submitted-drain label." },
+    { "id": "identity", "status": "pending_independent_record", "action": "Verify transaction, receipt, canonical block array index 168, timestamp and original wrapper calldata; do not substitute the diamond for the top-level recipient." },
+    { "id": "execution", "status": "pending_independent_record", "action": "Run verify.mjs --check offline and inspect the 21-frame replay equality, three matching logs, 227147 gas and CREATE/SELFDESTRUCT paths." },
+    { "id": "position", "status": "pending_independent_record", "action": "Inspect both header witnesses, index 168/169 query requests, nonce/native-prebalance corroboration and both observed native query-wrapper behaviors." },
+    { "id": "effects", "status": "pending_independent_record", "action": "Independently verify USDT owner loss, submitter gain and unchanged maximum allowance; verify storage slot derivations against the retained bytecode/source evidence." },
+    { "id": "code", "status": "pending_independent_record", "action": "Inspect original prestate runtime bytecode hashes and observed diamond-to-facet storage/delegate identity. Decide whether pinned source compilation and a second archive provider are required for the proposed narrow test." },
+    { "id": "scope", "status": "pending_independent_record", "action": "Keep source labels and the oracle outside detector inputs, record current chain-1/unknown-token/intermediate-lifecycle coverage gaps, and do not score victim pre-sign detection." }
+  ],
+  "remainingGaps": [
+    "Independent reviewer records and an explicit admission decision are still required.",
+    "Only one archive provider supplied execution/state evidence; no Merkle proofs or independent execution client were verified.",
+    "Source-to-runtime reproducible compilation and immutable source revision pinning are not completed.",
+    "The original victim approval transaction, signing prompt, informed intent and historical reputation snapshot are absent.",
+    "No matched legitimate control set has been admitted.",
+    "The current chain-999 engine does not support this chain-1 transaction; the evidence does not silently extend engine coverage.",
+    "Native query fee behavior was inconsistent across captured calls; this evidence supports narrow token effects, not a generalized native-balance simulator."
+  ]
+}

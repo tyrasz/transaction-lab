@@ -8,11 +8,11 @@ const ADDRESS = /^0x[0-9a-f]{40}$/i;
 const MAX_PAIRS = 8;
 const MAX_OBSERVATIONS = 256;
 const allowanceKind = amount => amount === 0n ? 'zero' : amount === UINT256_MAX ? 'uint256_max' : 'bounded';
-const observationKey = observation => JSON.stringify([observation.id, observation.kind, observation.asset?.address, observation.owner, observation.spender, observation.amountRaw, observation.framePath, observation.logIndex ?? null, observation.returnStatus ?? null]);
+const observationKey = observation => JSON.stringify([observation.id, observation.kind, observation.asset?.address, observation.owner, observation.spender, observation.amountRaw, observation.framePath, observation.logIndex ?? null, observation.returnStatus ?? null, observation.deadlineRaw ?? null, observation.submitter ?? null, observation.permitCaller ?? null]);
 
 function compareEvidence(observations, finalValue) {
   const events = observations.filter(o => o.kind === 'approval_event');
-  const requests = observations.filter(o => o.kind === 'approval_request');
+  const requests = observations.filter(o => ['approval_request', 'permit_request'].includes(o.kind));
   let lastEvent;
   let eventComparison = 'no_event';
   if (events.length === 1) lastEvent = events[0];
@@ -36,8 +36,9 @@ function compareEvidence(observations, finalValue) {
 
 /** Measure final allowance state for verified permission pairs in one successful EVM call. */
 export async function measureAllowances({ request, trace, block, rpc, metadata = {}, analysis, permissions, stateContext }) {
+  const historical = stateContext?.allowanceMeasurementBasis === 'historical_transaction_position_allowance';
   const base = {
-    status: 'not_applicable', basis: 'prestate_diff_allowance', allowances: [],
+    status: 'not_applicable', basis: historical ? 'historical_transaction_position_allowance' : 'prestate_diff_allowance', allowances: [],
     warnings: [], evidence: { request: [], response: [] },
     limits: { maxPairs: MAX_PAIRS, maxPermissionObservations: MAX_OBSERVATIONS },
   };
@@ -46,16 +47,18 @@ export async function measureAllowances({ request, trace, block, rpc, metadata =
   }
   let context;
   const warnings = [
-    'Allowances are queried before and after the entire simulated transaction at one pinned block hash. They are not inferred from individual Approval events.',
+    historical
+      ? 'Allowances are queried independently immediately before and after the original transaction at its exact position in the original block. They are not inferred from individual Approval events or permit requests.'
+      : 'Allowances are queried before and after the entire simulated transaction at one pinned block hash. They are not inferred from individual Approval events.',
     'Maximum allowance describes spending permission, not spender trustworthiness. No transaction security verdict is provided.',
   ];
   try {
     if (trace.value !== undefined && uint(trace.value) !== uint(request.value)) failState('Trace value differs from the unsigned call; allowance candidates were withheld.');
     // Re-derive candidates from the trace so stale or forged observations cannot
     // reintroduce failed subtrees, selector collisions, or unknown token contracts.
-    const checked = analyzePermissions({ request, trace, metadata });
+    const checked = analyzePermissions({ request, trace, block, metadata });
     if (checked.observations.length > MAX_OBSERVATIONS) failState('Permission evidence exceeds the configured 256-observation measurement limit.');
-    const observations = checked.observations.filter(o => o.tokenVerified === true && VERIFIED_TOKENS.has(o.asset?.address) && ['approval_request', 'approval_event'].includes(o.kind));
+    const observations = checked.observations.filter(o => o.tokenVerified === true && VERIFIED_TOKENS.has(o.asset?.address) && ['approval_request', 'permit_request', 'approval_event'].includes(o.kind));
     if (!observations.length) return { ...base, warnings: ['No successful, verified USDC or hUSDC permission pairs were observed in this trace.'] };
     if (permissions !== undefined) {
       if (!Array.isArray(permissions?.observations)) failState('Supplied permission observations are malformed.');

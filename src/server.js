@@ -123,7 +123,7 @@ export async function simulate(input, rpc) {
   const trace = await rpc.call(traceRequest.method, traceRequest.params);
   validateRootTrace(trace, request);
   const analysis = analyzeTrace({request, trace, block, metadata:METADATA, mode:'simulation'});
-  const permissions = analyzePermissions({request,trace,metadata:METADATA});
+  const permissions = analyzePermissions({request,trace,block,metadata:METADATA});
   const stateContext = createStateContext({request,block,rpc});
   const balanceMethod = ['withdraw','borrow','repay'].includes(analysis.protocol?.operation) ? measureLendingBalances : measureBalances;
   const [balanceResult,allowanceResult] = await Promise.all([
@@ -178,18 +178,22 @@ export async function replay(input, rpc) {
     throw new RpcError('The transaction receipt changed during historical tracing.', 'TRANSACTION_CHANGED');
   }
   const analysis = analyzeTrace({request,trace,block,metadata:METADATA,mode:'historical_trace'});
-  const permissions = analyzePermissions({request,trace,metadata:METADATA});
-  includePermissionCoverage(analysis,permissions);
+  const permissions = analyzePermissions({request,trace,block,metadata:METADATA});
   const stateContext = createHistoricalStateContext({request,block,rpc,transaction:tx,receipt,trace});
   const balanceMethod = ['withdraw','borrow','repay'].includes(analysis.protocol?.operation) ? measureLendingBalances : measureBalances;
-  const {evidence:balanceEvidence,...balanceChanges} = await balanceMethod({request,block,rpc,metadata:METADATA,analysis,stateContext});
+  const [balanceResult,allowanceResult] = await Promise.all([
+    balanceMethod({request,block,rpc,metadata:METADATA,analysis,stateContext}),
+    measureAllowances({request,trace,block,rpc,metadata:METADATA,analysis,permissions,stateContext}),
+  ]);
+  const {evidence:balanceEvidence,...balanceChanges} = balanceResult;
+  const {evidence:allowanceEvidence,...allowanceChanges} = allowanceResult;
+  includePermissionCoverage(analysis,permissions,allowanceChanges);
   return {
     schemaVersion:'1.0',implementation,id:randomUUID(),createdAt:new Date().toISOString(),request,
     source:{provider:rpc.provider,chainId:999,blockNumber:block.number,blockHash:block.hash,timestamp:block.timestamp,mode:'historical_trace',blockBinding:'transaction_hash',transactionHash,transactionIndex:BigInt(tx.transactionIndex).toString()},
-    ...analysis,permissions,balanceChanges,
-    allowanceChanges:{status:'not_applicable',basis:null,allowances:[],warnings:['Historical allowance measurement is not implemented. This replay returns permission observations only; its balance measurements do not verify allowances.']},
+    ...analysis,permissions,balanceChanges,allowanceChanges,
     timing:{totalMs:Math.round(performance.now()-start),rpcMs:Math.round(rpc.rpcMs)},
-    evidence:{traceMethod:traceRequest.method,traceRequest,traceResponse:trace,receipt,receiptRechecked:true,balanceMeasurement:balanceEvidence},
+    evidence:{traceMethod:traceRequest.method,traceRequest,traceResponse:trace,receipt,receiptRechecked:true,balanceMeasurement:balanceEvidence,allowanceMeasurement:allowanceEvidence},
   };
 }
 

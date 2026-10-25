@@ -351,3 +351,161 @@ for (const run of measuredRuns) test(`saved live module evidence: ${run.operatio
   assert.equal(next, run.evidence.request.length);
   assert.deepEqual(context.snapshotEvidence().response, run.evidence.response, 'normal successful raw evidence is preserved');
 });
+
+const permissionSources = new Map();
+const allowanceViews = JSON.parse(await readFile(new URL('../reports/historical-permissions/view-probes.json', import.meta.url)));
+const supplyCaptures = Object.fromEntries(allowanceViews.providers[0].captures.map(capture => [capture.label, capture]));
+permissionSources.set('supply', { captures: supplyCaptures });
+for (const name of ['approve-usdc-hyperlend-verified', 'permit-husdc-direct-verified', 'router-permit-candidate-verified']) {
+  permissionSources.set(name, JSON.parse(await readFile(new URL(`../reports/permission-discovery/${name}.json`, import.meta.url))));
+}
+const allowanceRuns = [
+  ...JSON.parse(await readFile(new URL('../reports/historical-permissions/view-module-validation.json', import.meta.url))).runs.map(run => ({ ...run, sourceKey: 'supply' })),
+  ...JSON.parse(await readFile(new URL('../reports/historical-permissions/approval-module-validation.json', import.meta.url))).runs.map(run => ({ ...run, sourceKey: 'approve-usdc-hyperlend-verified', allowances: [{ token: run.request.to, owner: run.owner, spender: run.spender, ...run.allowance }] })),
+  ...JSON.parse(await readFile(new URL('../reports/historical-permissions/permit-module-validation.json', import.meta.url))).runs.map(run => ({ ...run, sourceKey: run.name })),
+];
+const allowanceQuery = pair => ({ to: pair.token, data: '0xdd62ed3e' + pair.owner.slice(2).padStart(64, '0') + pair.spender.slice(2).padStart(64, '0') });
+function permissionSetup(run, mutateResponse) {
+  const source = structuredClone(permissionSources.get(run.sourceKey));
+  const get = name => source.captures[name].response.result;
+  const args = { request: structuredClone(run.request), block: structuredClone(run.block), transaction: get('transaction'), receipt: get('receipt'), trace: get(run.sourceKey === 'supply' ? 'trace' : 'callTrace') };
+  const calls = [];
+  args.rpc = { async call(method, params) {
+    const recorded = run.evidence.request[calls.length];
+    calls.push({ method, params });
+    assert.ok(recorded, 'no unrecorded permission RPC');
+    assert.equal(method, recorded.method); assert.deepEqual(params, recorded.params);
+    const result = structuredClone(run.evidence.response.find(response => response.id === recorded.id).result);
+    return mutateResponse?.({ method, params, result, args }) ?? result;
+  } };
+  return { args, calls, context: createHistoricalStateContext(args) };
+}
+
+for (const run of allowanceRuns) test(`recorded allowance state: ${run.sourceKey} on ${new URL(run.endpoint).hostname}`, async () => {
+  const { context, calls } = permissionSetup(run);
+  assert.equal(context.allowanceMeasurementBasis, 'historical_transaction_position_allowance');
+  assert.equal(context.measurementBasis, 'historical_transaction_position_balanceOf');
+  if (run.status === 'unavailable') {
+    await assert.rejects(context.readPair(allowanceQuery(run.allowances[0])), /Canonical block identity or original transaction position/);
+    assert.equal(calls.length, 1, 'incomplete provider transaction arrays fail before replay or state queries');
+    return;
+  }
+  for (const pair of run.allowances) {
+    const observed = await context.readPair(allowanceQuery(pair));
+    for (const field of ['before', 'after', 'delta']) assert.equal(observed[field].toString(), pair[field]);
+  }
+  await context.verifyCanonical();
+  assert.deepEqual(context.snapshotEvidence().response, run.evidence.response);
+  assert.equal(calls.length, run.evidence.request.length);
+});
+
+test('allowance view ABI is strict and variable-debt allowances remain unsupported', async () => {
+  const run = allowanceRuns.find(run => run.sourceKey === 'supply');
+  const { context, calls } = permissionSetup(run);
+  const valid = allowanceQuery(run.allowances[0]);
+  const cases = [
+    { ...valid, to: VUSDC }, { ...valid, to: address(1n) },
+    { ...valid, data: valid.data + '00' }, { ...valid, data: valid.data.slice(0, -2) },
+    { ...valid, data: valid.data.slice(0, 10) + '1' + valid.data.slice(11) },
+    { ...valid, data: valid.data.slice(0, 74) + '1' + valid.data.slice(75) },
+    { ...valid, data: [valid.data] },
+  ];
+  for (const invalid of cases) await assert.rejects(context.readPair(invalid), StateValidationError);
+  assert.equal(calls.length, 0);
+});
+
+test('allowance query rejects extra implementation calls and mismatching owner/spender input', async () => {
+  const run = allowanceRuns.find(run => run.sourceKey === 'permit-husdc-direct-verified');
+  for (const mutation of ['child', 'input', 'implementation', 'after-revert']) {
+    const { context } = permissionSetup(run, ({ method, params, result }) => {
+      if (method !== 'debug_traceCallMany' || params[2].tracer !== 'callTracer' || !params[0][0].transactions[0].data.startsWith('0xdd62ed3e')) return;
+      const frame = result[0][0], implementation = frame.calls[0];
+      if (mutation === 'child') implementation.calls = [{ ...structuredClone(implementation), calls: [] }];
+      if (mutation === 'input') implementation.input = '0x70a08231' + run.allowances[0].owner.slice(2).padStart(64, '0');
+      if (mutation === 'implementation') implementation.to = address(9n);
+      if (mutation === 'after-revert' && params[1].transactionIndex === Number(BigInt(run.executionIdentity.postTransactionIndex))) implementation.error = 'execution reverted';
+      return result;
+    });
+    await assert.rejects(context.readPair(allowanceQuery(run.allowances[0])), StateValidationError);
+  }
+});
+
+test('generic router root needs original runtime code and does not authorize arbitrary queries', async () => {
+  const run = allowanceRuns.find(run => run.sourceKey === 'router-permit-candidate-verified');
+  for (const code of [undefined, '0x', ['0x6000'], '0xz1']) {
+    const { context } = permissionSetup(run, ({ method, params, result, args }) => {
+      if (method === 'debug_traceTransaction' && params[1].tracerConfig.disableStorage) { result[args.request.to] = code === undefined ? {} : { code }; return result; }
+    });
+    await assert.rejects(context.prepare(), /root runtime code/);
+  }
+  const { context, calls } = permissionSetup(run);
+  await assert.rejects(context.readPair({ to: run.request.to, data: '0x70a08231' + run.request.from.slice(2).padStart(64, '0') }), StateValidationError);
+  assert.equal(calls.length, 0);
+});
+
+test('historical measurement rejects every lifecycle type, including reverted subtrees, before RPC', async () => {
+  const run = allowanceRuns.find(run => run.sourceKey === 'router-permit-candidate-verified');
+  for (const type of ['CREATE', 'CREATE2', 'SELFDESTRUCT']) {
+    for (const failure of ['none', 'lifecycle-frame', 'parent-frame']) {
+      const { args, calls } = permissionSetup(run, ({ method, params, args }) => {
+        // A matching replay and empty final diff must not erase intermediate
+        // lifecycle evidence if a future refactor moves the early guard.
+        if (method === 'debug_traceCallMany' && params[0][0].transactions[0].to === args.request.to) return [[structuredClone(args.trace)]];
+        if (method === 'debug_traceTransaction' && params[1].tracerConfig.diffMode) return { pre: {}, post: {} };
+      });
+      const lifecycle = { type, from: address(8n), to: address(9n), input: '0x', value: '0x0', gasUsed: '0x1', ...(type === 'SELFDESTRUCT' ? {} : { output: '0x6000' }) };
+      const branch = { type: 'CALL', from: args.request.to, to: address(8n), input: '0x', value: '0x0', gasUsed: '0x2', calls: [lifecycle] };
+      if (failure === 'lifecycle-frame') lifecycle.error = 'execution reverted';
+      if (failure === 'parent-frame') branch.error = 'execution reverted';
+      args.trace.calls.push(branch);
+      const context = createHistoricalStateContext(args);
+      await assert.rejects(context.prepare(), error => error instanceof StateValidationError && /creation or destruction/.test(error.message), `${type}, ${failure}`);
+      assert.deepEqual(calls, [], 'unsupported lifecycle is rejected before replay or any provider call');
+      assert.deepEqual(context.snapshotEvidence(), { request: [], response: [] });
+      assert.equal(context.executionIdentity, null);
+    }
+  }
+});
+
+test('temporary create then selfdestruct cannot be accepted through an empty final account diff', async () => {
+  const { args, calls } = setup('borrow', ({ method, params }) => {
+    if (method === 'debug_traceTransaction') return { pre: {}, post: {} };
+    if (method === 'debug_traceCallMany' && params[0][0].transactions[0].to === args.request.to) return [[structuredClone(args.trace)]];
+  });
+  const temporary = address(9n);
+  args.trace.calls.push(
+    { type: 'CREATE', from: args.request.to, to: temporary, input: '0x6000', output: '0x6000', value: '0x0', gasUsed: '0x1' },
+    { type: 'CALL', from: args.request.to, to: temporary, input: '0x', value: '0x0', gasUsed: '0x1', calls: [
+      { type: 'SELFDESTRUCT', from: temporary, to: args.request.to, input: '0x', value: '0x0', gasUsed: '0x0' },
+    ] },
+  );
+  await assert.rejects(createHistoricalStateContext(args).readPair(query(USDC, args.request.from)), /creation or destruction/);
+  assert.deepEqual(calls, [], 'known Pool roots also reject temporary lifecycle before consulting a final-state diff');
+});
+
+test('direct permission roots require strict approve and permit ABI plus known implementation', async () => {
+  for (const key of ['approve-usdc-hyperlend-verified', 'permit-husdc-direct-verified']) {
+    const run = allowanceRuns.find(run => run.sourceKey === key && run.status === 'measured');
+    for (const mutation of ['trailing', 'address-padding', 'implementation', ...(key.startsWith('permit') ? ['overflow-v'] : [])]) {
+      const { args } = permissionSetup(run);
+      if (mutation === 'implementation') args.trace.calls[0].to = address(9n);
+      else {
+        let data = args.request.data;
+        if (mutation === 'trailing') data += '00';
+        if (mutation === 'address-padding') data = data.slice(0, 10) + '1' + data.slice(11);
+        if (mutation === 'overflow-v') data = data.slice(0, 10 + 4 * 64) + word(256n).slice(2) + data.slice(10 + 5 * 64);
+        args.request.data = data; args.transaction.input = data; args.trace.input = data; args.trace.calls[0].input = data;
+      }
+      await assert.rejects(createHistoricalStateContext(args).prepare(), StateValidationError);
+    }
+  }
+});
+
+test('recorded permit final allowance reflects consumption and owner differs from submitter', () => {
+  const direct = allowanceRuns.find(run => run.sourceKey === 'permit-husdc-direct-verified');
+  assert.notEqual(direct.request.from, direct.allowances[0].owner);
+  assert.equal(BigInt(direct.allowances[0].after), (1n << 256n) - 1n);
+  const router = allowanceRuns.find(run => run.sourceKey === 'router-permit-candidate-verified');
+  assert.equal(BigInt(router.allowances[0].after), (1n << 256n) - 1n - 25000000n);
+  assert.equal(router.allowances[1].before, '0'); assert.equal(router.allowances[1].after, '0');
+});

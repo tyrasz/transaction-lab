@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "1.0",
+  "decidedAt": "2026-10-25T15:36:10.606Z",
+  "candidateId": "lifi-2024-07-16",
+  "decision": "admit_development_effects_reference_only",
+  "decisionBy": "codex-root",
+  "scope": [
+    "original_transaction_execution_reference",
+    "USDT_owner_and_submitter_balance_effects",
+    "unchanged_maximum_owner_to_diamond_allowance",
+    "temporary_lifecycle_and_unknown_selector_interpretation_controls"
+  ],
+  "notAdmittedFor": [
+    "general_security_classification_score",
+    "victim_presign_prediction",
+    "native_balance_or_fee_fidelity",
+    "independent_execution_engine_accuracy",
+    "blind_holdout_evaluation"
+  ],
+  "reviewers": {
+    "chain": "codex-agent-build_trace_analyzer",
+    "label": "codex-root",
+    "externalHumanReview": false,
+    "independence": "Separate internal AI-assisted evidence and attribution reviews; not independent organizations or a sealed external evaluation."
+  },
+  "artifacts": [
+    {
+      "path": "reviews/lifi-2024-07-16-independent-chain-review.json",
+      "sha256": "110dc68d6fc8f4b4cd8475dd2d724ffcc1c0847660a4277e107ceda82881fcb7"
+    },
+    {
+      "path": "reviews/lifi-2024-07-16-independent-label-review.json",
+      "sha256": "b1405d9bad3971a736c27015805f052163d4880126b56527c0b9c505b81d9918"
+    },
+    {
+      "path": "../../reports/security-validation/lifi-2024-07-16/validation.json",
+      "sha256": "4da1fd173499395694a1870ae093ecd56d05d11a4560ce45b109fee65acf7a40"
+    },
+    {
+      "path": "../../reports/security-validation/lifi-2024-07-16/effects-oracle.json",
+      "sha256": "93209698f448ca8a0d8f60573d5eb8abb60c4cfbdd934be15a38986d00147c32"
+    },
+    {
+      "path": "../../reports/security-validation/lifi-2024-07-16/feature-input.json",
+      "sha256": "4135fb0c6513948489694106abd4f54163728bddb80e9fb1ebfc5e79554fea74"
+    },
+    {
+      "path": "../../reports/security-validation/lifi-2024-07-16/bytecode-identities.json",
+      "sha256": "f2ba78b7509db13bdbe0d7819e0e16b7ebcf4a8a847794d4597d8a268c83f2c4"
+    }
+  ],
+  "engineSupported": false,
+  "chainId": 1,
+  "split": "development",
+  "incidentGroup": "lifi-july-2024",
+  "requiredLimits": [
+    "One successful archive execution provider; no state proofs or source recompilation.",
+    "Keep the complete original wrapper transaction, including temporary CREATE/SELFDESTRUCT paths.",
+    "The query wrapper native-fee variation is not resolved; token effects are the admitted scope.",
+    "Permission exercise did not reduce numeric maximum allowance; do not invent consumption or a new owner approval.",
+    "Original victim signing intent and matched legitimate controls remain unavailable.",
+    "Keep incident labels, postmortems, output oracle and incident-bearing paths outside detector feature inputs."
+  ],
+  "securityScoresProduced": false
+}
