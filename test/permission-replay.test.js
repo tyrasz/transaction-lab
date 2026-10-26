@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { replay } from '../src/server.js';
 import { RpcError } from '../src/rpc.js';
+import { VERSION } from '../src/config.js';
 
 // Complete observed public HTTP/RPC captures. This adapter serves only the saved
 // RPC sequence: no provider connection, alternate block, or extra call is allowed.
@@ -21,8 +22,10 @@ const guardedCapture=JSON.parse(guardedBytes);
 // Independently hash the current source bytes using the documented fingerprint
 // encoding. Source hardening can change this metadata without changing any
 // original chain observation or the captured implementation's provenance.
-const sourceFiles = [...guardedCapture.implementation.sourceFiles];
-sourceFiles.splice(sourceFiles.indexOf('historical-state.js'),0,'current-state.js');
+// Declared current additions are independent of the response under test; the
+// pinned capture inventory and its historical implementation remain unchanged.
+const sourceFiles = guardedCapture.implementation.sourceFiles.flatMap(name => name === 'historical-state.js'
+  ? ['current-state.js', name] : name === 'server.js' ? [name, 'standard-loader.js', 'standard-rpc.js'] : [name]);
 const currentSourceHash = createHash('sha256');
 for (const name of sourceFiles) {
   assert.match(name, /^[a-z-]+\.js$/);
@@ -246,7 +249,7 @@ for (const item of capture.cases) for (const legacyRun of item.runs) {
     assertAccountEffects(result,item);
     assert.equal(JSON.stringify(run.rpcCalls), originalRaw, 'Saved provider requests and responses remain immutable');
     assert.equal(result.implementation.sourceSha256, CURRENT_ENGINE_SHA256, 'Current implementation fingerprint matches independently read source files');
-    assert.equal(result.implementation.version,'0.8.0');
+    assert.equal(result.implementation.version,VERSION);
     assert.equal(result.implementation.name,run.response.implementation.name);
     assert.deepEqual(result.implementation.sourceFiles,sourceFiles);
     assert.equal(transfers.length,item.id==='usdc-router-permit-consumed'?2:0);

@@ -1,6 +1,8 @@
 const $ = (id) => document.getElementById(id);
 const state = { config: null, example: null, result: null, busy: false, benchmarkLoaded: false };
-const requestFieldIds = ['chain', 'from', 'to', 'data', 'value', 'block'];
+const requestFieldIds = ['chain', 'from', 'to', 'data', 'value', 'block', 'standard-queries'];
+const ethereumMode = () => $('chain').value === '1';
+const standardAvailable = () => state.config?.standardEvm?.available === true;
 
 function node(tag, className, text) {
   const element = document.createElement(tag);
@@ -17,7 +19,7 @@ function formatTime(value) { if (value === null || value === undefined || value 
 
 async function request(url, body) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 65000);
+  const timer = setTimeout(() => controller.abort(), url === '/api/evm/simulate' ? 180000 : 65000);
   try {
     const response = await fetch(url, { method: body ? 'POST' : 'GET', headers: body ? { 'Content-Type': 'application/json' } : undefined, body: body ? JSON.stringify(body) : undefined, signal: controller.signal });
     const result = await response.json();
@@ -36,13 +38,13 @@ async function request(url, body) {
 
 function setBusy(busy, mode) {
   state.busy = busy;
-  $('simulate-button').disabled = busy;
+  $('simulate-button').disabled = busy || (ethereumMode() && !standardAvailable());
   $('replay-button').disabled = busy;
   $('example').disabled = busy;
   for (const id of requestFieldIds) $(id).disabled = busy;
   document.querySelector('.results-panel').setAttribute('aria-busy', String(busy));
   $('run-status').classList.toggle('loading', busy);
-  $('run-status').textContent = busy ? mode === 'historical_trace' ? 'Retrieving the original execution trace and checking available historical balance evidence…' : 'Pinning the block, executing the call, and decoding token events…' : '';
+  $('run-status').textContent = busy ? mode === 'historical_trace' ? 'Retrieving the original execution trace and checking available historical balance evidence…' : ethereumMode() ? 'Running the unsigned call and checking each requested balance and allowance. This can take a few minutes…' : 'Pinning the block, executing the call, and decoding token events…' : '';
 }
 
 function clearResult({ inputsChanged = false } = {}) {
@@ -55,7 +57,7 @@ function clearResult({ inputsChanged = false } = {}) {
   $('download-json').disabled = true;
   $('copy-json').textContent = 'Copy JSON';
   $('result-label').textContent = inputsChanged ? 'Inputs changed' : 'Awaiting a transaction';
-  $('run-status').textContent = inputsChanged ? 'Inputs changed. Run a new simulation or inspect the selected historical transaction again.' : '';
+  $('run-status').textContent = inputsChanged ? 'Inputs changed. Run again to see a preview for these inputs.' : '';
   $('request-error').hidden = true;
 }
 
@@ -63,19 +65,77 @@ function requestFingerprint() {
   return JSON.stringify({ fields: requestFieldIds.map(id => $(id).value), exampleId: state.example?.id, transactionHash: state.example?.transactionHash });
 }
 
+function currentExamples() {
+  return ethereumMode() ? state.config?.standardEvm?.examples || []
+    : (state.config?.examples || []).filter(example => String(example.request?.chainId) === $('chain').value);
+}
+
 function selectExample({ initial = false } = {}) {
-  state.example = state.config?.examples?.find((example) => example.id === $('example').value) || null;
+  state.example = currentExamples().find((example) => example.id === $('example').value) || null;
   const example = state.example;
   if (example) {
-    const transaction = example.request || {};
-    for (const field of ['chain', 'from', 'to', 'data', 'value']) $(field).value = transaction[field === 'chain' ? 'chainId' : field] ?? (field === 'data' ? '0x' : field === 'value' ? '0' : '');
-    $('block').value = 'latest';
+    const transaction = (ethereumMode() ? example.input : example.request) || {};
+    for (const field of ['from', 'to', 'data', 'value']) $(field).value = transaction[field] ?? (field === 'data' ? '0x' : field === 'value' ? '0' : '');
+    $('block').value = ethereumMode() ? transaction.block || 'latest' : 'latest';
+    if (ethereumMode()) $('standard-queries').value = JSON.stringify(transaction.queries || [], null, 2);
   }
   $('example-description').textContent = example?.description || (example ? 'Original public transaction inputs. Simulating uses the requested state block.' : 'Enter public transaction inputs to inspect an unsigned call.');
-  $('replay-button').hidden = !example?.transactionHash;
-  $('historical-help').hidden = !example?.transactionHash;
-  $('historical-help').textContent = example?.transactionHash ? `Historical inspection uses the original transaction ${example.transactionHash.slice(0, 12)}… and its original block, independent of the fields above.` : '';
+  $('replay-button').hidden = ethereumMode() || !example?.transactionHash;
+  $('historical-help').hidden = ethereumMode() ? !example : !example?.transactionHash;
+  $('historical-help').textContent = ethereumMode() && example
+    ? 'This example starts at the end of the block before the original deposit. It runs the same calldata against that state; it does not replay the original transaction at its exact position.'
+    : example?.transactionHash ? `Historical inspection uses the original transaction ${example.transactionHash.slice(0, 12)}… and its original block, independent of the fields above.` : '';
+  $('standard-queries').setCustomValidity('');
   clearResult({ inputsChanged: !initial });
+}
+
+function selectNetwork({ initial = false } = {}) {
+  const standard = ethereumMode();
+  const examples = currentExamples();
+  const custom = node('option', '', 'Custom transaction');
+  custom.value = '';
+  $('example').replaceChildren(custom, ...examples.map(example => {
+    const option = node('option', '', example.title || example.label || example.id);
+    option.value = example.id;
+    return option;
+  }));
+  $('example').value = examples[0]?.id || '';
+  for (const id of ['from', 'to']) $(id).value = '';
+  $('data').value = '0x';
+  $('value').value = '0';
+  $('block').value = 'latest';
+  $('standard-queries').value = '[]';
+  $('standard-query-settings').hidden = !standard;
+  $('standard-query-settings').open = false;
+  $('standard-queries').required = standard;
+  $('value').readOnly = standard;
+  $('value-help').textContent = standard ? 'Ethereum previews currently support zero native value only.' : 'Native token amount as an integer number of wei.';
+  $('block-help').textContent = standard
+    ? 'Use latest, a hexadecimal block number, or a block hash. Execution starts at the end of that block. Ethereum previews use zero native value and a fixed gas limit.'
+    : 'Use latest or a hexadecimal block number. The result records the state used.';
+  $('network-heading').textContent = standard ? 'ETHEREUM · CHAIN 1 · EXPERIMENTAL' : 'HYPEREVM · CHAIN 999';
+  $('page-description').textContent = standard ? 'Preview an unsigned call and check the selected accounts’ balances and allowances.' : 'Simulate an unsigned call or inspect a historical execution. See the evidence behind each result.';
+  $('empty-description').textContent = standard ? 'Choose a deposit example or enter your own inputs. The preview shows before-and-after values for the balances and allowances you request.' : 'Choose an example or enter a transaction. The preview separates execution, token events, and coverage limits.';
+  $('network-help').hidden = !standard;
+  $('network-help').textContent = standardAvailable() ? 'Experimental Ethereum previews. No connected wallet or signature needed.' : state.config?.standardEvm?.reason || 'Ethereum previews are unavailable in this workspace.';
+  $('network-help').classList.toggle('unavailable-note', standard && !standardAvailable());
+  selectExample({ initial });
+  setBusy(false);
+}
+
+function readStandardQueries() {
+  let queries;
+  try { queries = JSON.parse($('standard-queries').value); }
+  catch { throw new Error('Enter a valid JSON query list in Advanced: balances & allowances to check.'); }
+  if (!Array.isArray(queries) || queries.length < 1 || queries.length > 8) throw new Error('Add between one and eight balance or allowance queries.');
+  for (const query of queries) {
+    if (!query || typeof query !== 'object' || Array.isArray(query) || Object.keys(query).sort().join() !== 'data,to'
+      || typeof query.to !== 'string' || !/^0x[0-9a-f]{40}$/i.test(query.to)
+      || typeof query.data !== 'string' || !/^0x(?:70a082310{24}[0-9a-f]{40}|dd62ed3e0{24}[0-9a-f]{40}0{24}[0-9a-f]{40})$/i.test(query.data)) {
+      throw new Error('Each query must contain only a token address (to) and a complete balanceOf or allowance call (data).');
+    }
+  }
+  return queries;
 }
 
 function addDefinition(list, label, value) {
@@ -578,12 +638,143 @@ function renderProtocol(protocol, result) {
   if (protocol.direction) $('protocol-summary').append(node('span', 'protocol-direction', readableKey(protocol.direction)));
 }
 
-function renderResult(result) {
+function beginResult(result, standard = false) {
   state.result = result;
   $('copy-json').disabled = false;
   $('download-json').disabled = false;
   $('empty-state').hidden = true;
   $('result-content').hidden = false;
+  $('hyper-result').hidden = standard;
+  $('standard-result').hidden = !standard;
+  $('coverage-label').textContent = standard ? 'Requested checks' : 'Coverage';
+  $('raw-json').textContent = JSON.stringify(result, null, 2);
+}
+
+function standardMeasured(query) {
+  return query.status === 'measured' && typeof query.beforeRaw === 'string' && /^\d+$/.test(query.beforeRaw)
+    && typeof query.afterRaw === 'string' && /^\d+$/.test(query.afterRaw)
+    && typeof query.deltaRaw === 'string' && /^-?\d+$/.test(query.deltaRaw);
+}
+
+function standardWarning(warning) {
+  const language = {
+    'Explicit queried accounts only; other assets and economic effects may be omitted.': 'Only the listed accounts and token queries are checked. Other changes may be omitted.',
+    'Synthetic BASEFEE-zero execution with no outer transaction signature or fee-settlement validation. Contract permit checks still execute.': 'Execution uses a zero base fee and does not validate transaction fees or the outer signature. Permit checks inside the call still run.',
+    'Historical block-end state is not the original transaction position.': 'A past block starts the call from that block’s end state, which differs from the original transaction’s position.',
+    'Token labels and decimals are historical reference metadata, not verified again for the requested state.': 'Token names and units come from historical reference data and are not checked again for this simulation.',
+    'Provider codeHash consistency is not independent state or source-code attestation.': 'The provider supplies the execution evidence. Contract code and state have not been independently authenticated.',
+    'No security verdict or comparative detection score is produced.': 'These results do not establish that a transaction or spender is safe.',
+  };
+  return language[warning] || display(warning);
+}
+
+function renderStandardQuery(query, sender) {
+  const allowance = query.kind === 'allowance';
+  const measured = standardMeasured(query);
+  const metadata = query.metadata;
+  const heading = `${metadata?.symbol || 'Token'} ${allowance ? 'allowance' : 'balance'}`;
+  const article = node('article', `standard-query-card${measured ? '' : ' query-unavailable'}`);
+  const header = node('div', 'permission-heading');
+  header.append(node('h4', '', heading), node('span', `query-status ${measured ? 'measured' : 'unavailable'}`, measured ? 'Measured' : query.status === 'not_applicable' ? 'Not applied' : 'Unavailable'));
+  article.append(header);
+  const owner = allowance ? query.owner : query.account;
+  const senderMatches = typeof owner === 'string' && typeof sender === 'string' && owner.toLowerCase() === sender.toLowerCase();
+  const details = node('dl', 'permission-details');
+  addDefinition(details, allowance ? 'Owner' : 'Account', owner);
+  if (senderMatches) addDefinition(details, 'Account role', 'Transaction sender');
+  if (allowance) addDefinition(details, 'Spender', query.spender);
+  addDefinition(details, 'Token contract', query.token);
+  if (metadata?.name) addDefinition(details, 'Reference name', metadata.name);
+  article.append(details);
+  const table = node('table', 'measurement-table');
+  const caption = node('caption', 'sr-only', `${heading} for ${owner || 'the requested account'}`);
+  const head = node('thead'), headRow = node('tr'), body = node('tbody'), row = node('tr');
+  for (const label of ['Before', 'After', 'Change']) { const th = node('th', '', label); th.scope = 'col'; headRow.append(th); }
+  head.append(headRow);
+  for (const field of ['before', 'after', 'delta']) {
+    const cell = node('td');
+    if (measured) {
+      const raw = query[`${field}Raw`];
+      const formatted = metadata ? query[field] : undefined;
+      const amount = field === 'delta' ? signedAmount(formatted, raw) : exactAmount(formatted, raw);
+      cell.append(node('strong', '', amount));
+      if (formatted !== undefined && formatted !== null) cell.append(node('span', 'raw-amount', `${raw} raw units`));
+    } else cell.append(node('span', 'missing-amount', 'Not available'));
+    row.append(cell);
+  }
+  body.append(row);
+  table.append(caption, head, body);
+  article.append(table);
+  if (!measured) article.append(node('p', 'query-note', query.reason || 'This value was not measured. It must not be interpreted as zero.'));
+  if (measured && allowance) {
+    const maximum = ((1n << 256n) - 1n).toString();
+    const text = query.beforeRaw === query.afterRaw
+      ? query.afterRaw === '0' ? 'Final allowance unchanged at zero.' : query.afterRaw === maximum ? 'Maximum allowance unchanged.' : 'Final allowance unchanged.'
+      : query.afterRaw === '0' ? 'Final allowance reduced to zero.' : query.afterRaw === maximum ? 'Final allowance is the maximum uint256 value.' : 'Final allowance changed to the amount shown above.';
+    article.append(node('p', 'query-note', text));
+  }
+  if (metadata) article.append(node('p', 'query-reference', `Name and units use reference metadata${metadata.referenceBlockNumber ? ` from block ${numberLabel(metadata.referenceBlockNumber)}` : ''}. They are not reverified for this simulation.`));
+  else article.append(node('p', 'query-reference', 'Token name and decimals are not established. Values are shown in raw units.'));
+  return article;
+}
+
+function renderStandardResult(result) {
+  beginResult(result, true);
+  const execution = result.execution || {};
+  const queries = Array.isArray(result.preview?.queries) ? result.preview.queries : [];
+  const measured = queries.filter(standardMeasured).length;
+  const sender = result.apiRequest?.from || result.request?.transaction?.from;
+  $('result-label').textContent = 'Ethereum unsigned simulation';
+  $('execution-status').textContent = execution.status === 'success' ? 'Completed' : execution.status === 'reverted_or_failed' ? 'Failed / reverted' : 'Unavailable';
+  $('execution-status').className = execution.status === 'success' ? 'success' : execution.status === 'reverted_or_failed' ? 'failed' : 'partial';
+  $('gas-used').textContent = execution.gasUsed ? `${numberLabel(execution.gasUsed)} gas used · fees not estimated` : 'Gas usage unavailable';
+  $('coverage-status').textContent = `${measured} / ${queries.length} measured`;
+  $('coverage-status').className = queries.length && measured === queries.length ? 'success' : 'partial';
+  $('coverage-detail').textContent = 'Selected balances and allowances only';
+  $('execution-error').hidden = !execution.error && !result.measurementFailure;
+  $('execution-error').textContent = execution.error ? `Execution error: ${display(execution.error)}` : result.measurementFailure ? `Measurements unavailable: ${display(result.measurementFailure)}` : '';
+  $('contract-revert').hidden = !execution.revertReason;
+  $('contract-revert').textContent = execution.revertReason ? `Contract-reported reason (untrusted contract output): ${String(execution.revertReason).slice(0, 4096)}` : '';
+  const selection = result.source?.blockSelection || {};
+  const context = $('standard-state-details');
+  context.replaceChildren();
+  $('standard-state-description').textContent = 'The call starts from the state at the end of the selected block. Choosing a past block does not replay the historical transaction at its original position. Before and after refer to this unsigned simulation.';
+  addDefinition(context, 'Requested state', selection.requested ?? result.apiRequest?.block);
+  addDefinition(context, 'Resolved block', result.block?.number ? numberLabel(result.block.number) : selection.resolvedNumber ? numberLabel(selection.resolvedNumber) : null);
+  addDefinition(context, 'Block hash', result.block?.hash || selection.resolvedHash);
+  addDefinition(context, 'Block time', formatTime(result.block?.timestamp));
+  addDefinition(context, 'Block binding', result.canonicalStatus === 'verified' ? 'Checked before and after the simulation' : 'Not verified; before-and-after amounts are unavailable');
+  for (const kind of ['balanceOf', 'allowance']) {
+    const group = kind === 'balanceOf' ? 'balances' : 'allowances';
+    const rows = queries.filter(query => query.kind === kind);
+    $(`standard-${group}-section`).hidden = rows.length === 0;
+    $(`standard-${group}-count`).textContent = `${rows.filter(standardMeasured).length} / ${rows.length} measured`;
+    $(`standard-${group}`).replaceChildren(...rows.map(query => renderStandardQuery(query, sender)));
+  }
+  $('standard-metadata-note').textContent = queries.length ? 'Amounts are exact token quantities, not prices or dollar valuations. Other accounts, tokens, debts, and permissions may not be included.' : 'No balance or allowance observations were returned. Missing observations are not zero balances.';
+  const warnings = [...new Set((result.preview?.warnings?.length ? result.preview.warnings : [
+    'Only the listed balances and allowances are checked. Other changes may be omitted.',
+    'Execution uses a zero base fee without transaction fee settlement or outer signature validation.',
+    'These results do not establish that a transaction or spender is safe.',
+  ]).map(standardWarning))];
+  $('warnings-section').hidden = false;
+  $('warnings-list').replaceChildren(...warnings.map(warning => node('li', '', display(warning))));
+  const details = $('source-details');
+  details.replaceChildren();
+  addDefinition(details, 'Network', 'Ethereum · chain 1');
+  addDefinition(details, 'Mode', 'Unsigned call at block-end state');
+  addDefinition(details, 'Sender', sender);
+  addDefinition(details, 'Recipient', result.apiRequest?.to || result.request?.transaction?.to);
+  addDefinition(details, 'Gas limit', '5,000,000');
+  addDefinition(details, 'Native value', '0 wei');
+  addDefinition(details, 'Network fees', 'Not estimated');
+  addDefinition(details, 'Measurement method', result.executionIdentity ? 'Separate token queries before and after applying the call’s full state changes' : 'Measurement context not established');
+  addDefinition(details, 'Run ID', result.id);
+  $('timing').textContent = result.timing?.totalMs !== undefined ? `${(result.timing.totalMs / 1000).toFixed(2)}s total` : '';
+}
+
+function renderResult(result) {
+  beginResult(result);
   const execution = result.execution || {};
   const coverage = result.coverage || {};
   const source = result.source || {};
@@ -648,22 +839,41 @@ function renderResult(result) {
 
 async function run(mode) {
   if (state.busy) return;
+  const standard = ethereumMode();
+  if (standard && (!standardAvailable() || mode === 'historical_trace')) return;
   if (mode === 'historical_trace' && !state.example?.transactionHash) return;
+  let queries;
+  if (standard) {
+    $('standard-queries').setCustomValidity('');
+    try { queries = readStandardQueries(); }
+    catch (error) {
+      $('standard-query-settings').open = true;
+      $('standard-queries').setCustomValidity(error.message);
+      $('standard-queries').reportValidity();
+      return;
+    }
+  }
   if (mode !== 'historical_trace' && !$('simulation-form').reportValidity()) return;
   clearResult();
   setBusy(true, mode);
   try {
     const fingerprint = requestFingerprint();
     const body = mode === 'historical_trace' ? { chainId: Number(state.example.request.chainId), transactionHash: state.example.transactionHash } : { chainId: Number($('chain').value), from: $('from').value.trim(), to: $('to').value.trim(), data: $('data').value.trim(), value: $('value').value.trim(), block: $('block').value.trim() };
-    const result = await request(mode === 'historical_trace' ? '/api/replay' : '/api/simulate', body);
+    if (standard) body.queries = queries;
+    const result = await request(standard ? '/api/evm/simulate' : mode === 'historical_trace' ? '/api/replay' : '/api/simulate', body);
     if (fingerprint !== requestFingerprint()) {
       setBusy(false);
       clearResult({ inputsChanged: true });
       return;
     }
-    renderResult(result);
+    if (standard) renderStandardResult(result);
+    else renderResult(result);
     setBusy(false);
-    $('run-status').textContent = result.execution?.status === 'success' ? historicalRunMessage(mode, result) : 'The provider returned an execution failure. Review the error and trace below.';
+    $('run-status').textContent = standard
+      ? result.execution?.status === 'success' ? 'Execution completed. Review which balances and allowances were measured below.'
+        : result.execution?.status === 'reverted_or_failed' ? 'The call failed or reverted. Before-and-after measurements were not applied.'
+          : 'Execution could not be established. Unavailable amounts are not zero.'
+      : result.execution?.status === 'success' ? historicalRunMessage(mode, result) : 'The provider returned an execution failure. Review the error and trace below.';
   } catch (error) {
     setBusy(false);
     $('request-error').hidden = false;
@@ -770,9 +980,16 @@ function setView(view) {
 $('simulation-form').addEventListener('submit', (event) => { event.preventDefault(); run('simulation'); });
 $('replay-button').addEventListener('click', () => run('historical_trace'));
 $('example').addEventListener('change', selectExample);
+$('chain').addEventListener('change', selectNetwork);
 for (const id of requestFieldIds) {
-  $(id).addEventListener('input', () => clearResult({ inputsChanged: true }));
-  $(id).addEventListener('change', () => clearResult({ inputsChanged: true }));
+  if (id === 'chain') continue;
+  const changed = () => {
+    if (id === 'standard-queries') $('standard-queries').setCustomValidity('');
+    if (ethereumMode() && state.example) $('historical-help').textContent = 'The selected example is a starting point. Simulation uses the fields and query list currently shown, at the end of the selected block.';
+    clearResult({ inputsChanged: true });
+  };
+  $(id).addEventListener('input', changed);
+  $(id).addEventListener('change', changed);
 }
 $('simulation-view-button').addEventListener('click', () => setView('simulation'));
 $('benchmark-view-button').addEventListener('click', () => setView('benchmark'));
@@ -797,10 +1014,10 @@ async function initialize() {
   try {
     state.config = await request('/api/config');
     const chains = state.config.chains || [];
-    if (chains.length) $('chain').replaceChildren(...chains.map((chain) => { const option = node('option', '', `${chain.name} · ${chain.chainId}`); option.value = chain.chainId; return option; }));
-    for (const example of state.config.examples || []) { const option = node('option', '', example.label || example.id); option.value = example.id; $('example').append(option); }
-    if (state.config.examples?.length) $('example').value = state.config.examples[0].id;
-    selectExample({ initial: true });
+    const choices = chains.length ? [...chains] : [{ name: 'HyperEVM', chainId: 999 }];
+    if (state.config.standardEvm && !choices.some(chain => Number(chain.chainId) === 1)) choices.push({ name: 'Ethereum · experimental', chainId: 1 });
+    $('chain').replaceChildren(...choices.map((chain) => { const option = node('option', '', `${chain.name} · ${chain.chainId}`); option.value = chain.chainId; return option; }));
+    selectNetwork({ initial: true });
     if (typeof state.config.projectStatus === 'string') $('project-status').textContent = state.config.projectStatus;
   } catch (error) {
     $('example-description').textContent = 'Examples unavailable. Custom transactions can still be entered.';

@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto';
 import { simulate } from '../src/server.js';
 import { RpcClient } from '../src/rpc.js';
 import { InputError } from '../src/validate.js';
+import { VERSION } from '../src/config.js';
 
 const sha = value => createHash('sha256').update(value).digest('hex');
 async function pinnedJson(path, expected) {
@@ -17,9 +18,13 @@ const failedInputCapture = await pinnedJson('reports/current-validated-compariso
 const capability = await pinnedJson('reports/current-query-capability/capture.json', '3c11faec39109a330d91428d9ad359ee1601fc3820f5ae17b9971c61e7ddfae2');
 const CORE_SHA = '2205334781a09baf98c3f5cb05a546bcca7d4946aea33b510d1963c8eb561a0f';
 const sourceFiles = ['account-effects.js','affected-balances.js','allowances.js','analyze.js','balances.js','config.js','current-state.js','historical-state.js','lending.js','lending-balances.js','permissions.js','query-validation.js','revert.js','rpc.js','server.js','state-diff.js','state.js','validate.js'];
+const currentSourceFiles = sourceFiles.flatMap(name => name === 'server.js' ? [name, 'standard-loader.js', 'standard-rpc.js'] : [name]);
 const engineHash = createHash('sha256');
-for (const name of sourceFiles) engineHash.update(name + '\0').update(await readFile(new URL('../src/' + name, import.meta.url))).update('\0');
+for (const name of currentSourceFiles) engineHash.update(name + '\0').update(await readFile(new URL('../src/' + name, import.meta.url))).update('\0');
 const actualSourceHash = engineHash.digest('hex');
+const baselineHash = createHash('sha256');
+for (const name of sourceFiles) baselineHash.update(name + '\0').update(await readFile(new URL('../reports/coverage-evaluation-v2-baseline-source/repository/src/' + name, import.meta.url))).update('\0');
+assert.equal(baselineHash.digest('hex'), CORE_SHA, 'The original 0.8 source remains byte-identical in its archive');
 const endpoints = { drpc: 'https://hyperliquid.drpc.org', 'hyperlend-archive': 'https://rpc.hyperlend.finance/archive' };
 const USDC = '0xb88339cb7199b77e23db6e890353e22632ba630f', HUSDC = '0x744e4f26ee30213989216e1632d9be3547c4885b', DEBT = '0xd612513cb3b2c52abcd6d4b338374c09ada4657d';
 const SENDER = '0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0', POOL = '0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b';
@@ -38,9 +43,10 @@ const priorAmounts = {
   ],
 };
 function withoutGenerated({ id, createdAt, timing, implementation, ...semantic }) { return semantic; }
-function assertImplementation(report) {
-  assert.equal(actualSourceHash, CORE_SHA, 'The live frozen implementation must match independently hashed local source bytes');
-  assert.deepEqual(report.implementation, { name: 'Transaction Lab', version: '0.8.0', sourceSha256: CORE_SHA, sourceFiles });
+function assertImplementation(report, recorded = false) {
+  assert.deepEqual(report.implementation, recorded
+    ? { name: 'Transaction Lab', version: '0.8.0', sourceSha256: CORE_SHA, sourceFiles }
+    : { name: 'Transaction Lab', version: VERSION, sourceSha256: actualSourceHash, sourceFiles: currentSourceFiles });
 }
 function sharedEvidence(run) {
   const snapshots = ['balanceMeasurement', 'allowanceMeasurement', 'affectedBalanceMeasurement'].map(key => run.response.evidence[key]).filter(item => item.request.length);
@@ -123,7 +129,7 @@ test('eight current API outcomes preserve frozen source, complete raw HTTP/RPC b
     assert.deepEqual(run.http.request.body, run.request);
     assert.equal(sha(run.http.response.bodyText), run.http.response.bodySha256);
     assert.equal(Buffer.byteLength(run.http.response.bodyText), run.http.response.responseBytes);
-    assert.deepEqual(JSON.parse(run.http.response.bodyText), run.response); assertImplementation(run.response);
+    assert.deepEqual(JSON.parse(run.http.response.bodyText), run.response); assertImplementation(run.response, true);
     for (const raw of run.rpcCalls) {
       count++; assert.deepEqual(JSON.parse(raw.requestText), raw.request);
       assert.equal(raw.httpStatus, 200); assert.equal(raw.bodyComplete, true); assert.equal(raw.error, undefined);

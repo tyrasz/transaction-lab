@@ -1,0 +1,67 @@
+{
+  "audit": "offline_no_network",
+  "runId": "2026-10-26T07-52-08.304Z-60177bf2",
+  "status": "passed",
+  "reportStatus": "enumeration_inconclusive",
+  "sourceSha256": "37dfa8d10226b144da8895ac7860171aad5fe686a8d630326bd22fe18f042e72",
+  "engine": {
+    "name": "Transaction Lab",
+    "version": "0.8.0",
+    "sourceFiles": [
+      "account-effects.js",
+      "affected-balances.js",
+      "allowances.js",
+      "analyze.js",
+      "balances.js",
+      "config.js",
+      "current-state.js",
+      "historical-state.js",
+      "lending.js",
+      "lending-balances.js",
+      "permissions.js",
+      "query-validation.js",
+      "revert.js",
+      "rpc.js",
+      "server.js",
+      "state-diff.js",
+      "state.js",
+      "validate.js"
+    ],
+    "sourceSha256": "2205334781a09baf98c3f5cb05a546bcca7d4946aea33b510d1963c8eb561a0f"
+  },
+  "reportSha256": "37472003b8fcdb55fe29e9ac8026572cbf375bd0297773bb92b53b010145f73e",
+  "rpcSha256": "864f909e8dae63593bcc7b4f1b53f5e812dff9ee53307a4aa3647c519b6c60df",
+  "counts": {
+    "rpc": 39,
+    "responseBytes": 142324,
+    "successfulBodies": 39,
+    "errorRecords": 0,
+    "phaseCounts": {
+      "selection": 19,
+      "product": 6,
+      "comparator": 14
+    },
+    "providerCounts": {
+      "A": 14,
+      "B": 20,
+      "official": 5
+    },
+    "referenceRows": 2,
+    "unresolvedRows": 3,
+    "attemptedSlots": 5,
+    "productInvocations": 1
+  },
+  "checks": [
+    "Every runner artifact has its indexed exact bytes and SHA-256.",
+    "Current complete source closure and engine identity match the pre-network manifest.",
+    "Every retained successful RPC body, sequential request identity, exact byte/hash and shared counter is independently checked; withheld error bytes are counted but cannot be reconstructed.",
+    "All cohort rows and reference occurrences remain in the final ledger; attempt cap, unknown replay boundaries and null-denominator fractions are preserved.",
+    "Every normalization packet binds to its exact saved selection request/response; the newly observed s=1 system form is retained unresolved, with two reference rows and three occurrence rows.",
+    "All invoked product outputs and product RPCs were sealed before any comparator request; security remains unassessed."
+  ],
+  "limitations": [
+    "Artifact consistency and accounting audit, not a second execution engine or proof of provider truth.",
+    "Withheld provider error bodies cannot be reconstructed from their retained hash/count.",
+    "No retry claim is checked against the single fixed process and captured phase/request sequence; repeated legitimate context queries are not reclassified as retries."
+  ]
+}
