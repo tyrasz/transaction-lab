@@ -1,5 +1,5 @@
 export const CHAIN_ID = 999;
-export const VERSION = '0.5.0';
+export const VERSION = '0.6.0';
 export const DEFAULT_RPC_URL = 'https://hyperliquid.drpc.org';
 export const POOL = '0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b';
 export const USDC = '0xb88339cb7199b77e23db6e890353e22632ba630f';
@@ -45,13 +45,21 @@ export const EXAMPLES = [
   {"id":"usdc-historical-router-permit","label":"USDC · historical router permit","description":"Public historical router call containing a permit and a separate approval. Only configured token permissions are measured; other router effects have partial coverage.","transactionHash":"0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d","request":{"chainId":999,"from":"0x0c71073344e27e33cb57fcb587fc412d689dfd1d","to":"0x693f12e9e6b35b34458793546065e8b08e0299d6","value":"0","data":"0x48519be800000000000000000000000053195a1c4e664ac09eb72892516f8f85ec80000000000000000000000000000000000000000000000000000000000000017d7840000000000000000000000000000000000000000000001c0df636224734347c2e0000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006a079d9a000000000000000000000000000000000000000000000000000000000000001bc7b60c1bd267ac7348356cdefb7f3478399bfefe8e52c4a1226b4985d5e5c00a3616b0b1956e4b2ce3026d7048b93d73fbdf55c568b3eefdfc104dd44ae93bca"}},
 ];
 
+EXAMPLES.push({
+  id: 'usdc-historical-transfer-from', label: 'USDC · historical allowance spending',
+  description: 'A public account spends another owner’s existing USDC allowance. Inspect both accounts, requested transfer amount, emitted events and the available final allowance measurement. Original signing intent is not assessed.',
+  transactionHash: '0xe2f9761a3fac3ba83ee15fc5e6f12b55d15cd804b321a2cffd9d2c16d6c38dfe',
+  request: { chainId: CHAIN_ID, from: '0x2908da1b63c4f7ce001bf5d875d179930a79eed4', to: USDC, value: '0', data: '0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b' },
+});
+
 export const CAPABILITIES = {
   simulation: true, historicalTrace: true, chainIds: [CHAIN_ID],
   assetBasis: 'Successful ERC-20 Transfer events; not portfolio balance deltas',
+  accountEffects: {supported:true,scope:'All bounded observed transfer participants and configured permission roles; separately measured balances and allowances are referenced without inferring missing state',basis:'observed_accounts_with_separate_state_measurements',additionalBalanceQueries:false},
   balanceMeasurement: {supported:true,method:'prestate_diff_balanceOf',scope:'Current-state Hyperlend USDC supply, withdrawal, variable-rate borrow and repay; involved user USDC, receipt-token and debt balances'},
   historicalBalanceMeasurement: {supported:true,method:'debug_traceCallMany',basis:'historical_transaction_position_balanceOf',scope:'Reconciled Hyperlend USDC operations only; original block and transaction position, independent token reads and isolated original-call validation'},
   securityAssessment: false, transactionBroadcast: false,
-  permissionObservations: {supported:true,scope:'ERC20 approve, implementation-verified ERC-2612 permit calls and Approval events for configured USDC/hUSDC',allowanceStateVerified:true,signatureIndependentlyVerified:false,scopeLimit:'Only verified USDC/hUSDC permission pairs observed in a successful execution; owner, transaction submitter and immediate caller remain distinct'},
+  permissionObservations: {supported:true,scope:'ERC20 approve, implementation-verified ERC-2612 permit and ERC20 transferFrom calls, and Approval events for configured USDC/hUSDC',allowanceStateVerified:true,signatureIndependentlyVerified:false,scopeLimit:'Only verified USDC/hUSDC permission pairs observed in a successful execution; owner, transaction submitter, immediate caller and recipient remain distinct. Transfer amounts are not requested allowances.'},
   historicalAllowanceMeasurement: {supported:true,method:'debug_traceCallMany',basis:'historical_transaction_position_allowance',scope:'Configured USDC/hUSDC permission pairs at the original transaction position; unsupported state changes and inconsistent provider indexes are unavailable'},
   supportedProtocols: ['Hyperlend USDC supply', 'Hyperlend USDC withdrawal', 'Hyperlend USDC variable-rate borrowing', 'Hyperlend USDC variable-rate repayment'],
   limitations: [

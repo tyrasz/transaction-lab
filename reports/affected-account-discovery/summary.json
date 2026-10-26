@@ -1,0 +1,350 @@
+{
+  "generatedAt": "2026-10-25T15:45:00.352Z",
+  "scope": "Development cases for affected-account event projection and transferFrom permission consumption; not held-out scoring.",
+  "newPublicRequests": 14,
+  "retries": 0,
+  "caseCount": 3,
+  "cases": [
+    {
+      "id": "direct-transferfrom-a",
+      "identity": {
+        "chainId": 999,
+        "transactionHash": "0xe2f9761a3fac3ba83ee15fc5e6f12b55d15cd804b321a2cffd9d2c16d6c38dfe",
+        "blockHash": "0x423e4d0311decaa1e0c1d452905059c1409fcd68e1aa94d78978756e845bbac5",
+        "blockNumber": "49322025",
+        "transactionIndex": "0",
+        "timestamp": "1792770140"
+      },
+      "provenance": {
+        "artifact": "direct-transferfrom-a-evidence.json",
+        "sha256": "848e7db26a485755ce99499c5c34319fa81517a82d56e4e713564c89dd0d9881",
+        "explorerUrl": "https://hyperevmscan.io/tx/0xe2f9761a3fac3ba83ee15fc5e6f12b55d15cd804b321a2cffd9d2c16d6c38dfe"
+      },
+      "transferFromCalls": [
+        {
+          "framePath": "0",
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "owner": "0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+          "recipient": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "spender": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "externalTransactionSender": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "rootContract": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "amountRaw": "1277067",
+          "ownerDiffersFromExternalSender": true,
+          "spenderDiffersFromRootContract": true,
+          "success": true,
+          "returnData": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "delegateTargets": [
+            "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8"
+          ]
+        }
+      ],
+      "usdcEventDeltas": [
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "account": "0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+          "eventNetRaw": "-1277067",
+          "measurementStatus": "not_queried_for_this_research",
+          "basis": "receipt_Transfer_events_only"
+        },
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "account": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "eventNetRaw": "1277067",
+          "measurementStatus": "not_queried_for_this_research",
+          "basis": "receipt_Transfer_events_only"
+        }
+      ],
+      "independentQueries": {
+        "status": "not_run_in_this_milestone",
+        "reason": "Scope is accountEffects event projection joined to measurements already available. New balance queries are deferred.",
+        "position": {
+          "stateBlockHash": "0x423e4d0311decaa1e0c1d452905059c1409fcd68e1aa94d78978756e845bbac5",
+          "beforeIndex": "0",
+          "afterIndex": "1"
+        },
+        "balances": [
+          {
+            "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "account": "0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+            "data": "0x70a08231000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe56379"
+          },
+          {
+            "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "account": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+            "data": "0x70a082310000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4"
+          }
+        ],
+        "allowances": [
+          {
+            "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "owner": "0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+            "spender": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+            "data": "0xdd62ed3e000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4"
+          }
+        ]
+      }
+    },
+    {
+      "id": "direct-transferfrom-b",
+      "identity": {
+        "chainId": 999,
+        "transactionHash": "0xc650c2592cd04133cf7ff88969468c3e454e0b36e989fdb09a943dce283686d1",
+        "blockHash": "0x8f8b0ab3bf724d5a7edba34836075ec1bc98289808f232389a99dc472c629656",
+        "blockNumber": "49321930",
+        "transactionIndex": "2",
+        "timestamp": "1792770047"
+      },
+      "provenance": {
+        "artifact": "direct-transferfrom-b-evidence.json",
+        "sha256": "dc64d9a7de8e8e32ffbba6173cc54b56ce238f6d2a6e079504884e0b175fa748",
+        "explorerUrl": "https://hyperevmscan.io/tx/0xc650c2592cd04133cf7ff88969468c3e454e0b36e989fdb09a943dce283686d1"
+      },
+      "transferFromCalls": [
+        {
+          "framePath": "0",
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "owner": "0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+          "recipient": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "spender": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "externalTransactionSender": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "rootContract": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "amountRaw": "1118386",
+          "ownerDiffersFromExternalSender": true,
+          "spenderDiffersFromRootContract": true,
+          "success": true,
+          "returnData": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "delegateTargets": [
+            "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8"
+          ]
+        }
+      ],
+      "usdcEventDeltas": [
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "account": "0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+          "eventNetRaw": "-1118386",
+          "measurementStatus": "not_queried_for_this_research",
+          "basis": "receipt_Transfer_events_only"
+        },
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "account": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "eventNetRaw": "1118386",
+          "measurementStatus": "not_queried_for_this_research",
+          "basis": "receipt_Transfer_events_only"
+        }
+      ],
+      "independentQueries": {
+        "status": "not_run_in_this_milestone",
+        "reason": "Scope is accountEffects event projection joined to measurements already available. New balance queries are deferred.",
+        "position": {
+          "stateBlockHash": "0x8f8b0ab3bf724d5a7edba34836075ec1bc98289808f232389a99dc472c629656",
+          "beforeIndex": "2",
+          "afterIndex": "3"
+        },
+        "balances": [
+          {
+            "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "account": "0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+            "data": "0x70a08231000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe56379"
+          },
+          {
+            "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "account": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+            "data": "0x70a082310000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4"
+          }
+        ],
+        "allowances": [
+          {
+            "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "owner": "0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+            "spender": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+            "data": "0xdd62ed3e000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4"
+          }
+        ]
+      }
+    },
+    {
+      "id": "router-permit-consumption",
+      "identity": {
+        "chainId": 999,
+        "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+        "blockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+        "blockNumber": "35204283",
+        "transactionIndex": "0",
+        "timestamp": "1778882210"
+      },
+      "provenance": {
+        "artifact": "../permission-discovery/router-permit-candidate-verified.json",
+        "sha256": "f1345339208819423e0079f6d01d0bddc220cf56b69383645fbfa16944118b74",
+        "explorerUrl": "https://hyperevmscan.io/tx/0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d"
+      },
+      "transferFromCalls": [
+        {
+          "framePath": "0.0.4",
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "owner": "0x0c71073344e27e33cb57fcb587fc412d689dfd1d",
+          "recipient": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+          "spender": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+          "externalTransactionSender": "0x0c71073344e27e33cb57fcb587fc412d689dfd1d",
+          "rootContract": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+          "amountRaw": "25000000",
+          "ownerDiffersFromExternalSender": false,
+          "spenderDiffersFromRootContract": false,
+          "success": true,
+          "returnData": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "delegateTargets": [
+            "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8"
+          ]
+        },
+        {
+          "framePath": "0.0.7.1.23",
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "owner": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+          "recipient": "0x04de1ef694923844bae419d4f832196f21767f86",
+          "spender": "0x04de1ef694923844bae419d4f832196f21767f86",
+          "externalTransactionSender": "0x0c71073344e27e33cb57fcb587fc412d689dfd1d",
+          "rootContract": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+          "amountRaw": "24812500",
+          "ownerDiffersFromExternalSender": true,
+          "spenderDiffersFromRootContract": true,
+          "success": true,
+          "returnData": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "delegateTargets": [
+            "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8"
+          ]
+        }
+      ],
+      "usdcEventDeltas": [
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "account": "0x0c71073344e27e33cb57fcb587fc412d689dfd1d",
+          "eventNetRaw": "-25000000",
+          "measurementStatus": "not_queried_for_this_research",
+          "basis": "receipt_Transfer_events_only"
+        },
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "account": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+          "eventNetRaw": "0",
+          "measurementStatus": "not_queried_for_this_research",
+          "basis": "receipt_Transfer_events_only"
+        },
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "account": "0x04de1ef694923844bae419d4f832196f21767f86",
+          "eventNetRaw": "24812304",
+          "measurementStatus": "not_queried_for_this_research",
+          "basis": "receipt_Transfer_events_only"
+        },
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "account": "0x7fe37fc2f987eb981a0fc63cf1eabf04463550d4",
+          "eventNetRaw": "196",
+          "measurementStatus": "not_queried_for_this_research",
+          "basis": "receipt_Transfer_events_only"
+        },
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "account": "0xb4894380282533a86cb241145fac54aaac995f18",
+          "eventNetRaw": "187500",
+          "measurementStatus": "not_queried_for_this_research",
+          "basis": "receipt_Transfer_events_only"
+        }
+      ],
+      "independentQueries": {
+        "status": "not_run_in_this_milestone",
+        "reason": "Scope is accountEffects event projection joined to measurements already available. New balance queries are deferred.",
+        "position": {
+          "stateBlockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+          "beforeIndex": "0",
+          "afterIndex": "1"
+        },
+        "balances": [
+          {
+            "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "account": "0x0c71073344e27e33cb57fcb587fc412d689dfd1d",
+            "data": "0x70a082310000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d"
+          },
+          {
+            "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "account": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+            "data": "0x70a08231000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6"
+          },
+          {
+            "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "account": "0x04de1ef694923844bae419d4f832196f21767f86",
+            "data": "0x70a0823100000000000000000000000004de1ef694923844bae419d4f832196f21767f86"
+          },
+          {
+            "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "account": "0x7fe37fc2f987eb981a0fc63cf1eabf04463550d4",
+            "data": "0x70a082310000000000000000000000007fe37fc2f987eb981a0fc63cf1eabf04463550d4"
+          },
+          {
+            "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "account": "0xb4894380282533a86cb241145fac54aaac995f18",
+            "data": "0x70a08231000000000000000000000000b4894380282533a86cb241145fac54aaac995f18"
+          }
+        ],
+        "allowances": [
+          {
+            "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "owner": "0x0c71073344e27e33cb57fcb587fc412d689dfd1d",
+            "spender": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+            "data": "0xdd62ed3e0000000000000000000000000c71073344e27e33cb57fcb587fc412d689dfd1d000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d6"
+          },
+          {
+            "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "owner": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+            "spender": "0x04de1ef694923844bae419d4f832196f21767f86",
+            "data": "0xdd62ed3e000000000000000000000000693f12e9e6b35b34458793546065e8b08e0299d600000000000000000000000004de1ef694923844bae419d4f832196f21767f86"
+          }
+        ]
+      }
+    }
+  ],
+  "existingLendingRegressionImplications": [
+    {
+      "operation": "supply",
+      "transactionHash": "0x25e076fc67489775131aafd134a1c6de8f974dea434000ba7568cf400df03cd2",
+      "sourceFixture": "../../fixtures/hyperlend-observed-historical-supply.json",
+      "transferFromCalls": [
+        {
+          "path": "0.0.0.3",
+          "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "recipient": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "amountRaw": "15066115"
+        }
+      ]
+    },
+    {
+      "operation": "withdraw",
+      "transactionHash": "0x94b5c4672e28cbeeab547c06f60e30afa02ac58b0cad4c7568a6ca9d8ac29ae7",
+      "sourceFixture": "../../fixtures/hyperlend-observed-historical-withdraw.json",
+      "transferFromCalls": []
+    },
+    {
+      "operation": "borrow",
+      "transactionHash": "0x0b8ad0d98c96224bdd9e1ad6623292164278340b123feb45eee9c556ec259afb",
+      "sourceFixture": "../../fixtures/hyperlend-observed-historical-borrow.json",
+      "transferFromCalls": []
+    },
+    {
+      "operation": "repay",
+      "transactionHash": "0x682c1d2f131715b8d4b04c71cd8e75ef56a107f0bbd992379a44bf426f22102f",
+      "sourceFixture": "../../fixtures/hyperlend-observed-historical-repay.json",
+      "transferFromCalls": [
+        {
+          "path": "0.0.1.4",
+          "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "recipient": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "amountRaw": "199626280"
+        }
+      ]
+    }
+  ]
+}

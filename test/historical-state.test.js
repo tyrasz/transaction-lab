@@ -215,6 +215,37 @@ test('canonical recheck catches a reorg and public errors never contain provider
   assert.ok(!JSON.stringify(poisoned.context.snapshotEvidence()).includes('SECRET'));
 });
 
+test('historical canonical failures stay latched and sanitized across later successful checks', async () => {
+  for (const failure of ['mismatch', 'rpc']) {
+    const { context, calls } = setup('withdraw', ({ method, result, calls }) => {
+      if (method !== 'eth_getBlockByNumber' || calls.filter(c => c.method === method).length !== 3) return;
+      if (failure === 'rpc') throw new Error('HISTORICAL_PRIVATE_PROVIDER_SECRET');
+      result.hash = word(1n); return result;
+    });
+    assert.equal(context.canonicalFailure, null);
+    await context.verifyCanonical(); // preparation has one canonical lookup, then this check
+    assert.equal(context.canonicalFailure, null);
+    await assert.rejects(context.verifyCanonical(), StateValidationError);
+    const firstFailure = context.canonicalFailure;
+    assert.equal(typeof firstFailure, 'string');
+    assert.doesNotMatch(firstFailure, /HISTORICAL_PRIVATE_PROVIDER_SECRET/);
+    await context.verifyCanonical();
+    assert.equal(context.canonicalFailure, firstFailure);
+    assert.equal(calls.filter(c => c.method === 'eth_getBlockByNumber').length, 4, 'latching adds no RPC');
+    assert.doesNotMatch(JSON.stringify(context.snapshotEvidence()), /HISTORICAL_PRIVATE_PROVIDER_SECRET/);
+  }
+});
+
+test('historical query-shape failure remains local to that pair', async () => {
+  const { context, args } = setup('withdraw', ({ method, params, result }) => {
+    if (method === 'debug_traceCallMany' && params[0][0].transactions[0].to === USDC && params[2].tracer === 'callTracer') { result[0][0].output = '0x01'; return result; }
+  });
+  await assert.rejects(context.readPair(query(USDC, args.request.from)), StateValidationError);
+  assert.equal(context.canonicalFailure, null);
+  await context.verifyCanonical();
+  assert.equal(context.canonicalFailure, null);
+});
+
 test('successful RPC error envelopes are sanitized before historical evidence retention', async () => {
   const marker = 'REVIEW_ONLY_PROVIDER_CREDENTIAL';
   const error = { code: -32603, message: `Upstream https://rpc.invalid/${marker} rejected request`, data: { requestUrl: marker } };

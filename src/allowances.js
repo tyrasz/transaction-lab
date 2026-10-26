@@ -8,11 +8,12 @@ const ADDRESS = /^0x[0-9a-f]{40}$/i;
 const MAX_PAIRS = 8;
 const MAX_OBSERVATIONS = 256;
 const allowanceKind = amount => amount === 0n ? 'zero' : amount === UINT256_MAX ? 'uint256_max' : 'bounded';
-const observationKey = observation => JSON.stringify([observation.id, observation.kind, observation.asset?.address, observation.owner, observation.spender, observation.amountRaw, observation.framePath, observation.logIndex ?? null, observation.returnStatus ?? null, observation.deadlineRaw ?? null, observation.submitter ?? null, observation.permitCaller ?? null]);
+const observationKey = observation => JSON.stringify([observation.id, observation.kind, observation.asset?.address, observation.owner, observation.spender, observation.amountRaw, observation.framePath, observation.logIndex ?? null, observation.returnStatus ?? null, observation.deadlineRaw ?? null, observation.submitter ?? null, observation.permitCaller ?? null, observation.implementation ?? null, observation.recipient ?? null, observation.amountMeaning ?? null, observation.executionStatus ?? null, observation.ownerIsSpender ?? null, observation.authorizationVerification ?? null, observation.intentVerification ?? null]);
 
 function compareEvidence(observations, finalValue) {
   const events = observations.filter(o => o.kind === 'approval_event');
   const requests = observations.filter(o => ['approval_request', 'permit_request'].includes(o.kind));
+  const transfers = observations.filter(o => o.kind === 'transfer_from_call');
   let lastEvent;
   let eventComparison = 'no_event';
   if (events.length === 1) lastEvent = events[0];
@@ -29,8 +30,10 @@ function compareEvidence(observations, finalValue) {
     lastEventObservationId: lastEvent?.id ?? null,
     lastEventAmountRaw: lastEvent?.amountRaw ?? null,
     requestComparison,
-    falseReturnObservationIds: requests.filter(request => request.returnStatus === 'returned_false').map(request => request.id),
-    explanation: 'The measured value is the final allowance after the whole transaction. Earlier approvals may be superseded or consumed later; an evidence difference is not a maliciousness verdict.',
+    transferObservationIds: transfers.map(transfer => transfer.id),
+    transferComparison: transfers.length ? 'not_compared_to_allowance' : 'no_transfer_from_call',
+    falseReturnObservationIds: [...requests, ...transfers].filter(call => call.returnStatus === 'returned_false').map(call => call.id),
+    explanation: 'The measured value is the final allowance after the whole transaction. Earlier approvals may be superseded or consumed later; an evidence difference is not a maliciousness verdict.' + (transfers.length ? ' transferFrom amounts are requested token transfers, not requested allowance values, and are not equated with allowance changes. An unchanged allowance does not establish that no spending occurred.' : ''),
   };
 }
 
@@ -58,7 +61,7 @@ export async function measureAllowances({ request, trace, block, rpc, metadata =
     // reintroduce failed subtrees, selector collisions, or unknown token contracts.
     const checked = analyzePermissions({ request, trace, block, metadata });
     if (checked.observations.length > MAX_OBSERVATIONS) failState('Permission evidence exceeds the configured 256-observation measurement limit.');
-    const observations = checked.observations.filter(o => o.tokenVerified === true && VERIFIED_TOKENS.has(o.asset?.address) && ['approval_request', 'permit_request', 'approval_event'].includes(o.kind));
+    const observations = checked.observations.filter(o => o.tokenVerified === true && VERIFIED_TOKENS.has(o.asset?.address) && ['approval_request', 'permit_request', 'approval_event', 'transfer_from_call'].includes(o.kind));
     if (!observations.length) return { ...base, warnings: ['No successful, verified USDC or hUSDC permission pairs were observed in this trace.'] };
     if (permissions !== undefined) {
       if (!Array.isArray(permissions?.observations)) failState('Supplied permission observations are malformed.');

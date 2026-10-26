@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
+import { isDeepStrictEqual } from 'node:util';
 import { replay } from '../src/server.js';
 import { RpcError } from '../src/rpc.js';
 
@@ -10,50 +11,116 @@ import { RpcError } from '../src/rpc.js';
 const bytes = await readFile(new URL('../reports/historical-comparisons/2026-10-23T15-35-35-718Z-http.json', import.meta.url));
 assert.equal(createHash('sha256').update(bytes).digest('hex'), 'acfed680cc322258956474854453acd632fb8b711171be2271f0518af6867167');
 const capture = JSON.parse(bytes);
+const freshBytes = await readFile(new URL('../reports/affected-account-comparisons/2026-10-26T02-23-00-749Z-http.json', import.meta.url));
+assert.equal(createHash('sha256').update(freshBytes).digest('hex'),'76d4470e663934d85f62202fb98a41349283c7544f22caa0cdd91222401677a7');
+const freshCapture=JSON.parse(freshBytes);
+const capturedEngine='fab9ca0c5b9d0292c67457d9e8eead88fa32914f65b56886067ed864a241b542';
+const sourceFiles=freshCapture.cases[0].runs[0].response.implementation.sourceFiles;
+const currentHash=createHash('sha256');
+for(const name of sourceFiles){assert.match(name,/^[a-z-]+\.js$/);currentHash.update(name+'\0').update(await readFile(new URL('../src/'+name,import.meta.url))).update('\0');}
+const currentEngine=currentHash.digest('hex');
+const USDC='0xb88339cb7199b77e23db6e890353e22632ba630f',HUSDC='0x744e4f26ee30213989216e1632d9be3547c4885b',VUSDC='0xd612513cb3b2c52abcd6d4b338374c09ada4657d',OWNER='0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0',POOL='0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b';
+const independent={
+ supply:{cash:'-15066115',position:HUSDC,event:'15066497',balance:'15066114',allowance:['115792089237316195423570985008687907853269984665640564039457584003439981948114','115792089237316195423570985008687907853269984665640564039457584003439966881999']},
+ withdraw:{cash:'503900226',position:HUSDC,event:'-503885190',balance:'-503900226'},
+ borrow:{cash:'835474410',position:VUSDC,event:'835476148',balance:'835474410'},
+ repay:{cash:'-199626280',position:VUSDC,event:'-199626071',balance:'-199626279',allowance:['115792089237316195423570985008687907853269984665640564039457584003409140907030','115792089237316195423570985008687907853269984665640564039457584003408941280750']},
+};
+function withoutGenerated(report){const {id,createdAt,timing,implementation,...rest}=report;const {sourceSha256,...provenance}=implementation;return {...rest,implementation:provenance};}
+function freshFor(operation,provider){return freshCapture.cases.find(c=>c.id==='hyperlend-usdc-'+operation)?.runs.find(r=>r.provider===(provider==='hyperlend-archive'?'archive':provider));}
+function assertEffects(report,operation){
+ const expected=independent[operation],effects=report.accountEffects;
+ assert.equal(effects.status,'observed');
+ assert.equal(effects.summary.measuredBalancePairs,report.balanceChanges.assets.length);
+ const holder=effects.accounts.find(a=>a.address===OWNER),cash=holder.tokens.find(t=>t.asset.address===USDC),position=holder.tokens.find(t=>t.asset.address===expected.position);
+ assert.equal(cash.events.netRaw,expected.cash);assert.equal(cash.balance.deltaRaw,expected.cash);
+ assert.equal(position.events.netRaw,expected.event);assert.equal(position.balance.deltaRaw,expected.balance);
+ assert.equal(position.role,expected.position===VUSDC?'liability':'receipt_token');
+ for(const account of effects.accounts)for(const token of account.tokens){
+  if(token.balance.status==='measured'){const original=report.balanceChanges.assets[token.balance.balanceChangeIndex];assert.equal(original.account,account.address);assert.equal(original.asset.address,token.asset.address);assert.deepEqual([token.balance.beforeRaw,token.balance.afterRaw,token.balance.deltaRaw],[original.beforeRaw,original.afterRaw,original.deltaRaw]);}
+  else assert.equal(token.balance.status,'not_measured');
+ }
+}
+
 function recordedRpc(run, mutate) {
-  const records = structuredClone(run.rpcCalls);
-  let position = 0;
+  const records=structuredClone(run.rpcCalls),used=new Set();let position=0;
+  // Concurrent consumers complete out of invocation order. Reproduce the saved
+  // shared-context completion order rather than fabricate a synchronous schedule.
+  const context=run.response?.evidence?.balanceMeasurement?.response?.length?run.response.evidence.balanceMeasurement:run.response?.evidence?.allowanceMeasurement;
+  const offset=context?.request?.length?records.length-context.request.length:records.length;
+  const completion=[...Array(offset).keys(),...(context?.response??[]).map(r=>offset+r.id-1)];
+  let completionIndex=0,pumpScheduled=false;const pending=new Map();
+  const pump=()=>{if(pumpScheduled)return;pumpScheduled=true;setImmediate(()=>{pumpScheduled=false;const index=completion[completionIndex],entry=pending.get(index);if(!entry)return;pending.delete(index);completionIndex++;entry.resolve(entry.result);pump();});};
   return {
-    provider: run.response?.source.provider ?? 'recorded-provider', rpcMs: 0,
-    async verifyChain() { assert.equal(await this.call('eth_chainId', []), '0x3e7'); },
-    async call(method, params = []) {
-      const record = records[position++];
-      assert.ok(record, 'No unrecorded RPC requests are allowed');
-      assert.deepEqual({ method, params }, { method: record.request.method, params: record.request.params });
-      if (record.error) throw new RpcError('Recorded provider failure.', record.error.code);
-      const result = structuredClone(record.response.result);
-      return mutate ? mutate({ method, params, result, position, total: records.length }) ?? result : result;
+    provider:run.response?.source.provider??'recorded-provider',rpcMs:0,
+    async verifyChain(){assert.equal(await this.call('eth_chainId',[]),'0x3e7');},
+    async call(method,params=[]){
+      let index=position++;
+      if(mutate)index=records.findIndex((record,i)=>!used.has(i)&&isDeepStrictEqual([method,params],[record.request.method,record.request.params]));
+      const record=records[index];assert.ok(record,'No unrecorded RPC requests are allowed');used.add(index);
+      assert.deepEqual({method,params},{method:record.request.method,params:record.request.params});
+      if(record.error)throw new RpcError('Recorded provider failure.',record.error.code);
+      const original=structuredClone(record.response.result);
+      if(mutate)return mutate({method,params,result:original,position:index+1,total:records.length})??original;
+      return await new Promise(resolve=>{pending.set(index,{resolve,result:original});pump();});
     },
-    get consumed() { return position; },
+    get consumed(){return position;},
   };
 }
 
-for (const item of capture.cases) for (const run of item.runs.filter(run => run.response)) {
-  test(`recorded full replay: ${item.operation} through ${run.provider}`, async () => {
-    const rpc = recordedRpc(run);
-    const report = await replay(run.request, rpc);
-    assert.equal(rpc.consumed, run.rpcCalls.length);
-    const expected = structuredClone(run.response);
-    // The adapter now permits separately validated allowance queries as well.
-    // Preserve every prior balance amount, witness, limit and RPC observation.
-    expected.balanceChanges.executionIdentity.validation.queryScope = 'configured_USDC_hUSDC_variable_debt_balanceOf_and_USDC_hUSDC_allowance';
-    for (const field of ['request','source','execution','coverage','protocol','inAssets','outAssets','movements','interestAccruals','positionChanges','balanceChanges','permissions','security']) {
-      assert.deepEqual(report[field], expected[field], `Original ${field} is preserved`);
-    }
-    // 0.5 adds historical allowance evidence; these original lending traces
-    // contain no approval/permit candidates, so no additional RPC is warranted.
-    const { allowanceMeasurement, ...originalEvidence } = report.evidence;
-    assert.deepEqual(originalEvidence, run.response.evidence);
-    assert.deepEqual(allowanceMeasurement, { request: [], response: [] });
-    assert.equal(report.balanceChanges.status, 'measured');
-    assert.equal(report.balanceChanges.basis, 'historical_transaction_position_balanceOf');
-    assert.equal(report.permissions.coverage.allowanceStateVerified, false);
-    assert.equal(report.allowanceChanges.status, 'not_applicable');
-    assert.deepEqual(report.allowanceChanges.allowances, []);
-  });
+test('v0.6 six-run capture retains the frozen source and full HTTP outcomes',()=>{
+ assert.deepEqual(freshCapture.summary,{planned:6,attempted:6,http200:6,measuredAllowances:5,unavailableAllowances:1,measuredBalances:4,failed:0,rpcCalls:162});
+ for(const item of freshCapture.cases)for(const run of item.runs){assert.equal(run.http.response.status,200);assert.equal(run.response.implementation.sourceSha256,capturedEngine);}
+});
+
+for(const item of capture.cases)for(const legacyRun of item.runs.filter(run=>run.response)){
+ test(`recorded full replay: ${item.operation} through ${legacyRun.provider}`,async()=>{
+  const fresh=freshFor(item.operation,legacyRun.provider),run=fresh??legacyRun,rpc=recordedRpc(run);
+  const report=await replay(run.request,rpc);
+  assert.equal(rpc.consumed,run.rpcCalls.length);
+  const expected=structuredClone(legacyRun.response);
+  expected.balanceChanges.executionIdentity.validation.queryScope='configured_USDC_hUSDC_variable_debt_balanceOf_and_USDC_hUSDC_allowance';
+  for(const field of ['request','source','execution','coverage','protocol','inAssets','outAssets','movements','interestAccruals','positionChanges','balanceChanges','security','warnings'])assert.deepEqual(report[field],expected[field],`Original ${field} is preserved`);
+  for(const field of ['traceMethod','traceRequest','traceResponse','receipt','receiptRechecked'])assert.deepEqual(report.evidence[field],expected.evidence[field],`Original ${field} raw execution is preserved`);
+  assertEffects(report,item.operation);
+  assert.equal(report.implementation.sourceSha256,currentEngine);
+  if(fresh){
+   assert.deepEqual(withoutGenerated(report),withoutGenerated(fresh.response),'New complete RPC interleaving, shared snapshots and all API semantics are exact');
+   const pair=report.allowanceChanges.allowances[0],known=independent[item.operation];
+   assert.equal(report.allowanceChanges.status,'measured');assert.equal(report.allowanceChanges.allowances.length,1);
+   assert.deepEqual([pair.asset.address,pair.owner,pair.spender,pair.beforeRaw,pair.afterRaw,pair.deltaRaw],[USDC,OWNER,POOL,...known.allowance,known.cash]);
+   assert.equal(pair.consistency.eventComparison,'no_event');assert.equal(pair.consistency.requestComparison,'no_request');assert.equal(pair.consistency.transferComparison,'not_compared_to_allowance');
+   assert.deepEqual(report.evidence.balanceMeasurement,report.evidence.allowanceMeasurement,'Both consumers retain the complete settled shared evidence');
+   const evidence=report.evidence.balanceMeasurement;assert.equal(evidence.request.length,evidence.response.length);
+   assert.deepEqual([...evidence.request.map(r=>r.id)].sort((a,b)=>a-b),[...evidence.response.map(r=>r.id)].sort((a,b)=>a-b));
+   assert.equal(report.permissions.observations.length,1);assert.equal(report.permissions.observations[0].kind,'transfer_from_call');
+   assert.equal(report.permissions.observations[0].amountRaw,known.cash.slice(1));
+   // Preserve the old permission scope/reasons/findings and the original warning
+   // prefix. The only new observation is independently checked transferFrom.
+   assert.deepEqual(report.permissions.scope,expected.permissions.scope);assert.deepEqual(report.permissions.findings,expected.permissions.findings);assert.deepEqual(report.permissions.coverage.reasons,expected.permissions.coverage.reasons);
+   assert.deepEqual(report.permissions.warnings.slice(0,expected.permissions.warnings.length),expected.permissions.warnings);
+  }else{
+   assert.deepEqual(report.permissions,expected.permissions);
+   const {allowanceMeasurement,...originalEvidence}=report.evidence;assert.deepEqual(originalEvidence,legacyRun.response.evidence);assert.deepEqual(allowanceMeasurement,{request:[],response:[]});
+   assert.equal(report.allowanceChanges.status,'not_applicable');assert.deepEqual(report.allowanceChanges.allowances,[]);
+  }
+ });
 }
 
-const repayRun = capture.cases.find(item => item.operation === 'repay').runs[0];
+for(const item of freshCapture.cases.filter(c=>c.id.startsWith('direct-')))for(const run of item.runs){
+ test(`recorded affected owner replay: ${item.id}`,async()=>{
+  const rpc=recordedRpc(run),report=await replay(run.request,rpc);assert.equal(rpc.consumed,run.rpcCalls.length);assert.deepEqual(withoutGenerated(report),withoutGenerated(run.response));assert.equal(report.implementation.sourceSha256,currentEngine);
+  const amount=item.id.endsWith('-a')?'1277067':'1118386',owner='0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379',spender='0x2908da1b63c4f7ce001bf5d875d179930a79eed4';
+  const call=report.permissions.observations[0];assert.equal(report.permissions.observations.length,1);assert.deepEqual([call.kind,call.owner,call.spender,call.recipient,call.submitter,call.amountRaw],['transfer_from_call',owner,spender,spender,spender,amount]);
+  assert.equal(report.accountEffects.accounts.length,2);assert.equal(report.accountEffects.summary.measuredBalancePairs,0);
+  for(const account of report.accountEffects.accounts){const token=account.tokens[0];assert.equal(token.asset.address,USDC);assert.equal(token.events.netRaw,(account.address===owner?'-':'')+amount);assert.equal(token.balance.status,'not_measured');}
+  assert.equal(report.balanceChanges.status,'not_applicable');assert.equal(report.security.status,'not_assessed');assert.equal(report.coverage.status,'partial');
+  if(item.id.endsWith('-a')){const a=report.allowanceChanges.allowances[0];assert.deepEqual([a.beforeRaw,a.afterRaw,a.deltaRaw],['115792089237316195423570985008687907853269984665640564039457584007756842122881','115792089237316195423570985008687907853269984665640564039457584007756840845814','-1277067']);}
+  else{assert.equal(report.allowanceChanges.status,'unavailable');assert.deepEqual(report.allowanceChanges.allowances,[]);assert.equal(report.permissions.coverage.allowanceStateVerified,false);assert.match(report.allowanceChanges.warnings.at(-1),/original transaction position/);}
+ });
+}
+
+const repayRun = freshFor('repay','drpc');
 test('historical API keeps original execution while refusing balances after canonical state changes', async () => {
   const rpc = recordedRpc(repayRun, ({ method, result, position, total }) => {
     if (position === total && method === 'eth_getBlockByNumber') result.hash = '0x' + 'f'.repeat(64);
@@ -65,6 +132,10 @@ test('historical API keeps original execution while refusing balances after cano
   assert.equal(report.balanceChanges.status, 'unavailable');
   assert.deepEqual(report.balanceChanges.assets, []);
   assert.equal(report.balanceChanges.executionIdentity, undefined);
+  assert.equal(report.allowanceChanges.status, 'unavailable', 'A later shared canonical failure also invalidates the earlier allowance measurement');
+  assert.deepEqual(report.allowanceChanges.allowances, []);
+  assert.equal(report.allowanceChanges.executionIdentity, undefined);
+  assert.deepEqual(report.evidence.balanceMeasurement, report.evidence.allowanceMeasurement);
   assert.equal(report.security.status, 'not_assessed');
 });
 
@@ -81,7 +152,12 @@ test('historical API retains original events but safely rejects nested provider 
   assert.deepEqual(report.balanceChanges.assets, []);
   assert.deepEqual(report.evidence.traceResponse, repayRun.response.evidence.traceResponse);
   assert.doesNotMatch(JSON.stringify(report), new RegExp(secret));
-  assert.equal(report.evidence.balanceMeasurement.response.at(-1).error.rpcCode, -32603);
+  const errors=report.evidence.balanceMeasurement.response.filter(entry=>entry.error);
+  assert.equal(errors.length,1);assert.equal(errors[0].error.rpcCode,-32603);
+  assert.deepEqual(report.evidence.balanceMeasurement,report.evidence.allowanceMeasurement);
+  const rejected=report.evidence.balanceMeasurement.request.find(entry=>entry.id===errors[0].id);
+  assert.equal(rejected.method,'debug_traceCallMany');assert.ok(rejected.params[0][0].transactions[0].data.startsWith('0x70a08231'));
+  assert.equal(report.allowanceChanges.status,'measured','A rejected balance view does not fabricate or remove an independently valid allowance query');
 });
 
 test('recorded archive failure remains a provider failure and cannot become an empty preview', async () => {

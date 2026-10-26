@@ -5,10 +5,11 @@ import { CHAIN_ID, USDC, HUSDC } from './config.js';
 
 const APPROVE = '0x095ea7b3';
 const PERMIT = '0xd505accf'; // ERC-2612 permit(address,address,uint256,uint256,uint8,bytes32,bytes32)
+const TRANSFER_FROM = '0x23b872dd';
 const APPROVAL = '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925';
 const MAX_UINT256 = (1n << 256n) - 1n;
 const VERIFIED_TOKENS = new Set([USDC, HUSDC]);
-const PERMIT_IMPLEMENTATIONS = {
+const TOKEN_IMPLEMENTATIONS = {
   [USDC]: '0x003f73f58ca78880da3642c5cb71d7459b3fe4f8',
   [HUSDC]: '0x410aa1ab680b886c875e99a7a4bfaf188508a7a3',
 };
@@ -62,16 +63,15 @@ function sameCallBranch(call, event) {
   return event.framePath === call.framePath || event.framePath.startsWith(`${call.framePath}.`);
 }
 
-function permitImplementation(frame, token) {
-  // Known proxy execution is required to interpret this selector as ERC-2612.
-  // This is implementation provenance, not independent signature verification.
+function proxyImplementation(frame, token) {
+  // This is execution provenance, not independent permission or intent verification.
   if (!Array.isArray(frame.calls) || frame.calls.length !== 1) return null;
   const delegated = frame.calls[0];
   return delegated?.type === 'DELEGATECALL' && !failed(delegated)
-    && address(delegated.from) === token && address(delegated.to) === PERMIT_IMPLEMENTATIONS[token]
+    && address(delegated.from) === token && address(delegated.to) === TOKEN_IMPLEMENTATIONS[token]
     && typeof delegated.input === 'string' && delegated.input.toLowerCase() === frame.input.toLowerCase()
     && quantity(delegated.value ?? '0x0') === 0n
-    ? PERMIT_IMPLEMENTATIONS[token] : null;
+    ? TOKEN_IMPLEMENTATIONS[token] : null;
 }
 
 /** Analyze permission evidence from a completed callTracer result, without RPC IO. */
@@ -142,7 +142,7 @@ export function analyzePermissions({ request, trace, block, metadata = {} } = {}
     }
 
     if (frame.type === 'CALL' && selector === PERMIT) {
-      const implementation = verified(token) ? permitImplementation(frame, token) : null;
+      const implementation = verified(token) ? proxyImplementation(frame, token) : null;
       if (!implementation) {
         reasons.add('A matching permit selector occurred without configured token and implementation provenance; ERC-2612 arguments were not inferred.');
         add({ kind: 'unverified_permission_call', contract: token, selector, framePath: path, basis: 'selector_only', tokenVerified: false });
@@ -171,6 +171,38 @@ export function analyzePermissions({ request, trace, block, metadata = {} } = {}
           warnings.add('Permit owner comes from calldata. The transaction submitter and immediate permit caller are reported separately; a relayed permit is not, by itself, evidence of maliciousness.');
           warnings.add('A permit deadline limits redemption of the signature; it does not make the resulting allowance expire. Domain, nonce, signature validity and original signing intent are not independently verified here.');
           if (relation === 'expired_at_execution') reasons.add('A successful permit trace has a deadline earlier than the recorded block time; this contradicts the configured ERC-2612 semantics.');
+        }
+      }
+    }
+
+    if (frame.type === 'CALL' && selector === TRANSFER_FROM) {
+      const implementation = verified(token) ? proxyImplementation(frame, token) : null;
+      const delegatedOutput = frame.calls?.[0]?.output ?? '0x';
+      const proxyOutput = frame.output ?? '0x';
+      if (!implementation || typeof proxyOutput !== 'string' || typeof delegatedOutput !== 'string' || !HEX.test(proxyOutput) || !HEX.test(delegatedOutput) || proxyOutput.toLowerCase() !== delegatedOutput.toLowerCase()) {
+        reasons.add('A matching transferFrom selector occurred without consistent configured proxy implementation evidence; transfer arguments were not inferred.');
+        add({ kind: 'unverified_permission_call', contract: token, selector, framePath: path, basis: 'selector_only', tokenVerified: false });
+      } else if (!HEX.test(frame.input) || frame.input.length !== 202 || !address(frame.from) || quantity(frame.value ?? '0x0') !== 0n) {
+        reasons.add('A malformed or nonzero-value transferFrom call was omitted.');
+      } else {
+        const owner = canonicalWordAddress(`0x${frame.input.slice(10, 74)}`);
+        const recipient = canonicalWordAddress(`0x${frame.input.slice(74, 138)}`);
+        if (!owner || !recipient) reasons.add('A transferFrom call with noncanonical owner or recipient encoding was omitted.');
+        else {
+          const asset = assetFor(token, metadata), amount = BigInt(`0x${frame.input.slice(138)}`), spender = address(frame.from);
+          const returned = returnStatus(frame.output);
+          add({
+            kind: 'transfer_from_call', asset, tokenVerified: true, implementation,
+            owner, spender, recipient, submitter: address(request?.from ?? trace.from), ownerIsSpender: owner === spender,
+            amountRaw: amount.toString(), amount: units(amount, asset.decimals), amountMeaning: 'requested_transfer_amount',
+            executionStatus: 'success', returnStatus: returned,
+            authorizationVerification: 'not_independently_verified', intentVerification: 'not_assessed',
+            basis: 'erc20_transferFrom_calldata', origin: path === '0' ? 'top_level_request' : 'nested_call', framePath: path,
+          });
+          warnings.add('transferFrom records a requested transfer amount, not a requested allowance. The owner, immediate spender, recipient and transaction submitter are distinct roles; call success does not independently verify intent or authorization.');
+          warnings.add('A transferFrom call does not by itself establish final token balances or numerical allowance consumption. Consult transfer events and separately measured state; an unchanged allowance does not mean no spending occurred.');
+          if (returned === 'returned_false') warnings.add(`transferFrom by ${spender} returned false; EVM call success does not establish that tokens moved.`);
+          if (returned === 'malformed' || returned === 'unavailable' || returned === 'empty') reasons.add('A transferFrom call lacks a canonical boolean return; its requested transfer and return evidence remain separate from established token movement.');
         }
       }
     }

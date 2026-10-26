@@ -1,0 +1,109 @@
+{
+  "id": "direct-transferfrom-a",
+  "kind": "observed_public_historical_development_case",
+  "provenance": {
+    "artifact": "direct-transferfrom-a-evidence.json",
+    "sha256": "848e7db26a485755ce99499c5c34319fa81517a82d56e4e713564c89dd0d9881",
+    "explorerUrl": "https://hyperevmscan.io/tx/0xe2f9761a3fac3ba83ee15fc5e6f12b55d15cd804b321a2cffd9d2c16d6c38dfe"
+  },
+  "identity": {
+    "chainId": 999,
+    "transactionHash": "0xe2f9761a3fac3ba83ee15fc5e6f12b55d15cd804b321a2cffd9d2c16d6c38dfe",
+    "blockHash": "0x423e4d0311decaa1e0c1d452905059c1409fcd68e1aa94d78978756e845bbac5",
+    "blockNumber": "49322025",
+    "transactionIndex": "0",
+    "timestamp": "1792770140"
+  },
+  "externalSender": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+  "rootContract": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+  "status": "success",
+  "checks": {
+    "chain999": true,
+    "transactionHash": true,
+    "receiptHash": true,
+    "successfulReceipt": true,
+    "blockHash": true,
+    "transactionIndex": true,
+    "blockByHashPosition": true,
+    "canonicalBlockPosition": true,
+    "traceRootMatches": true,
+    "traceGasMatchesReceipt": true
+  },
+  "transferFromCalls": [
+    {
+      "framePath": "0",
+      "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+      "owner": "0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+      "recipient": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+      "spender": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+      "externalTransactionSender": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+      "rootContract": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+      "amountRaw": "1277067",
+      "ownerDiffersFromExternalSender": true,
+      "spenderDiffersFromRootContract": true,
+      "success": true,
+      "returnData": "0x0000000000000000000000000000000000000000000000000000000000000001",
+      "delegateTargets": [
+        "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8"
+      ]
+    }
+  ],
+  "transferEvents": [
+    {
+      "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+      "from": "0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+      "to": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+      "amountRaw": "1277067",
+      "logIndex": "0"
+    }
+  ],
+  "eventDeltas": [
+    {
+      "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+      "account": "0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+      "eventNetRaw": "-1277067",
+      "measurementStatus": "not_queried_for_this_research",
+      "basis": "receipt_Transfer_events_only"
+    },
+    {
+      "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+      "account": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+      "eventNetRaw": "1277067",
+      "measurementStatus": "not_queried_for_this_research",
+      "basis": "receipt_Transfer_events_only"
+    }
+  ],
+  "requiredIndependentQueries": {
+    "status": "not_run_in_this_milestone",
+    "reason": "Scope is accountEffects event projection joined to measurements already available. New balance queries are deferred.",
+    "position": {
+      "stateBlockHash": "0x423e4d0311decaa1e0c1d452905059c1409fcd68e1aa94d78978756e845bbac5",
+      "beforeIndex": "0",
+      "afterIndex": "1"
+    },
+    "balances": [
+      {
+        "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+        "account": "0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+        "data": "0x70a08231000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe56379"
+      },
+      {
+        "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+        "account": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+        "data": "0x70a082310000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4"
+      }
+    ],
+    "allowances": [
+      {
+        "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+        "owner": "0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+        "spender": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+        "data": "0xdd62ed3e000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4"
+      }
+    ]
+  },
+  "availableIndependentState": {
+    "status": "not_queried",
+    "evidence": "Original prestate storage diff is retained, but no token-storage-layout inference or balanceOf/allowance query result is substituted for a measured state value."
+  }
+}

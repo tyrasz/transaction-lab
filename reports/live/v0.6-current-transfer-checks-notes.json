@@ -1,0 +1,226 @@
+{
+  "schemaVersion": "1.0",
+  "readOnly": true,
+  "signing": false,
+  "broadcasting": false,
+  "expectedRequestCount": 2,
+  "retries": 0,
+  "runs": [
+    {
+      "exampleId": "hyperlend-usdc-supply",
+      "httpStatus": 200,
+      "durationMs": 454,
+      "implementation": {
+        "name": "Transaction Lab",
+        "version": "0.6.0",
+        "sourceSha256": "fab9ca0c5b9d0292c67457d9e8eead88fa32914f65b56886067ed864a241b542",
+        "sourceFiles": [
+          "account-effects.js",
+          "allowances.js",
+          "analyze.js",
+          "balances.js",
+          "config.js",
+          "historical-state.js",
+          "lending.js",
+          "lending-balances.js",
+          "permissions.js",
+          "revert.js",
+          "rpc.js",
+          "server.js",
+          "state.js",
+          "validate.js"
+        ]
+      },
+      "source": {
+        "provider": "hyperliquid.drpc.org",
+        "chainId": 999,
+        "blockNumber": "49536896",
+        "blockHash": "0x48f4baab87c398dedf709546bbc5bc2da28f45ef90815bf98a47c8429b2f5fa7",
+        "timestamp": "1792981543",
+        "mode": "simulation",
+        "blockBinding": "explicit_block_hash",
+        "requestedBlock": "latest"
+      },
+      "execution": {
+        "status": "success",
+        "gasUsed": "165727",
+        "returnData": "0x",
+        "error": null
+      },
+      "balanceStatus": "measured",
+      "allowanceStatus": "measured",
+      "accountEffectsStatus": "observed",
+      "accountEffectsSummary": {
+        "accountCount": 3,
+        "nonSubmitterAccountCount": 2,
+        "tokenAccountPairs": 4,
+        "measuredBalancePairs": 2,
+        "unmeasuredBalancePairs": 2,
+        "measuredAllowancePairs": 1
+      },
+      "balanceChanges": [
+        {
+          "asset": {
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "decimals": 6,
+            "symbol": "USDC",
+            "name": "USDC",
+            "type": "ERC20",
+            "role": "underlying_asset"
+          },
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "beforeRaw": "344156193",
+          "afterRaw": "329090078",
+          "deltaRaw": "-15066115",
+          "before": "344.156193",
+          "after": "329.090078",
+          "delta": "-15.066115"
+        },
+        {
+          "asset": {
+            "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "decimals": 6,
+            "symbol": "hHyperEvmUSDC",
+            "name": "HyperLend HyperEVM USDC",
+            "type": "ERC20",
+            "role": "receipt_token"
+          },
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "beforeRaw": "3179075937",
+          "afterRaw": "3194142051",
+          "deltaRaw": "15066114",
+          "before": "3179.075937",
+          "after": "3194.142051",
+          "delta": "15.066114"
+        }
+      ],
+      "allowances": [
+        {
+          "asset": {
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "decimals": 6,
+            "symbol": "USDC",
+            "name": "USDC",
+            "type": "ERC20"
+          },
+          "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003202135963444",
+          "afterRaw": "115792089237316195423570985008687907853269984665640564039457584003202120897329",
+          "deltaRaw": "-15066115",
+          "before": "115792089237316195423570985008687907853269984665640564039457584003202135.963444",
+          "after": "115792089237316195423570985008687907853269984665640564039457584003202120.897329",
+          "delta": "-15.066115",
+          "beforeKind": "bounded",
+          "afterKind": "bounded",
+          "changed": true,
+          "observationIds": [
+            "permission-1"
+          ],
+          "consistency": {
+            "eventComparison": "no_event",
+            "lastEventObservationId": null,
+            "lastEventAmountRaw": null,
+            "requestComparison": "no_request",
+            "transferObservationIds": [
+              "permission-1"
+            ],
+            "transferComparison": "not_compared_to_allowance",
+            "falseReturnObservationIds": [],
+            "explanation": "The measured value is the final allowance after the whole transaction. Earlier approvals may be superseded or consumed later; an evidence difference is not a maliciousness verdict. transferFrom amounts are requested token transfers, not requested allowance values, and are not equated with allowance changes. An unchanged allowance does not establish that no spending occurred."
+          }
+        }
+      ],
+      "reportedReverts": [],
+      "apiError": null,
+      "transportFailure": null,
+      "interpretation": "The unsigned call executed successfully at the returned latest-state block; measurements retain their explicit scope."
+    },
+    {
+      "exampleId": "usdc-historical-transfer-from",
+      "httpStatus": 200,
+      "durationMs": 100,
+      "implementation": {
+        "name": "Transaction Lab",
+        "version": "0.6.0",
+        "sourceSha256": "fab9ca0c5b9d0292c67457d9e8eead88fa32914f65b56886067ed864a241b542",
+        "sourceFiles": [
+          "account-effects.js",
+          "allowances.js",
+          "analyze.js",
+          "balances.js",
+          "config.js",
+          "historical-state.js",
+          "lending.js",
+          "lending-balances.js",
+          "permissions.js",
+          "revert.js",
+          "rpc.js",
+          "server.js",
+          "state.js",
+          "validate.js"
+        ]
+      },
+      "source": {
+        "provider": "hyperliquid.drpc.org",
+        "chainId": 999,
+        "blockNumber": "49536896",
+        "blockHash": "0x48f4baab87c398dedf709546bbc5bc2da28f45ef90815bf98a47c8429b2f5fa7",
+        "timestamp": "1792981543",
+        "mode": "simulation",
+        "blockBinding": "explicit_block_hash",
+        "requestedBlock": "latest"
+      },
+      "execution": {
+        "status": "reverted",
+        "gasUsed": "39007",
+        "returnData": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002645524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63650000000000000000000000000000000000000000000000000000",
+        "error": "execution reverted",
+        "revert": {
+          "selector": "0x08c379a0",
+          "source": "contract_return_data",
+          "kind": "error_string",
+          "message": "ERC20: transfer amount exceeds balance"
+        }
+      },
+      "balanceStatus": "not_applicable",
+      "allowanceStatus": "not_applicable",
+      "accountEffectsStatus": "not_applicable",
+      "accountEffectsSummary": {
+        "accountCount": 0,
+        "nonSubmitterAccountCount": 0,
+        "tokenAccountPairs": 0,
+        "measuredBalancePairs": 0,
+        "unmeasuredBalancePairs": 0,
+        "measuredAllowancePairs": 0
+      },
+      "balanceChanges": [],
+      "allowances": [],
+      "reportedReverts": [
+        {
+          "path": "0",
+          "type": "CALL",
+          "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "error": "execution reverted",
+          "revertReason": "ERC20: transfer amount exceeds balance",
+          "returnData": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002645524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63650000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "path": "0.0",
+          "type": "DELEGATECALL",
+          "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+          "error": "execution reverted",
+          "revertReason": "ERC20: transfer amount exceeds balance",
+          "returnData": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002645524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63650000000000000000000000000000000000000000000000000000"
+        }
+      ],
+      "apiError": null,
+      "transportFailure": null,
+      "interpretation": "The actual execution failure is retained verbatim. It is a latest-state result, not evidence of a permit nonce issue or by itself an engine defect."
+    }
+  ],
+  "interpretation": "Execution reverts at latest state are retained as state-dependent outcomes, not automatically classified as engine failures. These direct supply/transferFrom calls contain no permit signature or permit nonce.",
+  "completedAt": "2026-10-26T02:25:44.165Z"
+}

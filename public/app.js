@@ -331,6 +331,101 @@ function renderPositions(changes, result) {
   }
 }
 
+function renderAccountEffects(effects, historical = false) {
+  const accounts = Array.isArray(effects?.accounts) ? effects.accounts : [];
+  $('account-effects-section').hidden = !effects;
+  $('account-effects-list').replaceChildren();
+  $('account-effects-summary').replaceChildren();
+  $('account-effects-warnings').replaceChildren();
+  if (!effects) return;
+  $('account-effects-badge').textContent = effects.status === 'observed' ? 'Limited account coverage' : titleCase(effects.status);
+  $('account-effects-description').textContent = effects.status === 'observed'
+    ? `Accounts identified in the ${historical ? 'original execution' : 'simulated call'} and available measurements. Some accounts have only event evidence; measured balance changes are labeled separately. This is not a complete inventory of affected accounts.`
+    : effects.status === 'not_applicable'
+      ? 'Account effects are not available for this execution. No zero balance change is inferred.'
+      : 'The observed-account view could not be produced. Missing observations do not establish unchanged balances.';
+  const summary = effects.summary || {};
+  const counts = [
+    ['Observed accounts', summary.accountCount],
+    ['Other than submitter', summary.nonSubmitterAccountCount],
+    ['Measured balance pairs', summary.measuredBalancePairs],
+    ['Unmeasured balance pairs', summary.unmeasuredBalancePairs],
+  ];
+  for (const [label, value] of effects.status === 'observed' ? counts : []) {
+    if (value === null || value === undefined) continue;
+    const count = node('div', 'account-count');
+    count.append(node('strong', '', value), node('span', '', label));
+    $('account-effects-summary').append(count);
+  }
+  for (const account of accounts) {
+    const card = node('details', 'account-effect');
+    card.open = accounts.length <= 2;
+    const heading = node('summary', 'account-effect-heading');
+    const identity = node('span', 'account-effect-identity');
+    identity.append(node('span', 'account-address', account.address), node('span', `account-submitter${account.isSubmitter ? ' is-submitter' : ''}`, account.isSubmitter ? 'Transaction submitter' : 'Other observed account'));
+    const tokens = Array.isArray(account.tokens) ? account.tokens : [];
+    const measuredCount = tokens.filter(token => token.balance?.status === 'measured').length;
+    heading.append(identity, node('span', 'account-effect-count', `${tokens.length} token${tokens.length === 1 ? '' : 's'} · ${measuredCount} measured`));
+    card.append(heading);
+    const body = node('div', 'account-effect-body');
+    if (account.roles?.length) body.append(node('p', 'account-role-list', account.roles.map(readableKey).join(' · ')));
+    if (!tokens.length) body.append(node('p', 'section-help', 'No token observations or measurements are attached to this account.'));
+    for (const token of tokens) {
+      const asset = token.asset || {};
+      const liability = token.role === 'liability';
+      const decimalsKnown = token.tokenVerified === true && Number.isInteger(asset.decimals) && asset.decimals >= 0 && asset.decimals <= 255;
+      const value = (formatted, raw, signed = false) => signed ? signedAmount(decimalsKnown ? formatted : null, raw) : exactAmount(decimalsKnown ? formatted : null, raw);
+      const row = node('div', `account-token${liability ? ' account-token-liability' : ''}`);
+      const title = node('div', 'account-token-heading');
+      title.append(node('strong', '', asset.symbol || 'Unknown token'), node('span', 'basis-badge', token.tokenVerified === true ? liability ? 'Liability' : titleCase(token.role) : 'Unverified token'));
+      row.append(title, node('div', 'account-token-address', asset.address));
+      if (liability) row.append(node('p', 'account-liability-note', 'Debt balance · an increase is additional debt, not spendable assets.'));
+      const evidence = node('div', 'account-evidence-grid');
+      const events = node('div', 'account-evidence');
+      events.append(node('h4', '', 'Transfer-event net'));
+      if (token.events?.status === 'observed') {
+        events.append(node('strong', 'account-evidence-value', value(token.events.net, token.events.netRaw, true)));
+        const details = node('dl', 'account-evidence-details');
+        addDefinition(details, 'Incoming events', value(token.events.incoming, token.events.incomingRaw));
+        addDefinition(details, 'Outgoing events', value(token.events.outgoing, token.events.outgoingRaw));
+        addDefinition(details, 'Exact net raw', token.events.netRaw);
+        events.append(details, node('p', 'account-evidence-note', 'Event-derived; this is not a measured balance change.'));
+      } else events.append(node('p', 'account-evidence-missing', 'No transfer event observed'), node('p', 'account-evidence-note', 'This does not establish zero balance change.'));
+      const balance = node('div', 'account-evidence');
+      balance.append(node('h4', '', liability ? 'Measured debt change' : 'Measured balance change'));
+      if (token.balance?.status === 'measured') {
+        balance.append(node('strong', 'account-evidence-value', value(token.balance.delta, token.balance.deltaRaw, true)));
+        const details = node('dl', 'account-evidence-details');
+        addDefinition(details, 'Before', value(token.balance.before, token.balance.beforeRaw));
+        addDefinition(details, 'After', value(token.balance.after, token.balance.afterRaw));
+        addDefinition(details, 'Exact change raw', token.balance.deltaRaw);
+        balance.append(details, node('p', 'account-evidence-note', token.balance.basis === 'historical_transaction_position_balanceOf'
+          ? 'Measured at the original transaction position.' : `Measurement basis: ${token.balance.basis ? readableKey(token.balance.basis) : 'Not provided'}.`));
+      } else balance.append(node('p', 'account-evidence-missing', 'Not measured'), node('p', 'account-evidence-note', 'No before-and-after balance result for this account and token.'));
+      evidence.append(events, balance);
+      row.append(evidence);
+      const references = Array.isArray(token.permissionReferences) ? token.permissionReferences : [];
+      const allowanceCount = Array.isArray(token.allowanceIndexes) ? token.allowanceIndexes.length : 0;
+      if (references.length || allowanceCount) {
+        const referenceDetails = node('details', 'account-references');
+        referenceDetails.append(node('summary', '', `${references.length} permission reference${references.length === 1 ? '' : 's'} · ${allowanceCount} measured allowance pair${allowanceCount === 1 ? '' : 's'}`));
+        const list = node('ul');
+        for (const reference of references) list.append(node('li', '', `${titleCase(reference.role)} in observation ${display(reference.observationId)}`));
+        if (allowanceCount) list.append(node('li', '', 'See the measured allowances section for the corresponding token, owner, and spender values.'));
+        referenceDetails.append(list);
+        row.append(referenceDetails);
+      }
+      body.append(row);
+    }
+    card.append(body);
+    $('account-effects-list').append(card);
+  }
+  if (effects.status === 'observed' && !accounts.length) $('account-effects-list').append(node('p', 'section-help', 'No accounts were identified in the available evidence.'));
+  const warnings = [...new Set([...(effects.coverage?.reasons || []), ...(effects.warnings || [])])];
+  $('account-effects-limits').hidden = !warnings.length;
+  $('account-effects-warnings').replaceChildren(...warnings.map(warning => node('li', '', display(warning))));
+}
+
 function renderPermissions(permissions, allowanceChanges) {
   const observations = Array.isArray(permissions?.observations) ? permissions.observations : [];
   const findings = Array.isArray(permissions?.findings) ? permissions.findings : [];
@@ -341,8 +436,8 @@ function renderPermissions(permissions, allowanceChanges) {
   if (!observations.length && !findings.length) return;
   const hasMeasuredPairs = allowanceChanges?.status === 'measured' && allowanceChanges.allowances?.length;
   $('permissions-description').textContent = hasMeasuredPairs
-    ? 'Approval and permit requests are shown separately from emitted events. Final allowances are measured only for the exact pairs identified above. Spender reputation and general transaction security remain not assessed.'
-    : 'Approval and permit requests are shown separately from emitted events. Final allowances are not measured for these observations. Spender reputation and general transaction security remain not assessed.';
+    ? 'Approval and permit requests, emitted Approval events, and transferFrom calls are distinct observations. Final allowances are measured only for the exact pairs identified above. Spender reputation, authorization intent, and general transaction security remain not assessed.'
+    : 'Approval and permit requests, emitted Approval events, and transferFrom calls are distinct observations. Final allowances are not measured for these observations. Spender reputation, authorization intent, and general transaction security remain not assessed.';
   for (const finding of findings) {
     const card = node('div', 'permission-finding');
     const label = finding.code === 'MAX_UINT256_APPROVAL_EVENT' ? 'Maximum allowance reported in an event'
@@ -362,14 +457,32 @@ function renderPermissions(permissions, allowanceChanges) {
     const permit = observation.kind === 'permit_request';
     const requested = observation.kind === 'approval_request' || permit;
     const emitted = observation.kind === 'approval_event';
-    const verified = observation.tokenVerified === true && (requested || emitted);
+    const transfer = observation.kind === 'transfer_from_call';
+    const verified = observation.tokenVerified === true && (requested || emitted || transfer);
     const heading = node('div', 'permission-heading');
-    const title = permit ? 'Permit authorization request' : requested ? 'Requested approval' : emitted ? 'Emitted Approval event' : 'Unverified permission signature';
+    const title = transfer ? 'transferFrom call · requested transfer' : permit ? 'Permit authorization request' : requested ? 'Requested approval' : emitted ? 'Emitted Approval event' : 'Unverified token call or event';
     heading.append(node('h4', '', title), node('span', 'basis-badge', verified ? observation.asset?.symbol || 'Configured token' : 'Unverified contract'));
     card.append(heading);
     const details = node('dl', 'permission-details');
     addDefinition(details, 'Token / contract', observation.asset?.address || observation.contract);
-    if (verified) {
+    if (verified && transfer) {
+      const measured = measuredAllowance(allowanceChanges, observation);
+      addDefinition(details, 'Owner', observation.owner);
+      addDefinition(details, 'Spender · token caller', observation.spender);
+      addDefinition(details, 'Recipient', observation.recipient);
+      addDefinition(details, 'Transaction submitter', observation.submitter);
+      addDefinition(details, 'Requested transfer', exactAmount(observation.amount, observation.amountRaw, observation.asset?.symbol));
+      addDefinition(details, 'Exact requested raw', observation.amountRaw);
+      addDefinition(details, 'Call return', observation.returnStatus === 'returned_true' ? 'Returned true · consult separate transfer and balance evidence'
+        : observation.returnStatus === 'returned_false' ? 'Returned false · token movement is not established'
+        : observation.returnStatus ? readableKey(observation.returnStatus) : 'Not available');
+      addDefinition(details, 'Authorization verification', 'Not independently verified');
+      addDefinition(details, 'Intent verification', 'Not assessed');
+      addDefinition(details, 'Final allowance', measured
+        ? `${exactAmount(measured.after, measured.afterRaw, measured.asset?.symbol)} · measured separately for this owner and spender`
+        : 'Not measured for this token, owner, and spender pair');
+      card.append(node('p', 'permission-unverified', 'This is a requested transfer amount, not an approval amount. A successful call does not independently establish authorization or intent; an unchanged allowance does not mean no spending occurred.'));
+    } else if (verified) {
       const measured = measuredAllowance(allowanceChanges, observation);
       const kind = observation.allowanceKind === 'uint256_max' ? 'Maximum uint256 (commonly called unlimited)'
         : observation.allowanceKind === 'revoke' ? 'Revoke · zero allowance' : 'Bounded amount';
@@ -408,6 +521,7 @@ function renderPermissions(permissions, allowanceChanges) {
       card.append(node('p', 'permission-unverified', 'ERC20 ownership, spender, and allowance semantics are not inferred from an unverified contract.'));
     }
     addDefinition(details, 'Evidence', observation.basis ? readableKey(observation.basis) : null);
+    addDefinition(details, 'Observation ID', observation.id);
     card.append(details);
     $('permission-observations').append(card);
   }
@@ -486,6 +600,7 @@ function renderResult(result) {
   renderAllowances(result.allowanceChanges, result.permissions, historical);
   renderPermissions(result.permissions, result.allowanceChanges);
   renderBalanceChanges(result.balanceChanges, source);
+  renderAccountEffects(result.accountEffects, historical);
   renderPositions(result.positionChanges, result);
   renderInterest(result.interestAccruals, protocol);
   const warnings = [...new Set([...(coverage.reasons || []), ...(result.warnings || [])])];

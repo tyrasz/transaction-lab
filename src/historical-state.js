@@ -1,7 +1,7 @@
 // Original-position Hyperlend balance and configured-token allowance reads. Every execution is ephemeral;
 // this module never signs, submits, or persists a transaction.
 import { CHAIN_ID, POOL, USDC, HUSDC, VUSDC } from './config.js';
-import { StateValidationError, failState, uint, hex, UINT256_MAX, buildStateOverrides } from './state.js';
+import { StateValidationError, failState, stateErrorDescription, uint, hex, UINT256_MAX, buildStateOverrides } from './state.js';
 import { assertNoProviderErrorResult } from './rpc.js';
 
 const ADDRESS = /^0x[0-9a-f]{40}$/i;
@@ -144,6 +144,7 @@ export function createHistoricalStateContext({ request, block, rpc, transaction,
   const pairs = new Map();
   let preparation, header, pinned, index, gasPrice, originalCall, executionIdentity;
   let evidenceBytes = 0;
+  let canonicalFailure = null;
   async function call(method, params) {
     if (evidence.request.length >= MAX_CALLS) failState('Historical state measurement exceeds its 64-RPC limit.');
     const id = evidence.request.length + 1;
@@ -262,10 +263,18 @@ export function createHistoricalStateContext({ request, block, rpc, transaction,
       return { ...await pairs.get(pairKey) };
     },
     async verifyCanonical() {
-      await prepare();
-      assertHeader(await call('eth_getBlockByNumber', [hex(pinnedBlock.number), false]));
+      try {
+        await prepare();
+        assertHeader(await call('eth_getBlockByNumber', [hex(pinnedBlock.number), false]));
+      } catch (error) {
+        // Preserve the first failed shared binding even if a concurrent
+        // consumer's canonical check later succeeds.
+        canonicalFailure ??= stateErrorDescription(error);
+        throw error;
+      }
     },
     snapshotEvidence() { return structuredClone(evidence); },
+    get canonicalFailure() { return canonicalFailure; },
     get executionIdentity() { return executionIdentity ? structuredClone(executionIdentity) : null; },
   });
 }

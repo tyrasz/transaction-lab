@@ -87,6 +87,7 @@ export function createStateContext({ request, block, rpc }) {
   let pinned;
   let overrides;
   let executionIdentity;
+  let canonicalFailure = null;
   async function call(method, params) {
     const evidenceId = evidence.request.length + 1;
     evidence.request.push({ id: evidenceId, method, params: structuredClone(params) });
@@ -127,11 +128,19 @@ export function createStateContext({ request, block, rpc }) {
       return { before: BigInt(before), after: BigInt(after), delta: BigInt(after) - BigInt(before) };
     },
     async verifyCanonical() {
-      await prepare();
-      const confirmed = await call('eth_getBlockByNumber', [hex(boundBlock.number), false]);
-      if (lower(confirmed?.hash) !== pinned.blockHash || uint(confirmed?.number) !== uint(boundBlock.number) || uint(confirmed?.timestamp) !== uint(boundBlock.timestamp)) failState('The pinned block is no longer canonical; no measured result is returned.');
+      try {
+        await prepare();
+        const confirmed = await call('eth_getBlockByNumber', [hex(boundBlock.number), false]);
+        if (lower(confirmed?.hash) !== pinned.blockHash || uint(confirmed?.number) !== uint(boundBlock.number) || uint(confirmed?.timestamp) !== uint(boundBlock.timestamp)) failState('The pinned block is no longer canonical; no measured result is returned.');
+      } catch (error) {
+        // All consumers share this binding. A later successful check cannot
+        // erase a failure observed while another consumer was still running.
+        canonicalFailure ??= stateErrorDescription(error);
+        throw error;
+      }
     },
     snapshotEvidence() { return structuredClone(evidence); },
+    get canonicalFailure() { return canonicalFailure; },
     get executionIdentity() { return executionIdentity ? structuredClone(executionIdentity) : null; },
   };
 }

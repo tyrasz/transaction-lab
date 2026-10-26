@@ -1,0 +1,70 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-10-25T15:46:19.453Z",
+  "kind": "bounded_affected_account_development_discovery",
+  "newRpcRequests": 14,
+  "newTransactionCaptures": 2,
+  "reusedTransactionCaptures": 1,
+  "retries": 0,
+  "balanceQueries": 0,
+  "allowanceQueries": 0,
+  "artifacts": [
+    {
+      "path": "INDEX.md",
+      "sha256": "738d253b08d4dc57f96c385006e177686979f54d7e9d4121931ef9628ab89bd7",
+      "bytes": 7410
+    },
+    {
+      "path": "capture-transferfrom.mjs",
+      "sha256": "e67472d49c221ba40414e9834ca596799e50e000df731e13651351c26a0b5ea4",
+      "bytes": 3501
+    },
+    {
+      "path": "direct-transferfrom-a-decoded.json",
+      "sha256": "9a3197d3117967fa7fac38520daf1b53a92898bdccd817fafc8da063d1cd9e15",
+      "bytes": 4298
+    },
+    {
+      "path": "direct-transferfrom-a-evidence.json",
+      "sha256": "848e7db26a485755ce99499c5c34319fa81517a82d56e4e713564c89dd0d9881",
+      "bytes": 18898
+    },
+    {
+      "path": "direct-transferfrom-b-decoded.json",
+      "sha256": "18f9bdbf2f73b0905206cf4167b848665c7282b28ec5d254ab24961ecac6dd81",
+      "bytes": 4299
+    },
+    {
+      "path": "direct-transferfrom-b-evidence.json",
+      "sha256": "dc64d9a7de8e8e32ffbba6173cc54b56ce238f6d2a6e079504884e0b175fa748",
+      "bytes": 18577
+    },
+    {
+      "path": "router-permit-consumption-decoded.json",
+      "sha256": "d208e5f8eb4d0674aba6287ec43c64456acdfdd970cdee9a6aa6a148b030348f",
+      "bytes": 14624
+    },
+    {
+      "path": "summarize.mjs",
+      "sha256": "9a7ee575ca4f9436af3d83de91ee1a69b3085d672218dd3486c3c184f214238e",
+      "bytes": 6399
+    },
+    {
+      "path": "summary.json",
+      "sha256": "78edac0603766011f169d3ff9d9bd56a70ac4030b5e2a9c442408c1de11e2af3",
+      "bytes": 15558
+    }
+  ],
+  "sourceSemantics": {
+    "url": "https://hyperevmscan.io/address/0x003f73f58ca78880da3642c5cb71d7459b3fe4f8#code",
+    "savedSource": "../permission-discovery/sources/usdc-FiatTokenV1.sol",
+    "sourceManifest": "../permission-discovery/sources/manifest.json",
+    "meaning": "Verified Circle transferFrom subtracts allowance including max uint256 without an Approval event; caller spends owner funds."
+  },
+  "limits": [
+    "Reviewed development cases, not held-out scoring.",
+    "Account effect values are Transfer-event nets, not independently measured balances.",
+    "Canonical position mismatch is retained in direct B; no retry or substitution.",
+    "No changes to existing replay tests, core files or prior evidence."
+  ]
+}

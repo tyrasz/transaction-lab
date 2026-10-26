@@ -1,0 +1,323 @@
+{
+  "schemaVersion": "1.0",
+  "kind": "v0.6_development_http_capture",
+  "capturedAt": "2026-10-26T02:23:00.749Z",
+  "implementation": {
+    "name": "Transaction Lab",
+    "version": "0.6.0",
+    "sourceSha256": "fab9ca0c5b9d0292c67457d9e8eead88fa32914f65b56886067ed864a241b542",
+    "sourceFiles": [
+      "account-effects.js",
+      "allowances.js",
+      "analyze.js",
+      "balances.js",
+      "config.js",
+      "historical-state.js",
+      "lending.js",
+      "lending-balances.js",
+      "permissions.js",
+      "revert.js",
+      "rpc.js",
+      "server.js",
+      "state.js",
+      "validate.js"
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "2026-10-26T02-23-00-749Z-http.json",
+      "sha256": "76d4470e663934d85f62202fb98a41349283c7544f22caa0cdd91222401677a7",
+      "bytes": 2069649
+    },
+    {
+      "path": "run-http-check.mjs",
+      "sha256": "58187ce2810fe95bd52e77b207347807694ecbcc162b1aac50ad41b69bfe59d4",
+      "bytes": 5726
+    },
+    {
+      "path": "2026-10-26T02-23-00-749Z-notes.md",
+      "sha256": "f814d5fa616915243fb991dfa923dbdca949b8529576af67f744264db0dea8f9",
+      "bytes": 4958
+    }
+  ],
+  "summary": {
+    "planned": 6,
+    "attempted": 6,
+    "http200": 6,
+    "measuredAllowances": 5,
+    "unavailableAllowances": 1,
+    "measuredBalances": 4,
+    "failed": 0,
+    "rpcCalls": 162
+  },
+  "lendingProviderComparisons": {
+    "matched": 2,
+    "total": 2,
+    "fields": [
+      "allowanceChanges",
+      "balanceChanges"
+    ]
+  },
+  "readOnly": true,
+  "retries": 0,
+  "newBalanceScope": false,
+  "runs": [
+    {
+      "id": "hyperlend-usdc-supply",
+      "provider": "drpc",
+      "transactionHash": "0x25e076fc67489775131aafd134a1c6de8f974dea434000ba7568cf400df03cd2",
+      "blockNumber": "49273757",
+      "originalTransactionIndex": "1",
+      "blockHash": "0x011bf84497b1c139b9e1e570976adec8e92feb48adf4123946a6314c96be5e2b",
+      "httpStatus": 200,
+      "rpcCalls": 26,
+      "allowanceStatus": "measured",
+      "balanceStatus": "measured",
+      "allowances": [
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003439981948114",
+          "afterRaw": "115792089237316195423570985008687907853269984665640564039457584003439966881999",
+          "deltaRaw": "-15066115",
+          "consistency": {
+            "eventComparison": "no_event",
+            "lastEventObservationId": null,
+            "lastEventAmountRaw": null,
+            "requestComparison": "no_request",
+            "transferObservationIds": [
+              "permission-1"
+            ],
+            "transferComparison": "not_compared_to_allowance",
+            "falseReturnObservationIds": [],
+            "explanation": "The measured value is the final allowance after the whole transaction. Earlier approvals may be superseded or consumed later; an evidence difference is not a maliciousness verdict. transferFrom amounts are requested token transfers, not requested allowance values, and are not equated with allowance changes. An unchanged allowance does not establish that no spending occurred."
+          }
+        }
+      ],
+      "accountEffects": {
+        "accountCount": 3,
+        "nonSubmitterAccountCount": 2,
+        "tokenAccountPairs": 4,
+        "measuredBalancePairs": 2,
+        "unmeasuredBalancePairs": 2,
+        "measuredAllowancePairs": 1
+      }
+    },
+    {
+      "id": "hyperlend-usdc-supply",
+      "provider": "archive",
+      "transactionHash": "0x25e076fc67489775131aafd134a1c6de8f974dea434000ba7568cf400df03cd2",
+      "blockNumber": "49273757",
+      "originalTransactionIndex": "1",
+      "blockHash": "0x011bf84497b1c139b9e1e570976adec8e92feb48adf4123946a6314c96be5e2b",
+      "httpStatus": 200,
+      "rpcCalls": 26,
+      "allowanceStatus": "measured",
+      "balanceStatus": "measured",
+      "allowances": [
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003439981948114",
+          "afterRaw": "115792089237316195423570985008687907853269984665640564039457584003439966881999",
+          "deltaRaw": "-15066115",
+          "consistency": {
+            "eventComparison": "no_event",
+            "lastEventObservationId": null,
+            "lastEventAmountRaw": null,
+            "requestComparison": "no_request",
+            "transferObservationIds": [
+              "permission-1"
+            ],
+            "transferComparison": "not_compared_to_allowance",
+            "falseReturnObservationIds": [],
+            "explanation": "The measured value is the final allowance after the whole transaction. Earlier approvals may be superseded or consumed later; an evidence difference is not a maliciousness verdict. transferFrom amounts are requested token transfers, not requested allowance values, and are not equated with allowance changes. An unchanged allowance does not establish that no spending occurred."
+          }
+        }
+      ],
+      "accountEffects": {
+        "accountCount": 3,
+        "nonSubmitterAccountCount": 2,
+        "tokenAccountPairs": 4,
+        "measuredBalancePairs": 2,
+        "unmeasuredBalancePairs": 2,
+        "measuredAllowancePairs": 1
+      }
+    },
+    {
+      "id": "hyperlend-usdc-repay",
+      "provider": "drpc",
+      "transactionHash": "0x682c1d2f131715b8d4b04c71cd8e75ef56a107f0bbd992379a44bf426f22102f",
+      "blockNumber": "49313549",
+      "originalTransactionIndex": "12",
+      "blockHash": "0x705f8f3af41d22dc8b9c9ec8d6de95565d41589e8a270ca04bf229c3766186b4",
+      "httpStatus": 200,
+      "rpcCalls": 42,
+      "allowanceStatus": "measured",
+      "balanceStatus": "measured",
+      "allowances": [
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003409140907030",
+          "afterRaw": "115792089237316195423570985008687907853269984665640564039457584003408941280750",
+          "deltaRaw": "-199626280",
+          "consistency": {
+            "eventComparison": "no_event",
+            "lastEventObservationId": null,
+            "lastEventAmountRaw": null,
+            "requestComparison": "no_request",
+            "transferObservationIds": [
+              "permission-1"
+            ],
+            "transferComparison": "not_compared_to_allowance",
+            "falseReturnObservationIds": [],
+            "explanation": "The measured value is the final allowance after the whole transaction. Earlier approvals may be superseded or consumed later; an evidence difference is not a maliciousness verdict. transferFrom amounts are requested token transfers, not requested allowance values, and are not equated with allowance changes. An unchanged allowance does not establish that no spending occurred."
+          }
+        }
+      ],
+      "accountEffects": {
+        "accountCount": 3,
+        "nonSubmitterAccountCount": 2,
+        "tokenAccountPairs": 7,
+        "measuredBalancePairs": 6,
+        "unmeasuredBalancePairs": 1,
+        "measuredAllowancePairs": 1
+      }
+    },
+    {
+      "id": "hyperlend-usdc-repay",
+      "provider": "archive",
+      "transactionHash": "0x682c1d2f131715b8d4b04c71cd8e75ef56a107f0bbd992379a44bf426f22102f",
+      "blockNumber": "49313549",
+      "originalTransactionIndex": "12",
+      "blockHash": "0x705f8f3af41d22dc8b9c9ec8d6de95565d41589e8a270ca04bf229c3766186b4",
+      "httpStatus": 200,
+      "rpcCalls": 42,
+      "allowanceStatus": "measured",
+      "balanceStatus": "measured",
+      "allowances": [
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003409140907030",
+          "afterRaw": "115792089237316195423570985008687907853269984665640564039457584003408941280750",
+          "deltaRaw": "-199626280",
+          "consistency": {
+            "eventComparison": "no_event",
+            "lastEventObservationId": null,
+            "lastEventAmountRaw": null,
+            "requestComparison": "no_request",
+            "transferObservationIds": [
+              "permission-1"
+            ],
+            "transferComparison": "not_compared_to_allowance",
+            "falseReturnObservationIds": [],
+            "explanation": "The measured value is the final allowance after the whole transaction. Earlier approvals may be superseded or consumed later; an evidence difference is not a maliciousness verdict. transferFrom amounts are requested token transfers, not requested allowance values, and are not equated with allowance changes. An unchanged allowance does not establish that no spending occurred."
+          }
+        }
+      ],
+      "accountEffects": {
+        "accountCount": 3,
+        "nonSubmitterAccountCount": 2,
+        "tokenAccountPairs": 7,
+        "measuredBalancePairs": 6,
+        "unmeasuredBalancePairs": 1,
+        "measuredAllowancePairs": 1
+      }
+    },
+    {
+      "id": "direct-transferfrom-a",
+      "provider": "drpc",
+      "transactionHash": "0xe2f9761a3fac3ba83ee15fc5e6f12b55d15cd804b321a2cffd9d2c16d6c38dfe",
+      "blockNumber": "49322025",
+      "originalTransactionIndex": "0",
+      "blockHash": "0x423e4d0311decaa1e0c1d452905059c1409fcd68e1aa94d78978756e845bbac5",
+      "httpStatus": 200,
+      "rpcCalls": 18,
+      "allowanceStatus": "measured",
+      "balanceStatus": "not_applicable",
+      "allowances": [
+        {
+          "token": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "owner": "0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+          "spender": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584007756842122881",
+          "afterRaw": "115792089237316195423570985008687907853269984665640564039457584007756840845814",
+          "deltaRaw": "-1277067",
+          "consistency": {
+            "eventComparison": "no_event",
+            "lastEventObservationId": null,
+            "lastEventAmountRaw": null,
+            "requestComparison": "no_request",
+            "transferObservationIds": [
+              "permission-1"
+            ],
+            "transferComparison": "not_compared_to_allowance",
+            "falseReturnObservationIds": [],
+            "explanation": "The measured value is the final allowance after the whole transaction. Earlier approvals may be superseded or consumed later; an evidence difference is not a maliciousness verdict. transferFrom amounts are requested token transfers, not requested allowance values, and are not equated with allowance changes. An unchanged allowance does not establish that no spending occurred."
+          }
+        }
+      ],
+      "accountEffects": {
+        "accountCount": 2,
+        "nonSubmitterAccountCount": 1,
+        "tokenAccountPairs": 2,
+        "measuredBalancePairs": 0,
+        "unmeasuredBalancePairs": 2,
+        "measuredAllowancePairs": 1
+      }
+    },
+    {
+      "id": "direct-transferfrom-b",
+      "provider": "drpc",
+      "transactionHash": "0xc650c2592cd04133cf7ff88969468c3e454e0b36e989fdb09a943dce283686d1",
+      "blockNumber": "49321930",
+      "originalTransactionIndex": "2",
+      "blockHash": "0x8f8b0ab3bf724d5a7edba34836075ec1bc98289808f232389a99dc472c629656",
+      "httpStatus": 200,
+      "rpcCalls": 8,
+      "allowanceStatus": "unavailable",
+      "balanceStatus": "not_applicable",
+      "allowances": [],
+      "accountEffects": {
+        "accountCount": 2,
+        "nonSubmitterAccountCount": 1,
+        "tokenAccountPairs": 2,
+        "measuredBalancePairs": 0,
+        "unmeasuredBalancePairs": 2,
+        "measuredAllowancePairs": 0
+      }
+    }
+  ],
+  "offlineVerification": {
+    "historicalReplay": {
+      "passed": 13,
+      "total": 13,
+      "test": "../../test/historical-replay.test.js"
+    },
+    "permissionReplay": {
+      "passed": 7,
+      "total": 7,
+      "test": "../../test/permission-replay.test.js"
+    },
+    "permissionRunner": {
+      "passed": 10,
+      "total": 10,
+      "test": "../../test/check-permissions.test.js"
+    },
+    "oldCapturesPreserved": true,
+    "generatedMetadataValidatedSeparately": true
+  },
+  "limitations": [
+    "Reviewed development corpus, not held-out scoring or a vendor ranking.",
+    "Six HTTP200 responses include one explicitly unavailable allowance; unavailable is not a successful measurement.",
+    "Direct transfer cases expose event evidence and no measured token balances.",
+    "Provider agreement does not establish execution-engine independence.",
+    "No retries, alternate blocks, signing or broadcasting."
+  ]
+}

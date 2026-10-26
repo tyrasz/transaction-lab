@@ -15,7 +15,7 @@ const capture = JSON.parse(bytes);
 // Independently hash the current source bytes using the documented fingerprint
 // encoding. Source hardening can change this metadata without changing any
 // original chain observation or the captured implementation's provenance.
-const sourceFiles = capture.cases[0].runs[0].response.implementation.sourceFiles;
+const sourceFiles = ['account-effects.js', ...capture.cases[0].runs[0].response.implementation.sourceFiles];
 const currentSourceHash = createHash('sha256');
 for (const name of sourceFiles) {
   assert.match(name, /^[a-z-]+\.js$/);
@@ -45,14 +45,81 @@ const KNOWN = {
       [USDC,'0x693f12e9e6b35b34458793546065e8b08e0299d6','0x04de1ef694923844bae419d4f832196f21767f86','0','0']],
   },
 };
-function comparable(report) {
-  // Exclude generated IDs, creation time, timing and the source fingerprint from
-  // historical semantic equality. Validate the current fingerprint independently
-  // below and the recorded fingerprint against its pinned value above. Preserve
-  // implementation name/version/sourceFiles and every semantic/raw evidence field.
-  const { id, createdAt, timing, implementation, ...rest } = report;
-  const { sourceSha256, ...implementationMetadata } = implementation;
-  return { ...rest, implementation: implementationMetadata };
+const TRANSFER_WARNINGS = [
+  'transferFrom records a requested transfer amount, not a requested allowance. The owner, immediate spender, recipient and transaction submitter are distinct roles; call success does not independently verify intent or authorization.',
+  'A transferFrom call does not by itself establish final token balances or numerical allowance consumption. Consult transfer events and separately measured state; an unchanged allowance does not mean no spending occurred.',
+];
+const TRANSFER_EXPLANATION = ' transferFrom amounts are requested token transfers, not requested allowance values, and are not equated with allowance changes. An unchanged allowance does not establish that no spending occurred.';
+const observationKey = o => JSON.stringify([o.kind,o.asset?.address,o.owner,o.spender,o.framePath]);
+function assertLegacyResult(actual, saved) {
+  const result = structuredClone(actual), expected = structuredClone(saved);
+  // Generated IDs/time/timing and implementation provenance are validated apart
+  // from semantic equality. v0.6 adds one source file and declares its new version.
+  for (const report of [result,expected]) for (const key of ['id','createdAt','timing','implementation']) delete report[key];
+  // Declared v0.6 wording revision includes transfer-only permissions accurately.
+  expected.coverage.reasons=expected.coverage.reasons.map(reason=>reason==='Configured ERC20 approval requests and events were interpreted separately. Final allowance state and other effects remain unverified.'
+    ? 'Configured ERC20 permission and transfer-call observations were interpreted separately. Final allowance state and other effects remain unverified.' : reason);
+  delete result.accountEffects; // Asserted independently below with known quantities.
+  const transfers = result.permissions.observations.filter(o=>o.kind==='transfer_from_call');
+  const oldObservations = result.permissions.observations.filter(o=>o.kind!=='transfer_from_call');
+  assert.equal(oldObservations.length, expected.permissions.observations.length);
+  const idMap = new Map();
+  for (const old of expected.permissions.observations) {
+    const matched = oldObservations.filter(o=>observationKey(o)===observationKey(old));
+    assert.equal(matched.length,1,'Every legacy permission observation has one semantic match');
+    idMap.set(matched[0].id,old.id);
+  }
+  const mapId = id => { assert.ok(idMap.has(id),'Legacy correlation references a known legacy observation'); return idMap.get(id); };
+  for (const observation of oldObservations) {
+    observation.id=mapId(observation.id);
+    for (const field of ['matchedEventIds','matchedRequestIds']) if (observation[field]) observation[field]=observation[field].map(mapId);
+  }
+  result.permissions.observations=oldObservations;
+  for (const finding of result.permissions.findings) if (finding.observationIds) finding.observationIds=finding.observationIds.map(mapId);
+  assert.deepEqual(result.permissions.warnings,[...expected.permissions.warnings,...(transfers.length?TRANSFER_WARNINGS:[])]);
+  result.permissions.warnings=expected.permissions.warnings;
+  for (const [index,allowance] of result.allowanceChanges.allowances.entries()) {
+    const relevant=transfers.filter(o=>o.asset.address===allowance.asset.address&&o.owner===allowance.owner&&o.spender===allowance.spender);
+    const ids=relevant.map(o=>o.id);
+    assert.deepEqual(allowance.consistency.transferObservationIds,ids);
+    assert.equal(allowance.consistency.transferComparison,ids.length?'not_compared_to_allowance':'no_transfer_from_call');
+    assert.deepEqual(allowance.observationIds.filter(id=>ids.includes(id)),ids);
+    allowance.observationIds=allowance.observationIds.filter(id=>!ids.includes(id)).map(mapId);
+    if (allowance.consistency.lastEventObservationId) allowance.consistency.lastEventObservationId=mapId(allowance.consistency.lastEventObservationId);
+    allowance.consistency.falseReturnObservationIds=allowance.consistency.falseReturnObservationIds.map(mapId);
+    assert.equal(allowance.consistency.explanation,expected.allowanceChanges.allowances[index].consistency.explanation+(ids.length?TRANSFER_EXPLANATION:''));
+    allowance.consistency.explanation=expected.allowanceChanges.allowances[index].consistency.explanation;
+    delete allowance.consistency.transferObservationIds;
+    delete allowance.consistency.transferComparison;
+  }
+  assert.deepEqual(result,expected,'Every unchanged v0.5 field and complete raw evidence is preserved');
+  return transfers;
+}
+function assertAccountEffects(result,item) {
+  const effects=result.accountEffects;
+  assert.equal(effects.status,'observed');
+  assert.equal(effects.summary.measuredBalancePairs,0,'No new balance queries or event-derived balances');
+  assert.equal(effects.summary.measuredAllowancePairs,result.allowanceChanges.allowances.length);
+  for (const account of effects.accounts) for (const token of account.tokens) assert.equal(token.balance.status,'not_measured');
+  if (item.id==='usdc-router-permit-consumed') {
+    const expected=new Map([
+      ['0x0c71073344e27e33cb57fcb587fc412d689dfd1d',['0','25000000','-25000000']],
+      ['0x693f12e9e6b35b34458793546065e8b08e0299d6',['25000000','25000000','0']],
+      ['0x04de1ef694923844bae419d4f832196f21767f86',['24812500','196','24812304']],
+      ['0x7fe37fc2f987eb981a0fc63cf1eabf04463550d4',['196','0','196']],
+      ['0xb4894380282533a86cb241145fac54aaac995f18',['187500','0','187500']],
+    ]);
+    const cash=effects.accounts.flatMap(account=>account.tokens.filter(token=>token.asset.address===USDC).map(token=>[account.address,token]));
+    assert.equal(cash.length,5);
+    for (const [address,token] of cash) {assert.equal(token.events.status,'observed');assert.deepEqual([token.events.incomingRaw,token.events.outgoingRaw,token.events.netRaw],expected.get(address));}
+    for (const account of effects.accounts) for (const token of account.tokens.filter(token=>token.role==='unverified_token')) {
+      assert.equal(token.tokenVerified,false);assert.equal(token.asset.decimals,null);assert.equal(token.asset.symbol,null);
+      assert.match(token.events.netRaw,/^-?\d+$/);assert.equal(token.events.net,null);
+    }
+  } else {
+    assert.equal(effects.summary.accountCount,item.id==='husdc-relayed-permit'?3:2);
+    for (const account of effects.accounts) for (const token of account.tokens) {assert.equal(token.events.status,'not_observed');assert.equal(token.events.net,null);}
+  }
 }
 function recordedRpc(run) {
   const records = structuredClone(run.rpcCalls);
@@ -100,9 +167,21 @@ for (const item of capture.cases) for (const run of item.runs) {
     const originalRaw = JSON.stringify(run.rpcCalls);
     const result = await replay(structuredClone(run.request), rpc);
     assert.equal(rpc.consumed, run.rpcCalls.length, 'Exactly the captured RPC sequence is consumed');
-    assert.deepEqual(comparable(result), comparable(run.response), 'Full API result and raw evidence are preserved');
+    const transfers=assertLegacyResult(result,run.response);
+    assertAccountEffects(result,item);
     assert.equal(JSON.stringify(run.rpcCalls), originalRaw, 'Saved provider requests and responses remain immutable');
     assert.equal(result.implementation.sourceSha256, CURRENT_ENGINE_SHA256, 'Current implementation fingerprint matches independently read source files');
+    assert.equal(result.implementation.version,'0.6.0');
+    assert.equal(result.implementation.name,run.response.implementation.name);
+    assert.deepEqual(result.implementation.sourceFiles,sourceFiles);
+    assert.equal(transfers.length,item.id==='usdc-router-permit-consumed'?2:0);
+    if (transfers.length) {
+      assert.deepEqual(transfers.map(o=>[o.framePath,o.owner,o.spender,o.recipient,o.amountRaw]),[
+        ['0.0.4','0x0c71073344e27e33cb57fcb587fc412d689dfd1d','0x693f12e9e6b35b34458793546065e8b08e0299d6','0x693f12e9e6b35b34458793546065e8b08e0299d6','25000000'],
+        ['0.0.7.1.23','0x693f12e9e6b35b34458793546065e8b08e0299d6','0x04de1ef694923844bae419d4f832196f21767f86','0x04de1ef694923844bae419d4f832196f21767f86','24812500'],
+      ]);
+      for (const transfer of transfers) {assert.equal(transfer.amountMeaning,'requested_transfer_amount');assert.equal(transfer.returnStatus,'returned_true');assert.equal(transfer.authorizationVerification,'not_independently_verified');assert.equal(transfer.intentVerification,'not_assessed');}
+    }
     assert.equal(result.execution.status, 'success');
     assert.equal(result.coverage.status, 'partial');
     assert.equal(result.permissions.coverage.status, 'limited');

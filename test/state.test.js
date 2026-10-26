@@ -48,3 +48,51 @@ test('lazy context snapshots request identity and shares in-flight preparation',
   assert.equal(calls.filter(call => call.method === 'debug_traceCall').length, 1);
   assert.equal(calls.find(call => call.method === 'debug_traceCall').params[0].value, '0x0');
 });
+
+test('shared canonical failure is sanitized and remains latched after a later successful check', async () => {
+  for (const failure of ['mismatch', 'rpc']) {
+    const request = { chainId: 999, from: ACCOUNT, to: TOKEN, value: '0', data: '0x' };
+    const block = { hash: word(42n), number: '42', timestamp: '123' };
+    const header = { hash: block.hash, number: '0x2a', timestamp: '0x7b' };
+    let checks = 0;
+    const rpc = { async call(method) {
+      if (method === 'eth_getBlockByHash') return header;
+      if (method === 'debug_traceCall') return { pre: {}, post: {} };
+      if (method === 'eth_getBlockByNumber') {
+        if (++checks === 2) {
+          if (failure === 'rpc') throw new Error('PRIVATE_PROVIDER_URL_SECRET');
+          return { ...header, hash: word(1n) };
+        }
+        return header;
+      }
+      return word(0n);
+    } };
+    const context = createStateContext({ request, block, rpc });
+    assert.equal(context.canonicalFailure, null);
+    await context.verifyCanonical();
+    assert.equal(context.canonicalFailure, null);
+    await assert.rejects(context.verifyCanonical());
+    const firstFailure = context.canonicalFailure;
+    assert.equal(typeof firstFailure, 'string');
+    assert.doesNotMatch(firstFailure, /PRIVATE_PROVIDER_URL_SECRET/);
+    await context.verifyCanonical();
+    assert.equal(context.canonicalFailure, firstFailure, 'another consumer cannot clear the failed binding');
+    assert.equal(checks, 3, 'the getter adds no RPC requests');
+    assert.doesNotMatch(JSON.stringify(context.snapshotEvidence()), /PRIVATE_PROVIDER_URL_SECRET/);
+  }
+});
+
+test('an isolated token query failure does not latch a canonical failure', async () => {
+  const request = { chainId: 999, from: ACCOUNT, to: TOKEN, value: '0', data: '0x' };
+  const block = { hash: word(42n), number: '42', timestamp: '123' };
+  const rpc = { async call(method) {
+    if (method.startsWith('eth_getBlock')) return { hash: block.hash, number: '0x2a', timestamp: '0x7b' };
+    if (method === 'debug_traceCall') return { pre: {}, post: {} };
+    throw new Error('PRIVATE_QUERY_SECRET');
+  } };
+  const context = createStateContext({ request, block, rpc });
+  await assert.rejects(context.readPair({ to: TOKEN, data: '0x' }));
+  assert.equal(context.canonicalFailure, null);
+  await context.verifyCanonical();
+  assert.equal(context.canonicalFailure, null);
+});
