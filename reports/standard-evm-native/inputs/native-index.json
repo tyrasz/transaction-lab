@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0",
+  "status": "candidate_found",
+  "developmentOnly": true,
+  "captureSha256": "59cf2cc3d92100ca62f9b13e69386ce4386bf308ca40f595904e9aab013a6b5c",
+  "requests": 14,
+  "responseBytes": 1024872,
+  "candidatesExamined": 1,
+  "parentSimulationAttempts": 1,
+  "originalTraceCalls": 1,
+  "parentDiffCalls": 1,
+  "retries": 0,
+  "unattemptedCandidates": [
+    "0x29c9c0d6d641177f9e76a9cc5a6451db65e2cd74a2a99363d2ec09db3624b252",
+    "0x75123d2d30a1940dc473e0dfc5f73c82db2da60be8d4573289be064e7a17a2a9"
+  ],
+  "selected": {
+    "hash": "0xe3310b67e3d47ab97dbe6148b933d9568a1b5819cb649b6cc790cd0b011f49bc",
+    "request": {
+      "from": "0xc0cb2ec9964f44621d867cdd4331a0541589fb93",
+      "to": "0x43b719b9c6cf849dca549765ba1af00f3dfc4ac1",
+      "data": "0x",
+      "value": "0x12655d12a5a0000",
+      "gas": "0x4c4b40"
+    },
+    "parentHash": "0x6e2f11a0daf8cc18df88266db83ae7955d5f947c41cf9ad4befd8d43fa10dda3",
+    "parentNumber": "26277080",
+    "sourceBlockHash": "0x3fa512841c5a033c100181333b2e464e8153c307b7cd6ab6f43a705a316859ed",
+    "sourceBlockNumber": "26277081",
+    "sourceTransactionIndex": "5",
+    "transactionLink": "https://etherscan.io/tx/0xe3310b67e3d47ab97dbe6148b933d9568a1b5819cb649b6cc790cd0b011f49bc",
+    "valueWei": "82848000000000000",
+    "valueETH": "0.082848",
+    "senderCode": "0x",
+    "recipientCode": "0x",
+    "senderNonceBefore": "0",
+    "senderNonceAfter": "1",
+    "unsignedGasUsed": "21000",
+    "sourceAndParentFullHeadersDeepEqual": true
+  },
+  "nativeChanges": [
+    {
+      "account": "0xc0cb2ec9964f44621d867cdd4331a0541589fb93",
+      "beforeRaw": "82911000000000000",
+      "afterRaw": "63000000000000",
+      "deltaRaw": "-82848000000000000"
+    },
+    {
+      "account": "0x43b719b9c6cf849dca549765ba1af00f3dfc4ac1",
+      "beforeRaw": "42883012001732692514",
+      "afterRaw": "42965860001732692514",
+      "deltaRaw": "82848000000000000"
+    }
+  ],
+  "rawRequestRoles": {
+    "chain": 1,
+    "latestFullSourceBlock": 2,
+    "parentBlock": 3,
+    "senderCode": 4,
+    "recipientCode": 5,
+    "senderBalanceBefore": 6,
+    "recipientBalanceBefore": 7,
+    "senderNonceBefore": 8,
+    "parentCallTrace": 9,
+    "parentPrePostDiff": 10,
+    "originalReceipt": 11,
+    "originalCallTrace": 12,
+    "sourceCanonicalRecheck": 13,
+    "parentCanonicalRecheck": 14
+  },
+  "limitsAndCaveats": [
+    "One latest block, not a finalized-block cohort; two later full numeric headers matched the original source and parent snapshots at capture time.",
+    "Parent call preserves original from/to/input/value but uses gas5000000, omits fee and nonce fields, and has no state or block overrides.",
+    "Independent pinned nonce0 explains omitted zero pre-nonce; explicit post nonce1 and balances were verified against the saved full diff.",
+    "Unsigned parent-state sender delta equals negative value only. This is not original signed fee settlement or exact original-position replay.",
+    "Provider-returned balances/diffs are internally consistent; no independent execution engine or cryptographic state proof is claimed.",
+    "No account ownership, security assessment or general coverage result follows from this development case."
+  ]
+}

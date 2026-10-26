@@ -1,0 +1,15 @@
+# Supplemental native ETH browser replay
+
+This directory contains browser QA against the archived 0.11 product, using the three recorded responses from [the live native packet](../standard-evm-native/NOTES.md). It is a supplemental rendering check, not another live blockchain simulation or an independent execution oracle. The original packet and product files are unchanged.
+
+The local replay server runs at `http://127.0.0.1:5176/`. It imports the archived `createAppServer` and `StandardRpcClient`, uses `persist:false`, and supplies the exact saved provider response bytes only when each outgoing JSON-RPC request matches its recorded method, parameters, ID and serialized body in sequence. It checks the source archive and saved-response hashes before importing product code. A mismatch is retained outside the API handler's error handling. Global fetch and outbound socket connections are blocked; the server listens only on loopback.
+
+The main task completed the three browser cases in this order: internal ETH swap, Aave deposit with no native candidates, then the native wallet transfer. Each case was submitted once. The final transfer remains in the QA tab. The live app on port 5174 is separate and is not changed or controlled by this server.
+
+`binding.json` records the frozen source and response bindings. After each completed browser submission, `playback-results.json` records all consumed RPC IDs and checks equality of the entire result, excluding generated run ID, creation time, timings and per-call transport duration. The corresponding replay response is retained. `browser-checks.json` is written separately by the main task after its actual browser observations; server replay equality alone does not establish visual correctness.
+
+All three archived handler responses reproduce exactly after the stated generated fields are excluded: 79 saved RPC responses consumed, zero mismatches, zero public network requests. The native wallet transfer is 0.082848 ETH, with two separately measured account balances and no token queries. The internal swap has two native balance measurements and four token measurements; the native deltas are ±0.000833321237492342 ETH and belong to the named contracts, not the external sender. Aave has no observed native candidates and four measured token queries; that is not a measured zero ETH portfolio. All native measurements exclude network fees.
+
+Run `node reports/standard-evm-native-ui-replay/verify.mjs` to audit the retained source bindings, playback sequence, wire IDs and hashes, full result equality and exact native values without opening a browser or network connection. Its output is retained in `verification.json`. This does not rerun the browser observations.
+
+The child task's CUA session exposes no browser surfaces, so the main task performs the browser interactions and screenshots in its own new QA tab. No fallback browser or original app tab is used by the child. The initial sandbox attempt to bind port 5176 was denied locally; the approved retry started the same loopback-only replay server. Neither attempt contacted a blockchain provider.

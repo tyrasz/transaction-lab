@@ -9,6 +9,8 @@ const ADDRESS = /^0x[0-9a-f]{40}$/i;
 const HASH = /^0x[0-9a-f]{64}$/i;
 const NUMBER = /^0x(?:0|[1-9a-f][0-9a-f]{0,15})$/i;
 const DATA = /^0x(?:[0-9a-f]{2})*$/i;
+const DECIMAL = /^(?:0|[1-9][0-9]{0,77})$/;
+const UINT256_MAX = (1n << 256n) - 1n;
 const MAX_SELECTION_BYTES = 8 * 1024 * 1024;
 const freeze = value => { if (value && typeof value === 'object') { for (const child of Object.values(value)) freeze(child); Object.freeze(value); } return value; };
 
@@ -204,15 +206,16 @@ export const STANDARD_EXAMPLES = freeze([
 
 export const STANDARD_CAPABILITIES = freeze({
   chainId: 1, name: 'Ethereum', status: 'experimental',
-  operation: 'unsigned_call_with_ERC20_queries',
+  operation: 'unsigned_call_with_ERC20_queries_and_native_balances',
   querySelection: ['automatic_from_observed_trace', 'explicit'],
   blockSelection: ['latest', 'canonical_hex_number', 'block_hash'],
   queryTypes: ['balanceOf', 'allowance'],
-  limits: { queries: 8, calldataBytes: 32768, gas: 5000000, engineRpcCalls: 64, blockSelectionRpcCalls: 1, totalRpcCalls: 65 },
+  limits: { queries: 8, nativeAccounts: 8, calldataBytes: 32768, gas: 5000000, engineRpcCalls: 64, blockSelectionRpcCalls: 1, totalRpcCalls: 65 },
   profile: 'unsigned_unpriced_block_end',
   limitations: [
     'Explicit queried accounts only; other assets and economic effects may be omitted.',
     'Synthetic BASEFEE-zero execution with no outer transaction signature or fee-settlement validation. Contract permit checks still execute.',
+    'Native balance measurements exclude outer transaction fees; observed value-flow candidates are not measured balance changes.',
     'Historical block-end state is not the original transaction position.',
     'Token labels and decimals are historical reference metadata, not verified again for the requested state.',
     'Provider codeHash consistency is not independent state or source-code attestation.',
@@ -254,10 +257,10 @@ export function validateStandardSimulation(input) {
   const from = address(input.from, 'from'), to = address(input.to, 'to');
   if (typeof input.data !== 'string' || !DATA.test(input.data) || input.data.length > 65538) throw new InputError('data must be even-length hexadecimal calldata of at most 32 KiB.');
   const value = input.value === undefined ? '0' : input.value;
-  if (value !== '0') throw new InputError('Only value "0" as a decimal wei string is supported.');
+  if (typeof value !== 'string' || !DECIMAL.test(value) || BigInt(value) > UINT256_MAX) throw new InputError('value must be a canonical decimal uint256 wei string.');
   const block = input.block === undefined ? 'latest' : input.block;
   if (typeof block !== 'string' || !(block === 'latest' || NUMBER.test(block) || HASH.test(block))) throw new InputError('block must be latest, a canonical hexadecimal block number, or a 32-byte block hash.');
-  if (!Object.hasOwn(input, 'queries')) return { chainId: 1, from, to, data: input.data.toLowerCase(), value: '0', block: block.toLowerCase() };
+  if (!Object.hasOwn(input, 'queries')) return { chainId: 1, from, to, data: input.data.toLowerCase(), value, block: block.toLowerCase() };
   if (!Array.isArray(input.queries) || input.queries.length < 1 || input.queries.length > 8) throw new InputError('Omit queries for automatic selection, or supply between one and eight explicit balanceOf or allowance queries.');
   const seen = new Set(), queries = [];
   for (const query of input.queries) {
@@ -269,7 +272,7 @@ export function validateStandardSimulation(input) {
     if (seen.has(key)) throw new InputError('Duplicate queries are not supported.');
     seen.add(key); queries.push(normalized);
   }
-  return { chainId: 1, from, to, data: input.data.toLowerCase(), value: '0', block: block.toLowerCase(), queries };
+  return { chainId: 1, from, to, data: input.data.toLowerCase(), value, block: block.toLowerCase(), queries };
 }
 
 function format(raw, decimals) {
@@ -284,12 +287,32 @@ function queryIdentity(query, sender) {
     : { kind: 'allowance', token: query.to, owner: first, spender: '0x' + query.data.slice(98, 138) };
   return { ...identity, accountIsSender: first === sender };
 }
+function nativePreview(input, result) {
+  // Candidate netValueRaw describes traced value flows. Display amounts only
+  // from the separately validated native measurement records.
+  return (result.nativeEffects?.measurements ?? []).map((measurement, index) => {
+    const entry = { index, account: measurement.account, accountIsSender: measurement.account === input.from,
+      metadata: { symbol: 'ETH', name: 'Ether', decimals: 18, chainId: 1, type: 'native' }, status: measurement.status };
+    for (const key of ['reason', 'basis', 'anchorEvidenceId', 'queryEvidence']) if (measurement[key] !== undefined) entry[key] = structuredClone(measurement[key]);
+    if (measurement.status === 'measured') {
+      const validAmount = raw => typeof raw === 'string' && DECIMAL.test(raw) && BigInt(raw) <= UINT256_MAX;
+      if (typeof measurement.account !== 'string' || !ADDRESS.test(measurement.account)
+        || !validAmount(measurement.beforeRaw) || !validAmount(measurement.afterRaw)
+        || typeof measurement.deltaRaw !== 'string' || !/^(?:0|-?[1-9][0-9]{0,77})$/.test(measurement.deltaRaw)
+        || BigInt(measurement.deltaRaw) !== BigInt(measurement.afterRaw) - BigInt(measurement.beforeRaw)) {
+        return { ...entry, status: 'unavailable', reason: 'The native balance measurement is malformed or inconsistent.' };
+      }
+      for (const key of ['before', 'after', 'delta']) { entry[key + 'Raw'] = measurement[key + 'Raw']; entry[key] = format(measurement[key + 'Raw'], 18); }
+    }
+    return entry;
+  });
+}
 export function projectStandardPreview(input, result) {
   const automatic = input.queries === undefined;
   const queries = automatic ? result.request?.queries ?? [] : input.queries;
   const warnings = [...STANDARD_CAPABILITIES.limitations];
   if (automatic) warnings[0] = 'Queries selected from bounded observed token calls and events only; silent, ambiguous, unselected and other economic effects may be omitted.';
-  return { scope: automatic ? 'observed_queried_accounts' : 'explicit_queried_accounts', warnings, queries: queries.map((query, index) => {
+  return { scope: automatic ? 'observed_queried_accounts' : 'explicit_queried_accounts', warnings, nativeBalances: nativePreview(input, result), queries: queries.map((query, index) => {
     const measurement = result.measurements[index];
     const metadata = METADATA[query.to] ? structuredClone(METADATA[query.to]) : null;
     const entry = { index, ...queryIdentity(query, input.from), metadata, status: measurement?.status ?? 'unavailable' };
@@ -328,7 +351,7 @@ export async function simulateStandard(input, rpc) {
     Object.assign(blockSelection, { kind: apiRequest.block === 'latest' ? 'resolved_latest' : 'resolved_number', resolvedHash: blockHash, resolvedNumber: BigInt(header.number).toString(), evidence: { method, params, result: header } });
   }
   const result = await simulateUnsignedCall({ rpc, chainId: apiRequest.chainId, blockHash,
-    request: { from: apiRequest.from, to: apiRequest.to, data: apiRequest.data, value: '0x0', gas: '0x4c4b40' }, queries: apiRequest.queries });
+    request: { from: apiRequest.from, to: apiRequest.to, data: apiRequest.data, value: '0x' + BigInt(apiRequest.value).toString(16), gas: '0x4c4b40' }, queries: apiRequest.queries });
   if (result.block && (result.block.hash !== blockHash || (blockSelection.resolvedNumber !== null && result.block.number !== blockSelection.resolvedNumber))) {
     throw new RpcError('The execution header differs from the selected Ethereum block identity.', 'STANDARD_BLOCK_MISMATCH');
   }

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0",
+  "checkedAt": "2026-10-26T13:40:54.053Z",
+  "mode": "browser_UI_against_offline_exact_saved_RPC_playback",
+  "browser": "Codex in-app browser",
+  "tabId": "5",
+  "url": "http://127.0.0.1:5176/",
+  "livePublicRpcCalls": 0,
+  "livePacketManifestSha256": "75ba63b9da1d90f31346e518908bff8c69aad76bcdf910669d371349758e5d70",
+  "implementationSha256": "5e915486d876ad4bab26490ec807c599b5a5bb1df683481bebffa2adb71e9c60",
+  "cases": [
+    {
+      "id": "internal-eth-swap",
+      "execution": "Completed",
+      "coverage": "ETH 2/2 · tokens 4/4",
+      "nativeDeltasETH": [
+        "-0.000833321237492342",
+        "+0.000833321237492342"
+      ],
+      "tokenBalanceCards": 4,
+      "nativeValueWei": "0",
+      "feeExclusionVisible": true
+    },
+    {
+      "id": "aave-no-native",
+      "execution": "Completed",
+      "coverage": "ETH 0/0 · tokens 4/4",
+      "nativeStatus": "None observed",
+      "tokenBalanceCards": 3,
+      "allowanceCards": 1,
+      "noNativeBalanceAssumedZero": true,
+      "feeExclusionVisible": true
+    },
+    {
+      "id": "native-transfer",
+      "execution": "Completed",
+      "coverage": "ETH 2/2 · tokens 0/0",
+      "nativeDeltasETH": [
+        "-0.082848",
+        "+0.082848"
+      ],
+      "nativeDeltasWei": [
+        "-82848000000000000",
+        "82848000000000000"
+      ],
+      "senderBeforeETH": "0.082911",
+      "senderAfterETH": "0.000063",
+      "recipientBeforeETH": "42.883012001732692514",
+      "recipientAfterETH": "42.965860001732692514",
+      "nativeValueWei": "82848000000000000",
+      "valueEditable": true,
+      "sourceValueMatchesInput": true,
+      "feeExclusionVisible": true,
+      "horizontalOverflow": false,
+      "screenshotVisuallyReviewed": true
+    }
+  ],
+  "consoleErrorsAndWarnings": [],
+  "notes": [
+    "Root operated actual form controls and inspected rendered DOM and native-transfer screenshot.",
+    "These interface checks replay the already captured live RPC responses; they are not additional live observations.",
+    "The ordinary application at port5174 was separately restarted at0.11.0; health and all3 served public files matched the frozen implementation."
+  ]
+}

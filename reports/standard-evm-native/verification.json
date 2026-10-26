@@ -1,0 +1,302 @@
+{
+  "status": "passed",
+  "planSha256": "ba57bd952efd6bef3ac50d09a7969241666506b57498f6566a178f13399bb908",
+  "manifestSha256": "75ba63b9da1d90f31346e518908bff8c69aad76bcdf910669d371349758e5d70",
+  "implementationSha256": "5e915486d876ad4bab26490ec807c599b5a5bb1df683481bebffa2adb71e9c60",
+  "sourceFiles": 38,
+  "sealedFiles": 59,
+  "publicNetworkRequests": 0,
+  "socketsOpened": 0,
+  "liveSourceImports": 0,
+  "replayMode": "archived_createAppServer_handler_in_memory_with_archived_StandardRpcClient",
+  "totals": {
+    "rpcCalls": 79,
+    "rpcResponseBytes": 368652
+  },
+  "cases": [
+    {
+      "id": "native-transfer",
+      "httpStatus": 200,
+      "execution": "success",
+      "canonicalStatus": "verified",
+      "nativeStatus": "measured",
+      "nativeMeasurements": [
+        {
+          "account": "0xc0cb2ec9964f44621d867cdd4331a0541589fb93",
+          "beforeRaw": "82911000000000000",
+          "afterRaw": "63000000000000",
+          "deltaRaw": "-82848000000000000",
+          "anchorEvidenceId": 4,
+          "wordIndex": 8
+        },
+        {
+          "account": "0x43b719b9c6cf849dca549765ba1af00f3dfc4ac1",
+          "beforeRaw": "42883012001732692514",
+          "afterRaw": "42965860001732692514",
+          "deltaRaw": "82848000000000000",
+          "anchorEvidenceId": 10,
+          "wordIndex": 9
+        }
+      ],
+      "tokenMeasurements": [],
+      "accounting": {
+        "rpcCalls": 15,
+        "observedBytes": 65692,
+        "retainedBytes": 65692,
+        "durationMs": 3540.2190419999997,
+        "withheldErrorBodies": 0
+      },
+      "playback": {
+        "status": "matched",
+        "consumedRpcIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "excludedGeneratedFields": [
+          "id",
+          "createdAt",
+          "timing",
+          "transportEvidence[].transport.durationMs"
+        ]
+      }
+    },
+    {
+      "id": "internal-eth-swap",
+      "httpStatus": 200,
+      "execution": "success",
+      "canonicalStatus": "verified",
+      "nativeStatus": "measured",
+      "nativeMeasurements": [
+        {
+          "account": "0x51c72848c68a965f66fa7a88855f9f7784502a7f",
+          "beforeRaw": "148806357832870076845",
+          "afterRaw": "148805524511632584503",
+          "deltaRaw": "-833321237492342",
+          "anchorEvidenceId": 12,
+          "wordIndex": 8
+        },
+        {
+          "account": "0x4838b106fce9647bdf1e7877bf73ce8b0bad5f97",
+          "beforeRaw": "7155873616174246236",
+          "afterRaw": "7156706937411738578",
+          "deltaRaw": "833321237492342",
+          "anchorEvidenceId": 13,
+          "wordIndex": 9
+        }
+      ],
+      "tokenMeasurements": [
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000051c72848c68a965f66fa7a88855f9f7784502a7f"
+          },
+          "status": "measured",
+          "beforeRaw": "9597601246724",
+          "afterRaw": "9584058730714",
+          "deltaRaw": "-13542516010"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000088e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
+          },
+          "status": "measured",
+          "beforeRaw": "58649970174792",
+          "afterRaw": "58663512690802",
+          "deltaRaw": "13542516010"
+        },
+        {
+          "query": {
+            "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "data": "0x70a0823100000000000000000000000051c72848c68a965f66fa7a88855f9f7784502a7f"
+          },
+          "status": "measured",
+          "beforeRaw": "5234210030040334873484",
+          "afterRaw": "5240011906271617850838",
+          "deltaRaw": "5801876231282977354"
+        },
+        {
+          "query": {
+            "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "data": "0x70a0823100000000000000000000000088e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
+          },
+          "status": "measured",
+          "beforeRaw": "9664575620385650038431",
+          "afterRaw": "9658773744154367061077",
+          "deltaRaw": "-5801876231282977354"
+        }
+      ],
+      "accounting": {
+        "rpcCalls": 34,
+        "observedBytes": 204773,
+        "retainedBytes": 204773,
+        "durationMs": 8127.632583,
+        "withheldErrorBodies": 0
+      },
+      "playback": {
+        "status": "matched",
+        "consumedRpcIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34
+        ],
+        "excludedGeneratedFields": [
+          "id",
+          "createdAt",
+          "timing",
+          "transportEvidence[].transport.durationMs"
+        ]
+      }
+    },
+    {
+      "id": "aave-no-native",
+      "httpStatus": 200,
+      "execution": "success",
+      "canonicalStatus": "verified",
+      "nativeStatus": "none",
+      "nativeMeasurements": [],
+      "tokenMeasurements": [
+        {
+          "query": {
+            "to": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+            "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+          },
+          "status": "measured",
+          "beforeRaw": "0",
+          "afterRaw": "3962903484",
+          "deltaRaw": "3962903484"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+          },
+          "status": "measured",
+          "beforeRaw": "3962903485",
+          "afterRaw": "0",
+          "deltaRaw": "-3962903485"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+          },
+          "status": "measured",
+          "beforeRaw": "0",
+          "afterRaw": "0",
+          "deltaRaw": "0"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000098c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c"
+          },
+          "status": "measured",
+          "beforeRaw": "151987610826648",
+          "afterRaw": "151991573730133",
+          "deltaRaw": "3962903485"
+        }
+      ],
+      "accounting": {
+        "rpcCalls": 30,
+        "observedBytes": 98187,
+        "retainedBytes": 98187,
+        "durationMs": 6620.21883299999,
+        "withheldErrorBodies": 0
+      },
+      "playback": {
+        "status": "matched",
+        "consumedRpcIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "excludedGeneratedFields": [
+          "id",
+          "createdAt",
+          "timing",
+          "transportEvidence[].transport.durationMs"
+        ]
+      }
+    }
+  ],
+  "limitations": [
+    "Three fixed development cases, not a prospective population, vendor comparison or security verdict.",
+    "Playback checks recorded provider evidence and complete API reproducibility; it is not an independent execution oracle.",
+    "Native values are decoded from BALANCE witnesses and pinned reads; candidate flow values are never used as measured amounts.",
+    "Unsigned parent-state calls exclude original signed fee settlement and original transaction-position replay.",
+    "Unattempted, failed, truncated or withheld-body cases remain explicit and are never replaced with synthetic provider responses.",
+    "No browser rendering or public network is replayed."
+  ]
+}

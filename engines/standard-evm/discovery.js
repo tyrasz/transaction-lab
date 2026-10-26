@@ -15,6 +15,7 @@ const lower = value => value.toLowerCase();
 const address = value => typeof value === 'string' && ADDRESS.test(value);
 const word = value => typeof value === 'string' && WORD.test(value);
 const uint = value => typeof value === 'string' && value.length <= 66 && QUANTITY.test(value) && BigInt(value) <= MAX ? BigInt(value) : null;
+const requestValue = value => typeof value === 'string' && value.length <= 78 && /^(?:0|[1-9][0-9]*)$/.test(value) && BigInt(value) <= MAX ? BigInt(value) : uint(value);
 const pad = value => value.slice(2).padStart(64, '0');
 const lexical = (a, b) => a < b ? -1 : a > b ? 1 : 0;
 class DiscoveryError extends Error {
@@ -105,7 +106,7 @@ export function discoverTokenQueries({request, trace, maxQueries = 8} = {}) {
       need(lower(raw.from) === parent.context,'Trace child caller does not match the executing storage context.');
       if (raw.type === 'DELEGATECALL') need(value === parent.value,'Trace delegate value differs from its inherited context.');
     } else {
-      need(raw.type === 'CALL' && lower(raw.from) === sender && lower(raw.to) === lower(request.to) && lower(raw.input) === lower(request.data) && value === 0n && gas === uint(request.gas) && gasUsed > 0n,'Trace root does not match the unsigned request.');
+      need(raw.type === 'CALL' && lower(raw.from) === sender && lower(raw.to) === lower(request.to) && lower(raw.input) === lower(request.data) && value === requestValue(request.value) && gas === uint(request.gas) && gasUsed > 0n,'Trace root does not match the unsigned request.');
     }
     if (isStatic) need(value === 0n,'Static execution context contains a native-value transfer.');
     const messageSender = raw.type === 'DELEGATECALL' ? parent.messageSender : lower(raw.from);
@@ -126,7 +127,7 @@ export function discoverTokenQueries({request, trace, maxQueries = 8} = {}) {
   }
   try {
     need(Number.isInteger(maxQueries) && maxQueries >= 1 && maxQueries <= DISCOVERY_LIMITS.maxQueries,'Discovery query limit must be between one and eight.','INVALID_DISCOVERY_INPUT');
-    need(plain(request,new Set(['from','to','data','value','gas'])) && address(request.from) && address(request.to) && typeof request.data === 'string' && request.data.length <= 65538 && BYTES.test(request.data) && ['0','0x0'].includes(request.value) && uint(request.gas) !== null && uint(request.gas) > 21000n && uint(request.gas) <= 5000000n,'Discovery requires the exact supported unsigned request.','INVALID_DISCOVERY_INPUT');
+    need(plain(request,new Set(['from','to','data','value','gas'])) && address(request.from) && address(request.to) && typeof request.data === 'string' && request.data.length <= 65538 && BYTES.test(request.data) && requestValue(request.value) !== null && uint(request.gas) !== null && uint(request.gas) > 21000n && uint(request.gas) <= 5000000n,'Discovery requires the exact supported unsigned request.','INVALID_DISCOVERY_INPUT');
     sender = lower(request.from);walk(trace,[],null);
     if (trace.error || trace.revertReason) {
       result.status='not_applicable';result.reason='Original execution did not succeed; reverted observations cannot discover committed effects.';counts.complete=true;return result;

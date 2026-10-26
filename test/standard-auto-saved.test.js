@@ -26,6 +26,11 @@ const expected = [
 ];
 const key = (method, params) => JSON.stringify([method, params]);
 const queryKey = value => value.to + ':' + value.data;
+function assertNoNativeFlows(report) {
+  assert.deepEqual(report.nativeEffects, { status: 'none', feeScope: 'excluded', maxAccounts: 8,
+    candidates: [], netValueByAccount: {}, selectedAccounts: [], counts: { candidates: 0, selected: 0, omitted: 0, measured: 0 }, measurements: [] });
+  assert.deepEqual(report.preview.nativeBalances, []);
+}
 
 function savedResults({ omitId } = {}) {
   const remaining = new Map(), used = [], unexpected = [];
@@ -58,6 +63,7 @@ function savedResults({ omitId } = {}) {
 test('automatic Aave API adapter discovers four measured queries from composite saved results, not explicit query input', async () => {
   assert.equal(Object.hasOwn(input, 'queries'), false);
   const fixture = savedResults(), report = await simulateStandard(input, fixture.rpc);
+  assertNoNativeFlows(report);
   fixture.finish(); assert.equal(fixture.mode, FIXTURE_MODE);
   assert.notDeepEqual(fixture.used, recorded.transportEvidence.map(row => row.id), 'This fixture changes execution order and must not be labeled original wire replay.');
   assert.deepEqual(report.apiRequest, input); assert.equal(Object.hasOwn(report.apiRequest, 'queries'), false);
@@ -98,6 +104,7 @@ test('missing independent aToken query response cannot be replaced by an observe
     && row.request.params[2].tracer === 'callTracer' && row.request.params[2].stateOverrides);
   assert.ok(withheld, 'Negative control withholds an actual saved after-state query result.');
   const fixture = savedResults({ omitId: withheld.id }), report = await simulateStandard(input, fixture.rpc);
+  assertNoNativeFlows(report);
   assert.equal(fixture.unexpected.length, 1);
   assert.deepEqual(fixture.unexpected[0], { method: withheld.request.method, params: withheld.request.params });
   assert.throws(() => fixture.finish(), /Engine-caught requests cannot hide/);

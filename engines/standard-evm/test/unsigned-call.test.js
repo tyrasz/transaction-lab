@@ -271,7 +271,7 @@ test('late canonical mismatch or scheduling deadline invalidates every previousl
 
 test('malformed inputs, too many/duplicate queries and reserved addresses are rejected before RPC', async () => {
   for(const change of [
-    h=>{h.chainId=0;}, h=>{h.blockHash=[BLOCK];}, h=>{h.request.from=[S];}, h=>{h.request.to=[TARGET];}, h=>{h.request.data=[CALL.data];}, h=>{h.request.value='1';}, h=>{h.request.gas='0x5208';}, h=>{h.request.gas=5000001;}, h=>{h.request.nonce=7;}, h=>{h.queries=[];}, h=>{h.queries.push(h.queries[0]);}, h=>{h.queries=Array.from({length:9},(_,i)=>({to:address(100+i),data:balanceOf(S)}));}, h=>{h.request.to=PROBE;}, h=>{h.queries[0].to=PROBE;},
+    h=>{h.chainId=0;}, h=>{h.blockHash=[BLOCK];}, h=>{h.request.from=[S];}, h=>{h.request.to=[TARGET];}, h=>{h.request.data=[CALL.data];}, h=>{h.request.value=(MAX+1n).toString();}, h=>{h.request.gas='0x5208';}, h=>{h.request.gas=5000001;}, h=>{h.request.nonce=7;}, h=>{h.queries=[];}, h=>{h.queries.push(h.queries[0]);}, h=>{h.queries=Array.from({length:9},(_,i)=>({to:address(100+i),data:balanceOf(S)}));}, h=>{h.request.to=PROBE;}, h=>{h.queries[0].to=PROBE;},
   ]){const h=harness();change(h);const result=await run(h);assert.equal(h.records.length,0);assert.equal(result.execution.status,'unavailable');noAmounts(result);}
 });
 

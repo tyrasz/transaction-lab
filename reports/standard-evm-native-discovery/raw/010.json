@@ -1,0 +1,64 @@
+{
+  "id": 10,
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 10,
+    "method": "debug_traceCall",
+    "params": [
+      {
+        "from": "0xc0cb2ec9964f44621d867cdd4331a0541589fb93",
+        "to": "0x43b719b9c6cf849dca549765ba1af00f3dfc4ac1",
+        "data": "0x",
+        "value": "0x12655d12a5a0000",
+        "gas": "0x4c4b40"
+      },
+      "0x6e2f11a0daf8cc18df88266db83ae7955d5f947c41cf9ad4befd8d43fa10dda3",
+      {
+        "tracer": "prestateTracer",
+        "timeout": "15s",
+        "tracerConfig": {
+          "diffMode": true
+        }
+      }
+    ]
+  },
+  "requestText": "{\"jsonrpc\":\"2.0\",\"id\":10,\"method\":\"debug_traceCall\",\"params\":[{\"from\":\"0xc0cb2ec9964f44621d867cdd4331a0541589fb93\",\"to\":\"0x43b719b9c6cf849dca549765ba1af00f3dfc4ac1\",\"data\":\"0x\",\"value\":\"0x12655d12a5a0000\",\"gas\":\"0x4c4b40\"},\"0x6e2f11a0daf8cc18df88266db83ae7955d5f947c41cf9ad4befd8d43fa10dda3\",{\"tracer\":\"prestateTracer\",\"timeout\":\"15s\",\"tracerConfig\":{\"diffMode\":true}}]}",
+  "requestSha256": "952add9b5924b0fadbd4761e73040a3af4e118f20264527de27b5aa98f4f0dc7",
+  "startedAt": "2026-10-26T13:12:51.276Z",
+  "response": {
+    "id": 10,
+    "jsonrpc": "2.0",
+    "result": {
+      "post": {
+        "0x43b719b9c6cf849dca549765ba1af00f3dfc4ac1": {
+          "balance": "0x25445660758710a22"
+        },
+        "0xc0cb2ec9964f44621d867cdd4331a0541589fb93": {
+          "balance": "0x394c549ef000",
+          "nonce": 1
+        }
+      },
+      "pre": {
+        "0x43b719b9c6cf849dca549765ba1af00f3dfc4ac1": {
+          "balance": "0x2531f10362e170a22",
+          "nonce": 75100
+        },
+        "0xc0cb2ec9964f44621d867cdd4331a0541589fb93": {
+          "balance": "0x1268f1d7ef8f000"
+        }
+      }
+    }
+  },
+  "status": "success",
+  "httpStatus": 200,
+  "completedAt": "2026-10-26T13:12:51.487Z",
+  "durationMs": 205.12416699999994,
+  "raw": {
+    "file": "raw/010.body",
+    "complete": true,
+    "observedBytes": 386,
+    "bytes": 386,
+    "observedPrefixSha256": "23b034c02d7fa0bac7dddd137a16d73b354695b3d863672b9f64887a6110b456",
+    "sha256": "23b034c02d7fa0bac7dddd137a16d73b354695b3d863672b9f64887a6110b456"
+  }
+}

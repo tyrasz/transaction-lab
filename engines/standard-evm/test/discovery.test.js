@@ -164,3 +164,23 @@ test('invalid query limits and request envelopes cannot silently relax bounds',(
     const request={from:S,to:T,data:'0x12345678',value:'0x0',gas:'0x4c4b40',...change};withheld(discoverTokenQueries({request,trace:frame()}));
   }
 });
+
+test('payable root binds exact native value while committed token events remain independent query candidates',()=>{
+  for (const amount of [1n,1000000000000000001n,MAX]) for (const requestAmount of ['0x'+amount.toString(16),amount.toString()]) {
+    const trace=frame({value:'0x'+amount.toString(16),calls:[frame({type:'DELEGATECALL',from:T,to:I,value:'0x'+amount.toString(16),logs:[log(Z,S,7n,T)]}),frame({type:'STATICCALL',from:T,to:R,logs:[log(O,B,8n,R)]}),frame({from:T,to:B,error:'execution reverted',logs:[log(O,R,9n,B)]})]});
+    const request={from:S,to:T,data:trace.input,value:requestAmount,gas:trace.gas},d=discoverTokenQueries({request,trace});
+    assert.equal(d.status,'discovered');assert.deepEqual(d.queries,[balance(T,S)]);assert.equal(d.observations.length,1);assert.equal(d.observations[0].amountRaw,'7');
+    assert.equal(d.observations[0].effectEstablished,false);assert.equal(d.observations[0].provenance.storageAddress,T);
+    const mismatch=structuredClone(trace);mismatch.value='0x0';withheld(discoverTokenQueries({request,trace:mismatch}));
+    const failed=structuredClone(trace);failed.error='execution reverted';assert.equal(discoverTokenQueries({request,trace:failed}).status,'not_applicable');
+  }
+  const nativeTransfer=frame({value:'0x1',input:transfer(R),logs:[log(S,R,7n)]}),request={from:S,to:T,data:nativeTransfer.input,value:'1',gas:nativeTransfer.gas};
+  const d=discoverTokenQueries({request,trace:nativeTransfer});assert.equal(d.observations.length,1);assert.equal(d.observations[0].kind,'transfer_event');
+  assert.ok(d.diagnostics.some(diagnostic=>diagnostic.code==='NONZERO_CALL_VALUE_EXCLUDED'),'Payable selector-only calls remain excluded; event candidates are retained.');
+});
+
+test('payable input value cannot exceed uint256 or admit noncanonical quantities',()=>{
+  for (const value of [(MAX+1n).toString(),'0x'+(MAX+1n).toString(16),'01','-1','1.0',1,1n,['1'],null]) {
+    const trace=frame({value:'0x1'}),request={from:S,to:T,data:trace.input,value,gas:trace.gas};withheld(discoverTokenQueries({request,trace}));
+  }
+});

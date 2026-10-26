@@ -39,7 +39,7 @@ async function expectedImplementation() {
     'src/rpc.js', 'src/state.js', 'src/state-diff.js', 'src/query-validation.js',
     'src/account-effects.js', 'src/affected-balances.js', 'src/allowances.js', 'src/analyze.js', 'src/balances.js', 'src/current-state.js',
     'src/historical-state.js', 'src/lending-balances.js', 'src/lending.js', 'src/permissions.js', 'src/revert.js',
-    'engines/standard-evm/package.json', 'engines/standard-evm/package-lock.json', 'engines/standard-evm/unsigned-call.js', 'engines/standard-evm/provider-state-diff.js', 'engines/standard-evm/discovery.js',
+    'engines/standard-evm/package.json', 'engines/standard-evm/package-lock.json', 'engines/standard-evm/unsigned-call.js', 'engines/standard-evm/provider-state-diff.js', 'engines/standard-evm/discovery.js', 'engines/standard-evm/native-effects.js',
     ...['package.json', 'sha3.js', '_u64.js', 'utils.js'].map(name => 'engines/standard-evm/node_modules/@noble/hashes/' + name),
   ].sort();
   const hash = createHash('sha256');
@@ -60,7 +60,7 @@ test('configuration exposes experimental Ethereum separately and binds its compl
   assert.deepEqual(api.implementation, await expectedImplementation());
   assert.equal(await loadStandardApi(), api, 'The loaded implementation identity is stable for this process.');
   assert.ok(api.implementation.sourceFiles.includes('src/standard-rpc.js'));
-  assert.equal(api.implementation.sourceFiles.length, 31);
+  assert.equal(api.implementation.sourceFiles.length, 32);
   assert.ok(api.implementation.sourceFiles.includes('src/analyze.js'), 'Transitive server imports belong to the standard API identity.');
   assert.ok(api.implementation.sourceFiles.includes('src/historical-state.js'));
   assert.ok(api.implementation.sourceFiles.includes('engines/standard-evm/unsigned-call.js'));
@@ -71,7 +71,7 @@ test('configuration exposes experimental Ethereum separately and binds its compl
 test('HTTP validation, origin and host protections reject inputs before creating either provider', async t => {
   let factories = 0;
   const base = await start(t, { standardRpcFactory() { factories++; throw new Error('No provider should be constructed.'); }, rpcFactory() { factories++; throw new Error('No provider should be constructed.'); } });
-  for (const change of [{ chainId: 999 }, { value: '0x0' }, { value: '1' }, { rpcUrl: 'https://user-supplied.invalid/private' }, { stateOverrides: {} }, { queries: [] }, { queries: Array(9).fill(input(0).queries[0]) }, { block: 'pending' }, { data: '0x0' }]) {
+  for (const change of [{ chainId: 999 }, { value: '0x0' }, { value: (1n << 256n).toString() }, { rpcUrl: 'https://user-supplied.invalid/private' }, { stateOverrides: {} }, { queries: [] }, { queries: Array(9).fill(input(0).queries[0]) }, { block: 'pending' }, { data: '0x0' }]) {
     const response = await post(base, '/api/evm/simulate', { ...input(0), ...change });
     assert.equal(response.status, 400); assert.ok((await response.json()).error.code);
   }
@@ -185,7 +185,10 @@ for (const [index, run] of capture.cases.entries()) test(`full HTTP production t
   const response = await post(base, '/api/evm/simulate', input(index));
   assert.equal(response.status, 200);
   const report = await response.json(); recorded.finish(); assert.equal(factories, 1);
-  const { id, createdAt, apiRequest, source, preview, timing, implementation, transportEvidence, ...engine } = report;
+  const { id, createdAt, apiRequest, source, preview, timing, implementation, transportEvidence, nativeEffects, ...engine } = report;
+  assert.deepEqual(nativeEffects, { status: 'none', feeScope: 'excluded', maxAccounts: 8,
+    candidates: [], netValueByAccount: {}, selectedAccounts: [], counts: { candidates: 0, selected: 0, omitted: 0, measured: 0 }, measurements: [] });
+  assert.deepEqual(preview.nativeBalances, []);
   assert.deepEqual(engine, run.result, 'Every engine field, raw trace, diff, evidence row, measurement and codeHash check is preserved.');
   assert.deepEqual(apiRequest, api.validateStandardSimulation(input(index)));
   assert.equal(source.profile, 'unsigned_unpriced_block_end'); assert.equal(source.blockSelection.resolvedHash, run.blockHash);
@@ -225,4 +228,22 @@ test('provider failure remains an explicit unavailable HTTP result with hashed, 
   assert.equal(report.transportEvidence[0].error.code, 'RPC_EXECUTION_ERROR');
   assert.equal(report.transportEvidence[0].transport.complete, true); assert.match(report.transportEvidence[0].transport.responseSha256, /^[0-9a-f]{64}$/);
   assert.ok(!JSON.stringify(report).includes(secret));
+});
+
+test('HTTP accepts canonical positive wei and preserves its exact engine value without displaying unmeasured native balances', async t => {
+  let calls = 0;
+  const rpc = new StandardRpcClient({ fetchImpl: async (_url, options) => {
+    calls++; const request = JSON.parse(options.body);
+    assert.equal(request.method, 'eth_chainId'); assert.deepEqual(request.params, []);
+    // Intentional wrong-chain control stops execution without any public call.
+    return new Response(JSON.stringify({ jsonrpc: '2.0', id: request.id, result: '0x2' }));
+  } });
+  const base = await start(t, { standardRpcFactory: () => rpc });
+  const request = { ...input(0), value: '1' }; delete request.queries;
+  const response = await post(base, '/api/evm/simulate', request); assert.equal(response.status, 200);
+  const report = await response.json();
+  assert.equal(calls, 1); assert.deepEqual(report.apiRequest, request);
+  assert.equal(report.request.transaction.value, '0x1'); assert.equal(report.execution.status, 'unavailable');
+  assert.equal(report.nativeEffects.status, 'unavailable'); assert.equal(report.nativeEffects.feeScope, 'excluded');
+  assert.deepEqual(report.preview.nativeBalances, []); assert.deepEqual(report.preview.queries, []);
 });

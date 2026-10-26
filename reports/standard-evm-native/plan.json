@@ -1,0 +1,354 @@
+{
+  "schemaVersion": "1.0",
+  "frozenAt": "2026-10-26T13:35:13.284Z",
+  "developmentOnly": true,
+  "title": "Three fixed native ETH development simulations",
+  "provider": "https://eth.drpc.org",
+  "chainId": 1,
+  "route": "/api/evm/simulate",
+  "method": "POST",
+  "implementation": {
+    "name": "Transaction Lab Ethereum preview",
+    "version": "0.11.0",
+    "sourceSha256": "5e915486d876ad4bab26490ec807c599b5a5bb1df683481bebffa2adb71e9c60",
+    "sourceFiles": [
+      "engines/standard-evm/discovery.js",
+      "engines/standard-evm/native-effects.js",
+      "engines/standard-evm/node_modules/@noble/hashes/_u64.js",
+      "engines/standard-evm/node_modules/@noble/hashes/package.json",
+      "engines/standard-evm/node_modules/@noble/hashes/sha3.js",
+      "engines/standard-evm/node_modules/@noble/hashes/utils.js",
+      "engines/standard-evm/package-lock.json",
+      "engines/standard-evm/package.json",
+      "engines/standard-evm/provider-state-diff.js",
+      "engines/standard-evm/unsigned-call.js",
+      "package.json",
+      "src/account-effects.js",
+      "src/affected-balances.js",
+      "src/allowances.js",
+      "src/analyze.js",
+      "src/balances.js",
+      "src/config.js",
+      "src/current-state.js",
+      "src/historical-state.js",
+      "src/lending-balances.js",
+      "src/lending.js",
+      "src/permissions.js",
+      "src/query-validation.js",
+      "src/revert.js",
+      "src/rpc.js",
+      "src/server.js",
+      "src/standard-loader.js",
+      "src/standard-rpc.js",
+      "src/standard-simulation.js",
+      "src/state-diff.js",
+      "src/state.js",
+      "src/validate.js"
+    ]
+  },
+  "limits": {
+    "cases": 3,
+    "rpcCallsPerCase": 65,
+    "totalRpcCalls": 195,
+    "rpcResponseBytes": 8388608,
+    "rpcTotalBytesPerCase": 33554432,
+    "rpcTotalBytes": 100663296,
+    "rpcRequestMs": 25000,
+    "rpcWallMs": 145000,
+    "httpRequestMs": 160000,
+    "httpResponseBytes": 134217728,
+    "closeGraceMs": 5000,
+    "retries": 0
+  },
+  "cases": [
+    {
+      "id": "native-transfer",
+      "input": {
+        "chainId": 1,
+        "from": "0xc0cb2ec9964f44621d867cdd4331a0541589fb93",
+        "to": "0x43b719b9c6cf849dca549765ba1af00f3dfc4ac1",
+        "data": "0x",
+        "value": "82848000000000000",
+        "block": "0x6e2f11a0daf8cc18df88266db83ae7955d5f947c41cf9ad4befd8d43fa10dda3"
+      },
+      "provenance": {
+        "inputFile": "inputs/native-index.json",
+        "originalTransactionHash": "0xe3310b67e3d47ab97dbe6148b933d9568a1b5819cb649b6cc790cd0b011f49bc",
+        "sourceBlockHash": "0x3fa512841c5a033c100181333b2e464e8153c307b7cd6ab6f43a705a316859ed",
+        "originalTransactionIndex": "5",
+        "conversion": "Only lossless hex wei to canonical decimal; fixed gas is supplied by the engine."
+      },
+      "requestText": "{\"chainId\":1,\"from\":\"0xc0cb2ec9964f44621d867cdd4331a0541589fb93\",\"to\":\"0x43b719b9c6cf849dca549765ba1af00f3dfc4ac1\",\"data\":\"0x\",\"value\":\"82848000000000000\",\"block\":\"0x6e2f11a0daf8cc18df88266db83ae7955d5f947c41cf9ad4befd8d43fa10dda3\"}",
+      "requestBytes": 232,
+      "requestSha256": "a3232dc8241cdff1c566870d590268567697ccd5014122c5b12c22de4a525f24"
+    },
+    {
+      "id": "internal-eth-swap",
+      "input": {
+        "chainId": 1,
+        "from": "0x6f0a91ef8adeb54db0e63be507747ab9a31d3926",
+        "to": "0x51c72848c68a965f66fa7a88855f9f7784502a7f",
+        "data": "0x771d503f0000000000000000000000000000000000000000000000000002f5e6b858327600000000000000000000000088e6a0c2ddd26feeb64f039a2c41296fcb3f5640000000000000000000000000000000000000000000000000000000032732652a00000000000000000000000000000000000000000000000050845d2327ad2400000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000014a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48000000000000000000000000",
+        "value": "0",
+        "block": "0x3891c3080a15e2c486e756f92933b0c023edee507f0d649e9155753b70f74c7a"
+      },
+      "provenance": {
+        "inputFile": "inputs/swap-response.json",
+        "conversion": "Exact unchanged automatic API request; contract-held assets do not imply sender ownership."
+      },
+      "requestText": "{\"chainId\":1,\"from\":\"0x6f0a91ef8adeb54db0e63be507747ab9a31d3926\",\"to\":\"0x51c72848c68a965f66fa7a88855f9f7784502a7f\",\"data\":\"0x771d503f0000000000000000000000000000000000000000000000000002f5e6b858327600000000000000000000000088e6a0c2ddd26feeb64f039a2c41296fcb3f5640000000000000000000000000000000000000000000000000000000032732652a00000000000000000000000000000000000000000000000050845d2327ad2400000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000014a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48000000000000000000000000\",\"value\":\"0\",\"block\":\"0x3891c3080a15e2c486e756f92933b0c023edee507f0d649e9155753b70f74c7a\"}",
+      "requestBytes": 736,
+      "requestSha256": "7f94532bd171441c9a849a94b5c14626d0126381532b84c88e6367fff95d565a"
+    },
+    {
+      "id": "aave-no-native",
+      "input": {
+        "chainId": 1,
+        "from": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+        "to": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+        "data": "0x02c205f0000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000ec351bbd00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b40000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006ade28e5000000000000000000000000000000000000000000000000000000000000001c1fc8457fd931323b0d6826fc26886f225497d878c64a89a6910d343460e195607fbaa6d6119003fd9817e7ca4267763e7ce8663807399d427761dd38b3af48f5",
+        "value": "0",
+        "block": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7"
+      },
+      "provenance": {
+        "inputFile": "inputs/aave-response.json",
+        "conversion": "Exact unchanged automatic API request; no-native control."
+      },
+      "requestText": "{\"chainId\":1,\"from\":\"0x48c16c5652add27eddb0f896748a35fc60b8d1b4\",\"to\":\"0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2\",\"data\":\"0x02c205f0000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000ec351bbd00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b40000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006ade28e5000000000000000000000000000000000000000000000000000000000000001c1fc8457fd931323b0d6826fc26886f225497d878c64a89a6910d343460e195607fbaa6d6119003fd9817e7ca4267763e7ce8663807399d427761dd38b3af48f5\",\"value\":\"0\",\"block\":\"0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7\"}",
+      "requestBytes": 736,
+      "requestSha256": "f856676e0d306e920b865753eee4d0a074a65d432e5a7ac3e299480819de2a88"
+    }
+  ],
+  "sources": [
+    {
+      "path": "engines/standard-evm/discovery.js",
+      "bytes": 17590,
+      "sha256": "67bee640d759429cd4eecaee794d512c508bc2bc876f03c005619dd2b45595d2"
+    },
+    {
+      "path": "engines/standard-evm/native-effects.js",
+      "bytes": 8741,
+      "sha256": "6626db64f54591a7eb760ced95d838c37f38075bc9909b2d4b2e2c1e29ee0d40"
+    },
+    {
+      "path": "engines/standard-evm/node_modules/@noble/hashes/LICENSE",
+      "bytes": 1109,
+      "sha256": "4f221aee6e072336700c408c68ab3b96a3fc09f6aebe6f48f1bd99e5ef13faec"
+    },
+    {
+      "path": "engines/standard-evm/node_modules/@noble/hashes/_u64.js",
+      "bytes": 4794,
+      "sha256": "b09da8c07fe8187c07649494cdb7cd0bcf13df90b506a9473d19e4d5f8c2e102"
+    },
+    {
+      "path": "engines/standard-evm/node_modules/@noble/hashes/package.json",
+      "bytes": 2583,
+      "sha256": "3e361734f5269de162fa362483d7f45dee7efb533ec217157945338f7591baaf"
+    },
+    {
+      "path": "engines/standard-evm/node_modules/@noble/hashes/sha3.js",
+      "bytes": 17469,
+      "sha256": "9a81e1edb24eae27b335533220167609cfb58008c5690e140ce478acdc669f32"
+    },
+    {
+      "path": "engines/standard-evm/node_modules/@noble/hashes/utils.js",
+      "bytes": 26035,
+      "sha256": "037ad49adb78168b6b699598fd33f85f7877456b1d28b4d032e2a1a16807947c"
+    },
+    {
+      "path": "engines/standard-evm/package-lock.json",
+      "bytes": 760,
+      "sha256": "f9ffc14283d590781e779c2e8d1a4dbe1447b61ec3d3dba460bc046f0ec3d5eb"
+    },
+    {
+      "path": "engines/standard-evm/package.json",
+      "bytes": 322,
+      "sha256": "048fa22728b4cef1ca2b0b08de11b85b3a5f2d2d326de9a966b0e9c4539e6826"
+    },
+    {
+      "path": "engines/standard-evm/provider-state-diff.js",
+      "bytes": 3536,
+      "sha256": "d506b50e2f5ae80c9fb45e32fba52383bf5608dabe83bd8b8c03809c023dc188"
+    },
+    {
+      "path": "engines/standard-evm/unsigned-call.js",
+      "bytes": 25039,
+      "sha256": "3674996188f005af6860e3a7e0850a9552386848bca22073dfc346542d358d11"
+    },
+    {
+      "path": "package.json",
+      "bytes": 748,
+      "sha256": "9e9a18ce644f8ebf4c9e7f94a9f11225f8f49726d234986c4bedb130d026fc65"
+    },
+    {
+      "path": "public/app.js",
+      "bytes": 87938,
+      "sha256": "07f17eafb84800b861a86784f50a06e9e266ce7acdd3121c6b5f4e636dae30fc"
+    },
+    {
+      "path": "public/index.html",
+      "bytes": 16466,
+      "sha256": "87f6bbc17c0a5b62ecc0a362d2a3e81c91ff0779f2ebd9cc5dce1913508ed037"
+    },
+    {
+      "path": "public/style.css",
+      "bytes": 27690,
+      "sha256": "044315ab5d5da83a4f26e5757b6f87fe22ac7477a0ca3f940527b0ca5f4576a1"
+    },
+    {
+      "path": "reports/standard-evm-native/freeze.mjs",
+      "bytes": 4683,
+      "sha256": "6e81955a145c941a1904e3d882ff08d0b7b7b8671cfc631caf8ec255838c14de"
+    },
+    {
+      "path": "reports/standard-evm-native/run.mjs",
+      "bytes": 21089,
+      "sha256": "01372380d7b07d4e932936361e7c570fe4dcd180aea4b0b66dc28045c3f35027"
+    },
+    {
+      "path": "src/account-effects.js",
+      "bytes": 10754,
+      "sha256": "81b9866e1a8c536ea5b5748c82fdca4525007fe7f56daa4b14c21a469919d18e"
+    },
+    {
+      "path": "src/affected-balances.js",
+      "bytes": 18176,
+      "sha256": "7e766f7eb0a528b18d5e8bc2b2c89561a4f2746e20b276dd1db42a4b9797ff60"
+    },
+    {
+      "path": "src/allowances.js",
+      "bytes": 9206,
+      "sha256": "efed5bfd9992a83fcf865bff6ca62ac4081e57c13ee95ec4b984732401e5b173"
+    },
+    {
+      "path": "src/analyze.js",
+      "bytes": 23060,
+      "sha256": "1c3f648a9aca61bd238994f4d728ca1b975d8448d3cb244537550fe6f2daa004"
+    },
+    {
+      "path": "src/balances.js",
+      "bytes": 6082,
+      "sha256": "d09763d892a5474df0c831b819366f1426217b7950c3270a3a1b50a1a0501480"
+    },
+    {
+      "path": "src/config.js",
+      "bytes": 10726,
+      "sha256": "3c3ce9d7c64f455683d94176c5c32d656fd90568b892fd7ddcbb82cff5542c10"
+    },
+    {
+      "path": "src/current-state.js",
+      "bytes": 17732,
+      "sha256": "0f1d5f89a07aaf9ad8910f0a6a8ce3e76da5c4a9b08d657f69243fec4fcc571d"
+    },
+    {
+      "path": "src/historical-state.js",
+      "bytes": 22682,
+      "sha256": "bd4247a6937e303d0da6522fcfb15b0947325e322def3d0afb7608cccb3f22a7"
+    },
+    {
+      "path": "src/lending-balances.js",
+      "bytes": 7607,
+      "sha256": "732b609118bbabb2333429d772c0aa6ab40715099e0bddbc8553fc86d8920465"
+    },
+    {
+      "path": "src/lending.js",
+      "bytes": 10228,
+      "sha256": "0aa71bbff18e6d4552c0e593b26b09589bf17bdd8c7d7df7a5b403ee039ba95d"
+    },
+    {
+      "path": "src/permissions.js",
+      "bytes": 20385,
+      "sha256": "f03ef5417b1c7399680632e8e726991d4d9918dfaac45fba7ee2f205a38378b0"
+    },
+    {
+      "path": "src/query-validation.js",
+      "bytes": 6911,
+      "sha256": "f0f15143af27be41174da93dc0c86008a1f1c41aeae673db40c9c8965cbadb73"
+    },
+    {
+      "path": "src/revert.js",
+      "bytes": 2291,
+      "sha256": "370f8ca85dac27870762d1042f24e27d9de4b7fa9e43b39258b93c5f48ccd677"
+    },
+    {
+      "path": "src/rpc.js",
+      "bytes": 7011,
+      "sha256": "d354a756cf56e2aa4bb37e8ede134136421dcd4a4e095a65060b8cdcf1c0484a"
+    },
+    {
+      "path": "src/server.js",
+      "bytes": 21277,
+      "sha256": "e2c36ebdab1d2d9054d6af5965b90eeccf9a9dfe6859f0cffe9df9a24f0411ad"
+    },
+    {
+      "path": "src/standard-loader.js",
+      "bytes": 2988,
+      "sha256": "63cdef666c8155e4463788da7c4dd64a2adea99760a72d5e7390b631160aff94"
+    },
+    {
+      "path": "src/standard-rpc.js",
+      "bytes": 7707,
+      "sha256": "505ac9e016b9063ef90834bc210d8e2f86748b956ab6889335281e64d4990d75"
+    },
+    {
+      "path": "src/standard-simulation.js",
+      "bytes": 22218,
+      "sha256": "3a0e5845cc2e4dda380461d6ea4dcd6c0cb782be3d21d349a64a9b8b704d0343"
+    },
+    {
+      "path": "src/state-diff.js",
+      "bytes": 5004,
+      "sha256": "91aad467697539ffbe9a76b7626799ff72ce043a3875355ec18933fe406e1235"
+    },
+    {
+      "path": "src/state.js",
+      "bytes": 11192,
+      "sha256": "f8e6e7121df5cc94f00e9b377b3b18a49961f9878882d69bcdea8ed816503a2b"
+    },
+    {
+      "path": "src/validate.js",
+      "bytes": 2459,
+      "sha256": "cbc61262784c7124009ce807066c9ed343ec1406ca7be67860945994a7f7c251"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "inputs/native-index.json",
+      "originalPath": "reports/standard-evm-native-discovery/index.json",
+      "sha256": "f4026a6a4eab5a8d1896a7953dd8af853ac7d65994dc368e7da129ddd17880fa",
+      "bytes": 3204
+    },
+    {
+      "path": "inputs/native-capture.json",
+      "originalPath": "reports/standard-evm-native-discovery/capture.json",
+      "sha256": "59cf2cc3d92100ca62f9b13e69386ce4386bf308ca40f595904e9aab013a6b5c",
+      "bytes": 2496454
+    },
+    {
+      "path": "inputs/native-manifest.json",
+      "originalPath": "reports/standard-evm-native-discovery/manifest.json",
+      "sha256": "13a4087b44b2455860136f06aed3dd2ee9a2d87be367edcf2e25949dd4fadeda",
+      "bytes": 5298
+    },
+    {
+      "path": "inputs/swap-response.json",
+      "originalPath": "reports/standard-evm-auto/swap-response.json",
+      "sha256": "2c28a1db535d44c493d51e6a6c01b9bcbfab50af66b033f043c67b07c4df0ff2",
+      "bytes": 699086
+    },
+    {
+      "path": "inputs/aave-response.json",
+      "originalPath": "reports/standard-evm-auto/aave-response.json",
+      "sha256": "2fea1f944225742955948d2d9e93142095f9a78f7b1edb5f26047613a222388c",
+      "bytes": 408253
+    }
+  ],
+  "protocol": [
+    "Exactly three cases in declared order, once each; no retries, replacements, fallback providers or new selection.",
+    "Run uses the complete archived application source with the production bounded Ethereum transport and fixed public endpoint.",
+    "STARTED.json is created exclusively before socket binding or public network. Any interrupted run is retained and cannot be relaunched.",
+    "API requests omit explicit token queries; the engine discovers its bounded token/native account set.",
+    "Native amounts must come from validated before/after state; candidate net-value diagnostics are not measurements.",
+    "No funding overrides, original signed fee settlement, account ownership claim, independent engine oracle or general coverage score."
+  ]
+}

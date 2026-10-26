@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "1.0",
+  "createdAt": "2026-10-26T13:12:26.328Z",
+  "purpose": "Bounded public development-case discovery of ordinary positive native ETH transfers; not a benchmark.",
+  "endpoint": "https://eth.drpc.org",
+  "limits": {
+    "requests": 25,
+    "candidates": 3,
+    "responseBytes": 8388608,
+    "totalBytes": 20971520,
+    "requestMs": 25000,
+    "wallMs": 360000
+  },
+  "methods": [
+    "eth_chainId",
+    "eth_getBlockByNumber",
+    "eth_getBlockByHash",
+    "eth_getCode",
+    "eth_getBalance",
+    "eth_getTransactionCount",
+    "eth_getTransactionReceipt",
+    "debug_traceTransaction",
+    "debug_traceCall"
+  ],
+  "selection": "One latest full block scan; first three transactions in list order with recipient, input0x, positive value and distinct from/to. Verify code-free sender and recipient at common parent hash. Execute identical from/to/input/value with gas5000000; no state or block overrides. Require isolated native value changes and sender nonce+1 from complete diff versus pinned before balances, then original receipt/trace and full source/parent canonical rechecks. Stop first success; retain failures and unattempted planned candidates. Budget exhaustion does not authorize a retry.",
+  "profile": {
+    "gas": "0x4c4b40",
+    "transactionFields": [
+      "from",
+      "to",
+      "data",
+      "value",
+      "gas"
+    ],
+    "gasPrice": "omitted",
+    "nonce": "omitted",
+    "stateOverrides": false,
+    "blockOverrides": false,
+    "withLog": true,
+    "retries": 0,
+    "signing": false,
+    "broadcasting": false
+  },
+  "scriptSha256": "06fd475fc4e5cf359b74d296fbfd7a093d9c4f50226e4739771eb61342f75974"
+}

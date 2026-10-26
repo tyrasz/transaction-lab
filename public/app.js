@@ -46,7 +46,7 @@ function setBusy(busy, mode) {
   updateQueryMode();
   document.querySelector('.results-panel').setAttribute('aria-busy', String(busy));
   $('run-status').classList.toggle('loading', busy);
-  $('run-status').textContent = busy ? mode === 'historical_trace' ? 'Retrieving the original execution trace and checking available historical balance evidence…' : ethereumMode() ? manualQueries() ? 'Running the unsigned call and checking the manual query list. This can take a few minutes…' : 'Running the unsigned call, selecting checks from observed token activity, and measuring the selected accounts. This can take a few minutes…' : 'Pinning the block, executing the call, and decoding token events…' : '';
+  $('run-status').textContent = busy ? mode === 'historical_trace' ? 'Retrieving the original execution trace and checking available historical balance evidence…' : ethereumMode() ? manualQueries() ? 'Running the unsigned call, checking the manual token list and measuring selected ETH accounts. This can take a few minutes…' : 'Running the unsigned call and measuring selected ETH accounts, token balances and allowances. This can take a few minutes…' : 'Pinning the block, executing the call, and decoding token events…' : '';
 }
 
 function clearResult({ inputsChanged = false } = {}) {
@@ -88,6 +88,7 @@ function selectExample({ initial = false } = {}) {
     ? 'This example starts at the end of the block before the original deposit. It runs the same calldata against that state; it does not replay the original transaction at its exact position.'
     : example?.transactionHash ? `Historical inspection uses the original transaction ${example.transactionHash.slice(0, 12)}… and its original block, independent of the fields above.` : '';
   $('standard-queries').setCustomValidity('');
+  $('value').setCustomValidity('');
   updateQueryMode();
   clearResult({ inputsChanged: !initial });
 }
@@ -100,8 +101,8 @@ function updateQueryMode() {
   $('standard-manual-queries').disabled = state.busy || !standard;
   $('standard-checks-help').hidden = !standard;
   $('standard-checks-help').textContent = manual
-    ? 'Only your manual query list will be checked. Automatic discovery is off.'
-    : 'Automatically select up to eight balance or allowance checks from the call. Other changes may be missed.';
+    ? 'Your manual list controls token checks. Up to eight observed ETH accounts are still selected automatically; network fees are excluded.'
+    : 'Automatically check up to eight observed ETH accounts and eight token balance or allowance queries. Other changes may be missed; network fees are excluded.';
   if (!manual) $('standard-queries').setCustomValidity('');
 }
 
@@ -124,14 +125,16 @@ function selectNetwork({ initial = false } = {}) {
   $('standard-manual-queries').checked = false;
   $('standard-query-settings').hidden = !standard;
   $('standard-query-settings').open = false;
-  $('value').readOnly = standard;
-  $('value-help').textContent = standard ? 'Ethereum previews currently support zero native value only.' : 'Native token amount as an integer number of wei.';
+  $('value').readOnly = false;
+  $('value').pattern = standard ? '0|[1-9][0-9]*' : '[0-9]+';
+  $('value-help').classList.toggle('sr-only', !standard);
+  $('value-help').textContent = standard ? 'ETH sent with the call, in whole wei. 1 ETH = 1000000000000000000 wei. Use 0 for none; network fees are excluded.' : 'Native token amount as an integer number of wei.';
   $('block-help').textContent = standard
-    ? 'Use latest, a hexadecimal block number, or a block hash. Execution starts at the end of that block. Ethereum previews use zero native value and a fixed gas limit.'
+    ? 'Use latest, a hexadecimal block number, or a block hash. Execution starts at the end of that block with a fixed gas limit and no transaction fee settlement.'
     : 'Use latest or a hexadecimal block number. The result records the state used.';
   $('network-heading').textContent = standard ? 'ETHEREUM · CHAIN 1 · EXPERIMENTAL' : 'HYPEREVM · CHAIN 999';
   $('page-description').textContent = standard ? 'Preview an unsigned call and check the selected accounts’ balances and allowances.' : 'Simulate an unsigned call or inspect a historical execution. See the evidence behind each result.';
-  $('empty-description').textContent = standard ? 'Choose a deposit example or enter your own inputs. The preview selects checks from observed token activity and shows which balances and allowances could be measured.' : 'Choose an example or enter a transaction. The preview separates execution, token events, and coverage limits.';
+  $('empty-description').textContent = standard ? 'Choose an example or enter your own inputs. The preview shows which ETH balances, token balances and allowances could be measured for the selected accounts.' : 'Choose an example or enter a transaction. The preview separates execution, token events, and coverage limits.';
   $('network-help').hidden = !standard;
   $('network-help').textContent = standardAvailable() ? 'Experimental Ethereum previews. No connected wallet or signature needed.' : state.config?.standardEvm?.reason || 'Ethereum previews are unavailable in this workspace.';
   $('network-help').classList.toggle('unavailable-note', standard && !standardAvailable());
@@ -684,6 +687,31 @@ function standardWarning(warning) {
   return language[warning] || display(warning);
 }
 
+function renderStandardAmounts(query, heading, account, native = false) {
+  const measured = standardMeasured(query);
+  const table = node('table', 'measurement-table');
+  const caption = node('caption', 'sr-only', `${heading} for ${account || 'the requested account'}`);
+  const head = node('thead'), headRow = node('tr'), body = node('tbody'), row = node('tr');
+  for (const label of ['Before', 'After', 'Change']) { const th = node('th', '', label); th.scope = 'col'; headRow.append(th); }
+  head.append(headRow);
+  for (const field of ['before', 'after', 'delta']) {
+    const cell = node('td');
+    if (measured) {
+      const raw = query[`${field}Raw`];
+      const formatted = native || query.metadata ? query[field] : undefined;
+      const amount = native && (formatted === null || formatted === undefined)
+        ? `${field === 'delta' && rawDirection(raw) === 'positive' ? '+' : ''}${raw} wei`
+        : `${field === 'delta' ? signedAmount(formatted, raw) : exactAmount(formatted, raw)}${native ? ' ETH' : ''}`;
+      cell.append(node('strong', '', amount));
+      if (formatted !== undefined && formatted !== null) cell.append(node('span', 'raw-amount', `${raw} ${native ? 'wei' : 'raw units'}`));
+    } else cell.append(node('span', 'missing-amount', 'Not available'));
+    row.append(cell);
+  }
+  body.append(row);
+  table.append(caption, head, body);
+  return table;
+}
+
 function renderStandardQuery(query, sender) {
   const allowance = query.kind === 'allowance';
   const measured = standardMeasured(query);
@@ -701,26 +729,7 @@ function renderStandardQuery(query, sender) {
   if (allowance) addDefinition(details, 'Spender', query.spender);
   addDefinition(details, 'Token contract', query.token);
   if (metadata?.name) addDefinition(details, 'Reference name', metadata.name);
-  article.append(details);
-  const table = node('table', 'measurement-table');
-  const caption = node('caption', 'sr-only', `${heading} for ${owner || 'the requested account'}`);
-  const head = node('thead'), headRow = node('tr'), body = node('tbody'), row = node('tr');
-  for (const label of ['Before', 'After', 'Change']) { const th = node('th', '', label); th.scope = 'col'; headRow.append(th); }
-  head.append(headRow);
-  for (const field of ['before', 'after', 'delta']) {
-    const cell = node('td');
-    if (measured) {
-      const raw = query[`${field}Raw`];
-      const formatted = metadata ? query[field] : undefined;
-      const amount = field === 'delta' ? signedAmount(formatted, raw) : exactAmount(formatted, raw);
-      cell.append(node('strong', '', amount));
-      if (formatted !== undefined && formatted !== null) cell.append(node('span', 'raw-amount', `${raw} raw units`));
-    } else cell.append(node('span', 'missing-amount', 'Not available'));
-    row.append(cell);
-  }
-  body.append(row);
-  table.append(caption, head, body);
-  article.append(table);
+  article.append(details, renderStandardAmounts(query, heading, owner));
   if (!measured) article.append(node('p', 'query-note', query.reason || 'This value was not measured. It must not be interpreted as zero.'));
   if (measured && allowance) {
     const maximum = ((1n << 256n) - 1n).toString();
@@ -732,6 +741,69 @@ function renderStandardQuery(query, sender) {
   if (metadata) article.append(node('p', 'query-reference', `Name and units use reference metadata${metadata.referenceBlockNumber ? ` from block ${numberLabel(metadata.referenceBlockNumber)}` : ''}. They are not reverified for this simulation.`));
   else article.append(node('p', 'query-reference', 'Token name and decimals are not established. Values are shown in raw units.'));
   return article;
+}
+
+function renderStandardNativeBalance(balance, sender) {
+  const measured = standardMeasured(balance);
+  const article = node('article', `standard-query-card${measured ? '' : ' query-unavailable'}`);
+  const header = node('div', 'permission-heading');
+  header.append(node('h4', '', 'ETH balance'), node('span', `query-status ${measured ? 'measured' : 'unavailable'}`, measured ? 'Measured' : balance.status === 'not_applicable' ? 'Not applied' : 'Unavailable'));
+  const details = node('dl', 'permission-details');
+  addDefinition(details, 'Account', balance.account);
+  if (typeof balance.account === 'string' && typeof sender === 'string' && balance.account.toLowerCase() === sender.toLowerCase()) addDefinition(details, 'Account role', 'Transaction sender');
+  article.append(header, details, renderStandardAmounts(balance, 'ETH balance', balance.account, true));
+  if (!measured) article.append(node('p', 'query-note', balance.reason || 'This ETH balance was not measured. Missing amounts are not zero.'));
+  else if (balance.deltaRaw === '0') article.append(node('p', 'query-note', 'Balance unchanged; measured before and after. Transaction fees are excluded.'));
+  return article;
+}
+
+function nativeSelectionCount(effects, rows) {
+  return Number.isSafeInteger(effects?.counts?.selected) && effects.counts.selected >= 0 ? effects.counts.selected : rows.length ? rows.length : null;
+}
+
+function renderStandardNative(effects, rows, sender) {
+  const status = effects?.status || 'unavailable';
+  const candidates = Array.isArray(effects?.candidates) ? effects.candidates : [];
+  const notSelected = candidates.filter(candidate => candidate.selected !== true);
+  const measured = rows.filter(standardMeasured).length;
+  const selected = nativeSelectionCount(effects, rows);
+  const maximum = Number.isSafeInteger(effects?.maxAccounts) ? effects.maxAccounts : 8;
+  $('standard-native-status').textContent = status === 'measured' ? 'Measured · fees excluded'
+    : status === 'partial' ? 'Partial account coverage' : status === 'none' ? 'None observed'
+      : status === 'not_applicable' ? 'Not applied' : 'Unavailable';
+  $('standard-native-description').textContent = status === 'not_applicable'
+    ? 'The call failed or reverted; its state changes were not committed. No ETH measurements were applied. Network fees are not modeled.'
+    : status === 'none' ? 'No supported ETH account candidates were observed. This is not a complete inventory of asset changes, and no balance is assumed to be zero.'
+      : status === 'unavailable' ? `ETH measurements could not be established. ${effects?.reason || 'The response does not establish native balance checks.'} Missing measurements are not zero balances.`
+        : `Separate balance reads measure the selected accounts before and after the call. Up to ${maximum} ETH accounts can be selected; other accounts and effects may be omitted.`;
+  const counts = $('standard-native-counts');
+  counts.replaceChildren();
+  for (const [label, value] of [
+    ['Observed ETH accounts', effects?.counts?.candidates],
+    ['Selected ETH accounts', selected],
+    ['Measured ETH accounts', selected === null ? null : measured],
+    ['Accounts not selected', effects?.counts?.omitted],
+  ]) {
+    if (!Number.isSafeInteger(value) || value < 0) continue;
+    const count = node('div', 'account-count');
+    count.append(node('strong', '', value), node('span', '', label));
+    counts.append(count);
+  }
+  counts.hidden = counts.children.length === 0;
+  $('standard-native-balances').replaceChildren(...rows.map(balance => renderStandardNativeBalance(balance, sender)));
+  $('standard-native-omissions').hidden = notSelected.length === 0;
+  $('standard-native-omissions').open = false;
+  $('standard-native-omissions-heading').textContent = `${notSelected.length} ETH account${notSelected.length === 1 ? '' : 's'} not selected`;
+  $('standard-native-candidates').replaceChildren(...notSelected.map(candidate => {
+    const item = node('article', 'discovery-candidate');
+    item.append(node('h4', '', 'ETH balance check not performed'));
+    const details = node('dl', 'permission-details');
+    addDefinition(details, 'Account', candidate.account);
+    addDefinition(details, 'Reason', candidate.reason === 'account-limit' ? `The ${maximum}-account limit was reached.`
+      : candidate.reason === 'rpc-budget' ? 'The provider request budget was reached.' : candidate.reason || 'The account was not selected for measurement.');
+    item.append(details);
+    return item;
+  }));
 }
 
 function renderDiscoveryCandidate(candidate, reason) {
@@ -809,16 +881,21 @@ function renderStandardResult(result) {
   const execution = result.execution || {};
   const queries = Array.isArray(result.preview?.queries) ? result.preview.queries : [];
   const measured = queries.filter(standardMeasured).length;
+  const nativeRows = Array.isArray(result.preview?.nativeBalances) ? result.preview.nativeBalances : [];
+  const nativeMeasured = nativeRows.filter(standardMeasured).length;
+  const nativeSelected = nativeSelectionCount(result.nativeEffects, nativeRows);
   const sender = result.apiRequest?.from || result.request?.transaction?.from;
   const automatic = result.preview?.scope === 'observed_queried_accounts' || Boolean(result.discovery);
-  $('coverage-label').textContent = automatic ? 'Selected checks' : 'Requested checks';
+  const tokenSelectionKnown = queries.length > 0 || !automatic || ['discovered', 'none'].includes(result.discovery?.status);
+  $('coverage-label').textContent = 'Measured checks';
   $('result-label').textContent = 'Ethereum unsigned simulation';
   $('execution-status').textContent = execution.status === 'success' ? 'Completed' : execution.status === 'reverted_or_failed' ? 'Failed / reverted' : 'Unavailable';
   $('execution-status').className = execution.status === 'success' ? 'success' : execution.status === 'reverted_or_failed' ? 'failed' : 'partial';
   $('gas-used').textContent = execution.gasUsed ? `${numberLabel(execution.gasUsed)} gas used · fees not estimated` : 'Gas usage unavailable';
-  $('coverage-status').textContent = `${measured} / ${queries.length} measured`;
-  $('coverage-status').className = queries.length && measured === queries.length ? 'success' : 'partial';
-  $('coverage-detail').textContent = 'Selected balances and allowances only';
+  $('coverage-status').textContent = `ETH ${nativeSelected === null ? '—' : `${nativeMeasured}/${nativeSelected}`} · tokens ${tokenSelectionKnown ? `${measured}/${queries.length}` : '—'}`;
+  $('coverage-status').className = `combined-coverage ${tokenSelectionKnown && nativeSelected !== null && nativeMeasured + measured > 0 && nativeMeasured === nativeSelected && measured === queries.length ? 'success' : 'partial'}`;
+  $('coverage-detail').textContent = 'Measured / selected · network fees excluded';
+  renderStandardNative(result.nativeEffects, nativeRows, sender);
   renderDiscovery(result.discovery, queries);
   $('execution-error').hidden = !execution.error && !result.measurementFailure;
   $('execution-error').textContent = execution.error ? `Execution error: ${display(execution.error)}` : result.measurementFailure ? `Measurements unavailable: ${display(result.measurementFailure)}` : '';
@@ -840,7 +917,7 @@ function renderStandardResult(result) {
     $(`standard-${group}-count`).textContent = `${rows.filter(standardMeasured).length} / ${rows.length} measured`;
     $(`standard-${group}`).replaceChildren(...rows.map(query => renderStandardQuery(query, sender)));
   }
-  $('standard-metadata-note').textContent = queries.length ? 'Amounts are exact token quantities, not prices or dollar valuations. Other accounts, tokens, debts, and permissions may not be included.' : 'No balance or allowance measurements were returned. Missing measurements are not zero balances.';
+  $('standard-metadata-note').textContent = queries.length ? 'Amounts are exact token quantities, not prices or dollar valuations. Other accounts, tokens, debts, and permissions may not be included.' : 'No token balance or allowance measurements were returned. ETH checks are shown separately. Missing measurements are not zero balances.';
   const warnings = [...new Set((result.preview?.warnings?.length ? result.preview.warnings : [
     'Only the listed balances and allowances are checked. Other changes may be omitted.',
     'Execution uses a zero base fee without transaction fee settlement or outer signature validation.',
@@ -855,9 +932,10 @@ function renderStandardResult(result) {
   addDefinition(details, 'Sender', sender);
   addDefinition(details, 'Recipient', result.apiRequest?.to || result.request?.transaction?.to);
   addDefinition(details, 'Gas limit', '5,000,000');
-  addDefinition(details, 'Native value', '0 wei');
+  const nativeValue = result.apiRequest?.value;
+  addDefinition(details, 'Native value', typeof nativeValue === 'string' && /^(?:0|[1-9][0-9]*)$/.test(nativeValue) ? `${nativeValue} wei` : 'Not available');
   addDefinition(details, 'Network fees', 'Not estimated');
-  addDefinition(details, 'Measurement method', result.executionIdentity ? 'Separate token queries before and after applying the call’s full state changes' : 'Measurement context not established');
+  addDefinition(details, 'Measurement method', result.executionIdentity ? 'Separate selected ETH balance and token checks before and after applying the call’s full state changes' : 'Measurement context not established');
   addDefinition(details, 'Run ID', result.id);
   $('timing').textContent = result.timing?.totalMs !== undefined ? `${(result.timing.totalMs / 1000).toFixed(2)}s total` : '';
 }
@@ -931,6 +1009,11 @@ async function run(mode) {
   const standard = ethereumMode();
   if (standard && (!standardAvailable() || mode === 'historical_trace')) return;
   if (mode === 'historical_trace' && !state.example?.transactionHash) return;
+  if (standard) {
+    const value = $('value').value;
+    $('value').setCustomValidity(/^(?:0|[1-9][0-9]{0,77})$/.test(value) && BigInt(value) < (1n << 256n)
+      ? '' : 'Enter a whole, nonnegative decimal wei amount within uint256, without leading zeros, signs or decimal points.');
+  }
   let queries;
   if (standard && manualQueries()) {
     $('standard-queries').setCustomValidity('');
@@ -959,8 +1042,8 @@ async function run(mode) {
     else renderResult(result);
     setBusy(false);
     $('run-status').textContent = standard
-      ? result.execution?.status === 'success' ? 'Execution completed. Review which balances and allowances were measured below.'
-        : result.execution?.status === 'reverted_or_failed' ? 'The call failed or reverted. Before-and-after measurements were not applied.'
+      ? result.execution?.status === 'success' ? 'Execution completed. Review the ETH balances, token balances and allowances measured below. Network fees are excluded.'
+        : result.execution?.status === 'reverted_or_failed' ? 'The call failed or reverted; its state changes were not committed. Before-and-after measurements were not applied. Network fees are not modeled.'
           : 'Execution could not be established. Unavailable amounts are not zero.'
       : result.execution?.status === 'success' ? historicalRunMessage(mode, result) : 'The provider returned an execution failure. Review the error and trace below.';
   } catch (error) {
@@ -1074,6 +1157,7 @@ for (const id of requestFieldIds) {
   if (id === 'chain') continue;
   const changed = () => {
     if (id === 'standard-queries') $('standard-queries').setCustomValidity('');
+    if (id === 'value') $('value').setCustomValidity('');
     if (id === 'standard-manual-queries') updateQueryMode();
     if (ethereumMode() && state.example) $('historical-help').textContent = manualQueries() ? 'The selected example is a starting point. Simulation uses the fields and manual query list currently shown, at the end of the selected block.' : 'The selected example is a starting point. Simulation uses the fields currently shown and automatically selects checks from the call, at the end of the selected block.';
     clearResult({ inputsChanged: true });

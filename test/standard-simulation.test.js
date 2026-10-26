@@ -11,7 +11,14 @@ const bytes = await readFile(new URL('../reports/standard-evm-deposits-v2/captur
 assert.equal(sha(bytes), '149d80c7e421805dbc403a66acb6fb3410ea1d092876c01cc2776b52c703d86e');
 const capture = JSON.parse(bytes);
 const input = () => structuredClone(STANDARD_EXAMPLES[0].input);
-const engineFields = ({ id, createdAt, apiRequest, source, preview, timing, ...engine }) => engine;
+function engineFields({ id, createdAt, apiRequest, source, preview, timing, nativeEffects, ...engine }) {
+  // The old zero-value deposit captures have no native flows. Assert the sole
+  // additive engine field independently; all frozen engine fields stay exact.
+  assert.deepEqual(nativeEffects, { status: 'none', feeScope: 'excluded', maxAccounts: 8,
+    candidates: [], netValueByAccount: {}, selectedAccounts: [], counts: { candidates: 0, selected: 0, omitted: 0, measured: 0 }, measurements: [] });
+  assert.deepEqual(preview.nativeBalances, []);
+  return engine;
+}
 const word = address => address.slice(2).padStart(64, '0');
 const balanceQuery = (to, account) => ({ to, data: '0x70a08231' + word(account) });
 
@@ -92,6 +99,8 @@ test('examples retain the frozen selections, exact calldata, zero value and quer
   }
   assert.ok(Object.isFrozen(STANDARD_EXAMPLES[0].input.queries[0]));
   assert.equal(STANDARD_CAPABILITIES.limits.totalRpcCalls, 65);
+  assert.equal(STANDARD_CAPABILITIES.limits.nativeAccounts, 8);
+  assert.ok(STANDARD_CAPABILITIES.limitations.some(text => /Native balance measurements exclude outer transaction fees/.test(text)));
   assert.equal(STANDARD_CAPABILITIES.status, 'experimental');
 });
 
@@ -134,15 +143,33 @@ test('automatic preview binds selected query identities to measured values and p
   assert.equal(invalid.queries[0].status, 'unavailable'); assert.equal(invalid.queries[0].deltaRaw, undefined);
 });
 
-test('unsupported chain, nonzero/hex/native values and noncanonical block selectors fail before RPC', async () => {
+test('unsupported chain, noncanonical/overflow wei values and block selectors fail before RPC', async () => {
   const invalid = [
     { chainId: 999 }, { chainId: 8453 }, { chainId: '0x1' }, { chainId: true },
-    ...['1', '0x0', 0, null, '-0', '00'].map(value => ({ value })),
+    ...['0x0', '0x1', 0, 1, null, '-0', '-1', '+1', '00', '01', '1.0', '1e18', ' 1', '1 ', '１', [], {}, (1n << 256n).toString(), '9'.repeat(10000)].map(value => ({ value })),
     ...['pending', 'earliest', 'finalized', '0x00', '0x01', '0x', '123', '0x10000000000000000', [], null].map(block => ({ block })),
   ];
   let calls = 0;
   for (const change of invalid) await assert.rejects(simulateStandard({ ...input(), ...change }, { async call() { calls++; } }), InputError);
   assert.equal(calls, 0);
+});
+
+test('canonical decimal wei preserves exact positive amounts through uint256 max in explicit and automatic input', () => {
+  for (const value of ['0', '1', '82848000000000000', '9007199254740993', ((1n << 256n) - 1n).toString()]) {
+    const manual = { ...input(), value }, automatic = { ...manual }; delete automatic.queries;
+    assert.equal(validateStandardSimulation(manual).value, value);
+    assert.equal(validateStandardSimulation(automatic).value, value);
+  }
+});
+
+test('nonzero decimal wei reaches the unsigned engine as exact hexadecimal without introducing fee or nonce inputs', async () => {
+  const value = '9007199254740993'; let calls = 0;
+  const report = await simulateStandard({ ...input(), value }, { async call(method, params) {
+    calls++; assert.equal(method, 'eth_chainId'); assert.deepEqual(params, []); return '0x2';
+  } });
+  assert.equal(calls, 1); assert.equal(report.apiRequest.value, value);
+  assert.deepEqual(report.request.transaction, { from: input().from, to: input().to, data: input().data, value: '0x20000000000001', gas: '0x4c4b40' });
+  assert.equal(report.execution.status, 'unavailable');
 });
 
 test('URLs, override/metadata/fee/signing fields and accessor/symbol/prototype records are rejected', () => {
@@ -297,4 +324,49 @@ test('pure display control: max uint256 uses exact decimal formatting and stale 
   assert.equal(view.queries[0].delta, '-115792089237316195423570985008687907853269984665640564039457584007913129.639935');
   const mismatched = projectStandardPreview(request, { measurements: [{ query: { ...query, to: input().to }, status: 'measured', beforeRaw: '1', afterRaw: '2', deltaRaw: '1' }] });
   assert.equal(mismatched.queries[0].status, 'unavailable'); assert.equal(mismatched.queries[0].deltaRaw, undefined);
+});
+
+test('native preview uses measured balances only, retains account identity and proof references, and formats ETH exactly', () => {
+  const request = input(); delete request.queries;
+  const recipient = '0x1111111111111111111111111111111111111111';
+  const nativeEffects = { status: 'partial', feeScope: 'excluded', maxAccounts: 8,
+    candidates: [{ account: request.from, netValueRaw: '-999', selected: true }, { account: recipient, netValueRaw: '999', selected: true },
+      { account: '0x2222222222222222222222222222222222222222', netValueRaw: '700', selected: false, reason: 'Native account limit.' }],
+    selectedAccounts: [request.from, recipient], counts: { candidates: 3, selected: 2, omitted: 1, measured: 1 },
+    measurements: [
+      { account: request.from, status: 'measured', beforeRaw: '82911000000000000', afterRaw: '63000000000000', deltaRaw: '-82848000000000000', basis: 'synthetic_native_state_proof', anchorEvidenceId: 4, queryEvidence: [{ state: 'before', evidenceId: 6 }, { state: 'after', evidenceId: 10 }] },
+      { account: recipient, status: 'unavailable', reason: 'Synthetic missing balance proof.', beforeRaw: '1', afterRaw: '1000', deltaRaw: '999', queryEvidence: [{ state: 'before', evidenceId: 7 }] },
+    ] };
+  const result = { measurements: [], request: { queries: [] }, nativeEffects }, saved = structuredClone(nativeEffects);
+  const preview = projectStandardPreview(request, result);
+  assert.equal(preview.nativeBalances.length, 2, 'An omitted candidate is not converted into an invented measured row.');
+  const [sender, other] = preview.nativeBalances;
+  assert.deepEqual(sender, { index: 0, account: request.from, accountIsSender: true,
+    metadata: { symbol: 'ETH', name: 'Ether', decimals: 18, chainId: 1, type: 'native' }, status: 'measured', basis: 'synthetic_native_state_proof', anchorEvidenceId: 4,
+    queryEvidence: nativeEffects.measurements[0].queryEvidence, beforeRaw: '82911000000000000', before: '0.082911', afterRaw: '63000000000000', after: '0.000063', deltaRaw: '-82848000000000000', delta: '-0.082848' });
+  assert.equal(other.account, recipient); assert.equal(other.accountIsSender, false); assert.equal(other.status, 'unavailable');
+  assert.equal(other.reason, 'Synthetic missing balance proof.');
+  for (const key of ['beforeRaw', 'afterRaw', 'deltaRaw', 'before', 'after', 'delta', 'netValueRaw']) assert.equal(other[key], undefined);
+  assert.equal(sender.netValueRaw, undefined, 'Collector diagnostic flow totals are not projected as balances.');
+  assert.deepEqual(result.nativeEffects, saved, 'Native status, candidates, omissions and measurements remain intact.');
+  sender.queryEvidence[0].evidenceId = 999; assert.deepEqual(result.nativeEffects, saved, 'Preview proof references do not alias the engine evidence.');
+});
+
+test('native preview preserves unmeasured states without amounts and rejects inconsistent measured arithmetic', () => {
+  const request = input(); delete request.queries;
+  const max = ((1n << 256n) - 1n).toString();
+  const nativeEffects = { status: 'measured', measurements: [{ account: request.from, status: 'measured', beforeRaw: max, afterRaw: '0', deltaRaw: '-' + max }] };
+  const result = { request: { queries: [] }, measurements: [], nativeEffects };
+  const row = projectStandardPreview(request, result).nativeBalances[0];
+  assert.equal(row.before, '115792089237316195423570985008687907853269984665640564039457.584007913129639935');
+  assert.equal(row.delta, '-' + row.before);
+  for (const status of ['unavailable', 'not_applicable']) {
+    nativeEffects.status = status; nativeEffects.measurements[0].status = status;
+    const unmeasured = projectStandardPreview(request, result).nativeBalances[0];
+    assert.equal(unmeasured.status, status); assert.equal(unmeasured.beforeRaw, undefined); assert.equal(unmeasured.delta, undefined);
+  }
+  nativeEffects.measurements[0].status = 'measured'; nativeEffects.measurements[0].deltaRaw = '1';
+  const inconsistent = projectStandardPreview(request, result).nativeBalances[0];
+  assert.equal(inconsistent.status, 'unavailable'); assert.equal(inconsistent.beforeRaw, undefined); assert.match(inconsistent.reason, /inconsistent/);
+  for (const status of ['none', 'unavailable', 'not_applicable']) assert.deepEqual(projectStandardPreview(request, { request: { queries: [] }, measurements: [], nativeEffects: { status, measurements: [] } }).nativeBalances, []);
 });
