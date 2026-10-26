@@ -13,7 +13,7 @@ const files = Object.freeze([
   'src/standard-loader.js', 'src/standard-rpc.js', 'src/standard-simulation.js',
   'src/rpc.js', 'src/state.js', 'src/state-diff.js', 'src/query-validation.js',
   'engines/standard-evm/package.json', 'engines/standard-evm/package-lock.json',
-  'engines/standard-evm/unsigned-call.js', 'engines/standard-evm/provider-state-diff.js',
+  'engines/standard-evm/unsigned-call.js', 'engines/standard-evm/provider-state-diff.js', 'engines/standard-evm/discovery.js',
   ...['package.json', 'sha3.js', '_u64.js', 'utils.js'].map(name => 'engines/standard-evm/node_modules/@noble/hashes/' + name),
 ].sort());
 const root = new URL('../', import.meta.url);

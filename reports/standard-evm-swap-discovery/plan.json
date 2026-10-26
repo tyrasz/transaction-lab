@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "1.0",
+  "createdAt": "2026-10-26T10:09:21.313Z",
+  "purpose": "Bounded public development-case discovery; not a benchmark or independent execution proof.",
+  "endpoint": "https://eth.drpc.org",
+  "limits": {
+    "requests": 40,
+    "candidates": 4,
+    "responseBytes": 8388608,
+    "totalBytes": 20971520,
+    "requestMs": 25000,
+    "wallMs": 360000
+  },
+  "methods": [
+    "eth_chainId",
+    "eth_getBlockByNumber",
+    "eth_getBlockByHash",
+    "eth_call",
+    "eth_getLogs",
+    "eth_getTransactionByHash",
+    "eth_getTransactionReceipt",
+    "eth_getCode",
+    "debug_traceTransaction",
+    "debug_traceCall"
+  ],
+  "selection": "Last20finalizedblocks; USDC-WETH500factoryverifiedpool; nonremovedUSDC-inputSwaplogs; prioritize distinctsender/recipient then newest block/index; first4distincthashes; requirezero nativevalue,codefreeexternal sender,receiptandparenttrace bothUSDCoutandWETHintothesender; stopfirstsuccess.",
+  "profile": {
+    "parentGas": "0x4c4b40",
+    "parentCallFields": [
+      "from",
+      "to",
+      "data",
+      "value",
+      "gas"
+    ],
+    "stateOverrides": false,
+    "blockOverrides": false,
+    "withLog": true,
+    "automaticRetries": false,
+    "signing": false,
+    "broadcasting": false
+  },
+  "sources": [
+    {
+      "url": "https://developers.uniswap.org/docs/protocols/v3/deployments/v3-ethereum-deployments",
+      "supports": "Canonical Ethereum factory and router addresses, WETH address, getPool mapping."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Uniswap/v3-core/main/contracts/interfaces/pool/IUniswapV3PoolEvents.sol",
+      "supports": "Swap event indexed sender/recipient and signed token0/token1 pool deltas."
+    }
+  ],
+  "scriptSha256": "4d2d432f046ea9f8bb6777ebfaa5246d2ebcab9a2f3129091adecb803db4f9d4"
+}

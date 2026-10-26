@@ -1,0 +1,604 @@
+{
+  "schemaVersion": "1.0",
+  "status": "passed",
+  "auditedAt": "2026-10-26T13:06:04.984Z",
+  "auditMode": "independent_offline_raw_evidence_checks_without_product_validator_imports",
+  "planSha256": "c393b1bdd032e0f18ae8d6a698d5022ac27bae8f6ea4b5db90cb89e974992603",
+  "manifestSha256": "473e1a366c7b20ca41f4fa7adb481500ea44e806bcfc3005285198550f276a52",
+  "resultsSha256": "aeee6baec5a762e4e04f15f3f603e01dde72b8f4a624742533f7c126c4217c15",
+  "implementationSha256": "46c44c52578a050e56aef17f8f562b16f9e539bfdfe9aa4c5775d8b75447dc4e",
+  "counts": {
+    "httpInputs": 3,
+    "rpcRequests": 106,
+    "rpcResponseBytes": 648104,
+    "independentlyCheckedMeasurements": 16,
+    "isolatedQueryTraceReturns": 32,
+    "nonceOnlyQueryDiffs": 32,
+    "originalCompleteDiffs": 3,
+    "prior09OverlappingMeasuredRows": 10
+  },
+  "checks": [
+    "All sealed manifest file bytes/hashes and planned source inventory verified; implementation fingerprint recomputed.",
+    "All three HTTP inputs exactly match their predeclared automatic inputs; queries are omitted.",
+    "All106 original JSON-RPC requests/responses bind to parsed engine evidence, sequential IDs, exact saved text hashes and byte counts.",
+    "Each of16 amounts recomputed from separate before/after uint256 trace-return words and subtraction; every query envelope, token/account, pin, tracer and nonce-only diff checked.",
+    "Full original state overrides independently reconstructed from every post basic field and all pre/post storage slots, including cleared slots; each after query uses them exactly.",
+    "All candidate query identities independently rederived from committed ERC20-shaped logs and CALL calldata, then sender-role priority and lexical order verified.",
+    "Aave4 and Morpho6 overlapping old0.9 measured rows match exactly; no assumption that the two different Morpho query selections cover the same complete inventory.",
+    "Swap four measured token deltas agree with prior observed contract/pool transfers; none are attributed to its EOA sender."
+  ],
+  "cases": [
+    {
+      "id": "aave-usdc-supply-with-permit",
+      "httpStatus": 200,
+      "rpcCalls": 30,
+      "rpcResponseBytes": 98187,
+      "candidates": 4,
+      "selected": 4,
+      "omitted": [],
+      "queryMeasurements": [
+        {
+          "query": {
+            "to": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+            "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+          },
+          "kind": "balanceOf",
+          "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+          "accountIsSender": true,
+          "beforeRaw": "0",
+          "afterRaw": "3962903484",
+          "deltaRaw": "3962903484",
+          "traceEvidenceIds": [
+            14,
+            16
+          ],
+          "nonceOnlyDiffEvidenceIds": [
+            15,
+            17
+          ],
+          "independentReturnwordArithmetic": "matched",
+          "exactEnvelopeAndCompleteOriginalOverrides": "matched"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+          },
+          "kind": "balanceOf",
+          "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+          "accountIsSender": true,
+          "beforeRaw": "3962903485",
+          "afterRaw": "0",
+          "deltaRaw": "-3962903485",
+          "traceEvidenceIds": [
+            18,
+            20
+          ],
+          "nonceOnlyDiffEvidenceIds": [
+            19,
+            21
+          ],
+          "independentReturnwordArithmetic": "matched",
+          "exactEnvelopeAndCompleteOriginalOverrides": "matched"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+          },
+          "kind": "allowance",
+          "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+          "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+          "accountIsSender": true,
+          "beforeRaw": "0",
+          "afterRaw": "0",
+          "deltaRaw": "0",
+          "traceEvidenceIds": [
+            22,
+            24
+          ],
+          "nonceOnlyDiffEvidenceIds": [
+            23,
+            25
+          ],
+          "independentReturnwordArithmetic": "matched",
+          "exactEnvelopeAndCompleteOriginalOverrides": "matched"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000098c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c"
+          },
+          "kind": "balanceOf",
+          "account": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+          "accountIsSender": false,
+          "beforeRaw": "151987610826648",
+          "afterRaw": "151991573730133",
+          "deltaRaw": "3962903485",
+          "traceEvidenceIds": [
+            26,
+            28
+          ],
+          "nonceOnlyDiffEvidenceIds": [
+            27,
+            29
+          ],
+          "independentReturnwordArithmetic": "matched",
+          "exactEnvelopeAndCompleteOriginalOverrides": "matched"
+        }
+      ],
+      "independentOverrideAudit": {
+        "originalDiffEvidenceId": 11,
+        "accountCount": 4,
+        "storageSlotCount": 10,
+        "clearedSlots": [
+          {
+            "account": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "slot": "0x2119e0282db64a6a833c92ea0c4dfa318ec55878b66dc545cc7ba981d4ff6ce3"
+          }
+        ],
+        "complete": true
+      },
+      "prior09OverlappingMeasuredRows": [
+        {
+          "query": {
+            "to": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+            "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+          },
+          "beforeRaw": "0",
+          "afterRaw": "3962903484",
+          "deltaRaw": "3962903484"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+          },
+          "beforeRaw": "3962903485",
+          "afterRaw": "0",
+          "deltaRaw": "-3962903485"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+          },
+          "beforeRaw": "0",
+          "afterRaw": "0",
+          "deltaRaw": "0"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000098c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c"
+          },
+          "beforeRaw": "151987610826648",
+          "afterRaw": "151991573730133",
+          "deltaRaw": "3962903485"
+        }
+      ],
+      "additionalNativeEffects": [],
+      "allEffectsCoverage": "inconclusive"
+    },
+    {
+      "id": "morpho-kiln-usdc-deposit",
+      "httpStatus": 200,
+      "rpcCalls": 46,
+      "rpcResponseBytes": 345927,
+      "candidates": 11,
+      "selected": 8,
+      "omitted": [
+        {
+          "query": {
+            "to": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+            "data": "0x70a08231000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+          },
+          "priority": 2,
+          "selection": "omitted_query_limit"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b000000000000000000000000beef01735c132ada46aa9aa4c54623caa92a64cb"
+          },
+          "priority": 3,
+          "selection": "omitted_query_limit"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e000000000000000000000000beef01735c132ada46aa9aa4c54623caa92a64cb000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+          },
+          "priority": 3,
+          "selection": "omitted_query_limit"
+        }
+      ],
+      "queryMeasurements": [
+        {
+          "query": {
+            "to": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+            "data": "0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+          },
+          "kind": "balanceOf",
+          "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "accountIsSender": true,
+          "beforeRaw": "1151370388097",
+          "afterRaw": "1481867899909",
+          "deltaRaw": "330497511812",
+          "traceEvidenceIds": [
+            14,
+            16
+          ],
+          "nonceOnlyDiffEvidenceIds": [
+            15,
+            17
+          ],
+          "independentReturnwordArithmetic": "matched",
+          "exactEnvelopeAndCompleteOriginalOverrides": "matched"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+          },
+          "kind": "balanceOf",
+          "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "accountIsSender": true,
+          "beforeRaw": "704323976173",
+          "afterRaw": "354323976173",
+          "deltaRaw": "-350000000000",
+          "traceEvidenceIds": [
+            18,
+            20
+          ],
+          "nonceOnlyDiffEvidenceIds": [
+            19,
+            21
+          ],
+          "independentReturnwordArithmetic": "matched",
+          "exactEnvelopeAndCompleteOriginalOverrides": "matched"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e00000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+          },
+          "kind": "allowance",
+          "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "spender": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "accountIsSender": true,
+          "beforeRaw": "350000000000",
+          "afterRaw": "0",
+          "deltaRaw": "-350000000000",
+          "traceEvidenceIds": [
+            22,
+            24
+          ],
+          "nonceOnlyDiffEvidenceIds": [
+            23,
+            25
+          ],
+          "independentReturnwordArithmetic": "matched",
+          "exactEnvelopeAndCompleteOriginalOverrides": "matched"
+        },
+        {
+          "query": {
+            "to": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+            "data": "0x70a08231000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+          },
+          "kind": "balanceOf",
+          "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "accountIsSender": false,
+          "beforeRaw": "18022867783",
+          "afterRaw": "18078180423",
+          "deltaRaw": "55312640",
+          "traceEvidenceIds": [
+            26,
+            28
+          ],
+          "nonceOnlyDiffEvidenceIds": [
+            27,
+            29
+          ],
+          "independentReturnwordArithmetic": "matched",
+          "exactEnvelopeAndCompleteOriginalOverrides": "matched"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a08231000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+          },
+          "kind": "balanceOf",
+          "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "accountIsSender": false,
+          "beforeRaw": "20083625",
+          "afterRaw": "20083625",
+          "deltaRaw": "0",
+          "traceEvidenceIds": [
+            30,
+            32
+          ],
+          "nonceOnlyDiffEvidenceIds": [
+            31,
+            33
+          ],
+          "independentReturnwordArithmetic": "matched",
+          "exactEnvelopeAndCompleteOriginalOverrides": "matched"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a08231000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+          },
+          "kind": "balanceOf",
+          "account": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+          "accountIsSender": false,
+          "beforeRaw": "128890534855869",
+          "afterRaw": "129240534855869",
+          "deltaRaw": "350000000000",
+          "traceEvidenceIds": [
+            34,
+            36
+          ],
+          "nonceOnlyDiffEvidenceIds": [
+            35,
+            37
+          ],
+          "independentReturnwordArithmetic": "matched",
+          "exactEnvelopeAndCompleteOriginalOverrides": "matched"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a08231000000000000000000000000beef01735c132ada46aa9aa4c54623caa92a64cb"
+          },
+          "kind": "balanceOf",
+          "account": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+          "accountIsSender": false,
+          "beforeRaw": "6011",
+          "afterRaw": "6011",
+          "deltaRaw": "0",
+          "traceEvidenceIds": [
+            38,
+            40
+          ],
+          "nonceOnlyDiffEvidenceIds": [
+            39,
+            41
+          ],
+          "independentReturnwordArithmetic": "matched",
+          "exactEnvelopeAndCompleteOriginalOverrides": "matched"
+        },
+        {
+          "query": {
+            "to": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+            "data": "0x70a08231000000000000000000000000255c7705e8bb334dfcae438197f7c4297988085a"
+          },
+          "kind": "balanceOf",
+          "account": "0x255c7705e8bb334dfcae438197f7c4297988085a",
+          "accountIsSender": false,
+          "beforeRaw": "34363220714011809188525",
+          "afterRaw": "34390568084318171872187",
+          "deltaRaw": "27347370306362683662",
+          "traceEvidenceIds": [
+            42,
+            44
+          ],
+          "nonceOnlyDiffEvidenceIds": [
+            43,
+            45
+          ],
+          "independentReturnwordArithmetic": "matched",
+          "exactEnvelopeAndCompleteOriginalOverrides": "matched"
+        }
+      ],
+      "independentOverrideAudit": {
+        "originalDiffEvidenceId": 11,
+        "accountCount": 6,
+        "storageSlotCount": 18,
+        "clearedSlots": [
+          {
+            "account": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "slot": "0x77d81c94a5f53c05558c767049d8c8e65ef8cd6b354606bba0d2f52a7ec7e8a4"
+          }
+        ],
+        "complete": true
+      },
+      "prior09OverlappingMeasuredRows": [
+        {
+          "query": {
+            "to": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+            "data": "0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+          },
+          "beforeRaw": "1151370388097",
+          "afterRaw": "1481867899909",
+          "deltaRaw": "330497511812"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+          },
+          "beforeRaw": "704323976173",
+          "afterRaw": "354323976173",
+          "deltaRaw": "-350000000000"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e00000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+          },
+          "beforeRaw": "350000000000",
+          "afterRaw": "0",
+          "deltaRaw": "-350000000000"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a08231000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+          },
+          "beforeRaw": "20083625",
+          "afterRaw": "20083625",
+          "deltaRaw": "0"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a08231000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+          },
+          "beforeRaw": "128890534855869",
+          "afterRaw": "129240534855869",
+          "deltaRaw": "350000000000"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a08231000000000000000000000000beef01735c132ada46aa9aa4c54623caa92a64cb"
+          },
+          "beforeRaw": "6011",
+          "afterRaw": "6011",
+          "deltaRaw": "0"
+        }
+      ],
+      "additionalNativeEffects": [],
+      "allEffectsCoverage": "inconclusive"
+    },
+    {
+      "id": "contract-held-usdc-weth-swap",
+      "httpStatus": 200,
+      "rpcCalls": 30,
+      "rpcResponseBytes": 203990,
+      "candidates": 4,
+      "selected": 4,
+      "omitted": [],
+      "queryMeasurements": [
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000051c72848c68a965f66fa7a88855f9f7784502a7f"
+          },
+          "kind": "balanceOf",
+          "account": "0x51c72848c68a965f66fa7a88855f9f7784502a7f",
+          "accountIsSender": false,
+          "beforeRaw": "9597601246724",
+          "afterRaw": "9584058730714",
+          "deltaRaw": "-13542516010",
+          "traceEvidenceIds": [
+            14,
+            16
+          ],
+          "nonceOnlyDiffEvidenceIds": [
+            15,
+            17
+          ],
+          "independentReturnwordArithmetic": "matched",
+          "exactEnvelopeAndCompleteOriginalOverrides": "matched"
+        },
+        {
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000088e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
+          },
+          "kind": "balanceOf",
+          "account": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+          "accountIsSender": false,
+          "beforeRaw": "58649970174792",
+          "afterRaw": "58663512690802",
+          "deltaRaw": "13542516010",
+          "traceEvidenceIds": [
+            18,
+            20
+          ],
+          "nonceOnlyDiffEvidenceIds": [
+            19,
+            21
+          ],
+          "independentReturnwordArithmetic": "matched",
+          "exactEnvelopeAndCompleteOriginalOverrides": "matched"
+        },
+        {
+          "query": {
+            "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "data": "0x70a0823100000000000000000000000051c72848c68a965f66fa7a88855f9f7784502a7f"
+          },
+          "kind": "balanceOf",
+          "account": "0x51c72848c68a965f66fa7a88855f9f7784502a7f",
+          "accountIsSender": false,
+          "beforeRaw": "5234210030040334873484",
+          "afterRaw": "5240011906271617850838",
+          "deltaRaw": "5801876231282977354",
+          "traceEvidenceIds": [
+            22,
+            24
+          ],
+          "nonceOnlyDiffEvidenceIds": [
+            23,
+            25
+          ],
+          "independentReturnwordArithmetic": "matched",
+          "exactEnvelopeAndCompleteOriginalOverrides": "matched"
+        },
+        {
+          "query": {
+            "to": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "data": "0x70a0823100000000000000000000000088e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
+          },
+          "kind": "balanceOf",
+          "account": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+          "accountIsSender": false,
+          "beforeRaw": "9664575620385650038431",
+          "afterRaw": "9658773744154367061077",
+          "deltaRaw": "-5801876231282977354",
+          "traceEvidenceIds": [
+            26,
+            28
+          ],
+          "nonceOnlyDiffEvidenceIds": [
+            27,
+            29
+          ],
+          "independentReturnwordArithmetic": "matched",
+          "exactEnvelopeAndCompleteOriginalOverrides": "matched"
+        }
+      ],
+      "independentOverrideAudit": {
+        "originalDiffEvidenceId": 11,
+        "accountCount": 6,
+        "storageSlotCount": 12,
+        "clearedSlots": [],
+        "complete": true
+      },
+      "prior09OverlappingMeasuredRows": [],
+      "additionalNativeEffects": [
+        {
+          "callPath": [
+            1
+          ],
+          "from": "0x51c72848c68a965f66fa7a88855f9f7784502a7f",
+          "to": "0x4838b106fce9647bdf1e7877bf73ce8b0bad5f97",
+          "valueRaw": "833321237492342",
+          "fromBeforeRaw": "148806357832870076845",
+          "fromAfterRaw": "148805524511632584503",
+          "fromDeltaRaw": "-833321237492342",
+          "toBeforeRaw": "7155873616174246236",
+          "toAfterRaw": "7156706937411738578",
+          "toDeltaRaw": "833321237492342",
+          "amountEvidence": "successful_call_value_agrees_with_complete_original_native_balance_diff",
+          "includedInAutomaticERC20Measurements": false,
+          "purposeAndOwnership": "unassessed",
+          "originalDiffEvidenceId": 11
+        }
+      ],
+      "allEffectsCoverage": "inconclusive"
+    }
+  ],
+  "limitations": [
+    "This is evidence consistency and arithmetic validation against one provider, not an independent EVM execution or cryptographic state proof.",
+    "The three transactions are development selections, not a representative or prospective accuracy cohort.",
+    "Parent-block-end unsigned simulations do not establish exact original transaction position, outer signatures or fee settlement.",
+    "Automatic discovery omits three Morpho candidates and does not establish coverage of silent, ambiguous or unobserved effects.",
+    "The swap includes an additional native-value transfer validated in the original full diff but not represented by the four ERC20 queries; purpose and ownership remain unassessed.",
+    "Labels and decimals remain configured historical reference metadata; the API does not re-attest them at these states. WETH stays raw in the API.",
+    "No browser re-rendering, network request or product source modification was performed for this audit."
+  ]
+}

@@ -204,7 +204,8 @@ export const STANDARD_EXAMPLES = freeze([
 
 export const STANDARD_CAPABILITIES = freeze({
   chainId: 1, name: 'Ethereum', status: 'experimental',
-  operation: 'unsigned_call_with_explicit_ERC20_queries',
+  operation: 'unsigned_call_with_ERC20_queries',
+  querySelection: ['automatic_from_observed_trace', 'explicit'],
   blockSelection: ['latest', 'canonical_hex_number', 'block_hash'],
   queryTypes: ['balanceOf', 'allowance'],
   limits: { queries: 8, calldataBytes: 32768, gas: 5000000, engineRpcCalls: 64, blockSelectionRpcCalls: 1, totalRpcCalls: 65 },
@@ -256,7 +257,8 @@ export function validateStandardSimulation(input) {
   if (value !== '0') throw new InputError('Only value "0" as a decimal wei string is supported.');
   const block = input.block === undefined ? 'latest' : input.block;
   if (typeof block !== 'string' || !(block === 'latest' || NUMBER.test(block) || HASH.test(block))) throw new InputError('block must be latest, a canonical hexadecimal block number, or a 32-byte block hash.');
-  if (!Array.isArray(input.queries) || input.queries.length < 1 || input.queries.length > 8) throw new InputError('Between one and eight explicit balanceOf or allowance queries are required.');
+  if (!Object.hasOwn(input, 'queries')) return { chainId: 1, from, to, data: input.data.toLowerCase(), value: '0', block: block.toLowerCase() };
+  if (!Array.isArray(input.queries) || input.queries.length < 1 || input.queries.length > 8) throw new InputError('Omit queries for automatic selection, or supply between one and eight explicit balanceOf or allowance queries.');
   const seen = new Set(), queries = [];
   for (const query of input.queries) {
     fields(query, ['to', 'data'], 'query');
@@ -283,7 +285,11 @@ function queryIdentity(query, sender) {
   return { ...identity, accountIsSender: first === sender };
 }
 export function projectStandardPreview(input, result) {
-  return { scope: 'explicit_queried_accounts', warnings: [...STANDARD_CAPABILITIES.limitations], queries: input.queries.map((query, index) => {
+  const automatic = input.queries === undefined;
+  const queries = automatic ? result.request?.queries ?? [] : input.queries;
+  const warnings = [...STANDARD_CAPABILITIES.limitations];
+  if (automatic) warnings[0] = 'Queries selected from bounded observed token calls and events only; silent, ambiguous, unselected and other economic effects may be omitted.';
+  return { scope: automatic ? 'observed_queried_accounts' : 'explicit_queried_accounts', warnings, queries: queries.map((query, index) => {
     const measurement = result.measurements[index];
     const metadata = METADATA[query.to] ? structuredClone(METADATA[query.to]) : null;
     const entry = { index, ...queryIdentity(query, input.from), metadata, status: measurement?.status ?? 'unavailable' };

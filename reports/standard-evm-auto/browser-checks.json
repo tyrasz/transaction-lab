@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.0",
+  "basis": "Manual CUA accessibility/DOM observations; Morpho screenshot inspected in conversation, no screenshot file retained.",
+  "url": "http://127.0.0.1:5174/",
+  "cases": [
+    {
+      "id": "aave-usdc-supply-with-permit",
+      "runId": "3a9c860d-d619-495b-9a38-d69eb668f051",
+      "submission": "browser",
+      "automaticDefault": true,
+      "requestOmittedQueries": true,
+      "checksShown": "4 candidates / 4 selected / 4 measured / 0 omitted",
+      "exactSenderBalanceChanges": [
+        "USDC -3962.903485",
+        "aEthUSDC +3962.903484"
+      ],
+      "senderAllowance": "0 to 0",
+      "duringCallControlsLocked": [
+        "Simulate",
+        "Network",
+        "Use a manual query list"
+      ]
+    },
+    {
+      "id": "morpho-kiln-usdc-deposit",
+      "runId": "82c2b7b2-a724-45be-843a-81eb8350c771",
+      "submission": "browser",
+      "previousResultClearedOnExampleChange": true,
+      "automaticDefault": true,
+      "requestOmittedQueries": true,
+      "checksShown": "11 candidates / 8 selected / 8 measured / 3 omitted",
+      "exactSenderBalanceChanges": [
+        "USDC -350000",
+        "mstkeUSDC +330497.511812"
+      ],
+      "senderAllowance": "350000 to 0",
+      "omittedDetailsExpanded": true,
+      "omittedDetails": [
+        "wrapper-owned inner vault balance",
+        "wrapper-to-inner USDC allowance",
+        "inner-to-Blue USDC allowance"
+      ],
+      "amountsSeparatedByAccount": true,
+      "rawJsonAvailable": true
+    }
+  ],
+  "swap": {
+    "id": "contract-held-usdc-weth-swap",
+    "submission": "HTTP_client",
+    "browserNotExercised": true
+  },
+  "browserConsoleErrorsAndWarnings": []
+}

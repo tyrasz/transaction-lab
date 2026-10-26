@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0",
+  "createdAt": "2026-10-26T10:12:13.725Z",
+  "purpose": "Follow-up development selection permitting contract-held affected token accounts; does not attribute contract assets to the EOA.",
+  "endpoint": "https://eth.drpc.org",
+  "priorCapture": "../standard-evm-swap-discovery/capture.json",
+  "priorCaptureSha256": "70caf4dbce6de446edcdbd1c0c1d7b3fa6f8cbd2a42f5b0ab265d33cb51b5560",
+  "candidateHashes": [
+    "0xb7a17f8cf3681c43f514cb438bb18748ef27f49b1981b1243e9b3d2e429794c9",
+    "0xee03073eb2b4250bd737504a9bf5ee01a80d92fe8c808208a0acacf402ca3d2a",
+    "0x3b59a905c4ccdbb03428b3bdb55bd33d4bebad1c203c889cf318d606e33b3861"
+  ],
+  "limits": {
+    "requests": 30,
+    "candidates": 3,
+    "responseBytes": 8388608,
+    "totalBytes": 20971520,
+    "requestMs": 25000,
+    "wallMs": 360000
+  },
+  "methods": [
+    "eth_chainId",
+    "eth_getBlockByNumber",
+    "eth_getBlockByHash",
+    "eth_call",
+    "eth_getCode",
+    "debug_traceTransaction",
+    "debug_traceCall"
+  ],
+  "selection": "Reuse only the three zero-native-value candidate transactions and receipts already captured, in original order. Verify source and parent header, source tx/index, EOA sender code, original trace; fixed-five-million-gas unsigned parent call with identical calldata and no state/block overrides. Stop first successful parent call retaining USDC-out and WETH-in for the same affected account, whether EOA or contract. No ownership inference.",
+  "profile": {
+    "parentGas": "0x4c4b40",
+    "parentCallFields": [
+      "from",
+      "to",
+      "data",
+      "value",
+      "gas"
+    ],
+    "stateOverrides": false,
+    "blockOverrides": false,
+    "withLog": true,
+    "automaticRetries": false,
+    "signing": false,
+    "broadcasting": false
+  },
+  "sources": [
+    {
+      "url": "https://developers.uniswap.org/docs/protocols/v3/deployments/v3-ethereum-deployments",
+      "supports": "Canonical Ethereum factory and router addresses, WETH address, getPool mapping."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/Uniswap/v3-core/main/contracts/interfaces/pool/IUniswapV3PoolEvents.sol",
+      "supports": "Swap event indexed sender/recipient and signed token0/token1 pool deltas."
+    }
+  ],
+  "scriptSha256": "89d0227a6f168c530657268eef3bd7b6c4c7bf0fc4be1906df1a9484c8b03b92"
+}

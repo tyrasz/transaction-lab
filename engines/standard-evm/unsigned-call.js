@@ -7,6 +7,7 @@ import { normalizeProviderStateDiff } from './provider-state-diff.js';
 import { buildStateOverrides, uint, StateValidationError } from '../../src/state.js';
 import { semanticTrace } from '../../src/query-validation.js';
 import { assertNoProviderErrorResult } from '../../src/rpc.js';
+import { discoverTokenQueries } from './discovery.js';
 
 const ADDRESS=/^0x[0-9a-f]{40}$/i, WORD=/^0x[0-9a-f]{64}$/i, BYTES=/^0x(?:[0-9a-f]{2})*$/i;
 const BALANCE=/^0x70a082310{24}[0-9a-f]{40}$/i, ALLOWANCE=/^0xdd62ed3e0{24}[0-9a-f]{40}0{24}[0-9a-f]{40}$/i;
@@ -81,9 +82,13 @@ export function validateQueryDiff(raw,{sender,nonce,balance}){
  * rpc.call must enforce a per-request timeout <=25s and retain raw transport
  * evidence externally; this function retains bounded parsed evidence too. */
 export async function simulateUnsignedCall({rpc,chainId,blockHash,request,queries,now=()=>performance.now()}){
-  const start=now(),evidence=[],measurements=[];let retained=0,latched=null;
+  const start=now(),evidence=[],measurements=[],automatic=queries===undefined;let retained=0,latched=null;
   const result={schemaVersion:'0.2',kind:'experimental_standard_evm_unsigned_call',security:{status:'not_assessed'},execution:{status:'unavailable'},measurements,evidence,
     scope:{state:'pinned_block_end',fees:'gas_price_omitted_no_fee_settlement',baseFee:'synthetic_zero_required',queries:'observed_ERC20_balanceOf_and_allowance_values',discovery:'explicit_queries_only',runtimeCodeAttestation:false,allEffectsCoverage:'inconclusive',signedTransactionValidation:false}};
+  if(automatic){
+    result.schemaVersion='0.3';result.scope.discovery='bounded_observed_trace_candidates';
+    result.discovery={status:'unavailable',reason:'Original trace not reached.',queries:[],candidates:[]};
+  }
   function deadline(){need(now()-start<LIMITS.wallMs,'Simulation exceeded its scheduling deadline.');}
   async function call(method,params){
     deadline();need(evidence.length<LIMITS.rpc,'Simulation exceeded its RPC budget.');
@@ -106,13 +111,14 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
   try{
     need(quantity(chainId,BigInt(Number.MAX_SAFE_INTEGER))!==null&&BigInt(chainId)>0n&&isWord(blockHash),'A positive chain ID and explicit block hash are required.');
     need(record(request)&&Object.keys(request).sort().join()==='data,from,gas,to,value'&&isAddress(request.from)&&isAddress(request.to)&&typeof request.data==='string'&&request.data.length<=65538&&isBytes(request.data)&&quantity(request.value)===0n&&quantity(request.gas)!==null&&BigInt(request.gas)>21000n&&BigInt(request.gas)<=5000000n,'Unsupported unsigned call envelope.');
-    need(Array.isArray(queries)&&queries.length>0&&queries.length<=LIMITS.queries,'Between one and eight explicit queries are required.');
-    const normalized=queries.map(normalizeQuery);need(new Set(normalized.map(q=>q.to+q.data)).size===normalized.length,'Duplicate queries must be removed before execution.');
+    need(automatic||(Array.isArray(queries)&&queries.length>0&&queries.length<=LIMITS.queries),'Between one and eight explicit queries are required.');
+    let normalized=automatic?[]:queries.map(normalizeQuery);need(new Set(normalized.map(q=>q.to+q.data)).size===normalized.length,'Duplicate queries must be removed before execution.');
     measurements.push(...normalized.map(query=>({query,status:'unavailable',reason:'Not reached.'})));
     originalCall={from:lower(request.from),to:lower(request.to),data:lower(request.data),gas:hex(request.gas),value:'0x0'};
     need(originalCall.from!==PROBE&&originalCall.to!==PROBE&&normalized.every(q=>q.to!==PROBE),'Input overlaps the reserved header witness.');
     pinned={blockHash:lower(blockHash),requireCanonical:true};
     result.request={chainId:BigInt(chainId).toString(),block:pinned,transaction:originalCall,queries:normalized};
+    if(automatic)result.request.querySelection='bounded_observed_trace_candidates';
     need(quantity(await call('eth_chainId',[]))===BigInt(chainId),'Provider chain identity differs from the request.');
     rawHeader=await call('eth_getBlockByHash',[pinned.blockHash,false]);identity=header(rawHeader);need(identity.hash===pinned.blockHash,'Provider returned the wrong source block.');result.block=identity;
     nonce=quantity(await call('eth_getTransactionCount',[originalCall.from,pinned]),MAX_NONCE-2n);
@@ -125,9 +131,24 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
     const rawTrace=await call('debug_traceCall',[originalCall,pinned,tracer(false)]),trace=bindTrace(rawTrace,originalCall);
     result.execution={status:failed(trace)?'reverted_or_failed':'success',gasUsed:trace.gasUsed,returnData:trace.output,error:trace.error,revertReason:trace.revertReason,trace:rawTrace};
     if(failed(trace)){
+      if(automatic)result.discovery={status:'not_applicable',reason:'Original execution did not succeed.',queries:[],candidates:[]};
       for(const entry of measurements)Object.assign(entry,{status:'not_applicable',reason:'Original execution did not succeed.'});
     }else{
       visit(trace,frame=>need(!['CREATE','CREATE2','SELFDESTRUCT'].includes(frame.type)&&frame.from!==PROBE&&frame.to!==PROBE,'Original execution contains unsupported lifecycle or witness-address behavior.'));
+      if(automatic){
+        result.discovery=discoverTokenQueries({request:originalCall,trace:rawTrace,maxQueries:LIMITS.queries});
+        need(record(result.discovery)&&Array.isArray(result.discovery.queries)&&result.discovery.queries.length<=LIMITS.queries,'Automatic query selection exceeded its supported bounds.');
+        normalized=result.discovery.queries.map(normalizeQuery);
+        need(new Set(normalized.map(q=>q.to+q.data)).size===normalized.length&&normalized.every(q=>q.to!==PROBE),'Automatic query selection contains duplicate or reserved targets.');
+        result.request.queries=normalized;
+        measurements.push(...normalized.map(query=>({query,status:'unavailable',reason:'Not reached.'})));
+        // Observed token calls/logs are hypotheses about query targets, not
+        // balance measurements. Every selected target still needs pinned code,
+        // and each before/after query follows the existing trace/diff checks.
+        for(const target of new Set(normalized.map(q=>q.to).filter(to=>to!==originalCall.to))){
+          const code=await call('eth_getCode',[target,pinned]);need(typeof code==='string'&&BYTES.test(code)&&code!=='0x','A selected target has no valid runtime code.');
+        }
+      }
       const normalizedDiff=normalizeProviderStateDiff(await call('debug_traceCall',[originalCall,pinned,tracer(true)])),diff=normalizedDiff.diff;result.stateDiff=diff;
       result.providerCodeHashChecks={basis:'Keccak256_of_explicit_provider_runtime_code_only',independentStateAttestation:false,claims:normalizedDiff.codeHashChecks};
       overrides=buildStateOverrides(diff);need(!Object.hasOwn(diff.pre,PROBE)&&!Object.hasOwn(diff.post,PROBE),'Original state changes overlap the header witness.');

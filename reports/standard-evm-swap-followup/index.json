@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "1.0",
+  "status": "candidate_found",
+  "developmentOnly": true,
+  "captureSha256": "706b2aa06bb0eab5287a276be20e963f0b256497a583953cf9ee62d0cd27d487",
+  "priorCaptureSha256": "70caf4dbce6de446edcdbd1c0c1d7b3fa6f8cbd2a42f5b0ab265d33cb51b5560",
+  "requests": 13,
+  "responseBytes": 193862,
+  "candidatesExamined": 1,
+  "parentSimulationAttempts": 1,
+  "originalTraceCalls": 1,
+  "parentDiffCalls": 1,
+  "retries": 0,
+  "unattemptedCandidates": [
+    "0xee03073eb2b4250bd737504a9bf5ee01a80d92fe8c808208a0acacf402ca3d2a",
+    "0x3b59a905c4ccdbb03428b3bdb55bd33d4bebad1c203c889cf318d606e33b3861"
+  ],
+  "selected": {
+    "hash": "0xb7a17f8cf3681c43f514cb438bb18748ef27f49b1981b1243e9b3d2e429794c9",
+    "request": {
+      "from": "0x6f0a91ef8adeb54db0e63be507747ab9a31d3926",
+      "to": "0x51c72848c68a965f66fa7a88855f9f7784502a7f",
+      "data": "0x771d503f0000000000000000000000000000000000000000000000000002f5e6b858327600000000000000000000000088e6a0c2ddd26feeb64f039a2c41296fcb3f5640000000000000000000000000000000000000000000000000000000032732652a00000000000000000000000000000000000000000000000050845d2327ad2400000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000c00000000000000000000000000000000000000000000000000000000000000014a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48000000000000000000000000",
+      "value": "0x0",
+      "gas": "0x4c4b40"
+    },
+    "parentHash": "0x3891c3080a15e2c486e756f92933b0c023edee507f0d649e9155753b70f74c7a",
+    "parentNumber": "26276082",
+    "sourceBlockHash": "0x4cacc1aa66f90401476a5c86beb20b0ee6e3d9c37a0a4994424bffe8a2542692",
+    "sourceBlockNumber": "26276083",
+    "sourceTransactionIndex": "5",
+    "transactionLink": "https://etherscan.io/tx/0xb7a17f8cf3681c43f514cb438bb18748ef27f49b1981b1243e9b3d2e429794c9",
+    "senderCode": "0x",
+    "originalGasUsed": "166771",
+    "parentGasUsed": "166771",
+    "canonicalHeadersDeepEqual": true
+  },
+  "affectedAccounts": [
+    {
+      "account": "0x51c72848c68a965f66fa7a88855f9f7784502a7f",
+      "role": "swap_contract",
+      "ownershipBySender": "unassessed",
+      "eventChanges": [
+        {
+          "token": "USDC",
+          "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "decimals": 6,
+          "deltaRaw": "-13542516010",
+          "delta": "-13542.51601"
+        },
+        {
+          "token": "WETH",
+          "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "decimals": 18,
+          "deltaRaw": "5801876231282977354",
+          "delta": "5.801876231282977354"
+        }
+      ]
+    },
+    {
+      "account": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+      "role": "UniswapV3_pool",
+      "ownershipBySender": "unassessed",
+      "eventChanges": [
+        {
+          "token": "USDC",
+          "deltaRaw": "13542516010"
+        },
+        {
+          "token": "WETH",
+          "deltaRaw": "-5801876231282977354"
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "blockHash": "0x3891c3080a15e2c486e756f92933b0c023edee507f0d649e9155753b70f74c7a",
+    "USDC": {
+      "decimals": 6,
+      "symbol": "USDC",
+      "requestIds": [
+        8,
+        9
+      ]
+    },
+    "WETH": {
+      "decimals": 18,
+      "symbol": "WETH",
+      "requestIds": [
+        10,
+        11
+      ]
+    }
+  },
+  "rawRequestRoles": {
+    "chain": 1,
+    "sourceBlock": 2,
+    "parentBlock": 3,
+    "senderCode": 4,
+    "originalTrace": 5,
+    "parentTrace": 6,
+    "parentPrePostDiff": 7,
+    "sourceCanonicalRecheck": 12,
+    "parentCanonicalRecheck": 13
+  },
+  "limitations": [
+    "Balances shown here are decoded committed Transfer-event changes, not independently queried before/after balances.",
+    "The original transaction and receipt are copied from the SHA-pinned first discovery packet; final headers confirm their block remains canonical.",
+    "Parent-block-end unsigned gas-5000000 execution is not a signed original-position replay or fee-settlement proof.",
+    "Contract balances are not attributed to the external sender. Contract ownership and general safety remain unassessed.",
+    "The first search failed its stricter external-sender asset criterion and remains unchanged. This follow-up separately allowed contract-held assets."
+  ]
+}

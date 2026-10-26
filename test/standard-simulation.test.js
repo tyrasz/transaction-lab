@@ -106,6 +106,34 @@ test('input normalizes address/query case, accepts canonical blocks and applies 
   for (const block of ['0x0', '0xabc', '0xABC', '0xffffffffffffffff', STANDARD_EXAMPLES[0].input.block]) assert.equal(validateStandardSimulation({ ...input(), block }).block, block.toLowerCase());
 });
 
+test('omitting queries explicitly selects automatic discovery, while null or an empty manual list remain invalid', () => {
+  const automatic = input(); delete automatic.queries;
+  assert.deepEqual(validateStandardSimulation(automatic), automatic);
+  assert.equal(Object.hasOwn(validateStandardSimulation(automatic), 'queries'), false);
+  for (const queries of [null, [], undefined]) assert.throws(() => validateStandardSimulation({ ...automatic, queries }), InputError);
+  assert.deepEqual(validateStandardSimulation(input()).queries, input().queries);
+});
+
+test('an early automatic provider failure is explicit and cannot fabricate token observations', async () => {
+  const automatic = input(); delete automatic.queries;
+  const report = await simulateStandard(automatic, { async call() { return '0x2'; } });
+  assert.equal(report.execution.status, 'unavailable'); assert.equal(report.discovery.status, 'unavailable');
+  assert.equal(report.preview.scope, 'observed_queried_accounts'); assert.deepEqual(report.preview.queries, []);
+  assert.match(report.preview.warnings[0], /may be omitted/); assert.equal(Object.hasOwn(report.apiRequest, 'queries'), false);
+});
+
+test('automatic preview binds selected query identities to measured values and preserves unknown raw units', () => {
+  const automatic = input(); delete automatic.queries;
+  const query = balanceQuery('0x2222222222222222222222222222222222222222', automatic.from);
+  const report = { request: { queries: [query] }, measurements: [{ query, status: 'measured', beforeRaw: '77', afterRaw: '53', deltaRaw: '-24' }] };
+  const view = projectStandardPreview(automatic, report);
+  assert.equal(view.queries.length, 1); assert.equal(view.queries[0].accountIsSender, true);
+  assert.equal(view.queries[0].deltaRaw, '-24'); assert.equal(view.queries[0].metadata, null);
+  report.measurements[0].query = balanceQuery(query.to, '0x3333333333333333333333333333333333333333');
+  const invalid = projectStandardPreview(automatic, report);
+  assert.equal(invalid.queries[0].status, 'unavailable'); assert.equal(invalid.queries[0].deltaRaw, undefined);
+});
+
 test('unsupported chain, nonzero/hex/native values and noncanonical block selectors fail before RPC', async () => {
   const invalid = [
     { chainId: 999 }, { chainId: 8453 }, { chainId: '0x1' }, { chainId: true },

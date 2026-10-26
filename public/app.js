@@ -1,8 +1,9 @@
 const $ = (id) => document.getElementById(id);
 const state = { config: null, example: null, result: null, busy: false, benchmarkLoaded: false };
-const requestFieldIds = ['chain', 'from', 'to', 'data', 'value', 'block', 'standard-queries'];
+const requestFieldIds = ['chain', 'from', 'to', 'data', 'value', 'block', 'standard-manual-queries', 'standard-queries'];
 const ethereumMode = () => $('chain').value === '1';
 const standardAvailable = () => state.config?.standardEvm?.available === true;
+const manualQueries = () => ethereumMode() && $('standard-manual-queries').checked;
 
 function node(tag, className, text) {
   const element = document.createElement(tag);
@@ -42,9 +43,10 @@ function setBusy(busy, mode) {
   $('replay-button').disabled = busy;
   $('example').disabled = busy;
   for (const id of requestFieldIds) $(id).disabled = busy;
+  updateQueryMode();
   document.querySelector('.results-panel').setAttribute('aria-busy', String(busy));
   $('run-status').classList.toggle('loading', busy);
-  $('run-status').textContent = busy ? mode === 'historical_trace' ? 'Retrieving the original execution trace and checking available historical balance evidence…' : ethereumMode() ? 'Running the unsigned call and checking each requested balance and allowance. This can take a few minutes…' : 'Pinning the block, executing the call, and decoding token events…' : '';
+  $('run-status').textContent = busy ? mode === 'historical_trace' ? 'Retrieving the original execution trace and checking available historical balance evidence…' : ethereumMode() ? manualQueries() ? 'Running the unsigned call and checking the manual query list. This can take a few minutes…' : 'Running the unsigned call, selecting checks from observed token activity, and measuring the selected accounts. This can take a few minutes…' : 'Pinning the block, executing the call, and decoding token events…' : '';
 }
 
 function clearResult({ inputsChanged = false } = {}) {
@@ -62,7 +64,7 @@ function clearResult({ inputsChanged = false } = {}) {
 }
 
 function requestFingerprint() {
-  return JSON.stringify({ fields: requestFieldIds.map(id => $(id).value), exampleId: state.example?.id, transactionHash: state.example?.transactionHash });
+  return JSON.stringify({ fields: requestFieldIds.map(id => $(id).type === 'checkbox' ? $(id).checked : $(id).value), exampleId: state.example?.id, transactionHash: state.example?.transactionHash });
 }
 
 function currentExamples() {
@@ -86,7 +88,21 @@ function selectExample({ initial = false } = {}) {
     ? 'This example starts at the end of the block before the original deposit. It runs the same calldata against that state; it does not replay the original transaction at its exact position.'
     : example?.transactionHash ? `Historical inspection uses the original transaction ${example.transactionHash.slice(0, 12)}… and its original block, independent of the fields above.` : '';
   $('standard-queries').setCustomValidity('');
+  updateQueryMode();
   clearResult({ inputsChanged: !initial });
+}
+
+function updateQueryMode() {
+  const standard = ethereumMode(), manual = manualQueries();
+  $('standard-manual-fields').hidden = !manual;
+  $('standard-queries').required = manual;
+  $('standard-queries').disabled = state.busy || !manual;
+  $('standard-manual-queries').disabled = state.busy || !standard;
+  $('standard-checks-help').hidden = !standard;
+  $('standard-checks-help').textContent = manual
+    ? 'Only your manual query list will be checked. Automatic discovery is off.'
+    : 'Automatically select up to eight balance or allowance checks from the call. Other changes may be missed.';
+  if (!manual) $('standard-queries').setCustomValidity('');
 }
 
 function selectNetwork({ initial = false } = {}) {
@@ -105,9 +121,9 @@ function selectNetwork({ initial = false } = {}) {
   $('value').value = '0';
   $('block').value = 'latest';
   $('standard-queries').value = '[]';
+  $('standard-manual-queries').checked = false;
   $('standard-query-settings').hidden = !standard;
   $('standard-query-settings').open = false;
-  $('standard-queries').required = standard;
   $('value').readOnly = standard;
   $('value-help').textContent = standard ? 'Ethereum previews currently support zero native value only.' : 'Native token amount as an integer number of wei.';
   $('block-help').textContent = standard
@@ -115,7 +131,7 @@ function selectNetwork({ initial = false } = {}) {
     : 'Use latest or a hexadecimal block number. The result records the state used.';
   $('network-heading').textContent = standard ? 'ETHEREUM · CHAIN 1 · EXPERIMENTAL' : 'HYPEREVM · CHAIN 999';
   $('page-description').textContent = standard ? 'Preview an unsigned call and check the selected accounts’ balances and allowances.' : 'Simulate an unsigned call or inspect a historical execution. See the evidence behind each result.';
-  $('empty-description').textContent = standard ? 'Choose a deposit example or enter your own inputs. The preview shows before-and-after values for the balances and allowances you request.' : 'Choose an example or enter a transaction. The preview separates execution, token events, and coverage limits.';
+  $('empty-description').textContent = standard ? 'Choose a deposit example or enter your own inputs. The preview selects checks from observed token activity and shows which balances and allowances could be measured.' : 'Choose an example or enter a transaction. The preview separates execution, token events, and coverage limits.';
   $('network-help').hidden = !standard;
   $('network-help').textContent = standardAvailable() ? 'Experimental Ethereum previews. No connected wallet or signature needed.' : state.config?.standardEvm?.reason || 'Ethereum previews are unavailable in this workspace.';
   $('network-help').classList.toggle('unavailable-note', standard && !standardAvailable());
@@ -718,12 +734,84 @@ function renderStandardQuery(query, sender) {
   return article;
 }
 
+function renderDiscoveryCandidate(candidate, reason) {
+  const item = node('article', 'discovery-candidate');
+  const allowance = candidate.kind === 'allowance';
+  item.append(node('h4', '', allowance ? 'Allowance check not performed' : 'Balance check not performed'));
+  const details = node('dl', 'permission-details');
+  addDefinition(details, 'Token contract', candidate.token);
+  addDefinition(details, allowance ? 'Owner' : 'Account', allowance ? candidate.owner : candidate.account);
+  if (allowance) addDefinition(details, 'Spender', candidate.spender);
+  addDefinition(details, 'Reason', candidate.selection === 'omitted_query_limit'
+    ? 'Not selected because the query limit was reached.'
+    : candidate.reason || reason || 'The available evidence did not establish a usable check.');
+  item.append(details);
+  return item;
+}
+
+function renderDiscovery(discovery, queries) {
+  $('standard-discovery').hidden = !discovery;
+  if (!discovery) return;
+  const candidates = Array.isArray(discovery.candidates) ? discovery.candidates : [];
+  const notSelected = candidates.filter(candidate => candidate.selection !== 'selected');
+  const observed = discovery.counts || {};
+  const described = discovery.status === 'discovered' || discovery.status === 'none';
+  $('standard-discovery-status').textContent = discovery.status === 'unavailable' ? 'Unavailable'
+    : discovery.status === 'not_applicable' ? 'Not applied' : 'Limited observations';
+  $('standard-discovery-description').textContent = discovery.status === 'unavailable'
+    ? `Automatic checks could not be established. ${discovery.reason || 'Review the execution evidence below.'} Missing checks do not establish that no assets changed.`
+    : discovery.status === 'not_applicable' ? 'Automatic checks were not applied because the call did not complete successfully. This is not an empty-asset result.'
+      : queries.length === 0 ? 'No supported checks were selected from this trace. This does not establish that no assets changed.'
+        : 'The checks below were selected from observed token activity. Selection does not guarantee that every affected account or asset was found.';
+  const counts = $('standard-discovery-counts');
+  counts.replaceChildren();
+  const candidateCount = Number.isSafeInteger(observed.candidates) && observed.candidates >= 0 ? observed.candidates : candidates.length;
+  const selectionKnown = described || queries.length > 0 || Number.isSafeInteger(observed.selected);
+  for (const [label, value] of [
+    [observed.complete === false ? 'Candidates retained before stop' : 'Recorded candidates', described || candidates.length ? candidateCount : null],
+    ['Selected checks', selectionKnown ? queries.length : null],
+    ['Measured checks', selectionKnown ? queries.filter(standardMeasured).length : null],
+    ['Candidates not selected', described || candidates.length ? notSelected.length : null],
+  ]) {
+    const count = node('div', 'account-count');
+    count.append(node('strong', '', value === null ? '—' : value), node('span', '', label));
+    counts.append(count);
+  }
+  $('standard-discovery-omissions').hidden = notSelected.length === 0;
+  $('standard-discovery-omissions').open = false;
+  $('standard-discovery-omissions-heading').textContent = `${notSelected.length} candidate${notSelected.length === 1 ? '' : 's'} not selected`;
+  $('standard-discovery-candidates').replaceChildren(...notSelected.map(candidate => renderDiscoveryCandidate(candidate, discovery.reason)));
+  const maximum = Number.isSafeInteger(discovery.limits?.maxQueries) ? discovery.limits.maxQueries : 8;
+  $('standard-discovery-limits').textContent = observed.truncated === true
+    ? 'The trace scan stopped at a limit. Counts describe only retained evidence; automatic checks were withheld.'
+    : observed.complete === false ? 'The trace scan did not complete. Counts describe only retained evidence; automatic checks were withheld.'
+      : observed.complete === true ? `The trace scan finished within its limits. Up to ${maximum} checks can be selected; a completed scan does not mean all asset changes were found.`
+        : 'A completed trace scan was not established. No conclusion about missing asset changes can be drawn.';
+  const diagnostics = Array.isArray(discovery.diagnostics) ? discovery.diagnostics : [];
+  const excluded = [
+    ['failedFrames', 'failed call frames'], ['staticFrames', 'read-only call frames'],
+    ['nftTransferLogs', 'NFT-style transfer logs'], ['malformedKnownSignatures', 'malformed token events or calls'],
+  ].filter(([key]) => Number.isSafeInteger(observed[key]) && observed[key] > 0)
+    .map(([key, label]) => `${observed[key]} ${label} excluded from candidate selection.`);
+  const notes = [...excluded, ...diagnostics.map(item => {
+    if (typeof item === 'string') return item;
+    const callPath = Array.isArray(item.callPath) ? item.callPath.length ? item.callPath.join('.') : 'root' : item.callPath;
+    const location = [callPath !== undefined ? `Call ${callPath}` : '', item.logIndex !== undefined ? `log ${item.logIndex}` : ''].filter(Boolean).join(', ');
+    return `${location ? `${location}: ` : ''}${item.message || item.reason || titleCase(item.code || 'Observation not used')}`;
+  })];
+  $('standard-discovery-diagnostics').hidden = notes.length === 0;
+  $('standard-discovery-diagnostics').open = false;
+  $('standard-discovery-notes').replaceChildren(...notes.map(item => node('li', '', item)));
+}
+
 function renderStandardResult(result) {
   beginResult(result, true);
   const execution = result.execution || {};
   const queries = Array.isArray(result.preview?.queries) ? result.preview.queries : [];
   const measured = queries.filter(standardMeasured).length;
   const sender = result.apiRequest?.from || result.request?.transaction?.from;
+  const automatic = result.preview?.scope === 'observed_queried_accounts' || Boolean(result.discovery);
+  $('coverage-label').textContent = automatic ? 'Selected checks' : 'Requested checks';
   $('result-label').textContent = 'Ethereum unsigned simulation';
   $('execution-status').textContent = execution.status === 'success' ? 'Completed' : execution.status === 'reverted_or_failed' ? 'Failed / reverted' : 'Unavailable';
   $('execution-status').className = execution.status === 'success' ? 'success' : execution.status === 'reverted_or_failed' ? 'failed' : 'partial';
@@ -731,6 +819,7 @@ function renderStandardResult(result) {
   $('coverage-status').textContent = `${measured} / ${queries.length} measured`;
   $('coverage-status').className = queries.length && measured === queries.length ? 'success' : 'partial';
   $('coverage-detail').textContent = 'Selected balances and allowances only';
+  renderDiscovery(result.discovery, queries);
   $('execution-error').hidden = !execution.error && !result.measurementFailure;
   $('execution-error').textContent = execution.error ? `Execution error: ${display(execution.error)}` : result.measurementFailure ? `Measurements unavailable: ${display(result.measurementFailure)}` : '';
   $('contract-revert').hidden = !execution.revertReason;
@@ -751,7 +840,7 @@ function renderStandardResult(result) {
     $(`standard-${group}-count`).textContent = `${rows.filter(standardMeasured).length} / ${rows.length} measured`;
     $(`standard-${group}`).replaceChildren(...rows.map(query => renderStandardQuery(query, sender)));
   }
-  $('standard-metadata-note').textContent = queries.length ? 'Amounts are exact token quantities, not prices or dollar valuations. Other accounts, tokens, debts, and permissions may not be included.' : 'No balance or allowance observations were returned. Missing observations are not zero balances.';
+  $('standard-metadata-note').textContent = queries.length ? 'Amounts are exact token quantities, not prices or dollar valuations. Other accounts, tokens, debts, and permissions may not be included.' : 'No balance or allowance measurements were returned. Missing measurements are not zero balances.';
   const warnings = [...new Set((result.preview?.warnings?.length ? result.preview.warnings : [
     'Only the listed balances and allowances are checked. Other changes may be omitted.',
     'Execution uses a zero base fee without transaction fee settlement or outer signature validation.',
@@ -843,7 +932,7 @@ async function run(mode) {
   if (standard && (!standardAvailable() || mode === 'historical_trace')) return;
   if (mode === 'historical_trace' && !state.example?.transactionHash) return;
   let queries;
-  if (standard) {
+  if (standard && manualQueries()) {
     $('standard-queries').setCustomValidity('');
     try { queries = readStandardQueries(); }
     catch (error) {
@@ -859,7 +948,7 @@ async function run(mode) {
   try {
     const fingerprint = requestFingerprint();
     const body = mode === 'historical_trace' ? { chainId: Number(state.example.request.chainId), transactionHash: state.example.transactionHash } : { chainId: Number($('chain').value), from: $('from').value.trim(), to: $('to').value.trim(), data: $('data').value.trim(), value: $('value').value.trim(), block: $('block').value.trim() };
-    if (standard) body.queries = queries;
+    if (standard && queries !== undefined) body.queries = queries;
     const result = await request(standard ? '/api/evm/simulate' : mode === 'historical_trace' ? '/api/replay' : '/api/simulate', body);
     if (fingerprint !== requestFingerprint()) {
       setBusy(false);
@@ -985,7 +1074,8 @@ for (const id of requestFieldIds) {
   if (id === 'chain') continue;
   const changed = () => {
     if (id === 'standard-queries') $('standard-queries').setCustomValidity('');
-    if (ethereumMode() && state.example) $('historical-help').textContent = 'The selected example is a starting point. Simulation uses the fields and query list currently shown, at the end of the selected block.';
+    if (id === 'standard-manual-queries') updateQueryMode();
+    if (ethereumMode() && state.example) $('historical-help').textContent = manualQueries() ? 'The selected example is a starting point. Simulation uses the fields and manual query list currently shown, at the end of the selected block.' : 'The selected example is a starting point. Simulation uses the fields currently shown and automatically selects checks from the call, at the end of the selected block.';
     clearResult({ inputsChanged: true });
   };
   $(id).addEventListener('input', changed);

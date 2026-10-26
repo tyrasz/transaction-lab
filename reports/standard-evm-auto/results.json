@@ -1,0 +1,637 @@
+{
+  "schemaVersion": "1.0",
+  "developmentOnly": true,
+  "purpose": "Development verification of automatic token/account query selection on two prior selected deposits and one separately discovered contract-held swap. Not an accuracy cohort or original-position replay.",
+  "planSha256": "c393b1bdd032e0f18ae8d6a698d5022ac27bae8f6ea4b5db90cb89e974992603",
+  "cases": [
+    {
+      "id": "aave-usdc-supply-with-permit",
+      "runId": "3a9c860d-d619-495b-9a38-d69eb668f051",
+      "responseFile": "aave-response.json",
+      "responseStatus": 200,
+      "execution": "success",
+      "canonicalStatus": "verified",
+      "discoveryStatus": "discovered",
+      "discoveryCounts": {
+        "complete": true,
+        "truncated": false,
+        "frames": 18,
+        "logs": 7,
+        "observations": 4,
+        "candidates": 4,
+        "selected": 4,
+        "omitted": 0,
+        "failedFrames": 0,
+        "staticFrames": 6,
+        "nftTransferLogs": 0,
+        "malformedKnownSignatures": 0,
+        "zeroAddressCandidatesExcluded": 1
+      },
+      "selectedQueries": 4,
+      "measuredQueries": 4,
+      "rpcCalls": 30,
+      "rpcResponseBytes": 98187,
+      "totalMs": 6457.35125,
+      "gasUsed": "189775",
+      "previewQueries": [
+        {
+          "index": 0,
+          "kind": "balanceOf",
+          "token": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+          "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+          "accountIsSender": true,
+          "metadata": {
+            "symbol": "aEthUSDC",
+            "name": "Aave Ethereum USDC",
+            "decimals": 6,
+            "referenceBlockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+            "referenceBlockNumber": "26270482",
+            "verifiedForSimulation": false,
+            "provenance": {
+              "kind": "historical_reference",
+              "selection": "reports/standard-evm-discovery/selected.json",
+              "selectionSha256": "4c97e73db7a3884ad08bfa016d5ec35a7903a6c40d544a27ca03af4ccd484bb9",
+              "records": [
+                "reports/standard-evm-discovery/raw/033.json",
+                "reports/standard-evm-discovery/raw/034.json",
+                "reports/standard-evm-discovery/raw/035.json"
+              ],
+              "description": "Labels and decimals come from the recorded discovery reference; they are not queried or attested for this simulation."
+            }
+          },
+          "status": "measured",
+          "beforeRaw": "0",
+          "before": "0",
+          "afterRaw": "3962903484",
+          "after": "3962.903484",
+          "deltaRaw": "3962903484",
+          "delta": "3962.903484"
+        },
+        {
+          "index": 1,
+          "kind": "balanceOf",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+          "accountIsSender": true,
+          "metadata": {
+            "symbol": "USDC",
+            "name": null,
+            "decimals": 6,
+            "referenceBlockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+            "referenceBlockNumber": "26270482",
+            "verifiedForSimulation": false,
+            "provenance": {
+              "kind": "historical_reference",
+              "selection": "reports/standard-evm-discovery/selected.json",
+              "selectionSha256": "4c97e73db7a3884ad08bfa016d5ec35a7903a6c40d544a27ca03af4ccd484bb9",
+              "records": [
+                "reports/standard-evm-discovery/raw/031.json"
+              ],
+              "description": "Labels and decimals come from the recorded discovery reference; they are not queried or attested for this simulation."
+            }
+          },
+          "status": "measured",
+          "beforeRaw": "3962903485",
+          "before": "3962.903485",
+          "afterRaw": "0",
+          "after": "0",
+          "deltaRaw": "-3962903485",
+          "delta": "-3962.903485"
+        },
+        {
+          "index": 2,
+          "kind": "allowance",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "owner": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+          "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+          "accountIsSender": true,
+          "metadata": {
+            "symbol": "USDC",
+            "name": null,
+            "decimals": 6,
+            "referenceBlockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+            "referenceBlockNumber": "26270482",
+            "verifiedForSimulation": false,
+            "provenance": {
+              "kind": "historical_reference",
+              "selection": "reports/standard-evm-discovery/selected.json",
+              "selectionSha256": "4c97e73db7a3884ad08bfa016d5ec35a7903a6c40d544a27ca03af4ccd484bb9",
+              "records": [
+                "reports/standard-evm-discovery/raw/031.json"
+              ],
+              "description": "Labels and decimals come from the recorded discovery reference; they are not queried or attested for this simulation."
+            }
+          },
+          "status": "measured",
+          "beforeRaw": "0",
+          "before": "0",
+          "afterRaw": "0",
+          "after": "0",
+          "deltaRaw": "0",
+          "delta": "0"
+        },
+        {
+          "index": 3,
+          "kind": "balanceOf",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+          "accountIsSender": false,
+          "metadata": {
+            "symbol": "USDC",
+            "name": null,
+            "decimals": 6,
+            "referenceBlockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+            "referenceBlockNumber": "26270482",
+            "verifiedForSimulation": false,
+            "provenance": {
+              "kind": "historical_reference",
+              "selection": "reports/standard-evm-discovery/selected.json",
+              "selectionSha256": "4c97e73db7a3884ad08bfa016d5ec35a7903a6c40d544a27ca03af4ccd484bb9",
+              "records": [
+                "reports/standard-evm-discovery/raw/031.json"
+              ],
+              "description": "Labels and decimals come from the recorded discovery reference; they are not queried or attested for this simulation."
+            }
+          },
+          "status": "measured",
+          "beforeRaw": "151987610826648",
+          "before": "151987610.826648",
+          "afterRaw": "151991573730133",
+          "after": "151991573.730133",
+          "deltaRaw": "3962903485",
+          "delta": "3962.903485"
+        }
+      ],
+      "omittedCandidates": []
+    },
+    {
+      "id": "morpho-kiln-usdc-deposit",
+      "runId": "82c2b7b2-a724-45be-843a-81eb8350c771",
+      "responseFile": "morpho-response.json",
+      "responseStatus": 200,
+      "execution": "success",
+      "canonicalStatus": "verified",
+      "discoveryStatus": "discovered",
+      "discoveryCounts": {
+        "complete": true,
+        "truncated": false,
+        "frames": 232,
+        "logs": 16,
+        "observations": 12,
+        "candidates": 11,
+        "selected": 8,
+        "omitted": 3,
+        "failedFrames": 0,
+        "staticFrames": 215,
+        "nftTransferLogs": 0,
+        "malformedKnownSignatures": 0,
+        "zeroAddressCandidatesExcluded": 4
+      },
+      "selectedQueries": 8,
+      "measuredQueries": 8,
+      "rpcCalls": 46,
+      "rpcResponseBytes": 345927,
+      "totalMs": 9462.053291999997,
+      "gasUsed": "1413682",
+      "previewQueries": [
+        {
+          "index": 0,
+          "kind": "balanceOf",
+          "token": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "accountIsSender": true,
+          "metadata": {
+            "symbol": "mstkeUSDC",
+            "name": "Yield Bearing Steakhouse Morpho USDC",
+            "decimals": 6,
+            "referenceBlockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+            "referenceBlockNumber": "26270562",
+            "verifiedForSimulation": false,
+            "provenance": {
+              "kind": "historical_reference",
+              "selection": "reports/standard-evm-discovery/selected.json",
+              "selectionSha256": "4c97e73db7a3884ad08bfa016d5ec35a7903a6c40d544a27ca03af4ccd484bb9",
+              "records": [
+                "reports/standard-evm-discovery/raw/037.json",
+                "reports/standard-evm-discovery/raw/038.json",
+                "reports/standard-evm-discovery/raw/039.json"
+              ],
+              "description": "Labels and decimals come from the recorded discovery reference; they are not queried or attested for this simulation."
+            }
+          },
+          "status": "measured",
+          "beforeRaw": "1151370388097",
+          "before": "1151370.388097",
+          "afterRaw": "1481867899909",
+          "after": "1481867.899909",
+          "deltaRaw": "330497511812",
+          "delta": "330497.511812"
+        },
+        {
+          "index": 1,
+          "kind": "balanceOf",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "accountIsSender": true,
+          "metadata": {
+            "symbol": "USDC",
+            "name": null,
+            "decimals": 6,
+            "referenceBlockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+            "referenceBlockNumber": "26270482",
+            "verifiedForSimulation": false,
+            "provenance": {
+              "kind": "historical_reference",
+              "selection": "reports/standard-evm-discovery/selected.json",
+              "selectionSha256": "4c97e73db7a3884ad08bfa016d5ec35a7903a6c40d544a27ca03af4ccd484bb9",
+              "records": [
+                "reports/standard-evm-discovery/raw/031.json"
+              ],
+              "description": "Labels and decimals come from the recorded discovery reference; they are not queried or attested for this simulation."
+            }
+          },
+          "status": "measured",
+          "beforeRaw": "704323976173",
+          "before": "704323.976173",
+          "afterRaw": "354323976173",
+          "after": "354323.976173",
+          "deltaRaw": "-350000000000",
+          "delta": "-350000"
+        },
+        {
+          "index": 2,
+          "kind": "allowance",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "owner": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "spender": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "accountIsSender": true,
+          "metadata": {
+            "symbol": "USDC",
+            "name": null,
+            "decimals": 6,
+            "referenceBlockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+            "referenceBlockNumber": "26270482",
+            "verifiedForSimulation": false,
+            "provenance": {
+              "kind": "historical_reference",
+              "selection": "reports/standard-evm-discovery/selected.json",
+              "selectionSha256": "4c97e73db7a3884ad08bfa016d5ec35a7903a6c40d544a27ca03af4ccd484bb9",
+              "records": [
+                "reports/standard-evm-discovery/raw/031.json"
+              ],
+              "description": "Labels and decimals come from the recorded discovery reference; they are not queried or attested for this simulation."
+            }
+          },
+          "status": "measured",
+          "beforeRaw": "350000000000",
+          "before": "350000",
+          "afterRaw": "0",
+          "after": "0",
+          "deltaRaw": "-350000000000",
+          "delta": "-350000"
+        },
+        {
+          "index": 3,
+          "kind": "balanceOf",
+          "token": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "accountIsSender": false,
+          "metadata": {
+            "symbol": "mstkeUSDC",
+            "name": "Yield Bearing Steakhouse Morpho USDC",
+            "decimals": 6,
+            "referenceBlockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+            "referenceBlockNumber": "26270562",
+            "verifiedForSimulation": false,
+            "provenance": {
+              "kind": "historical_reference",
+              "selection": "reports/standard-evm-discovery/selected.json",
+              "selectionSha256": "4c97e73db7a3884ad08bfa016d5ec35a7903a6c40d544a27ca03af4ccd484bb9",
+              "records": [
+                "reports/standard-evm-discovery/raw/037.json",
+                "reports/standard-evm-discovery/raw/038.json",
+                "reports/standard-evm-discovery/raw/039.json"
+              ],
+              "description": "Labels and decimals come from the recorded discovery reference; they are not queried or attested for this simulation."
+            }
+          },
+          "status": "measured",
+          "beforeRaw": "18022867783",
+          "before": "18022.867783",
+          "afterRaw": "18078180423",
+          "after": "18078.180423",
+          "deltaRaw": "55312640",
+          "delta": "55.31264"
+        },
+        {
+          "index": 4,
+          "kind": "balanceOf",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "accountIsSender": false,
+          "metadata": {
+            "symbol": "USDC",
+            "name": null,
+            "decimals": 6,
+            "referenceBlockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+            "referenceBlockNumber": "26270482",
+            "verifiedForSimulation": false,
+            "provenance": {
+              "kind": "historical_reference",
+              "selection": "reports/standard-evm-discovery/selected.json",
+              "selectionSha256": "4c97e73db7a3884ad08bfa016d5ec35a7903a6c40d544a27ca03af4ccd484bb9",
+              "records": [
+                "reports/standard-evm-discovery/raw/031.json"
+              ],
+              "description": "Labels and decimals come from the recorded discovery reference; they are not queried or attested for this simulation."
+            }
+          },
+          "status": "measured",
+          "beforeRaw": "20083625",
+          "before": "20.083625",
+          "afterRaw": "20083625",
+          "after": "20.083625",
+          "deltaRaw": "0",
+          "delta": "0"
+        },
+        {
+          "index": 5,
+          "kind": "balanceOf",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+          "accountIsSender": false,
+          "metadata": {
+            "symbol": "USDC",
+            "name": null,
+            "decimals": 6,
+            "referenceBlockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+            "referenceBlockNumber": "26270482",
+            "verifiedForSimulation": false,
+            "provenance": {
+              "kind": "historical_reference",
+              "selection": "reports/standard-evm-discovery/selected.json",
+              "selectionSha256": "4c97e73db7a3884ad08bfa016d5ec35a7903a6c40d544a27ca03af4ccd484bb9",
+              "records": [
+                "reports/standard-evm-discovery/raw/031.json"
+              ],
+              "description": "Labels and decimals come from the recorded discovery reference; they are not queried or attested for this simulation."
+            }
+          },
+          "status": "measured",
+          "beforeRaw": "128890534855869",
+          "before": "128890534.855869",
+          "afterRaw": "129240534855869",
+          "after": "129240534.855869",
+          "deltaRaw": "350000000000",
+          "delta": "350000"
+        },
+        {
+          "index": 6,
+          "kind": "balanceOf",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+          "accountIsSender": false,
+          "metadata": {
+            "symbol": "USDC",
+            "name": null,
+            "decimals": 6,
+            "referenceBlockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+            "referenceBlockNumber": "26270482",
+            "verifiedForSimulation": false,
+            "provenance": {
+              "kind": "historical_reference",
+              "selection": "reports/standard-evm-discovery/selected.json",
+              "selectionSha256": "4c97e73db7a3884ad08bfa016d5ec35a7903a6c40d544a27ca03af4ccd484bb9",
+              "records": [
+                "reports/standard-evm-discovery/raw/031.json"
+              ],
+              "description": "Labels and decimals come from the recorded discovery reference; they are not queried or attested for this simulation."
+            }
+          },
+          "status": "measured",
+          "beforeRaw": "6011",
+          "before": "0.006011",
+          "afterRaw": "6011",
+          "after": "0.006011",
+          "deltaRaw": "0",
+          "delta": "0"
+        },
+        {
+          "index": 7,
+          "kind": "balanceOf",
+          "token": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+          "account": "0x255c7705e8bb334dfcae438197f7c4297988085a",
+          "accountIsSender": false,
+          "metadata": {
+            "symbol": "steakUSDC",
+            "name": "Steakhouse USDC",
+            "decimals": 18,
+            "referenceBlockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+            "referenceBlockNumber": "26270562",
+            "verifiedForSimulation": false,
+            "provenance": {
+              "kind": "historical_reference",
+              "selection": "reports/standard-evm-discovery/selected.json",
+              "selectionSha256": "4c97e73db7a3884ad08bfa016d5ec35a7903a6c40d544a27ca03af4ccd484bb9",
+              "records": [
+                "reports/standard-evm-discovery/raw/041.json",
+                "reports/standard-evm-discovery/raw/042.json",
+                "reports/standard-evm-discovery/raw/043.json"
+              ],
+              "description": "Labels and decimals come from the recorded discovery reference; they are not queried or attested for this simulation."
+            }
+          },
+          "status": "measured",
+          "beforeRaw": "34363220714011809188525",
+          "before": "34363.220714011809188525",
+          "afterRaw": "34390568084318171872187",
+          "after": "34390.568084318171872187",
+          "deltaRaw": "27347370306362683662",
+          "delta": "27.347370306362683662"
+        }
+      ],
+      "omittedCandidates": [
+        {
+          "id": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb:0x70a08231000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "kind": "balanceOf",
+          "token": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+          "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "query": {
+            "to": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+            "data": "0x70a08231000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+          },
+          "priority": 2,
+          "selection": "omitted_query_limit",
+          "observationIds": [
+            "1.11.1:log:2"
+          ]
+        },
+        {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:0xdd62ed3e000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b000000000000000000000000beef01735c132ada46aa9aa4c54623caa92a64cb",
+          "kind": "allowance",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "owner": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "spender": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b000000000000000000000000beef01735c132ada46aa9aa4c54623caa92a64cb"
+          },
+          "priority": 3,
+          "selection": "omitted_query_limit",
+          "observationIds": [
+            "1.11.0.0:log:0",
+            "1.11.0:call",
+            "1.11.1.47:call"
+          ]
+        },
+        {
+          "id": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48:0xdd62ed3e000000000000000000000000beef01735c132ada46aa9aa4c54623caa92a64cb000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+          "kind": "allowance",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "owner": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+          "spender": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e000000000000000000000000beef01735c132ada46aa9aa4c54623caa92a64cb000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+          },
+          "priority": 3,
+          "selection": "omitted_query_limit",
+          "observationIds": [
+            "1.11.1.52.0:call"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contract-held-usdc-weth-swap",
+      "runId": "06722857-efa4-4822-bbc2-87cf2cc6a675",
+      "responseFile": "swap-response.json",
+      "responseStatus": 200,
+      "execution": "success",
+      "canonicalStatus": "verified",
+      "discoveryStatus": "discovered",
+      "discoveryCounts": {
+        "complete": true,
+        "truncated": false,
+        "frames": 11,
+        "logs": 3,
+        "observations": 4,
+        "candidates": 4,
+        "selected": 4,
+        "omitted": 0,
+        "failedFrames": 0,
+        "staticFrames": 4,
+        "nftTransferLogs": 0,
+        "malformedKnownSignatures": 0,
+        "zeroAddressCandidatesExcluded": 0
+      },
+      "selectedQueries": 4,
+      "measuredQueries": 4,
+      "rpcCalls": 30,
+      "rpcResponseBytes": 203990,
+      "totalMs": 6044.045874999996,
+      "gasUsed": "166771",
+      "previewQueries": [
+        {
+          "index": 0,
+          "kind": "balanceOf",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0x51c72848c68a965f66fa7a88855f9f7784502a7f",
+          "accountIsSender": false,
+          "metadata": {
+            "symbol": "USDC",
+            "name": null,
+            "decimals": 6,
+            "referenceBlockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+            "referenceBlockNumber": "26270482",
+            "verifiedForSimulation": false,
+            "provenance": {
+              "kind": "historical_reference",
+              "selection": "reports/standard-evm-discovery/selected.json",
+              "selectionSha256": "4c97e73db7a3884ad08bfa016d5ec35a7903a6c40d544a27ca03af4ccd484bb9",
+              "records": [
+                "reports/standard-evm-discovery/raw/031.json"
+              ],
+              "description": "Labels and decimals come from the recorded discovery reference; they are not queried or attested for this simulation."
+            }
+          },
+          "status": "measured",
+          "beforeRaw": "9597601246724",
+          "before": "9597601.246724",
+          "afterRaw": "9584058730714",
+          "after": "9584058.730714",
+          "deltaRaw": "-13542516010",
+          "delta": "-13542.51601"
+        },
+        {
+          "index": 1,
+          "kind": "balanceOf",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+          "accountIsSender": false,
+          "metadata": {
+            "symbol": "USDC",
+            "name": null,
+            "decimals": 6,
+            "referenceBlockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+            "referenceBlockNumber": "26270482",
+            "verifiedForSimulation": false,
+            "provenance": {
+              "kind": "historical_reference",
+              "selection": "reports/standard-evm-discovery/selected.json",
+              "selectionSha256": "4c97e73db7a3884ad08bfa016d5ec35a7903a6c40d544a27ca03af4ccd484bb9",
+              "records": [
+                "reports/standard-evm-discovery/raw/031.json"
+              ],
+              "description": "Labels and decimals come from the recorded discovery reference; they are not queried or attested for this simulation."
+            }
+          },
+          "status": "measured",
+          "beforeRaw": "58649970174792",
+          "before": "58649970.174792",
+          "afterRaw": "58663512690802",
+          "after": "58663512.690802",
+          "deltaRaw": "13542516010",
+          "delta": "13542.51601"
+        },
+        {
+          "index": 2,
+          "kind": "balanceOf",
+          "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "account": "0x51c72848c68a965f66fa7a88855f9f7784502a7f",
+          "accountIsSender": false,
+          "metadata": null,
+          "status": "measured",
+          "beforeRaw": "5234210030040334873484",
+          "afterRaw": "5240011906271617850838",
+          "deltaRaw": "5801876231282977354"
+        },
+        {
+          "index": 3,
+          "kind": "balanceOf",
+          "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          "account": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+          "accountIsSender": false,
+          "metadata": null,
+          "status": "measured",
+          "beforeRaw": "9664575620385650038431",
+          "afterRaw": "9658773744154367061077",
+          "deltaRaw": "-5801876231282977354"
+        }
+      ],
+      "omittedCandidates": []
+    }
+  ],
+  "totals": {
+    "rpcCalls": 106,
+    "rpcResponseBytes": 648104
+  },
+  "limitations": [
+    "Selected development examples, not a representative cohort or accuracy rate.",
+    "All three use historical parent-block-end state, not original-position replay or current quotes.",
+    "Automatic discovery is limited to eligible observed events and direct token calls; silent, ambiguous or unselected effects remain unmeasured.",
+    "Contract-held swap assets belong to the named contracts; external-sender ownership is unassessed.",
+    "WETH has no configured display metadata in this API response and remains in exact raw units.",
+    "No security assessment, signing or broadcasting."
+  ]
+}

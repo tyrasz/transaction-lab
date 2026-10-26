@@ -1,0 +1,9 @@
+This bounded development search selected no transaction. It made 11 read-only RPC calls, received 45,209 bytes, examined four distinct candidates, and made no simulation calls. Every request and response is retained, including the successful reads that disqualified candidates. There were no provider errors, retries, replacement candidates, signatures or broadcasts.
+
+The frozen rule inspected the last 20 finalized Ethereum blocks, queried the USDC/WETH 0.05% pool, and required receipt evidence of USDC leaving and WETH reaching the external transaction sender. Three zero-value transactions moved those tokens between contract-held balances and the pool instead. The fourth supplied nonzero native value. These are selection exclusions, not failed EVM replays. Sender code, original traces and parent-state simulations remain untested for them.
+
+`index.json` contains all four transaction links, identities, exclusion reasons and exact raw request IDs. `capture.json` retains the complete ordered RPC ledger and candidate evidence. Each `raw/NNN.body` stores the original response bytes; its corresponding JSON record binds request, response, byte counts and hashes. The initial factory `getPool(USDC,WETH,500)` query confirmed the chosen pool at the finalized block hash.
+
+Primary references: [Uniswap's Ethereum deployments](https://developers.uniswap.org/docs/protocols/v3/deployments/v3-ethereum-deployments) identify the factory, WETH and the `getPool` lookup; the [official pool event interface](https://github.com/Uniswap/v3-core/blob/main/contracts/interfaces/pool/IUniswapV3PoolEvents.sol) specifies the Swap event's indexed addresses and signed pool token deltas. These sources identify contracts and event semantics, not an independent execution oracle.
+
+This is a retained unsuccessful development search, not a prospective benchmark. Any revised selection requires a separately recorded plan and must preserve this packet.

@@ -66,6 +66,78 @@ function harness({ mutate, chainId = 1, originalFailed = false } = {}) {
 function noAmounts(result) { for (const row of result.measurements) for (const key of ['beforeRaw','afterRaw','deltaRaw','basis']) assert.equal(row[key], undefined); }
 const run = h => simulateUnsignedCall(h);
 
+function automaticHarness(mutate) {
+  const transfer = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+  const approval = '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925';
+  const h = harness({ mutate: observation => {
+    if (observation.stage === 'original_trace') {
+      // Synthetic discovery control: arbitrary event amounts intentionally do
+      // not match the independent query returns in VALUES. Discovery must not
+      // turn emitted quantities into wallet balance changes.
+      observation.result.calls = [USDC, ATOKEN, VAULT].map((token, index) => frame({
+        from: TARGET, to: token, input: '0x1234', gasUsed: '0x100', logs: [
+          { address: token, topics: [transfer, word(0), word(S)], data: word(999), position: '0x0', index: hex(index) },
+          ...(token === USDC ? [{ address: token, topics: [approval, word(S), word(TARGET)], data: word(123), position: '0x0', index: '0x3' }] : []),
+        ],
+      }));
+    }
+    return mutate?.(observation);
+  } });
+  delete h.queries;
+  return h;
+}
+
+test('automatic discovery measures selected queries from the same single original execution, never event amounts', async () => {
+  const h = automaticHarness(), result = await run(h);
+  assert.equal(result.execution.status, 'success'); assert.equal(result.canonicalStatus, 'verified');
+  assert.equal(result.scope.discovery, 'bounded_observed_trace_candidates');
+  assert.equal(result.scope.allEffectsCoverage, 'inconclusive');
+  assert.equal(result.request.querySelection, 'bounded_observed_trace_candidates');
+  assert.deepEqual(result.request.queries, QUERIES);
+  assert.deepEqual(result.discovery.queries, QUERIES);
+  assert.deepEqual(result.measurements.map(m => [m.beforeRaw, m.afterRaw, m.deltaRaw]), VALUES.map(([a,b]) => [a,b,(BigInt(b)-BigInt(a)).toString()]));
+  assert.equal(h.records.filter(r => r.method === 'debug_traceCall' && r.params[0].to === TARGET && r.params[2].tracer === 'callTracer').length, 1);
+  const originalIndex = h.records.findIndex(r => r.method === 'debug_traceCall' && r.params[0].to === TARGET);
+  assert.ok(h.records.findIndex(r => r.method === 'eth_getCode' && r.params[0] === USDC) > originalIndex);
+  for (const record of h.records.filter(r => r.method === 'debug_traceCall' && QUERIES.some(q => q.to === r.params[0].to && q.data === r.params[0].data))) {
+    assert.deepEqual(record.params[1], { blockHash: BLOCK, requireCanonical: true });
+    if (record.params[2].stateOverrides) assert.deepEqual(record.params[2].stateOverrides, EXPECTED_OVERRIDES);
+  }
+});
+
+test('automatic discovery with no observations keeps complete state evidence without claiming no asset changes', async () => {
+  const h = harness(); delete h.queries;
+  const result = await run(h);
+  assert.equal(result.execution.status, 'success'); assert.equal(result.canonicalStatus, 'verified');
+  assert.equal(result.discovery.status, 'none'); assert.deepEqual(result.measurements, []);
+  assert.deepEqual(result.request.queries, []);
+  assert.deepEqual(result.stateDiff, {
+    pre: { ...ORIGINAL_DIFF.pre, [S]: { nonce: '7', balance: '1000000000000000000' } },
+    post: { ...ORIGINAL_DIFF.post, [S]: { nonce: '8' } },
+  });
+  assert.equal(result.scope.allEffectsCoverage, 'inconclusive');
+  assert.equal(h.records.some(r => r.method === 'debug_traceCall' && QUERIES.some(q => q.to === r.params[0].to && q.data === r.params[0].data)), false);
+});
+
+test('failed automatic calls and unavailable selected targets cannot become empty successful asset previews', async () => {
+  const reverted = harness({ originalFailed: true }); delete reverted.queries;
+  const failed = await run(reverted);
+  assert.equal(failed.execution.status, 'reverted_or_failed'); assert.equal(failed.discovery.status, 'not_applicable');
+  assert.deepEqual(failed.measurements, []); assert.equal(failed.scope.allEffectsCoverage, 'inconclusive');
+  const h = automaticHarness(x => x.method === 'eth_getCode' && x.params[0] === USDC ? '0x' : undefined);
+  const unavailable = await run(h);
+  assert.equal(unavailable.execution.status, 'success'); assert.equal(unavailable.canonicalStatus, 'unverified');
+  assert.match(unavailable.measurementFailure, /selected target/); noAmounts(unavailable);
+  assert.equal(h.records.some(r => r.method === 'debug_traceCall' && r.params[2].tracer === 'prestateTracer'), false);
+});
+
+test('late shared canonical failure invalidates every automatically selected measurement', async () => {
+  const result = await run(automaticHarness(x => { if (x.method === 'eth_getBlockByNumber') x.result.hash = word(999); }));
+  assert.equal(result.discovery.queries.length, 4); assert.equal(result.execution.status, 'success');
+  assert.equal(result.canonicalStatus, 'unverified');
+  assert.ok(result.measurements.every(row => row.status === 'unavailable')); noAmounts(result);
+});
+
 // Positive public traces are pinned separately from the synthetic full pipeline.
 const realBytes = await readFile(new URL('../../../reports/standard-evm-capabilities/capture.json', import.meta.url));
 assert.equal(createHash('sha256').update(realBytes).digest('hex'), 'ada8360af17b2ebce8caa301ddea304814e730f2e1d492517ae5669081601d80');
