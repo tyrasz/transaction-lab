@@ -1,0 +1,187 @@
+{
+  "schemaVersion": "1.0",
+  "createdAt": "2026-10-26T07:19:30.944Z",
+  "purpose": "Capture sparse touched pre-execution code/storage and explicitly complete omitted basic account fields for one fixed unsigned direct USDC transferFrom, for independent local execution development.",
+  "authorization": "Preparation only until root approves exact plan and script hashes; one capture, no retries or replacement states.",
+  "scriptSha256": "14d1379d9c7e7f0200508e103619b7d2b1055dd29326d80797a608a62773f0e0",
+  "sources": [
+    {
+      "path": "reports/current-validated-decimal/capture.json",
+      "sha256": "bcb186b6a3a44d94be91ad74aa9b61b83a116ea06d0ada6834d2b19da028770b"
+    },
+    {
+      "path": "reports/current-validated-decimal/plan.json",
+      "sha256": "4a2e2432a9c817823b322ecda5b90d1b06058aaa2874c35edcd6ea14aa6d202b"
+    },
+    {
+      "path": "reports/current-validated-decimal/packet-manifest.json",
+      "sha256": "35ae5f8e4998e1a30a76838b4686b5f894929db201a5e0fd896753a6e2bf9fd5"
+    }
+  ],
+  "providers": [
+    {
+      "id": "drpc",
+      "url": "https://hyperliquid.drpc.org"
+    },
+    {
+      "id": "hyperlend-archive",
+      "url": "https://rpc.hyperlend.finance/archive"
+    }
+  ],
+  "budgets": {
+    "maxRpcCalls": 204,
+    "maxRpcCallsPerProvider": 102,
+    "maxPrestateAccountsPerProvider": 32,
+    "maxResponseBytes": 8388608,
+    "maxTotalResponseBytes": 33554432,
+    "requestTimeoutMs": 25000,
+    "maxElapsedMs": 360000,
+    "retries": 0
+  },
+  "caseId": "current-direct-transferfrom-a",
+  "blockNumber": "0x2f09828",
+  "envelope": {
+    "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+    "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+    "data": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+    "value": "0x0",
+    "gas": "0x4c4b40"
+  },
+  "pinned": {
+    "blockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+    "requireCanonical": true
+  },
+  "expectedHeader": {
+    "hash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+    "number": "0x2f09828",
+    "parentHash": "0x5461b1dddba63e3e989aea7f99036458f6ab4ebb4d478d0528cbd9e7372138c9",
+    "timestamp": "0x6adb805b",
+    "gasLimit": "0x2dc6c0",
+    "baseFeePerGas": "0x5f5e100",
+    "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "miner": "0x0000000000000000000000000000000000000000"
+  },
+  "completionFields": [
+    {
+      "field": "nonce",
+      "method": "eth_getTransactionCount"
+    },
+    {
+      "field": "balance",
+      "method": "eth_getBalance"
+    },
+    {
+      "field": "code",
+      "method": "eth_getCode"
+    }
+  ],
+  "completionRule": "After a structurally valid full prestate of at most32 accounts, sort addresses ascending and query each missing own nonce/balance/code field in the declared field order at the same canonical EIP-1898 hash. No extra storage reads. Preserve original prestate; raw completion responses stay separate. Explicit malformed fields are never repaired.",
+  "fixedRequests": [
+    {
+      "label": "chain",
+      "method": "eth_chainId",
+      "params": []
+    },
+    {
+      "label": "header-before",
+      "method": "eth_getBlockByHash",
+      "params": [
+        "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+        false
+      ]
+    },
+    {
+      "label": "full-prestate",
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+          "value": "0x0",
+          "gas": "0x4c4b40"
+        },
+        {
+          "blockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "prestateTracer",
+          "timeout": "15s",
+          "tracerConfig": {
+            "diffMode": false,
+            "disableCode": false,
+            "disableStorage": false,
+            "includeEmpty": true
+          }
+        }
+      ]
+    },
+    {
+      "label": "original-call-trace",
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+          "value": "0x0",
+          "gas": "0x4c4b40"
+        },
+        {
+          "blockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "callTracer",
+          "timeout": "15s",
+          "tracerConfig": {
+            "withLog": true
+          }
+        }
+      ]
+    },
+    {
+      "label": "original-state-diff",
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+          "value": "0x0",
+          "gas": "0x4c4b40"
+        },
+        {
+          "blockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "prestateTracer",
+          "timeout": "15s",
+          "tracerConfig": {
+            "diffMode": true
+          }
+        }
+      ]
+    },
+    {
+      "label": "header-after",
+      "method": "eth_getBlockByNumber",
+      "params": [
+        "0x2f09828",
+        false
+      ]
+    }
+  ],
+  "limits": [
+    "Input-state facts remain provider supplied and are not cryptographic state proof.",
+    "Missing account/storage reads during local execution must fail; no zeros or expected outputs may fill gaps.",
+    "An all-zero account may have ambiguous existence; completion facts do not establish absence.",
+    "includeEmpty support is unproven; no fallback if rejected or ignored.",
+    "Call trace and diff are comparison outputs, excluded from execution inputs.",
+    "Synthetic BASEFEE-zero/unpriced fixed5M call profile differs from a future signed transaction.",
+    "Local execution must reconcile intrinsic gas, warm-set and nonce semantics without using expected trace outputs to choose inputs.",
+    "Two endpoints do not establish independent provider execution engines."
+  ]
+}

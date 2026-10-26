@@ -1,0 +1,1693 @@
+{
+  "schemaVersion": "1.1",
+  "revision": {
+    "kind": "separate_corrected_comparator_report",
+    "previousResultsSha256": "bfc85b6ed1875d028b70e8d59968e645d0c1a2d8025f603cc837513ad2c916fb",
+    "previousPacketManifestSha256": "3f20d0cd30c2578154258656ada5d4e696e5ac6b27833688bcc60da7077385f7",
+    "archivedSourceInventorySha256": "ed683d26b959d6a4fd559cf7c139e648d9173c8321ff09b411b2fb2d05ef6319",
+    "corrections": [
+      "Bind original parent/block hashes and completed retained-state disposition.",
+      "Require native provider input and nonstatic call value; explicitly normalize omitted provider output and STATICCALL value only.",
+      "Validate supplied log positions and ordered sibling log ranges while permitting distinct index gaps."
+    ],
+    "inputSelectionChanged": false,
+    "rawEvidenceChanged": false
+  },
+  "provenance": {
+    "captureSha256": "8e7ca6979a894a6a4340379ef2ff875e7b398e2b48f157324d081dd319c40876",
+    "statePacketManifestSha256": "471e851baec1d716156e6a9a18d63a5c6fbaffde5515885eb6aff5bdc799fc11",
+    "runnerSha256": "585d44ad0a098cdb04a894cba7f01db5938193593cc2c2c248165c5e11ef7f5f",
+    "engine": {
+      "sourceSha256": "ff8e4d13a2160256b35ab1f3a64e3c05e750e515e8b87b4f3ce4b59d7bed6575",
+      "files": [
+        {
+          "file": "compare-recorded.js",
+          "bytes": 18092,
+          "sha256": "af7d3ce2d6922562f959c2136a88cbf9aed89161d28f7b4c0be4fabaacbdd4c1"
+        },
+        {
+          "file": "execute.js",
+          "bytes": 15854,
+          "sha256": "2aa738fad2611b4c2f5668f1112458bd2f55a5de514078aa824631f18429ace1"
+        },
+        {
+          "file": "prestate-inputs.js",
+          "bytes": 8029,
+          "sha256": "ac05dc59b6015fd4a96e5f181df98baeee5bfd1d217a8b9ed5abf03f200e44d5"
+        },
+        {
+          "file": "recorded-state.js",
+          "bytes": 9411,
+          "sha256": "1b79d28cbac762b6850b3ae7299832f479c97b5b6bccd5633ab373ebf5142c07"
+        },
+        {
+          "file": "package.json",
+          "bytes": 462,
+          "sha256": "dc71db993af39c0cd32be821de6705dbe8293a7f5a0efacc09d5b52a150b3366"
+        },
+        {
+          "file": "package-lock.json",
+          "bytes": 6946,
+          "sha256": "78b150d101a54b715a5d292a86566764723c9222e4379706ef681b46dbee4feb"
+        },
+        {
+          "file": "test/compare-recorded.test.js",
+          "bytes": 13845,
+          "sha256": "d65496f5fc59705ee7c4d55f298467286ff273ad03972ad62b4e79421e90a7fd"
+        },
+        {
+          "file": "test/execute.test.js",
+          "bytes": 16837,
+          "sha256": "96455940425eb5deade5dd43e8fe5167c4086999d1e6e1910f639f97f2095922"
+        },
+        {
+          "file": "test/prestate-inputs.test.js",
+          "bytes": 5255,
+          "sha256": "27ecfe0857591e6f273b8f4849587e006acc40ba24082031b370bae0e0a49f68"
+        },
+        {
+          "file": "test/recorded-state.test.js",
+          "bytes": 6528,
+          "sha256": "7ca5d199535d48cccaffa751e08c1e5cc9814be3149d94ad8ca2cd30639e6b98"
+        }
+      ],
+      "dependencies": [
+        {
+          "name": "@ethereumjs/common",
+          "version": "10.1.3",
+          "lockIntegrity": "sha512-ECWwbc4s8Ji7U0mkfZP6gIDy1FxXe0ZyVOTt0adkztPQRzX2DbH2ul7a83DSS8qYAiG6//vVXMkP60TyYOnv8Q=="
+        },
+        {
+          "name": "@ethereumjs/evm",
+          "version": "10.1.3",
+          "lockIntegrity": "sha512-7C6oo3f1rvtsFAQOURcmEkyUTBTePBbQUgWTfzrual8kbb0R8053rY+PolvFDETfVSK/TrPzZFhFe5sgz+Clgw=="
+        },
+        {
+          "name": "@ethereumjs/statemanager",
+          "version": "10.1.3",
+          "lockIntegrity": "sha512-d56NBae8xjh/ZY+orqvIfE30WLHOn2okacUekbM9J7VZrokjxQ2800sb6K6srffoSekcgbHxIWFJ3r+81jzrrA=="
+        },
+        {
+          "name": "@ethereumjs/util",
+          "version": "10.1.3",
+          "lockIntegrity": "sha512-PhezOVe4DFaC+QLIsnK/tiOaXjpjS2F9AH4Ez0EfWevFw9NWNSg95l7I0dWuHF0B7v9odm2Ijqwo0EnARXtUmA=="
+        }
+      ],
+      "lockSha256": "78b150d101a54b715a5d292a86566764723c9222e4379706ef681b46dbee4feb",
+      "node": "v22.23.2",
+      "v8": "12.4.254.21-node.56",
+      "platform": "darwin",
+      "arch": "arm64"
+    },
+    "executionOrder": "prestate_only_conversion_then_local_execution_then_provider_output_comparison",
+    "expectedOutputsUsedToConstructInputs": false
+  },
+  "cases": [
+    {
+      "provider": "drpc",
+      "inputRecordIds": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "inputPacketSha256": "0c0dd7f280550132e7262e7d9c0ac7b1ad16519e54dd84260837e70bbc314f18",
+      "normalizedInputsSha256": "1024335681ab898dae87f25ed25f2138a3fe4877a5421b8f79c139c9358a3236",
+      "comparisonRecordIds": [
+        7,
+        8
+      ],
+      "profile": {
+        "name": "captured_unsigned_zero_value_unpriced_call",
+        "sourceBlockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+        "actualBlockBaseFee": "100000000",
+        "executionBaseFee": "0",
+        "sourceGasLimit": "5000000",
+        "intrinsicGas": "21940",
+        "messageGasLimit": "4978060",
+        "intrinsicRule": "Cancun_call_21000_plus_4_per_zero_and_16_per_nonzero_calldata_byte_no_access_list",
+        "stateProof": "not_verified",
+        "sourceBinding": "requires_external_packet_verification",
+        "expectedOutputsUsed": false
+      },
+      "unresolvedAccounts": [],
+      "localExecution": {
+        "execution": {
+          "status": "success",
+          "executionGasUsed": "29328",
+          "gasRefundCounter": "0",
+          "returnData": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "error": null
+        },
+        "trace": {
+          "type": "CALL",
+          "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "executionAddress": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "caller": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "value": "0x0",
+          "input": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+          "gas": "0x4bf58c",
+          "gasUsed": "0x7290",
+          "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "error": null,
+          "depth": 0,
+          "calls": [
+            {
+              "type": "DELEGATECALL",
+              "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+              "executionAddress": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "caller": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+              "value": "0x0",
+              "input": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+              "gas": "0x4aaa49",
+              "gasUsed": "0x568a",
+              "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+              "error": null,
+              "depth": 1,
+              "calls": []
+            }
+          ]
+        },
+        "logs": [
+          {
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "topics": [
+              "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "0x000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+              "0x0000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4"
+            ],
+            "data": "0x0000000000000000000000000000000000000000000000000000000000137c8b"
+          }
+        ],
+        "environment": {
+          "chainId": 999,
+          "hardfork": "cancun",
+          "number": "49322024",
+          "timestamp": "1792770139",
+          "gasLimit": "3000000",
+          "baseFeePerGas": "0",
+          "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "miner": "0x0000000000000000000000000000000000000000",
+          "sourceBlockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+          "sourceParentHash": "0x5461b1dddba63e3e989aea7f99036458f6ab4ebb4d478d0528cbd9e7372138c9",
+          "sourceBlockIdentityVerified": false
+        },
+        "semantics": {
+          "kind": "unsigned_message",
+          "signatureVerification": false,
+          "transactionNonceValidation": false,
+          "callerNonce": "runCall_increments_once_including_EVM_revert",
+          "gasBudget": "message_execution_only_intrinsic_transaction_gas_not_subtracted",
+          "gasUsed": "execution_gas_before_transaction_refund_and_intrinsic_gas",
+          "gasPrice": "0",
+          "feeSettlement": false,
+          "warmAddresses": "sender_destination_coinbase_and_Ethereum_precompiles_1_to_10_no_access_list",
+          "logs": "committed_root_result_only_no_duplicated_descendant_log_arrays",
+          "callTree": "entered_messages_only",
+          "chainScope": "Ethereum_Cancun_rules_with_chainId999_not_full_HyperEVM_equivalence",
+          "lifecycle": "CREATE_CREATE2_SELFDESTRUCT_unsupported",
+          "deadline": "cooperative_until_final_atomic_commit_no_forceful_IO_cancellation"
+        },
+        "limits": {
+          "gas": 5000000,
+          "steps": 1000000,
+          "frames": 1000,
+          "depth": 32,
+          "logs": 2000,
+          "memoryBytes": 1048576,
+          "returnBytes": 1048576,
+          "calldataBytes": 32768,
+          "traceBytes": 8388608,
+          "wallMs": 10000
+        },
+        "usage": {
+          "steps": 705,
+          "frames": 2,
+          "maxDepth": 1,
+          "logOpcodes": 1,
+          "retainedTraceBytes": 1598
+        },
+        "stateDisposition": "message_result_retained_in_supplied_manager"
+      },
+      "localChanges": {
+        "scope": "Recorded accounts and slots only; no state-root or complete-effect proof.",
+        "accounts": [
+          {
+            "address": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+            "nonce": {
+              "before": "0x2ea48",
+              "after": "0x2ea49"
+            }
+          },
+          {
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "storage": [
+              {
+                "slot": "0x34533890b4047199c7d745ef14bc148d7f9fe4a9869d12e011fff443939396a7",
+                "before": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffdb9c89be81",
+                "after": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffdb9c7641f6"
+              },
+              {
+                "slot": "0x663c584fe36b00aeb0457457a41909f70d1fcda4a308105e08419edba94822fa",
+                "before": "0x0000000000000000000000000000000000000000000000000000043a17fc920c",
+                "after": "0x0000000000000000000000000000000000000000000000000000043a18100e97"
+              },
+              {
+                "slot": "0xee70c2565bc8797219017bb1565e8286ae21dcc52a7bc69cd0f003e7c3a53665",
+                "before": "0x00000000000000000000000000000000000000000000000000000000001785a6",
+                "after": "0x000000000000000000000000000000000000000000000000000000000004091b"
+              }
+            ]
+          }
+        ]
+      },
+      "localReads": {
+        "total": 32,
+        "distinct": 10,
+        "reads": [
+          {
+            "kind": "account",
+            "address": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4"
+          },
+          {
+            "kind": "account",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f"
+          },
+          {
+            "kind": "code",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f"
+          },
+          {
+            "kind": "storage",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "slot": "0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b"
+          },
+          {
+            "kind": "storage",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "slot": "0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3"
+          },
+          {
+            "kind": "code",
+            "address": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8"
+          },
+          {
+            "kind": "storage",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "slot": "0x0000000000000000000000000000000000000000000000000000000000000001"
+          },
+          {
+            "kind": "storage",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "slot": "0x663c584fe36b00aeb0457457a41909f70d1fcda4a308105e08419edba94822fa"
+          },
+          {
+            "kind": "storage",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "slot": "0xee70c2565bc8797219017bb1565e8286ae21dcc52a7bc69cd0f003e7c3a53665"
+          },
+          {
+            "kind": "storage",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "slot": "0x34533890b4047199c7d745ef14bc148d7f9fe4a9869d12e011fff443939396a7"
+          }
+        ]
+      },
+      "comparison": {
+        "status": "matched",
+        "scope": {
+          "kind": "one_recorded_unsigned_call",
+          "state": "captured_accounts_and_slots_only",
+          "gas": "Cancun_intrinsic_input_rule_root_only_zero_refund",
+          "calls": "full_entered_message_tree",
+          "logs": "ordered_committed_logs_using_distinct_provider_indices_and_available_positions",
+          "providerNormalization": {
+            "omittedOutput": "empty_bytes_native_callTracer_omitempty",
+            "omittedValue": "zero_for_STATICCALL_only",
+            "input": "required",
+            "logIndexGaps": "permitted",
+            "logPosition": "validate_if_supplied"
+          },
+          "expectedOutputsUsedAsInputs": false,
+          "independentStateProof": false
+        },
+        "execution": {
+          "status": "matched",
+          "intrinsicGas": "21940"
+        },
+        "callTree": {
+          "status": "matched",
+          "providerFrames": 2,
+          "localFrames": 2
+        },
+        "logs": {
+          "status": "matched",
+          "providerCount": 1,
+          "localCount": 1
+        },
+        "state": {
+          "status": "matched",
+          "baselineDifferences": [],
+          "providerChangedAccounts": 2,
+          "localChangedAccounts": 2,
+          "normalization": {
+            "omittedPostBasicField": "unchanged",
+            "preOnlyStorage": "cleared_to_zero_with_explicit_pre_and_input",
+            "postOnlyStorage": "requires_explicit_zero_input",
+            "accountCreationDeletion": "unsupported",
+            "codeChanges": "unsupported"
+          }
+        }
+      }
+    },
+    {
+      "provider": "hyperlend-archive",
+      "inputRecordIds": [
+        3,
+        4,
+        5,
+        6
+      ],
+      "inputPacketSha256": "0c0dd7f280550132e7262e7d9c0ac7b1ad16519e54dd84260837e70bbc314f18",
+      "normalizedInputsSha256": "1024335681ab898dae87f25ed25f2138a3fe4877a5421b8f79c139c9358a3236",
+      "comparisonRecordIds": [
+        7,
+        8
+      ],
+      "profile": {
+        "name": "captured_unsigned_zero_value_unpriced_call",
+        "sourceBlockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+        "actualBlockBaseFee": "100000000",
+        "executionBaseFee": "0",
+        "sourceGasLimit": "5000000",
+        "intrinsicGas": "21940",
+        "messageGasLimit": "4978060",
+        "intrinsicRule": "Cancun_call_21000_plus_4_per_zero_and_16_per_nonzero_calldata_byte_no_access_list",
+        "stateProof": "not_verified",
+        "sourceBinding": "requires_external_packet_verification",
+        "expectedOutputsUsed": false
+      },
+      "unresolvedAccounts": [],
+      "localExecution": {
+        "execution": {
+          "status": "success",
+          "executionGasUsed": "29328",
+          "gasRefundCounter": "0",
+          "returnData": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "error": null
+        },
+        "trace": {
+          "type": "CALL",
+          "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "executionAddress": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "caller": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "value": "0x0",
+          "input": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+          "gas": "0x4bf58c",
+          "gasUsed": "0x7290",
+          "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "error": null,
+          "depth": 0,
+          "calls": [
+            {
+              "type": "DELEGATECALL",
+              "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+              "executionAddress": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "caller": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+              "value": "0x0",
+              "input": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+              "gas": "0x4aaa49",
+              "gasUsed": "0x568a",
+              "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+              "error": null,
+              "depth": 1,
+              "calls": []
+            }
+          ]
+        },
+        "logs": [
+          {
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "topics": [
+              "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "0x000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+              "0x0000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4"
+            ],
+            "data": "0x0000000000000000000000000000000000000000000000000000000000137c8b"
+          }
+        ],
+        "environment": {
+          "chainId": 999,
+          "hardfork": "cancun",
+          "number": "49322024",
+          "timestamp": "1792770139",
+          "gasLimit": "3000000",
+          "baseFeePerGas": "0",
+          "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "miner": "0x0000000000000000000000000000000000000000",
+          "sourceBlockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+          "sourceParentHash": "0x5461b1dddba63e3e989aea7f99036458f6ab4ebb4d478d0528cbd9e7372138c9",
+          "sourceBlockIdentityVerified": false
+        },
+        "semantics": {
+          "kind": "unsigned_message",
+          "signatureVerification": false,
+          "transactionNonceValidation": false,
+          "callerNonce": "runCall_increments_once_including_EVM_revert",
+          "gasBudget": "message_execution_only_intrinsic_transaction_gas_not_subtracted",
+          "gasUsed": "execution_gas_before_transaction_refund_and_intrinsic_gas",
+          "gasPrice": "0",
+          "feeSettlement": false,
+          "warmAddresses": "sender_destination_coinbase_and_Ethereum_precompiles_1_to_10_no_access_list",
+          "logs": "committed_root_result_only_no_duplicated_descendant_log_arrays",
+          "callTree": "entered_messages_only",
+          "chainScope": "Ethereum_Cancun_rules_with_chainId999_not_full_HyperEVM_equivalence",
+          "lifecycle": "CREATE_CREATE2_SELFDESTRUCT_unsupported",
+          "deadline": "cooperative_until_final_atomic_commit_no_forceful_IO_cancellation"
+        },
+        "limits": {
+          "gas": 5000000,
+          "steps": 1000000,
+          "frames": 1000,
+          "depth": 32,
+          "logs": 2000,
+          "memoryBytes": 1048576,
+          "returnBytes": 1048576,
+          "calldataBytes": 32768,
+          "traceBytes": 8388608,
+          "wallMs": 10000
+        },
+        "usage": {
+          "steps": 705,
+          "frames": 2,
+          "maxDepth": 1,
+          "logOpcodes": 1,
+          "retainedTraceBytes": 1598
+        },
+        "stateDisposition": "message_result_retained_in_supplied_manager"
+      },
+      "localChanges": {
+        "scope": "Recorded accounts and slots only; no state-root or complete-effect proof.",
+        "accounts": [
+          {
+            "address": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+            "nonce": {
+              "before": "0x2ea48",
+              "after": "0x2ea49"
+            }
+          },
+          {
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "storage": [
+              {
+                "slot": "0x34533890b4047199c7d745ef14bc148d7f9fe4a9869d12e011fff443939396a7",
+                "before": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffdb9c89be81",
+                "after": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffdb9c7641f6"
+              },
+              {
+                "slot": "0x663c584fe36b00aeb0457457a41909f70d1fcda4a308105e08419edba94822fa",
+                "before": "0x0000000000000000000000000000000000000000000000000000043a17fc920c",
+                "after": "0x0000000000000000000000000000000000000000000000000000043a18100e97"
+              },
+              {
+                "slot": "0xee70c2565bc8797219017bb1565e8286ae21dcc52a7bc69cd0f003e7c3a53665",
+                "before": "0x00000000000000000000000000000000000000000000000000000000001785a6",
+                "after": "0x000000000000000000000000000000000000000000000000000000000004091b"
+              }
+            ]
+          }
+        ]
+      },
+      "localReads": {
+        "total": 32,
+        "distinct": 10,
+        "reads": [
+          {
+            "kind": "account",
+            "address": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4"
+          },
+          {
+            "kind": "account",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f"
+          },
+          {
+            "kind": "code",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f"
+          },
+          {
+            "kind": "storage",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "slot": "0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b"
+          },
+          {
+            "kind": "storage",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "slot": "0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3"
+          },
+          {
+            "kind": "code",
+            "address": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8"
+          },
+          {
+            "kind": "storage",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "slot": "0x0000000000000000000000000000000000000000000000000000000000000001"
+          },
+          {
+            "kind": "storage",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "slot": "0x663c584fe36b00aeb0457457a41909f70d1fcda4a308105e08419edba94822fa"
+          },
+          {
+            "kind": "storage",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "slot": "0xee70c2565bc8797219017bb1565e8286ae21dcc52a7bc69cd0f003e7c3a53665"
+          },
+          {
+            "kind": "storage",
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "slot": "0x34533890b4047199c7d745ef14bc148d7f9fe4a9869d12e011fff443939396a7"
+          }
+        ]
+      },
+      "comparison": {
+        "status": "matched",
+        "scope": {
+          "kind": "one_recorded_unsigned_call",
+          "state": "captured_accounts_and_slots_only",
+          "gas": "Cancun_intrinsic_input_rule_root_only_zero_refund",
+          "calls": "full_entered_message_tree",
+          "logs": "ordered_committed_logs_using_distinct_provider_indices_and_available_positions",
+          "providerNormalization": {
+            "omittedOutput": "empty_bytes_native_callTracer_omitempty",
+            "omittedValue": "zero_for_STATICCALL_only",
+            "input": "required",
+            "logIndexGaps": "permitted",
+            "logPosition": "validate_if_supplied"
+          },
+          "expectedOutputsUsedAsInputs": false,
+          "independentStateProof": false
+        },
+        "execution": {
+          "status": "matched",
+          "intrinsicGas": "21940"
+        },
+        "callTree": {
+          "status": "matched",
+          "providerFrames": 2,
+          "localFrames": 2
+        },
+        "logs": {
+          "status": "matched",
+          "providerCount": 1,
+          "localCount": 1
+        },
+        "state": {
+          "status": "matched",
+          "baselineDifferences": [],
+          "providerChangedAccounts": 2,
+          "localChangedAccounts": 2,
+          "normalization": {
+            "omittedPostBasicField": "unchanged",
+            "preOnlyStorage": "cleared_to_zero_with_explicit_pre_and_input",
+            "postOnlyStorage": "requires_explicit_zero_input",
+            "accountCreationDeletion": "unsupported",
+            "codeChanges": "unsupported"
+          }
+        }
+      }
+    }
+  ],
+  "controls": [
+    {
+      "id": "missing_required_slot",
+      "kind": "synthetic_input_mutation_control",
+      "description": "Remove one originally captured touched proxy slot.",
+      "result": {
+        "provider": "drpc",
+        "inputRecordIds": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "inputPacketSha256": "0c0dd7f280550132e7262e7d9c0ac7b1ad16519e54dd84260837e70bbc314f18",
+        "normalizedInputsSha256": "b9de4f45181a722524373d35cdc506bb51b20fe0b4ea4785d4d3857cd0a2095a",
+        "comparisonRecordIds": [
+          7,
+          8
+        ],
+        "profile": {
+          "name": "captured_unsigned_zero_value_unpriced_call",
+          "sourceBlockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+          "actualBlockBaseFee": "100000000",
+          "executionBaseFee": "0",
+          "sourceGasLimit": "5000000",
+          "intrinsicGas": "21940",
+          "messageGasLimit": "4978060",
+          "intrinsicRule": "Cancun_call_21000_plus_4_per_zero_and_16_per_nonzero_calldata_byte_no_access_list",
+          "stateProof": "not_verified",
+          "sourceBinding": "requires_external_packet_verification",
+          "expectedOutputsUsed": false
+        },
+        "unresolvedAccounts": [],
+        "localExecution": {
+          "execution": {
+            "status": "unavailable",
+            "error": {
+              "code": "LOCAL_STATE_MISSING",
+              "message": "Required local input state was not supplied."
+            },
+            "executionGasUsed": null,
+            "returnData": null
+          },
+          "trace": {
+            "type": "CALL",
+            "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+            "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "executionAddress": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "caller": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+            "value": "0x0",
+            "input": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+            "gas": "0x4bf58c",
+            "gasUsed": null,
+            "output": null,
+            "error": null,
+            "depth": 0,
+            "calls": [
+              {
+                "type": "DELEGATECALL",
+                "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                "executionAddress": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                "caller": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+                "value": "0x0",
+                "input": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+                "gas": "0x4aaa49",
+                "gasUsed": null,
+                "output": null,
+                "error": null,
+                "depth": 1,
+                "calls": [],
+                "incomplete": true
+              }
+            ],
+            "incomplete": true
+          },
+          "logs": [],
+          "environment": {
+            "chainId": 999,
+            "hardfork": "cancun",
+            "number": "49322024",
+            "timestamp": "1792770139",
+            "gasLimit": "3000000",
+            "baseFeePerGas": "0",
+            "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "miner": "0x0000000000000000000000000000000000000000",
+            "sourceBlockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+            "sourceParentHash": "0x5461b1dddba63e3e989aea7f99036458f6ab4ebb4d478d0528cbd9e7372138c9",
+            "sourceBlockIdentityVerified": false
+          },
+          "semantics": {
+            "kind": "unsigned_message",
+            "signatureVerification": false,
+            "transactionNonceValidation": false,
+            "callerNonce": "runCall_increments_once_including_EVM_revert",
+            "gasBudget": "message_execution_only_intrinsic_transaction_gas_not_subtracted",
+            "gasUsed": "execution_gas_before_transaction_refund_and_intrinsic_gas",
+            "gasPrice": "0",
+            "feeSettlement": false,
+            "warmAddresses": "sender_destination_coinbase_and_Ethereum_precompiles_1_to_10_no_access_list",
+            "logs": "committed_root_result_only_no_duplicated_descendant_log_arrays",
+            "callTree": "entered_messages_only",
+            "chainScope": "Ethereum_Cancun_rules_with_chainId999_not_full_HyperEVM_equivalence",
+            "lifecycle": "CREATE_CREATE2_SELFDESTRUCT_unsupported",
+            "deadline": "cooperative_until_final_atomic_commit_no_forceful_IO_cancellation"
+          },
+          "limits": {
+            "gas": 5000000,
+            "steps": 1000000,
+            "frames": 1000,
+            "depth": 32,
+            "logs": 2000,
+            "memoryBytes": 1048576,
+            "returnBytes": 1048576,
+            "calldataBytes": 32768,
+            "traceBytes": 8388608,
+            "wallMs": 10000
+          },
+          "usage": {
+            "steps": 176,
+            "frames": 2,
+            "maxDepth": 1,
+            "logOpcodes": 0,
+            "retainedTraceBytes": 1424
+          },
+          "stateDisposition": "rolled_back"
+        },
+        "localChanges": {
+          "scope": "Recorded accounts and slots only; no state-root or complete-effect proof.",
+          "accounts": []
+        },
+        "localReads": {
+          "total": 12,
+          "distinct": 7,
+          "reads": [
+            {
+              "kind": "account",
+              "address": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4"
+            },
+            {
+              "kind": "account",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f"
+            },
+            {
+              "kind": "code",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f"
+            },
+            {
+              "kind": "storage",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "slot": "0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b"
+            },
+            {
+              "kind": "storage",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "slot": "0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3"
+            },
+            {
+              "kind": "code",
+              "address": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8"
+            },
+            {
+              "kind": "storage",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "slot": "0x0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          ]
+        },
+        "comparison": {
+          "status": "unavailable",
+          "scope": {
+            "kind": "one_recorded_unsigned_call",
+            "state": "captured_accounts_and_slots_only",
+            "gas": "Cancun_intrinsic_input_rule_root_only_zero_refund",
+            "calls": "full_entered_message_tree",
+            "logs": "ordered_committed_logs_using_distinct_provider_indices_and_available_positions",
+            "providerNormalization": {
+              "omittedOutput": "empty_bytes_native_callTracer_omitempty",
+              "omittedValue": "zero_for_STATICCALL_only",
+              "input": "required",
+              "logIndexGaps": "permitted",
+              "logPosition": "validate_if_supplied"
+            },
+            "expectedOutputsUsedAsInputs": false,
+            "independentStateProof": false
+          },
+          "reason": "Local execution did not complete; no output agreement is inferred.",
+          "execution": {
+            "status": "unavailable",
+            "reason": "Local execution unavailable."
+          },
+          "callTree": {
+            "status": "unavailable",
+            "reason": "Local execution unavailable."
+          },
+          "logs": {
+            "status": "unavailable",
+            "reason": "Local execution unavailable."
+          },
+          "state": {
+            "status": "unavailable",
+            "reason": "Local execution unavailable."
+          }
+        }
+      }
+    },
+    {
+      "id": "missing_implementation_account",
+      "kind": "synthetic_input_mutation_control",
+      "description": "Remove the complete implementation account, so an actual execution read is unknown.",
+      "result": {
+        "provider": "drpc",
+        "inputRecordIds": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "inputPacketSha256": "0c0dd7f280550132e7262e7d9c0ac7b1ad16519e54dd84260837e70bbc314f18",
+        "normalizedInputsSha256": "d8264946fc420a19db3f995161bf0ff074788bca9d1018e69abc259550b83aec",
+        "comparisonRecordIds": [
+          7,
+          8
+        ],
+        "profile": {
+          "name": "captured_unsigned_zero_value_unpriced_call",
+          "sourceBlockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+          "actualBlockBaseFee": "100000000",
+          "executionBaseFee": "0",
+          "sourceGasLimit": "5000000",
+          "intrinsicGas": "21940",
+          "messageGasLimit": "4978060",
+          "intrinsicRule": "Cancun_call_21000_plus_4_per_zero_and_16_per_nonzero_calldata_byte_no_access_list",
+          "stateProof": "not_verified",
+          "sourceBinding": "requires_external_packet_verification",
+          "expectedOutputsUsed": false
+        },
+        "unresolvedAccounts": [],
+        "localExecution": {
+          "execution": {
+            "status": "unavailable",
+            "error": {
+              "code": "LOCAL_STATE_MISSING",
+              "message": "Required local input state was not supplied."
+            },
+            "executionGasUsed": null,
+            "returnData": null
+          },
+          "trace": {
+            "type": "CALL",
+            "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+            "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "executionAddress": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "caller": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+            "value": "0x0",
+            "input": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+            "gas": "0x4bf58c",
+            "gasUsed": null,
+            "output": null,
+            "error": null,
+            "depth": 0,
+            "calls": [
+              {
+                "type": "DELEGATECALL",
+                "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                "executionAddress": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                "caller": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+                "value": "0x0",
+                "input": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+                "gas": "0x4aaa49",
+                "gasUsed": null,
+                "output": null,
+                "error": null,
+                "depth": 1,
+                "calls": [],
+                "incomplete": true
+              }
+            ],
+            "incomplete": true
+          },
+          "logs": [],
+          "environment": {
+            "chainId": 999,
+            "hardfork": "cancun",
+            "number": "49322024",
+            "timestamp": "1792770139",
+            "gasLimit": "3000000",
+            "baseFeePerGas": "0",
+            "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "miner": "0x0000000000000000000000000000000000000000",
+            "sourceBlockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+            "sourceParentHash": "0x5461b1dddba63e3e989aea7f99036458f6ab4ebb4d478d0528cbd9e7372138c9",
+            "sourceBlockIdentityVerified": false
+          },
+          "semantics": {
+            "kind": "unsigned_message",
+            "signatureVerification": false,
+            "transactionNonceValidation": false,
+            "callerNonce": "runCall_increments_once_including_EVM_revert",
+            "gasBudget": "message_execution_only_intrinsic_transaction_gas_not_subtracted",
+            "gasUsed": "execution_gas_before_transaction_refund_and_intrinsic_gas",
+            "gasPrice": "0",
+            "feeSettlement": false,
+            "warmAddresses": "sender_destination_coinbase_and_Ethereum_precompiles_1_to_10_no_access_list",
+            "logs": "committed_root_result_only_no_duplicated_descendant_log_arrays",
+            "callTree": "entered_messages_only",
+            "chainScope": "Ethereum_Cancun_rules_with_chainId999_not_full_HyperEVM_equivalence",
+            "lifecycle": "CREATE_CREATE2_SELFDESTRUCT_unsupported",
+            "deadline": "cooperative_until_final_atomic_commit_no_forceful_IO_cancellation"
+          },
+          "limits": {
+            "gas": 5000000,
+            "steps": 1000000,
+            "frames": 1000,
+            "depth": 32,
+            "logs": 2000,
+            "memoryBytes": 1048576,
+            "returnBytes": 1048576,
+            "calldataBytes": 32768,
+            "traceBytes": 8388608,
+            "wallMs": 10000
+          },
+          "usage": {
+            "steps": 88,
+            "frames": 2,
+            "maxDepth": 1,
+            "logOpcodes": 0,
+            "retainedTraceBytes": 1424
+          },
+          "stateDisposition": "rolled_back"
+        },
+        "localChanges": {
+          "scope": "Recorded accounts and slots only; no state-root or complete-effect proof.",
+          "accounts": []
+        },
+        "localReads": {
+          "total": 9,
+          "distinct": 5,
+          "reads": [
+            {
+              "kind": "account",
+              "address": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4"
+            },
+            {
+              "kind": "account",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f"
+            },
+            {
+              "kind": "code",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f"
+            },
+            {
+              "kind": "storage",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "slot": "0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b"
+            },
+            {
+              "kind": "storage",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "slot": "0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3"
+            }
+          ]
+        },
+        "comparison": {
+          "status": "unavailable",
+          "scope": {
+            "kind": "one_recorded_unsigned_call",
+            "state": "captured_accounts_and_slots_only",
+            "gas": "Cancun_intrinsic_input_rule_root_only_zero_refund",
+            "calls": "full_entered_message_tree",
+            "logs": "ordered_committed_logs_using_distinct_provider_indices_and_available_positions",
+            "providerNormalization": {
+              "omittedOutput": "empty_bytes_native_callTracer_omitempty",
+              "omittedValue": "zero_for_STATICCALL_only",
+              "input": "required",
+              "logIndexGaps": "permitted",
+              "logPosition": "validate_if_supplied"
+            },
+            "expectedOutputsUsedAsInputs": false,
+            "independentStateProof": false
+          },
+          "reason": "Local execution did not complete; no output agreement is inferred.",
+          "execution": {
+            "status": "unavailable",
+            "reason": "Local execution unavailable."
+          },
+          "callTree": {
+            "status": "unavailable",
+            "reason": "Local execution unavailable."
+          },
+          "logs": {
+            "status": "unavailable",
+            "reason": "Local execution unavailable."
+          },
+          "state": {
+            "status": "unavailable",
+            "reason": "Local execution unavailable."
+          }
+        }
+      }
+    },
+    {
+      "id": "explicit_empty_implementation_code",
+      "kind": "synthetic_input_mutation_control",
+      "description": "Replace explicit implementation bytes with empty code as deliberately changed input state, not missing data.",
+      "result": {
+        "provider": "drpc",
+        "inputRecordIds": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "inputPacketSha256": "0c0dd7f280550132e7262e7d9c0ac7b1ad16519e54dd84260837e70bbc314f18",
+        "normalizedInputsSha256": "cbb4709f51837028e83327812eb69a83cd9a1a27d04f96dfce296e3fdb4e4701",
+        "comparisonRecordIds": [
+          7,
+          8
+        ],
+        "profile": {
+          "name": "captured_unsigned_zero_value_unpriced_call",
+          "sourceBlockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+          "actualBlockBaseFee": "100000000",
+          "executionBaseFee": "0",
+          "sourceGasLimit": "5000000",
+          "intrinsicGas": "21940",
+          "messageGasLimit": "4978060",
+          "intrinsicRule": "Cancun_call_21000_plus_4_per_zero_and_16_per_nonzero_calldata_byte_no_access_list",
+          "stateProof": "not_verified",
+          "sourceBinding": "requires_external_packet_verification",
+          "expectedOutputsUsed": false
+        },
+        "unresolvedAccounts": [],
+        "localExecution": {
+          "execution": {
+            "status": "success",
+            "executionGasUsed": "7171",
+            "gasRefundCounter": "0",
+            "returnData": "0x",
+            "error": null
+          },
+          "trace": {
+            "type": "CALL",
+            "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+            "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "executionAddress": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "caller": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+            "value": "0x0",
+            "input": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+            "gas": "0x4bf58c",
+            "gasUsed": "0x1c03",
+            "output": "0x",
+            "error": null,
+            "depth": 0,
+            "calls": [
+              {
+                "type": "DELEGATECALL",
+                "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                "executionAddress": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                "caller": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+                "value": "0x0",
+                "input": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+                "gas": "0x4aaa49",
+                "gasUsed": "0x0",
+                "output": "0x",
+                "error": null,
+                "depth": 1,
+                "calls": []
+              }
+            ]
+          },
+          "logs": [],
+          "environment": {
+            "chainId": 999,
+            "hardfork": "cancun",
+            "number": "49322024",
+            "timestamp": "1792770139",
+            "gasLimit": "3000000",
+            "baseFeePerGas": "0",
+            "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "miner": "0x0000000000000000000000000000000000000000",
+            "sourceBlockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+            "sourceParentHash": "0x5461b1dddba63e3e989aea7f99036458f6ab4ebb4d478d0528cbd9e7372138c9",
+            "sourceBlockIdentityVerified": false
+          },
+          "semantics": {
+            "kind": "unsigned_message",
+            "signatureVerification": false,
+            "transactionNonceValidation": false,
+            "callerNonce": "runCall_increments_once_including_EVM_revert",
+            "gasBudget": "message_execution_only_intrinsic_transaction_gas_not_subtracted",
+            "gasUsed": "execution_gas_before_transaction_refund_and_intrinsic_gas",
+            "gasPrice": "0",
+            "feeSettlement": false,
+            "warmAddresses": "sender_destination_coinbase_and_Ethereum_precompiles_1_to_10_no_access_list",
+            "logs": "committed_root_result_only_no_duplicated_descendant_log_arrays",
+            "callTree": "entered_messages_only",
+            "chainScope": "Ethereum_Cancun_rules_with_chainId999_not_full_HyperEVM_equivalence",
+            "lifecycle": "CREATE_CREATE2_SELFDESTRUCT_unsupported",
+            "deadline": "cooperative_until_final_atomic_commit_no_forceful_IO_cancellation"
+          },
+          "limits": {
+            "gas": 5000000,
+            "steps": 1000000,
+            "frames": 1000,
+            "depth": 32,
+            "logs": 2000,
+            "memoryBytes": 1048576,
+            "returnBytes": 1048576,
+            "calldataBytes": 32768,
+            "traceBytes": 8388608,
+            "wallMs": 10000
+          },
+          "usage": {
+            "steps": 100,
+            "frames": 2,
+            "maxDepth": 1,
+            "logOpcodes": 0,
+            "retainedTraceBytes": 1117
+          },
+          "stateDisposition": "message_result_retained_in_supplied_manager"
+        },
+        "localChanges": {
+          "scope": "Recorded accounts and slots only; no state-root or complete-effect proof.",
+          "accounts": [
+            {
+              "address": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+              "nonce": {
+                "before": "0x2ea48",
+                "after": "0x2ea49"
+              }
+            }
+          ]
+        },
+        "localReads": {
+          "total": 11,
+          "distinct": 6,
+          "reads": [
+            {
+              "kind": "account",
+              "address": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4"
+            },
+            {
+              "kind": "account",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f"
+            },
+            {
+              "kind": "code",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f"
+            },
+            {
+              "kind": "storage",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "slot": "0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b"
+            },
+            {
+              "kind": "storage",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "slot": "0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3"
+            },
+            {
+              "kind": "code",
+              "address": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8"
+            }
+          ]
+        },
+        "comparison": {
+          "status": "diverged",
+          "scope": {
+            "kind": "one_recorded_unsigned_call",
+            "state": "captured_accounts_and_slots_only",
+            "gas": "Cancun_intrinsic_input_rule_root_only_zero_refund",
+            "calls": "full_entered_message_tree",
+            "logs": "ordered_committed_logs_using_distinct_provider_indices_and_available_positions",
+            "providerNormalization": {
+              "omittedOutput": "empty_bytes_native_callTracer_omitempty",
+              "omittedValue": "zero_for_STATICCALL_only",
+              "input": "required",
+              "logIndexGaps": "permitted",
+              "logPosition": "validate_if_supplied"
+            },
+            "expectedOutputsUsedAsInputs": false,
+            "independentStateProof": false
+          },
+          "execution": {
+            "status": "diverged",
+            "expected": {
+              "status": "success",
+              "error": null,
+              "returnData": "0x0000000000000000000000000000000000000000000000000000000000000001",
+              "executionGasUsed": "29328"
+            },
+            "actual": {
+              "status": "success",
+              "error": null,
+              "returnData": "0x",
+              "executionGasUsed": "7171"
+            },
+            "intrinsicGas": "21940"
+          },
+          "callTree": {
+            "status": "diverged",
+            "expected": {
+              "type": "CALL",
+              "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+              "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "input": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+              "value": "0",
+              "gas": "4978060",
+              "gasUsed": "29328",
+              "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+              "error": null,
+              "calls": [
+                {
+                  "type": "DELEGATECALL",
+                  "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                  "input": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+                  "value": "0",
+                  "gas": "4893257",
+                  "gasUsed": "22154",
+                  "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                  "error": null,
+                  "calls": []
+                }
+              ]
+            },
+            "actual": {
+              "type": "CALL",
+              "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+              "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "input": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+              "value": "0",
+              "gas": "4978060",
+              "gasUsed": "7171",
+              "output": "0x",
+              "error": null,
+              "calls": [
+                {
+                  "type": "DELEGATECALL",
+                  "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                  "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                  "input": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+                  "value": "0",
+                  "gas": "4893257",
+                  "gasUsed": "0",
+                  "output": "0x",
+                  "error": null,
+                  "calls": []
+                }
+              ]
+            },
+            "providerFrames": 2,
+            "localFrames": 2
+          },
+          "logs": {
+            "status": "diverged",
+            "expected": [
+              {
+                "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                "topics": [
+                  "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                  "0x000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+                  "0x0000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4"
+                ],
+                "data": "0x0000000000000000000000000000000000000000000000000000000000137c8b"
+              }
+            ],
+            "actual": [],
+            "providerCount": 1,
+            "localCount": 0
+          },
+          "state": {
+            "status": "diverged",
+            "expected": {
+              "0x2908da1b63c4f7ce001bf5d875d179930a79eed4": {
+                "nonce": {
+                  "before": "191048",
+                  "after": "191049"
+                }
+              },
+              "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+                "storage": {
+                  "0x34533890b4047199c7d745ef14bc148d7f9fe4a9869d12e011fff443939396a7": {
+                    "before": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffdb9c89be81",
+                    "after": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffdb9c7641f6"
+                  },
+                  "0x663c584fe36b00aeb0457457a41909f70d1fcda4a308105e08419edba94822fa": {
+                    "before": "0x0000000000000000000000000000000000000000000000000000043a17fc920c",
+                    "after": "0x0000000000000000000000000000000000000000000000000000043a18100e97"
+                  },
+                  "0xee70c2565bc8797219017bb1565e8286ae21dcc52a7bc69cd0f003e7c3a53665": {
+                    "before": "0x00000000000000000000000000000000000000000000000000000000001785a6",
+                    "after": "0x000000000000000000000000000000000000000000000000000000000004091b"
+                  }
+                }
+              }
+            },
+            "actual": {
+              "0x2908da1b63c4f7ce001bf5d875d179930a79eed4": {
+                "nonce": {
+                  "before": "191048",
+                  "after": "191049"
+                }
+              }
+            },
+            "baselineDifferences": [],
+            "providerChangedAccounts": 2,
+            "localChangedAccounts": 1,
+            "normalization": {
+              "omittedPostBasicField": "unchanged",
+              "preOnlyStorage": "cleared_to_zero_with_explicit_pre_and_input",
+              "postOnlyStorage": "requires_explicit_zero_input",
+              "accountCreationDeletion": "unsupported",
+              "codeChanges": "unsupported"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "explicit_changed_owner_balance_slot",
+      "kind": "synthetic_input_mutation_control",
+      "description": "Increase the captured1541542 raw-unit owner balance slot by one; keep the changed input, without output-based repair.",
+      "result": {
+        "provider": "drpc",
+        "inputRecordIds": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "inputPacketSha256": "0c0dd7f280550132e7262e7d9c0ac7b1ad16519e54dd84260837e70bbc314f18",
+        "normalizedInputsSha256": "926e8c4f0c5cbb8329cebf555c7024d09196436a278d5762eee45bbcc864d367",
+        "comparisonRecordIds": [
+          7,
+          8
+        ],
+        "profile": {
+          "name": "captured_unsigned_zero_value_unpriced_call",
+          "sourceBlockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+          "actualBlockBaseFee": "100000000",
+          "executionBaseFee": "0",
+          "sourceGasLimit": "5000000",
+          "intrinsicGas": "21940",
+          "messageGasLimit": "4978060",
+          "intrinsicRule": "Cancun_call_21000_plus_4_per_zero_and_16_per_nonzero_calldata_byte_no_access_list",
+          "stateProof": "not_verified",
+          "sourceBinding": "requires_external_packet_verification",
+          "expectedOutputsUsed": false
+        },
+        "unresolvedAccounts": [],
+        "localExecution": {
+          "execution": {
+            "status": "success",
+            "executionGasUsed": "29328",
+            "gasRefundCounter": "0",
+            "returnData": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "error": null
+          },
+          "trace": {
+            "type": "CALL",
+            "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+            "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "executionAddress": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "caller": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+            "value": "0x0",
+            "input": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+            "gas": "0x4bf58c",
+            "gasUsed": "0x7290",
+            "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "error": null,
+            "depth": 0,
+            "calls": [
+              {
+                "type": "DELEGATECALL",
+                "from": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                "to": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8",
+                "executionAddress": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                "caller": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+                "value": "0x0",
+                "input": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+                "gas": "0x4aaa49",
+                "gasUsed": "0x568a",
+                "output": "0x0000000000000000000000000000000000000000000000000000000000000001",
+                "error": null,
+                "depth": 1,
+                "calls": []
+              }
+            ]
+          },
+          "logs": [
+            {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+                "0x0000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000000000000000137c8b"
+            }
+          ],
+          "environment": {
+            "chainId": 999,
+            "hardfork": "cancun",
+            "number": "49322024",
+            "timestamp": "1792770139",
+            "gasLimit": "3000000",
+            "baseFeePerGas": "0",
+            "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "miner": "0x0000000000000000000000000000000000000000",
+            "sourceBlockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+            "sourceParentHash": "0x5461b1dddba63e3e989aea7f99036458f6ab4ebb4d478d0528cbd9e7372138c9",
+            "sourceBlockIdentityVerified": false
+          },
+          "semantics": {
+            "kind": "unsigned_message",
+            "signatureVerification": false,
+            "transactionNonceValidation": false,
+            "callerNonce": "runCall_increments_once_including_EVM_revert",
+            "gasBudget": "message_execution_only_intrinsic_transaction_gas_not_subtracted",
+            "gasUsed": "execution_gas_before_transaction_refund_and_intrinsic_gas",
+            "gasPrice": "0",
+            "feeSettlement": false,
+            "warmAddresses": "sender_destination_coinbase_and_Ethereum_precompiles_1_to_10_no_access_list",
+            "logs": "committed_root_result_only_no_duplicated_descendant_log_arrays",
+            "callTree": "entered_messages_only",
+            "chainScope": "Ethereum_Cancun_rules_with_chainId999_not_full_HyperEVM_equivalence",
+            "lifecycle": "CREATE_CREATE2_SELFDESTRUCT_unsupported",
+            "deadline": "cooperative_until_final_atomic_commit_no_forceful_IO_cancellation"
+          },
+          "limits": {
+            "gas": 5000000,
+            "steps": 1000000,
+            "frames": 1000,
+            "depth": 32,
+            "logs": 2000,
+            "memoryBytes": 1048576,
+            "returnBytes": 1048576,
+            "calldataBytes": 32768,
+            "traceBytes": 8388608,
+            "wallMs": 10000
+          },
+          "usage": {
+            "steps": 705,
+            "frames": 2,
+            "maxDepth": 1,
+            "logOpcodes": 1,
+            "retainedTraceBytes": 1598
+          },
+          "stateDisposition": "message_result_retained_in_supplied_manager"
+        },
+        "localChanges": {
+          "scope": "Recorded accounts and slots only; no state-root or complete-effect proof.",
+          "accounts": [
+            {
+              "address": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+              "nonce": {
+                "before": "0x2ea48",
+                "after": "0x2ea49"
+              }
+            },
+            {
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "storage": [
+                {
+                  "slot": "0x34533890b4047199c7d745ef14bc148d7f9fe4a9869d12e011fff443939396a7",
+                  "before": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffdb9c89be81",
+                  "after": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffdb9c7641f6"
+                },
+                {
+                  "slot": "0x663c584fe36b00aeb0457457a41909f70d1fcda4a308105e08419edba94822fa",
+                  "before": "0x0000000000000000000000000000000000000000000000000000043a17fc920c",
+                  "after": "0x0000000000000000000000000000000000000000000000000000043a18100e97"
+                },
+                {
+                  "slot": "0xee70c2565bc8797219017bb1565e8286ae21dcc52a7bc69cd0f003e7c3a53665",
+                  "before": "0x00000000000000000000000000000000000000000000000000000000001785a7",
+                  "after": "0x000000000000000000000000000000000000000000000000000000000004091c"
+                }
+              ]
+            }
+          ]
+        },
+        "localReads": {
+          "total": 32,
+          "distinct": 10,
+          "reads": [
+            {
+              "kind": "account",
+              "address": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4"
+            },
+            {
+              "kind": "account",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f"
+            },
+            {
+              "kind": "code",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f"
+            },
+            {
+              "kind": "storage",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "slot": "0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b"
+            },
+            {
+              "kind": "storage",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "slot": "0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3"
+            },
+            {
+              "kind": "code",
+              "address": "0x003f73f58ca78880da3642c5cb71d7459b3fe4f8"
+            },
+            {
+              "kind": "storage",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "slot": "0x0000000000000000000000000000000000000000000000000000000000000001"
+            },
+            {
+              "kind": "storage",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "slot": "0x663c584fe36b00aeb0457457a41909f70d1fcda4a308105e08419edba94822fa"
+            },
+            {
+              "kind": "storage",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "slot": "0xee70c2565bc8797219017bb1565e8286ae21dcc52a7bc69cd0f003e7c3a53665"
+            },
+            {
+              "kind": "storage",
+              "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+              "slot": "0x34533890b4047199c7d745ef14bc148d7f9fe4a9869d12e011fff443939396a7"
+            }
+          ]
+        },
+        "comparison": {
+          "status": "diverged",
+          "scope": {
+            "kind": "one_recorded_unsigned_call",
+            "state": "captured_accounts_and_slots_only",
+            "gas": "Cancun_intrinsic_input_rule_root_only_zero_refund",
+            "calls": "full_entered_message_tree",
+            "logs": "ordered_committed_logs_using_distinct_provider_indices_and_available_positions",
+            "providerNormalization": {
+              "omittedOutput": "empty_bytes_native_callTracer_omitempty",
+              "omittedValue": "zero_for_STATICCALL_only",
+              "input": "required",
+              "logIndexGaps": "permitted",
+              "logPosition": "validate_if_supplied"
+            },
+            "expectedOutputsUsedAsInputs": false,
+            "independentStateProof": false
+          },
+          "execution": {
+            "status": "matched",
+            "intrinsicGas": "21940"
+          },
+          "callTree": {
+            "status": "matched",
+            "providerFrames": 2,
+            "localFrames": 2
+          },
+          "logs": {
+            "status": "matched",
+            "providerCount": 1,
+            "localCount": 1
+          },
+          "state": {
+            "status": "diverged",
+            "expected": {
+              "0x2908da1b63c4f7ce001bf5d875d179930a79eed4": {
+                "nonce": {
+                  "before": "191048",
+                  "after": "191049"
+                }
+              },
+              "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+                "storage": {
+                  "0x34533890b4047199c7d745ef14bc148d7f9fe4a9869d12e011fff443939396a7": {
+                    "before": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffdb9c89be81",
+                    "after": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffdb9c7641f6"
+                  },
+                  "0x663c584fe36b00aeb0457457a41909f70d1fcda4a308105e08419edba94822fa": {
+                    "before": "0x0000000000000000000000000000000000000000000000000000043a17fc920c",
+                    "after": "0x0000000000000000000000000000000000000000000000000000043a18100e97"
+                  },
+                  "0xee70c2565bc8797219017bb1565e8286ae21dcc52a7bc69cd0f003e7c3a53665": {
+                    "before": "0x00000000000000000000000000000000000000000000000000000000001785a6",
+                    "after": "0x000000000000000000000000000000000000000000000000000000000004091b"
+                  }
+                }
+              }
+            },
+            "actual": {
+              "0x2908da1b63c4f7ce001bf5d875d179930a79eed4": {
+                "nonce": {
+                  "before": "191048",
+                  "after": "191049"
+                }
+              },
+              "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+                "storage": {
+                  "0x34533890b4047199c7d745ef14bc148d7f9fe4a9869d12e011fff443939396a7": {
+                    "before": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffdb9c89be81",
+                    "after": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffdb9c7641f6"
+                  },
+                  "0x663c584fe36b00aeb0457457a41909f70d1fcda4a308105e08419edba94822fa": {
+                    "before": "0x0000000000000000000000000000000000000000000000000000043a17fc920c",
+                    "after": "0x0000000000000000000000000000000000000000000000000000043a18100e97"
+                  },
+                  "0xee70c2565bc8797219017bb1565e8286ae21dcc52a7bc69cd0f003e7c3a53665": {
+                    "before": "0x00000000000000000000000000000000000000000000000000000000001785a7",
+                    "after": "0x000000000000000000000000000000000000000000000000000000000004091c"
+                  }
+                }
+              }
+            },
+            "baselineDifferences": [
+              {
+                "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                "field": "storage",
+                "slot": "0xee70c2565bc8797219017bb1565e8286ae21dcc52a7bc69cd0f003e7c3a53665",
+                "expected": "0x00000000000000000000000000000000000000000000000000000000001785a6",
+                "actual": "0x00000000000000000000000000000000000000000000000000000000001785a7"
+              }
+            ],
+            "providerChangedAccounts": 2,
+            "localChangedAccounts": 2,
+            "normalization": {
+              "omittedPostBasicField": "unchanged",
+              "preOnlyStorage": "cleared_to_zero_with_explicit_pre_and_input",
+              "postOnlyStorage": "requires_explicit_zero_input",
+              "accountCreationDeletion": "unsupported",
+              "codeChanges": "unsupported"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "missing_sender_code_completion",
+      "kind": "synthetic_input_omission_control",
+      "description": "Omit the separately observed sender code field; conversion rejects before creating or executing a manager.",
+      "status": "unavailable",
+      "stage": "input_conversion",
+      "code": "LOCAL_INPUT_PACKET_INVALID",
+      "stateDisposition": "no_manager_created"
+    }
+  ],
+  "summary": {
+    "cases": 2,
+    "matched": 2,
+    "diverged": 0,
+    "unavailable": 0,
+    "controls": 5,
+    "networkCalls": 0
+  },
+  "limits": [
+    "One preselected standard-EVM USDC transfer, executed twice from endpoint-supplied state; not a general coverage or security score.",
+    "State is sparse provider input, not a cryptographic proof or an independently reconstructed chain.",
+    "Zero-value unsigned synthetic BASEFEE-zero Cancun profile; no signed-envelope or fee-settlement validation.",
+    "Full entered-message tree and committed logs are compared; absent/provider-unsupported frame evidence remains unavailable.",
+    "Gas comparison is restricted to zero refund and input-derived intrinsic normalization.",
+    "Lock integrity and installed direct dependency versions are recorded; the complete installed dependency tree is not independently attested."
+  ]
+}

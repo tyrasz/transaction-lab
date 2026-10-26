@@ -6,7 +6,7 @@ The long-term objective is to outperform commercial simulation/security provider
 
 ## Run
 
-Requires Node.js 22 or later. There are no runtime dependencies.
+Requires Node.js 22 or later. The primary service has no runtime dependencies. The optional experimental local executor has its own pinned dependencies under `engines/local-evm`.
 
 ```sh
 npm test
@@ -16,11 +16,15 @@ npm start
 
 Open http://127.0.0.1:5174/. The existing Dynamic comparison demo remains separate on port 5173.
 
+The [experimental local executor](engines/local-evm/README.md) runs real bytecode with EthereumJS against explicit sparse recorded inputs. It is separate from the API and preview: those continue to use provider execution. Install its locked dependencies with `npm ci --prefix engines/local-evm --ignore-scripts`, then run `npm run test:local`. Missing state and unsupported HyperCore calls stop local execution rather than supplying guessed values.
+
 With the server running, `npm run check:live` runs twelve read-only checks against public chain data and saves every API request and response in `reports/live/`. Wallet state and public-provider availability can change; a failed live check is retained for inspection. `npm run compare:providers` compares seven cases at one pinned block across the two documented public providers, preserving disagreements and evidence. `npm run check:historical` compares four fixed historical operations across those providers, retaining all eight calls and their underlying RPC evidence in `reports/historical-comparisons/` without retries. `npm run check:permissions` checks three observed approval/permit transactions across the same two providers, retaining all six attempts in `reports/permission-comparisons/`.
 
 The default public RPC is `https://hyperliquid.drpc.org`. For dedicated infrastructure, set `HYPEREVM_RPC_URL` to an RPC with `debug_traceCall`, `debug_traceTransaction`, archive data, and callTracer log support. Provider credentials stay on the server and are not included in evidence. The service checks chain ID before each operation. Public endpoints can change limits or capabilities.
 
 `npm run check:coverage` executes the [preregistered prospective pilot](research/coverage-evaluation/PLAN.md): it freezes the local source, waits for two future finalized HyperEVM blocks, keeps every transaction in the denominator, and attempts at most sixteen. It takes at least three minutes when selection succeeds and makes bounded read-only requests to both fixed public providers. Each run saves immutable product outputs before comparator adjudication under `reports/coverage-evaluation/`. This is a feasibility pilot; provider agreement and observed-pair matches are separate from complete transaction replay and all-effects accuracy.
+
+`npm run check:coverage:v2` is the separate [ordinary/system enumeration protocol](research/coverage-evaluation/PLAN-V2.md). It preserves every unresolved occurrence, keeps unsupported system replay explicit, and withholds a combined denominator when identity or enumeration is incomplete. It adds the fixed official enumeration endpoint to the same bounded budget. Review and freeze its source before a live run. The v1 pilot remains unchanged; offline v2 tests are not a new live accuracy result.
 
 Measured current-state balances require `debug_traceCall` with callTracer, prestateTracer diff mode, state overrides and canonical EIP-1898 block-hash queries, plus hash-bound nonce, native balance and code reads. Each configured token query uses four isolated calls: its trace and mutation diff before and after the complete original-call overrides. The profile deliberately omits gas price and verifies synthetic BASEFEE zero; it does not estimate network fees. Historical measurements require archive `debug_traceCallMany` with block-hash and transaction-index state context. If capabilities or validation checks fail, the response retains available execution evidence and marks measurements unavailable.
 
