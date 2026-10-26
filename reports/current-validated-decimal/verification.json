@@ -1,0 +1,853 @@
+{
+  "status": "verified_offline_packet",
+  "captureSha256": "bcb186b6a3a44d94be91ad74aa9b61b83a116ea06d0ada6834d2b19da028770b",
+  "implementation": {
+    "version": "0.8.0",
+    "sourceSha256": "2205334781a09baf98c3f5cb05a546bcca7d4946aea33b510d1963c8eb561a0f",
+    "sourceFiles": [
+      "account-effects.js",
+      "affected-balances.js",
+      "allowances.js",
+      "analyze.js",
+      "balances.js",
+      "config.js",
+      "current-state.js",
+      "historical-state.js",
+      "lending.js",
+      "lending-balances.js",
+      "permissions.js",
+      "query-validation.js",
+      "revert.js",
+      "rpc.js",
+      "server.js",
+      "state-diff.js",
+      "state.js",
+      "validate.js"
+    ]
+  },
+  "totals": {
+    "attempted": 8,
+    "http200": 8,
+    "failedHttp": 0,
+    "rpcCalls": 196,
+    "rpcResponseBytes": 305383,
+    "httpResponseBytes": 1019762
+  },
+  "measuredRunCount": 6,
+  "skipped": [],
+  "outcomes": [
+    {
+      "caseId": "current-supply",
+      "provider": "drpc",
+      "httpStatus": 200,
+      "rpcCalls": 31,
+      "error": null,
+      "execution": "success",
+      "statuses": {
+        "balanceChanges": "measured",
+        "allowanceChanges": "measured",
+        "affectedBalanceChanges": "measured"
+      },
+      "queries": [
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "callIds": [
+            13,
+            15,
+            17,
+            18
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "344156193",
+          "afterRaw": "329090078",
+          "deltaRaw": "-15066115"
+        },
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "callIds": [
+            14,
+            16,
+            19,
+            22
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003202135963444",
+          "afterRaw": "115792089237316195423570985008687907853269984665640564039457584003202120897329",
+          "deltaRaw": "-15066115"
+        },
+        {
+          "key": "0x744e4f26ee30213989216e1632d9be3547c4885b:0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "callIds": [
+            20,
+            21,
+            23,
+            25
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "3179075937",
+          "afterRaw": "3194142051",
+          "deltaRaw": "15066114"
+        },
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "callIds": [
+            27,
+            28,
+            29,
+            30
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "4384331852804",
+          "afterRaw": "4384346918919",
+          "deltaRaw": "15066115"
+        }
+      ],
+      "references": [
+        {
+          "id": "usdc",
+          "status": "matches_recorded_query_reference",
+          "expected": {
+            "beforeRaw": "344156193",
+            "afterRaw": "329090078",
+            "deltaRaw": "-15066115"
+          },
+          "observed": {
+            "beforeRaw": "344156193",
+            "afterRaw": "329090078",
+            "deltaRaw": "-15066115"
+          }
+        },
+        {
+          "id": "husdc",
+          "status": "matches_recorded_query_reference",
+          "expected": {
+            "beforeRaw": "3179075937",
+            "afterRaw": "3194142051",
+            "deltaRaw": "15066114"
+          },
+          "observed": {
+            "beforeRaw": "3179075937",
+            "afterRaw": "3194142051",
+            "deltaRaw": "15066114"
+          }
+        },
+        {
+          "id": "usdc-allowance",
+          "status": "matches_recorded_query_reference",
+          "expected": {
+            "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003202135963444",
+            "afterRaw": "115792089237316195423570985008687907853269984665640564039457584003202120897329",
+            "deltaRaw": "-15066115"
+          },
+          "observed": {
+            "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003202135963444",
+            "afterRaw": "115792089237316195423570985008687907853269984665640564039457584003202120897329",
+            "deltaRaw": "-15066115"
+          }
+        }
+      ],
+      "preparation": "raw_same_envelope_pinned_diff_nonce_and_eight_field_witnesses"
+    },
+    {
+      "caseId": "current-supply",
+      "provider": "hyperlend-archive",
+      "httpStatus": 200,
+      "rpcCalls": 31,
+      "error": null,
+      "execution": "success",
+      "statuses": {
+        "balanceChanges": "measured",
+        "allowanceChanges": "measured",
+        "affectedBalanceChanges": "measured"
+      },
+      "queries": [
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "callIds": [
+            13,
+            17,
+            20,
+            21
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "344156193",
+          "afterRaw": "329090078",
+          "deltaRaw": "-15066115"
+        },
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "callIds": [
+            14,
+            15,
+            16,
+            18
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003202135963444",
+          "afterRaw": "115792089237316195423570985008687907853269984665640564039457584003202120897329",
+          "deltaRaw": "-15066115"
+        },
+        {
+          "key": "0x744e4f26ee30213989216e1632d9be3547c4885b:0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "callIds": [
+            22,
+            23,
+            24,
+            25
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "3179075937",
+          "afterRaw": "3194142051",
+          "deltaRaw": "15066114"
+        },
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "callIds": [
+            27,
+            28,
+            29,
+            30
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "4384331852804",
+          "afterRaw": "4384346918919",
+          "deltaRaw": "15066115"
+        }
+      ],
+      "references": [
+        {
+          "id": "usdc",
+          "status": "matches_recorded_query_reference",
+          "expected": {
+            "beforeRaw": "344156193",
+            "afterRaw": "329090078",
+            "deltaRaw": "-15066115"
+          },
+          "observed": {
+            "beforeRaw": "344156193",
+            "afterRaw": "329090078",
+            "deltaRaw": "-15066115"
+          }
+        },
+        {
+          "id": "husdc",
+          "status": "matches_recorded_query_reference",
+          "expected": {
+            "beforeRaw": "3179075937",
+            "afterRaw": "3194142051",
+            "deltaRaw": "15066114"
+          },
+          "observed": {
+            "beforeRaw": "3179075937",
+            "afterRaw": "3194142051",
+            "deltaRaw": "15066114"
+          }
+        },
+        {
+          "id": "usdc-allowance",
+          "status": "matches_recorded_query_reference",
+          "expected": {
+            "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003202135963444",
+            "afterRaw": "115792089237316195423570985008687907853269984665640564039457584003202120897329",
+            "deltaRaw": "-15066115"
+          },
+          "observed": {
+            "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003202135963444",
+            "afterRaw": "115792089237316195423570985008687907853269984665640564039457584003202120897329",
+            "deltaRaw": "-15066115"
+          }
+        }
+      ],
+      "preparation": "raw_same_envelope_pinned_diff_nonce_and_eight_field_witnesses"
+    },
+    {
+      "caseId": "current-borrow",
+      "provider": "drpc",
+      "httpStatus": 200,
+      "rpcCalls": 38,
+      "error": null,
+      "execution": "success",
+      "statuses": {
+        "balanceChanges": "measured",
+        "allowanceChanges": "not_applicable",
+        "affectedBalanceChanges": "measured"
+      },
+      "queries": [
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "callIds": [
+            13,
+            14,
+            15,
+            16
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "569439069",
+          "afterRaw": "1404913479",
+          "deltaRaw": "835474410"
+        },
+        {
+          "key": "0x744e4f26ee30213989216e1632d9be3547c4885b:0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "callIds": [
+            17,
+            18,
+            19,
+            20
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "5677678780",
+          "afterRaw": "5677678780",
+          "deltaRaw": "0"
+        },
+        {
+          "key": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d:0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "to": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "callIds": [
+            21,
+            22,
+            23,
+            24
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "2",
+          "afterRaw": "835474412",
+          "deltaRaw": "835474410"
+        },
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "callIds": [
+            25,
+            26,
+            27,
+            28
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "4856080658038",
+          "afterRaw": "4855245183628",
+          "deltaRaw": "-835474410"
+        },
+        {
+          "key": "0x744e4f26ee30213989216e1632d9be3547c4885b:0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "data": "0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "callIds": [
+            29,
+            30,
+            31,
+            32
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "0",
+          "afterRaw": "0",
+          "deltaRaw": "0"
+        },
+        {
+          "key": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d:0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "to": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+          "data": "0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "callIds": [
+            33,
+            34,
+            35,
+            36
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "0",
+          "afterRaw": "0",
+          "deltaRaw": "0"
+        }
+      ],
+      "references": [
+        {
+          "id": "usdc",
+          "status": "matches_recorded_query_reference",
+          "expected": {
+            "beforeRaw": "569439069",
+            "afterRaw": "1404913479",
+            "deltaRaw": "835474410"
+          },
+          "observed": {
+            "beforeRaw": "569439069",
+            "afterRaw": "1404913479",
+            "deltaRaw": "835474410"
+          }
+        },
+        {
+          "id": "husdc",
+          "status": "matches_recorded_query_reference",
+          "expected": {
+            "beforeRaw": "5677678780",
+            "afterRaw": "5677678780",
+            "deltaRaw": "0"
+          },
+          "observed": {
+            "beforeRaw": "5677678780",
+            "afterRaw": "5677678780",
+            "deltaRaw": "0"
+          }
+        },
+        {
+          "id": "debt",
+          "status": "matches_recorded_query_reference",
+          "expected": {
+            "beforeRaw": "2",
+            "afterRaw": "835474412",
+            "deltaRaw": "835474410"
+          },
+          "observed": {
+            "beforeRaw": "2",
+            "afterRaw": "835474412",
+            "deltaRaw": "835474410"
+          }
+        },
+        {
+          "id": "husdc-allowance",
+          "status": "not_measured_or_unavailable",
+          "expected": {
+            "beforeRaw": "0",
+            "afterRaw": "0",
+            "deltaRaw": "0"
+          },
+          "observed": null
+        }
+      ],
+      "preparation": "raw_same_envelope_pinned_diff_nonce_and_eight_field_witnesses"
+    },
+    {
+      "caseId": "current-borrow",
+      "provider": "hyperlend-archive",
+      "httpStatus": 200,
+      "rpcCalls": 38,
+      "error": null,
+      "execution": "success",
+      "statuses": {
+        "balanceChanges": "measured",
+        "allowanceChanges": "not_applicable",
+        "affectedBalanceChanges": "measured"
+      },
+      "queries": [
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "callIds": [
+            13,
+            14,
+            15,
+            16
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "569439069",
+          "afterRaw": "1404913479",
+          "deltaRaw": "835474410"
+        },
+        {
+          "key": "0x744e4f26ee30213989216e1632d9be3547c4885b:0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "callIds": [
+            17,
+            18,
+            19,
+            20
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "5677678780",
+          "afterRaw": "5677678780",
+          "deltaRaw": "0"
+        },
+        {
+          "key": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d:0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "to": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "callIds": [
+            21,
+            22,
+            23,
+            24
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "2",
+          "afterRaw": "835474412",
+          "deltaRaw": "835474410"
+        },
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "callIds": [
+            25,
+            26,
+            27,
+            28
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "4856080658038",
+          "afterRaw": "4855245183628",
+          "deltaRaw": "-835474410"
+        },
+        {
+          "key": "0x744e4f26ee30213989216e1632d9be3547c4885b:0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "data": "0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "callIds": [
+            29,
+            30,
+            31,
+            32
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "0",
+          "afterRaw": "0",
+          "deltaRaw": "0"
+        },
+        {
+          "key": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d:0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "to": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+          "data": "0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "callIds": [
+            33,
+            34,
+            35,
+            36
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "0",
+          "afterRaw": "0",
+          "deltaRaw": "0"
+        }
+      ],
+      "references": [
+        {
+          "id": "usdc",
+          "status": "matches_recorded_query_reference",
+          "expected": {
+            "beforeRaw": "569439069",
+            "afterRaw": "1404913479",
+            "deltaRaw": "835474410"
+          },
+          "observed": {
+            "beforeRaw": "569439069",
+            "afterRaw": "1404913479",
+            "deltaRaw": "835474410"
+          }
+        },
+        {
+          "id": "husdc",
+          "status": "matches_recorded_query_reference",
+          "expected": {
+            "beforeRaw": "5677678780",
+            "afterRaw": "5677678780",
+            "deltaRaw": "0"
+          },
+          "observed": {
+            "beforeRaw": "5677678780",
+            "afterRaw": "5677678780",
+            "deltaRaw": "0"
+          }
+        },
+        {
+          "id": "debt",
+          "status": "matches_recorded_query_reference",
+          "expected": {
+            "beforeRaw": "2",
+            "afterRaw": "835474412",
+            "deltaRaw": "835474410"
+          },
+          "observed": {
+            "beforeRaw": "2",
+            "afterRaw": "835474412",
+            "deltaRaw": "835474410"
+          }
+        },
+        {
+          "id": "husdc-allowance",
+          "status": "not_measured_or_unavailable",
+          "expected": {
+            "beforeRaw": "0",
+            "afterRaw": "0",
+            "deltaRaw": "0"
+          },
+          "observed": null
+        }
+      ],
+      "preparation": "raw_same_envelope_pinned_diff_nonce_and_eight_field_witnesses"
+    },
+    {
+      "caseId": "current-direct-transferfrom-a",
+      "provider": "drpc",
+      "httpStatus": 200,
+      "rpcCalls": 26,
+      "error": null,
+      "execution": "success",
+      "statuses": {
+        "balanceChanges": "not_applicable",
+        "allowanceChanges": "measured",
+        "affectedBalanceChanges": "measured"
+      },
+      "queries": [
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0xdd62ed3e000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0xdd62ed3e000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "callIds": [
+            13,
+            14,
+            15,
+            16
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584007756842122881",
+          "afterRaw": "115792089237316195423570985008687907853269984665640564039457584007756840845814",
+          "deltaRaw": "-1277067"
+        },
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a08231000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a08231000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+          "callIds": [
+            18,
+            19,
+            20,
+            21
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "1541542",
+          "afterRaw": "264475",
+          "deltaRaw": "-1277067"
+        },
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a082310000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a082310000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "callIds": [
+            22,
+            23,
+            24,
+            25
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "4647557042700",
+          "afterRaw": "4647558319767",
+          "deltaRaw": "1277067"
+        }
+      ],
+      "references": [],
+      "preparation": "raw_same_envelope_pinned_diff_nonce_and_eight_field_witnesses"
+    },
+    {
+      "caseId": "current-direct-transferfrom-a",
+      "provider": "hyperlend-archive",
+      "httpStatus": 200,
+      "rpcCalls": 26,
+      "error": null,
+      "execution": "success",
+      "statuses": {
+        "balanceChanges": "not_applicable",
+        "allowanceChanges": "measured",
+        "affectedBalanceChanges": "measured"
+      },
+      "queries": [
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0xdd62ed3e000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0xdd62ed3e000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "callIds": [
+            13,
+            14,
+            15,
+            16
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584007756842122881",
+          "afterRaw": "115792089237316195423570985008687907853269984665640564039457584007756840845814",
+          "deltaRaw": "-1277067"
+        },
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a08231000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a08231000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+          "callIds": [
+            18,
+            19,
+            20,
+            21
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "1541542",
+          "afterRaw": "264475",
+          "deltaRaw": "-1277067"
+        },
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a082310000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a082310000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "callIds": [
+            22,
+            23,
+            24,
+            25
+          ],
+          "status": "validated_from_raw_four_call_evidence",
+          "beforeRaw": "4647557042700",
+          "afterRaw": "4647558319767",
+          "deltaRaw": "1277067"
+        }
+      ],
+      "references": [],
+      "preparation": "raw_same_envelope_pinned_diff_nonce_and_eight_field_witnesses"
+    },
+    {
+      "caseId": "current-usdc-router-permit-consumed",
+      "provider": "drpc",
+      "httpStatus": 200,
+      "rpcCalls": 3,
+      "error": null,
+      "execution": "reverted",
+      "statuses": {
+        "balanceChanges": "not_applicable",
+        "allowanceChanges": "not_applicable",
+        "affectedBalanceChanges": "not_applicable"
+      },
+      "queries": [],
+      "references": [],
+      "preparation": "unavailable_or_rejected_evidence_retained"
+    },
+    {
+      "caseId": "current-usdc-router-permit-consumed",
+      "provider": "hyperlend-archive",
+      "httpStatus": 200,
+      "rpcCalls": 3,
+      "error": null,
+      "execution": "reverted",
+      "statuses": {
+        "balanceChanges": "not_applicable",
+        "allowanceChanges": "not_applicable",
+        "affectedBalanceChanges": "not_applicable"
+      },
+      "queries": [],
+      "references": [],
+      "preparation": "unavailable_or_rejected_evidence_retained"
+    }
+  ],
+  "comparisons": [
+    {
+      "caseId": "current-supply",
+      "status": "recorded_results_available",
+      "originalCallTraceParsedObjectsEqual": true,
+      "executionStatusAgreement": true,
+      "measurementStatusesAgree": true,
+      "queries": [
+        {
+          "key": "0x744e4f26ee30213989216e1632d9be3547c4885b:0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "status": "exact_values_agree"
+        },
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "status": "exact_values_agree"
+        },
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "status": "exact_values_agree"
+        },
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "status": "exact_values_agree"
+        }
+      ]
+    },
+    {
+      "caseId": "current-borrow",
+      "status": "recorded_results_available",
+      "originalCallTraceParsedObjectsEqual": true,
+      "executionStatusAgreement": true,
+      "measurementStatusesAgree": true,
+      "queries": [
+        {
+          "key": "0x744e4f26ee30213989216e1632d9be3547c4885b:0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "status": "exact_values_agree"
+        },
+        {
+          "key": "0x744e4f26ee30213989216e1632d9be3547c4885b:0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "status": "exact_values_agree"
+        },
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "status": "exact_values_agree"
+        },
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "status": "exact_values_agree"
+        },
+        {
+          "key": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d:0x70a08231000000000000000000000000744e4f26ee30213989216e1632d9be3547c4885b",
+          "status": "exact_values_agree"
+        },
+        {
+          "key": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d:0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "status": "exact_values_agree"
+        }
+      ]
+    },
+    {
+      "caseId": "current-direct-transferfrom-a",
+      "status": "recorded_results_available",
+      "originalCallTraceParsedObjectsEqual": true,
+      "executionStatusAgreement": true,
+      "measurementStatusesAgree": true,
+      "queries": [
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a082310000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "status": "exact_values_agree"
+        },
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0x70a08231000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe56379",
+          "status": "exact_values_agree"
+        },
+        {
+          "key": "0xb88339cb7199b77e23db6e890353e22632ba630f:0xdd62ed3e000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed4",
+          "status": "exact_values_agree"
+        }
+      ]
+    },
+    {
+      "caseId": "current-usdc-router-permit-consumed",
+      "status": "recorded_results_available",
+      "originalCallTraceParsedObjectsEqual": true,
+      "executionStatusAgreement": true,
+      "measurementStatusesAgree": true,
+      "queries": []
+    }
+  ],
+  "networkCalls": 0,
+  "liveSourceImportedOrHashed": false,
+  "limitations": [
+    "Checks recorded evidence and scoped configured query behavior; not independent EVM execution or a cryptographic state proof.",
+    "Unavailable/reverted/error outcomes and reference/provider differences are retained without retries or fabricated quantities.",
+    "No historical-value expectation is applied to the new direct/router parent-state simulations."
+  ]
+}
+

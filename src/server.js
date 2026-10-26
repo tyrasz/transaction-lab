@@ -11,14 +11,14 @@ import { measureBalances } from './balances.js';
 import { measureLendingBalances } from './lending-balances.js';
 import { measureAllowances } from './allowances.js';
 import { measureAffectedBalances } from './affected-balances.js';
-import { createStateContext } from './state.js';
+import { createVerifiedCurrentStateContext } from './current-state.js';
 import { createHistoricalStateContext } from './historical-state.js';
 import { analyzePermissions } from './permissions.js';
 import { projectAccountEffects } from './account-effects.js';
 import { EXAMPLES, METADATA, CAPABILITIES, VERSION } from './config.js';
 
 const ROOT = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
-const engineFiles = ['account-effects.js','affected-balances.js','allowances.js','analyze.js','balances.js','config.js','historical-state.js','lending.js','lending-balances.js','permissions.js','query-validation.js','revert.js','rpc.js','server.js','state-diff.js','state.js','validate.js'];
+const engineFiles = ['account-effects.js','affected-balances.js','allowances.js','analyze.js','balances.js','config.js','current-state.js','historical-state.js','lending.js','lending-balances.js','permissions.js','query-validation.js','revert.js','rpc.js','server.js','state-diff.js','state.js','validate.js'];
 const engineHash = createHash('sha256');
 for (const name of engineFiles) engineHash.update(name+'\0').update(await readFile(path.join(ROOT,'src',name))).update('\0');
 const implementation = Object.freeze({name:'Transaction Lab',version:VERSION,sourceSha256:engineHash.digest('hex'),sourceFiles:engineFiles});
@@ -136,13 +136,13 @@ export async function simulate(input, rpc) {
   // Block hashes avoid silently moving to another block during a reorganization.
   const traceRequest = {
     method: 'debug_traceCall',
-    params: [{ from:request.from, to:request.to, data:request.data, value:'0x'+BigInt(request.value).toString(16), gas:'0x4c4b40' }, block.hash, TRACER],
+    params: [{ from:request.from, to:request.to, data:request.data, value:'0x'+BigInt(request.value).toString(16), gas:'0x4c4b40' }, {blockHash:block.hash,requireCanonical:true}, TRACER],
   };
   const trace = await rpc.call(traceRequest.method, traceRequest.params);
   validateRootTrace(trace, request);
   const analysis = analyzeTrace({request, trace, block, metadata:METADATA, mode:'simulation'});
   const permissions = analyzePermissions({request,trace,block,metadata:METADATA});
-  const stateContext = createStateContext({request,block,rpc});
+  const stateContext = createVerifiedCurrentStateContext({request,block,rpc,trace});
   const balanceMethod = ['withdraw','borrow','repay'].includes(analysis.protocol?.operation) ? measureLendingBalances : measureBalances;
   const initialResults = await Promise.all([
     balanceMethod({request,block,rpc,metadata:METADATA,analysis,stateContext}),

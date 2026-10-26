@@ -21,7 +21,8 @@ const guardedCapture=JSON.parse(guardedBytes);
 // Independently hash the current source bytes using the documented fingerprint
 // encoding. Source hardening can change this metadata without changing any
 // original chain observation or the captured implementation's provenance.
-const sourceFiles = guardedCapture.implementation.sourceFiles;
+const sourceFiles = [...guardedCapture.implementation.sourceFiles];
+sourceFiles.splice(sourceFiles.indexOf('historical-state.js'),0,'current-state.js');
 const currentSourceHash = createHash('sha256');
 for (const name of sourceFiles) {
   assert.match(name, /^[a-z-]+\.js$/);
@@ -245,7 +246,7 @@ for (const item of capture.cases) for (const legacyRun of item.runs) {
     assertAccountEffects(result,item);
     assert.equal(JSON.stringify(run.rpcCalls), originalRaw, 'Saved provider requests and responses remain immutable');
     assert.equal(result.implementation.sourceSha256, CURRENT_ENGINE_SHA256, 'Current implementation fingerprint matches independently read source files');
-    assert.equal(result.implementation.version,'0.7.1');
+    assert.equal(result.implementation.version,'0.8.0');
     assert.equal(result.implementation.name,run.response.implementation.name);
     assert.deepEqual(result.implementation.sourceFiles,sourceFiles);
     assert.equal(transfers.length,item.id==='usdc-router-permit-consumed'?2:0);

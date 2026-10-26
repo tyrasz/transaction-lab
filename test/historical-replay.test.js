@@ -21,7 +21,9 @@ const v7Capture=JSON.parse(v7Bytes);
 const guardedBytes=await readFile(new URL('../reports/replay-state-comparisons/capture.json',import.meta.url));
 assert.equal(createHash('sha256').update(guardedBytes).digest('hex'),'51d7cb6ba049b1cd38da52ba2131b4bc328ac264419c240f132c3b570f8ed610');
 const freshCapture=JSON.parse(guardedBytes);
-const sourceFiles=freshCapture.implementation.sourceFiles;
+// Current unsigned-query integration adds one dependency without changing any
+// historical RPC sequence. All original 0.7.1 capture identity stays untouched.
+const sourceFiles=[...freshCapture.implementation.sourceFiles];sourceFiles.splice(sourceFiles.indexOf('historical-state.js'),0,'current-state.js');
 const currentHash=createHash('sha256');
 for(const name of sourceFiles){assert.match(name,/^[a-z-]+\.js$/);currentHash.update(name+'\0').update(await readFile(new URL('../src/'+name,import.meta.url))).update('\0');}
 const currentEngine=currentHash.digest('hex');
@@ -36,7 +38,7 @@ const independent={
 // observations and proof fields; check implementation provenance separately.
 function withoutGenerated(report){const {id,createdAt,timing,implementation,...rest}=report;return rest;}
 function assertImplementation(report){
- assert.deepEqual(report.implementation,{name:'Transaction Lab',version:'0.7.1',sourceSha256:currentEngine,sourceFiles},'Implementation name, version, ordered source inventory and independently calculated source hash all match');
+ assert.deepEqual(report.implementation,{name:'Transaction Lab',version:'0.8.0',sourceSha256:currentEngine,sourceFiles},'Implementation name, version, ordered source inventory and independently calculated source hash all match');
 }
 function freshFor(operation,provider){return freshCapture.cases.find(c=>c.id==='hyperlend-usdc-'+operation)?.runs.find(r=>r.provider===provider);}
 function v6For(operation,provider){return v6Capture.cases.find(c=>c.id==='hyperlend-usdc-'+operation)?.runs.find(r=>r.provider===(provider==='hyperlend-archive'?'archive':provider));}

@@ -126,12 +126,15 @@ function existingPairs(result, basis, identity) {
 /** All candidate pairs count toward the cap, including independently proven reuse. */
 export async function measureAffectedBalances({ request, trace, block, rpc, metadata = {}, existingBalanceChanges, stateContext }) {
   const historical = stateContext?.measurementBasis === 'historical_transaction_position_balanceOf';
-  const basis = historical ? 'historical_transaction_position_balanceOf' : 'prestate_diff_balanceOf';
+  const verifiedCurrent = stateContext?.measurementBasis === 'current_pinned_state_validated_query';
+  const basis = historical ? 'historical_transaction_position_balanceOf' : verifiedCurrent ? 'current_pinned_state_validated_query' : 'prestate_diff_balanceOf';
   const base = { status: 'not_applicable', basis, assets: [], reusedPairs: [], candidatePairCount: 0, limits: LIMITS, warnings: [], evidence: { request: [], response: [] } };
   if (uint(request?.chainId) !== BigInt(CHAIN_ID) || !address(request?.from) || !address(request?.to) || !bytes(request?.data) || uint(request?.value) !== 0n || !object(trace) || failed(trace)) return { ...base, warnings: ['Affected-account measurements require a successful zero-value HyperEVM contract call.'] };
   let context;
   const warnings = [
-    historical ? 'Configured-token balances are queried independently immediately before and after the original transaction at its exact position in the original block.' : 'Configured-token balances are queried before and after the whole simulated transaction at one pinned block hash and timestamp.',
+    historical ? 'Configured-token balances are queried independently immediately before and after the original transaction at its exact position in the original block.' : verifiedCurrent
+      ? 'Configured-token balances are queried independently before and after the whole unsigned call, with validated query paths and nonce-only query effects. BASEFEE is synthetic zero; other execution header fields are checked against the pinned block.'
+      : 'Configured-token balances are queried before and after the whole simulated transaction at one pinned block hash and timestamp.',
     'Only observed Transfer participants and verified transferFrom owners/recipients are candidates. Silent changes, unknown tokens and native assets are outside this view.',
     'Event net amounts and requested transfers are evidence, not state measurements, intent verification or a security verdict. Receipt-token and debt events may differ from measured changes because of interest or rounding.',
   ];
@@ -142,9 +145,9 @@ export async function measureAffectedBalances({ request, trace, block, rpc, meta
     if (!pairs.size) return { ...base, warnings: [...warnings, 'No eligible configured-token balance candidates were observed.'] };
     // An original trace can prove an event's implementation without proving a
     // later balanceOf implementation. A generic call may upgrade a proxy via
-    // storage alone; a final code diff or slot denylist is insufficient. Only
-    // the historical context currently validates both isolated query paths.
-    if (!historical) return { ...base, status: 'unavailable', warnings: [...warnings, 'Current affected-account balance query implementation provenance is not validated before and after the simulated call. Additional current-state measurements are withheld; no balance queries were performed.'] };
+    // storage alone; a final code diff or slot denylist is insufficient. Accept
+    // only contexts which validate both isolated query paths and their effects.
+    if (!historical && !verifiedCurrent) return { ...base, status: 'unavailable', warnings: [...warnings, 'Current affected-account balance query implementation provenance is not validated before and after the simulated call. Additional current-state measurements are withheld; no balance queries were performed.'] };
     for (const { token } of pairs.values()) if (metadata[token]?.decimals !== 6 || metadata[token].address !== undefined && address(metadata[token].address) !== token) failState('Configured six-decimal token metadata is required for affected-account measurements.');
     const candidateContext = stateContext;
     if (!candidateContext.matches({ request, block, rpc })) failState('Shared state context does not match this request, block, and provider.');
@@ -153,6 +156,7 @@ export async function measureAffectedBalances({ request, trace, block, rpc, meta
     if (context.canonicalFailure) failState('The shared block verification has failed; affected-account measurements were withheld.');
     const identity = context.executionIdentity;
     if (!object(identity) || lower(identity.stateBlockHash) !== lower(block?.hash) || uint(identity.blockNumber) !== uint(block?.number) || uint(identity.timestamp) !== uint(block?.timestamp)) failState('Affected-account measurement has no matching pinned execution identity.');
+    if (verifiedCurrent && (identity.stateBinding !== 'block_hash' || identity.headerContext !== 'synthetic_unpriced_basefee_zero' || identity.method !== 'debug_traceCall' || identity.feePolicy !== 'gas_price_omitted_no_query_native_debit' || identity.validation?.queryImplementation !== 'configured_address_paths_before_and_after_no_runtime_code_attestation' || identity.validation?.queryMutation !== 'sender_nonce_increment_only_with_unchanged_native_balance')) failState('Affected-account measurements require the validated current query and environment profile.');
     const existing = existingPairs(existingBalanceChanges, basis, identity), assets = [], reusedPairs = [];
     for (const candidate of pairs.values()) {
       const { token, account } = candidate;

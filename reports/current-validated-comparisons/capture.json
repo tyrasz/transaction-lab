@@ -1,0 +1,565 @@
+{
+  "schemaVersion": "1.0",
+  "status": "complete",
+  "startedAt": "2026-10-26T06:58:20.342Z",
+  "planSha256": "ce00e354c196e04d586dcbf35a49df2b0d58f7ba5449c20deca1bb8cb95b839d",
+  "scriptSha256": "400dda60c792c6daa6aa677789be95d74c3982d6f8fc174d43abf2e56fca9e23",
+  "coreBindingSha256": "7754748ed8920f5ba69a9c073c5ddbb818a5a651d5fdc16eb2230b48f1c2e81b",
+  "implementation": {
+    "version": "0.8.0",
+    "sourceSha256": "2205334781a09baf98c3f5cb05a546bcca7d4946aea33b510d1963c8eb561a0f",
+    "sourceFiles": [
+      "account-effects.js",
+      "affected-balances.js",
+      "allowances.js",
+      "analyze.js",
+      "balances.js",
+      "config.js",
+      "current-state.js",
+      "historical-state.js",
+      "lending.js",
+      "lending-balances.js",
+      "permissions.js",
+      "query-validation.js",
+      "revert.js",
+      "rpc.js",
+      "server.js",
+      "state-diff.js",
+      "state.js",
+      "validate.js"
+    ]
+  },
+  "budgets": {
+    "plannedHttpRequests": 8,
+    "maxRpcCalls": 640,
+    "maxRpcCallsPerRun": 80,
+    "maxResponseBytes": 8388608,
+    "maxTotalResponseBytes": 134217728,
+    "rpcTimeoutMs": 25000,
+    "maxHttpRunMs": 120000,
+    "maxRunSequenceMs": 900000,
+    "retries": 0
+  },
+  "executionTransport": {
+    "kind": "ephemeral_local_http",
+    "route": "POST /api/simulate"
+  },
+  "cases": [
+    {
+      "id": "current-supply",
+      "operation": "supply",
+      "request": {
+        "chainId": 999,
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+        "data": "0x617ba037000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000000e5e4030000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d00000000000000000000000000000000000000000000000000000000000000000",
+        "value": "0x0",
+        "block": "0x2f3df80"
+      },
+      "expectedBlockHash": "0x48f4baab87c398dedf709546bbc5bc2da28f45ef90815bf98a47c8429b2f5fa7",
+      "historicalSourceTransactionHash": null,
+      "runs": [
+        {
+          "provider": "drpc",
+          "request": {
+            "chainId": 999,
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "data": "0x617ba037000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000000e5e4030000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d00000000000000000000000000000000000000000000000000000000000000000",
+            "value": "0x0",
+            "block": "0x2f3df80"
+          },
+          "startedAt": "2026-10-26T06:58:20.348Z",
+          "rpcCalls": [],
+          "http": {
+            "request": {
+              "method": "POST",
+              "url": "http://127.0.0.1:58164/api/simulate",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "chainId": 999,
+                "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                "data": "0x617ba037000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000000e5e4030000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d00000000000000000000000000000000000000000000000000000000000000000",
+                "value": "0x0",
+                "block": "0x2f3df80"
+              },
+              "bodyText": "{\"chainId\":999,\"from\":\"0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0\",\"to\":\"0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b\",\"data\":\"0x617ba037000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000000e5e4030000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d00000000000000000000000000000000000000000000000000000000000000000\",\"value\":\"0x0\",\"block\":\"0x2f3df80\"}"
+            },
+            "response": {
+              "status": 400,
+              "headers": {
+                "content-type": "application/json; charset=utf-8",
+                "date": "Mon, 26 Oct 2026 06:58:20 GMT",
+                "cache-control": "no-store",
+                "x-content-type-options": "nosniff"
+              },
+              "body": {
+                "error": {
+                  "code": "INVALID_INPUT",
+                  "message": "value must be an unsigned decimal wei string within uint256."
+                }
+              },
+              "bodyText": "{\"error\":{\"code\":\"INVALID_INPUT\",\"message\":\"value must be an unsigned decimal wei string within uint256.\"}}",
+              "bodySha256": "0867fb4104cb4ec610354f0e761c26bead5759c8f5e505345bed69da60c17d75",
+              "responseBytes": 107
+            }
+          },
+          "error": {
+            "code": "LOCAL_API_ERROR",
+            "message": "The planned local API request returned a non-success status; no retry was made."
+          },
+          "completedAt": "2026-10-26T06:58:20.357Z"
+        },
+        {
+          "provider": "hyperlend-archive",
+          "request": {
+            "chainId": 999,
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "data": "0x617ba037000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000000e5e4030000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d00000000000000000000000000000000000000000000000000000000000000000",
+            "value": "0x0",
+            "block": "0x2f3df80"
+          },
+          "startedAt": "2026-10-26T06:58:20.359Z",
+          "rpcCalls": [],
+          "http": {
+            "request": {
+              "method": "POST",
+              "url": "http://127.0.0.1:58164/api/simulate",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "chainId": 999,
+                "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                "data": "0x617ba037000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000000e5e4030000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d00000000000000000000000000000000000000000000000000000000000000000",
+                "value": "0x0",
+                "block": "0x2f3df80"
+              },
+              "bodyText": "{\"chainId\":999,\"from\":\"0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0\",\"to\":\"0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b\",\"data\":\"0x617ba037000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000000e5e4030000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d00000000000000000000000000000000000000000000000000000000000000000\",\"value\":\"0x0\",\"block\":\"0x2f3df80\"}"
+            },
+            "response": {
+              "status": 400,
+              "headers": {
+                "content-type": "application/json; charset=utf-8",
+                "date": "Mon, 26 Oct 2026 06:58:20 GMT",
+                "cache-control": "no-store",
+                "x-content-type-options": "nosniff"
+              },
+              "body": {
+                "error": {
+                  "code": "INVALID_INPUT",
+                  "message": "value must be an unsigned decimal wei string within uint256."
+                }
+              },
+              "bodyText": "{\"error\":{\"code\":\"INVALID_INPUT\",\"message\":\"value must be an unsigned decimal wei string within uint256.\"}}",
+              "bodySha256": "0867fb4104cb4ec610354f0e761c26bead5759c8f5e505345bed69da60c17d75",
+              "responseBytes": 107
+            }
+          },
+          "error": {
+            "code": "LOCAL_API_ERROR",
+            "message": "The planned local API request returned a non-success status; no retry was made."
+          },
+          "completedAt": "2026-10-26T06:58:20.362Z"
+        }
+      ]
+    },
+    {
+      "id": "current-borrow",
+      "operation": "borrow",
+      "request": {
+        "chainId": 999,
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+        "data": "0xa415bcad000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000031cc53ea000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "value": "0x0",
+        "block": "0x2f08b79"
+      },
+      "expectedBlockHash": "0x206b1f6b56dced1f90f742384ad84d74973a02d8bee8c07a823f394d1506a5a2",
+      "historicalSourceTransactionHash": null,
+      "runs": [
+        {
+          "provider": "drpc",
+          "request": {
+            "chainId": 999,
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "data": "0xa415bcad000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000031cc53ea000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "value": "0x0",
+            "block": "0x2f08b79"
+          },
+          "startedAt": "2026-10-26T06:58:20.364Z",
+          "rpcCalls": [],
+          "http": {
+            "request": {
+              "method": "POST",
+              "url": "http://127.0.0.1:58164/api/simulate",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "chainId": 999,
+                "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                "data": "0xa415bcad000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000031cc53ea000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                "value": "0x0",
+                "block": "0x2f08b79"
+              },
+              "bodyText": "{\"chainId\":999,\"from\":\"0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0\",\"to\":\"0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b\",\"data\":\"0xa415bcad000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000031cc53ea000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0\",\"value\":\"0x0\",\"block\":\"0x2f08b79\"}"
+            },
+            "response": {
+              "status": 400,
+              "headers": {
+                "content-type": "application/json; charset=utf-8",
+                "date": "Mon, 26 Oct 2026 06:58:20 GMT",
+                "cache-control": "no-store",
+                "x-content-type-options": "nosniff"
+              },
+              "body": {
+                "error": {
+                  "code": "INVALID_INPUT",
+                  "message": "value must be an unsigned decimal wei string within uint256."
+                }
+              },
+              "bodyText": "{\"error\":{\"code\":\"INVALID_INPUT\",\"message\":\"value must be an unsigned decimal wei string within uint256.\"}}",
+              "bodySha256": "0867fb4104cb4ec610354f0e761c26bead5759c8f5e505345bed69da60c17d75",
+              "responseBytes": 107
+            }
+          },
+          "error": {
+            "code": "LOCAL_API_ERROR",
+            "message": "The planned local API request returned a non-success status; no retry was made."
+          },
+          "completedAt": "2026-10-26T06:58:20.367Z"
+        },
+        {
+          "provider": "hyperlend-archive",
+          "request": {
+            "chainId": 999,
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "data": "0xa415bcad000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000031cc53ea000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "value": "0x0",
+            "block": "0x2f08b79"
+          },
+          "startedAt": "2026-10-26T06:58:20.369Z",
+          "rpcCalls": [],
+          "http": {
+            "request": {
+              "method": "POST",
+              "url": "http://127.0.0.1:58164/api/simulate",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "chainId": 999,
+                "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+                "data": "0xa415bcad000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000031cc53ea000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                "value": "0x0",
+                "block": "0x2f08b79"
+              },
+              "bodyText": "{\"chainId\":999,\"from\":\"0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0\",\"to\":\"0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b\",\"data\":\"0xa415bcad000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000031cc53ea000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0\",\"value\":\"0x0\",\"block\":\"0x2f08b79\"}"
+            },
+            "response": {
+              "status": 400,
+              "headers": {
+                "content-type": "application/json; charset=utf-8",
+                "date": "Mon, 26 Oct 2026 06:58:20 GMT",
+                "cache-control": "no-store",
+                "x-content-type-options": "nosniff"
+              },
+              "body": {
+                "error": {
+                  "code": "INVALID_INPUT",
+                  "message": "value must be an unsigned decimal wei string within uint256."
+                }
+              },
+              "bodyText": "{\"error\":{\"code\":\"INVALID_INPUT\",\"message\":\"value must be an unsigned decimal wei string within uint256.\"}}",
+              "bodySha256": "0867fb4104cb4ec610354f0e761c26bead5759c8f5e505345bed69da60c17d75",
+              "responseBytes": 107
+            }
+          },
+          "error": {
+            "code": "LOCAL_API_ERROR",
+            "message": "The planned local API request returned a non-success status; no retry was made."
+          },
+          "completedAt": "2026-10-26T06:58:20.371Z"
+        }
+      ]
+    },
+    {
+      "id": "current-direct-transferfrom-a",
+      "operation": null,
+      "request": {
+        "chainId": 999,
+        "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+        "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+        "data": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+        "value": "0x0",
+        "block": "0x2f09828"
+      },
+      "expectedBlockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+      "historicalSourceTransactionHash": "0xe2f9761a3fac3ba83ee15fc5e6f12b55d15cd804b321a2cffd9d2c16d6c38dfe",
+      "runs": [
+        {
+          "provider": "drpc",
+          "request": {
+            "chainId": 999,
+            "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+            "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "data": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+            "value": "0x0",
+            "block": "0x2f09828"
+          },
+          "startedAt": "2026-10-26T06:58:20.373Z",
+          "rpcCalls": [],
+          "http": {
+            "request": {
+              "method": "POST",
+              "url": "http://127.0.0.1:58164/api/simulate",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "chainId": 999,
+                "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+                "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                "data": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+                "value": "0x0",
+                "block": "0x2f09828"
+              },
+              "bodyText": "{\"chainId\":999,\"from\":\"0x2908da1b63c4f7ce001bf5d875d179930a79eed4\",\"to\":\"0xb88339cb7199b77e23db6e890353e22632ba630f\",\"data\":\"0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b\",\"value\":\"0x0\",\"block\":\"0x2f09828\"}"
+            },
+            "response": {
+              "status": 400,
+              "headers": {
+                "content-type": "application/json; charset=utf-8",
+                "date": "Mon, 26 Oct 2026 06:58:20 GMT",
+                "cache-control": "no-store",
+                "x-content-type-options": "nosniff"
+              },
+              "body": {
+                "error": {
+                  "code": "INVALID_INPUT",
+                  "message": "value must be an unsigned decimal wei string within uint256."
+                }
+              },
+              "bodyText": "{\"error\":{\"code\":\"INVALID_INPUT\",\"message\":\"value must be an unsigned decimal wei string within uint256.\"}}",
+              "bodySha256": "0867fb4104cb4ec610354f0e761c26bead5759c8f5e505345bed69da60c17d75",
+              "responseBytes": 107
+            }
+          },
+          "error": {
+            "code": "LOCAL_API_ERROR",
+            "message": "The planned local API request returned a non-success status; no retry was made."
+          },
+          "completedAt": "2026-10-26T06:58:20.375Z"
+        },
+        {
+          "provider": "hyperlend-archive",
+          "request": {
+            "chainId": 999,
+            "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+            "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "data": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+            "value": "0x0",
+            "block": "0x2f09828"
+          },
+          "startedAt": "2026-10-26T06:58:20.378Z",
+          "rpcCalls": [],
+          "http": {
+            "request": {
+              "method": "POST",
+              "url": "http://127.0.0.1:58164/api/simulate",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "chainId": 999,
+                "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+                "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+                "data": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+                "value": "0x0",
+                "block": "0x2f09828"
+              },
+              "bodyText": "{\"chainId\":999,\"from\":\"0x2908da1b63c4f7ce001bf5d875d179930a79eed4\",\"to\":\"0xb88339cb7199b77e23db6e890353e22632ba630f\",\"data\":\"0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b\",\"value\":\"0x0\",\"block\":\"0x2f09828\"}"
+            },
+            "response": {
+              "status": 400,
+              "headers": {
+                "content-type": "application/json; charset=utf-8",
+                "date": "Mon, 26 Oct 2026 06:58:20 GMT",
+                "cache-control": "no-store",
+                "x-content-type-options": "nosniff"
+              },
+              "body": {
+                "error": {
+                  "code": "INVALID_INPUT",
+                  "message": "value must be an unsigned decimal wei string within uint256."
+                }
+              },
+              "bodyText": "{\"error\":{\"code\":\"INVALID_INPUT\",\"message\":\"value must be an unsigned decimal wei string within uint256.\"}}",
+              "bodySha256": "0867fb4104cb4ec610354f0e761c26bead5759c8f5e505345bed69da60c17d75",
+              "responseBytes": 107
+            }
+          },
+          "error": {
+            "code": "LOCAL_API_ERROR",
+            "message": "The planned local API request returned a non-success status; no retry was made."
+          },
+          "completedAt": "2026-10-26T06:58:20.380Z"
+        }
+      ]
+    },
+    {
+      "id": "current-usdc-router-permit-consumed",
+      "operation": null,
+      "request": {
+        "chainId": 999,
+        "from": "0x0c71073344e27e33cb57fcb587fc412d689dfd1d",
+        "to": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+        "data": "0x48519be800000000000000000000000053195a1c4e664ac09eb72892516f8f85ec80000000000000000000000000000000000000000000000000000000000000017d7840000000000000000000000000000000000000000000001c0df636224734347c2e0000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006a079d9a000000000000000000000000000000000000000000000000000000000000001bc7b60c1bd267ac7348356cdefb7f3478399bfefe8e52c4a1226b4985d5e5c00a3616b0b1956e4b2ce3026d7048b93d73fbdf55c568b3eefdfc104dd44ae93bca",
+        "value": "0x0",
+        "block": "0x2192cba"
+      },
+      "expectedBlockHash": "0x86ec3e764c6331c20bdedfa0d647222f548db8ba927b7de7e4b4f055193f9c22",
+      "historicalSourceTransactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+      "runs": [
+        {
+          "provider": "drpc",
+          "request": {
+            "chainId": 999,
+            "from": "0x0c71073344e27e33cb57fcb587fc412d689dfd1d",
+            "to": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+            "data": "0x48519be800000000000000000000000053195a1c4e664ac09eb72892516f8f85ec80000000000000000000000000000000000000000000000000000000000000017d7840000000000000000000000000000000000000000000001c0df636224734347c2e0000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006a079d9a000000000000000000000000000000000000000000000000000000000000001bc7b60c1bd267ac7348356cdefb7f3478399bfefe8e52c4a1226b4985d5e5c00a3616b0b1956e4b2ce3026d7048b93d73fbdf55c568b3eefdfc104dd44ae93bca",
+            "value": "0x0",
+            "block": "0x2192cba"
+          },
+          "startedAt": "2026-10-26T06:58:20.382Z",
+          "rpcCalls": [],
+          "http": {
+            "request": {
+              "method": "POST",
+              "url": "http://127.0.0.1:58164/api/simulate",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "chainId": 999,
+                "from": "0x0c71073344e27e33cb57fcb587fc412d689dfd1d",
+                "to": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                "data": "0x48519be800000000000000000000000053195a1c4e664ac09eb72892516f8f85ec80000000000000000000000000000000000000000000000000000000000000017d7840000000000000000000000000000000000000000000001c0df636224734347c2e0000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006a079d9a000000000000000000000000000000000000000000000000000000000000001bc7b60c1bd267ac7348356cdefb7f3478399bfefe8e52c4a1226b4985d5e5c00a3616b0b1956e4b2ce3026d7048b93d73fbdf55c568b3eefdfc104dd44ae93bca",
+                "value": "0x0",
+                "block": "0x2192cba"
+              },
+              "bodyText": "{\"chainId\":999,\"from\":\"0x0c71073344e27e33cb57fcb587fc412d689dfd1d\",\"to\":\"0x693f12e9e6b35b34458793546065e8b08e0299d6\",\"data\":\"0x48519be800000000000000000000000053195a1c4e664ac09eb72892516f8f85ec80000000000000000000000000000000000000000000000000000000000000017d7840000000000000000000000000000000000000000000001c0df636224734347c2e0000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006a079d9a000000000000000000000000000000000000000000000000000000000000001bc7b60c1bd267ac7348356cdefb7f3478399bfefe8e52c4a1226b4985d5e5c00a3616b0b1956e4b2ce3026d7048b93d73fbdf55c568b3eefdfc104dd44ae93bca\",\"value\":\"0x0\",\"block\":\"0x2192cba\"}"
+            },
+            "response": {
+              "status": 400,
+              "headers": {
+                "content-type": "application/json; charset=utf-8",
+                "date": "Mon, 26 Oct 2026 06:58:20 GMT",
+                "cache-control": "no-store",
+                "x-content-type-options": "nosniff"
+              },
+              "body": {
+                "error": {
+                  "code": "INVALID_INPUT",
+                  "message": "value must be an unsigned decimal wei string within uint256."
+                }
+              },
+              "bodyText": "{\"error\":{\"code\":\"INVALID_INPUT\",\"message\":\"value must be an unsigned decimal wei string within uint256.\"}}",
+              "bodySha256": "0867fb4104cb4ec610354f0e761c26bead5759c8f5e505345bed69da60c17d75",
+              "responseBytes": 107
+            }
+          },
+          "error": {
+            "code": "LOCAL_API_ERROR",
+            "message": "The planned local API request returned a non-success status; no retry was made."
+          },
+          "completedAt": "2026-10-26T06:58:20.384Z"
+        },
+        {
+          "provider": "hyperlend-archive",
+          "request": {
+            "chainId": 999,
+            "from": "0x0c71073344e27e33cb57fcb587fc412d689dfd1d",
+            "to": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+            "data": "0x48519be800000000000000000000000053195a1c4e664ac09eb72892516f8f85ec80000000000000000000000000000000000000000000000000000000000000017d7840000000000000000000000000000000000000000000001c0df636224734347c2e0000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006a079d9a000000000000000000000000000000000000000000000000000000000000001bc7b60c1bd267ac7348356cdefb7f3478399bfefe8e52c4a1226b4985d5e5c00a3616b0b1956e4b2ce3026d7048b93d73fbdf55c568b3eefdfc104dd44ae93bca",
+            "value": "0x0",
+            "block": "0x2192cba"
+          },
+          "startedAt": "2026-10-26T06:58:20.386Z",
+          "rpcCalls": [],
+          "http": {
+            "request": {
+              "method": "POST",
+              "url": "http://127.0.0.1:58164/api/simulate",
+              "headers": {
+                "content-type": "application/json"
+              },
+              "body": {
+                "chainId": 999,
+                "from": "0x0c71073344e27e33cb57fcb587fc412d689dfd1d",
+                "to": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+                "data": "0x48519be800000000000000000000000053195a1c4e664ac09eb72892516f8f85ec80000000000000000000000000000000000000000000000000000000000000017d7840000000000000000000000000000000000000000000001c0df636224734347c2e0000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006a079d9a000000000000000000000000000000000000000000000000000000000000001bc7b60c1bd267ac7348356cdefb7f3478399bfefe8e52c4a1226b4985d5e5c00a3616b0b1956e4b2ce3026d7048b93d73fbdf55c568b3eefdfc104dd44ae93bca",
+                "value": "0x0",
+                "block": "0x2192cba"
+              },
+              "bodyText": "{\"chainId\":999,\"from\":\"0x0c71073344e27e33cb57fcb587fc412d689dfd1d\",\"to\":\"0x693f12e9e6b35b34458793546065e8b08e0299d6\",\"data\":\"0x48519be800000000000000000000000053195a1c4e664ac09eb72892516f8f85ec80000000000000000000000000000000000000000000000000000000000000017d7840000000000000000000000000000000000000000000001c0df636224734347c2e0000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006a079d9a000000000000000000000000000000000000000000000000000000000000001bc7b60c1bd267ac7348356cdefb7f3478399bfefe8e52c4a1226b4985d5e5c00a3616b0b1956e4b2ce3026d7048b93d73fbdf55c568b3eefdfc104dd44ae93bca\",\"value\":\"0x0\",\"block\":\"0x2192cba\"}"
+            },
+            "response": {
+              "status": 400,
+              "headers": {
+                "content-type": "application/json; charset=utf-8",
+                "date": "Mon, 26 Oct 2026 06:58:20 GMT",
+                "cache-control": "no-store",
+                "x-content-type-options": "nosniff"
+              },
+              "body": {
+                "error": {
+                  "code": "INVALID_INPUT",
+                  "message": "value must be an unsigned decimal wei string within uint256."
+                }
+              },
+              "bodyText": "{\"error\":{\"code\":\"INVALID_INPUT\",\"message\":\"value must be an unsigned decimal wei string within uint256.\"}}",
+              "bodySha256": "0867fb4104cb4ec610354f0e761c26bead5759c8f5e505345bed69da60c17d75",
+              "responseBytes": 107
+            }
+          },
+          "error": {
+            "code": "LOCAL_API_ERROR",
+            "message": "The planned local API request returned a non-success status; no retry was made."
+          },
+          "completedAt": "2026-10-26T06:58:20.388Z"
+        }
+      ]
+    }
+  ],
+  "skipped": [],
+  "summary": {
+    "planned": 8,
+    "attempted": 8,
+    "http200": 0,
+    "failedHttp": 8,
+    "rpcCalls": 0,
+    "rpcResponseBytes": 0,
+    "httpResponseBytes": 856,
+    "responseBytes": 856
+  },
+  "limitations": [
+    "Preselected development regression cases, not a prospective or blinded cohort.",
+    "No retries, fallbacks, transaction replacements, signatures or broadcasts.",
+    "Two endpoints do not establish independent execution engines or cryptographic state proof.",
+    "Successful JSON-RPC response bodies are retained exactly; rejected provider envelopes retain only hashes, byte counts and fixed local diagnostics.",
+    "These are unsigned current simulations at fixed selected block-end states, not original-position historical replays or signed transaction validation. Parent-state direct/router output quantities are deliberately not predeclared."
+  ],
+  "completedAt": "2026-10-26T06:58:20.389Z",
+  "elapsedMs": 46
+}

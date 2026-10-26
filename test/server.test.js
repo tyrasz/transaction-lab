@@ -16,7 +16,7 @@ test('simulation binds trace to the observed block hash and never switches to la
     throw new Error('Unexpected RPC method');
   }};
   const report=await simulate(EXAMPLES[0].request,rpc);
-  assert.equal(calls[1].params[1],hash);
+  assert.deepEqual(calls[1].params[1],{blockHash:hash,requireCanonical:true});
   assert.equal(calls[1].params[2].tracerConfig.withLog,true);
   assert.equal(report.source.blockHash,hash);
   assert.equal(report.execution.status,'reverted');

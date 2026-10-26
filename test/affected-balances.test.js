@@ -25,11 +25,12 @@ function setup(options = {}) {
   const trace = { type: 'CALL', from: SUBMITTER, to: ROUTER, input: request.data, output: '0x', value: '0x0', gasUsed: '0x2000', calls: [tokenCall(options)] };
   return { request, trace, block, metadata: structuredClone(METADATA), rpc: {} };
 }
-function contextFor(input, { historical = true, values = new Map(), mutate, error } = {}) {
+function contextFor(input, { historical = true, verifiedCurrent = false, values = new Map(), mutate, error } = {}) {
   const queries = [], evidence = { request: [], response: [] };
-  const identity = historical ? { stateBlockHash: input.block.hash, blockNumber: input.block.number, timestamp: input.block.timestamp, transactionHash: word(99), transactionIndex: '1', postTransactionIndex: '2', stateBinding: 'block_hash_and_transaction_index', headerContext: 'original_block', method: 'debug_traceCallMany' } : { stateBlockHash: input.block.hash, blockNumber: input.block.number, timestamp: input.block.timestamp, stateBinding: 'block_hash', headerContext: 'unchanged', method: 'debug_traceCall/prestateTracer + eth_call/stateDiff' };
+  const identity = verifiedCurrent ? { stateBlockHash: input.block.hash, blockNumber: input.block.number, timestamp: input.block.timestamp, stateBinding: 'block_hash', headerContext: 'synthetic_unpriced_basefee_zero', method: 'debug_traceCall', feePolicy: 'gas_price_omitted_no_query_native_debit', validation: { queryImplementation: 'configured_address_paths_before_and_after_no_runtime_code_attestation', queryMutation: 'sender_nonce_increment_only_with_unchanged_native_balance' } }
+    : historical ? { stateBlockHash: input.block.hash, blockNumber: input.block.number, timestamp: input.block.timestamp, transactionHash: word(99), transactionIndex: '1', postTransactionIndex: '2', stateBinding: 'block_hash_and_transaction_index', headerContext: 'original_block', method: 'debug_traceCallMany' } : { stateBlockHash: input.block.hash, blockNumber: input.block.number, timestamp: input.block.timestamp, stateBinding: 'block_hash', headerContext: 'unchanged', method: 'debug_traceCall/prestateTracer + eth_call/stateDiff' };
   const stateContext = {
-    ...(historical ? { measurementBasis: 'historical_transaction_position_balanceOf' } : {}),
+    ...(verifiedCurrent ? { measurementBasis: 'current_pinned_state_validated_query' } : historical ? { measurementBasis: 'historical_transaction_position_balanceOf' } : {}),
     matches: ({ request, block, rpc }) => request === input.request && block === input.block && rpc === input.rpc,
     async prepare() {}, executionIdentity: identity, canonicalFailure: null,
     async readPair(query) {
@@ -307,6 +308,38 @@ test('current affected queries remain unavailable until both implementation path
     assert.equal(calls, 0); assert.equal(prepared, false); assert.deepEqual(result.evidence, { request: [], response: [] });
     assert.match(result.warnings.at(-1), /implementation provenance is not validated/);
   }
+});
+
+test('validated current context admits affected participants with independently returned values and explicit synthetic environment', async () => {
+  // Synthetic consumer integration; current-state.test.js exercises the actual
+  // query paths/mutation guard against genuine saved traces and fault controls.
+  const input = setup(), values = new Map([[`${USDC}:${OWNER}`, [150n, 49n]], [`${USDC}:${RECIPIENT}`, [10n, 109n]]]);
+  const { result, queries } = await run(input, { verifiedCurrent: true, values });
+  assert.equal(result.status, 'measured'); assert.equal(result.basis, 'current_pinned_state_validated_query');
+  assert.deepEqual(result.assets.map(asset => asset.deltaRaw), ['-101', '99']);
+  assert.ok(result.assets.every(asset => asset.consistency.eventComparison === 'differs_from_event_net'));
+  assert.equal(queries.length, 2); assert.equal(result.executionIdentity.headerContext, 'synthetic_unpriced_basefee_zero');
+  assert.match(result.warnings[0], /BASEFEE is synthetic zero/);
+});
+
+test('current context basis alone cannot admit an unvalidated query/environment profile', async () => {
+  for (const mutate of [identity => { identity.headerContext = 'unchanged'; }, identity => { identity.feePolicy = 'ignored'; }, identity => { delete identity.validation.queryMutation; }, identity => { delete identity.validation.queryImplementation; }]) {
+    const input = setup(), context = contextFor(input, { verifiedCurrent: true }); mutate(context.identity);
+    const result = await measureAffectedBalances({ ...input, ...context });
+    assert.equal(result.status, 'unavailable'); assert.equal(context.queries.length, 0);
+    assert.match(result.warnings.at(-1), /validated current query and environment profile/);
+  }
+});
+
+test('current measured pair reuse retains the validated basis and rechecks exact same-context amounts', async () => {
+  const input = setup(), context = contextFor(input, { verifiedCurrent: true });
+  const original = await measureAffectedBalances({ ...input, ...context });
+  const reused = await measureAffectedBalances({ ...input, ...context, existingBalanceChanges: { ...original, assets: [original.assets[0]] } });
+  assert.equal(reused.status, 'measured'); assert.equal(reused.assets.length, 1); assert.equal(reused.reusedPairs.length, 1);
+  assert.equal(reused.reusedPairs[0].basis, 'current_pinned_state_validated_query');
+  const changed = structuredClone(original); changed.assets[0].beforeRaw = '1'; changed.assets[0].deltaRaw = '-1';
+  const denied = await measureAffectedBalances({ ...input, ...context, existingBalanceChanges: changed });
+  assert.equal(denied.status, 'unavailable'); assert.deepEqual(denied.reusedPairs, []);
 });
 
 test('observed supply trace identifies USDC sender/custody and hUSDC beneficiary; synthetic query values are separate', async () => {

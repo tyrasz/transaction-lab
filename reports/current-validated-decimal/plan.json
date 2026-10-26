@@ -1,0 +1,244 @@
+{
+  "schemaVersion": "1.0",
+  "createdAt": "2026-10-26T07:00:59.548Z",
+  "purpose": "Corrected client encoding for the identical eight preselected current simulations: value is unsigned decimal wei for the public HTTP API. Prior failed input attempts remain immutable; this is not new transaction selection, a retry of provider execution, or an accuracy/security score.",
+  "coreBinding": "Frozen version 0.8.0; do not bind or run until independent runner review and explicit root approval of this new plan/script hashes.",
+  "scriptSha256": "c6ade22ab1c0bf070b673ed61509526672429985e0d418da400933a7da9bd6dd",
+  "providers": {
+    "drpc": "https://hyperliquid.drpc.org",
+    "hyperlend-archive": "https://rpc.hyperlend.finance/archive"
+  },
+  "budgets": {
+    "plannedHttpRequests": 8,
+    "maxRpcCalls": 640,
+    "maxRpcCallsPerRun": 80,
+    "maxResponseBytes": 8388608,
+    "maxTotalResponseBytes": 134217728,
+    "rpcTimeoutMs": 25000,
+    "maxHttpRunMs": 120000,
+    "maxRunSequenceMs": 900000,
+    "retries": 0
+  },
+  "expectedRpcCallsIfPriorOutcomesPersist": null,
+  "sources": [
+    {
+      "path": "reports/current-query-capability/plan.json",
+      "sha256": "de8ae6eed7c291947efec06efa307b040359deb6bb5e5129ccbd8bef02b9e6a2"
+    },
+    {
+      "path": "reports/current-query-capability/capture.json",
+      "sha256": "3c11faec39109a330d91428d9ad359ee1601fc3820f5ae17b9971c61e7ddfae2"
+    },
+    {
+      "path": "reports/current-query-capability/summary.json",
+      "sha256": "023626d2384de23efecc121cb2baac87f9b8461124349644a2a48ea1449162bf"
+    },
+    {
+      "path": "reports/replay-state-comparisons/capture.json",
+      "sha256": "51d7cb6ba049b1cd38da52ba2131b4bc328ac264419c240f132c3b570f8ed610"
+    },
+    {
+      "path": "reports/replay-state-comparisons/capture.mjs",
+      "sha256": "0a9c9705af4dc1fb6b30a9452573aac922df7be83d867da2d61d230199a44c07"
+    },
+    {
+      "path": "reports/current-validated-comparisons/plan.json",
+      "sha256": "ce00e354c196e04d586dcbf35a49df2b0d58f7ba5449c20deca1bb8cb95b839d"
+    },
+    {
+      "path": "reports/current-validated-comparisons/capture.mjs",
+      "sha256": "400dda60c792c6daa6aa677789be95d74c3982d6f8fc174d43abf2e56fca9e23"
+    },
+    {
+      "path": "reports/current-validated-comparisons/capture.json",
+      "sha256": "391522d206dfa8add52c3b8a275729fd286e94a35c3b12cb863010a2e9fe8884"
+    }
+  ],
+  "cases": [
+    {
+      "id": "current-supply",
+      "operation": "supply",
+      "request": {
+        "chainId": 999,
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+        "data": "0x617ba037000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000000e5e4030000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d00000000000000000000000000000000000000000000000000000000000000000",
+        "value": "0",
+        "block": "0x2f3df80"
+      },
+      "expectedBlockHash": "0x48f4baab87c398dedf709546bbc5bc2da28f45ef90815bf98a47c8429b2f5fa7",
+      "providers": [
+        "drpc",
+        "hyperlend-archive"
+      ],
+      "source": {
+        "path": "reports/current-query-capability/plan.json",
+        "caseId": "supply"
+      },
+      "knownReference": {
+        "kind": "separately_recorded_provider_query_values",
+        "scope": "Same fixed current-call envelope/state and configured query pairs; not an independent execution engine or a presigned-state proof.",
+        "path": "reports/current-query-capability/capture.json",
+        "queries": [
+          {
+            "id": "usdc",
+            "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "beforeRaw": "344156193",
+            "afterRaw": "329090078",
+            "deltaRaw": "-15066115"
+          },
+          {
+            "id": "husdc",
+            "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "beforeRaw": "3179075937",
+            "afterRaw": "3194142051",
+            "deltaRaw": "15066114"
+          },
+          {
+            "id": "usdc-allowance",
+            "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003202135963444",
+            "afterRaw": "115792089237316195423570985008687907853269984665640564039457584003202120897329",
+            "deltaRaw": "-15066115"
+          }
+        ]
+      }
+    },
+    {
+      "id": "current-borrow",
+      "operation": "borrow",
+      "request": {
+        "chainId": 999,
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+        "data": "0xa415bcad000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000031cc53ea000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "value": "0",
+        "block": "0x2f08b79"
+      },
+      "expectedBlockHash": "0x206b1f6b56dced1f90f742384ad84d74973a02d8bee8c07a823f394d1506a5a2",
+      "providers": [
+        "drpc",
+        "hyperlend-archive"
+      ],
+      "source": {
+        "path": "reports/current-query-capability/plan.json",
+        "caseId": "borrow"
+      },
+      "knownReference": {
+        "kind": "separately_recorded_provider_query_values",
+        "scope": "Same fixed current-call envelope/state and configured query pairs; not an independent execution engine or a presigned-state proof.",
+        "path": "reports/current-query-capability/capture.json",
+        "queries": [
+          {
+            "id": "usdc",
+            "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "beforeRaw": "569439069",
+            "afterRaw": "1404913479",
+            "deltaRaw": "835474410"
+          },
+          {
+            "id": "husdc",
+            "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "beforeRaw": "5677678780",
+            "afterRaw": "5677678780",
+            "deltaRaw": "0"
+          },
+          {
+            "id": "debt",
+            "to": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+            "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "beforeRaw": "2",
+            "afterRaw": "835474412",
+            "deltaRaw": "835474410"
+          },
+          {
+            "id": "husdc-allowance",
+            "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "beforeRaw": "0",
+            "afterRaw": "0",
+            "deltaRaw": "0"
+          }
+        ]
+      }
+    },
+    {
+      "id": "current-direct-transferfrom-a",
+      "request": {
+        "chainId": 999,
+        "from": "0x2908da1b63c4f7ce001bf5d875d179930a79eed4",
+        "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+        "data": "0x23b872dd000000000000000000000000fc1bdd1ff58200761d56ccbce73f6f42ebe563790000000000000000000000002908da1b63c4f7ce001bf5d875d179930a79eed40000000000000000000000000000000000000000000000000000000000137c8b",
+        "value": "0",
+        "block": "0x2f09828"
+      },
+      "expectedBlockHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87",
+      "providers": [
+        "drpc",
+        "hyperlend-archive"
+      ],
+      "historicalSourceTransactionHash": "0xe2f9761a3fac3ba83ee15fc5e6f12b55d15cd804b321a2cffd9d2c16d6c38dfe",
+      "source": {
+        "path": "reports/replay-state-comparisons/capture.json",
+        "caseId": "direct-transferfrom-a",
+        "provider": "drpc",
+        "originalBlockNumber": "0x2f09829",
+        "originalBlockHash": "0x423e4d0311decaa1e0c1d452905059c1409fcd68e1aa94d78978756e845bbac5",
+        "parentHash": "0xe4e17972b424a9785e111ba5cfd3fc08fc3229e074c078a99a69fd126ee10e87"
+      },
+      "knownReference": null,
+      "referenceLimitation": "Original calldata replayed at the saved original block parent end state. No new raw balance/allowance outcome is assumed; failure or differences are retained without retry."
+    },
+    {
+      "id": "current-usdc-router-permit-consumed",
+      "request": {
+        "chainId": 999,
+        "from": "0x0c71073344e27e33cb57fcb587fc412d689dfd1d",
+        "to": "0x693f12e9e6b35b34458793546065e8b08e0299d6",
+        "data": "0x48519be800000000000000000000000053195a1c4e664ac09eb72892516f8f85ec80000000000000000000000000000000000000000000000000000000000000017d7840000000000000000000000000000000000000000000001c0df636224734347c2e0000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000000000000000000000000000000000000000000000000000006a079d9a000000000000000000000000000000000000000000000000000000000000001bc7b60c1bd267ac7348356cdefb7f3478399bfefe8e52c4a1226b4985d5e5c00a3616b0b1956e4b2ce3026d7048b93d73fbdf55c568b3eefdfc104dd44ae93bca",
+        "value": "0",
+        "block": "0x2192cba"
+      },
+      "expectedBlockHash": "0x86ec3e764c6331c20bdedfa0d647222f548db8ba927b7de7e4b4f055193f9c22",
+      "providers": [
+        "drpc",
+        "hyperlend-archive"
+      ],
+      "historicalSourceTransactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+      "source": {
+        "path": "reports/replay-state-comparisons/capture.json",
+        "caseId": "usdc-router-permit-consumed",
+        "provider": "drpc",
+        "originalBlockNumber": "0x2192cbb",
+        "originalBlockHash": "0xc4e624b4a34acf2b15115aff40a699d95807ed66d32e86209f1a360f48302117",
+        "parentHash": "0x86ec3e764c6331c20bdedfa0d647222f548db8ba927b7de7e4b4f055193f9c22"
+      },
+      "knownReference": null,
+      "referenceLimitation": "Original calldata replayed at the saved original block parent end state. No new raw balance/allowance outcome is assumed; failure or differences are retained without retry."
+    }
+  ],
+  "rules": [
+    "Exactly the fixed four cases on the two stated providers, at the specified selected block numbers/hashes. No latest block, discovery, fallback, retry or replacement.",
+    "Parent block numbers/hashes are derived solely from saved original block headers. Parent-state unsigned simulations are not labeled original transaction-position replay.",
+    "All envelopes come from saved captures, using zero native value and the API current-call profile. No signature generation, signing, submission or paid infrastructure.",
+    "Supply/borrow reference quantities are previously recorded same-state provider queries; direct/router quantities and success are unknown and must not be fabricated. A mismatch is evidence to retain, not a reason to rerun.",
+    "Capture exact successful HTTP/RPC bodies and hashes. Preserve fixed failure metadata/hashes and count all observed response bytes, including a cap-crossing chunk.",
+    "Verify source fingerprint before/after attempts and product identity plus selected state binding in HTTP200 responses. Retain failures and explicit global-limit skips.",
+    "The reviewed replay-state runner is adapted only for the fixed current request matrix/route and state identity checks. No production/source edits are authorized by this plan."
+  ],
+  "requiredImplementation": {
+    "version": "0.8.0",
+    "sourceSha256": "2205334781a09baf98c3f5cb05a546bcca7d4946aea33b510d1963c8eb561a0f"
+  },
+  "encodingCorrection": {
+    "priorPacket": "reports/current-validated-comparisons/",
+    "priorOutcome": "eight HTTP 400 INVALID_INPUT, zero RPC",
+    "onlyRequestChange": "value = BigInt(prior.request.value).toString(10)",
+    "selection": "Same cases, blocks, transaction envelopes, provider order, budgets and known references."
+  }
+}

@@ -4,6 +4,7 @@ import { DEFAULT_RPC_URL } from './config.js';
 const READ_METHODS = new Set([
   'eth_chainId', 'eth_getBlockByNumber', 'eth_getBlockByHash',
   'eth_getTransactionByHash', 'eth_getTransactionReceipt', 'eth_call',
+  'eth_getTransactionCount', 'eth_getBalance', 'eth_getCode',
   'debug_traceCall', 'debug_traceTransaction', 'debug_traceCallMany', 'eth_simulateV1',
 ]);
 

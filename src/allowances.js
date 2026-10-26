@@ -40,8 +40,9 @@ function compareEvidence(observations, finalValue) {
 /** Measure final allowance state for verified permission pairs in one successful EVM call. */
 export async function measureAllowances({ request, trace, block, rpc, metadata = {}, analysis, permissions, stateContext }) {
   const historical = stateContext?.allowanceMeasurementBasis === 'historical_transaction_position_allowance';
+  const verifiedCurrent = stateContext?.allowanceMeasurementBasis === 'current_pinned_state_validated_allowance';
   const base = {
-    status: 'not_applicable', basis: historical ? 'historical_transaction_position_allowance' : 'prestate_diff_allowance', allowances: [],
+    status: 'not_applicable', basis: historical ? 'historical_transaction_position_allowance' : verifiedCurrent ? 'current_pinned_state_validated_allowance' : 'prestate_diff_allowance', allowances: [],
     warnings: [], evidence: { request: [], response: [] },
     limits: { maxPairs: MAX_PAIRS, maxPermissionObservations: MAX_OBSERVATIONS },
   };
@@ -52,7 +53,9 @@ export async function measureAllowances({ request, trace, block, rpc, metadata =
   const warnings = [
     historical
       ? 'Allowances are queried independently immediately before and after the original transaction at its exact position in the original block. They are not inferred from individual Approval events or permit requests.'
-      : 'Allowances are queried before and after the entire simulated transaction at one pinned block hash. They are not inferred from individual Approval events. The provider simulation omits gas-price fields; its execution header is not verified to match the original block.',
+      : verifiedCurrent
+        ? 'Allowances are queried before and after the whole unsigned call with validated configured-token paths and nonce-only query effects. The unpriced environment uses synthetic BASEFEE zero; other header fields are checked against the pinned block. Approval events are separate evidence, not final allowance values.'
+        : 'Allowances are queried before and after the entire simulated transaction at one pinned block hash. They are not inferred from individual Approval events. The provider simulation omits gas-price fields; its execution header is not verified to match the original block.',
     'Maximum allowance describes spending permission, not spender trustworthiness. No transaction security verdict is provided.',
   ];
   try {

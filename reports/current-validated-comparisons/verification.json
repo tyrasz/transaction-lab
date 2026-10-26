@@ -1,0 +1,374 @@
+{
+  "status": "verified_offline_packet",
+  "captureSha256": "391522d206dfa8add52c3b8a275729fd286e94a35c3b12cb863010a2e9fe8884",
+  "implementation": {
+    "version": "0.8.0",
+    "sourceSha256": "2205334781a09baf98c3f5cb05a546bcca7d4946aea33b510d1963c8eb561a0f",
+    "sourceFiles": [
+      "account-effects.js",
+      "affected-balances.js",
+      "allowances.js",
+      "analyze.js",
+      "balances.js",
+      "config.js",
+      "current-state.js",
+      "historical-state.js",
+      "lending.js",
+      "lending-balances.js",
+      "permissions.js",
+      "query-validation.js",
+      "revert.js",
+      "rpc.js",
+      "server.js",
+      "state-diff.js",
+      "state.js",
+      "validate.js"
+    ]
+  },
+  "totals": {
+    "attempted": 8,
+    "http200": 0,
+    "failedHttp": 8,
+    "rpcCalls": 0,
+    "rpcResponseBytes": 0,
+    "httpResponseBytes": 856
+  },
+  "measuredRunCount": 0,
+  "skipped": [],
+  "outcomes": [
+    {
+      "caseId": "current-supply",
+      "provider": "drpc",
+      "httpStatus": 400,
+      "rpcCalls": 0,
+      "error": "LOCAL_API_ERROR",
+      "execution": null,
+      "statuses": {
+        "balanceChanges": null,
+        "allowanceChanges": null,
+        "affectedBalanceChanges": null
+      },
+      "queries": [],
+      "references": [
+        {
+          "id": "usdc",
+          "status": "not_measured_or_unavailable",
+          "expected": {
+            "beforeRaw": "344156193",
+            "afterRaw": "329090078",
+            "deltaRaw": "-15066115"
+          },
+          "observed": null
+        },
+        {
+          "id": "husdc",
+          "status": "not_measured_or_unavailable",
+          "expected": {
+            "beforeRaw": "3179075937",
+            "afterRaw": "3194142051",
+            "deltaRaw": "15066114"
+          },
+          "observed": null
+        },
+        {
+          "id": "usdc-allowance",
+          "status": "not_measured_or_unavailable",
+          "expected": {
+            "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003202135963444",
+            "afterRaw": "115792089237316195423570985008687907853269984665640564039457584003202120897329",
+            "deltaRaw": "-15066115"
+          },
+          "observed": null
+        }
+      ],
+      "apiError": {
+        "code": "INVALID_INPUT",
+        "message": "value must be an unsigned decimal wei string within uint256."
+      }
+    },
+    {
+      "caseId": "current-supply",
+      "provider": "hyperlend-archive",
+      "httpStatus": 400,
+      "rpcCalls": 0,
+      "error": "LOCAL_API_ERROR",
+      "execution": null,
+      "statuses": {
+        "balanceChanges": null,
+        "allowanceChanges": null,
+        "affectedBalanceChanges": null
+      },
+      "queries": [],
+      "references": [
+        {
+          "id": "usdc",
+          "status": "not_measured_or_unavailable",
+          "expected": {
+            "beforeRaw": "344156193",
+            "afterRaw": "329090078",
+            "deltaRaw": "-15066115"
+          },
+          "observed": null
+        },
+        {
+          "id": "husdc",
+          "status": "not_measured_or_unavailable",
+          "expected": {
+            "beforeRaw": "3179075937",
+            "afterRaw": "3194142051",
+            "deltaRaw": "15066114"
+          },
+          "observed": null
+        },
+        {
+          "id": "usdc-allowance",
+          "status": "not_measured_or_unavailable",
+          "expected": {
+            "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003202135963444",
+            "afterRaw": "115792089237316195423570985008687907853269984665640564039457584003202120897329",
+            "deltaRaw": "-15066115"
+          },
+          "observed": null
+        }
+      ],
+      "apiError": {
+        "code": "INVALID_INPUT",
+        "message": "value must be an unsigned decimal wei string within uint256."
+      }
+    },
+    {
+      "caseId": "current-borrow",
+      "provider": "drpc",
+      "httpStatus": 400,
+      "rpcCalls": 0,
+      "error": "LOCAL_API_ERROR",
+      "execution": null,
+      "statuses": {
+        "balanceChanges": null,
+        "allowanceChanges": null,
+        "affectedBalanceChanges": null
+      },
+      "queries": [],
+      "references": [
+        {
+          "id": "usdc",
+          "status": "not_measured_or_unavailable",
+          "expected": {
+            "beforeRaw": "569439069",
+            "afterRaw": "1404913479",
+            "deltaRaw": "835474410"
+          },
+          "observed": null
+        },
+        {
+          "id": "husdc",
+          "status": "not_measured_or_unavailable",
+          "expected": {
+            "beforeRaw": "5677678780",
+            "afterRaw": "5677678780",
+            "deltaRaw": "0"
+          },
+          "observed": null
+        },
+        {
+          "id": "debt",
+          "status": "not_measured_or_unavailable",
+          "expected": {
+            "beforeRaw": "2",
+            "afterRaw": "835474412",
+            "deltaRaw": "835474410"
+          },
+          "observed": null
+        },
+        {
+          "id": "husdc-allowance",
+          "status": "not_measured_or_unavailable",
+          "expected": {
+            "beforeRaw": "0",
+            "afterRaw": "0",
+            "deltaRaw": "0"
+          },
+          "observed": null
+        }
+      ],
+      "apiError": {
+        "code": "INVALID_INPUT",
+        "message": "value must be an unsigned decimal wei string within uint256."
+      }
+    },
+    {
+      "caseId": "current-borrow",
+      "provider": "hyperlend-archive",
+      "httpStatus": 400,
+      "rpcCalls": 0,
+      "error": "LOCAL_API_ERROR",
+      "execution": null,
+      "statuses": {
+        "balanceChanges": null,
+        "allowanceChanges": null,
+        "affectedBalanceChanges": null
+      },
+      "queries": [],
+      "references": [
+        {
+          "id": "usdc",
+          "status": "not_measured_or_unavailable",
+          "expected": {
+            "beforeRaw": "569439069",
+            "afterRaw": "1404913479",
+            "deltaRaw": "835474410"
+          },
+          "observed": null
+        },
+        {
+          "id": "husdc",
+          "status": "not_measured_or_unavailable",
+          "expected": {
+            "beforeRaw": "5677678780",
+            "afterRaw": "5677678780",
+            "deltaRaw": "0"
+          },
+          "observed": null
+        },
+        {
+          "id": "debt",
+          "status": "not_measured_or_unavailable",
+          "expected": {
+            "beforeRaw": "2",
+            "afterRaw": "835474412",
+            "deltaRaw": "835474410"
+          },
+          "observed": null
+        },
+        {
+          "id": "husdc-allowance",
+          "status": "not_measured_or_unavailable",
+          "expected": {
+            "beforeRaw": "0",
+            "afterRaw": "0",
+            "deltaRaw": "0"
+          },
+          "observed": null
+        }
+      ],
+      "apiError": {
+        "code": "INVALID_INPUT",
+        "message": "value must be an unsigned decimal wei string within uint256."
+      }
+    },
+    {
+      "caseId": "current-direct-transferfrom-a",
+      "provider": "drpc",
+      "httpStatus": 400,
+      "rpcCalls": 0,
+      "error": "LOCAL_API_ERROR",
+      "execution": null,
+      "statuses": {
+        "balanceChanges": null,
+        "allowanceChanges": null,
+        "affectedBalanceChanges": null
+      },
+      "queries": [],
+      "references": [],
+      "apiError": {
+        "code": "INVALID_INPUT",
+        "message": "value must be an unsigned decimal wei string within uint256."
+      }
+    },
+    {
+      "caseId": "current-direct-transferfrom-a",
+      "provider": "hyperlend-archive",
+      "httpStatus": 400,
+      "rpcCalls": 0,
+      "error": "LOCAL_API_ERROR",
+      "execution": null,
+      "statuses": {
+        "balanceChanges": null,
+        "allowanceChanges": null,
+        "affectedBalanceChanges": null
+      },
+      "queries": [],
+      "references": [],
+      "apiError": {
+        "code": "INVALID_INPUT",
+        "message": "value must be an unsigned decimal wei string within uint256."
+      }
+    },
+    {
+      "caseId": "current-usdc-router-permit-consumed",
+      "provider": "drpc",
+      "httpStatus": 400,
+      "rpcCalls": 0,
+      "error": "LOCAL_API_ERROR",
+      "execution": null,
+      "statuses": {
+        "balanceChanges": null,
+        "allowanceChanges": null,
+        "affectedBalanceChanges": null
+      },
+      "queries": [],
+      "references": [],
+      "apiError": {
+        "code": "INVALID_INPUT",
+        "message": "value must be an unsigned decimal wei string within uint256."
+      }
+    },
+    {
+      "caseId": "current-usdc-router-permit-consumed",
+      "provider": "hyperlend-archive",
+      "httpStatus": 400,
+      "rpcCalls": 0,
+      "error": "LOCAL_API_ERROR",
+      "execution": null,
+      "statuses": {
+        "balanceChanges": null,
+        "allowanceChanges": null,
+        "affectedBalanceChanges": null
+      },
+      "queries": [],
+      "references": [],
+      "apiError": {
+        "code": "INVALID_INPUT",
+        "message": "value must be an unsigned decimal wei string within uint256."
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "caseId": "current-supply",
+      "status": "not_comparable",
+      "executionStatusAgreement": null,
+      "measurementStatusesAgree": null,
+      "queries": []
+    },
+    {
+      "caseId": "current-borrow",
+      "status": "not_comparable",
+      "executionStatusAgreement": null,
+      "measurementStatusesAgree": null,
+      "queries": []
+    },
+    {
+      "caseId": "current-direct-transferfrom-a",
+      "status": "not_comparable",
+      "executionStatusAgreement": null,
+      "measurementStatusesAgree": null,
+      "queries": []
+    },
+    {
+      "caseId": "current-usdc-router-permit-consumed",
+      "status": "not_comparable",
+      "executionStatusAgreement": null,
+      "measurementStatusesAgree": null,
+      "queries": []
+    }
+  ],
+  "networkCalls": 0,
+  "liveSourceImportedOrHashed": false,
+  "limitations": [
+    "Checks recorded evidence and scoped configured query behavior; not independent EVM execution or a cryptographic state proof.",
+    "Unavailable/reverted/error outcomes and reference/provider differences are retained without retries or fabricated quantities.",
+    "No historical-value expectation is applied to the new direct/router parent-state simulations."
+  ]
+}
+

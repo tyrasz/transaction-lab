@@ -272,6 +272,11 @@ function renderBalanceChanges(changes, source = {}, affectedBalances) {
       addDefinition(context, 'State binding', identity.stateBinding === 'block_hash_and_transaction_index' ? 'Block hash and transaction index' : identity.stateBinding || 'Not provided');
       addDefinition(context, 'Block hash', identity.stateBlockHash || 'Not provided');
     } else if (historical) addDefinition(context, 'Measurement basis', changes.basis || 'Not provided');
+    else if (identity.headerContext === 'synthetic_unpriced_basefee_zero') {
+      addDefinition(context, 'State', 'Pinned block, with isolated before-and-after token queries');
+      addDefinition(context, 'Call environment', 'Unsigned call with a zero base fee; other block fields checked');
+      addDefinition(context, 'Network fees', 'Not estimated');
+    }
     $('balance-verification').hidden = !context.children.length;
   }
   if (measured) {
@@ -622,6 +627,11 @@ function renderResult(result) {
   addDefinition(details, 'State binding', source.blockBinding);
   addDefinition(details, 'RPC provider', source.provider);
   addDefinition(details, 'Trace method', result.evidence?.traceMethod);
+  if (!historical) {
+    const validated = [result.balanceChanges, result.allowanceChanges, result.affectedBalanceChanges].some(value => value?.status === 'measured' && value.executionIdentity?.headerContext === 'synthetic_unpriced_basefee_zero');
+    addDefinition(details, 'Call environment', validated ? 'Unsigned call with a zero base fee; other block fields checked' : 'Unsigned call; gas price omitted and execution header not validated');
+    addDefinition(details, 'Network fees', 'Not estimated');
+  }
   if (historical && result.balanceChanges?.status === 'measured' && result.balanceChanges.basis === 'historical_transaction_position_balanceOf') {
     addDefinition(details, 'Balance method', result.balanceChanges.executionIdentity?.method);
     addDefinition(details, 'Balance state', 'Before and after the original transaction, with original block context');

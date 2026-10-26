@@ -79,7 +79,7 @@ export function projectAccountEffects({ request, analysis, permissions, balanceC
     // delta. The source/index identifies the corresponding state result and its
     // separately retained RPC evidence. Reused pairs are already in the base set.
     for (const [source, measurements] of [['balanceChanges', balanceChanges], ['affectedBalanceChanges', affectedBalanceChanges]]) if (measurements?.status === 'measured') {
-      if (!['prestate_diff_balanceOf', 'historical_transaction_position_balanceOf'].includes(measurements.basis) || !Array.isArray(measurements.assets) || measurements.assets.length > LIMITS.maxTokenAccountPairs) throw new Error('Measured balance references are malformed.');
+      if (!['prestate_diff_balanceOf', 'current_pinned_state_validated_query', 'historical_transaction_position_balanceOf'].includes(measurements.basis) || !Array.isArray(measurements.assets) || measurements.assets.length > LIMITS.maxTokenAccountPairs) throw new Error('Measured balance references are malformed.');
       for (const [index, entry] of measurements.assets.entries()) {
         const token = entry.asset?.address;
         if (!known(token)) throw new Error('Measured balance references contain an unsupported token.');
