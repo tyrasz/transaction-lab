@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "1.0",
+  "status": "incomplete_or_failed_fixed_candidate",
+  "syntheticSequence": true,
+  "exactHistoricalReplay": false,
+  "planSha256": "5a4be0448003659ef5441b7a17294f1d60acfa4b31a8faac46f23965217d7066",
+  "captureSha256": "e3e4e36d1433b8eb29467cdc172b0ea7efa6f3f3ca526a478aa6e42d89b99c03",
+  "requests": 12,
+  "responseBytes": 35499,
+  "retries": 0,
+  "candidate": {
+    "sender": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+    "blockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+    "amountRaw": "3962903485",
+    "usdcBalanceRaw": "3962903485",
+    "allowanceBeforeRaw": "0",
+    "allowanceAfterApprovalRaw": "3962903485",
+    "approvalNonceBefore": "52",
+    "approvalNonceAfter": "53",
+    "withoutApprovalRevert": "ERC20: transfer amount exceeds allowance",
+    "supplyAfterApproval": "not_attempted",
+    "canonicalRecheck": "not_attempted"
+  },
+  "stopReason": "Discovery-only query-diff assertion required pre fields exactly nonce. Observed pre contains independently anchored unchanged native balance plus nonce53, post nonce54. Provider calls all succeeded. No prior outcome replaced.",
+  "offlineDiagnosis": {
+    "queryPreNativeBalanceRaw": "2558093428345938830",
+    "matchesPinnedNativeBalance": true,
+    "queryNonceBefore": "53",
+    "queryNonceAfter": "54",
+    "queryStoredChanges": false
+  },
+  "limitations": [
+    "Synthetic unsigned calls at historical parent block end, not original-position or signed execution.",
+    "Fee fields are omitted; native fees and independent BASEFEE/header-witness validation are outside this discovery.",
+    "Provider-supplied execution/state evidence is not an independent engine or cryptographic state proof.",
+    "One development fixture, no population coverage/security accuracy claim."
+  ]
+}

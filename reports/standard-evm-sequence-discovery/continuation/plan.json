@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0",
+  "frozenAt": "2026-10-26T14:17:46.833Z",
+  "endpoint": "https://eth.drpc.org",
+  "syntheticSequence": true,
+  "supplementalContinuation": true,
+  "originalOutcomePreserved": "incomplete_or_failed_fixed_candidate",
+  "originalCaptureSha256": "e3e4e36d1433b8eb29467cdc172b0ea7efa6f3f3ca526a478aa6e42d89b99c03",
+  "originalManifestSha256": "b845a0ae70adb3f34c382fb83a2086a438dbe1540dc8f2c53a94c047fc5fe52e",
+  "originalPlanSha256": "5a4be0448003659ef5441b7a17294f1d60acfa4b31a8faac46f23965217d7066",
+  "scriptSha256": "6d455e11bae69148a8153f13591d2cf999c77f26a90959843be216792da29486",
+  "supply": {
+    "from": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+    "to": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+    "data": "0x617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000ec351bbd00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b40000000000000000000000000000000000000000000000000000000000000000",
+    "value": "0x0",
+    "gas": "0x4c4b40"
+  },
+  "blockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+  "completeApprovalOverridesSha256": "7f20cea3604741c8ca4d36d1707d43206e80cb884af76ba83dff7f8bd96e3add",
+  "limits": {
+    "requests": 3,
+    "candidates": 1,
+    "responseBytes": 8388608,
+    "totalBytes": 33554432,
+    "requestMs": 25000,
+    "wallMs": 360000,
+    "retries": 0
+  },
+  "methods": [
+    "debug_traceCall",
+    "eth_getBlockByNumber"
+  ],
+  "continuationReason": "Original read-only query prestate includes unchanged sender native balance anchored to independent pinned read. Validate that field and nonce53→54 offline, then perform only three previously unattempted observations.",
+  "procedure": [
+    "Verify every original packet file against original manifest; import only its archived helpers.",
+    "Recompute full unchanged approve overrides; no funding or guessed slot patch.",
+    "Supply after approve callTracer withLog, supply pre/postdiff under exact same overrides, then full numeric block header recheck. Each called once.",
+    "Preserve original12-call incomplete outcome and all three supplemental outcomes, no retry or fallback."
+  ],
+  "limitations": [
+    "Synthetic unsigned calls at historical parent block end, not original-position or signed execution.",
+    "Fee fields are omitted; native fees and independent BASEFEE/header-witness validation are outside this discovery.",
+    "Provider-supplied execution/state evidence is not an independent engine or cryptographic state proof.",
+    "One development fixture, no population coverage/security accuracy claim."
+  ]
+}

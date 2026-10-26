@@ -1,0 +1,159 @@
+{
+  "schemaVersion": "1.0",
+  "frozenAt": "2026-10-26T13:51:05.523Z",
+  "id": "synthetic-aave-approve-then-supply",
+  "endpoint": "https://eth.drpc.org",
+  "chainId": 1,
+  "blockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+  "sender": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+  "usdc": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "pool": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+  "aToken": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+  "amountRaw": "3962903485",
+  "approval": {
+    "from": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+    "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "data": "0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000ec351bbd",
+    "value": "0x0",
+    "gas": "0x4c4b40"
+  },
+  "supply": {
+    "from": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+    "to": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+    "data": "0x617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000ec351bbd00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b40000000000000000000000000000000000000000000000000000000000000000",
+    "value": "0x0",
+    "gas": "0x4c4b40"
+  },
+  "provenance": {
+    "originalHistoricalTransaction": "0x6166280a62cdad28e7b8af05ebb622b42b61deff981b3b6cd83dc03b3bb130b2",
+    "originalOperation": "supplyWithPermit",
+    "derivedOperation": "supply(address,uint256,address,uint16)",
+    "derivation": "First four ABI arguments unchanged; selector changed and permit suffix removed. A synthetic approve transaction is prepended. Not an original historical transaction replay.",
+    "primaryDocumentation": "https://aave.com/docs/aave-v3/smart-contracts/pool",
+    "sourceArchiveManifestSha256": "75ba63b9da1d90f31346e518908bff8c69aad76bcdf910669d371349758e5d70"
+  },
+  "limits": {
+    "requests": 30,
+    "candidates": 1,
+    "responseBytes": 8388608,
+    "totalBytes": 33554432,
+    "requestMs": 25000,
+    "wallMs": 360000,
+    "retries": 0
+  },
+  "methods": [
+    "eth_chainId",
+    "eth_getBlockByHash",
+    "eth_getBlockByNumber",
+    "eth_getTransactionCount",
+    "eth_getBalance",
+    "eth_getCode",
+    "eth_call",
+    "debug_traceCall"
+  ],
+  "scriptSha256": "557fa43a9e5e749b7b48559d28f14bbab265d307ea05f203ac8d290e8195a374",
+  "sources": [
+    {
+      "path": "source/engines/standard-evm/node_modules/@noble/hashes/LICENSE",
+      "bytes": 1109,
+      "sha256": "4f221aee6e072336700c408c68ab3b96a3fc09f6aebe6f48f1bd99e5ef13faec",
+      "origin": "reports/standard-evm-native/source/engines/standard-evm/node_modules/@noble/hashes/LICENSE"
+    },
+    {
+      "path": "source/engines/standard-evm/node_modules/@noble/hashes/_u64.js",
+      "bytes": 4794,
+      "sha256": "b09da8c07fe8187c07649494cdb7cd0bcf13df90b506a9473d19e4d5f8c2e102",
+      "origin": "reports/standard-evm-native/source/engines/standard-evm/node_modules/@noble/hashes/_u64.js"
+    },
+    {
+      "path": "source/engines/standard-evm/node_modules/@noble/hashes/package.json",
+      "bytes": 2583,
+      "sha256": "3e361734f5269de162fa362483d7f45dee7efb533ec217157945338f7591baaf",
+      "origin": "reports/standard-evm-native/source/engines/standard-evm/node_modules/@noble/hashes/package.json"
+    },
+    {
+      "path": "source/engines/standard-evm/node_modules/@noble/hashes/sha3.js",
+      "bytes": 17469,
+      "sha256": "9a81e1edb24eae27b335533220167609cfb58008c5690e140ce478acdc669f32",
+      "origin": "reports/standard-evm-native/source/engines/standard-evm/node_modules/@noble/hashes/sha3.js"
+    },
+    {
+      "path": "source/engines/standard-evm/node_modules/@noble/hashes/utils.js",
+      "bytes": 26035,
+      "sha256": "037ad49adb78168b6b699598fd33f85f7877456b1d28b4d032e2a1a16807947c",
+      "origin": "reports/standard-evm-native/source/engines/standard-evm/node_modules/@noble/hashes/utils.js"
+    },
+    {
+      "path": "source/engines/standard-evm/package.json",
+      "bytes": 322,
+      "sha256": "048fa22728b4cef1ca2b0b08de11b85b3a5f2d2d326de9a966b0e9c4539e6826",
+      "origin": "reports/standard-evm-native/source/engines/standard-evm/package.json"
+    },
+    {
+      "path": "source/engines/standard-evm/provider-state-diff.js",
+      "bytes": 3536,
+      "sha256": "d506b50e2f5ae80c9fb45e32fba52383bf5608dabe83bd8b8c03809c023dc188",
+      "origin": "reports/standard-evm-native/source/engines/standard-evm/provider-state-diff.js"
+    },
+    {
+      "path": "source/package.json",
+      "bytes": 748,
+      "sha256": "9e9a18ce644f8ebf4c9e7f94a9f11225f8f49726d234986c4bedb130d026fc65",
+      "origin": "reports/standard-evm-native/source/package.json"
+    },
+    {
+      "path": "source/src/config.js",
+      "bytes": 10726,
+      "sha256": "3c3ce9d7c64f455683d94176c5c32d656fd90568b892fd7ddcbb82cff5542c10",
+      "origin": "reports/standard-evm-native/source/src/config.js"
+    },
+    {
+      "path": "source/src/rpc.js",
+      "bytes": 7011,
+      "sha256": "d354a756cf56e2aa4bb37e8ede134136421dcd4a4e095a65060b8cdcf1c0484a",
+      "origin": "reports/standard-evm-native/source/src/rpc.js"
+    },
+    {
+      "path": "source/src/state-diff.js",
+      "bytes": 5004,
+      "sha256": "91aad467697539ffbe9a76b7626799ff72ce043a3875355ec18933fe406e1235",
+      "origin": "reports/standard-evm-native/source/src/state-diff.js"
+    },
+    {
+      "path": "source/src/state.js",
+      "bytes": 11192,
+      "sha256": "f8e6e7121df5cc94f00e9b377b3b18a49961f9878882d69bcdea8ed816503a2b",
+      "origin": "reports/standard-evm-native/source/src/state.js"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "inputs/aave-response.json",
+      "bytes": 408253,
+      "sha256": "2fea1f944225742955948d2d9e93142095f9a78f7b1edb5f26047613a222388c",
+      "origin": "reports/standard-evm-auto/aave-response.json"
+    },
+    {
+      "path": "inputs/aave-pool-docs.html",
+      "bytes": 382510,
+      "sha256": "1fb51175d15fe55c0bf13e446cb079bc4af84302c7356684fca573a093209870",
+      "origin": "reports/standard-evm-discovery/raw/028.body"
+    }
+  ],
+  "procedure": [
+    "Single fixed candidate; no fallback, replacement, signing, broadcasting or funding.",
+    "Fresh hash-pinned account, balance and allowance reads; allowance must be0 and balance at least amount.",
+    "Capture supply at original base state and require a revert.",
+    "Execute actual approve via callTracer withLog and prestateTracer; require Approval owner/spender/value plus sender nonce transition and only one USDC storage change.",
+    "Build complete poststate overrides from the validated full approve diff using archived buildStateOverrides; preserve nonce and every changed slot, no direct guessed allowance slot or balance patch.",
+    "Query allowance under exact approve overrides; validate nonce-only query diff but never carry this measurement-call nonce into the sequence.",
+    "Execute unchanged derived supply with exactly the complete approve overrides; retain full trace/diff/events, validate sender nonce after approval to after supply.",
+    "Recheck complete pinned header by number; retain every result and stop once candidate succeeds or fails."
+  ],
+  "limitations": [
+    "Synthetic unsigned calls at historical parent block end, not original-position or signed execution.",
+    "Fee fields are omitted; native fees and independent BASEFEE/header-witness validation are outside this discovery.",
+    "Provider-supplied execution/state evidence is not an independent engine or cryptographic state proof.",
+    "One development fixture, no population coverage/security accuracy claim."
+  ]
+}

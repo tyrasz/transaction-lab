@@ -1,0 +1,78 @@
+{
+  "id": 11,
+  "role": "allowance_after_approval_trace",
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 11,
+    "method": "debug_traceCall",
+    "params": [
+      {
+        "from": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "data": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+        "value": "0x0",
+        "gas": "0x493e0"
+      },
+      "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+      {
+        "tracer": "callTracer",
+        "timeout": "15s",
+        "tracerConfig": {
+          "withLog": true
+        },
+        "stateOverrides": {
+          "0x48c16c5652add27eddb0f896748a35fc60b8d1b4": {
+            "nonce": "0x35"
+          },
+          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": {
+            "stateDiff": {
+              "0x26336f21a63aacd3574e840a3278fccb16fd789e8d3e700e5b9587a87e8da134": "0x00000000000000000000000000000000000000000000000000000000ec351bbd"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "requestText": "{\"jsonrpc\":\"2.0\",\"id\":11,\"method\":\"debug_traceCall\",\"params\":[{\"from\":\"0x48c16c5652add27eddb0f896748a35fc60b8d1b4\",\"to\":\"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48\",\"data\":\"0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2\",\"value\":\"0x0\",\"gas\":\"0x493e0\"},\"0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7\",{\"tracer\":\"callTracer\",\"timeout\":\"15s\",\"tracerConfig\":{\"withLog\":true},\"stateOverrides\":{\"0x48c16c5652add27eddb0f896748a35fc60b8d1b4\":{\"nonce\":\"0x35\"},\"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48\":{\"stateDiff\":{\"0x26336f21a63aacd3574e840a3278fccb16fd789e8d3e700e5b9587a87e8da134\":\"0x00000000000000000000000000000000000000000000000000000000ec351bbd\"}}}}]}",
+  "requestSha256": "9b5ca828928aa04925a663208cd8e1428602d64030141492ada6bdfd1e005dfe",
+  "requestBytes": 766,
+  "startedAt": "2026-10-26T13:51:26.861Z",
+  "response": {
+    "id": 11,
+    "jsonrpc": "2.0",
+    "result": {
+      "from": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+      "gas": "0x493e0",
+      "gasUsed": "0x7c04",
+      "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "input": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+      "output": "0x00000000000000000000000000000000000000000000000000000000ec351bbd",
+      "calls": [
+        {
+          "from": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "gas": "0x411e2",
+          "gasUsed": "0xa63",
+          "to": "0x43506849d7c04f9138d1a2050bbf3a0c054402dd",
+          "input": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+          "output": "0x00000000000000000000000000000000000000000000000000000000ec351bbd",
+          "value": "0x0",
+          "type": "DELEGATECALL"
+        }
+      ],
+      "value": "0x0",
+      "type": "CALL"
+    }
+  },
+  "status": "success",
+  "httpStatus": 200,
+  "completedAt": "2026-10-26T13:51:27.194Z",
+  "durationMs": 331.336542,
+  "raw": {
+    "file": "raw/011.body",
+    "complete": true,
+    "observedBytes": 839,
+    "bytes": 839,
+    "observedPrefixSha256": "62161eeae0b8d6bd20f7f77d02e341acd84610d8918ecd7891f4b0260a6d4952",
+    "sha256": "62161eeae0b8d6bd20f7f77d02e341acd84610d8918ecd7891f4b0260a6d4952"
+  }
+}

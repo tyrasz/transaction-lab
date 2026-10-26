@@ -1,9 +1,11 @@
 const $ = (id) => document.getElementById(id);
-const state = { config: null, example: null, result: null, busy: false, benchmarkLoaded: false };
-const requestFieldIds = ['chain', 'from', 'to', 'data', 'value', 'block', 'standard-manual-queries', 'standard-queries'];
+const state = { config: null, example: null, result: null, busy: false, benchmarkLoaded: false, sequenceDrafts: [], sequenceControls: [], nextCallKey: 1 };
+const requestFieldIds = ['chain', 'ethereum-call-mode', 'from', 'to', 'data', 'value', 'block', 'standard-manual-queries', 'standard-queries'];
 const ethereumMode = () => $('chain').value === '1';
+const sequenceMode = () => ethereumMode() && $('ethereum-call-mode').value === 'sequence';
 const standardAvailable = () => state.config?.standardEvm?.available === true;
-const manualQueries = () => ethereumMode() && $('standard-manual-queries').checked;
+const sequenceAvailable = () => standardAvailable() && state.config?.standardEvm?.sequenceCapabilities?.available === true;
+const manualQueries = () => ethereumMode() && !sequenceMode() && $('standard-manual-queries').checked;
 
 function node(tag, className, text) {
   const element = document.createElement(tag);
@@ -20,7 +22,7 @@ function formatTime(value) { if (value === null || value === undefined || value 
 
 async function request(url, body) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), url === '/api/evm/simulate' ? 180000 : 65000);
+  const timer = setTimeout(() => controller.abort(), url === '/api/evm/simulate-sequence' ? 300000 : url === '/api/evm/simulate' ? 180000 : 65000);
   try {
     const response = await fetch(url, { method: body ? 'POST' : 'GET', headers: body ? { 'Content-Type': 'application/json' } : undefined, body: body ? JSON.stringify(body) : undefined, signal: controller.signal });
     const result = await response.json();
@@ -39,14 +41,14 @@ async function request(url, body) {
 
 function setBusy(busy, mode) {
   state.busy = busy;
-  $('simulate-button').disabled = busy || (ethereumMode() && !standardAvailable());
+  $('simulate-button').disabled = busy || (ethereumMode() && !standardAvailable()) || (sequenceMode() && !sequenceAvailable());
   $('replay-button').disabled = busy;
   $('example').disabled = busy;
   for (const id of requestFieldIds) $(id).disabled = busy;
   updateQueryMode();
   document.querySelector('.results-panel').setAttribute('aria-busy', String(busy));
   $('run-status').classList.toggle('loading', busy);
-  $('run-status').textContent = busy ? mode === 'historical_trace' ? 'Retrieving the original execution trace and checking available historical balance evidence…' : ethereumMode() ? manualQueries() ? 'Running the unsigned call, checking the manual token list and measuring selected ETH accounts. This can take a few minutes…' : 'Running the unsigned call and measuring selected ETH accounts, token balances and allowances. This can take a few minutes…' : 'Pinning the block, executing the call, and decoding token events…' : '';
+  $('run-status').textContent = busy ? sequenceMode() ? 'Evaluating the calls in order and checking the state after each step. This can take several minutes…' : mode === 'historical_trace' ? 'Retrieving the original execution trace and checking available historical balance evidence…' : ethereumMode() ? manualQueries() ? 'Running the unsigned call, checking the manual token list and measuring selected ETH accounts. This can take a few minutes…' : 'Running the unsigned call and measuring selected ETH accounts, token balances and allowances. This can take a few minutes…' : 'Pinning the block, executing the call, and decoding token events…' : '';
 }
 
 function clearResult({ inputsChanged = false } = {}) {
@@ -64,12 +66,90 @@ function clearResult({ inputsChanged = false } = {}) {
 }
 
 function requestFingerprint() {
-  return JSON.stringify({ fields: requestFieldIds.map(id => $(id).type === 'checkbox' ? $(id).checked : $(id).value), exampleId: state.example?.id, transactionHash: state.example?.transactionHash });
+  return JSON.stringify({ fields: requestFieldIds.map(id => $(id).type === 'checkbox' ? $(id).checked : $(id).value), calls: sequenceMode() ? state.sequenceControls.map(row => ({ key: row.key, to: row.to.value, data: row.data.value, value: row.value.value, manual: row.manual.checked, queries: row.queries.value })) : null, exampleId: state.example?.id, transactionHash: state.example?.transactionHash });
 }
 
 function currentExamples() {
-  return ethereumMode() ? state.config?.standardEvm?.examples || []
+  return sequenceMode() ? state.config?.standardEvm?.sequenceExamples || [] : ethereumMode() ? state.config?.standardEvm?.examples || []
     : (state.config?.examples || []).filter(example => String(example.request?.chainId) === $('chain').value);
+}
+
+function populateExampleOptions() {
+  const examples = currentExamples(), custom = node('option', '', 'Custom transaction');
+  custom.value = '';
+  $('example').replaceChildren(custom, ...examples.map(example => {
+    const option = node('option', '', example.title || example.label || example.id); option.value = example.id; return option;
+  }));
+  $('example').value = examples[0]?.id || '';
+}
+
+function newSequenceDraft(call = {}) {
+  return { key: state.nextCallKey++, to: call.to || '', data: call.data || '0x', value: call.value ?? '0', manual: false, queriesText: JSON.stringify(call.queries || [], null, 2) };
+}
+
+function renderSequenceEditor() {
+  state.sequenceControls = [];
+  $('sequence-calls').replaceChildren(...state.sequenceDrafts.map((draft, index) => {
+    const card = node('fieldset', 'sequence-call'), legend = node('legend', '', `Step ${index + 1}`);
+    card.append(legend);
+    const controls = { key: draft.key, card };
+    function field(key, label, multiline = false) {
+      const wrapper = node('div', 'field'), id = `sequence-${draft.key}-${key}`, caption = node('label', '', label);
+      caption.htmlFor = id;
+      const input = node(multiline ? 'textarea' : 'input', 'mono');
+      input.id = id; input.value = draft[key] ?? ''; input.required = true; input.spellcheck = false;
+      if (multiline) input.rows = 3; else input.type = 'text';
+      if (key === 'value') { input.inputMode = 'numeric'; input.pattern = '0|[1-9][0-9]*'; }
+      input.addEventListener('input', () => { draft[key] = input.value; input.setCustomValidity(''); clearResult({ inputsChanged: true }); });
+      controls[key] = input; wrapper.append(caption, input); return wrapper;
+    }
+    card.append(field('to', 'Contract / recipient'), field('data', 'Calldata', true), field('value', 'Value · wei'));
+    const advanced = node('details', 'query-settings'), summary = node('summary', '', 'Advanced: token checks');
+    const choice = node('label', 'manual-query-choice'), manual = node('input');
+    manual.type = 'checkbox'; manual.checked = draft.manual; manual.id = `sequence-${draft.key}-manual`;
+    choice.htmlFor = manual.id; choice.append(manual, document.createTextNode('Use a manual query list'));
+    const manualFields = node('div'), queryLabel = node('label', '', 'Query list · JSON'), queries = node('textarea', 'mono');
+    queries.id = `sequence-${draft.key}-queries`; queries.rows = 5; queries.spellcheck = false; queries.value = draft.queriesText;
+    queryLabel.htmlFor = queries.id; manual.setAttribute('aria-controls', `sequence-${draft.key}-manual-fields`); manualFields.id = `sequence-${draft.key}-manual-fields`;
+    manualFields.append(node('p', 'field-help', 'One to eight token balanceOf or allowance calls, each with to and data. ETH account checks stay automatic.'), queryLabel, queries);
+    advanced.append(summary, choice, manualFields); card.append(advanced);
+    Object.assign(controls, { manual, manualFields, queries, advanced });
+    manual.addEventListener('change', () => { draft.manual = manual.checked; queries.setCustomValidity(''); updateSequenceControls(); clearResult({ inputsChanged: true }); });
+    queries.addEventListener('input', () => { draft.queriesText = queries.value; queries.setCustomValidity(''); clearResult({ inputsChanged: true }); });
+    const actions = node('div', 'sequence-call-actions');
+    for (const [action, label] of [['up', 'Move up'], ['down', 'Move down'], ['remove', 'Remove']]) {
+      const button = node('button', 'text-button', label); button.type = 'button'; button.setAttribute('aria-label', `${label} step ${index + 1}`);
+      controls[action] = button;
+      button.addEventListener('click', () => {
+        if (state.busy) return;
+        if (action === 'remove') { if (state.sequenceDrafts.length <= 2) return; state.sequenceDrafts.splice(index, 1); }
+        else {
+          const next = index + (action === 'up' ? -1 : 1); if (next < 0 || next >= state.sequenceDrafts.length) return;
+          [state.sequenceDrafts[index], state.sequenceDrafts[next]] = [state.sequenceDrafts[next], state.sequenceDrafts[index]];
+        }
+        renderSequenceEditor(); clearResult({ inputsChanged: true });
+        (state.sequenceControls.find(row => row.key === draft.key) || state.sequenceControls[Math.min(index, state.sequenceControls.length - 1)])?.to.focus();
+      });
+      actions.append(button);
+    }
+    card.append(actions); state.sequenceControls.push(controls); return card;
+  }));
+  updateSequenceControls();
+}
+
+function updateSequenceControls() {
+  const active = sequenceMode(), locked = state.busy || !active;
+  for (const [index, row] of state.sequenceControls.entries()) {
+    for (const key of ['to', 'data', 'value', 'manual']) row[key].disabled = locked;
+    for (const key of ['to', 'data', 'value']) row[key].required = active;
+    row.queries.disabled = locked || !row.manual.checked; row.queries.required = active && row.manual.checked;
+    row.manualFields.hidden = !row.manual.checked;
+    if (!row.manual.checked) row.queries.setCustomValidity('');
+    row.up.disabled = locked || index === 0; row.down.disabled = locked || index === state.sequenceControls.length - 1;
+    row.remove.disabled = locked || state.sequenceControls.length <= 2;
+  }
+  $('add-sequence-call').disabled = locked || state.sequenceControls.length >= 4;
+  $('sequence-call-count').textContent = `${state.sequenceControls.length} of 4 calls · minimum 2. Each step has its own token and ETH account checks.`;
 }
 
 function selectExample({ initial = false } = {}) {
@@ -77,15 +157,16 @@ function selectExample({ initial = false } = {}) {
   const example = state.example;
   if (example) {
     const transaction = (ethereumMode() ? example.input : example.request) || {};
-    for (const field of ['from', 'to', 'data', 'value']) $(field).value = transaction[field] ?? (field === 'data' ? '0x' : field === 'value' ? '0' : '');
+    for (const field of sequenceMode() ? ['from'] : ['from', 'to', 'data', 'value']) $(field).value = transaction[field] ?? (field === 'data' ? '0x' : field === 'value' ? '0' : '');
     $('block').value = ethereumMode() ? transaction.block || 'latest' : 'latest';
-    if (ethereumMode()) $('standard-queries').value = JSON.stringify(transaction.queries || [], null, 2);
+    if (sequenceMode()) { state.sequenceDrafts = (transaction.calls || []).map(newSequenceDraft); renderSequenceEditor(); }
+    else if (ethereumMode()) $('standard-queries').value = JSON.stringify(transaction.queries || [], null, 2);
   }
   $('example-description').textContent = example?.description || (example ? 'Original public transaction inputs. Simulating uses the requested state block.' : 'Enter public transaction inputs to inspect an unsigned call.');
   $('replay-button').hidden = ethereumMode() || !example?.transactionHash;
   $('historical-help').hidden = ethereumMode() ? !example : !example?.transactionHash;
   $('historical-help').textContent = ethereumMode() && example
-    ? 'This example starts at the end of the block before the original deposit. It runs the same calldata against that state; it does not replay the original transaction at its exact position.'
+    ? sequenceMode() ? 'This example uses the selected block-end state, then applies each successful simulated call before evaluating the next. It is not a historical transaction-position replay.' : 'This example starts at the end of the block before the original deposit. It runs the same calldata against that state; it does not replay the original transaction at its exact position.'
     : example?.transactionHash ? `Historical inspection uses the original transaction ${example.transactionHash.slice(0, 12)}… and its original block, independent of the fields above.` : '';
   $('standard-queries').setCustomValidity('');
   $('value').setCustomValidity('');
@@ -94,29 +175,35 @@ function selectExample({ initial = false } = {}) {
 }
 
 function updateQueryMode() {
-  const standard = ethereumMode(), manual = manualQueries();
+  const standard = ethereumMode(), sequence = sequenceMode(), manual = manualQueries();
+  $('ethereum-call-mode-field').hidden = !standard;
+  $('ethereum-call-mode').disabled = state.busy || !standard;
+  $('sequence-mode-option').disabled = !sequenceAvailable();
+  $('sequence-availability').hidden = !standard || sequenceAvailable();
+  $('sequence-availability').textContent = 'Ordered-call simulations are unavailable in this workspace.';
+  $('single-call-target-fields').hidden = sequence; $('single-value-field').hidden = sequence;
+  $('common-state-row').classList.toggle('sequence-state-row', sequence);
+  $('value-help').hidden = sequence; $('sequence-editor').hidden = !sequence;
+  $('simulate-label').textContent = sequence ? 'Simulate sequence' : 'Simulate';
+  for (const id of ['to', 'data', 'value']) { $(id).disabled = state.busy || sequence; $(id).required = !sequence; if (sequence) $(id).setCustomValidity(''); }
+  $('standard-query-settings').hidden = !standard || sequence;
   $('standard-manual-fields').hidden = !manual;
   $('standard-queries').required = manual;
   $('standard-queries').disabled = state.busy || !manual;
-  $('standard-manual-queries').disabled = state.busy || !standard;
+  $('standard-manual-queries').disabled = state.busy || !standard || sequence;
   $('standard-checks-help').hidden = !standard;
-  $('standard-checks-help').textContent = manual
+  $('standard-checks-help').textContent = sequence ? 'Each step checks up to eight observed ETH accounts and eight token queries. Before and after refer to that step, not the entire sequence.' : manual
     ? 'Your manual list controls token checks. Up to eight observed ETH accounts are still selected automatically; network fees are excluded.'
     : 'Automatically check up to eight observed ETH accounts and eight token balance or allowance queries. Other changes may be missed; network fees are excluded.';
   if (!manual) $('standard-queries').setCustomValidity('');
+  updateSequenceControls();
 }
 
 function selectNetwork({ initial = false } = {}) {
   const standard = ethereumMode();
-  const examples = currentExamples();
-  const custom = node('option', '', 'Custom transaction');
-  custom.value = '';
-  $('example').replaceChildren(custom, ...examples.map(example => {
-    const option = node('option', '', example.title || example.label || example.id);
-    option.value = example.id;
-    return option;
-  }));
-  $('example').value = examples[0]?.id || '';
+  $('ethereum-call-mode').value = 'single';
+  state.sequenceDrafts = [newSequenceDraft(), newSequenceDraft()]; renderSequenceEditor();
+  populateExampleOptions();
   for (const id of ['from', 'to']) $(id).value = '';
   $('data').value = '0x';
   $('value').value = '0';
@@ -142,9 +229,9 @@ function selectNetwork({ initial = false } = {}) {
   setBusy(false);
 }
 
-function readStandardQueries() {
+function readStandardQueries(text = $('standard-queries').value) {
   let queries;
-  try { queries = JSON.parse($('standard-queries').value); }
+  try { queries = JSON.parse(text); }
   catch { throw new Error('Enter a valid JSON query list in Advanced: balances & allowances to check.'); }
   if (!Array.isArray(queries) || queries.length < 1 || queries.length > 8) throw new Error('Add between one and eight balance or allowance queries.');
   for (const query of queries) {
@@ -155,6 +242,30 @@ function readStandardQueries() {
     }
   }
   return queries;
+}
+
+function validateWeiField(field) {
+  const value = field.value;
+  field.setCustomValidity(/^(?:0|[1-9][0-9]{0,77})$/.test(value) && BigInt(value) < (1n << 256n)
+    ? '' : 'Enter a whole, nonnegative decimal wei amount within uint256, without leading zeros, signs or decimal points.');
+}
+
+function readSequenceCalls() {
+  if (state.sequenceControls.length < 2 || state.sequenceControls.length > 4) {
+    $('request-error').hidden = false; $('request-error').textContent = 'Add between two and four calls.'; return null;
+  }
+  const calls = [];
+  for (const row of state.sequenceControls) {
+    validateWeiField(row.value);
+    const call = { to: row.to.value.trim(), data: row.data.value.trim(), value: row.value.value };
+    row.queries.setCustomValidity('');
+    if (row.manual.checked) {
+      try { call.queries = readStandardQueries(row.queries.value); }
+      catch (error) { row.advanced.open = true; row.queries.setCustomValidity(error.message); row.queries.reportValidity(); return null; }
+    }
+    calls.push(call);
+  }
+  return calls;
 }
 
 function addDefinition(list, label, value) {
@@ -665,6 +776,9 @@ function beginResult(result, standard = false) {
   $('result-content').hidden = false;
   $('hyper-result').hidden = standard;
   $('standard-result').hidden = !standard;
+  $('sequence-result').hidden = !result.sequence;
+  $('execution-label').textContent = 'Execution';
+  state.renderStep = null;
   $('coverage-label').textContent = standard ? 'Requested checks' : 'Coverage';
   $('raw-json').textContent = JSON.stringify(result, null, 2);
 }
@@ -692,7 +806,7 @@ function renderStandardAmounts(query, heading, account, native = false) {
   const table = node('table', 'measurement-table');
   const caption = node('caption', 'sr-only', `${heading} for ${account || 'the requested account'}`);
   const head = node('thead'), headRow = node('tr'), body = node('tbody'), row = node('tr');
-  for (const label of ['Before', 'After', 'Change']) { const th = node('th', '', label); th.scope = 'col'; headRow.append(th); }
+  for (const label of state.renderStep ? [`Before step ${state.renderStep}`, `After step ${state.renderStep}`, `Step ${state.renderStep} change`] : ['Before', 'After', 'Change']) { const th = node('th', '', label); th.scope = 'col'; headRow.append(th); }
   head.append(headRow);
   for (const field of ['before', 'after', 'delta']) {
     const cell = node('td');
@@ -876,8 +990,11 @@ function renderDiscovery(discovery, queries) {
   $('standard-discovery-notes').replaceChildren(...notes.map(item => node('li', '', item)));
 }
 
-function renderStandardResult(result) {
-  beginResult(result, true);
+function renderStandardResult(result, sequenceContext = null) {
+  if (!sequenceContext) beginResult(result, true);
+  const stepNumber = sequenceContext ? sequenceContext.step.index + 1 : null;
+  state.renderStep = stepNumber;
+  $('standard-result').hidden = false;
   const execution = result.execution || {};
   const queries = Array.isArray(result.preview?.queries) ? result.preview.queries : [];
   const measured = queries.filter(standardMeasured).length;
@@ -887,8 +1004,9 @@ function renderStandardResult(result) {
   const sender = result.apiRequest?.from || result.request?.transaction?.from;
   const automatic = result.preview?.scope === 'observed_queried_accounts' || Boolean(result.discovery);
   const tokenSelectionKnown = queries.length > 0 || !automatic || ['discovered', 'none'].includes(result.discovery?.status);
-  $('coverage-label').textContent = 'Measured checks';
-  $('result-label').textContent = 'Ethereum unsigned simulation';
+  $('coverage-label').textContent = stepNumber ? `Step ${stepNumber} checks` : 'Measured checks';
+  $('execution-label').textContent = stepNumber ? `Step ${stepNumber} execution` : 'Execution';
+  $('result-label').textContent = stepNumber ? `Ethereum sequence · step ${stepNumber}` : 'Ethereum unsigned simulation';
   $('execution-status').textContent = execution.status === 'success' ? 'Completed' : execution.status === 'reverted_or_failed' ? 'Failed / reverted' : 'Unavailable';
   $('execution-status').className = execution.status === 'success' ? 'success' : execution.status === 'reverted_or_failed' ? 'failed' : 'partial';
   $('gas-used').textContent = execution.gasUsed ? `${numberLabel(execution.gasUsed)} gas used · fees not estimated` : 'Gas usage unavailable';
@@ -901,14 +1019,18 @@ function renderStandardResult(result) {
   $('execution-error').textContent = execution.error ? `Execution error: ${display(execution.error)}` : result.measurementFailure ? `Measurements unavailable: ${display(result.measurementFailure)}` : '';
   $('contract-revert').hidden = !execution.revertReason;
   $('contract-revert').textContent = execution.revertReason ? `Contract-reported reason (untrusted contract output): ${String(execution.revertReason).slice(0, 4096)}` : '';
-  const selection = result.source?.blockSelection || {};
+  const selection = result.source?.blockSelection || sequenceContext?.sequence.source?.blockSelection || {};
+  const stateSource = sequenceContext?.step.stateSource || result.source?.stateSource;
+  const block = result.block || sequenceContext?.sequence.block;
   const context = $('standard-state-details');
   context.replaceChildren();
-  $('standard-state-description').textContent = 'The call starts from the state at the end of the selected block. Choosing a past block does not replay the historical transaction at its original position. Before and after refer to this unsigned simulation.';
+  $('standard-state-description').textContent = stepNumber
+    ? `${stateSource?.kind === 'initial_block' ? 'This step starts from the selected block’s end state.' : stateSource?.kind === 'after_step' && Number.isInteger(stateSource.stepIndex) ? `This step starts from the simulated state after step ${stateSource.stepIndex + 1}, using the same block context.` : 'The starting state for this step was not established.'} Before and after refer only to step ${stepNumber}. This is not original transaction-position replay.`
+    : 'The call starts from the state at the end of the selected block. Choosing a past block does not replay the historical transaction at its original position. Before and after refer to this unsigned simulation.';
   addDefinition(context, 'Requested state', selection.requested ?? result.apiRequest?.block);
-  addDefinition(context, 'Resolved block', result.block?.number ? numberLabel(result.block.number) : selection.resolvedNumber ? numberLabel(selection.resolvedNumber) : null);
-  addDefinition(context, 'Block hash', result.block?.hash || selection.resolvedHash);
-  addDefinition(context, 'Block time', formatTime(result.block?.timestamp));
+  addDefinition(context, 'Resolved block', block?.number ? numberLabel(block.number) : selection.resolvedNumber ? numberLabel(selection.resolvedNumber) : null);
+  addDefinition(context, 'Block hash', block?.hash || selection.resolvedHash);
+  addDefinition(context, 'Block time', formatTime(block?.timestamp));
   addDefinition(context, 'Block binding', result.canonicalStatus === 'verified' ? 'Checked before and after the simulation' : 'Not verified; before-and-after amounts are unavailable');
   for (const kind of ['balanceOf', 'allowance']) {
     const group = kind === 'balanceOf' ? 'balances' : 'allowances';
@@ -928,7 +1050,7 @@ function renderStandardResult(result) {
   const details = $('source-details');
   details.replaceChildren();
   addDefinition(details, 'Network', 'Ethereum · chain 1');
-  addDefinition(details, 'Mode', 'Unsigned call at block-end state');
+  addDefinition(details, 'Mode', stepNumber ? `Unsigned ordered call · step ${stepNumber}` : 'Unsigned call at block-end state');
   addDefinition(details, 'Sender', sender);
   addDefinition(details, 'Recipient', result.apiRequest?.to || result.request?.transaction?.to);
   addDefinition(details, 'Gas limit', '5,000,000');
@@ -936,8 +1058,92 @@ function renderStandardResult(result) {
   addDefinition(details, 'Native value', typeof nativeValue === 'string' && /^(?:0|[1-9][0-9]*)$/.test(nativeValue) ? `${nativeValue} wei` : 'Not available');
   addDefinition(details, 'Network fees', 'Not estimated');
   addDefinition(details, 'Measurement method', result.executionIdentity ? 'Separate selected ETH balance and token checks before and after applying the call’s full state changes' : 'Measurement context not established');
-  addDefinition(details, 'Run ID', result.id);
-  $('timing').textContent = result.timing?.totalMs !== undefined ? `${(result.timing.totalMs / 1000).toFixed(2)}s total` : '';
+  addDefinition(details, 'Run ID', result.id || sequenceContext?.sequence.id);
+  const elapsed = result.timing?.totalMs ?? sequenceContext?.sequence.timing?.totalMs;
+  $('timing').textContent = elapsed !== undefined ? `${(elapsed / 1000).toFixed(2)}s ${sequenceContext ? 'sequence total' : 'total'}` : '';
+}
+
+function sequenceStepLabel(step) {
+  return step.status === 'completed' ? 'Completed' : step.status === 'reverted_or_failed' ? 'Failed / reverted'
+    : step.status === 'skipped' ? 'Skipped' : step.result?.execution?.status === 'success' ? 'Executed; state unavailable' : 'Unavailable';
+}
+
+function sequenceStepView(sequence, step) {
+  if (!step.result || sequence.canonicalStatus === 'verified') return step.result;
+  const result = structuredClone(step.result), reason = 'The sequence’s block context was not verified. All measured amounts are withheld.';
+  result.canonicalStatus = 'unverified'; result.measurementFailure = reason;
+  for (const row of [...(result.preview?.queries || []), ...(result.preview?.nativeBalances || [])]) {
+    row.status = 'unavailable'; row.reason = reason;
+    for (const key of ['before', 'after', 'delta', 'beforeRaw', 'afterRaw', 'deltaRaw']) delete row[key];
+  }
+  if (result.nativeEffects) { result.nativeEffects.status = 'unavailable'; result.nativeEffects.reason = reason; if (result.nativeEffects.counts) result.nativeEffects.counts.measured = 0; }
+  return result;
+}
+
+function renderSequenceStep(sequence, step) {
+  for (const entry of state.sequenceStepButtons || []) {
+    const selected = entry.index === step.index;
+    entry.button.classList.toggle('selected', selected); entry.button.setAttribute('aria-pressed', String(selected));
+  }
+  const result = sequenceStepView(sequence, step), stepNumber = step.index + 1;
+  $('sequence-step-notice').textContent = `Viewing step ${stepNumber}. ${step.reason || (step.status === 'skipped' ? 'An earlier step stopped the sequence; this call was not evaluated.' : 'Amounts below describe this step only.')} The JSON download contains the entire sequence.`;
+  if (result) { renderStandardResult(result, { sequence, step }); return; }
+  $('standard-result').hidden = true;
+  $('result-label').textContent = `Ethereum sequence · step ${stepNumber}`;
+  $('execution-label').textContent = `Step ${stepNumber} execution`;
+  $('execution-status').textContent = sequenceStepLabel(step); $('execution-status').className = 'partial';
+  $('gas-used').textContent = step.status === 'skipped' ? 'Not executed' : 'Execution evidence unavailable';
+  $('coverage-label').textContent = `Step ${stepNumber} checks`;
+  $('coverage-status').textContent = '—'; $('coverage-status').className = 'partial';
+  $('coverage-detail').textContent = 'No measurements; missing amounts are not zero';
+  $('execution-error').hidden = true; $('contract-revert').hidden = true; $('warnings-section').hidden = true;
+  const details = $('source-details'); details.replaceChildren();
+  addDefinition(details, 'Network', 'Ethereum · chain 1'); addDefinition(details, 'Step', stepNumber);
+  addDefinition(details, 'Sender', sequence.apiRequest?.from); addDefinition(details, 'Recipient', step.input?.to);
+  addDefinition(details, 'Requested state', sequence.source?.blockSelection?.requested ?? sequence.apiRequest?.block);
+  addDefinition(details, 'Block hash', sequence.block?.hash || sequence.source?.blockSelection?.resolvedHash);
+  addDefinition(details, 'Outcome', sequenceStepLabel(step)); addDefinition(details, 'Reason', step.reason);
+  addDefinition(details, 'Network fees', 'Not estimated'); addDefinition(details, 'Run ID', sequence.id);
+  $('timing').textContent = '';
+}
+
+function renderSequenceResult(result) {
+  beginResult(result, true);
+  $('sequence-result').hidden = false;
+  const sequence = result.sequence || {}, steps = Array.isArray(result.steps) ? result.steps : [];
+  $('sequence-result-status').textContent = sequence.status === 'completed' ? 'Completed' : sequence.status === 'stopped' ? 'Stopped' : 'Unavailable';
+  const progress = Number.isInteger(sequence.completedSteps) ? `${sequence.completedSteps} of ${steps.length} steps completed. ` : '';
+  $('sequence-result-description').textContent = `${progress}${sequence.reason ? `${sequence.reason} ` : ''}Each step uses the simulated state left by the previous successful call. A later failure does not undo an earlier simulated call. This does not guarantee that separate transactions will execute together. Network fees and outer signatures are not modeled.${result.canonicalStatus === 'verified' ? '' : ' The sequence’s block context is unverified; all measured amounts are withheld.'}`;
+  state.sequenceStepButtons = [];
+  $('sequence-step-list').replaceChildren(...steps.map(step => {
+    const item = node('li'), button = node('button', 'sequence-step-button'); button.type = 'button';
+    button.setAttribute('aria-pressed', 'false');
+    button.append(node('strong', '', `Step ${step.index + 1} · ${sequenceStepLabel(step)}`), node('span', 'sequence-step-address', step.input?.to || 'Recipient unavailable'));
+    const view = sequenceStepView(result, step);
+    if (view) {
+      const queries = Array.isArray(view.preview?.queries) ? view.preview.queries : [];
+      const nativeRows = Array.isArray(view.preview?.nativeBalances) ? view.preview.nativeBalances : [];
+      const nativeSelected = nativeSelectionCount(view.nativeEffects, nativeRows);
+      const automatic = view.preview?.scope === 'observed_queried_accounts' || Boolean(view.discovery);
+      const tokenSelected = queries.length > 0 || !automatic || ['discovered', 'none'].includes(view.discovery?.status);
+      button.append(node('span', 'sequence-step-counts', `ETH: ${nativeSelected === null ? 'not established' : `${nativeRows.filter(standardMeasured).length}/${nativeSelected} measured`} · token checks: ${tokenSelected ? `${queries.filter(standardMeasured).length}/${queries.length} measured` : 'not established'}`));
+      for (const allowance of queries.filter(row => row.kind === 'allowance' && standardMeasured(row))) {
+        const metadata = allowance.metadata;
+        const amount = field => exactAmount(metadata ? allowance[field] : undefined, allowance[`${field}Raw`], metadata?.symbol);
+        button.append(node('span', 'sequence-allowance-summary', `Allowance: ${amount('before')} → ${amount('after')}`));
+      }
+    } else button.append(node('span', 'sequence-step-counts', step.status === 'skipped' ? 'Not executed · no measurements' : 'No execution or measurement result'));
+    button.addEventListener('click', () => renderSequenceStep(result, step));
+    state.sequenceStepButtons.push({ index: step.index, button }); item.append(button); return item;
+  }));
+  const selected = steps.find(step => ['reverted_or_failed', 'unavailable'].includes(step.status)) || [...steps].reverse().find(step => step.result) || steps[0];
+  if (selected) renderSequenceStep(result, selected);
+  else {
+    $('standard-result').hidden = true; $('execution-label').textContent = 'Sequence execution'; $('execution-status').textContent = 'Unavailable'; $('execution-status').className = 'partial';
+    $('gas-used').textContent = 'No step execution established'; $('coverage-label').textContent = 'Measured checks'; $('coverage-status').textContent = '—'; $('coverage-status').className = 'partial';
+    $('coverage-detail').textContent = 'No step measurements'; $('sequence-step-notice').textContent = 'No step results were returned. Missing results are not successful calls or zero balances.';
+    $('execution-error').hidden = true; $('contract-revert').hidden = true; $('warnings-section').hidden = true; $('source-details').replaceChildren(); $('timing').textContent = '';
+  }
 }
 
 function renderResult(result) {
@@ -1007,13 +1213,13 @@ function renderResult(result) {
 async function run(mode) {
   if (state.busy) return;
   const standard = ethereumMode();
+  const sequence = sequenceMode();
   if (standard && (!standardAvailable() || mode === 'historical_trace')) return;
+  if (sequence && !sequenceAvailable()) return;
   if (mode === 'historical_trace' && !state.example?.transactionHash) return;
-  if (standard) {
-    const value = $('value').value;
-    $('value').setCustomValidity(/^(?:0|[1-9][0-9]{0,77})$/.test(value) && BigInt(value) < (1n << 256n)
-      ? '' : 'Enter a whole, nonnegative decimal wei amount within uint256, without leading zeros, signs or decimal points.');
-  }
+  if (standard && !sequence) validateWeiField($('value'));
+  const calls = sequence ? readSequenceCalls() : undefined;
+  if (sequence && !calls) return;
   let queries;
   if (standard && manualQueries()) {
     $('standard-queries').setCustomValidity('');
@@ -1030,18 +1236,23 @@ async function run(mode) {
   setBusy(true, mode);
   try {
     const fingerprint = requestFingerprint();
-    const body = mode === 'historical_trace' ? { chainId: Number(state.example.request.chainId), transactionHash: state.example.transactionHash } : { chainId: Number($('chain').value), from: $('from').value.trim(), to: $('to').value.trim(), data: $('data').value.trim(), value: $('value').value.trim(), block: $('block').value.trim() };
+    const body = sequence ? { chainId: 1, from: $('from').value.trim(), block: $('block').value.trim(), calls }
+      : mode === 'historical_trace' ? { chainId: Number(state.example.request.chainId), transactionHash: state.example.transactionHash } : { chainId: Number($('chain').value), from: $('from').value.trim(), to: $('to').value.trim(), data: $('data').value.trim(), value: $('value').value.trim(), block: $('block').value.trim() };
     if (standard && queries !== undefined) body.queries = queries;
-    const result = await request(standard ? '/api/evm/simulate' : mode === 'historical_trace' ? '/api/replay' : '/api/simulate', body);
+    const result = await request(sequence ? '/api/evm/simulate-sequence' : standard ? '/api/evm/simulate' : mode === 'historical_trace' ? '/api/replay' : '/api/simulate', body);
     if (fingerprint !== requestFingerprint()) {
       setBusy(false);
       clearResult({ inputsChanged: true });
       return;
     }
-    if (standard) renderStandardResult(result);
+    if (sequence) renderSequenceResult(result);
+    else if (standard) renderStandardResult(result);
     else renderResult(result);
     setBusy(false);
-    $('run-status').textContent = standard
+    $('run-status').textContent = sequence
+      ? result.sequence?.status === 'completed' ? 'Sequence completed. Select each step to review its balances and allowances. Network fees are excluded.'
+        : 'The sequence stopped or could not be established. Review the attempted steps and explicitly skipped calls below.'
+      : standard
       ? result.execution?.status === 'success' ? 'Execution completed. Review the ETH balances, token balances and allowances measured below. Network fees are excluded.'
         : result.execution?.status === 'reverted_or_failed' ? 'The call failed or reverted; its state changes were not committed. Before-and-after measurements were not applied. Network fees are not modeled.'
           : 'Execution could not be established. Unavailable amounts are not zero.'
@@ -1153,13 +1364,22 @@ $('simulation-form').addEventListener('submit', (event) => { event.preventDefaul
 $('replay-button').addEventListener('click', () => run('historical_trace'));
 $('example').addEventListener('change', selectExample);
 $('chain').addEventListener('change', selectNetwork);
+$('ethereum-call-mode').addEventListener('change', () => {
+  if (state.busy) return;
+  populateExampleOptions(); selectExample(); setBusy(false);
+});
+$('add-sequence-call').addEventListener('click', () => {
+  if (state.busy || !sequenceMode() || state.sequenceDrafts.length >= 4) return;
+  state.sequenceDrafts.push(newSequenceDraft()); renderSequenceEditor(); clearResult({ inputsChanged: true });
+  state.sequenceControls.at(-1)?.to.focus();
+});
 for (const id of requestFieldIds) {
-  if (id === 'chain') continue;
+  if (id === 'chain' || id === 'ethereum-call-mode') continue;
   const changed = () => {
     if (id === 'standard-queries') $('standard-queries').setCustomValidity('');
     if (id === 'value') $('value').setCustomValidity('');
     if (id === 'standard-manual-queries') updateQueryMode();
-    if (ethereumMode() && state.example) $('historical-help').textContent = manualQueries() ? 'The selected example is a starting point. Simulation uses the fields and manual query list currently shown, at the end of the selected block.' : 'The selected example is a starting point. Simulation uses the fields currently shown and automatically selects checks from the call, at the end of the selected block.';
+    if (ethereumMode() && state.example) $('historical-help').textContent = sequenceMode() ? 'The selected example is a starting point. The sequence uses the calls currently shown, in their displayed order, from one selected block-end state.' : manualQueries() ? 'The selected example is a starting point. Simulation uses the fields and manual query list currently shown, at the end of the selected block.' : 'The selected example is a starting point. Simulation uses the fields currently shown and automatically selects checks from the call, at the end of the selected block.';
     clearResult({ inputsChanged: true });
   };
   $(id).addEventListener('input', changed);

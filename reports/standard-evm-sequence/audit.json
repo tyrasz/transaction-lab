@@ -1,0 +1,354 @@
+{
+  "schemaVersion": "1.0",
+  "status": "passed",
+  "auditedAt": "2026-10-26T14:44:02.541Z",
+  "method": "Independent offline byte/hash, wire, query-word, full-diff composition and header audit; no product/composition helper imports or network",
+  "inputs": {
+    "manifestSha256": "6e861f3b9f21e8d878b5347a5990707a29fa32bca28a81bbce1cbf8ca473255c",
+    "planSha256": "14ad30f7f7031395ab2c4636ac649d0029a2ba3a9669ba1f61efa53afd4ae107",
+    "implementationSha256": "3b769d18eac4e46548420e51799baf0185f56154c1fbfaaed6914f8b4cb83e60"
+  },
+  "verified": {
+    "baseManifestFiles": 73,
+    "baseManifestBytes": 6610792,
+    "archivedSourceFiles": 52,
+    "implementationFiles": 33,
+    "provenanceInputs": 5,
+    "httpCases": 3,
+    "rpcCalls": 112,
+    "rawResponseBytes": 457073,
+    "queryReturnWords": 20,
+    "queryMutationDiffs": 20,
+    "headerWitnessWords": 64,
+    "completeHeaderObservations": 14,
+    "validatedProviderRuntimeCodeHashOccurrences": 4
+  },
+  "checks": {
+    "exactPlannedCasesAndOrder": true,
+    "requestAndResponseByteHashes": true,
+    "allRawWireBoundToEngineEvidence": true,
+    "queryWordsDecodedWithoutEventAmounts": true,
+    "fullOriginalAndQueryOverridesReconstructed": true,
+    "clearedStorageSlotsRetained": true,
+    "onlyOriginalCallNonceCarried": true,
+    "startingNonceProgression": [
+      "52",
+      "53",
+      "54"
+    ],
+    "completeHeadersEqual": true,
+    "thirdCallActuallyReverted": true,
+    "successfulPrefixRetained": true,
+    "feeAtomicityClaimsExcluded": true
+  },
+  "cases": [
+    {
+      "id": "supply-without-approval",
+      "httpStatus": 200,
+      "rpcCalls": 9,
+      "observedResponseBytes": 54718,
+      "canonicalStatus": "verified",
+      "sequenceStatus": null,
+      "steps": [
+        {
+          "index": 0,
+          "execution": "reverted_or_failed",
+          "gasUsed": "122733",
+          "startingNonce": "52",
+          "measurements": [],
+          "decodedRevertReason": "ERC20: transfer amount exceeds allowance",
+          "originalTraceEvidenceId": 8
+        }
+      ]
+    },
+    {
+      "id": "approve-then-supply",
+      "httpStatus": 200,
+      "rpcCalls": 47,
+      "observedResponseBytes": 173734,
+      "canonicalStatus": "verified",
+      "sequenceStatus": "completed",
+      "steps": [
+        {
+          "index": 0,
+          "execution": "success",
+          "gasUsed": "55570",
+          "startingNonce": "52",
+          "measurements": [
+            {
+              "kind": "allowance",
+              "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+              "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+              "beforeRaw": "0",
+              "afterRaw": "3962903485",
+              "deltaRaw": "3962903485",
+              "evidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 12,
+                  "mutationEvidenceId": 13
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 14,
+                  "mutationEvidenceId": 15
+                }
+              ]
+            }
+          ],
+          "originalDiffEvidenceId": 9,
+          "afterOverridesSha256": "7f20cea3604741c8ca4d36d1707d43206e80cb884af76ba83dff7f8bd96e3add",
+          "afterOverrideAccounts": 2,
+          "afterOverrideSlots": 1
+        },
+        {
+          "index": 1,
+          "execution": "success",
+          "gasUsed": "165499",
+          "startingNonce": "53",
+          "measurements": [
+            {
+              "kind": "balanceOf",
+              "token": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+              "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+              "beforeRaw": "0",
+              "afterRaw": "3962903484",
+              "deltaRaw": "3962903484",
+              "evidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 14,
+                  "mutationEvidenceId": 15
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 16,
+                  "mutationEvidenceId": 17
+                }
+              ]
+            },
+            {
+              "kind": "balanceOf",
+              "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+              "beforeRaw": "3962903485",
+              "afterRaw": "0",
+              "deltaRaw": "-3962903485",
+              "evidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 18,
+                  "mutationEvidenceId": 19
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 20,
+                  "mutationEvidenceId": 21
+                }
+              ]
+            },
+            {
+              "kind": "allowance",
+              "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+              "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+              "beforeRaw": "3962903485",
+              "afterRaw": "0",
+              "deltaRaw": "-3962903485",
+              "evidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 22,
+                  "mutationEvidenceId": 23
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 24,
+                  "mutationEvidenceId": 25
+                }
+              ]
+            },
+            {
+              "kind": "balanceOf",
+              "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "account": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+              "beforeRaw": "151987610826648",
+              "afterRaw": "151991573730133",
+              "deltaRaw": "3962903485",
+              "evidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 26,
+                  "mutationEvidenceId": 27
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 28,
+                  "mutationEvidenceId": 29
+                }
+              ]
+            }
+          ],
+          "originalDiffEvidenceId": 11,
+          "afterOverridesSha256": "863e83cc65f3dd166ab60ec389fe0aaf84001fe70da7ee088e55880674ef93cf",
+          "afterOverrideAccounts": 4,
+          "afterOverrideSlots": 10
+        }
+      ]
+    },
+    {
+      "id": "approve-supply-repeat",
+      "httpStatus": 200,
+      "rpcCalls": 56,
+      "observedResponseBytes": 228621,
+      "canonicalStatus": "verified",
+      "sequenceStatus": "stopped",
+      "steps": [
+        {
+          "index": 0,
+          "execution": "success",
+          "gasUsed": "55570",
+          "startingNonce": "52",
+          "measurements": [
+            {
+              "kind": "allowance",
+              "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+              "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+              "beforeRaw": "0",
+              "afterRaw": "3962903485",
+              "deltaRaw": "3962903485",
+              "evidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 12,
+                  "mutationEvidenceId": 13
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 14,
+                  "mutationEvidenceId": 15
+                }
+              ]
+            }
+          ],
+          "originalDiffEvidenceId": 9,
+          "afterOverridesSha256": "7f20cea3604741c8ca4d36d1707d43206e80cb884af76ba83dff7f8bd96e3add",
+          "afterOverrideAccounts": 2,
+          "afterOverrideSlots": 1
+        },
+        {
+          "index": 1,
+          "execution": "success",
+          "gasUsed": "165499",
+          "startingNonce": "53",
+          "measurements": [
+            {
+              "kind": "balanceOf",
+              "token": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+              "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+              "beforeRaw": "0",
+              "afterRaw": "3962903484",
+              "deltaRaw": "3962903484",
+              "evidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 14,
+                  "mutationEvidenceId": 15
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 16,
+                  "mutationEvidenceId": 17
+                }
+              ]
+            },
+            {
+              "kind": "balanceOf",
+              "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+              "beforeRaw": "3962903485",
+              "afterRaw": "0",
+              "deltaRaw": "-3962903485",
+              "evidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 18,
+                  "mutationEvidenceId": 19
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 20,
+                  "mutationEvidenceId": 21
+                }
+              ]
+            },
+            {
+              "kind": "allowance",
+              "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+              "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+              "beforeRaw": "3962903485",
+              "afterRaw": "0",
+              "deltaRaw": "-3962903485",
+              "evidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 22,
+                  "mutationEvidenceId": 23
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 24,
+                  "mutationEvidenceId": 25
+                }
+              ]
+            },
+            {
+              "kind": "balanceOf",
+              "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "account": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+              "beforeRaw": "151987610826648",
+              "afterRaw": "151991573730133",
+              "deltaRaw": "3962903485",
+              "evidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 26,
+                  "mutationEvidenceId": 27
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 28,
+                  "mutationEvidenceId": 29
+                }
+              ]
+            }
+          ],
+          "originalDiffEvidenceId": 11,
+          "afterOverridesSha256": "863e83cc65f3dd166ab60ec389fe0aaf84001fe70da7ee088e55880674ef93cf",
+          "afterOverrideAccounts": 4,
+          "afterOverrideSlots": 10
+        },
+        {
+          "index": 2,
+          "execution": "reverted_or_failed",
+          "gasUsed": "116474",
+          "startingNonce": "54",
+          "measurements": [],
+          "decodedRevertReason": "ERC20: transfer amount exceeds allowance",
+          "originalTraceEvidenceId": 8
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Three preselected constructed development cases, not a holdout or a transaction-accuracy denominator.",
+    "Provider-supplied execution/state consistency; no independent EVM execution, cryptographic state proof or provider honesty assertion.",
+    "No event or requested amount was used to supply a measured balance or allowance.",
+    "The repeated third call reverted; no fourth call or live skipped-step assertion is present.",
+    "No shared canonical failure was injected into this live packet; that behavior belongs to separate synthetic controls.",
+    "Runtime code hashes were checked only against explicit bytes from the same provider using the byte-verified archived noble Keccak library."
+  ]
+}

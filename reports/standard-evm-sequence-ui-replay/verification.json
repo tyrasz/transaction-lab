@@ -1,0 +1,215 @@
+{
+  "status": "passed",
+  "verificationMode": "offline_file_audit_of_browser_replay",
+  "publicNetworkRequests": 0,
+  "manifestSha256": "6e861f3b9f21e8d878b5347a5990707a29fa32bca28a81bbce1cbf8ca473255c",
+  "sourceFilesVerified": 52,
+  "recordedRpcResponsesConsumed": 112,
+  "recordedRpcResponseBytes": 457073,
+  "cases": [
+    {
+      "id": "supply-without-approval",
+      "httpStatus": 200,
+      "semanticResult": "matched",
+      "recordedRpcResponses": 9,
+      "canonicalStatus": "verified",
+      "sequence": null,
+      "steps": [
+        {
+          "index": 0,
+          "status": "reverted_or_failed",
+          "execution": "reverted_or_failed",
+          "stateSource": null,
+          "tokenMeasurements": [],
+          "nativeMeasurements": []
+        }
+      ]
+    },
+    {
+      "id": "approve-then-supply",
+      "httpStatus": 200,
+      "semanticResult": "matched",
+      "recordedRpcResponses": 47,
+      "canonicalStatus": "verified",
+      "sequence": {
+        "status": "completed",
+        "completedSteps": 2,
+        "attemptedSteps": 2
+      },
+      "steps": [
+        {
+          "index": 0,
+          "status": "completed",
+          "execution": "success",
+          "stateSource": {
+            "kind": "initial_block"
+          },
+          "tokenMeasurements": [
+            {
+              "kind": "allowance",
+              "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "owner": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+              "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+              "status": "measured",
+              "beforeRaw": "0",
+              "afterRaw": "3962903485",
+              "deltaRaw": "3962903485"
+            }
+          ],
+          "nativeMeasurements": []
+        },
+        {
+          "index": 1,
+          "status": "completed",
+          "execution": "success",
+          "stateSource": {
+            "kind": "after_step",
+            "stepIndex": 0
+          },
+          "tokenMeasurements": [
+            {
+              "kind": "balanceOf",
+              "token": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+              "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+              "status": "measured",
+              "beforeRaw": "0",
+              "afterRaw": "3962903484",
+              "deltaRaw": "3962903484"
+            },
+            {
+              "kind": "balanceOf",
+              "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+              "status": "measured",
+              "beforeRaw": "3962903485",
+              "afterRaw": "0",
+              "deltaRaw": "-3962903485"
+            },
+            {
+              "kind": "allowance",
+              "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "owner": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+              "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+              "status": "measured",
+              "beforeRaw": "3962903485",
+              "afterRaw": "0",
+              "deltaRaw": "-3962903485"
+            },
+            {
+              "kind": "balanceOf",
+              "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "account": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+              "status": "measured",
+              "beforeRaw": "151987610826648",
+              "afterRaw": "151991573730133",
+              "deltaRaw": "3962903485"
+            }
+          ],
+          "nativeMeasurements": []
+        }
+      ]
+    },
+    {
+      "id": "approve-supply-repeat",
+      "httpStatus": 200,
+      "semanticResult": "matched",
+      "recordedRpcResponses": 56,
+      "canonicalStatus": "verified",
+      "sequence": {
+        "status": "stopped",
+        "completedSteps": 2,
+        "attemptedSteps": 3,
+        "stoppedAtIndex": 2,
+        "reason": "Original execution did not succeed."
+      },
+      "steps": [
+        {
+          "index": 0,
+          "status": "completed",
+          "execution": "success",
+          "stateSource": {
+            "kind": "initial_block"
+          },
+          "tokenMeasurements": [
+            {
+              "kind": "allowance",
+              "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "owner": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+              "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+              "status": "measured",
+              "beforeRaw": "0",
+              "afterRaw": "3962903485",
+              "deltaRaw": "3962903485"
+            }
+          ],
+          "nativeMeasurements": []
+        },
+        {
+          "index": 1,
+          "status": "completed",
+          "execution": "success",
+          "stateSource": {
+            "kind": "after_step",
+            "stepIndex": 0
+          },
+          "tokenMeasurements": [
+            {
+              "kind": "balanceOf",
+              "token": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+              "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+              "status": "measured",
+              "beforeRaw": "0",
+              "afterRaw": "3962903484",
+              "deltaRaw": "3962903484"
+            },
+            {
+              "kind": "balanceOf",
+              "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+              "status": "measured",
+              "beforeRaw": "3962903485",
+              "afterRaw": "0",
+              "deltaRaw": "-3962903485"
+            },
+            {
+              "kind": "allowance",
+              "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "owner": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+              "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+              "status": "measured",
+              "beforeRaw": "3962903485",
+              "afterRaw": "0",
+              "deltaRaw": "-3962903485"
+            },
+            {
+              "kind": "balanceOf",
+              "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "account": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+              "status": "measured",
+              "beforeRaw": "151987610826648",
+              "afterRaw": "151991573730133",
+              "deltaRaw": "3962903485"
+            }
+          ],
+          "nativeMeasurements": []
+        },
+        {
+          "index": 2,
+          "status": "reverted_or_failed",
+          "execution": "reverted_or_failed",
+          "stateSource": {
+            "kind": "after_step",
+            "stepIndex": 1
+          },
+          "tokenMeasurements": [],
+          "nativeMeasurements": []
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "This audit verifies archived source and exact replay data, not visual appearance.",
+    "Browser observations are recorded separately by the root task.",
+    "Recorded provider responses are not new independent execution evidence."
+  ]
+}

@@ -1,0 +1,483 @@
+{
+  "status": "passed",
+  "planSha256": "14ad30f7f7031395ab2c4636ac649d0029a2ba3a9669ba1f61efa53afd4ae107",
+  "manifestSha256": "6e861f3b9f21e8d878b5347a5990707a29fa32bca28a81bbce1cbf8ca473255c",
+  "implementationSha256": "3b769d18eac4e46548420e51799baf0185f56154c1fbfaaed6914f8b4cb83e60",
+  "sourceFiles": 52,
+  "sealedFiles": 73,
+  "publicNetworkRequests": 0,
+  "socketsOpened": 0,
+  "liveSourceImports": 0,
+  "replayMode": "archived_createAppServer_handler_with_archived_StandardRpcClient_and_exact_saved_wire_responses",
+  "totals": {
+    "rpcCalls": 112,
+    "responseBytes": 457073,
+    "independentlyDecodedMeasurements": 10
+  },
+  "cases": [
+    {
+      "id": "supply-without-approval",
+      "profile": "single",
+      "httpStatus": 200,
+      "canonicalStatus": "verified",
+      "sequence": null,
+      "accounting": {
+        "rpcCalls": 9,
+        "observedBytes": 54718,
+        "retainedBytes": 54718,
+        "durationMs": 2067.219875,
+        "withheldErrorBodies": 0
+      },
+      "steps": [
+        {
+          "status": "reverted_or_failed",
+          "measurements": [],
+          "originalTraceEvidenceId": 8,
+          "revertReason": "ERC20: transfer amount exceeds allowance"
+        }
+      ],
+      "playback": {
+        "status": "matched",
+        "consumedRpcIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "excludedGeneratedFields": [
+          "id",
+          "createdAt",
+          "timing",
+          "transportEvidence[].transport.durationMs"
+        ]
+      }
+    },
+    {
+      "id": "approve-then-supply",
+      "profile": "sequence",
+      "httpStatus": 200,
+      "canonicalStatus": "verified",
+      "sequence": {
+        "status": "completed",
+        "completedSteps": 2,
+        "attemptedSteps": 2
+      },
+      "accounting": {
+        "rpcCalls": 47,
+        "observedBytes": 173734,
+        "retainedBytes": 173734,
+        "durationMs": 11462.801877000002,
+        "withheldErrorBodies": 0
+      },
+      "steps": [
+        {
+          "status": "success",
+          "measurements": [
+            {
+              "query": {
+                "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "data": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+              },
+              "beforeRaw": "0",
+              "afterRaw": "3962903485",
+              "deltaRaw": "3962903485",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 12,
+                  "mutationEvidenceId": 13
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 14,
+                  "mutationEvidenceId": 15
+                }
+              ]
+            }
+          ],
+          "originalTraceEvidenceId": 8,
+          "originalDiffEvidenceId": 9,
+          "completeOverridesSha256": "7f20cea3604741c8ca4d36d1707d43206e80cb884af76ba83dff7f8bd96e3add"
+        },
+        {
+          "status": "success",
+          "measurements": [
+            {
+              "query": {
+                "to": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+                "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+              },
+              "beforeRaw": "0",
+              "afterRaw": "3962903484",
+              "deltaRaw": "3962903484",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 14,
+                  "mutationEvidenceId": 15
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 16,
+                  "mutationEvidenceId": 17
+                }
+              ]
+            },
+            {
+              "query": {
+                "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+              },
+              "beforeRaw": "3962903485",
+              "afterRaw": "0",
+              "deltaRaw": "-3962903485",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 18,
+                  "mutationEvidenceId": 19
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 20,
+                  "mutationEvidenceId": 21
+                }
+              ]
+            },
+            {
+              "query": {
+                "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "data": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+              },
+              "beforeRaw": "3962903485",
+              "afterRaw": "0",
+              "deltaRaw": "-3962903485",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 22,
+                  "mutationEvidenceId": 23
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 24,
+                  "mutationEvidenceId": 25
+                }
+              ]
+            },
+            {
+              "query": {
+                "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "data": "0x70a0823100000000000000000000000098c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c"
+              },
+              "beforeRaw": "151987610826648",
+              "afterRaw": "151991573730133",
+              "deltaRaw": "3962903485",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 26,
+                  "mutationEvidenceId": 27
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 28,
+                  "mutationEvidenceId": 29
+                }
+              ]
+            }
+          ],
+          "originalTraceEvidenceId": 8,
+          "originalDiffEvidenceId": 11,
+          "completeOverridesSha256": "863e83cc65f3dd166ab60ec389fe0aaf84001fe70da7ee088e55880674ef93cf"
+        }
+      ],
+      "playback": {
+        "status": "matched",
+        "consumedRpcIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47
+        ],
+        "excludedGeneratedFields": [
+          "id",
+          "createdAt",
+          "timing",
+          "transportEvidence[].transport.durationMs"
+        ]
+      }
+    },
+    {
+      "id": "approve-supply-repeat",
+      "profile": "sequence",
+      "httpStatus": 200,
+      "canonicalStatus": "verified",
+      "sequence": {
+        "status": "stopped",
+        "completedSteps": 2,
+        "attemptedSteps": 3,
+        "stoppedAtIndex": 2,
+        "reason": "Original execution did not succeed."
+      },
+      "accounting": {
+        "rpcCalls": 56,
+        "observedBytes": 228621,
+        "retainedBytes": 228621,
+        "durationMs": 13705.880547999994,
+        "withheldErrorBodies": 0
+      },
+      "steps": [
+        {
+          "status": "success",
+          "measurements": [
+            {
+              "query": {
+                "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "data": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+              },
+              "beforeRaw": "0",
+              "afterRaw": "3962903485",
+              "deltaRaw": "3962903485",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 12,
+                  "mutationEvidenceId": 13
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 14,
+                  "mutationEvidenceId": 15
+                }
+              ]
+            }
+          ],
+          "originalTraceEvidenceId": 8,
+          "originalDiffEvidenceId": 9,
+          "completeOverridesSha256": "7f20cea3604741c8ca4d36d1707d43206e80cb884af76ba83dff7f8bd96e3add"
+        },
+        {
+          "status": "success",
+          "measurements": [
+            {
+              "query": {
+                "to": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+                "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+              },
+              "beforeRaw": "0",
+              "afterRaw": "3962903484",
+              "deltaRaw": "3962903484",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 14,
+                  "mutationEvidenceId": 15
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 16,
+                  "mutationEvidenceId": 17
+                }
+              ]
+            },
+            {
+              "query": {
+                "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+              },
+              "beforeRaw": "3962903485",
+              "afterRaw": "0",
+              "deltaRaw": "-3962903485",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 18,
+                  "mutationEvidenceId": 19
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 20,
+                  "mutationEvidenceId": 21
+                }
+              ]
+            },
+            {
+              "query": {
+                "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "data": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+              },
+              "beforeRaw": "3962903485",
+              "afterRaw": "0",
+              "deltaRaw": "-3962903485",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 22,
+                  "mutationEvidenceId": 23
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 24,
+                  "mutationEvidenceId": 25
+                }
+              ]
+            },
+            {
+              "query": {
+                "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "data": "0x70a0823100000000000000000000000098c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c"
+              },
+              "beforeRaw": "151987610826648",
+              "afterRaw": "151991573730133",
+              "deltaRaw": "3962903485",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 26,
+                  "mutationEvidenceId": 27
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 28,
+                  "mutationEvidenceId": 29
+                }
+              ]
+            }
+          ],
+          "originalTraceEvidenceId": 8,
+          "originalDiffEvidenceId": 11,
+          "completeOverridesSha256": "863e83cc65f3dd166ab60ec389fe0aaf84001fe70da7ee088e55880674ef93cf"
+        },
+        {
+          "status": "reverted_or_failed",
+          "measurements": [],
+          "originalTraceEvidenceId": 8,
+          "revertReason": "ERC20: transfer amount exceeds allowance"
+        }
+      ],
+      "playback": {
+        "status": "matched",
+        "consumedRpcIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56
+        ],
+        "excludedGeneratedFields": [
+          "id",
+          "createdAt",
+          "timing",
+          "transportEvidence[].transport.durationMs"
+        ]
+      }
+    }
+  ],
+  "limitations": [
+    "Three fixed constructed development examples at one historical block end; no coverage denominator or vendor/security score.",
+    "Read-only unsigned provider simulations exclude fee settlement, signatures and original historical transaction-position replay.",
+    "Independent consistency checks use provider-supplied traces/diffs; archived handler playback is reproducibility, not an independent execution oracle.",
+    "Token labels/decimals remain historical references, not current-state metadata attestations.",
+    "Only returned measurement words determine amounts; events and discovery candidates are not measurements."
+  ]
+}

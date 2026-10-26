@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "1.0",
+  "checkedAt": "2026-10-26T14:48:45.561Z",
+  "mode": "actual_browser_with_archived_handler_and_saved_RPC_playback",
+  "liveManifestSha256": "6e861f3b9f21e8d878b5347a5990707a29fa32bca28a81bbce1cbf8ca473255c",
+  "implementationSha256": "3b769d18eac4e46548420e51799baf0185f56154c1fbfaaed6914f8b4cb83e60",
+  "browser": "Codex in-app browser",
+  "replayUrl": "http://127.0.0.1:5176/",
+  "mainAppUrl": "http://127.0.0.1:5174/",
+  "publicNetworkRequests": 0,
+  "actualBrowserPostOrder": [
+    "supply-without-approval",
+    "approve-then-supply",
+    "approve-supply-repeat"
+  ],
+  "submissionCorrespondence": "../standard-evm-sequence-ui-replay/playback-results.json",
+  "cases": [
+    {
+      "id": "supply-without-approval",
+      "executionLabel": "Failed / reverted",
+      "contractReportedRevert": "ERC20: transfer amount exceeds allowance",
+      "canonicalStatus": "verified",
+      "measuredRows": 0
+    },
+    {
+      "id": "approve-then-supply",
+      "sequenceStatus": "completed",
+      "completedSteps": 2,
+      "attemptedSteps": 2,
+      "selectedFinalStep": 2,
+      "allowanceStep1": {
+        "before": "0",
+        "after": "3962.903485"
+      },
+      "allowanceStep2": {
+        "before": "3962.903485",
+        "after": "0"
+      },
+      "senderUsdcDelta": "-3962.903485",
+      "senderAEthUsdcDelta": "3962.903484",
+      "reserveUsdcDelta": "3962.903485",
+      "allFourAmountTablesLabelStep2": true,
+      "step1InspectableAfterSupply": true,
+      "stepSwitchRetainsWholeTwoStepRawJson": true
+    },
+    {
+      "id": "approve-supply-repeat",
+      "sequenceStatus": "stopped",
+      "completedSteps": 2,
+      "attemptedSteps": 3,
+      "stoppedAtIndex": 2,
+      "stepStatuses": [
+        "completed",
+        "completed",
+        "reverted_or_failed"
+      ],
+      "contractReportedRevert": "ERC20: transfer amount exceeds allowance",
+      "initialSelection": "failed_third_step",
+      "failedStepMeasurementsShownAs": "not established",
+      "priorDepositAmountsRemainVisible": true,
+      "stepSwitchRetainsWholeThreeStepRawJson": true
+    }
+  ],
+  "controls": {
+    "senderAndModeLockedDuringRequest": true,
+    "allDynamicStepInputsAndButtonsLockedDuringRequest": true,
+    "addCallLockedDuringRequest": true,
+    "modeChangeClearsPriorResult": true,
+    "addingCallClearsPriorResult": true,
+    "addDisabledAtFourCalls": true,
+    "fourthCallRemovable": true,
+    "moveDownThenUpRestoresApprovalSupplySupplyOrder": true,
+    "hiddenSingleCallFieldsDoNotEnterSequenceRequest": true
+  },
+  "observedContextLabels": {
+    "step1": "This step starts from the selected block’s end state.",
+    "step2": "This step starts from the simulated state after step 1, using the same block context.",
+    "step3": "This step starts from the simulated state after step 2, using the same block context."
+  },
+  "visual": {
+    "screenshotInspected": true,
+    "viewportWidth": 1280,
+    "viewportHeight": 720,
+    "horizontalOverflow": false,
+    "stepCardsReadable": true,
+    "selectedStepVisible": true
+  },
+  "console": {
+    "levels": [
+      "error",
+      "warn"
+    ],
+    "returnedEntries": 0,
+    "queryLimit": 20
+  },
+  "rawJson": {
+    "completeOuterSequencePreserved": true,
+    "downloadHandlerReviewed": true,
+    "actualDownloadedFileBytesChecked": false
+  },
+  "interactionNote": "One attempted third-case submit was blocked by browser required-field validation before HTTP because an operator nth locator included the hidden single-call field. The recipient remained empty. The corrected locator filled the intended third field, and the exact planned third case was submitted once; the playback ledger retains exactly three HTTP attempts and no failures.",
+  "finalState": {
+    "offlineServerStopped": true,
+    "mainAppRestarted": true,
+    "mainAppVersion": "0.12.0",
+    "mainAppMode": "Ordered calls",
+    "mainAppExample": "Approve USDC, then supply to Aave V3",
+    "mainAppCallCount": 2,
+    "mainAppSimulateEnabled": true,
+    "mainAppNewPublicSimulationSubmitted": false
+  },
+  "limitations": [
+    "Browser checks replay the captured RPC evidence and are not additional live chain observations or an independent execution oracle.",
+    "The displayed raw JSON and download handler were checked; no saved browser-download file was independently read.",
+    "The live packet contains constructed unsigned calls at historical block-end state; no signatures, broadcasts, fees or atomic rollback are modeled."
+  ]
+}

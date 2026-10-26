@@ -9,6 +9,7 @@ import { semanticTrace } from '../../src/query-validation.js';
 import { assertNoProviderErrorResult } from '../../src/rpc.js';
 import { discoverTokenQueries } from './discovery.js';
 import { collectNativeEffects } from './native-effects.js';
+import { composeSequenceOverrides } from './sequence-state.js';
 
 const ADDRESS=/^0x[0-9a-f]{40}$/i, WORD=/^0x[0-9a-f]{64}$/i, BYTES=/^0x(?:[0-9a-f]{2})*$/i;
 const BALANCE=/^0x70a082310{24}[0-9a-f]{40}$/i, ALLOWANCE=/^0xdd62ed3e0{24}[0-9a-f]{40}0{24}[0-9a-f]{40}$/i;
@@ -19,6 +20,10 @@ const record=x=>x!==null&&typeof x==='object'&&!Array.isArray(x)&&[Object.protot
 const isAddress=x=>typeof x==='string'&&ADDRESS.test(x),isWord=x=>typeof x==='string'&&WORD.test(x),isBytes=x=>typeof x==='string'&&BYTES.test(x);
 const quantity=(x,max=MAX)=>{if(typeof x==='string'&&x.length>80)return null;const n=uint(x);return n!==null&&n>=0n&&n<=max?n:null;};
 const hex=x=>'0x'+BigInt(x).toString(16), sha=x=>createHash('sha256').update(JSON.stringify(x)).digest('hex');
+// Continuations are private capabilities tied to an unmodified in-process result.
+// Serialized reports and caller-supplied overrides cannot supply starting state.
+const continuations = new WeakMap();
+export const SEQUENCE_LIMITS=Object.freeze({minCalls:2,maxCalls:4,rpc:257,responseBytes:8*1024*1024,evidenceBytes:128*1024*1024,wallMs:240000});
 class ValidationError extends Error {}
 const need=(condition,message)=>{if(!condition)throw new ValidationError(message);};
 const publicError=e=>e instanceof ValidationError||e instanceof StateValidationError?e.message:'The provider did not complete a valid bounded read-only request.';
@@ -82,7 +87,7 @@ export function validateQueryDiff(raw,{sender,nonce,balance}){
  * own nonce-only effects are discarded. Every requested query stays in output.
  * rpc.call must enforce a per-request timeout <=25s and retain raw transport
  * evidence externally; this function retains bounded parsed evidence too. */
-export async function simulateUnsignedCall({rpc,chainId,blockHash,request,queries,now=()=>performance.now()}){
+export async function simulateUnsignedCall({rpc,chainId,blockHash,request,queries,previous,now=()=>performance.now()}){
   const start=now(),evidence=[],measurements=[],automatic=queries===undefined;let retained=0,latched=null;
   const result={schemaVersion:'0.2',kind:'experimental_standard_evm_unsigned_call',security:{status:'not_assessed'},execution:{status:'unavailable'},measurements,evidence,
     nativeEffects:{status:'unavailable',reason:'Original state changes not reached.',feeScope:'excluded',maxAccounts:8,measurements:[]},
@@ -101,7 +106,15 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
       retained+=bytes;item.result=JSON.parse(text);return structuredClone(item.result);
     }catch(error){item.error=publicError(error);throw error;}
   }
-  let pinned,identity,rawHeader,nonce,balance,postBalance,overrides,originalCall;
+  let pinned,identity,rawHeader,nonce,balance,postBalance,overrides,originalCall,predecessor,initialOverrides;
+  const initialOptions=()=>initialOverrides?{stateOverrides:structuredClone(initialOverrides)}:{};
+  function startingBasic(account,field,pinnedValue,evidenceId){
+    const carried=initialOverrides?.[account]?.[field];
+    const value=carried===undefined?pinnedValue:quantity(carried,field==='nonce'?MAX_NONCE:MAX);
+    need(value!==null,'Carried basic state is malformed.');
+    if(predecessor)result.startingState.basicStateReads.push({account,field,pinnedEvidenceId:evidenceId,pinnedRaw:pinnedValue.toString(),startingRaw:value.toString(),basis:carried===undefined?'pinned_block_read':'validated_previous_state_override'});
+    return value;
+  }
   const nativeAnchors=new Map(),nativeExpected=new Map(),targetCodes=new Map();
   async function witness(after){
     const rows=result.nativeEffects.measurements;
@@ -109,7 +122,7 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
     for(const [i,row] of rows.entries())code+='73'+row.account.slice(2)+'3161'+(256+32*i).toString(16).padStart(4,'0')+'52';
     code+='61'+(256+32*rows.length).toString(16).padStart(4,'0')+'6000f3';
     const input={from:originalCall.from,to:PROBE,data:'0x',value:'0x0',gas:'0x493e0'};
-    const stateOverrides={...(after?overrides:{}),[PROBE]:{code}},traceEvidenceId=evidence.length+1;
+    const stateOverrides={...(after?overrides:initialOverrides??{}),[PROBE]:{code}},traceEvidenceId=evidence.length+1;
     const output=bindTrace(await call('debug_traceCall',[input,pinned,{...tracer(false),stateOverrides}]),input);
     need(!failed(output)&&output.calls.length===0&&output.logs.length===0&&output.output.length===514+64*rows.length,'Header and native-balance witness is incomplete.');
     const expected=[identity.number,identity.timestamp,identity.gasLimit,0,identity.mixHash,identity.miner,chainId,identity.parentHash].map(BigInt);
@@ -135,19 +148,31 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
     originalCall={from:lower(request.from),to:lower(request.to),data:lower(request.data),gas:hex(request.gas),value:hex(request.value)};
     need(originalCall.from!==PROBE&&originalCall.to!==PROBE&&normalized.every(q=>q.to!==PROBE),'Input overlaps the reserved header witness.');
     pinned={blockHash:lower(blockHash),requireCanonical:true};
+    if(previous!==undefined){
+      predecessor=record(previous)?continuations.get(previous):undefined;
+      need(predecessor&&sha(previous)===predecessor.resultSha256,'Continuation requires an unmodified validated in-process predecessor.');
+      need(predecessor.chainId===BigInt(chainId).toString()&&predecessor.blockHash===pinned.blockHash&&predecessor.sender===originalCall.from&&predecessor.priorCalls<SEQUENCE_LIMITS.maxCalls,'Continuation chain, block, sender or length does not match.');
+      initialOverrides=structuredClone(predecessor.overrides);
+      result.scope.state='pinned_block_end_plus_prior_validated_calls';
+      result.startingState={kind:'after_previous_simulation',previousResultSha256:predecessor.resultSha256,priorCalls:predecessor.priorCalls,completeOverridesSha256:sha(initialOverrides),overrides:structuredClone(initialOverrides),basicStateReads:[]};
+    }
     result.request={chainId:BigInt(chainId).toString(),block:pinned,transaction:originalCall,queries:normalized};
     if(automatic)result.request.querySelection='bounded_observed_trace_candidates';
     need(quantity(await call('eth_chainId',[]))===BigInt(chainId),'Provider chain identity differs from the request.');
     rawHeader=await call('eth_getBlockByHash',[pinned.blockHash,false]);identity=header(rawHeader);need(identity.hash===pinned.blockHash,'Provider returned the wrong source block.');result.block=identity;
+    if(predecessor)need(isDeepStrictEqual(rawHeader,predecessor.rawHeader),'Continuation header or block contents differ from the predecessor.');
     nonce=quantity(await call('eth_getTransactionCount',[originalCall.from,pinned]),MAX_NONCE-2n);
-    balance=quantity(await call('eth_getBalance',[originalCall.from,pinned]));need(nonce!==null&&balance!==null,'Sender basic state is incomplete.');
-    nativeAnchors.set(originalCall.from,{value:balance,evidenceId:evidence.length});
+    need(nonce!==null,'Sender basic state is incomplete.');nonce=startingBasic(originalCall.from,'nonce',nonce,evidence.length);
+    need(nonce<=MAX_NONCE-2n,'Carried sender nonce exceeds the supported range.');
+    balance=quantity(await call('eth_getBalance',[originalCall.from,pinned]));need(balance!==null,'Sender basic state is incomplete.');
+    const pinnedSenderBalance=balance;balance=startingBasic(originalCall.from,'balance',balance,evidence.length);
+    nativeAnchors.set(originalCall.from,{value:balance,pinnedValue:pinnedSenderBalance,evidenceId:evidence.length});
     need(await call('eth_getCode',[originalCall.from,pinned])==='0x','Only code-free senders are supported.');
     for(const target of new Set([originalCall.to,...normalized.map(q=>q.to)])){
       const code=await call('eth_getCode',[target,pinned]);need(typeof code==='string'&&BYTES.test(code)&&(code!=='0x'||(target===originalCall.to&&!normalized.some(q=>q.to===target))),'A declared target has no valid runtime code.');targetCodes.set(target,code);
     }
     need(await call('eth_getCode',[PROBE,pinned])==='0x','Reserved header witness address is not code-free.');
-    const rawTrace=await call('debug_traceCall',[originalCall,pinned,tracer(false)]),trace=bindTrace(rawTrace,originalCall);
+    const rawTrace=await call('debug_traceCall',[originalCall,pinned,{...tracer(false),...initialOptions()}]),trace=bindTrace(rawTrace,originalCall);
     result.execution={status:failed(trace)?'reverted_or_failed':'success',gasUsed:trace.gasUsed,returnData:trace.output,error:trace.error,revertReason:trace.revertReason,trace:rawTrace};
     if(failed(trace)){
       result.nativeEffects={...result.nativeEffects,status:'not_applicable',reason:'Original execution did not succeed.'};
@@ -169,7 +194,7 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
           const code=targetCodes.has(target)?targetCodes.get(target):await call('eth_getCode',[target,pinned]);need(typeof code==='string'&&BYTES.test(code)&&code!=='0x','A selected target has no valid runtime code.');
         }
       }
-      const normalizedDiff=normalizeProviderStateDiff(await call('debug_traceCall',[originalCall,pinned,tracer(true)])),diff=normalizedDiff.diff;result.stateDiff=diff;
+      const normalizedDiff=normalizeProviderStateDiff(await call('debug_traceCall',[originalCall,pinned,{...tracer(true),...initialOptions()}])),diff=normalizedDiff.diff;result.stateDiff=diff;
       result.providerCodeHashChecks={basis:'Keccak256_of_explicit_provider_runtime_code_only',independentStateAttestation:false,claims:normalizedDiff.codeHashChecks};
       need(!Object.hasOwn(diff.pre,PROBE)&&!Object.hasOwn(diff.post,PROBE),'Original state changes overlap the header witness.');
       const collection=collectNativeEffects(trace,diff);
@@ -184,8 +209,9 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
       }
       async function anchor(account){
         if(!nativeAnchors.has(account)){
-          const value=quantity(await basic('eth_getBalance',account));need(value!==null,'Pinned native balance is malformed.');
-          nativeAnchors.set(account,{value,evidenceId:evidence.length});
+          const pinnedValue=quantity(await basic('eth_getBalance',account));need(pinnedValue!==null,'Pinned native balance is malformed.');
+          const value=startingBasic(account,'balance',pinnedValue,evidence.length);
+          nativeAnchors.set(account,{value,pinnedValue,evidenceId:evidence.length});
         }
         return nativeAnchors.get(account).value;
       }
@@ -197,10 +223,11 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
         need(quantity(post.balance)>0n&&(post.nonce===undefined||quantity(post.nonce)===0n)&&(post.code===undefined||post.code==='0x')&&(post.storage===undefined||Object.keys(post.storage).length===0),'Unsupported newly created account state.');
         need(BigInt(collection.netValueByAccount[account]??'0')>0n&&await anchor(account)===0n,'New funded account lacks an independently established empty balance.');
         const nonceId=evidence.length+1;
-        need(quantity(await basic('eth_getTransactionCount',account),MAX_NONCE)===0n,'New funded account did not have an empty nonce.');
+        const pinnedNonce=quantity(await basic('eth_getTransactionCount',account),MAX_NONCE);need(pinnedNonce!==null,'Pinned account nonce is malformed.');
+        need(startingBasic(account,'nonce',pinnedNonce,evidence.length)===0n,'New funded account did not have an empty nonce.');
         const codeId=evidence.length+1;need(await basic('eth_getCode',account)==='0x','New funded account did not have empty code.');
         effectiveDiff.pre[account]={balance:'0',...(post.nonce===undefined?{}:{nonce:'0'}),...(post.code===undefined?{}:{code:'0x'})};
-        normalizations.push({account,basis:'pinned_zero_balance_zero_nonce_empty_code',balanceEvidenceId:nativeAnchors.get(account).evidenceId,nonceEvidenceId:nonceId,codeEvidenceId:codeId});
+        normalizations.push({account,basis:predecessor?'validated_starting_zero_balance_zero_nonce_and_pinned_empty_code':'pinned_zero_balance_zero_nonce_empty_code',balanceEvidenceId:nativeAnchors.get(account).evidenceId,nonceEvidenceId:nonceId,codeEvidenceId:codeId});
       }
       // Validate every reported native transition, including accounts omitted
       // from the eight-account display. Missing pre.balance is never guessed.
@@ -215,7 +242,9 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
           nativeExpected.set(account,final);
         }else need(net===0n,'Native transfer is absent from the complete original state diff.');
       }
-      overrides=buildStateOverrides(effectiveDiff);
+      if(predecessor){
+        const composed=composeSequenceOverrides(initialOverrides,effectiveDiff);overrides=composed.overrides;result.startingState.overlapChecks=composed.overlapChecks;
+      }else overrides=buildStateOverrides(effectiveDiff);
       if(normalizations.length)result.nativeEffects.stateNormalization=normalizations;
       const before=diff.pre[originalCall.from],after=diff.post[originalCall.from];
       postBalance=after?.balance===undefined?balance:quantity(after.balance);
@@ -227,21 +256,21 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
         const initial=await anchor(account),pre=effectiveDiff.pre[account];
         need(!pre||observedPre(pre,'balance',initial)===initial,'Native state prebalance differs from its pinned independent read.');
         if(!nativeExpected.has(account))nativeExpected.set(account,initial);
-        result.nativeEffects.measurements.push({account,status:'unavailable',reason:'Witness not reached.',anchorEvidenceId:nativeAnchors.get(account).evidenceId,queryEvidence:[]});
+        result.nativeEffects.measurements.push({account,status:'unavailable',reason:'Witness not reached.',anchorEvidenceId:nativeAnchors.get(account).evidenceId,...(predecessor?{startingBalance:{basis:initialOverrides[account]?.balance===undefined?'pinned_block_read':'validated_previous_state_override',pinnedRaw:nativeAnchors.get(account).pinnedValue.toString(),startingRaw:initial.toString(),completeOverridesSha256:sha(initialOverrides)}}:{}),queryEvidence:[]});
       }
       result.nativeEffects.selectedAccounts=result.nativeEffects.measurements.map(row=>row.account);
       result.nativeEffects.counts.selected=result.nativeEffects.measurements.length;
       result.nativeEffects.counts.omitted=collection.candidates.length-result.nativeEffects.measurements.length;
       await witness(false);await witness(true);
-      for(const row of result.nativeEffects.measurements){delete row.reason;Object.assign(row,{status:'measured',deltaRaw:(BigInt(row.afterRaw)-BigInt(row.beforeRaw)).toString(),basis:'pinned_balance_reads_and_isolated_BALANCE_witnesses_with_nonce_only_effects'});}
+      for(const row of result.nativeEffects.measurements){delete row.reason;Object.assign(row,{status:'measured',deltaRaw:(BigInt(row.afterRaw)-BigInt(row.beforeRaw)).toString(),basis:predecessor?'validated_carried_balances_and_isolated_BALANCE_witnesses_with_nonce_only_effects':'pinned_balance_reads_and_isolated_BALANCE_witnesses_with_nonce_only_effects'});}
       result.nativeEffects.counts.measured=result.nativeEffects.measurements.length;
       result.nativeEffects.status=collection.candidates.length===0?'none':result.nativeEffects.counts.omitted?'partial':'measured';
-      result.executionIdentity={chainId:BigInt(chainId).toString(),stateBlockHash:pinned.blockHash,blockNumber:identity.number,timestamp:identity.timestamp,originalEnvelopeSha256:sha(originalCall),completeOverridesSha256:sha(overrides),actualBlockBaseFee:identity.baseFeePerGas,executionBaseFee:'0',omittedZeroPrefields:'accepted_only_with_independent_pinned_basic_state_reads'};
+      result.executionIdentity={chainId:BigInt(chainId).toString(),stateBlockHash:pinned.blockHash,blockNumber:identity.number,timestamp:identity.timestamp,originalEnvelopeSha256:sha(originalCall),completeOverridesSha256:sha(overrides),actualBlockBaseFee:identity.baseFeePerGas,executionBaseFee:'0',omittedZeroPrefields:predecessor?'accepted_only_with_validated_starting_basic_state':'accepted_only_with_independent_pinned_basic_state_reads'};
       for(const entry of measurements){
         try{
           const values=[];entry.queryEvidence=[];
           for(const afterState of [false,true]){
-            const queryCall={from:originalCall.from,...entry.query,value:'0x0',gas:'0x493e0'},extra=afterState?{stateOverrides:overrides}:{};
+            const queryCall={from:originalCall.from,...entry.query,value:'0x0',gas:'0x493e0'},extra=afterState?{stateOverrides:overrides}:initialOptions();
             const proof={state:afterState?'after':'before',traceEvidenceId:evidence.length+1};entry.queryEvidence.push(proof);
             const qTrace=await call('debug_traceCall',[queryCall,pinned,{...tracer(false),...extra}]);
             const observed=validateQueryTrace(qTrace,queryCall);
@@ -259,5 +288,101 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
   }catch(error){latched=publicError(error);}
   if(latched){result.measurementFailure=latched;result.canonicalStatus='unverified';result.nativeEffects.status='unavailable';result.nativeEffects.reason=latched;if(result.nativeEffects.counts)result.nativeEffects.counts.measured=0;for(const entry of [...measurements,...result.nativeEffects.measurements]){delete entry.beforeRaw;delete entry.afterRaw;delete entry.deltaRaw;delete entry.basis;Object.assign(entry,{status:'unavailable',reason:latched});}}
   result.accounting={rpcCalls:evidence.length,retainedResultBytes:retained,limits:LIMITS};
+  if(!latched&&result.execution.status==='success'&&result.canonicalStatus==='verified'&&overrides){
+    continuations.set(result,{chainId:BigInt(chainId).toString(),blockHash:pinned.blockHash,sender:originalCall.from,priorCalls:(predecessor?.priorCalls??0)+1,rawHeader:structuredClone(rawHeader),overrides:structuredClone(overrides),resultSha256:sha(result)});
+  }
+  return result;
+}
+
+function invalidateSequenceAmounts(result,reason){
+  continuations.delete(result);
+  result.canonicalStatus='unverified';result.measurementFailure??=reason;result.sequenceValidationFailure=reason;
+  result.nativeEffects.status='unavailable';result.nativeEffects.reason=reason;
+  if(result.nativeEffects.counts)result.nativeEffects.counts.measured=0;
+  for(const entry of [...result.measurements,...result.nativeEffects.measurements]){
+    for(const field of ['beforeRaw','afterRaw','deltaRaw','basis'])delete entry[field];
+    Object.assign(entry,{status:'unavailable',reason});
+  }
+}
+
+/** Ordered, separate unsigned calls at one unchanged block context. Only an
+ * actual successful validated predecessor can supply subsequent state. Query
+ * mutations are discarded and later failures never imply an atomic rollback. */
+export async function simulateUnsignedSequence({rpc,chainId,blockHash,calls,now=()=>performance.now()}){
+  // Validate every envelope before the first provider request; otherwise an
+  // invalid last input could leave a misleading successful partial sequence.
+  need(quantity(chainId,BigInt(Number.MAX_SAFE_INTEGER))!==null&&BigInt(chainId)>0n&&isWord(blockHash),'A positive chain ID and explicit block hash are required.');
+  need(Array.isArray(calls)&&calls.length>=SEQUENCE_LIMITS.minCalls&&calls.length<=SEQUENCE_LIMITS.maxCalls,'An ordered sequence requires between two and four calls.');
+  let sender;
+  const inputs=calls.map(input=>{
+    need(record(input)&&Object.keys(input).every(key=>['request','queries'].includes(key)),'Unsupported sequence input fields.');
+    const request=input.request;
+    need(record(request)&&Object.keys(request).sort().join()==='data,from,gas,to,value'&&isAddress(request.from)&&isAddress(request.to)&&typeof request.data==='string'&&request.data.length<=65538&&isBytes(request.data)&&quantity(request.value)!==null&&quantity(request.gas)!==null&&BigInt(request.gas)>21000n&&BigInt(request.gas)<=5000000n,'Unsupported unsigned sequence envelope.');
+    sender??=lower(request.from);need(lower(request.from)===sender,'Every sequence call must use the same sender.');
+    need(lower(request.from)!==PROBE&&lower(request.to)!==PROBE,'Input overlaps the reserved header witness.');
+    if(input.queries!==undefined){
+      need(Array.isArray(input.queries)&&input.queries.length>0&&input.queries.length<=LIMITS.queries,'Between one and eight explicit queries are required.');
+      const queries=input.queries.map(normalizeQuery);
+      need(queries.every(q=>q.to!==PROBE)&&new Set(queries.map(q=>q.to+q.data)).size===queries.length,'Sequence queries contain duplicate or reserved targets.');
+    }
+    return structuredClone(input);
+  });
+  const start=now(),evidence=[];let retained=0,activeIndex=0,previous,referenceHeader,sharedFailure;
+  const result={schemaVersion:'0.1',kind:'experimental_standard_evm_unsigned_sequence',security:{status:'not_assessed'},canonicalStatus:'unverified',
+    scope:{state:'pinned_block_end_plus_prior_validated_calls',atomic:false,stopsOnFailure:true,fees:'excluded',blockTimeAdvancement:false,queryMutationsCarried:false,signedTransactionValidation:false,allEffectsCoverage:'inconclusive'},
+    sequence:{status:'unavailable',completedSteps:0,attemptedSteps:0},
+    steps:inputs.map((input,index)=>({index,input:structuredClone(input.request),stateSource:index===0?{kind:'initial_block'}:{kind:'after_step',stepIndex:index-1},status:'skipped',reason:'Not reached.'})),sequenceEvidence:evidence};
+  async function boundedCall(method,params,final=false){
+    need(now()-start<SEQUENCE_LIMITS.wallMs,'Sequence exceeded its scheduling deadline.');
+    need(evidence.length<SEQUENCE_LIMITS.rpc-(final?0:1),'Sequence exceeded its shared RPC budget.');
+    const item={id:evidence.length+1,...(final?{kind:'final_canonical_check'}:{stepIndex:activeIndex}),method,paramsSha256:sha(params)};evidence.push(item);
+    try{
+      const value=await rpc.call(method,structuredClone(params));
+      need(now()-start<SEQUENCE_LIMITS.wallMs,'Sequence exceeded its scheduling deadline.');assertNoProviderErrorResult(method,value);
+      const serialized=JSON.stringify(value),bytes=Buffer.byteLength(serialized);
+      need(bytes<=SEQUENCE_LIMITS.responseBytes&&retained+bytes<=SEQUENCE_LIMITS.evidenceBytes,'Sequence evidence exceeded its shared byte budget.');
+      retained+=bytes;Object.assign(item,{resultBytes:bytes,resultSha256:sha(value)});
+      return structuredClone(value);
+    }catch(error){item.error=publicError(error);throw error;}
+  }
+  for(const [index,input] of inputs.entries()){
+    activeIndex=index;const step=result.steps[index];result.sequence.attemptedSteps++;
+    const output=await simulateUnsignedCall({rpc:{call:(method,params)=>boundedCall(method,params)},chainId,blockHash,...input,...(previous?{previous}:{}),now});
+    step.result=output;delete step.reason;
+    const sourceHeader=output.evidence.find(item=>item.method==='eth_getBlockByHash'&&item.result)?.result;
+    if(!referenceHeader&&sourceHeader)referenceHeader=structuredClone(sourceHeader);
+    result.block??=output.block;
+    if(sourceHeader&&referenceHeader&&!isDeepStrictEqual(sourceHeader,referenceHeader))sharedFailure='Sequence steps do not share an identical source header and block contents.';
+    if(output.canonicalStatus!=='verified')sharedFailure??='A sequence step could not validate its shared state and canonical context.';
+    if(output.execution.status==='reverted_or_failed'&&output.canonicalStatus==='verified'){
+      step.status='reverted_or_failed';step.reason='Original execution did not succeed.';
+      Object.assign(result.sequence,{status:'stopped',stoppedAtIndex:index,reason:step.reason});break;
+    }
+    if(!continuations.has(output)){
+      step.status='unavailable';step.reason=output.measurementFailure??'Complete validated continuation state is unavailable.';
+      Object.assign(result.sequence,{status:'unavailable',stoppedAtIndex:index,reason:step.reason});break;
+    }
+    step.status='completed';result.sequence.completedSteps++;previous=output;
+    if(index===inputs.length-1)result.sequence.status='completed';
+  }
+  for(const step of result.steps.filter(step=>step.status==='skipped'))step.reason='Skipped because an earlier call did not complete with validated state.';
+  try{
+    need(Boolean(referenceHeader),'Sequence source header was not established.');
+    const params=[hex(header(referenceHeader).number),false],id=evidence.length+1;
+    const confirmed=await boundedCall('eth_getBlockByNumber',params,true);
+    result.finalVerification={sequenceEvidenceId:id,method:'eth_getBlockByNumber',params,result:confirmed};
+    need(isDeepStrictEqual(confirmed,referenceHeader),'Canonical header or block contents changed during the sequence.');
+    need(!sharedFailure,sharedFailure);
+    result.canonicalStatus='verified';
+  }catch(error){
+    const reason=publicError(error);result.canonicalStatus='unverified';
+    Object.assign(result.sequence,{status:'unavailable',reason});
+    for(const step of result.steps)if(step.result){invalidateSequenceAmounts(step.result,reason);if(step.status==='completed'){step.status='unavailable';step.reason=reason;}}
+    result.sequence.completedSteps=0;
+  }
+  // These capabilities are scoped to this invocation, not exposed as a way
+  // to extend a returned sequence beyond its declared bounded input list.
+  for(const step of result.steps)if(step.result)continuations.delete(step.result);
+  result.accounting={rpcCalls:evidence.length,retainedResultBytes:retained,limits:SEQUENCE_LIMITS};
   return result;
 }

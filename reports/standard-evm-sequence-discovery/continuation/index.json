@@ -1,0 +1,113 @@
+{
+  "schemaVersion": "1.0",
+  "status": "usable_synthetic_sequence_with_preserved_initial_incomplete_packet",
+  "syntheticUnsignedSequence": true,
+  "exactHistoricalReplay": false,
+  "chainId": 1,
+  "blockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+  "blockNumber": "26270482",
+  "sender": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+  "usdc": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "pool": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+  "aToken": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+  "amountRaw": "3962903485",
+  "sequenceInputs": {
+    "source": "../plan.json",
+    "approval": {
+      "from": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+      "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "data": "0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000ec351bbd",
+      "value": "0x0",
+      "gas": "0x4c4b40"
+    },
+    "supply": {
+      "from": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+      "to": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+      "data": "0x617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000ec351bbd00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b40000000000000000000000000000000000000000000000000000000000000000",
+      "value": "0x0",
+      "gas": "0x4c4b40"
+    },
+    "calldataDerivation": "First four ABI arguments unchanged; selector changed and permit suffix removed. A synthetic approve transaction is prepended. Not an original historical transaction replay."
+  },
+  "observed": {
+    "senderCode": "0x",
+    "balanceBeforeRaw": "3962903485",
+    "allowanceBeforeRaw": "0",
+    "withoutApprovalStatus": "reverted",
+    "withoutApprovalRevert": "ERC20: transfer amount exceeds allowance",
+    "approvalStatus": "success",
+    "allowanceAfterApprovalRaw": "3962903485",
+    "approvalNonceBefore": "52",
+    "approvalNonceAfter": "53",
+    "supplyAfterApprovalStatus": "success",
+    "supplyNonceBefore": "53",
+    "supplyNonceAfter": "54",
+    "supplyGasUsed": "165499",
+    "allowanceAfterSupplyBasis": "previously observed allowance slot is present in supply pre with approved value and absent from supply post; cleared to zero under diff semantics",
+    "allowanceAfterSupplyRaw": "0",
+    "fullCanonicalHeaderMatch": true,
+    "events": [
+      {
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "from": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+        "to": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+        "amountRaw": "3962903485"
+      },
+      {
+        "token": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+        "amountRaw": "3962903484"
+      }
+    ]
+  },
+  "composition": {
+    "source": "actual simulated approve full pre/post diff",
+    "helper": "../source/src/state.js#buildStateOverrides",
+    "overrideSha256": "7f20cea3604741c8ca4d36d1707d43206e80cb884af76ba83dff7f8bd96e3add",
+    "unchangedOverridesUsedBySupplyTraceAndDiff": true,
+    "originalFundingOverrides": false,
+    "guessedStorageSlots": false,
+    "measurementQueryNonceCarried": false
+  },
+  "packets": {
+    "initial": {
+      "status": "incomplete_or_failed_fixed_candidate",
+      "requests": 12,
+      "responseBytes": 35499,
+      "captureSha256": "e3e4e36d1433b8eb29467cdc172b0ea7efa6f3f3ca526a478aa6e42d89b99c03",
+      "manifestSha256": "b845a0ae70adb3f34c382fb83a2086a438dbe1540dc8f2c53a94c047fc5fe52e"
+    },
+    "supplemental": {
+      "requests": 3,
+      "responseBytes": 48009,
+      "planSha256": "e11b6c05c68c5dc5334dc860ce2c94bb0ba6f4e8fb2a65108760c49c5be3a0b4",
+      "captureSha256": "ae31c207aa98e1172cf8112211d981c3abbda559622f74c18af84db72b7443e6"
+    },
+    "combinedRequests": 15,
+    "combinedResponseBytes": 83508,
+    "repeatedPublicRequests": 0,
+    "retries": 0
+  },
+  "rawReferences": {
+    "initialBalance": "../raw/006.json",
+    "initialAllowance": "../raw/007.json",
+    "supplyWithoutApproval": "../raw/008.json",
+    "approvalTrace": "../raw/009.json",
+    "approvalDiff": "../raw/010.json",
+    "allowanceAfterApprovalTrace": "../raw/011.json",
+    "allowanceAfterApprovalDiff": "../raw/012.json",
+    "supplyAfterApprovalTrace": "raw/001.json",
+    "supplyAfterApprovalDiff": "raw/002.json",
+    "canonicalHeader": "raw/003.json"
+  },
+  "limitations": [
+    "Synthetic unsigned calls at historical parent block end, not original-position or signed execution.",
+    "Fee fields are omitted; native fees and independent BASEFEE/header-witness validation are outside this discovery.",
+    "Provider-supplied execution/state evidence is not an independent engine or cryptographic state proof.",
+    "One development fixture, no population coverage/security accuracy claim.",
+    "The initial packet is incomplete due a discovery-only assertion; this continuation supplies only its three unattempted observations.",
+    "Transfer and mint event quantities are observations, not independently queried final token balances.",
+    "No successful original historical approve/supply pair is claimed; the original history used supplyWithPermit."
+  ]
+}

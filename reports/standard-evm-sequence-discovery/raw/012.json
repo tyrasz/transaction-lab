@@ -1,0 +1,69 @@
+{
+  "id": 12,
+  "role": "allowance_after_approval_diff",
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 12,
+    "method": "debug_traceCall",
+    "params": [
+      {
+        "from": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "data": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+        "value": "0x0",
+        "gas": "0x493e0"
+      },
+      "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+      {
+        "tracer": "prestateTracer",
+        "timeout": "15s",
+        "tracerConfig": {
+          "diffMode": true
+        },
+        "stateOverrides": {
+          "0x48c16c5652add27eddb0f896748a35fc60b8d1b4": {
+            "nonce": "0x35"
+          },
+          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": {
+            "stateDiff": {
+              "0x26336f21a63aacd3574e840a3278fccb16fd789e8d3e700e5b9587a87e8da134": "0x00000000000000000000000000000000000000000000000000000000ec351bbd"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "requestText": "{\"jsonrpc\":\"2.0\",\"id\":12,\"method\":\"debug_traceCall\",\"params\":[{\"from\":\"0x48c16c5652add27eddb0f896748a35fc60b8d1b4\",\"to\":\"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48\",\"data\":\"0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2\",\"value\":\"0x0\",\"gas\":\"0x493e0\"},\"0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7\",{\"tracer\":\"prestateTracer\",\"timeout\":\"15s\",\"tracerConfig\":{\"diffMode\":true},\"stateOverrides\":{\"0x48c16c5652add27eddb0f896748a35fc60b8d1b4\":{\"nonce\":\"0x35\"},\"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48\":{\"stateDiff\":{\"0x26336f21a63aacd3574e840a3278fccb16fd789e8d3e700e5b9587a87e8da134\":\"0x00000000000000000000000000000000000000000000000000000000ec351bbd\"}}}}]}",
+  "requestSha256": "8a1a1e5b3cf1ba1755a9553c4843b16b8f4f4b2535f742e5be4713aaed79c139",
+  "requestBytes": 771,
+  "startedAt": "2026-10-26T13:51:27.196Z",
+  "response": {
+    "id": 12,
+    "jsonrpc": "2.0",
+    "result": {
+      "post": {
+        "0x48c16c5652add27eddb0f896748a35fc60b8d1b4": {
+          "nonce": 54
+        }
+      },
+      "pre": {
+        "0x48c16c5652add27eddb0f896748a35fc60b8d1b4": {
+          "balance": "0x23802c6b72d2238e",
+          "nonce": 53
+        }
+      }
+    }
+  },
+  "status": "success",
+  "httpStatus": 200,
+  "completedAt": "2026-10-26T13:51:27.484Z",
+  "durationMs": 286.98912500000006,
+  "raw": {
+    "file": "raw/012.body",
+    "complete": true,
+    "observedBytes": 200,
+    "bytes": 200,
+    "observedPrefixSha256": "a8666ac75b5b7189da31a1b954e190503a762633869493fea97d3f60f224f5bc",
+    "sha256": "a8666ac75b5b7189da31a1b954e190503a762633869493fea97d3f60f224f5bc"
+  }
+}

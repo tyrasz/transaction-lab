@@ -39,7 +39,7 @@ async function expectedImplementation() {
     'src/rpc.js', 'src/state.js', 'src/state-diff.js', 'src/query-validation.js',
     'src/account-effects.js', 'src/affected-balances.js', 'src/allowances.js', 'src/analyze.js', 'src/balances.js', 'src/current-state.js',
     'src/historical-state.js', 'src/lending-balances.js', 'src/lending.js', 'src/permissions.js', 'src/revert.js',
-    'engines/standard-evm/package.json', 'engines/standard-evm/package-lock.json', 'engines/standard-evm/unsigned-call.js', 'engines/standard-evm/provider-state-diff.js', 'engines/standard-evm/discovery.js', 'engines/standard-evm/native-effects.js',
+    'engines/standard-evm/package.json', 'engines/standard-evm/package-lock.json', 'engines/standard-evm/unsigned-call.js', 'engines/standard-evm/provider-state-diff.js', 'engines/standard-evm/discovery.js', 'engines/standard-evm/native-effects.js', 'engines/standard-evm/sequence-state.js',
     ...['package.json', 'sha3.js', '_u64.js', 'utils.js'].map(name => 'engines/standard-evm/node_modules/@noble/hashes/' + name),
   ].sort();
   const hash = createHash('sha256');
@@ -55,12 +55,14 @@ test('configuration exposes experimental Ethereum separately and binds its compl
   assert.equal(config.standardEvm.available, true);
   assert.deepEqual(config.standardEvm.examples, api.STANDARD_EXAMPLES);
   assert.deepEqual(config.standardEvm.capabilities, api.STANDARD_CAPABILITIES);
+  assert.deepEqual(config.standardEvm.sequenceCapabilities, api.STANDARD_SEQUENCE_CAPABILITIES);
+  assert.deepEqual(config.standardEvm.sequenceExamples, api.STANDARD_SEQUENCE_EXAMPLES);
   assert.deepEqual(config.examples, EXAMPLES);
   assert.deepEqual(config.chains, [{ chainId: 999, name: 'HyperEVM' }, { chainId: 1, name: 'Ethereum', experimental: true }]);
   assert.deepEqual(api.implementation, await expectedImplementation());
   assert.equal(await loadStandardApi(), api, 'The loaded implementation identity is stable for this process.');
   assert.ok(api.implementation.sourceFiles.includes('src/standard-rpc.js'));
-  assert.equal(api.implementation.sourceFiles.length, 32);
+  assert.equal(api.implementation.sourceFiles.length, 33);
   assert.ok(api.implementation.sourceFiles.includes('src/analyze.js'), 'Transitive server imports belong to the standard API identity.');
   assert.ok(api.implementation.sourceFiles.includes('src/historical-state.js'));
   assert.ok(api.implementation.sourceFiles.includes('engines/standard-evm/unsigned-call.js'));
@@ -122,14 +124,16 @@ test('missing optional dependency returns 503 while health and the established H
 test('the two-simulation limit is rechecked after asynchronous loading and shared with the legacy route', async t => {
   const loaded = defer(), allEntered = defer(), bothRunning = defer(), finish = defer();
   let loads = 0, factories = 0, running = 0, legacyFactories = 0;
-  const syntheticApi = { ...api, async simulateStandard() {
+  const complete = async () => {
     if (++running === 2) bothRunning.resolve(); await finish.promise;
     return { syntheticConcurrencyControl: true };
-  } };
+  };
+  const syntheticApi = { ...api, simulateStandard: complete, simulateStandardSequence: complete };
   t.after(() => { loaded.resolve(); finish.resolve(); });
   const base = await start(t, { standardLoader: async () => { if (++loads === 3) allEntered.resolve(); await loaded.promise; return syntheticApi; },
     standardRpcFactory() { factories++; return {}; }, rpcFactory() { legacyFactories++; throw new Error('Busy requests must not create a provider.'); } });
-  const requests = Array.from({ length: 3 }, () => post(base, '/api/evm/simulate', input(0)));
+  const sequenceInput = structuredClone(api.STANDARD_SEQUENCE_EXAMPLES[0].input);
+  const requests = [post(base, '/api/evm/simulate', input(0)), post(base, '/api/evm/simulate-sequence', sequenceInput), post(base, '/api/evm/simulate-sequence', sequenceInput)];
   await bounded(allEntered.promise); assert.equal(factories, 0); loaded.resolve();
   await bounded(bothRunning.promise);
   const first = await bounded(Promise.race(requests)); assert.equal(first.status, 429); assert.equal((await first.clone().json()).error.code, 'BUSY');

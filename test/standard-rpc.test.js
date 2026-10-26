@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { setTimeout as delay } from 'node:timers/promises';
-import { StandardRpcClient, STANDARD_RPC_LIMITS } from '../src/standard-rpc.js';
+import { StandardRpcClient, STANDARD_RPC_LIMITS, STANDARD_SEQUENCE_RPC_LIMITS } from '../src/standard-rpc.js';
 
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const address = digit => '0x' + digit.repeat(40);
@@ -10,6 +10,19 @@ const frame = { type: 'CALL', from: address('1'), to: address('2'), input: '0x',
 const success = (init, result = '0x1') => JSON.stringify({ jsonrpc: '2.0', id: JSON.parse(init.body).id, result });
 const deferred = () => { let resolve; const promise = new Promise(r => { resolve = r; }); return { promise, resolve }; };
 const readerResponse = reader => ({ ok: true, status: 200, body: { getReader: () => reader, cancel: (...args) => reader.cancel?.(...args) } });
+
+test('sequence resource profile is explicit and bounded without widening single-call limits', async () => {
+  assert.deepEqual(new StandardRpcClient().limits, STANDARD_RPC_LIMITS);
+  assert.deepEqual(new StandardRpcClient({ profile: 'sequence' }).limits, STANDARD_SEQUENCE_RPC_LIMITS);
+  assert.deepEqual(STANDARD_SEQUENCE_RPC_LIMITS, { calls: 258, responseBytes: 8388608, totalBytes: 134217728, wallMs: 265000, requestMs: 25000 });
+  for (const profile of ['', 'unlimited', null, {}, 1]) assert.throws(() => new StandardRpcClient({ profile }), { code: 'INVALID_RPC_PROFILE' });
+  for (const [key, value] of Object.entries(STANDARD_SEQUENCE_RPC_LIMITS)) assert.throws(() => new StandardRpcClient({ profile: 'sequence', limits: { [key]: value + 1 } }), { code: 'INVALID_RPC_LIMIT' });
+  assert.throws(() => new StandardRpcClient({ limits: { calls: 258 } }), { code: 'INVALID_RPC_LIMIT' });
+  const rpc = new StandardRpcClient({ profile: 'sequence', limits: { calls: 66 }, fetchImpl: async (_url, init) => new Response(success(init)) });
+  for (let i = 0; i < 66; i++) assert.equal(await rpc.call('eth_chainId'), '0x1');
+  await assert.rejects(rpc.call('eth_chainId'), { code: 'RPC_BUDGET' });
+  assert.equal(rpc.evidence.length, 66);
+});
 
 test('Ethereum endpoint defaults and server-configured overrides never appear in saved request metadata', async () => {
   const previous = process.env.ETHEREUM_RPC_URL;

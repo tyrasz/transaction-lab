@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { isDeepStrictEqual } from 'node:util';
-import { simulateUnsignedCall, normalizeQuery } from '../engines/standard-evm/unsigned-call.js';
+import { simulateUnsignedCall, simulateUnsignedSequence, normalizeQuery } from '../engines/standard-evm/unsigned-call.js';
 import { InputError } from './validate.js';
 import { RpcError, assertNoProviderErrorResult } from './rpc.js';
 
@@ -11,6 +11,7 @@ const NUMBER = /^0x(?:0|[1-9a-f][0-9a-f]{0,15})$/i;
 const DATA = /^0x(?:[0-9a-f]{2})*$/i;
 const DECIMAL = /^(?:0|[1-9][0-9]{0,77})$/;
 const UINT256_MAX = (1n << 256n) - 1n;
+const RESERVED_WITNESS = '0x000000000000000000000000000000000000ba1a';
 const MAX_SELECTION_BYTES = 8 * 1024 * 1024;
 const freeze = value => { if (value && typeof value === 'object') { for (const child of Object.values(value)) freeze(child); Object.freeze(value); } return value; };
 
@@ -223,6 +224,38 @@ export const STANDARD_CAPABILITIES = freeze({
   ],
 });
 
+export const STANDARD_SEQUENCE_CAPABILITIES = freeze({
+  available: true, chainId: 1, status: 'experimental', minCalls: 2, maxCalls: 4,
+  profile: 'unsigned_unpriced_sequence', sameSender: true, sameBlock: true,
+  atomic: false, stopsOnFailure: true, fees: 'excluded',
+  limits: { queriesPerCall: 8, nativeAccountsPerCall: 8, calldataBytesPerCall: 32768, gasPerCall: 5000000,
+    engineRpcCalls: 257, blockSelectionRpcCalls: 1, totalRpcCalls: 258, wallMs: 265000, totalBytes: 128 * 1024 * 1024 },
+  limitations: [
+    'Each call starts from the validated state left by the preceding successful call, at the same block time.',
+    'These are separate unsigned calls, not an atomic bundle or a guarantee of transaction inclusion.',
+    'A failed call stops later calls; a verified earlier prefix is not rolled back.',
+    'Outer signatures and transaction fees are not modeled. Contract permit checks still execute.',
+    'Per-call token and native queries are bounded and do not establish complete economic effects or a security verdict.',
+  ],
+});
+export const STANDARD_SEQUENCE_EXAMPLES = freeze([{
+  id: 'aave-usdc-approve-then-supply', title: 'Approve USDC, then supply to Aave V3',
+  description: 'Constructed unsigned example at a historical block end. The approval feeds the following supply; this is not an original historical transaction pair.',
+  input: { chainId: 1, from: STANDARD_EXAMPLES[0].input.from, block: STANDARD_EXAMPLES[0].input.block, calls: [
+    { to: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+      data: '0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000ec351bbd',
+      value: '0', queries: [STANDARD_EXAMPLES[0].input.queries[3]] },
+    { to: STANDARD_EXAMPLES[0].input.to,
+      data: '0x617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000ec351bbd00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b40000000000000000000000000000000000000000000000000000000000000000',
+      value: '0', queries: STANDARD_EXAMPLES[0].input.queries },
+  ] },
+  reference: { profile: 'constructed_sequence_at_historical_block_end', stateBlockHash: STANDARD_EXAMPLES[0].input.block,
+    originalTransactionHash: STANDARD_EXAMPLES[0].reference.originalTransactionHash,
+    originalOperation: 'supplyWithPermit', syntheticUnsignedSequence: true, exactHistoricalReplay: false,
+    derivation: 'The supply keeps the first four ABI arguments from supplyWithPermit. A separate approval is prepended; its permit suffix is not reused.',
+    capture: 'reports/standard-evm-sequence-discovery/continuation/capture.json', captureSha256: 'ae31c207aa98e1172cf8112211d981c3abbda559622f74c18af84db72b7443e6' },
+}]);
+
 const AAVE_PARENT = '0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7';
 const MORPHO_PARENT = '0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61';
 function referenceMetadata(symbol, name, decimals, blockHash, blockNumber, records) {
@@ -275,6 +308,21 @@ export function validateStandardSimulation(input) {
   return { chainId: 1, from, to, data: input.data.toLowerCase(), value, block: block.toLowerCase(), queries };
 }
 
+export function validateStandardSequence(input) {
+  fields(input, ['chainId', 'from', 'block', 'calls'], 'sequence request');
+  if (!Array.isArray(input.calls) || input.calls.length < 2 || input.calls.length > 4) throw new InputError('A sequence requires between two and four calls.');
+  let shared;
+  const calls = Array.from(input.calls, call => {
+    fields(call, ['to', 'data', 'value', 'queries'], 'sequence call');
+    const normalized = validateStandardSimulation({ ...call, chainId: input.chainId, from: input.from, ...(Object.hasOwn(input, 'block') ? { block: input.block } : {}) });
+    if (normalized.from === RESERVED_WITNESS || normalized.to === RESERVED_WITNESS || normalized.queries?.some(query => query.to === RESERVED_WITNESS)) throw new InputError('Sequence inputs overlap the reserved execution witness.');
+    const { chainId, from, block, ...step } = normalized;
+    shared = { chainId, from, block };
+    return step;
+  });
+  return { ...shared, calls };
+}
+
 function format(raw, decimals) {
   const value = BigInt(raw), negative = value < 0n, absolute = negative ? -value : value;
   const base = 10n ** BigInt(decimals), fraction = (absolute % base).toString().padStart(decimals, '0').replace(/0+$/, '');
@@ -293,7 +341,7 @@ function nativePreview(input, result) {
   return (result.nativeEffects?.measurements ?? []).map((measurement, index) => {
     const entry = { index, account: measurement.account, accountIsSender: measurement.account === input.from,
       metadata: { symbol: 'ETH', name: 'Ether', decimals: 18, chainId: 1, type: 'native' }, status: measurement.status };
-    for (const key of ['reason', 'basis', 'anchorEvidenceId', 'queryEvidence']) if (measurement[key] !== undefined) entry[key] = structuredClone(measurement[key]);
+    for (const key of ['reason', 'basis', 'anchorEvidenceId', 'queryEvidence', 'startingBalance']) if (measurement[key] !== undefined) entry[key] = structuredClone(measurement[key]);
     if (measurement.status === 'measured') {
       const validAmount = raw => typeof raw === 'string' && DECIMAL.test(raw) && BigInt(raw) <= UINT256_MAX;
       if (typeof measurement.account !== 'string' || !ADDRESS.test(measurement.account)
@@ -330,9 +378,7 @@ export function projectStandardPreview(input, result) {
 
 /** rpc is supplied by the server's bounded fixed-provider transport. Hash
  * selections add no RPC; latest/numeric selections add exactly one request. */
-export async function simulateStandard(input, rpc) {
-  const start = performance.now(), rpcStart = Number.isFinite(rpc?.rpcMs) ? rpc.rpcMs : null;
-  const apiRequest = validateStandardSimulation(input);
+async function selectBlock(apiRequest, rpc) {
   let blockHash = apiRequest.block;
   const blockSelection = { requested: apiRequest.block, kind: 'pinned_hash', resolvedHash: blockHash, resolvedNumber: null, evidence: null };
   if (!HASH.test(blockHash)) {
@@ -350,8 +396,9 @@ export async function simulateStandard(input, rpc) {
     blockHash = header.hash.toLowerCase();
     Object.assign(blockSelection, { kind: apiRequest.block === 'latest' ? 'resolved_latest' : 'resolved_number', resolvedHash: blockHash, resolvedNumber: BigInt(header.number).toString(), evidence: { method, params, result: header } });
   }
-  const result = await simulateUnsignedCall({ rpc, chainId: apiRequest.chainId, blockHash,
-    request: { from: apiRequest.from, to: apiRequest.to, data: apiRequest.data, value: '0x' + BigInt(apiRequest.value).toString(16), gas: '0x4c4b40' }, queries: apiRequest.queries });
+  return { blockHash, blockSelection };
+}
+function assertSelectedBlock(result, blockHash, blockSelection) {
   if (result.block && (result.block.hash !== blockHash || (blockSelection.resolvedNumber !== null && result.block.number !== blockSelection.resolvedNumber))) {
     throw new RpcError('The execution header differs from the selected Ethereum block identity.', 'STANDARD_BLOCK_MISMATCH');
   }
@@ -362,9 +409,46 @@ export async function simulateStandard(input, rpc) {
       throw new RpcError('The complete execution header differs from the selected Ethereum block header.', 'STANDARD_BLOCK_MISMATCH');
     }
   }
+}
+function engineRequest(input) {
+  return { from: input.from, to: input.to, data: input.data, value: '0x' + BigInt(input.value).toString(16), gas: '0x4c4b40' };
+}
+function duration(start, rpcStart, rpc) {
   const timing = { totalMs: performance.now() - start };
   if (rpcStart !== null && Number.isFinite(rpc.rpcMs)) timing.rpcMs = Math.max(0, rpc.rpcMs - rpcStart);
+  return timing;
+}
+export async function simulateStandard(input, rpc) {
+  const start = performance.now(), rpcStart = Number.isFinite(rpc?.rpcMs) ? rpc.rpcMs : null;
+  const apiRequest = validateStandardSimulation(input);
+  const { blockHash, blockSelection } = await selectBlock(apiRequest, rpc);
+  const result = await simulateUnsignedCall({ rpc, chainId: apiRequest.chainId, blockHash, request: engineRequest(apiRequest), queries: apiRequest.queries });
+  assertSelectedBlock(result, blockHash, blockSelection);
   return { ...result, id: randomUUID(), createdAt: new Date().toISOString(), apiRequest,
     source: { kind: 'standard_evm_unsigned_call', profile: 'unsigned_unpriced_block_end', blockSelection },
-    preview: projectStandardPreview(apiRequest, result), timing };
+    preview: projectStandardPreview(apiRequest, result), timing: duration(start, rpcStart, rpc) };
+}
+
+export async function simulateStandardSequence(input, rpc) {
+  const start = performance.now(), rpcStart = Number.isFinite(rpc?.rpcMs) ? rpc.rpcMs : null;
+  const apiRequest = validateStandardSequence(input);
+  const { blockHash, blockSelection } = await selectBlock(apiRequest, rpc);
+  const result = await simulateUnsignedSequence({ rpc, chainId: apiRequest.chainId, blockHash,
+    calls: apiRequest.calls.map(call => ({ request: engineRequest({ ...call, from: apiRequest.from }), ...(call.queries === undefined ? {} : { queries: call.queries }) })) });
+  // The engine's final shared-state validation has finished before any display
+  // projection. Failed canonical validation has already removed all amounts.
+  for (const step of result.steps) if (step.result) assertSelectedBlock(step.result, blockHash, blockSelection);
+  const id = randomUUID(), createdAt = new Date().toISOString();
+  return { ...result, id, createdAt, apiRequest,
+    source: { kind: 'standard_evm_unsigned_sequence', profile: 'unsigned_unpriced_sequence', blockSelection },
+    steps: result.steps.map(step => {
+      const call = apiRequest.calls[step.index];
+      const normalized = { chainId: apiRequest.chainId, from: apiRequest.from, ...call, block: apiRequest.block };
+      return { ...step, input: structuredClone(call), ...(step.result ? { result: { ...step.result,
+        apiRequest: normalized,
+        source: { kind: 'standard_evm_unsigned_call', profile: step.stateSource.kind === 'initial_block' ? 'unsigned_unpriced_block_end' : 'unsigned_unpriced_after_prior_calls',
+          blockSelection: structuredClone(blockSelection), stateSource: structuredClone(step.stateSource) },
+        preview: projectStandardPreview(normalized, step.result),
+      } } : {}) };
+    }), timing: duration(start, rpcStart, rpc) };
 }

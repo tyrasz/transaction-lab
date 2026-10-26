@@ -3,6 +3,7 @@ import { performance } from 'node:perf_hooks';
 import { RpcError, assertNoProviderErrorResult } from './rpc.js';
 
 export const STANDARD_RPC_LIMITS = Object.freeze({ calls: 65, responseBytes: 8 * 1024 * 1024, totalBytes: 32 * 1024 * 1024, wallMs: 145000, requestMs: 25000 });
+export const STANDARD_SEQUENCE_RPC_LIMITS = Object.freeze({ calls: 258, responseBytes: 8 * 1024 * 1024, totalBytes: 128 * 1024 * 1024, wallMs: 265000, requestMs: 25000 });
 const METHODS = new Set(['eth_chainId', 'eth_getBlockByHash', 'eth_getBlockByNumber', 'eth_getTransactionCount', 'eth_getBalance', 'eth_getCode', 'debug_traceCall']);
 const hash = value => createHash('sha256').update(value).digest('hex');
 const fail = (message, code, detail = null) => { throw new RpcError(message, code, detail); };
@@ -10,10 +11,11 @@ const fail = (message, code, detail = null) => { throw new RpcError(message, cod
 /** Bounded read-only transport. Successful response bytes are retained as
  * strict UTF-8 text; rejected/error bodies retain hashes and sizes only. */
 export class StandardRpcClient {
-  constructor({ url = process.env.ETHEREUM_RPC_URL || 'https://eth.drpc.org', fetchImpl = fetch, now = () => performance.now(), limits = {} } = {}) {
+  constructor({ url = process.env.ETHEREUM_RPC_URL || 'https://eth.drpc.org', fetchImpl = fetch, now = () => performance.now(), limits = {}, profile = 'single' } = {}) {
     try { this.url = new URL(url); } catch { fail('Ethereum RPC URL is invalid.', 'INVALID_RPC_URL'); }
     if (!['http:', 'https:'].includes(this.url.protocol)) fail('Ethereum RPC URL must use HTTP or HTTPS.', 'INVALID_RPC_URL');
-    this.limits = { ...STANDARD_RPC_LIMITS };
+    if (!['single', 'sequence'].includes(profile)) fail('Invalid RPC resource profile.', 'INVALID_RPC_PROFILE');
+    this.limits = { ...(profile === 'sequence' ? STANDARD_SEQUENCE_RPC_LIMITS : STANDARD_RPC_LIMITS) };
     for (const [key, value] of Object.entries(limits)) {
       if (!Object.hasOwn(this.limits, key) || !Number.isSafeInteger(value) || value < 1 || value > this.limits[key]) fail('Invalid RPC resource limit.', 'INVALID_RPC_LIMIT');
       this.limits[key] = value;
