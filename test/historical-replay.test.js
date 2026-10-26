@@ -13,9 +13,12 @@ assert.equal(createHash('sha256').update(bytes).digest('hex'), 'acfed680cc322258
 const capture = JSON.parse(bytes);
 const freshBytes = await readFile(new URL('../reports/affected-account-comparisons/2026-10-26T02-23-00-749Z-http.json', import.meta.url));
 assert.equal(createHash('sha256').update(freshBytes).digest('hex'),'76d4470e663934d85f62202fb98a41349283c7544f22caa0cdd91222401677a7');
-const freshCapture=JSON.parse(freshBytes);
+const v6Capture=JSON.parse(freshBytes);
 const capturedEngine='fab9ca0c5b9d0292c67457d9e8eead88fa32914f65b56886067ed864a241b542';
-const sourceFiles=freshCapture.cases[0].runs[0].response.implementation.sourceFiles;
+const v7Bytes=await readFile(new URL('../reports/affected-balance-comparisons/capture.json',import.meta.url));
+assert.equal(createHash('sha256').update(v7Bytes).digest('hex'),'53eec210304f3f3ff749bc4a4cdbd4fe55f57e87a2cd0b94983574bd0942de34');
+const freshCapture=JSON.parse(v7Bytes);
+const sourceFiles=freshCapture.implementation.sourceFiles;
 const currentHash=createHash('sha256');
 for(const name of sourceFiles){assert.match(name,/^[a-z-]+\.js$/);currentHash.update(name+'\0').update(await readFile(new URL('../src/'+name,import.meta.url))).update('\0');}
 const currentEngine=currentHash.digest('hex');
@@ -27,17 +30,18 @@ const independent={
  repay:{cash:'-199626280',position:VUSDC,event:'-199626071',balance:'-199626279',allowance:['115792089237316195423570985008687907853269984665640564039457584003409140907030','115792089237316195423570985008687907853269984665640564039457584003408941280750']},
 };
 function withoutGenerated(report){const {id,createdAt,timing,implementation,...rest}=report;const {sourceSha256,...provenance}=implementation;return {...rest,implementation:provenance};}
-function freshFor(operation,provider){return freshCapture.cases.find(c=>c.id==='hyperlend-usdc-'+operation)?.runs.find(r=>r.provider===(provider==='hyperlend-archive'?'archive':provider));}
+function freshFor(operation,provider){return freshCapture.cases.find(c=>c.id==='hyperlend-usdc-'+operation)?.runs.find(r=>r.provider===provider);}
+function v6For(operation,provider){return v6Capture.cases.find(c=>c.id==='hyperlend-usdc-'+operation)?.runs.find(r=>r.provider===(provider==='hyperlend-archive'?'archive':provider));}
 function assertEffects(report,operation){
  const expected=independent[operation],effects=report.accountEffects;
  assert.equal(effects.status,'observed');
- assert.equal(effects.summary.measuredBalancePairs,report.balanceChanges.assets.length);
+ assert.equal(effects.summary.measuredBalancePairs,report.balanceChanges.assets.length+report.affectedBalanceChanges.assets.length);
  const holder=effects.accounts.find(a=>a.address===OWNER),cash=holder.tokens.find(t=>t.asset.address===USDC),position=holder.tokens.find(t=>t.asset.address===expected.position);
  assert.equal(cash.events.netRaw,expected.cash);assert.equal(cash.balance.deltaRaw,expected.cash);
  assert.equal(position.events.netRaw,expected.event);assert.equal(position.balance.deltaRaw,expected.balance);
  assert.equal(position.role,expected.position===VUSDC?'liability':'receipt_token');
  for(const account of effects.accounts)for(const token of account.tokens){
-  if(token.balance.status==='measured'){const original=report.balanceChanges.assets[token.balance.balanceChangeIndex];assert.equal(original.account,account.address);assert.equal(original.asset.address,token.asset.address);assert.deepEqual([token.balance.beforeRaw,token.balance.afterRaw,token.balance.deltaRaw],[original.beforeRaw,original.afterRaw,original.deltaRaw]);}
+  if(token.balance.status==='measured'){const original=token.balance.balanceChangeIndex===undefined?report.affectedBalanceChanges.assets[token.balance.affectedBalanceChangeIndex]:report.balanceChanges.assets[token.balance.balanceChangeIndex];assert.equal(original.account,account.address);assert.equal(original.asset.address,token.asset.address);assert.deepEqual([token.balance.beforeRaw,token.balance.afterRaw,token.balance.deltaRaw],[original.beforeRaw,original.afterRaw,original.deltaRaw]);}
   else assert.equal(token.balance.status,'not_measured');
  }
 }
@@ -69,13 +73,24 @@ function recordedRpc(run, mutate) {
 }
 
 test('v0.6 six-run capture retains the frozen source and full HTTP outcomes',()=>{
- assert.deepEqual(freshCapture.summary,{planned:6,attempted:6,http200:6,measuredAllowances:5,unavailableAllowances:1,measuredBalances:4,failed:0,rpcCalls:162});
- for(const item of freshCapture.cases)for(const run of item.runs){assert.equal(run.http.response.status,200);assert.equal(run.response.implementation.sourceSha256,capturedEngine);}
+ assert.deepEqual(v6Capture.summary,{planned:6,attempted:6,http200:6,measuredAllowances:5,unavailableAllowances:1,measuredBalances:4,failed:0,rpcCalls:162});
+ for(const item of v6Capture.cases)for(const run of item.runs){assert.equal(run.http.response.status,200);assert.equal(run.response.implementation.sourceSha256,capturedEngine);}
+});
+
+test('v0.7 predeclared eleven attempts retain frozen implementation and every original RPC/HTTP response',()=>{
+ assert.deepEqual(freshCapture.summary,{planned:11,attempted:11,http200:11,failedHttp:0,measuredBalances:7,measuredAllowances:8,measuredAffectedBalances:11,unavailableAffectedBalances:0,rpcCalls:402,responseBytes:5201258});
+ for(const item of freshCapture.cases)for(const run of item.runs){
+  assert.equal(run.http.response.status,200);assert.deepEqual(JSON.parse(run.http.response.bodyText),run.response);
+  assert.equal(createHash('sha256').update(run.http.response.bodyText).digest('hex'),run.http.response.bodySha256);
+  assert.equal(run.response.implementation.sourceSha256,'7658ae0d03d6b17f72045905d231e9803b6ab38d57b4cac3a88d2eec19b5ff10');
+  for(const entry of run.rpcCalls){assert.deepEqual(JSON.parse(entry.responseText),entry.response);assert.equal(createHash('sha256').update(entry.responseText).digest('hex'),entry.responseSha256);}
+ }
 });
 
 for(const item of capture.cases)for(const legacyRun of item.runs.filter(run=>run.response)){
  test(`recorded full replay: ${item.operation} through ${legacyRun.provider}`,async()=>{
-  const fresh=freshFor(item.operation,legacyRun.provider),run=fresh??legacyRun,rpc=recordedRpc(run);
+  const fresh=freshFor(item.operation,legacyRun.provider);assert.ok(fresh,'Every changed successful legacy lending case has a genuine v0.7 recording');
+  const run=fresh,rpc=recordedRpc(run);
   const report=await replay(run.request,rpc);
   assert.equal(rpc.consumed,run.rpcCalls.length);
   const expected=structuredClone(legacyRun.response);
@@ -84,8 +99,24 @@ for(const item of capture.cases)for(const legacyRun of item.runs.filter(run=>run
   for(const field of ['traceMethod','traceRequest','traceResponse','receipt','receiptRechecked'])assert.deepEqual(report.evidence[field],expected.evidence[field],`Original ${field} raw execution is preserved`);
   assertEffects(report,item.operation);
   assert.equal(report.implementation.sourceSha256,currentEngine);
-  if(fresh){
-   assert.deepEqual(withoutGenerated(report),withoutGenerated(fresh.response),'New complete RPC interleaving, shared snapshots and all API semantics are exact');
+  assert.deepEqual(withoutGenerated(report),withoutGenerated(fresh.response),'New complete RPC interleaving, shared snapshots and all API semantics are exact');
+  const prior=v6For(item.operation,legacyRun.provider)?.response??legacyRun.response;
+  assert.deepEqual(report.permissions,prior.permissions,'All prior permission observations and correlations are preserved');
+  if(prior.allowanceChanges.status==='measured')assert.deepEqual(report.allowanceChanges,prior.allowanceChanges,'All prior measured allowance amounts and evidence comparisons are preserved');
+  else {
+   // The v0.4 withdrawal/borrow recording predates allowance support. Both old
+   // and new paths contain no measured allowance; current scope wording is new.
+   assert.equal(report.allowanceChanges.status,prior.allowanceChanges.status);
+   assert.deepEqual(report.allowanceChanges.allowances,prior.allowanceChanges.allowances);
+  }
+  assert.equal(report.affectedBalanceChanges.status,'measured');assert.equal(report.affectedBalanceChanges.candidatePairCount,3);
+  assert.deepEqual(report.evidence.balanceMeasurement,report.evidence.affectedBalanceMeasurement);
+  for(const reused of report.affectedBalanceChanges.reusedPairs){const original=report.balanceChanges.assets[reused.balanceChangeIndex];assert.equal(original.asset.address,reused.token);assert.equal(original.account,reused.account);}
+  if(item.operation==='supply'){
+   assert.equal(report.affectedBalanceChanges.assets.length,1);assert.equal(report.affectedBalanceChanges.reusedPairs.length,2);
+   const custody=report.affectedBalanceChanges.assets[0];assert.deepEqual([custody.asset.address,custody.account,custody.beforeRaw,custody.afterRaw,custody.deltaRaw],[USDC,HUSDC,'4986770736971','4986785803086','15066115']);
+  }else{assert.deepEqual(report.affectedBalanceChanges.assets,[]);assert.equal(report.affectedBalanceChanges.reusedPairs.length,3);}
+  if(['supply','repay'].includes(item.operation)){
    const pair=report.allowanceChanges.allowances[0],known=independent[item.operation];
    assert.equal(report.allowanceChanges.status,'measured');assert.equal(report.allowanceChanges.allowances.length,1);
    assert.deepEqual([pair.asset.address,pair.owner,pair.spender,pair.beforeRaw,pair.afterRaw,pair.deltaRaw],[USDC,OWNER,POOL,...known.allowance,known.cash]);
@@ -95,13 +126,9 @@ for(const item of capture.cases)for(const legacyRun of item.runs.filter(run=>run
    assert.deepEqual([...evidence.request.map(r=>r.id)].sort((a,b)=>a-b),[...evidence.response.map(r=>r.id)].sort((a,b)=>a-b));
    assert.equal(report.permissions.observations.length,1);assert.equal(report.permissions.observations[0].kind,'transfer_from_call');
    assert.equal(report.permissions.observations[0].amountRaw,known.cash.slice(1));
-   // Preserve the old permission scope/reasons/findings and the original warning
-   // prefix. The only new observation is independently checked transferFrom.
-   assert.deepEqual(report.permissions.scope,expected.permissions.scope);assert.deepEqual(report.permissions.findings,expected.permissions.findings);assert.deepEqual(report.permissions.coverage.reasons,expected.permissions.coverage.reasons);
-   assert.deepEqual(report.permissions.warnings.slice(0,expected.permissions.warnings.length),expected.permissions.warnings);
   }else{
    assert.deepEqual(report.permissions,expected.permissions);
-   const {allowanceMeasurement,...originalEvidence}=report.evidence;assert.deepEqual(originalEvidence,legacyRun.response.evidence);assert.deepEqual(allowanceMeasurement,{request:[],response:[]});
+   assert.deepEqual(report.evidence.allowanceMeasurement,{request:[],response:[]});
    assert.equal(report.allowanceChanges.status,'not_applicable');assert.deepEqual(report.allowanceChanges.allowances,[]);
   }
  });
@@ -112,13 +139,23 @@ for(const item of freshCapture.cases.filter(c=>c.id.startsWith('direct-')))for(c
   const rpc=recordedRpc(run),report=await replay(run.request,rpc);assert.equal(rpc.consumed,run.rpcCalls.length);assert.deepEqual(withoutGenerated(report),withoutGenerated(run.response));assert.equal(report.implementation.sourceSha256,currentEngine);
   const amount=item.id.endsWith('-a')?'1277067':'1118386',owner='0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379',spender='0x2908da1b63c4f7ce001bf5d875d179930a79eed4';
   const call=report.permissions.observations[0];assert.equal(report.permissions.observations.length,1);assert.deepEqual([call.kind,call.owner,call.spender,call.recipient,call.submitter,call.amountRaw],['transfer_from_call',owner,spender,spender,spender,amount]);
-  assert.equal(report.accountEffects.accounts.length,2);assert.equal(report.accountEffects.summary.measuredBalancePairs,0);
-  for(const account of report.accountEffects.accounts){const token=account.tokens[0];assert.equal(token.asset.address,USDC);assert.equal(token.events.netRaw,(account.address===owner?'-':'')+amount);assert.equal(token.balance.status,'not_measured');}
+  assert.equal(report.accountEffects.accounts.length,2);assert.equal(report.accountEffects.summary.measuredBalancePairs,2);
+  assert.equal(report.affectedBalanceChanges.status,'measured');assert.equal(report.affectedBalanceChanges.assets.length,2);
+  for(const account of report.accountEffects.accounts){const token=account.tokens[0];assert.equal(token.asset.address,USDC);assert.equal(token.events.netRaw,(account.address===owner?'-':'')+amount);assert.equal(token.balance.status,'measured');const original=report.affectedBalanceChanges.assets[token.balance.affectedBalanceChangeIndex];assert.equal(original.account,account.address);assert.equal(token.balance.deltaRaw,original.deltaRaw);}
   assert.equal(report.balanceChanges.status,'not_applicable');assert.equal(report.security.status,'not_assessed');assert.equal(report.coverage.status,'partial');
   if(item.id.endsWith('-a')){const a=report.allowanceChanges.allowances[0];assert.deepEqual([a.beforeRaw,a.afterRaw,a.deltaRaw],['115792089237316195423570985008687907853269984665640564039457584007756842122881','115792089237316195423570985008687907853269984665640564039457584007756840845814','-1277067']);}
-  else{assert.equal(report.allowanceChanges.status,'unavailable');assert.deepEqual(report.allowanceChanges.allowances,[]);assert.equal(report.permissions.coverage.allowanceStateVerified,false);assert.match(report.allowanceChanges.warnings.at(-1),/original transaction position/);}
+  else{const a=report.allowanceChanges.allowances[0];assert.deepEqual([a.beforeRaw,a.afterRaw,a.deltaRaw],['115792089237316195423570985008687907853269984665640564039457584007756843241267','115792089237316195423570985008687907853269984665640564039457584007756842122881','-1118386']);assert.deepEqual(report.affectedBalanceChanges.assets.map(entry=>[entry.beforeRaw,entry.afterRaw,entry.deltaRaw]),[['1118386','0','-1118386'],['4647555924314','4647557042700','1118386']]);}
  });
 }
+
+test('original v0.6 direct-B index inconsistency still withholds all state using its untouched recording',async()=>{
+ const run=v6Capture.cases.find(item=>item.id==='direct-transferfrom-b').runs[0],rpc=recordedRpc(run),report=await replay(run.request,rpc);
+ assert.equal(rpc.consumed,run.rpcCalls.length);assert.equal(rpc.consumed,8);
+ for(const field of ['request','source','execution','movements','permissions','balanceChanges','allowanceChanges','accountEffects'])assert.deepEqual(report[field],run.response[field]);
+ assert.deepEqual(report.evidence.traceResponse,run.response.evidence.traceResponse);assert.deepEqual(report.evidence.receipt,run.response.evidence.receipt);
+ assert.equal(report.affectedBalanceChanges.status,'unavailable');assert.deepEqual(report.affectedBalanceChanges.assets,[]);assert.deepEqual(report.affectedBalanceChanges.reusedPairs,[]);
+ assert.match(report.affectedBalanceChanges.warnings.at(-1),/original transaction position/);
+});
 
 const repayRun = freshFor('repay','drpc');
 test('historical API keeps original execution while refusing balances after canonical state changes', async () => {
@@ -135,6 +172,7 @@ test('historical API keeps original execution while refusing balances after cano
   assert.equal(report.allowanceChanges.status, 'unavailable', 'A later shared canonical failure also invalidates the earlier allowance measurement');
   assert.deepEqual(report.allowanceChanges.allowances, []);
   assert.equal(report.allowanceChanges.executionIdentity, undefined);
+  assert.equal(report.affectedBalanceChanges.status,'unavailable');assert.deepEqual(report.affectedBalanceChanges.assets,[]);assert.deepEqual(report.affectedBalanceChanges.reusedPairs,[]);
   assert.deepEqual(report.evidence.balanceMeasurement, report.evidence.allowanceMeasurement);
   assert.equal(report.security.status, 'not_assessed');
 });
@@ -153,7 +191,7 @@ test('historical API retains original events but safely rejects nested provider 
   assert.deepEqual(report.evidence.traceResponse, repayRun.response.evidence.traceResponse);
   assert.doesNotMatch(JSON.stringify(report), new RegExp(secret));
   const errors=report.evidence.balanceMeasurement.response.filter(entry=>entry.error);
-  assert.equal(errors.length,1);assert.equal(errors[0].error.rpcCode,-32603);
+  assert.equal(errors.length,2);assert.ok(errors.every(entry=>entry.error.rpcCode===-32603));
   assert.deepEqual(report.evidence.balanceMeasurement,report.evidence.allowanceMeasurement);
   const rejected=report.evidence.balanceMeasurement.request.find(entry=>entry.id===errors[0].id);
   assert.equal(rejected.method,'debug_traceCallMany');assert.ok(rejected.params[0][0].transactions[0].data.startsWith('0x70a08231'));

@@ -1,5 +1,5 @@
 export const CHAIN_ID = 999;
-export const VERSION = '0.6.0';
+export const VERSION = '0.7.0';
 export const DEFAULT_RPC_URL = 'https://hyperliquid.drpc.org';
 export const POOL = '0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b';
 export const USDC = '0xb88339cb7199b77e23db6e890353e22632ba630f';
@@ -55,9 +55,10 @@ EXAMPLES.push({
 export const CAPABILITIES = {
   simulation: true, historicalTrace: true, chainIds: [CHAIN_ID],
   assetBasis: 'Successful ERC-20 Transfer events; not portfolio balance deltas',
-  accountEffects: {supported:true,scope:'All bounded observed transfer participants and configured permission roles; separately measured balances and allowances are referenced without inferring missing state',basis:'observed_accounts_with_separate_state_measurements',additionalBalanceQueries:false},
+  accountEffects: {supported:true,scope:'All bounded observed transfer participants and configured permission roles; separately measured balances and allowances are referenced without inferring missing state',basis:'observed_accounts_with_separate_state_measurements',additionalBalanceQueries:'historical_only'},
+  affectedBalanceMeasurement: {supported:true,modes:['historical_trace'],basis:'historical_transaction_position_balanceOf',maxCandidatePairs:8,scope:'Observed configured USDC/hUSDC/variable-debt Transfer participants and verified transferFrom owners/recipients at the original transaction position; unknown, silent and native changes remain outside scope',currentStateStatus:'unavailable_pending_query_provenance_validation'},
   balanceMeasurement: {supported:true,method:'prestate_diff_balanceOf',scope:'Current-state Hyperlend USDC supply, withdrawal, variable-rate borrow and repay; involved user USDC, receipt-token and debt balances'},
-  historicalBalanceMeasurement: {supported:true,method:'debug_traceCallMany',basis:'historical_transaction_position_balanceOf',scope:'Reconciled Hyperlend USDC operations only; original block and transaction position, independent token reads and isolated original-call validation'},
+  historicalBalanceMeasurement: {supported:true,method:'debug_traceCallMany',basis:'historical_transaction_position_balanceOf',scope:'Reconciled Hyperlend USDC operations plus bounded observed configured-token participants; original block and transaction position, separate token reads and isolated original-call validation'},
   securityAssessment: false, transactionBroadcast: false,
   permissionObservations: {supported:true,scope:'ERC20 approve, implementation-verified ERC-2612 permit and ERC20 transferFrom calls, and Approval events for configured USDC/hUSDC',allowanceStateVerified:true,signatureIndependentlyVerified:false,scopeLimit:'Only verified USDC/hUSDC permission pairs observed in a successful execution; owner, transaction submitter, immediate caller and recipient remain distinct. Transfer amounts are not requested allowances.'},
   historicalAllowanceMeasurement: {supported:true,method:'debug_traceCallMany',basis:'historical_transaction_position_allowance',scope:'Configured USDC/hUSDC permission pairs at the original transaction position; unsupported state changes and inconsistent provider indexes are unavailable'},

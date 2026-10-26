@@ -88,6 +88,20 @@ test('historical context snapshots inputs, caches repeated pairs and shares lazy
   assert.throws(() => { context.measurementBasis = 'wrong'; }, TypeError);
 });
 
+test('historical evidence rejection retains a sanitized terminal response record', async () => {
+  for (const result of [1n, 'PRIVATE_' + 'x'.repeat(8 * 1024 * 1024)]) {
+    const { args } = setup();
+    args.rpc = { async call() { return result; } };
+    const context = createHistoricalStateContext(args);
+    await assert.rejects(context.prepare(), /non-JSON evidence|size limit/);
+    const evidence = context.snapshotEvidence();
+    assert.equal(evidence.request.length, 1);
+    assert.equal(evidence.response.length, 1);
+    assert.ok(evidence.response[0].error.code.startsWith('STATE_'));
+    assert.doesNotMatch(JSON.stringify(evidence), /PRIVATE_/);
+  }
+});
+
 test('original transaction, receipt, block and array position must agree before execution', async () => {
   const changes = [
     args => { args.transaction.hash = word(1n); },

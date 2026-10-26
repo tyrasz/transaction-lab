@@ -16,7 +16,7 @@ const known = token => [USDC, HUSDC, VUSDC].includes(token);
 const role = token => token === USDC ? 'underlying_asset' : token === HUSDC ? 'receipt_token' : token === VUSDC ? 'liability' : 'unverified_token';
 
 /** Inputs must be the analysis and state measurements for the same API response. */
-export function projectAccountEffects({ request, analysis, permissions, balanceChanges, allowanceChanges } = {}) {
+export function projectAccountEffects({ request, analysis, permissions, balanceChanges, allowanceChanges, affectedBalanceChanges } = {}) {
   const base = {
     status: 'not_applicable', basis: 'observed_accounts_with_separate_state_measurements',
     coverage: { status: 'limited', reasons: ['Only accounts appearing in decoded transfer events, verified permission observations, or separately measured token balances are listed. Silent balance changes and native assets are outside this view.'] },
@@ -76,10 +76,11 @@ export function projectAccountEffects({ request, analysis, permissions, balanceC
       }
     }
     // Reuse only the separately verified state result, never an event-inferred
-    // delta. Its underlying RPC evidence remains in evidence.balanceMeasurement.
-    if (balanceChanges?.status === 'measured') {
-      if (!['prestate_diff_balanceOf', 'historical_transaction_position_balanceOf'].includes(balanceChanges.basis) || !Array.isArray(balanceChanges.assets) || balanceChanges.assets.length > LIMITS.maxTokenAccountPairs) throw new Error('Measured balance references are malformed.');
-      for (const [index, entry] of balanceChanges.assets.entries()) {
+    // delta. The source/index identifies the corresponding state result and its
+    // separately retained RPC evidence. Reused pairs are already in the base set.
+    for (const [source, measurements] of [['balanceChanges', balanceChanges], ['affectedBalanceChanges', affectedBalanceChanges]]) if (measurements?.status === 'measured') {
+      if (!['prestate_diff_balanceOf', 'historical_transaction_position_balanceOf'].includes(measurements.basis) || !Array.isArray(measurements.assets) || measurements.assets.length > LIMITS.maxTokenAccountPairs) throw new Error('Measured balance references are malformed.');
+      for (const [index, entry] of measurements.assets.entries()) {
         const token = entry.asset?.address;
         if (!known(token)) throw new Error('Measured balance references contain an unsupported token.');
         const before = amount(entry.beforeRaw), after = amount(entry.afterRaw), delta = signed(entry.deltaRaw);
@@ -87,7 +88,7 @@ export function projectAccountEffects({ request, analysis, permissions, balanceC
         const { holder, effect } = getToken(entry.account, token);
         if (effect.balance.status === 'measured') throw new Error('Duplicate measured balance references are ambiguous.');
         holder.roles.add('measured_balance_account');
-        effect.balance = { status: 'measured', basis: balanceChanges.basis, beforeRaw: before.toString(), afterRaw: after.toString(), deltaRaw: delta.toString(), before: formatUnits(before, 6), after: formatUnits(after, 6), delta: formatUnits(delta, 6), balanceChangeIndex: index };
+        effect.balance = { status: 'measured', basis: measurements.basis, beforeRaw: before.toString(), afterRaw: after.toString(), deltaRaw: delta.toString(), before: formatUnits(before, 6), after: formatUnits(after, 6), delta: formatUnits(delta, 6), ...(source === 'balanceChanges' ? { balanceChangeIndex: index } : { affectedBalanceChangeIndex: index }) };
       }
     }
     let measuredAllowancePairs = 0;

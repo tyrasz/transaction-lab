@@ -231,7 +231,7 @@ function renderInterest(accruals, protocol) {
   }
 }
 
-function renderBalanceChanges(changes, source = {}) {
+function renderBalanceChanges(changes, source = {}, affectedBalances) {
   $('balances-section').hidden = !changes;
   $('balance-verification').hidden = true;
   $('balance-verification-details').replaceChildren();
@@ -255,6 +255,12 @@ function renderBalanceChanges(changes, source = {}) {
     : changes.status === 'not_applicable'
       ? historical ? 'Historical balance measurement is not available for this execution. Original event evidence remains available below.' : 'Balance measurement does not apply to this execution mode. Event evidence remains available below.'
       : historical ? 'Balances at the original transaction position could not be measured. Missing measurements do not imply zero balance change.' : 'Before-and-after balances could not be measured. No zero balance change is inferred from missing data.';
+  if (affectedBalances?.status === 'measured' && affectedBalances.assets?.length) {
+    $('balances-heading').textContent = 'Protocol balance measurements';
+    $('balances-description').textContent = measured
+      ? $('balances-description').textContent + ' Additional measured balances appear under Observed accounts.'
+      : 'The protocol-specific adapter has no measured result. Separately verified before-and-after balances appear under Observed accounts below.';
+  }
   if (measured) {
     const identity = changes.executionIdentity || {};
     const context = $('balance-verification-details');
@@ -331,7 +337,7 @@ function renderPositions(changes, result) {
   }
 }
 
-function renderAccountEffects(effects, historical = false) {
+function renderAccountEffects(effects, historical = false, affectedBalances) {
   const accounts = Array.isArray(effects?.accounts) ? effects.accounts : [];
   $('account-effects-section').hidden = !effects;
   $('account-effects-list').replaceChildren();
@@ -421,7 +427,7 @@ function renderAccountEffects(effects, historical = false) {
     $('account-effects-list').append(card);
   }
   if (effects.status === 'observed' && !accounts.length) $('account-effects-list').append(node('p', 'section-help', 'No accounts were identified in the available evidence.'));
-  const warnings = [...new Set([...(effects.coverage?.reasons || []), ...(effects.warnings || [])])];
+  const warnings = [...new Set([...(effects.coverage?.reasons || []), ...(effects.warnings || []), ...(affectedBalances?.warnings || [])])];
   $('account-effects-limits').hidden = !warnings.length;
   $('account-effects-warnings').replaceChildren(...warnings.map(warning => node('li', '', display(warning))));
 }
@@ -599,8 +605,8 @@ function renderResult(result) {
   renderAssetList('in-assets', result.inAssets, 'transferIn');
   renderAllowances(result.allowanceChanges, result.permissions, historical);
   renderPermissions(result.permissions, result.allowanceChanges);
-  renderBalanceChanges(result.balanceChanges, source);
-  renderAccountEffects(result.accountEffects, historical);
+  renderBalanceChanges(result.balanceChanges, source, result.affectedBalanceChanges);
+  renderAccountEffects(result.accountEffects, historical, result.affectedBalanceChanges);
   renderPositions(result.positionChanges, result);
   renderInterest(result.interestAccruals, protocol);
   const warnings = [...new Set([...(coverage.reasons || []), ...(result.warnings || [])])];

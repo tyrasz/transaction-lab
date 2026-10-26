@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0",
+  "version": "0.7.0",
+  "sourceSha256": "7658ae0d03d6b17f72045905d231e9803b6ab38d57b4cac3a88d2eec19b5ff10",
+  "sourceFiles": ["account-effects.js", "affected-balances.js", "allowances.js", "analyze.js", "balances.js", "config.js", "historical-state.js", "lending.js", "lending-balances.js", "permissions.js", "revert.js", "rpc.js", "server.js", "state.js", "validate.js"],
+  "scope": "Eleven predeclared read-only historical API requests for development regression evidence. No transaction signing, broadcasting, retries, replacement transactions, blind-holdout claim, accuracy percentage or security score.",
+  "transport": "Ephemeral loopback HTTP POST /api/replay using the frozen product server and public RPC providers.",
+  "providers": {
+    "drpc": "https://hyperliquid.drpc.org",
+    "hyperlend-archive": "https://rpc.hyperlend.finance/archive"
+  },
+  "budgets": {
+    "plannedHttpRequests": 11,
+    "maxRpcCalls": 512,
+    "maxRpcCallsPerRun": 80,
+    "maxResponseBytes": 8388608,
+    "maxTotalResponseBytes": 134217728,
+    "rpcTimeoutMs": 25000,
+    "maxRunMs": 120000,
+    "maxRunSequenceMs": 900000,
+    "retries": 0
+  },
+  "expectedRpcCallsIfPriorOutcomesPersist": 383,
+  "cases": [
+    {"id":"hyperlend-usdc-supply","operation":"supply","transactionHash":"0x25e076fc67489775131aafd134a1c6de8f974dea434000ba7568cf400df03cd2","providers":["drpc","hyperlend-archive"],"expectedRpcCallsPerProvider":31},
+    {"id":"hyperlend-usdc-withdraw","operation":"withdraw","transactionHash":"0x94b5c4672e28cbeeab547c06f60e30afa02ac58b0cad4c7568a6ca9d8ac29ae7","providers":["drpc"],"expectedRpcCallsPerProvider":38},
+    {"id":"hyperlend-usdc-borrow","operation":"borrow","transactionHash":"0x0b8ad0d98c96224bdd9e1ad6623292164278340b123feb45eee9c556ec259afb","providers":["drpc","hyperlend-archive"],"expectedRpcCallsPerProvider":38},
+    {"id":"hyperlend-usdc-repay","operation":"repay","transactionHash":"0x682c1d2f131715b8d4b04c71cd8e75ef56a107f0bbd992379a44bf426f22102f","providers":["drpc","hyperlend-archive"],"expectedRpcCallsPerProvider":43},
+    {"id":"direct-transferfrom-a","transactionHash":"0xe2f9761a3fac3ba83ee15fc5e6f12b55d15cd804b321a2cffd9d2c16d6c38dfe","providers":["drpc"],"expectedRpcCallsPerProvider":27},
+    {"id":"direct-transferfrom-b","transactionHash":"0xc650c2592cd04133cf7ff88969468c3e454e0b36e989fdb09a943dce283686d1","providers":["drpc"],"expectedRpcCallsPerProvider":8,"expectedLimitation":"Prior dRPC block list conflicts with the transaction's original index. Preserve any unavailable outcome without retry or replacement."},
+    {"id":"usdc-router-permit-consumed","transactionHash":"0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d","providers":["drpc","hyperlend-archive"],"expectedRpcCallsPerProvider":43}
+  ],
+  "preservedLegacyEvidence": [
+    "The original archive withdrawal RPC failure remains in its existing v0.4 recording and regression; it is not retried here.",
+    "Four approve-only/permit-only API recordings need no new RPC queries and retain their original observations.",
+    "All earlier successful execution traces, receipts, lending position amounts, permission observations and allowances remain separate comparison references; new measurements never overwrite old evidence."
+  ],
+  "approval": "The parent agent must approve this exact plan and its SHA-256 before --capture. --check performs local validation only."
+}

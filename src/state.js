@@ -1,10 +1,15 @@
 // Read-only reconstruction of one unsigned call's post-state at a pinned block.
 // No methods in this module sign, submit, or persist a blockchain transaction.
+import { assertNoProviderErrorResult } from './rpc.js';
 export const UINT256_MAX = (1n << 256n) - 1n;
 const ADDRESS = /^0x[0-9a-f]{40}$/i;
 const WORD = /^0x[0-9a-f]{64}$/i;
 const CODE = /^0x(?:[0-9a-f]{2})*$/i;
 const ZERO_WORD = `0x${'0'.repeat(64)}`;
+const MAX_PAIRS = 12;
+const MAX_CALLS = 64;
+const MAX_RESPONSE_BYTES = 8 * 1024 * 1024;
+const MAX_EVIDENCE_BYTES = 32 * 1024 * 1024;
 const isObject = value => value && typeof value === 'object' && !Array.isArray(value);
 const lower = value => typeof value === 'string' ? value.toLowerCase() : '';
 export const uint = value => typeof value === 'string' && /^(?:0x[0-9a-f]+|[0-9]+)$/i.test(value) ? BigInt(value) : (Number.isSafeInteger(value) && value >= 0 ? BigInt(value) : null);
@@ -83,23 +88,41 @@ export function createStateContext({ request, block, rpc }) {
   const boundBlock = structuredClone(block);
   const key = identityKey(boundRequest, boundBlock);
   const evidence = { request: [], response: [] };
+  const pairs = new Map();
+  let evidenceBytes = 0;
   let preparation;
   let pinned;
   let overrides;
   let executionIdentity;
   let canonicalFailure = null;
   async function call(method, params) {
+    if (evidence.request.length >= MAX_CALLS) failState('State measurement exceeds its 64-RPC limit.');
     const evidenceId = evidence.request.length + 1;
     evidence.request.push({ id: evidenceId, method, params: structuredClone(params) });
+    let result;
     try {
-      const result = await rpc.call(method, params);
-      evidence.response.push({ id: evidenceId, method, result: structuredClone(result) });
-      return result;
+      result = await rpc.call(method, params);
+      assertNoProviderErrorResult(method, result);
     } catch (error) {
       const publicError = publicRpcFailure(error);
       evidence.response.push({ id: evidenceId, method, error: publicError });
       throw new StateValidationError(publicError.message);
     }
+    let size;
+    try { size = Buffer.byteLength(JSON.stringify(result), 'utf8'); }
+    catch {
+      const message = 'State measurement returned non-JSON evidence.';
+      evidence.response.push({ id: evidenceId, method, error: { code: 'STATE_INVALID_EVIDENCE', message } });
+      failState(message);
+    }
+    if (size > MAX_RESPONSE_BYTES || evidenceBytes + size > MAX_EVIDENCE_BYTES) {
+      const message = 'State measurement RPC evidence exceeds its configured size limit.';
+      evidence.response.push({ id: evidenceId, method, error: { code: 'STATE_EVIDENCE_LIMIT', message } });
+      failState(message);
+    }
+    evidenceBytes += size;
+    evidence.response.push({ id: evidenceId, method, result: structuredClone(result) });
+    return result;
   }
   async function prepare() {
     if (!preparation) preparation = (async () => {
@@ -119,13 +142,20 @@ export function createStateContext({ request, block, rpc }) {
     matches(candidate) { return candidate.rpc === rpc && identityKey(candidate.request, candidate.block) === key; },
     prepare,
     async readPair(query) {
-      await prepare();
       if (!ADDRESS.test(query?.to ?? '') || typeof query.data !== 'string' || !CODE.test(query.data)) failState('A valid token state query is required.');
-      const tx = { from: lower(boundRequest.from), to: lower(query.to), data: query.data, gas: '0x493e0' };
-      const before = await call('eth_call', [tx, pinned]);
-      const after = await call('eth_call', [tx, pinned, overrides]);
-      if (typeof before !== 'string' || typeof after !== 'string' || !WORD.test(before) || !WORD.test(after)) failState('Token state query did not return exactly one uint256 word.');
-      return { before: BigInt(before), after: BigInt(after), delta: BigInt(after) - BigInt(before) };
+      const q = { to: lower(query.to), data: lower(query.data) }, pairKey = q.to + ':' + q.data;
+      if (!pairs.has(pairKey)) {
+        if (pairs.size >= MAX_PAIRS) failState('State measurement exceeds its 12 token/account pair limit.');
+        pairs.set(pairKey, (async () => {
+          await prepare();
+          const tx = { from: lower(boundRequest.from), ...q, gas: '0x493e0' };
+          const before = await call('eth_call', [tx, pinned]);
+          const after = await call('eth_call', [tx, pinned, overrides]);
+          if (typeof before !== 'string' || typeof after !== 'string' || !WORD.test(before) || !WORD.test(after)) failState('Token state query did not return exactly one uint256 word.');
+          return { before: BigInt(before), after: BigInt(after), delta: BigInt(after) - BigInt(before) };
+        })());
+      }
+      return { ...await pairs.get(pairKey) };
     },
     async verifyCanonical() {
       try {

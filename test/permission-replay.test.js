@@ -12,10 +12,13 @@ const FILE_SHA256 = 'e305f6b98a5c3ef3deee207d5b463c2f1ad8bb0cbc30577d9336084805a
 const CAPTURED_ENGINE_SHA256 = '02f8ab5584ff7ca5fabd18a2a9a969280211b54b4b14382e2091ef353738cc9f';
 assert.equal(createHash('sha256').update(bytes).digest('hex'), FILE_SHA256);
 const capture = JSON.parse(bytes);
+const v7Bytes = await readFile(new URL('../reports/affected-balance-comparisons/capture.json', import.meta.url));
+assert.equal(createHash('sha256').update(v7Bytes).digest('hex'),'53eec210304f3f3ff749bc4a4cdbd4fe55f57e87a2cd0b94983574bd0942de34');
+const v7Capture=JSON.parse(v7Bytes);
 // Independently hash the current source bytes using the documented fingerprint
 // encoding. Source hardening can change this metadata without changing any
 // original chain observation or the captured implementation's provenance.
-const sourceFiles = ['account-effects.js', ...capture.cases[0].runs[0].response.implementation.sourceFiles];
+const sourceFiles = v7Capture.implementation.sourceFiles;
 const currentSourceHash = createHash('sha256');
 for (const name of sourceFiles) {
   assert.match(name, /^[a-z-]+\.js$/);
@@ -54,12 +57,18 @@ const observationKey = o => JSON.stringify([o.kind,o.asset?.address,o.owner,o.sp
 function assertLegacyResult(actual, saved) {
   const result = structuredClone(actual), expected = structuredClone(saved);
   // Generated IDs/time/timing and implementation provenance are validated apart
-  // from semantic equality. v0.6 adds one source file and declares its new version.
+  // from semantic equality; original observations remain unchanged in v0.7.
   for (const report of [result,expected]) for (const key of ['id','createdAt','timing','implementation']) delete report[key];
   // Declared v0.6 wording revision includes transfer-only permissions accurately.
   expected.coverage.reasons=expected.coverage.reasons.map(reason=>reason==='Configured ERC20 approval requests and events were interpreted separately. Final allowance state and other effects remain unverified.'
     ? 'Configured ERC20 permission and transfer-call observations were interpreted separately. Final allowance state and other effects remain unverified.' : reason);
   delete result.accountEffects; // Asserted independently below with known quantities.
+  delete result.affectedBalanceChanges; // New state queries are asserted separately.
+  delete result.evidence.affectedBalanceMeasurement;
+  // Shared state evidence now includes additional genuine query responses and
+  // final canonical checks. Preserve original trace/receipt evidence in full,
+  // and validate complete current evidence against the new frozen API capture.
+  for(const report of [result,expected])for(const field of ['balanceMeasurement','allowanceMeasurement'])delete report.evidence[field];
   const transfers = result.permissions.observations.filter(o=>o.kind==='transfer_from_call');
   const oldObservations = result.permissions.observations.filter(o=>o.kind!=='transfer_from_call');
   assert.equal(oldObservations.length, expected.permissions.observations.length);
@@ -92,16 +101,26 @@ function assertLegacyResult(actual, saved) {
     delete allowance.consistency.transferObservationIds;
     delete allowance.consistency.transferComparison;
   }
-  assert.deepEqual(result,expected,'Every unchanged v0.5 field and complete raw evidence is preserved');
+  assert.deepEqual(result,expected,'Every unchanged v0.5 semantic field and original raw execution/receipt is preserved');
   return transfers;
 }
 function assertAccountEffects(result,item) {
   const effects=result.accountEffects;
   assert.equal(effects.status,'observed');
-  assert.equal(effects.summary.measuredBalancePairs,0,'No new balance queries or event-derived balances');
+  assert.equal(effects.summary.measuredBalancePairs,item.id==='usdc-router-permit-consumed'?5:0,'Only independently queried configured-token balances are measured');
   assert.equal(effects.summary.measuredAllowancePairs,result.allowanceChanges.allowances.length);
-  for (const account of effects.accounts) for (const token of account.tokens) assert.equal(token.balance.status,'not_measured');
+  for (const account of effects.accounts) for (const token of account.tokens) {
+    if(token.balance.status==='measured'){
+      assert.equal(item.id,'usdc-router-permit-consumed');assert.equal(token.asset.address,USDC);
+      const measured=result.affectedBalanceChanges.assets[token.balance.affectedBalanceChangeIndex];
+      assert.equal(measured.account,account.address);assert.deepEqual([token.balance.beforeRaw,token.balance.afterRaw,token.balance.deltaRaw],[measured.beforeRaw,measured.afterRaw,measured.deltaRaw]);
+    }else assert.equal(token.balance.status,'not_measured');
+  }
   if (item.id==='usdc-router-permit-consumed') {
+    assert.equal(result.affectedBalanceChanges.status,'measured');assert.equal(result.affectedBalanceChanges.assets.length,5);
+    assert.deepEqual(result.evidence.allowanceMeasurement,result.evidence.affectedBalanceMeasurement);
+    const knownBalances=[['50000000','25000000','-25000000'],['0','0','0'],['4099157892','4123970196','24812304'],['64258987719','64258987915','196'],['11356529011','11356716511','187500']];
+    assert.deepEqual(result.affectedBalanceChanges.assets.map(entry=>[entry.beforeRaw,entry.afterRaw,entry.deltaRaw]),knownBalances);
     const expected=new Map([
       ['0x0c71073344e27e33cb57fcb587fc412d689dfd1d',['0','25000000','-25000000']],
       ['0x693f12e9e6b35b34458793546065e8b08e0299d6',['25000000','25000000','0']],
@@ -117,6 +136,7 @@ function assertAccountEffects(result,item) {
       assert.match(token.events.netRaw,/^-?\d+$/);assert.equal(token.events.net,null);
     }
   } else {
+    assert.equal(result.affectedBalanceChanges.status,'not_applicable');assert.deepEqual(result.evidence.affectedBalanceMeasurement,{request:[],response:[]});
     assert.equal(effects.summary.accountCount,item.id==='husdc-relayed-permit'?3:2);
     for (const account of effects.accounts) for (const token of account.tokens) {assert.equal(token.events.status,'not_observed');assert.equal(token.events.net,null);}
   }
@@ -161,17 +181,27 @@ test('permission capture contains exactly six observed HTTP200 responses with th
   }
 });
 
-for (const item of capture.cases) for (const run of item.runs) {
-  test(`recorded full permission replay: ${item.id} through ${run.provider}`, async () => {
+for (const item of capture.cases) for (const legacyRun of item.runs) {
+  test(`recorded full permission replay: ${item.id} through ${legacyRun.provider}`, async () => {
+    const fresh=item.id==='usdc-router-permit-consumed'?v7Capture.cases.find(entry=>entry.id===item.id)?.runs.find(run=>run.provider===legacyRun.provider):null;
+    if(item.id==='usdc-router-permit-consumed')assert.ok(fresh,'Changed router requests require genuine new captures');
+    const run=fresh??legacyRun;
     const rpc = recordedRpc(run);
     const originalRaw = JSON.stringify(run.rpcCalls);
     const result = await replay(structuredClone(run.request), rpc);
     assert.equal(rpc.consumed, run.rpcCalls.length, 'Exactly the captured RPC sequence is consumed');
-    const transfers=assertLegacyResult(result,run.response);
+    const transfers=assertLegacyResult(result,legacyRun.response);
+    if(fresh){
+      const withoutGenerated=report=>{const {id,createdAt,timing,implementation,...rest}=report;return rest;};
+      assert.deepEqual(withoutGenerated(result),withoutGenerated(fresh.response),'Every new API field and complete shared evidence matches the observed v0.7 response');
+    }else{
+      assert.deepEqual(result.evidence.balanceMeasurement,legacyRun.response.evidence.balanceMeasurement);
+      assert.deepEqual(result.evidence.allowanceMeasurement,legacyRun.response.evidence.allowanceMeasurement);
+    }
     assertAccountEffects(result,item);
     assert.equal(JSON.stringify(run.rpcCalls), originalRaw, 'Saved provider requests and responses remain immutable');
     assert.equal(result.implementation.sourceSha256, CURRENT_ENGINE_SHA256, 'Current implementation fingerprint matches independently read source files');
-    assert.equal(result.implementation.version,'0.6.0');
+    assert.equal(result.implementation.version,'0.7.0');
     assert.equal(result.implementation.name,run.response.implementation.name);
     assert.deepEqual(result.implementation.sourceFiles,sourceFiles);
     assert.equal(transfers.length,item.id==='usdc-router-permit-consumed'?2:0);

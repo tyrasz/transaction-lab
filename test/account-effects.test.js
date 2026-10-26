@@ -98,6 +98,28 @@ test('unavailable balances do not become zeros or reference stale assets', () =>
   assert.equal(tokenAt(result, A).balance.beforeRaw, undefined);
 });
 
+test('additional measured accounts retain source indexes and cannot duplicate base pairs', () => {
+  const args = input([movement(A, B)]);
+  args.balanceChanges = { status: 'measured', basis: 'historical_transaction_position_balanceOf', assets: [{ account: A, asset: { address: USDC }, beforeRaw: '2000000', afterRaw: '1000000', deltaRaw: '-1000000' }] };
+  args.affectedBalanceChanges = { status: 'measured', basis: 'historical_transaction_position_balanceOf', assets: [{ account: B, asset: { address: USDC }, beforeRaw: '0', afterRaw: '1000000', deltaRaw: '1000000' }], reusedPairs: [{ token: USDC, account: A, balanceChangeIndex: 0 }] };
+  const result = projectAccountEffects(args);
+  assert.equal(result.summary.measuredBalancePairs, 2);
+  assert.equal(result.summary.unmeasuredBalancePairs, 0);
+  assert.equal(tokenAt(result, A).balance.balanceChangeIndex, 0);
+  assert.equal(tokenAt(result, B).balance.affectedBalanceChangeIndex, 0);
+  assert.equal(tokenAt(result, B).balance.balanceChangeIndex, undefined);
+  args.affectedBalanceChanges.assets.push(args.balanceChanges.assets[0]);
+  assert.equal(projectAccountEffects(args).status, 'unavailable');
+});
+
+test('withheld additional measurements never turn event totals into balance results', () => {
+  const args = input([movement(A, B)]);
+  args.affectedBalanceChanges = { status: 'unavailable', assets: [{ account: B, asset: { address: USDC }, beforeRaw: '0', afterRaw: '1000000', deltaRaw: '1000000' }] };
+  const result = projectAccountEffects(args);
+  assert.equal(result.summary.measuredBalancePairs, 0);
+  assert.equal(tokenAt(result, B).balance.status, 'not_measured');
+});
+
 test('final zero allowance is linked to both owner and spender without claiming no spending', () => {
   const args = input([movement(A, B)]);
   args.allowanceChanges = { status: 'measured', allowances: [{ asset: { address: USDC }, owner: A, spender: B, beforeRaw: '0', afterRaw: '0', deltaRaw: '0' }] };

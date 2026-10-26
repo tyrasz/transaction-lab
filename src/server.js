@@ -10,6 +10,7 @@ import { analyzeTrace } from './analyze.js';
 import { measureBalances } from './balances.js';
 import { measureLendingBalances } from './lending-balances.js';
 import { measureAllowances } from './allowances.js';
+import { measureAffectedBalances } from './affected-balances.js';
 import { createStateContext } from './state.js';
 import { createHistoricalStateContext } from './historical-state.js';
 import { analyzePermissions } from './permissions.js';
@@ -17,7 +18,7 @@ import { projectAccountEffects } from './account-effects.js';
 import { EXAMPLES, METADATA, CAPABILITIES, VERSION } from './config.js';
 
 const ROOT = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
-const engineFiles = ['account-effects.js','allowances.js','analyze.js','balances.js','config.js','historical-state.js','lending.js','lending-balances.js','permissions.js','revert.js','rpc.js','server.js','state.js','validate.js'];
+const engineFiles = ['account-effects.js','affected-balances.js','allowances.js','analyze.js','balances.js','config.js','historical-state.js','lending.js','lending-balances.js','permissions.js','revert.js','rpc.js','server.js','state.js','validate.js'];
 const engineHash = createHash('sha256');
 for (const name of engineFiles) engineHash.update(name+'\0').update(await readFile(path.join(ROOT,'src',name))).update('\0');
 const implementation = Object.freeze({name:'Transaction Lab',version:VERSION,sourceSha256:engineHash.digest('hex'),sourceFiles:engineFiles});
@@ -45,7 +46,7 @@ function includePermissionCoverage(analysis, permissions, allowanceChanges) {
 }
 
 function finalizeMeasurements(stateContext, results) {
-  // Both consumers must settle before retaining shared evidence. Otherwise the
+  // All consumers must settle before retaining shared evidence. Otherwise the
   // first snapshot can contain the other consumer's request without its result.
   const evidence = stateContext.snapshotEvidence();
   return results.map(result => {
@@ -53,6 +54,7 @@ function finalizeMeasurements(stateContext, results) {
     if (stateContext.canonicalFailure && result.status === 'measured') {
       const { executionIdentity, ...rest } = result;
       return { ...rest, status: 'unavailable', ...(Array.isArray(result.assets) ? { assets: [] } : {}), ...(Array.isArray(result.allowances) ? { allowances: [] } : {}),
+        ...(Array.isArray(result.reusedPairs) ? { reusedPairs: [] } : {}),
         warnings: [...result.warnings, `Shared block verification failed; all measurements were withheld: ${stateContext.canonicalFailure}`], evidence: snapshot };
     }
     return { ...result, evidence: snapshot };
@@ -142,19 +144,22 @@ export async function simulate(input, rpc) {
   const permissions = analyzePermissions({request,trace,block,metadata:METADATA});
   const stateContext = createStateContext({request,block,rpc});
   const balanceMethod = ['withdraw','borrow','repay'].includes(analysis.protocol?.operation) ? measureLendingBalances : measureBalances;
-  const [balanceResult,allowanceResult] = finalizeMeasurements(stateContext, await Promise.all([
+  const initialResults = await Promise.all([
     balanceMethod({request,block,rpc,metadata:METADATA,analysis,stateContext}),
     measureAllowances({request,trace,block,rpc,metadata:METADATA,analysis,permissions,stateContext}),
-  ]));
+  ]);
+  const affectedResult = await measureAffectedBalances({request,trace,block,rpc,metadata:METADATA,existingBalanceChanges:initialResults[0],stateContext});
+  const [balanceResult,allowanceResult,affectedBalanceResult] = finalizeMeasurements(stateContext,[...initialResults,affectedResult]);
   const {evidence:balanceEvidence,...balanceChanges} = balanceResult;
   const {evidence:allowanceEvidence,...allowanceChanges} = allowanceResult;
+  const {evidence:affectedBalanceEvidence,...affectedBalanceChanges} = affectedBalanceResult;
   includePermissionCoverage(analysis,permissions,allowanceChanges);
-  const accountEffects = projectAccountEffects({request,analysis,permissions,balanceChanges,allowanceChanges});
+  const accountEffects = projectAccountEffects({request,analysis,permissions,balanceChanges,allowanceChanges,affectedBalanceChanges});
   return {
     schemaVersion:'1.0', implementation, id:randomUUID(), createdAt:new Date().toISOString(), request,
     source:{provider:rpc.provider,chainId:999,blockNumber:block.number,blockHash:block.hash,timestamp:block.timestamp,mode:'simulation',blockBinding:'explicit_block_hash',requestedBlock:blockTag},
-    ...analysis, balanceChanges, allowanceChanges, permissions, accountEffects, timing:{totalMs:Math.round(performance.now()-start),rpcMs:Math.round(rpc.rpcMs)},
-    evidence:{traceMethod:traceRequest.method,traceRequest,traceResponse:trace,balanceMeasurement:balanceEvidence,allowanceMeasurement:allowanceEvidence},
+    ...analysis, balanceChanges, allowanceChanges, affectedBalanceChanges, permissions, accountEffects, timing:{totalMs:Math.round(performance.now()-start),rpcMs:Math.round(rpc.rpcMs)},
+    evidence:{traceMethod:traceRequest.method,traceRequest,traceResponse:trace,balanceMeasurement:balanceEvidence,allowanceMeasurement:allowanceEvidence,affectedBalanceMeasurement:affectedBalanceEvidence},
   };
 }
 
@@ -198,20 +203,25 @@ export async function replay(input, rpc) {
   const permissions = analyzePermissions({request,trace,block,metadata:METADATA});
   const stateContext = createHistoricalStateContext({request,block,rpc,transaction:tx,receipt,trace});
   const balanceMethod = ['withdraw','borrow','repay'].includes(analysis.protocol?.operation) ? measureLendingBalances : measureBalances;
-  const [balanceResult,allowanceResult] = finalizeMeasurements(stateContext, await Promise.all([
+  const initialResults = await Promise.all([
     balanceMethod({request,block,rpc,metadata:METADATA,analysis,stateContext}),
     measureAllowances({request,trace,block,rpc,metadata:METADATA,analysis,permissions,stateContext}),
-  ]));
+  ]);
+  // Reuse proven pairs through the same context cache. A failure in a later
+  // canonical check invalidates earlier measurements before any are returned.
+  const affectedResult = await measureAffectedBalances({request,trace,block,rpc,metadata:METADATA,existingBalanceChanges:initialResults[0],stateContext});
+  const [balanceResult,allowanceResult,affectedBalanceResult] = finalizeMeasurements(stateContext,[...initialResults,affectedResult]);
   const {evidence:balanceEvidence,...balanceChanges} = balanceResult;
   const {evidence:allowanceEvidence,...allowanceChanges} = allowanceResult;
+  const {evidence:affectedBalanceEvidence,...affectedBalanceChanges} = affectedBalanceResult;
   includePermissionCoverage(analysis,permissions,allowanceChanges);
-  const accountEffects = projectAccountEffects({request,analysis,permissions,balanceChanges,allowanceChanges});
+  const accountEffects = projectAccountEffects({request,analysis,permissions,balanceChanges,allowanceChanges,affectedBalanceChanges});
   return {
     schemaVersion:'1.0',implementation,id:randomUUID(),createdAt:new Date().toISOString(),request,
     source:{provider:rpc.provider,chainId:999,blockNumber:block.number,blockHash:block.hash,timestamp:block.timestamp,mode:'historical_trace',blockBinding:'transaction_hash',transactionHash,transactionIndex:BigInt(tx.transactionIndex).toString()},
-    ...analysis,permissions,balanceChanges,allowanceChanges,accountEffects,
+    ...analysis,permissions,balanceChanges,allowanceChanges,affectedBalanceChanges,accountEffects,
     timing:{totalMs:Math.round(performance.now()-start),rpcMs:Math.round(rpc.rpcMs)},
-    evidence:{traceMethod:traceRequest.method,traceRequest,traceResponse:trace,receipt,receiptRechecked:true,balanceMeasurement:balanceEvidence,allowanceMeasurement:allowanceEvidence},
+    evidence:{traceMethod:traceRequest.method,traceRequest,traceResponse:trace,receipt,receiptRechecked:true,balanceMeasurement:balanceEvidence,allowanceMeasurement:allowanceEvidence,affectedBalanceMeasurement:affectedBalanceEvidence},
   };
 }
 

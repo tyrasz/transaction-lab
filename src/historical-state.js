@@ -163,8 +163,16 @@ export function createHistoricalStateContext({ request, block, rpc, transaction,
     }
     let size;
     try { size = Buffer.byteLength(JSON.stringify(result), 'utf8'); }
-    catch { failState('Historical RPC returned non-JSON evidence.'); }
-    if (size > MAX_RESPONSE_BYTES || evidenceBytes + size > MAX_EVIDENCE_BYTES) failState('Historical RPC evidence exceeds its configured size limit.');
+    catch {
+      const message = 'Historical RPC returned non-JSON evidence.';
+      evidence.response.push({ id, method, error: { code: 'STATE_INVALID_EVIDENCE', message } });
+      failState(message);
+    }
+    if (size > MAX_RESPONSE_BYTES || evidenceBytes + size > MAX_EVIDENCE_BYTES) {
+      const message = 'Historical RPC evidence exceeds its configured size limit.';
+      evidence.response.push({ id, method, error: { code: 'STATE_EVIDENCE_LIMIT', message } });
+      failState(message);
+    }
     evidenceBytes += size;
     evidence.response.push({ id, method, result: structuredClone(result) });
     return result;

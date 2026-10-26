@@ -96,3 +96,82 @@ test('an isolated token query failure does not latch a canonical failure', async
   await context.verifyCanonical();
   assert.equal(context.canonicalFailure, null);
 });
+
+function pairHarness(handler = () => word(0n)) {
+  const request = { chainId: 999, from: ACCOUNT, to: TOKEN, value: '0', data: '0x' };
+  const block = { hash: word(42n), number: '42', timestamp: '123' };
+  const calls = [];
+  const rpc = { async call(method, params) {
+    calls.push({ method, params: structuredClone(params) });
+    if (method.startsWith('eth_getBlock')) return { hash: block.hash, number: '0x2a', timestamp: '0x7b' };
+    if (method === 'debug_traceCall') return { pre: {}, post: {} };
+    return handler(method, params);
+  } };
+  return { context: createStateContext({ request, block, rpc }), calls };
+}
+
+test('concurrent normalized queries share one pair and callers cannot mutate cached values', async () => {
+  const { context, calls } = pairHarness((method, params) => word(params.length === 2 ? 10n : 7n));
+  const query = { to: '0x' + 'aB'.repeat(20), data: '0xAB' };
+  const first = context.readPair(query);
+  query.data = '0xff';
+  const [a, b] = await Promise.all([first, context.readPair({ to: '0x' + 'ab'.repeat(20), data: '0xab' })]);
+  assert.deepEqual(a, { before: 10n, after: 7n, delta: -3n });
+  assert.deepEqual(a, b);
+  a.after = 999n;
+  assert.equal(b.after, 7n);
+  assert.equal((await context.readPair({ to: '0x' + 'AB'.repeat(20), data: '0xAB' })).after, 7n);
+  assert.equal(calls.filter(call => call.method === 'eth_call').length, 2);
+  assert.ok(calls.filter(call => call.method === 'eth_call').every(call => call.params[0].data === '0xab'));
+});
+
+test('query failures are cached without hidden retries or leaking provider details', async () => {
+  const { context, calls } = pairHarness(() => { throw new Error('PRIVATE_PROVIDER_SECRET'); });
+  const query = { to: TOKEN, data: '0x01' };
+  const results = await Promise.allSettled([context.readPair(query), context.readPair(query)]);
+  assert.ok(results.every(result => result.status === 'rejected'));
+  await assert.rejects(context.readPair(query));
+  assert.equal(calls.filter(call => call.method === 'eth_call').length, 1);
+  assert.doesNotMatch(JSON.stringify(context.snapshotEvidence()), /PRIVATE_PROVIDER_SECRET/);
+});
+
+test('shared context limits distinct pairs and total requests before contacting the provider', async () => {
+  const { context, calls } = pairHarness();
+  await Promise.all(Array.from({ length: 12 }, (_, index) => context.readPair({ to: TOKEN, data: `0x${index.toString(16).padStart(2, '0')}` })));
+  await assert.rejects(context.readPair({ to: TOKEN, data: '0xff' }), /12 token\/account pair/);
+  assert.equal(calls.length, 26);
+  await Promise.all(Array.from({ length: 38 }, () => context.verifyCanonical()));
+  assert.equal(calls.length, 64);
+  await assert.rejects(context.verifyCanonical(), /64-RPC limit/);
+  assert.equal(calls.length, 64);
+  assert.equal(context.snapshotEvidence().request.length, 64);
+});
+
+test('non-JSON and oversized results retain one sanitized terminal error per request', async () => {
+  for (const result of [1n, undefined, 'PRIVATE_' + 'x'.repeat(8 * 1024 * 1024)]) {
+    const { context, calls } = pairHarness(() => result);
+    await assert.rejects(context.readPair({ to: TOKEN, data: '0x01' }), /non-JSON evidence|size limit/);
+    const evidence = context.snapshotEvidence();
+    assert.equal(evidence.request.length, calls.length);
+    assert.equal(evidence.response.length, calls.length);
+    assert.ok(evidence.response.at(-1).error.code.startsWith('STATE_'));
+    assert.doesNotMatch(JSON.stringify(evidence), /PRIVATE_/);
+  }
+});
+
+test('individually bounded responses cannot exceed the shared evidence budget', async () => {
+  const block = { hash: word(42n), number: '42', timestamp: '123' };
+  const request = { chainId: 999, from: ACCOUNT, to: TOKEN, value: '0', data: '0x' };
+  const header = { hash: block.hash, number: '0x2a', timestamp: '0x7b', extra: 'x'.repeat(6 * 1024 * 1024) };
+  let calls = 0;
+  const context = createStateContext({ request, block, rpc: { async call(method) { calls++; return method === 'debug_traceCall' ? { pre: {}, post: {} } : header; } } });
+  await context.prepare();
+  for (let i = 0; i < 4; i++) await context.verifyCanonical();
+  await assert.rejects(context.verifyCanonical(), /size limit/);
+  assert.equal(calls, 7);
+  const evidence = context.snapshotEvidence();
+  assert.equal(evidence.request.length, evidence.response.length);
+  assert.equal(evidence.response.at(-1).error.code, 'STATE_EVIDENCE_LIMIT');
+  assert.equal(evidence.response.filter(record => record.result?.extra).length, 5);
+  assert.ok(context.canonicalFailure);
+});
