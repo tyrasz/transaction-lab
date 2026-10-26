@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "1.0",
+  "createdAt": "2026-10-26T04:30:35.486Z",
+  "hypothesis": "The three additional B hashes are representations of HyperCore system transactions. This remains unproven before this diagnostic.",
+  "pilot": {
+    "path": "../coverage-evaluation/2026-10-26T04-23-53.888Z-c78b7336/rpc.json",
+    "sha256": "e4155c2816bdf27761869f7fc7eea8cf84ce59475c89a801a1ee5a7e144379a9",
+    "recordIds": [
+      6,
+      7
+    ],
+    "status": "selection_failed_unchanged"
+  },
+  "blockNumber": "0x2f3fbe6",
+  "blockHash": "0x1a90cb1b12defb35c5b542b1218b4b5f8524d7eea721ab1f0cf28e8b6af8e2b4",
+  "additionalHashes": [
+    "0xc9d5e5dfb1b07ed8d7bb0373618767191bd7ad9bcc11d9185bff886ba7ab088a",
+    "0x14f094947b7c9ca7d83baad145e0e26e3c770a884709e7dc4b3e539d222664d8",
+    "0x395725735b69f19ffcb48893a82942e932bfd719ef10faf666ae739d2a510939"
+  ],
+  "endpoints": {
+    "official": "https://rpc.hyperliquid.xyz/evm",
+    "A": "https://hyperliquid.drpc.org",
+    "B": "https://rpc.hyperlend.finance/archive"
+  },
+  "limits": {
+    "requests": 12,
+    "responseBytes": 8388608,
+    "totalResponseBytes": 33554432,
+    "requestMs": 25000,
+    "retries": 0
+  },
+  "calls": [
+    {
+      "endpoint": "official",
+      "method": "eth_chainId",
+      "params": []
+    },
+    {
+      "endpoint": "official",
+      "method": "eth_getBlockByNumber",
+      "params": [
+        "0x2f3fbe6",
+        false
+      ]
+    },
+    {
+      "endpoint": "official",
+      "method": "eth_getSystemTxsByBlockNumber",
+      "params": [
+        "0x2f3fbe6"
+      ]
+    },
+    {
+      "endpoint": "A",
+      "method": "eth_chainId",
+      "params": []
+    },
+    {
+      "endpoint": "B",
+      "method": "eth_chainId",
+      "params": []
+    },
+    {
+      "endpoint": "A",
+      "method": "eth_getTransactionByHash",
+      "params": [
+        "0xc9d5e5dfb1b07ed8d7bb0373618767191bd7ad9bcc11d9185bff886ba7ab088a"
+      ]
+    },
+    {
+      "endpoint": "B",
+      "method": "eth_getTransactionByHash",
+      "params": [
+        "0xc9d5e5dfb1b07ed8d7bb0373618767191bd7ad9bcc11d9185bff886ba7ab088a"
+      ]
+    },
+    {
+      "endpoint": "A",
+      "method": "eth_getTransactionByHash",
+      "params": [
+        "0x14f094947b7c9ca7d83baad145e0e26e3c770a884709e7dc4b3e539d222664d8"
+      ]
+    },
+    {
+      "endpoint": "B",
+      "method": "eth_getTransactionByHash",
+      "params": [
+        "0x14f094947b7c9ca7d83baad145e0e26e3c770a884709e7dc4b3e539d222664d8"
+      ]
+    },
+    {
+      "endpoint": "A",
+      "method": "eth_getTransactionByHash",
+      "params": [
+        "0x395725735b69f19ffcb48893a82942e932bfd719ef10faf666ae739d2a510939"
+      ]
+    },
+    {
+      "endpoint": "B",
+      "method": "eth_getTransactionByHash",
+      "params": [
+        "0x395725735b69f19ffcb48893a82942e932bfd719ef10faf666ae739d2a510939"
+      ]
+    },
+    {
+      "endpoint": "official",
+      "method": "eth_getTransactionByHash",
+      "params": [
+        "0xc9d5e5dfb1b07ed8d7bb0373618767191bd7ad9bcc11d9185bff886ba7ab088a"
+      ]
+    }
+  ],
+  "scriptSha256": "8c3bd32e03a56d6cfcf842fbf297ad52b18fb449368b3e3f6068ab12a29ea312",
+  "rules": [
+    "Exactly the twelve fixed requests in order, without retry, substitution, fallback or new discovery.",
+    "This is separate from the failed pilot; no denominator, metric or pilot status is changed.",
+    "Equal block hashes do not establish identical transaction lists or original-position semantics.",
+    "Successful JSON-RPC bytes are retained and hashed. Error text is omitted; observed bytes are counted and hashed.",
+    "A cap-crossing stream chunk is counted but not retained as usable evidence; no further calls after the total-byte cap.",
+    "System-action attribution requires matching explicit fields or a separately evidenced encoding; zero gas price or list position alone is insufficient."
+  ]
+}

@@ -1,6 +1,6 @@
 # Prospective HyperEVM coverage pilot
 
-**Protocol only; no cohort selected, requests sent, or results claimed.** This tests a frozen implementation on a small future chain-999 cohort. It cannot establish “90% of EVM transactions simulate accurately,” general security accuracy, or superiority to a vendor. [ROADMAP](../../ROADMAP.md) and [STATUS](../../STATUS.md) describe development evidence; those inspected cases are not holdouts.
+**Protocol v1. The first run failed cohort selection on a provider transaction-list disagreement; no transaction accuracy score was produced.** [Run evidence](../../reports/coverage-evaluation/2026-10-26T04-23-53.888Z-c78b7336/NOTES.md) retains the exact frozen protocol and source revision. The rules below remain unchanged; no replacement run has been made. This tests a frozen implementation on a small future chain-999 cohort. It cannot establish “90% of EVM transactions simulate accurately,” general security accuracy, or superiority to a vendor. [ROADMAP](../../ROADMAP.md) and [STATUS](../../STATUS.md) describe development evidence; those inspected cases are not holdouts.
 
 ## Freeze, selection, and budget
 
