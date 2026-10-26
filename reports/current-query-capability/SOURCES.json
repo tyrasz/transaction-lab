@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0",
+  "accessedOn": "2026-10-26",
+  "sources": [
+    { "url": "https://geth.ethereum.org/docs/interacting-with-geth/rpc/ns-debug#debug_tracecall", "kind": "primary_documentation", "supports": "Trace-call state and block override interface.", "limit": "Does not prove a remote provider implements this exact behavior." },
+    { "url": "https://geth.ethereum.org/docs/developers/evm-tracing/built-in-tracers#prestatetracer", "kind": "primary_documentation", "supports": "Prestate tracer diff-mode omission and changed-state representation.", "limit": "Packet-specific acceptance remains based on retained raw responses and explicit field checks." },
+    { "url": "https://github.com/ethereum/go-ethereum/blob/master/eth/tracers/api.go", "kind": "primary_source_code_moving_branch", "supports": "Upstream TraceCall zero-price BASEFEE override and NoBaseFee configuration provide a plausible mechanism for observed synthetic basefee.", "limit": "Not pinned or attested as either provider's deployed implementation." },
+    { "url": "https://github.com/ethereum/go-ethereum/blob/master/core/state_transition.go", "kind": "primary_source_code_moving_branch", "supports": "Upstream sender nonce increment and zero-price fee handling provide a plausible mechanism for observed query diffs.", "limit": "Not proof of provider code, configuration, or engine independence." }
+  ],
+  "observedFactsSource": "capture.json",
+  "interpretationSource": "NOTES.md",
+  "productionGateChanged": false
+}

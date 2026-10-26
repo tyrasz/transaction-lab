@@ -1,0 +1,139 @@
+{
+  "schemaVersion": "1.0",
+  "createdAt": "2026-10-26T06:19:06.854Z",
+  "purpose": "Fourteen predeclared historical HTTP requests to capture genuine original-vs-replay changed-state guard evidence, preserving earlier recordings and independent numerical expectations.",
+  "coreBinding": "frozen-core.json must bind the exact root-authorized source fingerprint and version after core freeze; no RPC may run before root explicitly confirms freeze.",
+  "scriptSha256": "0a9c9705af4dc1fb6b30a9452573aac922df7be83d867da2d61d230199a44c07",
+  "providers": {
+    "drpc": "https://hyperliquid.drpc.org",
+    "hyperlend-archive": "https://rpc.hyperlend.finance/archive"
+  },
+  "budgets": {
+    "plannedHttpRequests": 14,
+    "maxRpcCalls": 800,
+    "maxRpcCallsPerRun": 80,
+    "maxResponseBytes": 8388608,
+    "maxTotalResponseBytes": 134217728,
+    "rpcTimeoutMs": 25000,
+    "maxHttpRunMs": 120000,
+    "maxRunSequenceMs": 900000,
+    "retries": 0
+  },
+  "expectedRpcCallsIfPriorOutcomesPersist": 467,
+  "sources": [
+    {
+      "path": "reports/system-position-diagnostic/INTEGRATION.md",
+      "sha256": "f51c202cbac90e64864cb2c9d2a89fa6e7f088dfaa64ab96f3daa281e497f80c"
+    },
+    {
+      "path": "reports/affected-balance-comparisons/capture.json",
+      "sha256": "53eec210304f3f3ff749bc4a4cdbd4fe55f57e87a2cd0b94983574bd0942de34"
+    },
+    {
+      "path": "reports/permission-comparisons/2026-10-25T15-36-55-519Z-http.json",
+      "sha256": "f11c0013cb315876ac9c4fde65d2fd94af246bdbb1fc714a3a196178a2c0d377"
+    }
+  ],
+  "cases": [
+    {
+      "id": "hyperlend-usdc-supply",
+      "operation": "supply",
+      "transactionHash": "0x25e076fc67489775131aafd134a1c6de8f974dea434000ba7568cf400df03cd2",
+      "providers": [
+        "drpc",
+        "hyperlend-archive"
+      ],
+      "expectedRpcCallsPerProvider": 32,
+      "source": "reports/affected-balance-comparisons/capture.json"
+    },
+    {
+      "id": "hyperlend-usdc-withdraw",
+      "operation": "withdraw",
+      "transactionHash": "0x94b5c4672e28cbeeab547c06f60e30afa02ac58b0cad4c7568a6ca9d8ac29ae7",
+      "providers": [
+        "drpc"
+      ],
+      "expectedRpcCallsPerProvider": 39,
+      "source": "reports/affected-balance-comparisons/capture.json"
+    },
+    {
+      "id": "hyperlend-usdc-borrow",
+      "operation": "borrow",
+      "transactionHash": "0x0b8ad0d98c96224bdd9e1ad6623292164278340b123feb45eee9c556ec259afb",
+      "providers": [
+        "drpc",
+        "hyperlend-archive"
+      ],
+      "expectedRpcCallsPerProvider": 39,
+      "source": "reports/affected-balance-comparisons/capture.json"
+    },
+    {
+      "id": "hyperlend-usdc-repay",
+      "operation": "repay",
+      "transactionHash": "0x682c1d2f131715b8d4b04c71cd8e75ef56a107f0bbd992379a44bf426f22102f",
+      "providers": [
+        "drpc",
+        "hyperlend-archive"
+      ],
+      "expectedRpcCallsPerProvider": 44,
+      "source": "reports/affected-balance-comparisons/capture.json"
+    },
+    {
+      "id": "direct-transferfrom-a",
+      "transactionHash": "0xe2f9761a3fac3ba83ee15fc5e6f12b55d15cd804b321a2cffd9d2c16d6c38dfe",
+      "providers": [
+        "drpc"
+      ],
+      "expectedRpcCallsPerProvider": 28,
+      "source": "reports/affected-balance-comparisons/capture.json"
+    },
+    {
+      "id": "direct-transferfrom-b",
+      "transactionHash": "0xc650c2592cd04133cf7ff88969468c3e454e0b36e989fdb09a943dce283686d1",
+      "providers": [
+        "drpc"
+      ],
+      "expectedRpcCallsPerProvider": 28,
+      "source": "reports/affected-balance-comparisons/capture.json"
+    },
+    {
+      "id": "usdc-router-permit-consumed",
+      "transactionHash": "0x9dba139e63627a8f3693b9a63ff556f89a5358c2603738f6d98172b7ddd3074d",
+      "providers": [
+        "drpc",
+        "hyperlend-archive"
+      ],
+      "expectedRpcCallsPerProvider": 44,
+      "source": "reports/affected-balance-comparisons/capture.json"
+    },
+    {
+      "id": "usdc-approval-historical",
+      "transactionHash": "0x371bf6c3af982636caa9874bb107a7d3d967cea340678b5dfb856ff35f9923b5",
+      "providers": [
+        "hyperlend-archive"
+      ],
+      "expectedRpcCallsPerProvider": 18,
+      "source": "reports/permission-comparisons/2026-10-25T15-36-55-519Z-http.json"
+    },
+    {
+      "id": "husdc-relayed-permit-historical",
+      "transactionHash": "0x8793c27ee5aa623de4e2131296ad54d4e1276dd3e5d28b7b493f4d2080f4556e",
+      "providers": [
+        "drpc",
+        "hyperlend-archive"
+      ],
+      "expectedRpcCallsPerProvider": 18,
+      "source": "reports/permission-comparisons/2026-10-25T15-36-55-519Z-http.json"
+    }
+  ],
+  "rules": [
+    "No live RPC before explicit root freeze authorization; local --check and --bind perform no network requests.",
+    "Each case/provider is attempted at most once. Retain all API failures, unavailable measurements, transport failures and budget skips. No substitutions, fallback, retries or provider switching.",
+    "Count all RPC response bytes and local HTTP response bytes against the aggregate limit, including a cap-crossing final chunk. Discard oversized content; retain bounded hash and fixed failure metadata.",
+    "Use actual product HTTP POST /api/replay via an ephemeral loopback server with recording RPC injection. No shared port5174 dependency.",
+    "Every successful RPC retains exact response text/hash and exact JSON request. RPC error envelope bodies are withheld; valid contract-controlled trace errors remain evidence.",
+    "Verify frozen source bytes before each attempt and after completion, and compare implementation identity in every HTTP200 response.",
+    "Existing original dRPC approval/index failure, archive withdrawal failure, direct-B inconsistency, prospective pilot, and independent seven-pair oracle are immutable; do not manufacture new responses for old call sequences.",
+    "These previously inspected development cases are not a held-out accuracy evaluation or security score."
+  ]
+}

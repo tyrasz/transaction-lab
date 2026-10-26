@@ -1,0 +1,1495 @@
+{
+  "schemaVersion": "1.0",
+  "planSha256": "de8ae6eed7c291947efec06efa307b040359deb6bb5e5129ccbd8bef02b9e6a2",
+  "frozenCommit": "27c60a4bc380118f67328a878b1e425b6c335908",
+  "scope": "Development capability observations only. Query-path checks use frozen historical pure logic; fee/nonce/header observations are current-specific and do not enable production measurements.",
+  "observations": [
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "block": {
+        "hash": "0x48f4baab87c398dedf709546bbc5bc2da28f45ef90815bf98a47c8429b2f5fa7",
+        "number": "49536896",
+        "timestamp": "1792981543"
+      },
+      "originalEnvelope": {
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+        "data": "0x617ba037000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000000e5e4030000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d00000000000000000000000000000000000000000000000000000000000000000",
+        "value": "0x0",
+        "gas": "0x4c4b40"
+      },
+      "queries": [
+        {
+          "id": "usdc",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "kind": "balance",
+          "envelope": {
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "value": "0x0",
+            "gas": "0x493e0"
+          },
+          "before": {
+            "status": "validated_known_path",
+            "amountRaw": "344156193",
+            "gasUsed": "31182"
+          },
+          "after": {
+            "status": "validated_known_path",
+            "amountRaw": "329090078",
+            "gasUsed": "31182"
+          },
+          "deltaRaw": "-15066115",
+          "beforeDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x10487bf294e738a0",
+              "nonce": 82526
+            },
+            "senderAfter": {
+              "nonce": 82527
+            }
+          },
+          "afterDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x10487bf294e738a0",
+              "nonce": 82527
+            },
+            "senderAfter": {
+              "nonce": 82528
+            }
+          }
+        },
+        {
+          "id": "husdc",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "kind": "balance",
+          "envelope": {
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "value": "0x0",
+            "gas": "0x493e0"
+          },
+          "before": {
+            "status": "validated_known_path",
+            "amountRaw": "3179075937",
+            "gasUsed": "44761"
+          },
+          "after": {
+            "status": "validated_known_path",
+            "amountRaw": "3194142051",
+            "gasUsed": "44301"
+          },
+          "deltaRaw": "15066114",
+          "beforeDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x10487bf294e738a0",
+              "nonce": 82526
+            },
+            "senderAfter": {
+              "nonce": 82527
+            }
+          },
+          "afterDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x10487bf294e738a0",
+              "nonce": 82527
+            },
+            "senderAfter": {
+              "nonce": 82528
+            }
+          }
+        },
+        {
+          "id": "usdc-allowance",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "kind": "allowance",
+          "envelope": {
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "value": "0x0",
+            "gas": "0x493e0"
+          },
+          "before": {
+            "status": "validated_known_path",
+            "amountRaw": "115792089237316195423570985008687907853269984665640564039457584003202135963444",
+            "gasUsed": "31647"
+          },
+          "after": {
+            "status": "validated_known_path",
+            "amountRaw": "115792089237316195423570985008687907853269984665640564039457584003202120897329",
+            "gasUsed": "31647"
+          },
+          "deltaRaw": "-15066115",
+          "beforeDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x10487bf294e738a0",
+              "nonce": 82526
+            },
+            "senderAfter": {
+              "nonce": 82527
+            }
+          },
+          "afterDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x10487bf294e738a0",
+              "nonce": 82527
+            },
+            "senderAfter": {
+              "nonce": 82528
+            }
+          }
+        }
+      ],
+      "sender": {
+        "address": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "nonce": "0x1425e",
+        "nativeBalance": "0x10487bf294e738a0",
+        "code": "0x"
+      },
+      "originalValidation": "successful_known_envelope_no_lifecycle_valid_diff",
+      "originalOverrides": {
+        "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b": {
+          "stateDiff": {
+            "0x137b6bf81cf5e4c5ae540a76691cd4329310b754eff67992fe010855aee42100": "0x000000000035bb57eb1bf45ab4ecba4d0000000003718e3c512c38255b7c4318",
+            "0x137b6bf81cf5e4c5ae540a76691cd4329310b754eff67992fe010855aee42101": "0x00000000004137d0cc87a78d05e75f6600000000038a0e3240911c1a04aaf3d8",
+            "0x137b6bf81cf5e4c5ae540a76691cd4329310b754eff67992fe010855aee42102": "0x000000000000000000000e006adeba2700000000000000000000000000000cf2",
+            "0x137b6bf81cf5e4c5ae540a76691cd4329310b754eff67992fe010855aee42107": "0x0000000000000000000003fccf70d00700000000000000000000000005a4b44f"
+          }
+        },
+        "0x744e4f26ee30213989216e1632d9be3547c4885b": {
+          "stateDiff": {
+            "0x0000000000000000000000000000000000000000000000000000000000000036": "0x00000000000000000000000000000000000000000000000000002c3cf684a768",
+            "0x915fe61d65c17160aad2615a408a588aa461c46e803a97034e823a65031da32c": "0x0000000003718e3c512c38255b7c4318000000000000000000000000b2a47fa7"
+          }
+        },
+        "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+          "nonce": "0x1425f"
+        },
+        "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+          "stateDiff": {
+            "0x21a9ed7426191a62f3472170ab3797f6e0760d62201eb5219a953b77b6ae85be": "0x00000000000000000000000000000000000000000000000000000000139d841e",
+            "0x4c44f4033f99ade2d97b117146cdbfb9a60d5f0e23e6790d98f1cd4778d9b58b": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffbb721ff5331",
+            "0xa2839be30d10bf09fb026bc8f7fb1c5e6ead784096a50501683c136f34d051fd": "0x000000000000000000000000000000000000000000000000000003fccf70d007"
+          }
+        }
+      },
+      "originalOverridesSha256": "1fee3d27b3a8e4d7bba8583581d93042fdc41c6b6b184be83149269f52dbbbbe",
+      "headerWitness": {
+        "before": {
+          "status": "observed",
+          "values": {
+            "number": "49536896",
+            "timestamp": "1792981543",
+            "gasLimit": "3000000",
+            "baseFee": "0",
+            "prevRandao": "0",
+            "coinbase": "0",
+            "chainId": "999",
+            "parentHash": "82342532811229342144433487604812276349781318718641219299916750944530761408370"
+          },
+          "headerValues": {
+            "number": "49536896",
+            "timestamp": "1792981543",
+            "gasLimit": "3000000",
+            "baseFee": "160370124",
+            "prevRandao": "0",
+            "coinbase": "0",
+            "chainId": "999",
+            "parentHash": "82342532811229342144433487604812276349781318718641219299916750944530761408370"
+          },
+          "differences": [
+            "baseFee"
+          ]
+        },
+        "after": {
+          "status": "observed",
+          "values": {
+            "number": "49536896",
+            "timestamp": "1792981543",
+            "gasLimit": "3000000",
+            "baseFee": "0",
+            "prevRandao": "0",
+            "coinbase": "0",
+            "chainId": "999",
+            "parentHash": "82342532811229342144433487604812276349781318718641219299916750944530761408370"
+          },
+          "headerValues": {
+            "number": "49536896",
+            "timestamp": "1792981543",
+            "gasLimit": "3000000",
+            "baseFee": "160370124",
+            "prevRandao": "0",
+            "coinbase": "0",
+            "chainId": "999",
+            "parentHash": "82342532811229342144433487604812276349781318718641219299916750944530761408370"
+          },
+          "differences": [
+            "baseFee"
+          ]
+        }
+      },
+      "anchor": {
+        "transactionHash": "0xd04561ab2feea19cba3bd034208c4e83359a8e1c07c97ce68e9aca0dc96873fc",
+        "sender": "0xc72d4658359fe7595e26f00d3bc1ed4e5530a90b",
+        "transactionNonce": "0x1692e",
+        "directEndNonce": "0x1692f",
+        "directParentNonce": "0x1692e",
+        "tracedPreNonce": "92463",
+        "queryPath": {
+          "status": "validated_known_path",
+          "amountRaw": "344156193",
+          "gasUsed": "31182"
+        },
+        "classification": "traced_state_matches_end_and_differs_from_parent"
+      },
+      "directUSDC": {
+        "before": "0x0000000000000000000000000000000000000000000000000000000014836821",
+        "after": "0x00000000000000000000000000000000000000000000000000000000139d841e",
+        "beforeMatchesTrace": true,
+        "afterMatchesTrace": true
+      },
+      "canonical": "confirmed",
+      "status": "captured_current_capability_observations"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "block": {
+        "hash": "0x206b1f6b56dced1f90f742384ad84d74973a02d8bee8c07a823f394d1506a5a2",
+        "number": "49318777",
+        "timestamp": "1792766945"
+      },
+      "originalEnvelope": {
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+        "data": "0xa415bcad000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000031cc53ea000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "value": "0x0",
+        "gas": "0x4c4b40"
+      },
+      "queries": [
+        {
+          "id": "usdc",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "kind": "balance",
+          "envelope": {
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "value": "0x0",
+            "gas": "0x493e0"
+          },
+          "before": {
+            "status": "validated_known_path",
+            "amountRaw": "569439069",
+            "gasUsed": "31182"
+          },
+          "after": {
+            "status": "validated_known_path",
+            "amountRaw": "1404913479",
+            "gasUsed": "31182"
+          },
+          "deltaRaw": "835474410",
+          "beforeDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x702b7ad07202fb1",
+              "nonce": 78161
+            },
+            "senderAfter": {
+              "nonce": 78162
+            }
+          },
+          "afterDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x702b7ad07202fb1",
+              "nonce": 78162
+            },
+            "senderAfter": {
+              "nonce": 78163
+            }
+          }
+        },
+        {
+          "id": "husdc",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "kind": "balance",
+          "envelope": {
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "value": "0x0",
+            "gas": "0x493e0"
+          },
+          "before": {
+            "status": "validated_known_path",
+            "amountRaw": "5677678780",
+            "gasUsed": "44761"
+          },
+          "after": {
+            "status": "validated_known_path",
+            "amountRaw": "5677678780",
+            "gasUsed": "44301"
+          },
+          "deltaRaw": "0",
+          "beforeDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x702b7ad07202fb1",
+              "nonce": 78161
+            },
+            "senderAfter": {
+              "nonce": 78162
+            }
+          },
+          "afterDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x702b7ad07202fb1",
+              "nonce": 78162
+            },
+            "senderAfter": {
+              "nonce": 78163
+            }
+          }
+        },
+        {
+          "id": "debt",
+          "to": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "kind": "balance",
+          "envelope": {
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+            "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "value": "0x0",
+            "gas": "0x493e0"
+          },
+          "before": {
+            "status": "validated_known_path",
+            "amountRaw": "2",
+            "gasUsed": "45018"
+          },
+          "after": {
+            "status": "validated_known_path",
+            "amountRaw": "835474412",
+            "gasUsed": "44395"
+          },
+          "deltaRaw": "835474410",
+          "beforeDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x702b7ad07202fb1",
+              "nonce": 78161
+            },
+            "senderAfter": {
+              "nonce": 78162
+            }
+          },
+          "afterDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x702b7ad07202fb1",
+              "nonce": 78162
+            },
+            "senderAfter": {
+              "nonce": 78163
+            }
+          }
+        },
+        {
+          "id": "husdc-allowance",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "kind": "allowance",
+          "envelope": {
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "value": "0x0",
+            "gas": "0x493e0"
+          },
+          "before": {
+            "status": "validated_known_path",
+            "amountRaw": "0",
+            "gasUsed": "29725"
+          },
+          "after": {
+            "status": "validated_known_path",
+            "amountRaw": "0",
+            "gasUsed": "29725"
+          },
+          "deltaRaw": "0",
+          "beforeDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x702b7ad07202fb1",
+              "nonce": 78161
+            },
+            "senderAfter": {
+              "nonce": 78162
+            }
+          },
+          "afterDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x702b7ad07202fb1",
+              "nonce": 78162
+            },
+            "senderAfter": {
+              "nonce": 78163
+            }
+          }
+        }
+      ],
+      "sender": {
+        "address": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "nonce": "0x13151",
+        "nativeBalance": "0x702b7ad07202fb1",
+        "code": "0x"
+      },
+      "originalValidation": "successful_known_envelope_no_lifecycle_valid_diff",
+      "originalOverrides": {
+        "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b": {
+          "stateDiff": {
+            "0x137b6bf81cf5e4c5ae540a76691cd4329310b754eff67992fe010855aee42100": "0x00000000002ae37c3ee67ff3b29f5d2f0000000003713fa469febec5c9432835",
+            "0x137b6bf81cf5e4c5ae540a76691cd4329310b754eff67992fe010855aee42101": "0x0000000000347f721031800f1a961a56000000000389ab303118a4a669b7e300",
+            "0x137b6bf81cf5e4c5ae540a76691cd4329310b754eff67992fe010855aee42102": "0x000000000000000000000e006adb73e100000000000000000000000000000cf2",
+            "0x137b6bf81cf5e4c5ae540a76691cd4329310b754eff67992fe010855aee42107": "0x00000000000000000000046a732a1a8c0000000000000000000000001b1a919a"
+          }
+        },
+        "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+          "nonce": "0x13152"
+        },
+        "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+          "stateDiff": {
+            "0x21a9ed7426191a62f3472170ab3797f6e0760d62201eb5219a953b77b6ae85be": "0x0000000000000000000000000000000000000000000000000000000053bd4747",
+            "0xa2839be30d10bf09fb026bc8f7fb1c5e6ead784096a50501683c136f34d051fd": "0x0000000000000000000000000000000000000000000000000000046a732a1a8c"
+          }
+        },
+        "0xd612513cb3b2c52abcd6d4b338374c09ada4657d": {
+          "stateDiff": {
+            "0x000000000000000000000000000000000000000000000000000000000000003a": "0x000000000000000000000000000000000000000000000000000027adaad151ba",
+            "0x794a2a694e0c14f313166605d8352dd197a29a5ff37aea497f3f0dd07729e4f8": "0x000000000389ab303118a4a669b7e3000000000000000000000000002d7b848a"
+          }
+        }
+      },
+      "originalOverridesSha256": "8cc063e19e585128cd4e924d3ed9d43a5051d104c16c82fc488700e342bf517e",
+      "headerWitness": {
+        "before": {
+          "status": "observed",
+          "values": {
+            "number": "49318777",
+            "timestamp": "1792766945",
+            "gasLimit": "3000000",
+            "baseFee": "0",
+            "prevRandao": "0",
+            "coinbase": "0",
+            "chainId": "999",
+            "parentHash": "44915118171540624725347575155589596311692803728661213089121739136713699513561"
+          },
+          "headerValues": {
+            "number": "49318777",
+            "timestamp": "1792766945",
+            "gasLimit": "3000000",
+            "baseFee": "100000000",
+            "prevRandao": "0",
+            "coinbase": "0",
+            "chainId": "999",
+            "parentHash": "44915118171540624725347575155589596311692803728661213089121739136713699513561"
+          },
+          "differences": [
+            "baseFee"
+          ]
+        },
+        "after": {
+          "status": "observed",
+          "values": {
+            "number": "49318777",
+            "timestamp": "1792766945",
+            "gasLimit": "3000000",
+            "baseFee": "0",
+            "prevRandao": "0",
+            "coinbase": "0",
+            "chainId": "999",
+            "parentHash": "44915118171540624725347575155589596311692803728661213089121739136713699513561"
+          },
+          "headerValues": {
+            "number": "49318777",
+            "timestamp": "1792766945",
+            "gasLimit": "3000000",
+            "baseFee": "100000000",
+            "prevRandao": "0",
+            "coinbase": "0",
+            "chainId": "999",
+            "parentHash": "44915118171540624725347575155589596311692803728661213089121739136713699513561"
+          },
+          "differences": [
+            "baseFee"
+          ]
+        }
+      },
+      "anchor": {
+        "transactionHash": "0x68b068b67a38dfbc6fb34b7a5beeef7207bd268c5019ef120b1b675cd2716068",
+        "sender": "0xb596893b979f377b1e197beb27d840fbb627bdc8",
+        "transactionNonce": "0x27c",
+        "directEndNonce": "0x27d",
+        "directParentNonce": "0x27c",
+        "tracedPreNonce": "637",
+        "queryPath": {
+          "status": "validated_known_path",
+          "amountRaw": "569439069",
+          "gasUsed": "31182"
+        },
+        "classification": "traced_state_matches_end_and_differs_from_parent"
+      },
+      "directUSDC": {
+        "before": "0x0000000000000000000000000000000000000000000000000000000021f0f35d",
+        "after": "0x0000000000000000000000000000000000000000000000000000000053bd4747",
+        "beforeMatchesTrace": true,
+        "afterMatchesTrace": true
+      },
+      "canonical": "confirmed",
+      "status": "captured_current_capability_observations"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "block": {
+        "hash": "0x48f4baab87c398dedf709546bbc5bc2da28f45ef90815bf98a47c8429b2f5fa7",
+        "number": "49536896",
+        "timestamp": "1792981543"
+      },
+      "originalEnvelope": {
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+        "data": "0x617ba037000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000000e5e4030000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d00000000000000000000000000000000000000000000000000000000000000000",
+        "value": "0x0",
+        "gas": "0x4c4b40"
+      },
+      "queries": [
+        {
+          "id": "usdc",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "kind": "balance",
+          "envelope": {
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "value": "0x0",
+            "gas": "0x493e0"
+          },
+          "before": {
+            "status": "validated_known_path",
+            "amountRaw": "344156193",
+            "gasUsed": "31182"
+          },
+          "after": {
+            "status": "validated_known_path",
+            "amountRaw": "329090078",
+            "gasUsed": "31182"
+          },
+          "deltaRaw": "-15066115",
+          "beforeDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x10487bf294e738a0",
+              "nonce": 82526
+            },
+            "senderAfter": {
+              "nonce": 82527
+            }
+          },
+          "afterDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x10487bf294e738a0",
+              "nonce": 82527
+            },
+            "senderAfter": {
+              "nonce": 82528
+            }
+          }
+        },
+        {
+          "id": "husdc",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "kind": "balance",
+          "envelope": {
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "value": "0x0",
+            "gas": "0x493e0"
+          },
+          "before": {
+            "status": "validated_known_path",
+            "amountRaw": "3179075937",
+            "gasUsed": "44761"
+          },
+          "after": {
+            "status": "validated_known_path",
+            "amountRaw": "3194142051",
+            "gasUsed": "44301"
+          },
+          "deltaRaw": "15066114",
+          "beforeDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x10487bf294e738a0",
+              "nonce": 82526
+            },
+            "senderAfter": {
+              "nonce": 82527
+            }
+          },
+          "afterDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x10487bf294e738a0",
+              "nonce": 82527
+            },
+            "senderAfter": {
+              "nonce": 82528
+            }
+          }
+        },
+        {
+          "id": "usdc-allowance",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "kind": "allowance",
+          "envelope": {
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "value": "0x0",
+            "gas": "0x493e0"
+          },
+          "before": {
+            "status": "validated_known_path",
+            "amountRaw": "115792089237316195423570985008687907853269984665640564039457584003202135963444",
+            "gasUsed": "31647"
+          },
+          "after": {
+            "status": "validated_known_path",
+            "amountRaw": "115792089237316195423570985008687907853269984665640564039457584003202120897329",
+            "gasUsed": "31647"
+          },
+          "deltaRaw": "-15066115",
+          "beforeDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x10487bf294e738a0",
+              "nonce": 82526
+            },
+            "senderAfter": {
+              "nonce": 82527
+            }
+          },
+          "afterDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x10487bf294e738a0",
+              "nonce": 82527
+            },
+            "senderAfter": {
+              "nonce": 82528
+            }
+          }
+        }
+      ],
+      "sender": {
+        "address": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "nonce": "0x1425e",
+        "nativeBalance": "0x10487bf294e738a0",
+        "code": "0x"
+      },
+      "originalValidation": "successful_known_envelope_no_lifecycle_valid_diff",
+      "originalOverrides": {
+        "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b": {
+          "stateDiff": {
+            "0x137b6bf81cf5e4c5ae540a76691cd4329310b754eff67992fe010855aee42100": "0x000000000035bb57eb1bf45ab4ecba4d0000000003718e3c512c38255b7c4318",
+            "0x137b6bf81cf5e4c5ae540a76691cd4329310b754eff67992fe010855aee42101": "0x00000000004137d0cc87a78d05e75f6600000000038a0e3240911c1a04aaf3d8",
+            "0x137b6bf81cf5e4c5ae540a76691cd4329310b754eff67992fe010855aee42102": "0x000000000000000000000e006adeba2700000000000000000000000000000cf2",
+            "0x137b6bf81cf5e4c5ae540a76691cd4329310b754eff67992fe010855aee42107": "0x0000000000000000000003fccf70d00700000000000000000000000005a4b44f"
+          }
+        },
+        "0x744e4f26ee30213989216e1632d9be3547c4885b": {
+          "stateDiff": {
+            "0x0000000000000000000000000000000000000000000000000000000000000036": "0x00000000000000000000000000000000000000000000000000002c3cf684a768",
+            "0x915fe61d65c17160aad2615a408a588aa461c46e803a97034e823a65031da32c": "0x0000000003718e3c512c38255b7c4318000000000000000000000000b2a47fa7"
+          }
+        },
+        "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+          "nonce": "0x1425f"
+        },
+        "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+          "stateDiff": {
+            "0x21a9ed7426191a62f3472170ab3797f6e0760d62201eb5219a953b77b6ae85be": "0x00000000000000000000000000000000000000000000000000000000139d841e",
+            "0x4c44f4033f99ade2d97b117146cdbfb9a60d5f0e23e6790d98f1cd4778d9b58b": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffbb721ff5331",
+            "0xa2839be30d10bf09fb026bc8f7fb1c5e6ead784096a50501683c136f34d051fd": "0x000000000000000000000000000000000000000000000000000003fccf70d007"
+          }
+        }
+      },
+      "originalOverridesSha256": "1fee3d27b3a8e4d7bba8583581d93042fdc41c6b6b184be83149269f52dbbbbe",
+      "headerWitness": {
+        "before": {
+          "status": "observed",
+          "values": {
+            "number": "49536896",
+            "timestamp": "1792981543",
+            "gasLimit": "3000000",
+            "baseFee": "0",
+            "prevRandao": "0",
+            "coinbase": "0",
+            "chainId": "999",
+            "parentHash": "82342532811229342144433487604812276349781318718641219299916750944530761408370"
+          },
+          "headerValues": {
+            "number": "49536896",
+            "timestamp": "1792981543",
+            "gasLimit": "3000000",
+            "baseFee": "160370124",
+            "prevRandao": "0",
+            "coinbase": "0",
+            "chainId": "999",
+            "parentHash": "82342532811229342144433487604812276349781318718641219299916750944530761408370"
+          },
+          "differences": [
+            "baseFee"
+          ]
+        },
+        "after": {
+          "status": "observed",
+          "values": {
+            "number": "49536896",
+            "timestamp": "1792981543",
+            "gasLimit": "3000000",
+            "baseFee": "0",
+            "prevRandao": "0",
+            "coinbase": "0",
+            "chainId": "999",
+            "parentHash": "82342532811229342144433487604812276349781318718641219299916750944530761408370"
+          },
+          "headerValues": {
+            "number": "49536896",
+            "timestamp": "1792981543",
+            "gasLimit": "3000000",
+            "baseFee": "160370124",
+            "prevRandao": "0",
+            "coinbase": "0",
+            "chainId": "999",
+            "parentHash": "82342532811229342144433487604812276349781318718641219299916750944530761408370"
+          },
+          "differences": [
+            "baseFee"
+          ]
+        }
+      },
+      "anchor": {
+        "transactionHash": "0xd04561ab2feea19cba3bd034208c4e83359a8e1c07c97ce68e9aca0dc96873fc",
+        "sender": "0xc72d4658359fe7595e26f00d3bc1ed4e5530a90b",
+        "transactionNonce": "0x1692e",
+        "directEndNonce": "0x1692f",
+        "directParentNonce": "0x1692e",
+        "tracedPreNonce": "92463",
+        "queryPath": {
+          "status": "validated_known_path",
+          "amountRaw": "344156193",
+          "gasUsed": "31182"
+        },
+        "classification": "traced_state_matches_end_and_differs_from_parent"
+      },
+      "directUSDC": {
+        "before": "0x0000000000000000000000000000000000000000000000000000000014836821",
+        "after": "0x00000000000000000000000000000000000000000000000000000000139d841e",
+        "beforeMatchesTrace": true,
+        "afterMatchesTrace": true
+      },
+      "canonical": "confirmed",
+      "status": "captured_current_capability_observations"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "block": {
+        "hash": "0x206b1f6b56dced1f90f742384ad84d74973a02d8bee8c07a823f394d1506a5a2",
+        "number": "49318777",
+        "timestamp": "1792766945"
+      },
+      "originalEnvelope": {
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+        "data": "0xa415bcad000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000031cc53ea000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "value": "0x0",
+        "gas": "0x4c4b40"
+      },
+      "queries": [
+        {
+          "id": "usdc",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "kind": "balance",
+          "envelope": {
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "value": "0x0",
+            "gas": "0x493e0"
+          },
+          "before": {
+            "status": "validated_known_path",
+            "amountRaw": "569439069",
+            "gasUsed": "31182"
+          },
+          "after": {
+            "status": "validated_known_path",
+            "amountRaw": "1404913479",
+            "gasUsed": "31182"
+          },
+          "deltaRaw": "835474410",
+          "beforeDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x702b7ad07202fb1",
+              "nonce": 78161
+            },
+            "senderAfter": {
+              "nonce": 78162
+            }
+          },
+          "afterDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x702b7ad07202fb1",
+              "nonce": 78162
+            },
+            "senderAfter": {
+              "nonce": 78163
+            }
+          }
+        },
+        {
+          "id": "husdc",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "kind": "balance",
+          "envelope": {
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "value": "0x0",
+            "gas": "0x493e0"
+          },
+          "before": {
+            "status": "validated_known_path",
+            "amountRaw": "5677678780",
+            "gasUsed": "44761"
+          },
+          "after": {
+            "status": "validated_known_path",
+            "amountRaw": "5677678780",
+            "gasUsed": "44301"
+          },
+          "deltaRaw": "0",
+          "beforeDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x702b7ad07202fb1",
+              "nonce": 78161
+            },
+            "senderAfter": {
+              "nonce": 78162
+            }
+          },
+          "afterDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x702b7ad07202fb1",
+              "nonce": 78162
+            },
+            "senderAfter": {
+              "nonce": 78163
+            }
+          }
+        },
+        {
+          "id": "debt",
+          "to": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "kind": "balance",
+          "envelope": {
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+            "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "value": "0x0",
+            "gas": "0x493e0"
+          },
+          "before": {
+            "status": "validated_known_path",
+            "amountRaw": "2",
+            "gasUsed": "45018"
+          },
+          "after": {
+            "status": "validated_known_path",
+            "amountRaw": "835474412",
+            "gasUsed": "44395"
+          },
+          "deltaRaw": "835474410",
+          "beforeDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x702b7ad07202fb1",
+              "nonce": 78161
+            },
+            "senderAfter": {
+              "nonce": 78162
+            }
+          },
+          "afterDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x702b7ad07202fb1",
+              "nonce": 78162
+            },
+            "senderAfter": {
+              "nonce": 78163
+            }
+          }
+        },
+        {
+          "id": "husdc-allowance",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "kind": "allowance",
+          "envelope": {
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+            "value": "0x0",
+            "gas": "0x493e0"
+          },
+          "before": {
+            "status": "validated_known_path",
+            "amountRaw": "0",
+            "gasUsed": "29725"
+          },
+          "after": {
+            "status": "validated_known_path",
+            "amountRaw": "0",
+            "gasUsed": "29725"
+          },
+          "deltaRaw": "0",
+          "beforeDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x702b7ad07202fb1",
+              "nonce": 78161
+            },
+            "senderAfter": {
+              "nonce": 78162
+            }
+          },
+          "afterDiff": {
+            "status": "matches_candidate_sender_nonce_only_unpriced_profile",
+            "checks": {
+              "onlySenderChanged": true,
+              "onlyNonceAndBalanceFields": true,
+              "noStorageOrCode": true,
+              "expectedStartNonce": true,
+              "incrementsExactlyOnce": true,
+              "expectedStartBalance": true,
+              "noNativeDebit": true
+            },
+            "changedAccounts": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "senderBefore": {
+              "balance": "0x702b7ad07202fb1",
+              "nonce": 78162
+            },
+            "senderAfter": {
+              "nonce": 78163
+            }
+          }
+        }
+      ],
+      "sender": {
+        "address": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "nonce": "0x13151",
+        "nativeBalance": "0x702b7ad07202fb1",
+        "code": "0x"
+      },
+      "originalValidation": "successful_known_envelope_no_lifecycle_valid_diff",
+      "originalOverrides": {
+        "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b": {
+          "stateDiff": {
+            "0x137b6bf81cf5e4c5ae540a76691cd4329310b754eff67992fe010855aee42100": "0x00000000002ae37c3ee67ff3b29f5d2f0000000003713fa469febec5c9432835",
+            "0x137b6bf81cf5e4c5ae540a76691cd4329310b754eff67992fe010855aee42101": "0x0000000000347f721031800f1a961a56000000000389ab303118a4a669b7e300",
+            "0x137b6bf81cf5e4c5ae540a76691cd4329310b754eff67992fe010855aee42102": "0x000000000000000000000e006adb73e100000000000000000000000000000cf2",
+            "0x137b6bf81cf5e4c5ae540a76691cd4329310b754eff67992fe010855aee42107": "0x00000000000000000000046a732a1a8c0000000000000000000000001b1a919a"
+          }
+        },
+        "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+          "nonce": "0x13152"
+        },
+        "0xb88339cb7199b77e23db6e890353e22632ba630f": {
+          "stateDiff": {
+            "0x21a9ed7426191a62f3472170ab3797f6e0760d62201eb5219a953b77b6ae85be": "0x0000000000000000000000000000000000000000000000000000000053bd4747",
+            "0xa2839be30d10bf09fb026bc8f7fb1c5e6ead784096a50501683c136f34d051fd": "0x0000000000000000000000000000000000000000000000000000046a732a1a8c"
+          }
+        },
+        "0xd612513cb3b2c52abcd6d4b338374c09ada4657d": {
+          "stateDiff": {
+            "0x000000000000000000000000000000000000000000000000000000000000003a": "0x000000000000000000000000000000000000000000000000000027adaad151ba",
+            "0x794a2a694e0c14f313166605d8352dd197a29a5ff37aea497f3f0dd07729e4f8": "0x000000000389ab303118a4a669b7e3000000000000000000000000002d7b848a"
+          }
+        }
+      },
+      "originalOverridesSha256": "8cc063e19e585128cd4e924d3ed9d43a5051d104c16c82fc488700e342bf517e",
+      "headerWitness": {
+        "before": {
+          "status": "observed",
+          "values": {
+            "number": "49318777",
+            "timestamp": "1792766945",
+            "gasLimit": "3000000",
+            "baseFee": "0",
+            "prevRandao": "0",
+            "coinbase": "0",
+            "chainId": "999",
+            "parentHash": "44915118171540624725347575155589596311692803728661213089121739136713699513561"
+          },
+          "headerValues": {
+            "number": "49318777",
+            "timestamp": "1792766945",
+            "gasLimit": "3000000",
+            "baseFee": "100000000",
+            "prevRandao": "0",
+            "coinbase": "0",
+            "chainId": "999",
+            "parentHash": "44915118171540624725347575155589596311692803728661213089121739136713699513561"
+          },
+          "differences": [
+            "baseFee"
+          ]
+        },
+        "after": {
+          "status": "observed",
+          "values": {
+            "number": "49318777",
+            "timestamp": "1792766945",
+            "gasLimit": "3000000",
+            "baseFee": "0",
+            "prevRandao": "0",
+            "coinbase": "0",
+            "chainId": "999",
+            "parentHash": "44915118171540624725347575155589596311692803728661213089121739136713699513561"
+          },
+          "headerValues": {
+            "number": "49318777",
+            "timestamp": "1792766945",
+            "gasLimit": "3000000",
+            "baseFee": "100000000",
+            "prevRandao": "0",
+            "coinbase": "0",
+            "chainId": "999",
+            "parentHash": "44915118171540624725347575155589596311692803728661213089121739136713699513561"
+          },
+          "differences": [
+            "baseFee"
+          ]
+        }
+      },
+      "anchor": {
+        "transactionHash": "0x68b068b67a38dfbc6fb34b7a5beeef7207bd268c5019ef120b1b675cd2716068",
+        "sender": "0xb596893b979f377b1e197beb27d840fbb627bdc8",
+        "transactionNonce": "0x27c",
+        "directEndNonce": "0x27d",
+        "directParentNonce": "0x27c",
+        "tracedPreNonce": "637",
+        "queryPath": {
+          "status": "validated_known_path",
+          "amountRaw": "569439069",
+          "gasUsed": "31182"
+        },
+        "classification": "traced_state_matches_end_and_differs_from_parent"
+      },
+      "directUSDC": {
+        "before": "0x0000000000000000000000000000000000000000000000000000000021f0f35d",
+        "after": "0x0000000000000000000000000000000000000000000000000000000053bd4747",
+        "beforeMatchesTrace": true,
+        "afterMatchesTrace": true
+      },
+      "canonical": "confirmed",
+      "status": "captured_current_capability_observations"
+    }
+  ],
+  "limits": [
+    "Both providers may share underlying node/client behavior; this is not an independent execution oracle.",
+    "No fresh runtime-code hashes for token/Pool dependencies, malicious-override controls, signature validation, paid infrastructure, signing or broadcasts.",
+    "Header witnesses may expose a synthetic BASEFEE. No unchanged-header label is assumed.",
+    "Anchors classify only the observed sender nonce under the exact tested wrapper; they do not prove every storage account or arbitrary state transition.",
+    "Recorded cases are development controls, not prospective or representative accuracy evidence."
+  ]
+}

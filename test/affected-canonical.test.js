@@ -9,12 +9,15 @@ import { USDC, HUSDC } from '../src/config.js';
 
 // Fault controls over a retained observed run. Mutated replies exist only in
 // memory and are never presented or persisted as actual provider observations.
-const bytes = await readFile(new URL('../reports/affected-balance-comparisons/capture.json', import.meta.url));
+const bytes = await readFile(new URL('../reports/replay-state-comparisons/capture.json', import.meta.url));
 const capture = JSON.parse(bytes);
 const digest = value => createHash('sha256').update(value).digest('hex');
-const CAPTURE_SHA256 = '53eec210304f3f3ff749bc4a4cdbd4fe55f57e87a2cd0b94983574bd0942de34';
+const CAPTURE_SHA256 = '51d7cb6ba049b1cd38da52ba2131b4bc328ac264419c240f132c3b570f8ed610';
 assert.equal(digest(bytes), CAPTURE_SHA256, 'The observed reference capture must remain immutable');
 assert.equal(capture.status, 'complete');
+const previousBytes = await readFile(new URL('../reports/affected-balance-comparisons/capture.json', import.meta.url));
+assert.equal(digest(previousBytes), '53eec210304f3f3ff749bc4a4cdbd4fe55f57e87a2cd0b94983574bd0942de34', 'The original capture is preserved');
+const previous = JSON.parse(previousBytes);
 
 function observedRun(operation) {
   const item = capture.cases.find(item => item.id === `hyperlend-usdc-${operation}`);
@@ -22,8 +25,19 @@ function observedRun(operation) {
   assert.ok(run, `The declared dRPC ${operation} run is required; no provider substitution`);
   assert.equal(run.http.response.status, 200);
   for (const field of ['balanceChanges', 'allowanceChanges', 'affectedBalanceChanges']) assert.equal(run.response[field].status, 'measured', `Observed ${operation}/${field} must be measured before fault injection`);
+  const old = previous.cases.find(item => item.id === `hyperlend-usdc-${operation}`).runs.find(run => run.provider === 'drpc');
+  for (const field of ['balanceChanges', 'allowanceChanges', 'affectedBalanceChanges']) {
+    const unchanged = structuredClone(run.response[field]);
+    assert.equal(unchanged.executionIdentity.validation.originalReplayState, 'complete_pre_post_diff_match');
+    delete unchanged.executionIdentity.validation.originalReplayState;
+    assert.deepEqual(unchanged, old.response[field], `${field} amounts and semantics remain unchanged from the original observed run`);
+  }
   assert.ok(run.response.affectedBalanceChanges.reusedPairs.length > 0, 'The third consumer must reuse established state');
-  assert.ok(run.rpcCalls.every(record => !record.error && record.response && !record.response.error), 'No failed observation can serve as a successful baseline');
+  for (const record of run.rpcCalls) {
+    assert.equal(record.error, undefined); assert.ok(record.response); assert.equal(Object.hasOwn(record.response, 'error'), false);
+    assert.equal(digest(record.responseText), record.responseSha256);
+    assert.deepEqual(JSON.parse(record.responseText), record.response);
+  }
   return run;
 }
 

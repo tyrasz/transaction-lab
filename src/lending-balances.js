@@ -35,7 +35,7 @@ export async function measureLendingBalances({ request, block, rpc, metadata = {
   const warnings = [
     historical
       ? 'Balances are queried independently immediately before and after the original transaction, at its exact position in the original block. The original call is validated separately; no balance probes are inserted into that replay.'
-      : 'Balances are measured before and after an ephemeral state diff at the same pinned block hash and timestamp.',
+      : 'Balances are measured before and after an ephemeral state diff at one pinned block. The provider simulation omits gas-price fields; its execution header is not verified to match the original block.',
     'USDC cash, hUSDC supplied positions and non-transferable USDC debt are reported separately. Reserve custody balances are not user wealth.',
     'This measurement covers only the involved accounts and these three configured tokens; it does not assess transaction security or predict future blocks.',
   ];

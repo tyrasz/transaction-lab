@@ -5,10 +5,11 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { EvaluationBudget, boundedLimits } from '../src/evaluation-budget.js';
-import { compareTraces, compareTransactionEnvelopes, compareOriginalReplay, independentInventory, validateHistoricalEvidence } from '../src/evaluation-comparator.js';
+import { compareTraces, compareTransactionEnvelopes, compareOriginalReplay, compareStateDiffs, strictStateDiffProjection, independentInventory, validateHistoricalEvidence, COMPARISON_RULES } from '../src/evaluation-comparator.js';
 import { runCoverageEvaluation, selectProspectiveCohort, coverageMetrics, validateProductProvenance, compareObservedPairs } from '../src/evaluate-coverage.js';
 
-// All fixtures in this file are hand-constructed controls, not chain observations.
+// Fixtures are hand-constructed controls except the explicitly pinned public
+// position-diagnostic regression below. Modified packets remain negative controls.
 const A = '0x' + '11'.repeat(20), B = '0x' + '22'.repeat(20), TOKEN = '0xb88339cb7199b77e23db6e890353e22632ba630f';
 const hash = n => '0x' + BigInt(n).toString(16).padStart(64, '0');
 const topicAddress = a => '0x' + a.slice(2).padStart(64, '0');
@@ -147,11 +148,18 @@ test('candidate inventory includes unknown tokens and owner distinct from submit
   fixture.trace.calls[0].error = 'reverted'; assert.equal(independentInventory(fixture).allowances.length, 0);
 });
 
-function replayEvidence(transaction, row, trace) {
+const stateDiffFixture = () => ({ pre: { [A]: { balance: '100000', nonce: 3 }, [B]: { balance: '1000' } }, post: { [A]: { balance: '79000', nonce: 4 }, [B]: { balance: '22000' } } });
+function replayEvidence(transaction, row, trace, diff = stateDiffFixture()) {
   const call = { from: transaction.from, to: transaction.to, data: transaction.input, value: transaction.value, gas: transaction.gas, gasPrice: transaction.gasPrice, nonce: transaction.nonce };
-  return { request: [{ id: 8, method: 'debug_traceCallMany', params: [[{ transactions: [call] }], { blockNumber: { blockHash: row.blockHash, requireCanonical: true }, transactionIndex: 0 }, { tracer: 'callTracer', timeout: '15s', tracerConfig: { withLog: true } }] }], response: [{ id: 8, method: 'debug_traceCallMany', result: [[trace]] }] };
+  const context = { blockNumber: { blockHash: row.blockHash, requireCanonical: true }, transactionIndex: Number(row.transactionIndex) };
+  const diffTracer = { tracer: 'prestateTracer', timeout: '15s', tracerConfig: { diffMode: true } };
+  return { request: [
+    { id: 8, method: 'debug_traceCallMany', params: [[{ transactions: [call] }], context, { tracer: 'callTracer', timeout: '15s', tracerConfig: { withLog: true } }] },
+    { id: 9, method: 'debug_traceTransaction', params: [transaction.hash, structuredClone(diffTracer)] },
+    { id: 10, method: 'debug_traceCallMany', params: [[{ transactions: [structuredClone(call)] }], structuredClone(context), structuredClone(diffTracer)] },
+  ], response: [{ id: 8, method: 'debug_traceCallMany', result: [[trace]] }, { id: 9, method: 'debug_traceTransaction', result: structuredClone(diff) }, { id: 10, method: 'debug_traceCallMany', result: [[structuredClone(diff)]] }] };
 }
-const executionIdentity = row => ({ transactionHash: row.transactionHash, transactionIndex: row.transactionIndex, postTransactionIndex: String(BigInt(row.transactionIndex) + 1n), stateBlockHash: row.blockHash, blockNumber: row.blockNumber, timestamp: row.timestamp, method: 'debug_traceCallMany', stateBinding: 'block_hash_and_transaction_index', headerContext: 'original_block', validation: { originalReplay: 'semantic_trace_and_receipt_match', feeRepresentation: 'original_effective_gas_price', headerFields: ['number', 'timestamp', 'gasLimit', 'baseFee', 'prevRandao', 'coinbase', 'chainId', 'parentHash'] } });
+const executionIdentity = row => ({ transactionHash: row.transactionHash, transactionIndex: row.transactionIndex, postTransactionIndex: String(BigInt(row.transactionIndex) + 1n), stateBlockHash: row.blockHash, blockNumber: row.blockNumber, timestamp: row.timestamp, method: 'debug_traceCallMany', stateBinding: 'block_hash_and_transaction_index', headerContext: 'original_block', validation: { originalReplay: 'semantic_trace_and_receipt_match', originalReplayState: 'complete_pre_post_diff_match', feeRepresentation: 'original_effective_gas_price', headerFields: ['number', 'timestamp', 'gasLimit', 'baseFee', 'prevRandao', 'coinbase', 'chainId', 'parentHash'] } });
 test('exact replay requires original-position evidence and full legacy envelope; typed fee substitution remains incomplete', () => {
   const { transaction, row, trace } = evidenceFixture(), evidence = replayEvidence(transaction, row, trace);
   const identity = executionIdentity(row);
@@ -160,6 +168,145 @@ test('exact replay requires original-position evidence and full legacy envelope;
   assert.equal(compareOriginalReplay({ ...args, oracleEvidence: null }).status, 'incomplete');
   assert.equal(compareOriginalReplay({ ...args, transaction: { ...transaction, type: '0x2', maxFeePerGas: '0x2', maxPriorityFeePerGas: '0x1' } }).status, 'incomplete');
   args.oracleEvidence.response[0].result[0][0].gas = '0x1'; assert.equal(compareOriginalReplay(args).status, 'mismatched');
+});
+
+function originalReplayFixture(diff) {
+  const { transaction, row, trace } = evidenceFixture(), evidence = replayEvidence(transaction, row, trace, diff);
+  return { transaction, row, originalTrace: trace, productEvidence: evidence, oracleEvidence: structuredClone(evidence), productIdentity: executionIdentity(row), oracleIdentity: executionIdentity(row) };
+}
+test('exact replay independently requires both original and replay diffs, plus the completed state-validation identity', () => {
+  assert.equal(COMPARISON_RULES.version, 'prospective-2');
+  for (const side of ['productEvidence', 'oracleEvidence']) for (const id of [9, 10]) {
+    const args = originalReplayFixture();
+    args[side].request = args[side].request.filter(record => record.id !== id);
+    args[side].response = args[side].response.filter(record => record.id !== id);
+    assert.equal(compareOriginalReplay(args).status, 'incomplete', side + ':' + id);
+  }
+  for (const side of ['productIdentity', 'oracleIdentity']) {
+    const args = originalReplayFixture(); delete args[side].validation.originalReplayState;
+    assert.equal(compareOriginalReplay(args).status, 'incomplete');
+  }
+  const args = originalReplayFixture(), snapshot = structuredClone(args);
+  const result = compareOriginalReplay(args);
+  assert.equal(result.status, 'matched');
+  assert.deepEqual(Object.values(result.comparisons.state).map(item => item.status), ['matched', 'matched', 'matched', 'matched']);
+  assert.deepEqual(args, snapshot, 'comparison must not mutate raw evidence');
+});
+
+test('replay state requests bind the original hash and exact trace envelope/context, without ambiguity or overrides', () => {
+  const mutations = [
+    e => { e.request[1].params[0] = hash(999); },
+    e => { e.request[1].params[1].stateOverrides = {}; },
+    e => { e.request[2].params[0][0].transactions[0].gas = '0x1'; },
+    e => { e.request[2].params[0][0].transactions[0].nonce = '0x4'; },
+    e => { e.request[2].params[1].transactionIndex = 1; },
+    e => { e.request[2].params[1].blockNumber.blockHash = hash(999); },
+    e => { e.request[2].params[2].stateOverrides = {}; },
+    e => { e.request[2].params[0][0].blockOverride = { time: '0x1' }; },
+    e => { e.request[2].params[2].tracerConfig.diffMode = false; },
+    e => { e.response[2].result = [e.response[2].result[0], e.response[2].result[0]]; },
+    e => { e.response[2].error = null; },
+    e => { e.response[2].method = 'debug_traceTransaction'; },
+    e => { e.request.push(structuredClone(e.request[1])); },
+    e => { e.response.push(structuredClone(e.response[2])); },
+    e => { e.request.push({ ...structuredClone(e.request[1]), id: 11 }); e.response.push({ ...structuredClone(e.response[1]), id: 11 }); },
+    e => { e.request.push({ ...structuredClone(e.request[2]), id: 11 }); e.response.push({ ...structuredClone(e.response[2]), id: 11 }); },
+  ];
+  for (const [index, mutate] of mutations.entries()) {
+    const args = originalReplayFixture(); mutate(args.oracleEvidence);
+    assert.equal(compareOriginalReplay(args).status, 'incomplete', 'mutation ' + index);
+  }
+  const args = originalReplayFixture(); args.transaction.transactionIndex = '0x1';
+  assert.equal(compareOriginalReplay(args).status, 'mismatched');
+});
+
+test('state comparison preserves absolute native balances, missing fields and every storage slot', () => {
+  const diff = stateDiffFixture(), encoded = structuredClone(diff);
+  encoded.pre[A].balance = '0x186a0'; encoded.pre[A].nonce = '0x3';
+  assert.equal(compareStateDiffs(diff, encoded).status, 'matched');
+  const shifted = structuredClone(diff);
+  shifted.pre[B].balance = '2000'; shifted.post[B].balance = '23000';
+  assert.equal(BigInt(shifted.post[B].balance) - BigInt(shifted.pre[B].balance), BigInt(diff.post[B].balance) - BigInt(diff.pre[B].balance));
+  assert.equal(compareStateDiffs(diff, shifted).status, 'mismatched', 'equal deltas do not establish the original position');
+  const args = originalReplayFixture(); args.oracleEvidence.response[2].result = [[shifted]];
+  assert.equal(compareOriginalReplay(args).status, 'mismatched');
+  args.oracleEvidence.response[1].result = structuredClone(shifted);
+  assert.equal(compareOriginalReplay(args).status, 'mismatched', 'two internally matching providers must still agree on absolute state');
+  for (const extra of [{ balance: '0' }, { storage: {} }, { code: '0x' }]) {
+    const empty = { pre: { [A]: {} }, post: { [A]: {} } }, explicit = structuredClone(empty);
+    Object.assign(explicit.post[A], extra);
+    assert.equal(compareStateDiffs(empty, explicit).status, 'mismatched');
+  }
+  const stored = stateDiffFixture(); stored.pre[B].storage = { [hash(1)]: hash(25) }; stored.post[B].storage = {};
+  const omitted = structuredClone(stored); delete omitted.pre[B].storage[hash(1)];
+  assert.equal(compareStateDiffs(stored, omitted).status, 'mismatched', 'pre-only cleared slots remain evidence');
+});
+
+test('equal malformed state maps and normalized-key collisions never become exact replay proof', () => {
+  const malformed = [null, {}, { pre: {}, post: {}, extra: true }, { pre: [], post: {} },
+    { pre: { bad: {} }, post: {} }, { pre: { [A]: { balance: '-1' } }, post: {} },
+    { pre: { [A]: { balance: (1n << 256n).toString() } }, post: {} }, { pre: { [A]: { nonce: (1n << 64n).toString() } }, post: {} },
+    { pre: { [A]: { nonce: Number.MAX_SAFE_INTEGER + 1 } }, post: {} }, { pre: { [A]: { balance: '0'.repeat(81) } }, post: {} },
+    { pre: { [A]: { code: '0x0' } }, post: {} }, { pre: { [A]: { storage: [] } }, post: {} },
+    { pre: { [A]: { storage: { '0x1': hash(1) } } }, post: {} }, { pre: { [A]: { storage: { [hash(1)]: [hash(1)] } } }, post: {} },
+    { pre: { [A]: { unexpected: 0 } }, post: {} },
+    { pre: { [TOKEN]: {}, [TOKEN.toUpperCase()]: {} }, post: {} },
+    { pre: { [A]: { storage: { ['0x' + 'ab'.repeat(32)]: hash(1), ['0x' + 'AB'.repeat(32)]: hash(1) } } }, post: {} },
+  ];
+  for (const [index, diff] of malformed.entries()) {
+    assert.equal(compareStateDiffs(diff, diff).status, 'incomplete', 'schema control ' + index);
+    assert.equal(compareOriginalReplay(originalReplayFixture(diff)).status, 'incomplete', 'exact proof control ' + index);
+  }
+  let invoked = false; const diff = stateDiffFixture();
+  Object.defineProperty(diff.pre[A], 'balance', { enumerable: true, get() { invoked = true; return '100000'; } });
+  assert.equal(compareStateDiffs(diff, diff).status, 'incomplete'); assert.equal(invoked, false);
+  const inherited = stateDiffFixture(); inherited.pre[A] = Object.create({ nonce: 3 });
+  assert.equal(compareStateDiffs(inherited, inherited).status, 'incomplete');
+});
+
+test('state evidence bounds cover the union and identical empty evidence cannot replace original sender nonce proof', () => {
+  const addressAt = n => '0x' + BigInt(n).toString(16).padStart(40, '0');
+  const tooManyAccounts = { pre: Object.fromEntries(Array.from({ length: 100 }, (_, i) => [addressAt(i + 1), {}])), post: { [addressAt(101)]: {} } };
+  const tooManySlots = { pre: { [A]: { storage: Object.fromEntries(Array.from({ length: 2000 }, (_, i) => [hash(i), hash(0)])) } }, post: { [B]: { storage: { [hash(0)]: hash(0) } } } };
+  const tooMuchCode = { pre: { [A]: { code: '0x' + '00'.repeat(4 * 1024 * 1024) } }, post: {} };
+  for (const diff of [tooManyAccounts, tooManySlots, tooMuchCode]) assert.equal(compareStateDiffs(diff, diff).status, 'incomplete');
+  for (const diff of [{ pre: {}, post: {} }, { pre: { [A]: { balance: '1' } }, post: { [A]: { balance: '0' } } }, { pre: { [A]: { nonce: 3 } }, post: { [A]: {} } }]) {
+    assert.equal(compareStateDiffs(diff, diff).status, 'matched', 'generic schema can represent empty maps');
+    assert.equal(compareOriginalReplay(originalReplayFixture(diff)).status, 'incomplete', 'transaction proof requires its nonce transition');
+  }
+  for (const diff of [{ pre: { [A]: { nonce: 2 } }, post: { [A]: { nonce: 3 } } }, { pre: { [A]: { nonce: 3 } }, post: { [A]: { nonce: 5 } } }]) assert.equal(compareOriginalReplay(originalReplayFixture(diff)).status, 'mismatched');
+});
+
+test('recorded trace-equal wrong positions differ in absolute fee-recipient state; typed positives remain incomplete', async () => {
+  const raw = await readFile(new URL('../reports/system-position-diagnostic/capture.json', import.meta.url));
+  assert.equal(createHash('sha256').update(raw).digest('hex'), 'be9af34792cb17c38d75cdef077d88185b531890ed3e46c4547e834b1b52002b');
+  const capture = JSON.parse(raw), zero = '0x' + '0'.repeat(40);
+  let traceOnlyFalseMatches = 0, correctlyPositioned = 0;
+  for (const provider of capture.providers) for (const item of provider.cases) {
+    const transaction = item.transaction.result, correct = item.replays.find(replay => replay.position === Number(BigInt(transaction.transactionIndex)));
+    const row = { transactionHash: transaction.hash, blockHash: transaction.blockHash, blockNumber: String(BigInt(transaction.blockNumber)), transactionIndex: String(BigInt(transaction.transactionIndex)), timestamp: String(BigInt(provider.block.result.timestamp)) };
+    const records = [correct.trace.rpcId, item.originalDiff.rpcId, correct.diff.rpcId].map(id => capture.records.find(record => record.request.id === id));
+    for (const record of records) assert.equal(createHash('sha256').update(record.responseRaw).digest('hex'), record.responseSha256);
+    const evidence = { request: records.map(record => structuredClone(record.request)), response: records.map(record => ({ id: record.request.id, method: record.request.method, result: structuredClone(record.response.result) })) };
+    const args = { transaction, row, originalTrace: item.originalTrace.result, productEvidence: evidence, oracleEvidence: structuredClone(evidence), productIdentity: executionIdentity(row), oracleIdentity: executionIdentity(row) };
+    const result = compareOriginalReplay(args);
+    assert.equal(result.status, 'incomplete'); assert.match(result.reason, /typed transaction envelope/);
+    assert.ok(Object.values(result.comparisons.state).every(comparison => comparison.status === 'matched')); correctlyPositioned++;
+    if (![1, 2].includes(item.ordinaryIndex)) continue;
+    const wrong = item.replays.find(replay => replay.position === item.ordinaryIndex), originalDiff = item.originalDiff.result, wrongDiff = wrong.diff.result[0][0];
+    assert.equal(compareTraces(item.originalTrace.result, wrong.trace.result[0][0]).status, 'matched');
+    assert.equal(compareStateDiffs(originalDiff, wrongDiff).status, 'mismatched');
+    assert.equal(BigInt(originalDiff.post[zero].balance) - BigInt(originalDiff.pre[zero].balance), BigInt(wrongDiff.post[zero].balance) - BigInt(wrongDiff.pre[zero].balance));
+    const withoutFeeRecipient = diff => { const copy = strictStateDiffProjection(diff); delete copy.pre[zero]; delete copy.post[zero]; return copy; };
+    assert.deepEqual(withoutFeeRecipient(originalDiff), withoutFeeRecipient(wrongDiff));
+    // Deliberately mispair an observed wrong-position result with the correct
+    // request as an adversarial fixture; this is not an additional chain result.
+    args.oracleEvidence.response.find(record => record.id === correct.diff.rpcId).result = structuredClone(wrong.diff.result);
+    const negative = compareOriginalReplay(args);
+    assert.equal(negative.status, 'mismatched'); assert.equal(negative.comparisons.state.oracleVsOriginal.status, 'mismatched');
+    traceOnlyFalseMatches++;
+  }
+  assert.equal(correctlyPositioned, 10); assert.equal(traceOnlyFalseMatches, 4);
 });
 
 function cohortMock({ empty = false, mismatch = false, parentMismatch = false, prestateFails = false, beforeComparator, transfers = false } = {}) {

@@ -1,0 +1,37 @@
+{
+  "commit": "27c60a4bc380118f67328a878b1e425b6c335908",
+  "purpose": "Frozen dependency closure; imported query-validator and buildStateOverrides are pure. No live core imports or RpcClient calls are used.",
+  "entries": [
+    {
+      "file": "state.js",
+      "source": "27c60a4bc380118f67328a878b1e425b6c335908:src/state.js",
+      "sha256": "f5f9d4e600a8be3a99cfdab986ed6d2cc2586adaada90687b89a141eb44c79d8",
+      "bytes": 11101
+    },
+    {
+      "file": "rpc.js",
+      "source": "27c60a4bc380118f67328a878b1e425b6c335908:src/rpc.js",
+      "sha256": "740aef93d804933e39a524c4de7a4e94614f5a05142e0d502bfd5d552ef02ce8",
+      "bytes": 6949
+    },
+    {
+      "file": "config.js",
+      "source": "27c60a4bc380118f67328a878b1e425b6c335908:src/config.js",
+      "sha256": "a6f1d8cc27855fad888d2e10837173ed4a2c892fabd33a34d55205b52969a910",
+      "bytes": 10303
+    },
+    {
+      "file": "historical-state.js",
+      "source": "27c60a4bc380118f67328a878b1e425b6c335908:src/historical-state.js",
+      "sha256": "69cff29fee77173ce278fa986c2469f38d3c8e0c57d4cbc165dfe447e8429f98",
+      "bytes": 26854
+    },
+    {
+      "file": "query-validator.js",
+      "derivedFrom": "historical-state.js",
+      "transformation": "Copy source prefix before function validateReadDiff, append exports of semanticTrace, validateQuery and hasContractLifecycle; no acceptance-rule changes.",
+      "sha256": "3977d9fc2a42d93838e037c2e12bb15563e1792dea76dfc5236d1d1df0cca8dc",
+      "bytes": 9752
+    }
+  ]
+}

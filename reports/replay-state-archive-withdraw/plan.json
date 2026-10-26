@@ -1,0 +1,67 @@
+{
+  "schemaVersion": "1.0",
+  "createdAt": "2026-10-26T06:28:02.753Z",
+  "purpose": "Separate one-shot archive-provider withdrawal HTTP regression control at the frozen0.7.1 implementation. Additional provider coverage, not a retry/replacement of the immutable14-run packet or any earlier failed capture.",
+  "coreBinding": "frozen-core.json must bind the exact root-authorized source fingerprint and version after core freeze; no RPC may run before root explicitly confirms freeze.",
+  "scriptSha256": "8aa36fa4f7900d2b0959e715d1060199e4a7b72fc001d509675c15bbb152530c",
+  "providers": {
+    "hyperlend-archive": "https://rpc.hyperlend.finance/archive"
+  },
+  "budgets": {
+    "plannedHttpRequests": 1,
+    "maxRpcCalls": 80,
+    "maxRpcCallsPerRun": 80,
+    "maxResponseBytes": 8388608,
+    "maxTotalResponseBytes": 33554432,
+    "rpcTimeoutMs": 25000,
+    "maxHttpRunMs": 120000,
+    "maxRunSequenceMs": 120000,
+    "retries": 0
+  },
+  "expectedRpcCallsIfPriorOutcomesPersist": 39,
+  "sources": [
+    {
+      "path": "reports/system-position-diagnostic/INTEGRATION.md",
+      "sha256": "f51c202cbac90e64864cb2c9d2a89fa6e7f088dfaa64ab96f3daa281e497f80c"
+    },
+    {
+      "path": "reports/affected-balance-comparisons/capture.json",
+      "sha256": "53eec210304f3f3ff749bc4a4cdbd4fe55f57e87a2cd0b94983574bd0942de34"
+    },
+    {
+      "path": "reports/permission-comparisons/2026-10-25T15-36-55-519Z-http.json",
+      "sha256": "f11c0013cb315876ac9c4fde65d2fd94af246bdbb1fc714a3a196178a2c0d377"
+    },
+    {
+      "path": "reports/replay-state-comparisons/capture.mjs",
+      "sha256": "0a9c9705af4dc1fb6b30a9452573aac922df7be83d867da2d61d230199a44c07"
+    },
+    {
+      "path": "reports/replay-state-comparisons/capture.json",
+      "sha256": "51d7cb6ba049b1cd38da52ba2131b4bc328ac264419c240f132c3b570f8ed610"
+    }
+  ],
+  "cases": [
+    {
+      "id": "hyperlend-usdc-withdraw",
+      "operation": "withdraw",
+      "transactionHash": "0x94b5c4672e28cbeeab547c06f60e30afa02ac58b0cad4c7568a6ca9d8ac29ae7",
+      "providers": [
+        "hyperlend-archive"
+      ],
+      "expectedRpcCallsPerProvider": 39,
+      "source": "reports/affected-balance-comparisons/capture.json"
+    }
+  ],
+  "rules": [
+    "No live RPC before explicit root freeze authorization; local --check and --bind perform no network requests.",
+    "Each case/provider is attempted at most once. Retain all API failures, unavailable measurements, transport failures and budget skips. No substitutions, fallback, retries or provider switching.",
+    "Count all RPC response bytes and local HTTP response bytes against the aggregate limit, including a cap-crossing final chunk. Discard oversized content; retain bounded hash and fixed failure metadata.",
+    "Use actual product HTTP POST /api/replay via an ephemeral loopback server with recording RPC injection. No shared port5174 dependency.",
+    "Every successful RPC retains exact response text/hash and exact JSON request. RPC error envelope bodies are withheld; valid contract-controlled trace errors remain evidence.",
+    "Verify frozen source bytes before each attempt and after completion, and compare implementation identity in every HTTP200 response.",
+    "Existing original dRPC approval/index failure, archive withdrawal failure, direct-B inconsistency, prospective pilot, and independent seven-pair oracle are immutable; do not manufacture new responses for old call sequences.",
+    "These previously inspected development cases are not a held-out accuracy evaluation or security score."
+  ],
+  "authorization": "Root explicitly authorized one separate archive withdrawal run after the original14-run packet completed, at the same frozen source/version, maximum80RPC/8MiBresponse/32MiBtotal/120s, no retries/fallback."
+}

@@ -26,7 +26,7 @@ export async function measureBalances({ request, block, rpc, metadata = {}, anal
   const warnings = [
     historical
       ? 'Configured USDC and hUSDC balances are queried independently immediately before and after the original transaction, at its exact position in the original block. The original call is validated separately; no balance probes are inserted into that replay.'
-      : 'Balances are measured by calling the configured USDC and hUSDC contracts before and after an ephemeral state diff at the same block hash and timestamp.',
+      : 'Balances are measured by calling the configured USDC and hUSDC contracts before and after an ephemeral state diff at one pinned block. The provider simulation omits gas-price fields; its execution header is not verified to match the original block.',
     'This measurement covers the submitting account and deposit beneficiary for these two tokens. It does not assess transaction security or predict future blocks.',
   ];
   const base = { status: 'not_applicable', basis: historical ? 'historical_transaction_position_balanceOf' : 'prestate_diff_balanceOf', assets: [], warnings, evidence: { request: [], response: [] } };

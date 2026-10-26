@@ -52,7 +52,7 @@ export async function measureAllowances({ request, trace, block, rpc, metadata =
   const warnings = [
     historical
       ? 'Allowances are queried independently immediately before and after the original transaction at its exact position in the original block. They are not inferred from individual Approval events or permit requests.'
-      : 'Allowances are queried before and after the entire simulated transaction at one pinned block hash. They are not inferred from individual Approval events.',
+      : 'Allowances are queried before and after the entire simulated transaction at one pinned block hash. They are not inferred from individual Approval events. The provider simulation omits gas-price fields; its execution header is not verified to match the original block.',
     'Maximum allowance describes spending permission, not spender trustworthiness. No transaction security verdict is provided.',
   ];
   try {

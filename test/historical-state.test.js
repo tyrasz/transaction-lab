@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { isDeepStrictEqual } from 'node:util';
 import { createHistoricalStateContext } from '../src/historical-state.js';
 import { StateValidationError } from '../src/state.js';
 import { USDC, HUSDC, VUSDC } from '../src/config.js';
@@ -14,6 +16,96 @@ const originals = new Map();
 for (const operation of ['withdraw', 'borrow', 'repay']) originals.set(operation, JSON.parse(await readFile(new URL(`../reports/lending-discovery/${operation}-evidence.json`, import.meta.url))));
 const query = (token, account) => ({ to: token, data: '0x70a08231' + account.slice(2).padStart(64, '0') });
 
+const refreshedBytes = await readFile(new URL('../reports/replay-state-comparisons/capture.json', import.meta.url));
+assert.equal(createHash('sha256').update(refreshedBytes).digest('hex'), '51d7cb6ba049b1cd38da52ba2131b4bc328ac264419c240f132c3b570f8ed610');
+const refreshedCaptures = [JSON.parse(refreshedBytes)];
+const archiveWithdrawalBytes = await readFile(new URL('../reports/replay-state-archive-withdraw/capture.json', import.meta.url));
+assert.equal(createHash('sha256').update(archiveWithdrawalBytes).digest('hex'), '19e405356e7d9ba2eca23968cc33b9ff68bdfc8dbb27d2090b03c1c9c2d59a74');
+refreshedCaptures.push(JSON.parse(archiveWithdrawalBytes));
+function refreshedRun(caseId, endpoint) {
+  const provider = endpoint.includes('drpc') ? 'drpc' : 'hyperlend-archive';
+  const run = refreshedCaptures.flatMap(capture => capture.cases).filter(item => item.id === caseId).flatMap(item => item.runs).find(run => run.provider === provider);
+  assert.ok(run, 'A genuine fresh provider capture is required; old responses cannot fill the new replay-diff request');
+  return run;
+}
+
+// Unit consumers read fewer pairs than the full HTTP request. Select only exact
+// recorded context calls, preserving every actual result; never invent a missing
+// reply or claim that this subset was a new full HTTP/provider run.
+function capturedContextSubset(run, supplementalSupply = null) {
+  assert.equal(run.http.response.status, 200);
+  assert.deepEqual(JSON.parse(run.http.response.bodyText), run.response);
+  assert.equal(createHash('sha256').update(run.http.response.bodyText).digest('hex'), run.http.response.bodySha256);
+  const evidence = Object.entries(run.response.evidence).filter(([name, value]) => name.endsWith('Measurement') && value?.request?.length).map(([, value]) => value).sort((a, b) => b.request.length - a.request.length)[0];
+  assert.ok(evidence);
+  const offset = run.rpcCalls.length - evidence.request.length;
+  const entries = evidence.request.map((request, index) => {
+    const raw = run.rpcCalls[offset + index], response = evidence.response.find(response => response.id === request.id);
+    assert.deepEqual({ method: raw.request.method, params: raw.request.params }, { method: request.method, params: request.params });
+    assert.equal(createHash('sha256').update(raw.responseText).digest('hex'), raw.responseSha256);
+    assert.deepEqual(JSON.parse(raw.responseText), raw.response);
+    assert.equal(raw.response.error, undefined); assert.equal(response.error, undefined);
+    assert.deepEqual(raw.response.result, response.result);
+    return { request, response, source: 'fresh_http' };
+  });
+  if (supplementalSupply) {
+    // The API correctly queries only the USDC spending allowance for supply.
+    // Preserve the earlier module's extra hUSDC zero-allowance control using its
+    // actual old query responses, explicitly combined with the new preparation.
+    // This is composite recorded evidence, not a new single live execution.
+    const old = supplementalSupply.evidence;
+    const originalCall = entries.find(entry => entry.request.method === 'debug_traceCallMany' && entry.request.params[2].tracer === 'callTracer' && entry.request.params[0][0].transactions[0].nonce !== undefined);
+    const oldCall = old.request.find(entry => entry.method === 'debug_traceCallMany' && entry.params[2].tracer === 'callTracer' && entry.params[0][0].transactions[0].nonce !== undefined);
+    assert.deepEqual(oldCall.params, originalCall.request.params, 'The full original envelope, pinned block and declared index coincide');
+    const identity = run.response.allowanceChanges.executionIdentity;
+    for (const field of ['transactionHash', 'transactionIndex', 'postTransactionIndex', 'stateBlockHash', 'blockNumber', 'timestamp']) assert.equal(supplementalSupply.executionIdentity[field], identity[field]);
+    assert.equal(supplementalSupply.block.hash, identity.stateBlockHash);
+    assert.equal(supplementalSupply.block.number, identity.blockNumber);
+    assert.equal(supplementalSupply.block.timestamp, identity.timestamp);
+    const originalDiff = entries.find(entry => entry.request.method === 'debug_traceTransaction' && entry.request.params[1].tracerConfig.diffMode);
+    const oldDiff = old.request.find(entry => entry.method === 'debug_traceTransaction' && entry.params[1].tracerConfig.diffMode);
+    assert.deepEqual(old.response.find(entry => entry.id === oldDiff.id).result, originalDiff.response.result, 'Original complete raw pre/post state agrees across both genuine captures');
+    const extra = old.request.filter(entry => entry.method === 'debug_traceCallMany' && entry.params[0][0].transactions[0].to === HUSDC && entry.params[0][0].transactions[0].data.startsWith('0xdd62ed3e'));
+    assert.equal(extra.length, 4);
+    for (const request of extra) {
+      const response = old.response.find(entry => entry.id === request.id);
+      assert.ok(response); assert.equal(response.error, undefined);
+      assert.equal(request.params[1].blockNumber.blockHash, identity.stateBlockHash);
+      assert.ok([identity.transactionIndex, identity.postTransactionIndex].includes(String(request.params[1].transactionIndex)));
+      entries.push({ request, response, source: 'legacy_supply_view' });
+    }
+  }
+  const selected = [], used = new Set();
+  const rpc = { async call(method, params) {
+    const candidates = entries.map((entry, index) => ({ entry, index })).filter(({ entry, index }) => !used.has(index) && entry.request.method === method && isDeepStrictEqual(entry.request.params, params));
+    // Preparation uses the first canonical check. The subset's final check uses
+    // the actual last recorded canonical response, after all HTTP consumers.
+    const finalCanonical = method === 'eth_getBlockByNumber' && selected.some(entry => entry.request.method === 'debug_traceCallMany');
+    const matched = finalCanonical ? candidates.at(-1) : candidates[0];
+    assert.ok(matched, 'No unrecorded RPC method, parameters or provider response is allowed');
+    used.add(matched.index); selected.push(matched.entry);
+    return structuredClone(matched.entry.response.result);
+  } };
+  return {
+    rpc,
+    assertComplete(context, queryCount) {
+      const originalQueries = selected.filter(entry => entry.request.method === 'debug_traceCallMany' && entry.request.params[0][0].transactions[0].nonce !== undefined);
+      assert.equal(originalQueries.length, 2, 'original callTracer plus one genuine replay-diff result');
+      assert.deepEqual(originalQueries.map(entry => entry.request.params[2].tracer), ['callTracer', 'prestateTracer']);
+      const tokenQueries = selected.filter(entry => entry.request.method === 'debug_traceCallMany' && /^(?:0x70a08231|0xdd62ed3e)/.test(entry.request.params[0][0].transactions[0].data));
+      assert.equal(tokenQueries.length, queryCount * 4);
+      const genericProof = selected.filter(entry => entry.request.method === 'debug_traceTransaction' && entry.request.params[1].tracerConfig.disableStorage).length;
+      assert.equal(selected.length, 8 + genericProof + queryCount * 4);
+      assert.equal(selected.filter(entry => entry.source === 'legacy_supply_view').length, supplementalSupply ? 4 : 0);
+      assert.deepEqual(context.snapshotEvidence(), {
+        request: selected.map((entry, index) => ({ ...entry.request, id: index + 1 })),
+        response: selected.map((entry, index) => ({ ...entry.response, id: index + 1 })),
+      }, 'All selected real responses are retained exactly; only internal evidence IDs are rebased');
+      assert.equal(context.executionIdentity.validation.originalReplayState, 'complete_pre_post_diff_match');
+    },
+  };
+}
+
 function setup(operation = 'withdraw', mutateResponse = undefined) {
   const original = structuredClone(originals.get(operation));
   const transaction = original.captures.transaction.response.result;
@@ -25,17 +117,20 @@ function setup(operation = 'withdraw', mutateResponse = undefined) {
   const index = Number(BigInt(transaction.transactionIndex));
   const calls = [];
   const getCapture = label => captures.captures.find(item => item.endpoint.includes('drpc') && item.label === label).response.result;
+  // Synthetic replay-diff equality for unit controls only. The strict recorded
+  // transport tests below must obtain this new RPC from genuine fresh evidence.
+  const unitOriginalDiff = operation === 'withdraw' ? structuredClone(initialProbes.providers[0].captures.find(c => c.label === 'historical-prestate-diff').response.result) : { pre: { [request.from]: { nonce: transaction.nonce } }, post: { [request.from]: { nonce: '0x' + (BigInt(transaction.nonce) + 1n).toString(16) } } };
   const rpc = { async call(method, params) {
     const call = { method, params: structuredClone(params) }; calls.push(call);
     let result;
     if (method === 'eth_getBlockByHash' || method === 'eth_getBlockByNumber') result = structuredClone(header);
-    else if (method === 'debug_traceTransaction') result = operation === 'withdraw' ? structuredClone(initialProbes.providers[0].captures.find(c => c.label === 'historical-prestate-diff').response.result) : { pre: {}, post: {} };
+    else if (method === 'debug_traceTransaction') result = structuredClone(unitOriginalDiff);
     else if (method === 'debug_traceCallMany') {
       const input = params[0][0].transactions[0], position = params[1].transactionIndex;
       if (input.to === PROBE) {
         const output = '0x' + [header.number, header.timestamp, header.gasLimit, header.baseFeePerGas, header.mixHash, header.miner, '0x3e7', header.parentHash].map(value => word(value).slice(2)).join('');
         result = [[{ type: 'CALL', from: input.from, to: input.to, input: '0x', value: '0x0', output, gasUsed: '0x6000' }]];
-      } else if (input.to === transaction.to) result = structuredClone(getCapture(`${operation}-original-position`));
+      } else if (input.to === transaction.to) result = params[2].tracer === 'prestateTracer' ? [[structuredClone(unitOriginalDiff)]] : structuredClone(getCapture(`${operation}-original-position`));
       else if (params[2].tracer === 'prestateTracer') {
         // Synthetic read-only fee/nonce control; execution traces below are public observations.
         const recorded = getCapture(`${operation}-${position === index ? 'before' : 'after'}-position`)[0].find(t => t.to === input.to);
@@ -64,6 +159,7 @@ for (const [operation, token, delta] of [['withdraw', HUSDC, -503900226n], ['bor
   assert.equal(context.executionIdentity.transactionHash, args.transaction.hash);
   assert.equal(context.executionIdentity.transactionIndex, BigInt(args.transaction.transactionIndex).toString());
   assert.equal(context.executionIdentity.postTransactionIndex, (BigInt(args.transaction.transactionIndex) + 1n).toString());
+  assert.equal(context.executionIdentity.validation.originalReplayState, 'complete_pre_post_diff_match');
   for (const call of calls.filter(c => c.method === 'debug_traceCallMany')) {
     assert.equal(call.params[0].length, 1);
     assert.equal(call.params[0][0].transactions.length, 1, 'query calls are never inserted into an original execution sequence');
@@ -86,6 +182,77 @@ test('historical context snapshots inputs, caches repeated pairs and shares lazy
   const snapshot = context.snapshotEvidence(); snapshot.request[0].method = 'modified';
   assert.notEqual(context.snapshotEvidence().request[0].method, 'modified');
   assert.throws(() => { context.measurementBasis = 'wrong'; }, TypeError);
+});
+
+test('preparation compares one original replay diff before witnesses or token queries', async () => {
+  const { context, args, calls } = setup();
+  await Promise.all([context.prepare(), context.prepare()]);
+  assert.equal(calls.length, 7);
+  const [trace, originalDiff, replayDiff] = calls.slice(2, 5);
+  assert.equal(trace.method, 'debug_traceCallMany');
+  assert.equal(originalDiff.method, 'debug_traceTransaction');
+  assert.equal(replayDiff.method, 'debug_traceCallMany');
+  assert.deepEqual(replayDiff.params.slice(0, 2), trace.params.slice(0, 2));
+  assert.deepEqual(replayDiff.params[2], { tracer: 'prestateTracer', timeout: '15s', tracerConfig: { diffMode: true } });
+  assert.equal(replayDiff.params[1].transactionIndex, Number(BigInt(args.transaction.transactionIndex)));
+  assert.equal(calls[5].params[0][0].transactions[0].to, PROBE);
+  assert.equal(context.executionIdentity.validation.originalReplayState, 'complete_pre_post_diff_match');
+});
+
+test('matching empty or missing-sender-nonce diffs cannot establish historical preparation', async () => {
+  for (const target of ['original', 'replay']) for (const change of ['empty', 'missing-pre-nonce', 'missing-post-nonce', 'shifted-nonces']) {
+    const { context, calls } = setup('withdraw', ({ method, params, result, request }) => {
+      const isOriginal = method === 'debug_traceTransaction';
+      const isReplay = method === 'debug_traceCallMany' && params[2].tracer === 'prestateTracer' && params[0][0].transactions[0].to === request.to;
+      if (target === 'original' ? !isOriginal : !isReplay) return;
+      const diff = isOriginal ? result : result[0][0];
+      if (change === 'empty') { diff.pre = {}; diff.post = {}; }
+      if (change === 'missing-pre-nonce') delete diff.pre[request.from].nonce;
+      if (change === 'missing-post-nonce') delete diff.post[request.from].nonce;
+      if (change === 'shifted-nonces') { diff.pre[request.from].nonce++; diff.post[request.from].nonce++; }
+      return result;
+    });
+    await assert.rejects(context.prepare(), /expected sender nonce transition/);
+    assert.equal(calls.length, target === 'original' ? 4 : 5);
+    assert.equal(context.executionIdentity, null);
+  }
+});
+
+test('a full-diff mismatch rejects shared preparation before any consumer can read state', async () => {
+  const { context, args, calls } = setup('withdraw', ({ method, params, result, request }) => {
+    if (method !== 'debug_traceCallMany' || params[2].tracer !== 'prestateTracer' || params[0][0].transactions[0].to !== request.to) return;
+    const diff = result[0][0];
+    // Synthetic absolute-state shift preserves the original sender nonce and
+    // native delta, just as the real diagnostic does for its fee recipient.
+    for (const side of ['pre', 'post']) diff[side][request.from].balance = word(BigInt(diff[side][request.from].balance) + 1n);
+    return result;
+  });
+  const queries = [query(USDC, args.request.from), query(HUSDC, args.request.from), { to: USDC, data: '0xdd62ed3e' + args.request.from.slice(2).padStart(64, '0') + args.request.to.slice(2).padStart(64, '0') }];
+  const results = await Promise.allSettled(queries.map(q => context.readPair(q)));
+  for (const result of results) {
+    assert.equal(result.status, 'rejected');
+    assert.match(result.reason.message, /replay state diff does not match/);
+  }
+  assert.equal(calls.length, 5, 'all consumers share one failed preparation');
+  assert.equal(context.executionIdentity, null);
+  assert.equal(context.snapshotEvidence().request.length, context.snapshotEvidence().response.length);
+  await assert.rejects(context.prepare(), /replay state diff does not match/);
+  assert.equal(calls.length, 5, 'no retry of failed preparation');
+});
+
+test('the new original replay diff rejects malformed bundles and sanitizes provider errors', async () => {
+  for (const variant of ['bundle', 'unknown-field', 'provider-error', 'exception']) {
+    const { context } = setup('withdraw', ({ method, params, result, request }) => {
+      if (method !== 'debug_traceCallMany' || params[2].tracer !== 'prestateTracer' || params[0][0].transactions[0].to !== request.to) return;
+      if (variant === 'bundle') return [result[0], result[0]];
+      if (variant === 'unknown-field') { result[0][0].post[request.from].unknown = true; return result; }
+      if (variant === 'provider-error') return [[{ error: { code: -32603, message: 'PRIVATE_ORIGINAL_DIFF_ERROR' } }]];
+      throw new Error('PRIVATE_ORIGINAL_DIFF_ERROR');
+    });
+    await assert.rejects(context.prepare(), error => error instanceof StateValidationError && !error.message.includes('PRIVATE_ORIGINAL_DIFF_ERROR'));
+    assert.equal(context.executionIdentity, null);
+    assert.doesNotMatch(JSON.stringify(context.snapshotEvidence()), /PRIVATE_ORIGINAL_DIFF_ERROR/);
+  }
 });
 
 test('historical evidence rejection retains a sanitized terminal response record', async () => {
@@ -152,13 +319,13 @@ test('ignored indexes and altered original execution fail semantic replay valida
 
 test('input gas annotations alone may differ but nested gas used and event position may not', async () => {
   const { context } = setup('withdraw', ({ method, params, result }) => {
-    if (method === 'debug_traceCallMany' && params[0][0].transactions[0].to !== PROBE && !params[0][0].transactions[0].data.startsWith('0x70a08231')) {
+    if (method === 'debug_traceCallMany' && params[2].tracer === 'callTracer' && params[0][0].transactions[0].to !== PROBE && !params[0][0].transactions[0].data.startsWith('0x70a08231')) {
       result[0][0].gas = '0x1'; result[0][0].calls[0].gas = '0x2'; return result;
     }
   });
   await context.prepare();
   const bad = setup('withdraw', ({ method, params, result }) => {
-    if (method === 'debug_traceCallMany' && params[0][0].transactions[0].to !== PROBE && !params[0][0].transactions[0].data.startsWith('0x70a08231')) { result[0][0].calls[0].gasUsed = '0x1'; return result; }
+    if (method === 'debug_traceCallMany' && params[2].tracer === 'callTracer' && params[0][0].transactions[0].to !== PROBE && !params[0][0].transactions[0].data.startsWith('0x70a08231')) { result[0][0].calls[0].gasUsed = '0x1'; return result; }
   });
   await assert.rejects(bad.context.prepare(), StateValidationError);
 });
@@ -204,7 +371,7 @@ test('only known balanceOf queries are allowed and malformed query traces are re
 test('balance queries may incur fee/nonce effects but may not alter token storage or other accounts', async () => {
   for (const mode of ['storage', 'other-account', 'code', 'nonce', 'created']) {
     const { context, args } = setup('withdraw', ({ method, params, result, request }) => {
-      if (method !== 'debug_traceCallMany' || params[2].tracer !== 'prestateTracer') return;
+      if (method !== 'debug_traceCallMany' || params[2].tracer !== 'prestateTracer' || !params[0][0].transactions[0].data.startsWith('0x70a08231')) return;
       const diff = result[0][0];
       if (mode === 'storage') { diff.pre[request.from].storage = { [word(1n)]: word(1n) }; diff.post[request.from].storage = { [word(1n)]: word(2n) }; }
       if (mode === 'other-account') { diff.pre[USDC] = { balance: '0x1' }; diff.post[USDC] = { balance: '0x0' }; }
@@ -307,7 +474,7 @@ test('blob, authorization and inconsistent fee envelopes are rejected', async ()
 test('independent sender nonce evidence detects ignored or clamped positions even if replay matches', async () => {
   for (const shift of [-1, 1, 50]) {
     const { context, args } = setup('withdraw', ({ method, params, result, request }) => {
-      if (method === 'debug_traceCallMany' && params[2].tracer === 'prestateTracer') {
+      if (method === 'debug_traceCallMany' && params[2].tracer === 'prestateTracer' && params[0][0].transactions[0].data.startsWith('0x70a08231')) {
         result[0][0].pre[request.from].nonce += shift;
         result[0][0].post[request.from].nonce += shift;
         return result;
@@ -320,7 +487,7 @@ test('independent sender nonce evidence detects ignored or clamped positions eve
 test('native changes must equal the query gas charge and beneficiary tip exactly', async () => {
   for (const account of ['sender', 'miner']) {
     const { context, args } = setup('withdraw', ({ method, params, result, request, header }) => {
-      if (method === 'debug_traceCallMany' && params[2].tracer === 'prestateTracer') {
+      if (method === 'debug_traceCallMany' && params[2].tracer === 'prestateTracer' && params[0][0].transactions[0].data.startsWith('0x70a08231')) {
         const record = result[0][0].post[account === 'sender' ? request.from : header.miner];
         record.balance = word(BigInt(record.balance) + 1n); return result;
       }
@@ -337,13 +504,13 @@ test('historical query resources are capped and duplicate pairs consume no extra
     }
   });
   for (let i = 1; i <= 12; i++) await context.readPair(query(USDC, address(i)));
-  assert.equal(calls.length, 54);
+  assert.equal(calls.length, 55);
   const count = calls.length;
   await context.readPair(query(USDC, address(1n)));
   assert.equal(calls.length, count);
   await assert.rejects(context.readPair(query(USDC, address(13n))), /12 token\/account pair limit/);
   await context.verifyCanonical();
-  assert.equal(calls.length, 55);
+  assert.equal(calls.length, 56);
 });
 
 test('address and event topic arrays are rejected without coercing them into strings', async () => {
@@ -363,7 +530,7 @@ test('address and event topic arrays are rejected without coercing them into str
 
 test('receipt comparison excludes reverted child logs while full replay still matches them', async () => {
   const environment = setup('withdraw', ({ method, params }) => {
-    if (method === 'debug_traceCallMany' && params[0][0].transactions[0].to === environment.args.request.to) return [[structuredClone(environment.args.trace)]];
+    if (method === 'debug_traceCallMany' && params[2].tracer === 'callTracer' && params[0][0].transactions[0].to === environment.args.request.to) return [[structuredClone(environment.args.trace)]];
   });
   const { args } = environment;
   args.trace.calls.push({ type: 'CALL', from: args.request.to, to: USDC, input: '0x', output: '0x', value: '0x0', gasUsed: '0x1', error: 'execution reverted', revertReason: 'Expected synthetic revert', logs: [{ address: USDC, topics: [word(99n)], data: word(1n) }] });
@@ -379,22 +546,18 @@ const measuredRuns = JSON.parse(await readFile(new URL('../reports/historical-st
 for (const run of measuredRuns) test(`saved live module evidence: ${run.operation} on ${new URL(run.endpoint).hostname}`, async () => {
   assert.equal(run.status, 'measured');
   const { args } = setup(run.operation);
-  let next = 0;
-  args.rpc = { async call(method, params) {
-    const recorded = run.evidence.request[next++];
-    assert.ok(recorded, 'no unrecorded RPC');
-    assert.equal(method, recorded.method);
-    assert.deepEqual(params, recorded.params);
-    return structuredClone(run.evidence.response.find(item => item.id === recorded.id).result);
-  } };
+  const fresh = refreshedRun('hyperlend-usdc-' + run.operation, run.endpoint);
+  assert.equal(fresh.response.balanceChanges.status, 'measured');
+  const captured = capturedContextSubset(fresh);
+  args.rpc = captured.rpc;
   const context = createHistoricalStateContext(args);
   for (const expected of run.balances) {
     const observed = await context.readPair(query(expected.token, args.request.from));
     for (const field of ['before', 'after', 'delta']) assert.equal(observed[field].toString(), expected[field]);
   }
   await context.verifyCanonical();
-  assert.equal(next, run.evidence.request.length);
-  assert.deepEqual(context.snapshotEvidence().response, run.evidence.response, 'normal successful raw evidence is preserved');
+  captured.assertComplete(context, run.balances.length);
+  assert.deepEqual(context.executionIdentity, fresh.response.balanceChanges.executionIdentity);
 });
 
 const permissionSources = new Map();
@@ -405,19 +568,35 @@ for (const name of ['approve-usdc-hyperlend-verified', 'permit-husdc-direct-veri
   permissionSources.set(name, JSON.parse(await readFile(new URL(`../reports/permission-discovery/${name}.json`, import.meta.url))));
 }
 const allowanceRuns = [
-  ...JSON.parse(await readFile(new URL('../reports/historical-permissions/view-module-validation.json', import.meta.url))).runs.map(run => ({ ...run, sourceKey: 'supply' })),
+  ...await (async () => {
+    const bytes = await readFile(new URL('../reports/historical-permissions/view-module-validation.json', import.meta.url));
+    assert.equal(createHash('sha256').update(bytes).digest('hex'), 'c14b724476368b6c747e99f841378a9172eb7274bdcc5b00ecfb71ecc0f46380');
+    return JSON.parse(bytes).runs.map(run => ({ ...run, sourceKey: 'supply' }));
+  })(),
   ...JSON.parse(await readFile(new URL('../reports/historical-permissions/approval-module-validation.json', import.meta.url))).runs.map(run => ({ ...run, sourceKey: 'approve-usdc-hyperlend-verified', allowances: [{ token: run.request.to, owner: run.owner, spender: run.spender, ...run.allowance }] })),
   ...JSON.parse(await readFile(new URL('../reports/historical-permissions/permit-module-validation.json', import.meta.url))).runs.map(run => ({ ...run, sourceKey: run.name })),
 ];
 const allowanceQuery = pair => ({ to: pair.token, data: '0xdd62ed3e' + pair.owner.slice(2).padStart(64, '0') + pair.spender.slice(2).padStart(64, '0') });
-function permissionSetup(run, mutateResponse) {
+function permissionSetup(run, mutateResponse, syntheticReplayDiff = false) {
   const source = structuredClone(permissionSources.get(run.sourceKey));
   const get = name => source.captures[name].response.result;
   const args = { request: structuredClone(run.request), block: structuredClone(run.block), transaction: get('transaction'), receipt: get('receipt'), trace: get(run.sourceKey === 'supply' ? 'trace' : 'callTrace') };
   const calls = [];
+  let recordedIndex = 0;
   args.rpc = { async call(method, params) {
-    const recorded = run.evidence.request[calls.length];
     calls.push({ method, params });
+    if (syntheticReplayDiff && method === 'debug_traceCallMany' && params[2].tracer === 'prestateTracer' && params[0][0].transactions[0].data === args.request.data) {
+      // Explicit synthetic unit-only equality stub. Never used by the recorded
+      // allowance/live tests, which reject every unrecorded provider request.
+      const originalCall = run.evidence.request.find(entry => entry.method === 'debug_traceCallMany' && entry.params[2].tracer === 'callTracer' && entry.params[0][0].transactions[0].data === args.request.data);
+      const expectedParams = structuredClone(originalCall.params);
+      expectedParams[2] = { tracer: 'prestateTracer', timeout: '15s', tracerConfig: { diffMode: true } };
+      assert.deepEqual(params, expectedParams);
+      const originalDiff = run.evidence.request.find(entry => entry.method === 'debug_traceTransaction' && entry.params[1].tracerConfig.diffMode);
+      const result = [[structuredClone(run.evidence.response.find(entry => entry.id === originalDiff.id).result)]];
+      return mutateResponse?.({ method, params, result, args }) ?? result;
+    }
+    const recorded = run.evidence.request[recordedIndex++];
     assert.ok(recorded, 'no unrecorded permission RPC');
     assert.equal(method, recorded.method); assert.deepEqual(params, recorded.params);
     const result = structuredClone(run.evidence.response.find(response => response.id === recorded.id).result);
@@ -425,28 +604,36 @@ function permissionSetup(run, mutateResponse) {
   } };
   return { args, calls, context: createHistoricalStateContext(args) };
 }
+const permissionUnitSetup = (run, mutateResponse) => permissionSetup(run, mutateResponse, true);
 
-for (const run of allowanceRuns) test(`recorded allowance state: ${run.sourceKey} on ${new URL(run.endpoint).hostname}`, async () => {
-  const { context, calls } = permissionSetup(run);
-  assert.equal(context.allowanceMeasurementBasis, 'historical_transaction_position_allowance');
-  assert.equal(context.measurementBasis, 'historical_transaction_position_balanceOf');
+for (const run of allowanceRuns) test(`${run.sourceKey === 'supply' ? 'composite recorded allowance evidence' : 'recorded allowance state'}: ${run.sourceKey} on ${new URL(run.endpoint).hostname}`, async () => {
   if (run.status === 'unavailable') {
+    // This genuine early failure predates the new RPC and remains unchanged.
+    const { context, calls } = permissionSetup(run);
     await assert.rejects(context.readPair(allowanceQuery(run.allowances[0])), /Canonical block identity or original transaction position/);
     assert.equal(calls.length, 1, 'incomplete provider transaction arrays fail before replay or state queries');
     return;
   }
+  const ids = { supply: 'hyperlend-usdc-supply', 'approve-usdc-hyperlend-verified': 'usdc-approval-historical', 'permit-husdc-direct-verified': 'husdc-relayed-permit-historical', 'router-permit-candidate-verified': 'usdc-router-permit-consumed' };
+  const fresh = refreshedRun(ids[run.sourceKey], run.endpoint);
+  assert.equal(fresh.response.allowanceChanges.status, 'measured');
+  const captured = capturedContextSubset(fresh, run.sourceKey === 'supply' ? run : null), { args } = permissionSetup(run);
+  args.rpc = captured.rpc;
+  const context = createHistoricalStateContext(args);
+  assert.equal(context.allowanceMeasurementBasis, 'historical_transaction_position_allowance');
+  assert.equal(context.measurementBasis, 'historical_transaction_position_balanceOf');
   for (const pair of run.allowances) {
     const observed = await context.readPair(allowanceQuery(pair));
     for (const field of ['before', 'after', 'delta']) assert.equal(observed[field].toString(), pair[field]);
   }
   await context.verifyCanonical();
-  assert.deepEqual(context.snapshotEvidence().response, run.evidence.response);
-  assert.equal(calls.length, run.evidence.request.length);
+  captured.assertComplete(context, run.allowances.length);
+  assert.deepEqual(context.executionIdentity, fresh.response.allowanceChanges.executionIdentity);
 });
 
 test('allowance view ABI is strict and variable-debt allowances remain unsupported', async () => {
   const run = allowanceRuns.find(run => run.sourceKey === 'supply');
-  const { context, calls } = permissionSetup(run);
+  const { context, calls } = permissionUnitSetup(run);
   const valid = allowanceQuery(run.allowances[0]);
   const cases = [
     { ...valid, to: VUSDC }, { ...valid, to: address(1n) },
@@ -462,7 +649,7 @@ test('allowance view ABI is strict and variable-debt allowances remain unsupport
 test('allowance query rejects extra implementation calls and mismatching owner/spender input', async () => {
   const run = allowanceRuns.find(run => run.sourceKey === 'permit-husdc-direct-verified');
   for (const mutation of ['child', 'input', 'implementation', 'after-revert']) {
-    const { context } = permissionSetup(run, ({ method, params, result }) => {
+    const { context } = permissionUnitSetup(run, ({ method, params, result }) => {
       if (method !== 'debug_traceCallMany' || params[2].tracer !== 'callTracer' || !params[0][0].transactions[0].data.startsWith('0xdd62ed3e')) return;
       const frame = result[0][0], implementation = frame.calls[0];
       if (mutation === 'child') implementation.calls = [{ ...structuredClone(implementation), calls: [] }];
@@ -478,12 +665,12 @@ test('allowance query rejects extra implementation calls and mismatching owner/s
 test('generic router root needs original runtime code and does not authorize arbitrary queries', async () => {
   const run = allowanceRuns.find(run => run.sourceKey === 'router-permit-candidate-verified');
   for (const code of [undefined, '0x', ['0x6000'], '0xz1']) {
-    const { context } = permissionSetup(run, ({ method, params, result, args }) => {
+    const { context } = permissionUnitSetup(run, ({ method, params, result, args }) => {
       if (method === 'debug_traceTransaction' && params[1].tracerConfig.disableStorage) { result[args.request.to] = code === undefined ? {} : { code }; return result; }
     });
     await assert.rejects(context.prepare(), /root runtime code/);
   }
-  const { context, calls } = permissionSetup(run);
+  const { context, calls } = permissionUnitSetup(run);
   await assert.rejects(context.readPair({ to: run.request.to, data: '0x70a08231' + run.request.from.slice(2).padStart(64, '0') }), StateValidationError);
   assert.equal(calls.length, 0);
 });
@@ -492,7 +679,7 @@ test('historical measurement rejects every lifecycle type, including reverted su
   const run = allowanceRuns.find(run => run.sourceKey === 'router-permit-candidate-verified');
   for (const type of ['CREATE', 'CREATE2', 'SELFDESTRUCT']) {
     for (const failure of ['none', 'lifecycle-frame', 'parent-frame']) {
-      const { args, calls } = permissionSetup(run, ({ method, params, args }) => {
+      const { args, calls } = permissionUnitSetup(run, ({ method, params, args }) => {
         // A matching replay and empty final diff must not erase intermediate
         // lifecycle evidence if a future refactor moves the early guard.
         if (method === 'debug_traceCallMany' && params[0][0].transactions[0].to === args.request.to) return [[structuredClone(args.trace)]];
@@ -532,7 +719,7 @@ test('direct permission roots require strict approve and permit ABI plus known i
   for (const key of ['approve-usdc-hyperlend-verified', 'permit-husdc-direct-verified']) {
     const run = allowanceRuns.find(run => run.sourceKey === key && run.status === 'measured');
     for (const mutation of ['trailing', 'address-padding', 'implementation', ...(key.startsWith('permit') ? ['overflow-v'] : [])]) {
-      const { args } = permissionSetup(run);
+      const { args } = permissionUnitSetup(run);
       if (mutation === 'implementation') args.trace.calls[0].to = address(9n);
       else {
         let data = args.request.data;

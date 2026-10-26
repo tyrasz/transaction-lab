@@ -17,7 +17,10 @@ const v6Capture=JSON.parse(freshBytes);
 const capturedEngine='fab9ca0c5b9d0292c67457d9e8eead88fa32914f65b56886067ed864a241b542';
 const v7Bytes=await readFile(new URL('../reports/affected-balance-comparisons/capture.json',import.meta.url));
 assert.equal(createHash('sha256').update(v7Bytes).digest('hex'),'53eec210304f3f3ff749bc4a4cdbd4fe55f57e87a2cd0b94983574bd0942de34');
-const freshCapture=JSON.parse(v7Bytes);
+const v7Capture=JSON.parse(v7Bytes);
+const guardedBytes=await readFile(new URL('../reports/replay-state-comparisons/capture.json',import.meta.url));
+assert.equal(createHash('sha256').update(guardedBytes).digest('hex'),'51d7cb6ba049b1cd38da52ba2131b4bc328ac264419c240f132c3b570f8ed610');
+const freshCapture=JSON.parse(guardedBytes);
 const sourceFiles=freshCapture.implementation.sourceFiles;
 const currentHash=createHash('sha256');
 for(const name of sourceFiles){assert.match(name,/^[a-z-]+\.js$/);currentHash.update(name+'\0').update(await readFile(new URL('../src/'+name,import.meta.url))).update('\0');}
@@ -29,7 +32,12 @@ const independent={
  borrow:{cash:'835474410',position:VUSDC,event:'835476148',balance:'835474410'},
  repay:{cash:'-199626280',position:VUSDC,event:'-199626071',balance:'-199626279',allowance:['115792089237316195423570985008687907853269984665640564039457584003409140907030','115792089237316195423570985008687907853269984665640564039457584003408941280750']},
 };
-function withoutGenerated(report){const {id,createdAt,timing,implementation,...rest}=report;const {sourceSha256,...provenance}=implementation;return {...rest,implementation:provenance};}
+// v0.7.1 adds a separately observed original replay diff. Compare all API
+// observations and proof fields; check implementation provenance separately.
+function withoutGenerated(report){const {id,createdAt,timing,implementation,...rest}=report;return rest;}
+function assertImplementation(report){
+ assert.deepEqual(report.implementation,{name:'Transaction Lab',version:'0.7.1',sourceSha256:currentEngine,sourceFiles},'Implementation name, version, ordered source inventory and independently calculated source hash all match');
+}
 function freshFor(operation,provider){return freshCapture.cases.find(c=>c.id==='hyperlend-usdc-'+operation)?.runs.find(r=>r.provider===provider);}
 function v6For(operation,provider){return v6Capture.cases.find(c=>c.id==='hyperlend-usdc-'+operation)?.runs.find(r=>r.provider===(provider==='hyperlend-archive'?'archive':provider));}
 function assertEffects(report,operation){
@@ -78,8 +86,8 @@ test('v0.6 six-run capture retains the frozen source and full HTTP outcomes',()=
 });
 
 test('v0.7 predeclared eleven attempts retain frozen implementation and every original RPC/HTTP response',()=>{
- assert.deepEqual(freshCapture.summary,{planned:11,attempted:11,http200:11,failedHttp:0,measuredBalances:7,measuredAllowances:8,measuredAffectedBalances:11,unavailableAffectedBalances:0,rpcCalls:402,responseBytes:5201258});
- for(const item of freshCapture.cases)for(const run of item.runs){
+ assert.deepEqual(v7Capture.summary,{planned:11,attempted:11,http200:11,failedHttp:0,measuredBalances:7,measuredAllowances:8,measuredAffectedBalances:11,unavailableAffectedBalances:0,rpcCalls:402,responseBytes:5201258});
+ for(const item of v7Capture.cases)for(const run of item.runs){
   assert.equal(run.http.response.status,200);assert.deepEqual(JSON.parse(run.http.response.bodyText),run.response);
   assert.equal(createHash('sha256').update(run.http.response.bodyText).digest('hex'),run.http.response.bodySha256);
   assert.equal(run.response.implementation.sourceSha256,'7658ae0d03d6b17f72045905d231e9803b6ab38d57b4cac3a88d2eec19b5ff10');
@@ -87,20 +95,32 @@ test('v0.7 predeclared eleven attempts retain frozen implementation and every or
  }
 });
 
+test('v0.7.1 retains all fourteen guarded API outcomes and every genuine new RPC response',()=>{
+ assert.equal(freshCapture.status,'complete');assert.equal(freshCapture.summary.attempted,14);assert.equal(freshCapture.summary.rpcCalls,467);assert.deepEqual(freshCapture.skipped,[]);
+ for(const item of freshCapture.cases)for(const run of item.runs){
+  assert.equal(run.http.response.status,200);assert.deepEqual(JSON.parse(run.http.response.bodyText),run.response);assert.equal(createHash('sha256').update(run.http.response.bodyText).digest('hex'),run.http.response.bodySha256);
+  assert.equal(run.response.implementation.sourceSha256,'1d7c3a202cc691729b0b31a6d1abf65fa32fb3a0d2b31c31e458240198b38b10');
+  for(const entry of run.rpcCalls){assert.deepEqual(JSON.parse(entry.responseText),entry.response);assert.equal(createHash('sha256').update(entry.responseText).digest('hex'),entry.responseSha256);}
+  for(const field of ['balanceChanges','allowanceChanges','affectedBalanceChanges'])if(run.response[field].status==='measured')assert.equal(run.response[field].executionIdentity.validation.originalReplayState,'complete_pre_post_diff_match');
+ }
+});
+
 for(const item of capture.cases)for(const legacyRun of item.runs.filter(run=>run.response)){
  test(`recorded full replay: ${item.operation} through ${legacyRun.provider}`,async()=>{
-  const fresh=freshFor(item.operation,legacyRun.provider);assert.ok(fresh,'Every changed successful legacy lending case has a genuine v0.7 recording');
+  const fresh=freshFor(item.operation,legacyRun.provider);assert.ok(fresh,'Every changed successful legacy lending case has a genuine guarded recording');
   const run=fresh,rpc=recordedRpc(run);
   const report=await replay(run.request,rpc);
   assert.equal(rpc.consumed,run.rpcCalls.length);
   const expected=structuredClone(legacyRun.response);
   expected.balanceChanges.executionIdentity.validation.queryScope='configured_USDC_hUSDC_variable_debt_balanceOf_and_USDC_hUSDC_allowance';
+  expected.balanceChanges.executionIdentity.validation.originalReplayState='complete_pre_post_diff_match';
   for(const field of ['request','source','execution','coverage','protocol','inAssets','outAssets','movements','interestAccruals','positionChanges','balanceChanges','security','warnings'])assert.deepEqual(report[field],expected[field],`Original ${field} is preserved`);
   for(const field of ['traceMethod','traceRequest','traceResponse','receipt','receiptRechecked'])assert.deepEqual(report.evidence[field],expected.evidence[field],`Original ${field} raw execution is preserved`);
   assertEffects(report,item.operation);
-  assert.equal(report.implementation.sourceSha256,currentEngine);
+  assertImplementation(report);
   assert.deepEqual(withoutGenerated(report),withoutGenerated(fresh.response),'New complete RPC interleaving, shared snapshots and all API semantics are exact');
-  const prior=v6For(item.operation,legacyRun.provider)?.response??legacyRun.response;
+  const prior=structuredClone(v6For(item.operation,legacyRun.provider)?.response??legacyRun.response);
+  if(prior.allowanceChanges.status==='measured')prior.allowanceChanges.executionIdentity.validation.originalReplayState='complete_pre_post_diff_match';
   assert.deepEqual(report.permissions,prior.permissions,'All prior permission observations and correlations are preserved');
   if(prior.allowanceChanges.status==='measured')assert.deepEqual(report.allowanceChanges,prior.allowanceChanges,'All prior measured allowance amounts and evidence comparisons are preserved');
   else {
@@ -136,9 +156,21 @@ for(const item of capture.cases)for(const legacyRun of item.runs.filter(run=>run
 
 for(const item of freshCapture.cases.filter(c=>c.id.startsWith('direct-')))for(const run of item.runs){
  test(`recorded affected owner replay: ${item.id}`,async()=>{
-  const rpc=recordedRpc(run),report=await replay(run.request,rpc);assert.equal(rpc.consumed,run.rpcCalls.length);assert.deepEqual(withoutGenerated(report),withoutGenerated(run.response));assert.equal(report.implementation.sourceSha256,currentEngine);
+  const rpc=recordedRpc(run),report=await replay(run.request,rpc);assert.equal(rpc.consumed,run.rpcCalls.length);assert.deepEqual(withoutGenerated(report),withoutGenerated(run.response));assertImplementation(report);
   const amount=item.id.endsWith('-a')?'1277067':'1118386',owner='0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379',spender='0x2908da1b63c4f7ce001bf5d875d179930a79eed4';
   const call=report.permissions.observations[0];assert.equal(report.permissions.observations.length,1);assert.deepEqual([call.kind,call.owner,call.spender,call.recipient,call.submitter,call.amountRaw],['transfer_from_call',owner,spender,spender,spender,amount]);
+  if(item.id==='direct-transferfrom-b'){
+   assert.equal(report.allowanceChanges.status,'unavailable');assert.deepEqual(report.allowanceChanges.allowances,[]);
+   assert.equal(report.affectedBalanceChanges.status,'unavailable');assert.deepEqual(report.affectedBalanceChanges.assets,[]);assert.deepEqual(report.affectedBalanceChanges.reusedPairs,[]);
+   assert.equal(report.affectedBalanceChanges.executionIdentity,undefined);assert.equal(report.allowanceChanges.executionIdentity,undefined);
+   assert.match(report.affectedBalanceChanges.warnings.at(-1),/Canonical block identity or original transaction position/);
+   const lists=run.rpcCalls.filter(entry=>entry.request.method==='eth_getBlockByNumber').map(entry=>entry.response.result.transactions);
+   assert.deepEqual(lists.map(list=>list.length),[5,5,3]);assert.equal(lists[0][2],item.transactionHash);assert.equal(lists[2][0],item.transactionHash);
+   assert.equal(report.accountEffects.summary.measuredBalancePairs,0);assert.equal(report.accountEffects.summary.measuredAllowancePairs,0);
+   const old=v7Capture.cases.find(c=>c.id===item.id).runs[0].response;
+   assert.deepEqual(old.affectedBalanceChanges.assets.map(entry=>[entry.beforeRaw,entry.afterRaw,entry.deltaRaw]),[['1118386','0','-1118386'],['4647555924314','4647557042700','1118386']],'Prior genuine measurements remain preserved, not admitted through the changed current view');
+   return;
+  }
   assert.equal(report.accountEffects.accounts.length,2);assert.equal(report.accountEffects.summary.measuredBalancePairs,2);
   assert.equal(report.affectedBalanceChanges.status,'measured');assert.equal(report.affectedBalanceChanges.assets.length,2);
   for(const account of report.accountEffects.accounts){const token=account.tokens[0];assert.equal(token.asset.address,USDC);assert.equal(token.events.netRaw,(account.address===owner?'-':'')+amount);assert.equal(token.balance.status,'measured');const original=report.affectedBalanceChanges.assets[token.balance.affectedBalanceChangeIndex];assert.equal(original.account,account.address);assert.equal(token.balance.deltaRaw,original.deltaRaw);}
@@ -150,6 +182,7 @@ for(const item of freshCapture.cases.filter(c=>c.id.startsWith('direct-')))for(c
 
 test('original v0.6 direct-B index inconsistency still withholds all state using its untouched recording',async()=>{
  const run=v6Capture.cases.find(item=>item.id==='direct-transferfrom-b').runs[0],rpc=recordedRpc(run),report=await replay(run.request,rpc);
+ assertImplementation(report);
  assert.equal(rpc.consumed,run.rpcCalls.length);assert.equal(rpc.consumed,8);
  for(const field of ['request','source','execution','movements','permissions','balanceChanges','allowanceChanges','accountEffects'])assert.deepEqual(report[field],run.response[field]);
  assert.deepEqual(report.evidence.traceResponse,run.response.evidence.traceResponse);assert.deepEqual(report.evidence.receipt,run.response.evidence.receipt);
@@ -164,6 +197,7 @@ test('historical API keeps original execution while refusing balances after cano
     return result;
   });
   const report = await replay(repayRun.request, rpc);
+  assertImplementation(report);
   assert.equal(report.execution.status, 'success');
   assert.equal(report.outAssets[0].transferOut[0].value, '199.62628');
   assert.equal(report.balanceChanges.status, 'unavailable');
@@ -185,6 +219,7 @@ test('historical API retains original events but safely rejects nested provider 
     }
   });
   const report = await replay(repayRun.request, rpc);
+  assertImplementation(report);
   assert.equal(report.execution.status, 'success');
   assert.equal(report.balanceChanges.status, 'unavailable');
   assert.deepEqual(report.balanceChanges.assets, []);

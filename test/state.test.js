@@ -47,6 +47,9 @@ test('lazy context snapshots request identity and shares in-flight preparation',
   await Promise.all([context.prepare(), context.prepare()]);
   assert.equal(calls.filter(call => call.method === 'debug_traceCall').length, 1);
   assert.equal(calls.find(call => call.method === 'debug_traceCall').params[0].value, '0x0');
+  assert.equal(context.executionIdentity.headerContext, 'provider_unpriced_call_unverified');
+  assert.equal(context.executionIdentity.feePolicy, 'gas_price_omitted');
+  assert.equal(context.executionIdentity.headerValidation, 'not_performed', 'Pinning state does not establish unchanged EVM header fields');
 });
 
 test('shared canonical failure is sanitized and remains latched after a later successful check', async () => {

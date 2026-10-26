@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "1.0",
+  "createdAt": "2026-10-26T04:37:21.425Z",
+  "sourceRevision": "27c60a4bc380118f67328a878b1e425b6c335908",
+  "purpose": "Separate fixed development diagnostic of ordinary-versus-system-inclusive replay positions. The failed prospective pilot remains unchanged.",
+  "blockNumber": "0x2f3fbe6",
+  "blockHash": "0x1a90cb1b12defb35c5b542b1218b4b5f8524d7eea721ab1f0cf28e8b6af8e2b4",
+  "users": [
+    "0x1774921234db960d6e8e1591b95d6d70d182b1227eb4d20f1232760ca527b392",
+    "0x52e44bd70312e00d0a5a096a653d83a90bccb7e27fb66dcc1fd7e28034e33486",
+    "0x5e6e562b55c65dd43a0f980b2a18f81cf047dd7a9702400bfababa98563f12d7",
+    "0x1229c2ee75bf04b07356ce7e7b19b2108404020785614abde5bac429abf80c26",
+    "0x45d1d4ea98b031fd653f69b6f186f6680379d05dca91f7b0d512c9979e272799"
+  ],
+  "systemPrefixLength": 3,
+  "limits": {
+    "totalRpc": 86,
+    "perTransactionRpc": 8,
+    "totalResponseBytes": 67108864,
+    "responseBytes": 8388608,
+    "requestMs": 25000,
+    "wallMs": 600000
+  },
+  "dependencies": [
+    {
+      "path": "frozen/evaluation-budget.js",
+      "source": "src/evaluation-budget.js",
+      "sha256": "90c48c86ffe3bf0ea580c7c03b51cccc2f0dcdf98d327208bb5c7fe1720d7a40"
+    },
+    {
+      "path": "frozen/evaluation-comparator.js",
+      "source": "src/evaluation-comparator.js",
+      "sha256": "484d92284cc54da30f8874649d838a293764fe33f6cbab41058bea9527d68476"
+    },
+    {
+      "path": "frozen/rpc.js",
+      "source": "src/rpc.js",
+      "sha256": "740aef93d804933e39a524c4de7a4e94614f5a05142e0d502bfd5d552ef02ce8"
+    },
+    {
+      "path": "frozen/config.js",
+      "source": "src/config.js",
+      "sha256": "a6f1d8cc27855fad888d2e10837173ed4a2c892fabd33a34d55205b52969a910"
+    }
+  ],
+  "scriptSha256": "bfe5256450ba72470d4210afbe8d3c9f174047a25a66f4ddf9975c443349c994",
+  "sourceEvidence": {
+    "path": "../system-transaction-diagnostic/comparison.json",
+    "sha256": "17362d2529a2329d7c88d9a1c723cc43fecfa2baffda6e8c60e6519b21693525"
+  },
+  "requestMatrix": {
+    "providers": [
+      "A",
+      "B"
+    ],
+    "eachProvider": {
+      "chain": 1,
+      "blockBefore": 1,
+      "perUser": {
+        "transaction": 1,
+        "receipt": 1,
+        "originalTrace": 1,
+        "originalDiff": 1,
+        "positions": [
+          "ordinaryIndex",
+          "ordinaryIndex+3"
+        ],
+        "perPosition": {
+          "trace": 1,
+          "diff": 1
+        }
+      },
+      "blockAfter": 1
+    },
+    "maximum": 86
+  },
+  "rules": [
+    "Every one of the five preselected ordinary transactions is retained for both providers. No discovery, replacements, retries or third provider.",
+    "Unsupported or failed prerequisites cause explicit skipped dependent requests, not a replacement envelope.",
+    "Use the existing unsigned original-nonce/effective-gas-price/access-list reconstruction. Typed fee substitution is not exact signed replay.",
+    "Compare both original trace and original pre/post diff against both predeclared positions; full strict trace comparison and separately named input-gas-excluded semantic comparison. Record ambiguous matches.",
+    "Cross-provider same-state/trace agreement is corroboration, not independent execution or a universal index-offset proof.",
+    "No scoring denominator or claimed accuracy is created by this diagnostic.",
+    "Every attempted RPC is counted; successful raw bytes and hashes retained; arbitrary provider failure prose omitted. Budgets stop work without retry."
+  ]
+}

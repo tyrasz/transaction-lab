@@ -134,7 +134,7 @@ export function createStateContext({ request, block, rpc }) {
       const tx = { from: lower(boundRequest.from), to: lower(boundRequest.to), data: boundRequest.data, value: hex(boundRequest.value), gas: '0x4c4b40' };
       const diff = await call('debug_traceCall', [tx, pinned, { tracer: 'prestateTracer', timeout: '15s', tracerConfig: { diffMode: true } }]);
       overrides = buildStateOverrides(diff);
-      executionIdentity = { stateBlockHash: pinned.blockHash, blockNumber: uint(boundBlock.number).toString(), timestamp: uint(boundBlock.timestamp).toString(), stateBinding: 'block_hash', headerContext: 'unchanged', method: 'debug_traceCall/prestateTracer + eth_call/stateDiff' };
+      executionIdentity = { stateBlockHash: pinned.blockHash, blockNumber: uint(boundBlock.number).toString(), timestamp: uint(boundBlock.timestamp).toString(), stateBinding: 'block_hash', headerContext: 'provider_unpriced_call_unverified', feePolicy: 'gas_price_omitted', headerValidation: 'not_performed', method: 'debug_traceCall/prestateTracer + eth_call/stateDiff' };
     })();
     return preparation;
   }

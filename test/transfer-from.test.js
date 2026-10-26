@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { analyzePermissions } from '../src/permissions.js';
 import { measureAllowances } from '../src/allowances.js';
 import { createHistoricalStateContext } from '../src/historical-state.js';
@@ -227,12 +228,24 @@ const views = JSON.parse(await readFile(new URL('../reports/historical-permissio
 const supplyRun = JSON.parse(await readFile(new URL('../reports/historical-permissions/view-module-validation.json', import.meta.url))).runs[0];
 test('observed historical supply transferFrom identifies the Pool and measures its recorded allowance decrease', async () => {
   const capture = Object.fromEntries(views.providers[0].captures.map(c => [c.label, c.response.result]));
+  const bytes = await readFile(new URL('../reports/replay-state-comparisons/capture.json', import.meta.url));
+  assert.equal(createHash('sha256').update(bytes).digest('hex'), '51d7cb6ba049b1cd38da52ba2131b4bc328ac264419c240f132c3b570f8ed610');
+  const run = JSON.parse(bytes).cases.find(item => item.id === 'hyperlend-usdc-supply').runs.find(item => item.provider === 'drpc');
+  for (const [label, id] of [['transaction', 2], ['receipt', 3], ['trace', 5]]) {
+    assert.deepEqual(run.rpcCalls.find(entry => entry.request.id === id).response.result, capture[label]);
+  }
+  // The isolated allowance module consumes this exact subset of the new full
+  // HTTP capture. Other consumers' balance queries are not invented or replayed.
+  const sourceIds = [7, 8, 9, 10, 11, 12, 13, 15, 20, 25, 26, 27];
   const calls = [];
   const rpc = { async call(method, params) {
+    const saved = run.rpcCalls.find(entry => entry.request.id === sourceIds[calls.length]);
+    assert.ok(saved, 'only the declared recorded request sequence may execute');
+    assert.deepEqual({ method, params }, { method: saved.request.method, params: saved.request.params });
     calls.push({ method, params });
-    const saved = supplyRun.evidence.request.find(r => r.method === method && JSON.stringify(r.params) === JSON.stringify(params));
-    assert.ok(saved, 'only captured original-position read requests may execute in this offline test');
-    return structuredClone(supplyRun.evidence.response.find(r => r.id === saved.id).result);
+    assert.deepEqual(JSON.parse(saved.responseText), saved.response);
+    assert.equal(createHash('sha256').update(saved.responseText).digest('hex'), saved.responseSha256);
+    return structuredClone(saved.response.result);
   } };
   const input = { request: supplyRun.request, block: supplyRun.block, transaction: capture.transaction, receipt: capture.receipt, trace: capture.trace, rpc, metadata: METADATA, analysis: { execution: { status: 'success' } } };
   const observed = transfers(input);
@@ -247,7 +260,8 @@ test('observed historical supply transferFrom identifies the Pool and measures i
   assert.equal(result.allowances[0].deltaRaw, '-15066115');
   assert.equal(result.allowances[0].consistency.requestComparison, 'no_request');
   assert.equal(result.allowances[0].consistency.transferComparison, 'not_compared_to_allowance');
-  assert.ok(calls.length > 0);
+  assert.equal(result.executionIdentity.validation.originalReplayState, 'complete_pre_post_diff_match');
+  assert.equal(calls.length, sourceIds.length);
 });
 
 test('observed router transferFrom calls retain owner versus router spending roles after permit', async () => {

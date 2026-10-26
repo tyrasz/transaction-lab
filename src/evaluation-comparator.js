@@ -10,11 +10,12 @@ export const ORACLE_TOKENS = Object.freeze({
   '0xd612513cb3b2c52abcd6d4b338374c09ada4657d': { implementation: '0x8158e5569475a443a5723ccac462930f590449ed', role: 'liability', allowance: false },
 });
 export const COMPARISON_RULES = Object.freeze({
-  version: 'prospective-1',
+  version: 'prospective-2',
   trace: 'Ordered full call tree, including failed descendants; type/from/to/input/value/gas/gasUsed/output/outcome and ordered per-frame logs including position. Missing optional values differ from zero or empty bytes. Absent calls/logs differ from explicit empty arrays. Provider failure prose is ignored, failure presence is retained.',
   requiredFrameFields: ['type', 'from', 'input', 'gas', 'gasUsed'],
   normalization: 'Address and byte-string case, integer representation only. Object property order is irrelevant; all array order is significant. No gas annotation exclusions or log sorting.',
-  exactReplay: 'Unsigned legacy type-0 envelope fields must be present and unchanged, with original block hash/index, completed shared header/nonce/isolation checks and strict full trace equality. Type-1/2 effective-gas-price substitution is incomplete, never exact. This is endpoint agreement using a shared state adapter, not independent-engine or signed-transaction validation.',
+  exactReplay: 'Unsigned legacy type-0 envelope fields must be present and unchanged, with original block hash/index, completed shared header/nonce/isolation checks and strict full trace equality. Each provider must also supply the original transaction pre/post diff and a CallMany diff for exactly the same replay envelope and context. Independently validated complete maps, absolute account/slot values and field presence must match within and across providers, including the sender original nonce and increment; a product validation flag alone is insufficient. Type-1/2 effective-gas-price substitution is incomplete, never exact. This is endpoint agreement using a shared state adapter, not independent-engine or signed-transaction validation.',
+  stateDiff: 'Independent schema: exactly pre/post maps, at most 100 distinct accounts and 2000 distinct account/storage-slot pairs across both maps; uint256 balances, uint64 nonces, exact 32-byte slots and values, at most 8 MiB bytecode text. Only balance/nonce/code/storage account fields are accepted. Normalize representation and object order only; reject duplicate normalized keys, unknown fields, accessors and malformed objects. Empty equal maps cannot prove a transaction nonce transition.',
   inventory: 'Candidate balance pairs from all ERC20-shaped receipt Transfer logs; candidate allowances from all ERC20-shaped Approval logs and successful CALL transferFrom/approve/permit arguments. Unknown token candidates remain in the inventory and unavailable. Only the separately listed verified token implementations can be queried. No observed candidates never establishes no effects.',
   oracleQueryOrder: 'Lexicographic balance token:account first, then allowance token:owner:spender; at most eight combined candidates queried, including unsupported candidates in the ordering. No replacements after query failure.',
   completeness: 'All-effects asset and permission inventory completeness remains inconclusive: native fees, NFTs, silent changes, nonstandard permissions, rebases and deferred HyperCore effects are not fully enumerated. Observed-pair corroboration is a separately named metric.',
@@ -194,22 +195,132 @@ export function independentInventory({ receipt, trace, transaction, prestate }) 
     rootKind, completeness: 'inconclusive', reasons: ['Observed events and selectors do not enumerate all token, native, fee, nonce, NFT, silent-state, nonstandard-permission or deferred cross-domain effects.', 'Queries use the product historical state adapter on a second provider; they are corroboration, not an independently implemented execution oracle.'] };
 }
 
-export function findOriginalReplay(evidence, transaction, row) {
-  if (!Array.isArray(evidence?.request) || !Array.isArray(evidence?.response)) return null;
-  for (const request of evidence.request) {
-    if (!request || !Array.isArray(request.params)) continue;
-    const [bundles, context, options] = request.params ?? [], call = bundles?.[0]?.transactions?.[0];
-    const keys = (value, expected) => value && Object.keys(value).sort().join() === [...expected].sort().join();
-    if (request.method !== 'debug_traceCallMany' || request.params?.length !== 3 || bundles?.length !== 1 || !keys(bundles[0], ['transactions']) || bundles[0]?.transactions?.length !== 1 || !keys(context, ['blockNumber', 'transactionIndex']) || !keys(context.blockNumber, ['blockHash', 'requireCanonical']) || !keys(options, ['tracer', 'timeout', 'tracerConfig']) || options?.tracer !== 'callTracer' || options.timeout !== '15s' || !keys(options.tracerConfig, ['withLog']) || options.tracerConfig.withLog !== true || !call) continue;
-    if (lower(call.from) !== lower(transaction.from) || lower(call.to) !== lower(transaction.to) || lower(call.data) !== lower(transaction.input) || call.nonce === undefined) continue;
-    const response = evidence.response.find(item => item.id === request.id && item.method === request.method);
-    if (!Array.isArray(response?.result) || response.result.length !== 1 || !Array.isArray(response.result[0]) || response.result[0].length !== 1) continue;
-    try {
-      if (lower(context?.blockNumber?.blockHash) !== row.blockHash || context.blockNumber.requireCanonical !== true || integer(context.transactionIndex) !== row.transactionIndex) continue;
-      return { call, trace: response.result[0][0], requestId: request.id };
-    } catch {}
+// Deliberately independent of the product's state-diff/state-override validators.
+// Projection preserves every reported field, including absent versus zero.
+function ownDataKeys(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value) || ![Object.prototype, null].includes(Object.getPrototypeOf(value))) throw new TypeError('Invalid evidence record.');
+  const keys = Reflect.ownKeys(value);
+  for (const key of keys) {
+    const descriptor = Object.getOwnPropertyDescriptor(value, key);
+    if (typeof key !== 'string' || !descriptor.enumerable || !Object.hasOwn(descriptor, 'value')) throw new TypeError('Unsupported evidence property.');
   }
-  return null;
+  return keys;
+}
+const exactKeys = (value, names) => isDeepStrictEqual(ownDataKeys(value).sort(), [...names].sort());
+function stateQuantity(value, bits) {
+  // Bound before BigInt parsing, including noncanonical leading-zero input.
+  if (typeof value === 'string' && value.length > 80) throw new TypeError('Excessive state quantity.');
+  const normalized = integer(value);
+  if (BigInt(normalized) >= 1n << BigInt(bits)) throw new TypeError('Out-of-range state quantity.');
+  return normalized;
+}
+export function strictStateDiffProjection(diff) {
+  if (!exactKeys(diff, ['pre', 'post'])) throw new TypeError('Missing complete pre/post maps.');
+  const accounts = new Set(), slots = new Set();
+  let codeBytes = 0;
+  return Object.fromEntries(['pre', 'post'].map(side => {
+    const names = ownDataKeys(diff[side]);
+    if (names.length > 100) throw new TypeError('Excessive diff accounts.');
+    const normalized = new Map();
+    for (const name of names) {
+      const account = address(name), data = diff[side][name];
+      if (normalized.has(account)) throw new TypeError('Colliding normalized account addresses.');
+      accounts.add(account);
+      if (accounts.size > 100) throw new TypeError('Excessive diff account union.');
+      const record = {};
+      for (const field of ownDataKeys(data).sort()) {
+        const value = data[field];
+        if (field === 'balance' || field === 'nonce') record[field] = stateQuantity(value, field === 'balance' ? 256 : 64);
+        else if (field === 'code') {
+          if (typeof value !== 'string') throw new TypeError('Invalid bytecode.');
+          codeBytes += Buffer.byteLength(value);
+          if (codeBytes > 8 * 1024 * 1024) throw new TypeError('Excessive bytecode evidence.');
+          record.code = bytes(value);
+        } else if (field === 'storage') {
+          const storageNames = ownDataKeys(value), storage = new Map();
+          if (storageNames.length > 2000) throw new TypeError('Excessive diff slots.');
+          for (const storageName of storageNames) {
+            const slot = word(storageName);
+            if (storage.has(slot)) throw new TypeError('Colliding normalized storage slots.');
+            if (typeof value[storageName] !== 'string') throw new TypeError('Invalid storage value.');
+            storage.set(slot, word(value[storageName])); slots.add(account + ':' + slot);
+            if (slots.size > 2000) throw new TypeError('Excessive diff slot union.');
+          }
+          record.storage = Object.fromEntries([...storage].sort(([a], [b]) => a.localeCompare(b)));
+        } else throw new TypeError('Unsupported diff account field.');
+      }
+      normalized.set(account, record);
+    }
+    return [side, Object.fromEntries([...normalized].sort(([a], [b]) => a.localeCompare(b)))];
+  }));
+}
+export function compareStateDiffs(left, right) {
+  try { return { status: isDeepStrictEqual(strictStateDiffProjection(left), strictStateDiffProjection(right)) ? 'matched' : 'mismatched', basis: 'complete_absolute_pre_post_state_diff' }; }
+  catch { return { status: 'incomplete', reason: 'Complete pre/post state evidence is absent, malformed or exceeds the independent comparator limits.' }; }
+}
+function indexedEvidence(evidence) {
+  if (!Array.isArray(evidence?.request) || !Array.isArray(evidence?.response) || evidence.request.length > 256 || evidence.response.length > 256) throw new TypeError('Missing or excessive RPC evidence.');
+  const requests = new Map(), responses = new Map();
+  for (const request of evidence.request) {
+    if (!request || !Number.isSafeInteger(request.id) || request.id < 1 || requests.has(request.id) || typeof request.method !== 'string' || !Array.isArray(request.params)) throw new TypeError('Ambiguous request identity.');
+    requests.set(request.id, request);
+  }
+  for (const response of evidence.response) {
+    const request = requests.get(response?.id);
+    if (!request || request.method !== response.method || responses.has(response.id)) throw new TypeError('Ambiguous response identity.');
+    responses.set(response.id, response);
+  }
+  return { requests: [...requests.values()], result(request) {
+    const response = responses.get(request.id);
+    if (!response || Object.hasOwn(response, 'error') || !Object.hasOwn(response, 'result')) throw new TypeError('Missing successful response.');
+    return response.result;
+  } };
+}
+function tracerOptions(options, tracer) {
+  return exactKeys(options, ['tracer', 'timeout', 'tracerConfig']) && options.tracer === tracer && options.timeout === '15s' &&
+    (tracer === 'callTracer' ? exactKeys(options.tracerConfig, ['withLog']) && options.tracerConfig.withLog === true : exactKeys(options.tracerConfig, ['diffMode']) && options.tracerConfig.diffMode === true);
+}
+function callManyShape(request, tracer) {
+  const [bundles, context, options] = request.params;
+  return request.method === 'debug_traceCallMany' && request.params.length === 3 && Array.isArray(bundles) && bundles.length === 1 && exactKeys(bundles[0], ['transactions']) &&
+    Array.isArray(bundles[0].transactions) && bundles[0].transactions.length === 1 && exactKeys(context, ['blockNumber', 'transactionIndex']) && exactKeys(context.blockNumber, ['blockHash', 'requireCanonical']) && tracerOptions(options, tracer);
+}
+function singleBundleResult(result) {
+  if (!Array.isArray(result) || result.length !== 1 || !Array.isArray(result[0]) || result[0].length !== 1) throw new TypeError('Missing single replay result.');
+  return result[0][0];
+}
+function replayCandidate(indexed, transaction, row) {
+  const candidates = [];
+  for (const request of indexed.requests) {
+    if (request.method !== 'debug_traceCallMany' || request.params[2]?.tracer !== 'callTracer') continue;
+    if (!callManyShape(request, 'callTracer')) continue;
+    const [bundles, context] = request.params, call = bundles[0].transactions[0];
+    if (lower(call?.from) !== lower(transaction.from) || lower(call?.to) !== lower(transaction.to) || lower(call?.data) !== lower(transaction.input) || call?.nonce === undefined) continue;
+    if (word(context.blockNumber.blockHash) !== row.blockHash || context.blockNumber.requireCanonical !== true || integer(context.transactionIndex) !== row.transactionIndex) continue;
+    candidates.push({ call, trace: singleBundleResult(indexed.result(request)), requestId: request.id, request });
+  }
+  if (candidates.length !== 1) throw new TypeError('Missing or ambiguous original replay.');
+  return candidates[0];
+}
+export function findOriginalReplay(evidence, transaction, row) {
+  try { return replayCandidate(indexedEvidence(evidence), transaction, row); }
+  catch { return null; }
+}
+function replayStateEvidence(evidence, transaction, candidate) {
+  const indexed = indexedEvidence(evidence), originals = [], replays = [];
+  for (const request of indexed.requests) {
+    if (request.method === 'debug_traceTransaction' && request.params[1]?.tracer === 'prestateTracer' && request.params[1]?.tracerConfig?.diffMode === true && lower(request.params[0]) === lower(transaction.hash)) {
+      if (request.params.length !== 2 || !tracerOptions(request.params[1], 'prestateTracer')) throw new TypeError('Malformed original diff request.');
+      originals.push(indexed.result(request));
+    }
+    if (request.method === 'debug_traceCallMany' && request.params[2]?.tracer === 'prestateTracer' && request.params[2]?.tracerConfig?.diffMode === true &&
+      isDeepStrictEqual(request.params.slice(0, 2), candidate.request.params.slice(0, 2))) {
+      if (!callManyShape(request, 'prestateTracer')) throw new TypeError('Malformed replay diff request.');
+      replays.push(singleBundleResult(indexed.result(request)));
+    }
+  }
+  if (originals.length !== 1 || replays.length !== 1) throw new TypeError('Missing or ambiguous paired state evidence.');
+  return { original: originals[0], replay: replays[0] };
 }
 export function compareOriginalReplay({ transaction, originalTrace, row, productEvidence, oracleEvidence, productIdentity, oracleIdentity }) {
   const a = findOriginalReplay(productEvidence, transaction, row), b = findOriginalReplay(oracleEvidence, transaction, row);
@@ -218,6 +329,22 @@ export function compareOriginalReplay({ transaction, originalTrace, row, product
   if (Object.values(comparisons).some(value => value.status === 'mismatched')) return { status: 'mismatched', comparisons, reason: 'Strict original-position call-tree evidence differs.' };
   if (Object.values(comparisons).some(value => value.status !== 'matched')) return { status: 'incomplete', comparisons, reason: 'Required original-position trace fields are incomplete.' };
   try {
+    if (word(transaction.hash) !== row.transactionHash || word(transaction.blockHash) !== row.blockHash || integer(transaction.blockNumber) !== row.blockNumber || integer(transaction.transactionIndex) !== row.transactionIndex || integer(transaction.chainId) !== '999') return { status: 'mismatched', comparisons, reason: 'Original transaction identity differs from the replay position.' };
+    const productState = replayStateEvidence(productEvidence, transaction, a), oracleState = replayStateEvidence(oracleEvidence, transaction, b);
+    comparisons.state = {
+      productVsOriginal: compareStateDiffs(productState.original, productState.replay),
+      oracleVsOriginal: compareStateDiffs(oracleState.original, oracleState.replay),
+      originalProviders: compareStateDiffs(productState.original, oracleState.original),
+      replayProviders: compareStateDiffs(productState.replay, oracleState.replay),
+    };
+    if (Object.values(comparisons.state).some(value => value.status === 'mismatched')) return { status: 'mismatched', comparisons, reason: 'Complete original-position pre/post state evidence differs, including absolute values and field presence.' };
+    if (Object.values(comparisons.state).some(value => value.status !== 'matched')) return { status: 'incomplete', comparisons, reason: 'Required original-position pre/post state evidence is malformed or incomplete.' };
+    const sender = address(transaction.from), originalNonce = stateQuantity(transaction.nonce, 64);
+    for (const diff of [productState.original, productState.replay, oracleState.original, oracleState.replay]) {
+      const normalized = strictStateDiffProjection(diff);
+      if (!Object.hasOwn(normalized.pre[sender] ?? {}, 'nonce') || !Object.hasOwn(normalized.post[sender] ?? {}, 'nonce')) return { status: 'incomplete', comparisons, reason: 'Original state evidence does not report the sender nonce transition.' };
+      if (normalized.pre[sender].nonce !== originalNonce || normalized.post[sender].nonce !== String(BigInt(originalNonce) + 1n)) return { status: 'mismatched', comparisons, reason: 'Original state evidence does not reproduce the transaction sender nonce and increment.' };
+    }
     if (integer(transaction.type) !== '0' || transaction.accessList !== undefined || ['authorizationList', 'blobVersionedHashes', 'maxFeePerBlobGas'].some(key => transaction[key] !== undefined)) return { status: 'incomplete', comparisons, reason: 'The shared adapter does not reproduce the complete typed transaction envelope; effective gas price alone is insufficient.' };
     const expected = { from: lower(transaction.from), to: lower(transaction.to), data: lower(transaction.input), value: integer(transaction.value), gas: integer(transaction.gas), gasPrice: integer(transaction.gasPrice), nonce: integer(transaction.nonce) };
     for (const candidate of [a, b]) {
@@ -226,8 +353,8 @@ export function compareOriginalReplay({ transaction, originalTrace, row, product
       if (!isDeepStrictEqual(normalized, expected)) return { status: 'mismatched', comparisons, reason: 'Original envelope fields differ.' };
     }
     for (const identity of [productIdentity, oracleIdentity]) {
-      if (!identity || identity.stateBinding !== 'block_hash_and_transaction_index' || identity.headerContext !== 'original_block' || identity.method !== 'debug_traceCallMany' || identity.transactionHash !== row.transactionHash || identity.stateBlockHash !== row.blockHash || integer(identity.blockNumber) !== row.blockNumber || integer(identity.timestamp) !== row.timestamp || integer(identity.transactionIndex) !== row.transactionIndex || integer(identity.postTransactionIndex) !== String(BigInt(row.transactionIndex) + 1n) || identity.validation?.originalReplay !== 'semantic_trace_and_receipt_match' || identity.validation?.feeRepresentation !== 'original_effective_gas_price' || !isDeepStrictEqual(identity.validation.headerFields, ['number', 'timestamp', 'gasLimit', 'baseFee', 'prevRandao', 'coinbase', 'chainId', 'parentHash'])) throw new TypeError();
+      if (!identity || identity.stateBinding !== 'block_hash_and_transaction_index' || identity.headerContext !== 'original_block' || identity.method !== 'debug_traceCallMany' || identity.transactionHash !== row.transactionHash || identity.stateBlockHash !== row.blockHash || integer(identity.blockNumber) !== row.blockNumber || integer(identity.timestamp) !== row.timestamp || integer(identity.transactionIndex) !== row.transactionIndex || integer(identity.postTransactionIndex) !== String(BigInt(row.transactionIndex) + 1n) || identity.validation?.originalReplay !== 'semantic_trace_and_receipt_match' || identity.validation?.originalReplayState !== 'complete_pre_post_diff_match' || identity.validation?.feeRepresentation !== 'original_effective_gas_price' || !isDeepStrictEqual(identity.validation.headerFields, ['number', 'timestamp', 'gasLimit', 'baseFee', 'prevRandao', 'coinbase', 'chainId', 'parentHash'])) throw new TypeError();
     }
-    return { status: 'matched', comparisons, scope: 'Complete unsigned legacy-call envelope and strict original-position endpoint agreement; shared adapter, no signature or independent-engine proof.' };
-  } catch { return { status: 'incomplete', comparisons, reason: 'Complete original envelope or original-position validation identity is unavailable.' }; }
+    return { status: 'matched', comparisons, scope: 'Complete unsigned legacy-call envelope, strict original-position trace and complete pre/post state-diff endpoint agreement; shared adapter, no signature, cryptographic state proof or independent-engine proof.' };
+  } catch { return { status: 'incomplete', comparisons, reason: 'Complete original envelope, bound original/replay state evidence or original-position validation identity is unavailable.' }; }
 }

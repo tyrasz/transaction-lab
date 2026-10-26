@@ -1,0 +1,1036 @@
+{
+  "schemaVersion": "1.0",
+  "createdAt": "2026-10-26T04:42:11.903Z",
+  "purpose": "Current unsigned-query capability evidence at two fixed recorded states; not a historical replay, production release, accuracy benchmark or security classification.",
+  "sources": [
+    {
+      "path": "reports/live/v0.6-current-transfer-checks.json",
+      "sha256": "8851de07c31f2d17dbb9661ceabdaec7d71907cd07eab3f1bd62e7eebf41a2fb",
+      "bytes": 221896
+    },
+    {
+      "path": "reports/lending-discovery/measured-current-balances.json",
+      "sha256": "549b97369980a8c0c24a7db4cfe22eb9e1114927a20860de7a9b7e6398ef459c",
+      "bytes": 153339
+    },
+    {
+      "path": "reports/lending-discovery/borrow-evidence.json",
+      "sha256": "102152aa23209503b4a0ce108cf8c92b5abdb340e3c31ea0343d3999b0b8b0be",
+      "bytes": 107823
+    },
+    {
+      "path": "research/current-query-validation/PLAN.md",
+      "sha256": "5ff926263435de2fa3a0f0234444053f8ebf0893798718ccfbe1b0e9542460da",
+      "bytes": 25765
+    }
+  ],
+  "frozenSourcesSha256": "140f3d31bc6ea36d2ac2d8e6acd5cd2f6fe16703cdd0f28f3e1b099e1c91b44c",
+  "frozenCommit": "27c60a4bc380118f67328a878b1e425b6c335908",
+  "scriptSha256": "797a74292e2850d71f7a8ea3384a84f38bf3dced14dcf67acc044b0796f9d7a3",
+  "endpoints": {
+    "A": "https://hyperliquid.drpc.org",
+    "B": "https://rpc.hyperlend.finance/archive"
+  },
+  "limits": {
+    "maxRpc": 128,
+    "plannedRpc": 126,
+    "responseBytes": 8388608,
+    "totalResponseBytes": 67108864,
+    "requestMs": 25000,
+    "wallMs": 600000,
+    "retries": 0
+  },
+  "cases": [
+    {
+      "id": "supply",
+      "header": {
+        "hash": "0x48f4baab87c398dedf709546bbc5bc2da28f45ef90815bf98a47c8429b2f5fa7",
+        "parentHash": "0xb60c38d3aa7a2e4255048a85eb4056d584875ef0cca4dbef5fb0da858bbe5f72",
+        "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "miner": "0x0000000000000000000000000000000000000000",
+        "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "transactionsRoot": "0x458d545dc819f91fd534179eb3568a8fdfa29d2198335cd45622d7926d119ef0",
+        "receiptsRoot": "0xa72a509476c2c6ea741289f4f82a7f14762ae1f56a07e68b7394ad5f1a06bc68",
+        "logsBloom": "0x00000001400020000040000000800000000000000002000000000000000000000000000000000000000004000008000000000000000020000000040000014000100000000000000800000008000900002000000000040000400000000000000000000000000000000000000000100000000010000000000088800010000800000000004000000000080000000100000000000001000002008040002000000000000000000000000000000800000000000000000000000000000000020000040000000002000002000000000080000000000000000400000004000000000000200000000000080000000000000000000000000000000000000000000000000000",
+        "difficulty": "0x0",
+        "number": "0x2f3df80",
+        "gasLimit": "0x2dc6c0",
+        "gasUsed": "0x6000b",
+        "timestamp": "0x6adeba27",
+        "extraData": "0x",
+        "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "nonce": "0x0000000000000000",
+        "baseFeePerGas": "0x98f0dcc",
+        "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "blobGasUsed": "0x0",
+        "excessBlobGas": "0x0",
+        "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "size": "0x782",
+        "uncles": [],
+        "transactions": [
+          "0xd04561ab2feea19cba3bd034208c4e83359a8e1c07c97ce68e9aca0dc96873fc",
+          "0x8c0cbb0166d18f853c780b73de73ef504dd86b08345d2ff34c8bdda0c004cfe9",
+          "0x574618607b7c20c3e120e24ff081e2a8151add397c547ce03cdd9119c7397978"
+        ],
+        "withdrawals": []
+      },
+      "original": {
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+        "data": "0x617ba037000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000000e5e4030000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d00000000000000000000000000000000000000000000000000000000000000000",
+        "value": "0x0",
+        "gas": "0x4c4b40"
+      },
+      "source": "reports/live/v0.6-current-transfer-checks.json",
+      "queries": [
+        {
+          "id": "usdc",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "kind": "balance"
+        },
+        {
+          "id": "husdc",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "kind": "balance"
+        },
+        {
+          "id": "usdc-allowance",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "kind": "allowance"
+        }
+      ],
+      "previousMeasurements": [
+        {
+          "asset": {
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "decimals": 6,
+            "symbol": "USDC",
+            "name": "USDC",
+            "type": "ERC20",
+            "role": "underlying_asset"
+          },
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "beforeRaw": "344156193",
+          "afterRaw": "329090078",
+          "deltaRaw": "-15066115",
+          "before": "344.156193",
+          "after": "329.090078",
+          "delta": "-15.066115"
+        },
+        {
+          "asset": {
+            "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "decimals": 6,
+            "symbol": "hHyperEvmUSDC",
+            "name": "HyperLend HyperEVM USDC",
+            "type": "ERC20",
+            "role": "receipt_token"
+          },
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "beforeRaw": "3179075937",
+          "afterRaw": "3194142051",
+          "deltaRaw": "15066114",
+          "before": "3179.075937",
+          "after": "3194.142051",
+          "delta": "15.066114"
+        },
+        {
+          "asset": {
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "decimals": 6,
+            "symbol": "USDC",
+            "name": "USDC",
+            "type": "ERC20"
+          },
+          "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584003202135963444",
+          "afterRaw": "115792089237316195423570985008687907853269984665640564039457584003202120897329",
+          "deltaRaw": "-15066115",
+          "before": "115792089237316195423570985008687907853269984665640564039457584003202135.963444",
+          "after": "115792089237316195423570985008687907853269984665640564039457584003202120.897329",
+          "delta": "-15.066115",
+          "beforeKind": "bounded",
+          "afterKind": "bounded",
+          "changed": true,
+          "observationIds": [
+            "permission-1"
+          ],
+          "consistency": {
+            "eventComparison": "no_event",
+            "lastEventObservationId": null,
+            "lastEventAmountRaw": null,
+            "requestComparison": "no_request",
+            "transferObservationIds": [
+              "permission-1"
+            ],
+            "transferComparison": "not_compared_to_allowance",
+            "falseReturnObservationIds": [],
+            "explanation": "The measured value is the final allowance after the whole transaction. Earlier approvals may be superseded or consumed later; an evidence difference is not a maliciousness verdict. transferFrom amounts are requested token transfers, not requested allowance values, and are not equated with allowance changes. An unchanged allowance does not establish that no spending occurred."
+          }
+        }
+      ],
+      "pinned": {
+        "blockHash": "0x48f4baab87c398dedf709546bbc5bc2da28f45ef90815bf98a47c8429b2f5fa7",
+        "requireCanonical": true
+      },
+      "anchorTransactionHash": "0xd04561ab2feea19cba3bd034208c4e83359a8e1c07c97ce68e9aca0dc96873fc"
+    },
+    {
+      "id": "borrow",
+      "header": {
+        "hash": "0x206b1f6b56dced1f90f742384ad84d74973a02d8bee8c07a823f394d1506a5a2",
+        "parentHash": "0x634d0e55ceabc59544992419eb78e0f5dff49f9a30202d3929b073df4d6654d9",
+        "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "miner": "0x0000000000000000000000000000000000000000",
+        "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "transactionsRoot": "0xb5e46b5e090943b6185111e7d998f5cb7c8a6384fc8a27e1dc3c82f95994f889",
+        "receiptsRoot": "0x4221accf4603388674b86ca0d17362da0ae92049f266e7f76580ab4e90de75dc",
+        "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "difficulty": "0x0",
+        "number": "0x2f08b79",
+        "gasLimit": "0x2dc6c0",
+        "gasUsed": "0x6c34",
+        "timestamp": "0x6adb73e1",
+        "extraData": "0x",
+        "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "nonce": "0x0000000000000000",
+        "baseFeePerGas": "0x5f5e100",
+        "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "blobGasUsed": "0x0",
+        "excessBlobGas": "0x0",
+        "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "size": "0x5e8",
+        "uncles": [],
+        "transactions": [
+          "0x68b068b67a38dfbc6fb34b7a5beeef7207bd268c5019ef120b1b675cd2716068"
+        ],
+        "withdrawals": []
+      },
+      "original": {
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+        "data": "0xa415bcad000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000031cc53ea000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "value": "0x0",
+        "gas": "0x4c4b40"
+      },
+      "source": "reports/lending-discovery/measured-current-balances.json",
+      "queries": [
+        {
+          "id": "usdc",
+          "to": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "kind": "balance"
+        },
+        {
+          "id": "husdc",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "kind": "balance"
+        },
+        {
+          "id": "debt",
+          "to": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+          "data": "0x70a082310000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "kind": "balance"
+        },
+        {
+          "id": "husdc-allowance",
+          "to": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "data": "0xdd62ed3e0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d000000000000000000000000000a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "owner": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "spender": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+          "kind": "allowance"
+        }
+      ],
+      "previousMeasurements": [
+        {
+          "asset": {
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "decimals": 6,
+            "symbol": "USDC",
+            "name": "USDC",
+            "type": "ERC20",
+            "role": "underlying_asset"
+          },
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "accountRoles": [
+            "caller",
+            "recipient",
+            "position_owner"
+          ],
+          "beforeRaw": "569439069",
+          "afterRaw": "1404913479",
+          "deltaRaw": "835474410",
+          "before": "569.439069",
+          "after": "1404.913479",
+          "delta": "835.47441"
+        },
+        {
+          "asset": {
+            "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "decimals": 6,
+            "symbol": "hHyperEvmUSDC",
+            "name": "HyperLend HyperEVM USDC",
+            "type": "ERC20",
+            "role": "receipt_token"
+          },
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "accountRoles": [
+            "caller",
+            "recipient",
+            "position_owner"
+          ],
+          "beforeRaw": "5677678780",
+          "afterRaw": "5677678780",
+          "deltaRaw": "0",
+          "before": "5677.67878",
+          "after": "5677.67878",
+          "delta": "0"
+        },
+        {
+          "asset": {
+            "address": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+            "decimals": 6,
+            "symbol": "variableDebtHyperEvmUSDC",
+            "name": "HyperLend HyperEVM Variable Debt USDC",
+            "role": "liability",
+            "transferable": false,
+            "type": "ERC20"
+          },
+          "account": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "accountRoles": [
+            "caller",
+            "recipient",
+            "position_owner"
+          ],
+          "beforeRaw": "2",
+          "afterRaw": "835474412",
+          "deltaRaw": "835474410",
+          "before": "0.000002",
+          "after": "835.474412",
+          "delta": "835.47441"
+        },
+        {
+          "asset": {
+            "address": "0xb88339cb7199b77e23db6e890353e22632ba630f",
+            "decimals": 6,
+            "symbol": "USDC",
+            "name": "USDC",
+            "type": "ERC20",
+            "role": "underlying_asset"
+          },
+          "account": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "accountRoles": [
+            "reserve_custody"
+          ],
+          "beforeRaw": "4856080658038",
+          "afterRaw": "4855245183628",
+          "deltaRaw": "-835474410",
+          "before": "4856080.658038",
+          "after": "4855245.183628",
+          "delta": "-835.47441"
+        },
+        {
+          "asset": {
+            "address": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+            "decimals": 6,
+            "symbol": "hHyperEvmUSDC",
+            "name": "HyperLend HyperEVM USDC",
+            "type": "ERC20",
+            "role": "receipt_token"
+          },
+          "account": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "accountRoles": [
+            "reserve_custody"
+          ],
+          "beforeRaw": "0",
+          "afterRaw": "0",
+          "deltaRaw": "0",
+          "before": "0",
+          "after": "0",
+          "delta": "0"
+        },
+        {
+          "asset": {
+            "address": "0xd612513cb3b2c52abcd6d4b338374c09ada4657d",
+            "decimals": 6,
+            "symbol": "variableDebtHyperEvmUSDC",
+            "name": "HyperLend HyperEVM Variable Debt USDC",
+            "role": "liability",
+            "transferable": false,
+            "type": "ERC20"
+          },
+          "account": "0x744e4f26ee30213989216e1632d9be3547c4885b",
+          "accountRoles": [
+            "reserve_custody"
+          ],
+          "beforeRaw": "0",
+          "afterRaw": "0",
+          "deltaRaw": "0",
+          "before": "0",
+          "after": "0",
+          "delta": "0"
+        }
+      ],
+      "pinned": {
+        "blockHash": "0x206b1f6b56dced1f90f742384ad84d74973a02d8bee8c07a823f394d1506a5a2",
+        "requireCanonical": true
+      },
+      "anchorTransactionHash": "0x68b068b67a38dfbc6fb34b7a5beeef7207bd268c5019ef120b1b675cd2716068"
+    }
+  ],
+  "scheduled": [
+    {
+      "provider": "A",
+      "caseId": null,
+      "label": "chain"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "header"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "sender-nonce"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "sender-balance"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "sender-code"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "witness-code"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "original-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "original-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "header-before"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "header-after"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "anchor-transaction"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "anchor-nonce-end"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "anchor-nonce-parent"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "anchor-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "anchor-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "usdc-before-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "usdc-before-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "usdc-after-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "usdc-after-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "husdc-before-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "husdc-before-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "husdc-after-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "husdc-after-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "usdc-allowance-before-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "usdc-allowance-before-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "usdc-allowance-after-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "usdc-allowance-after-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "direct-usdc-before"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "direct-usdc-after"
+    },
+    {
+      "provider": "A",
+      "caseId": "supply",
+      "label": "canonical"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "header"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "sender-nonce"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "sender-balance"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "sender-code"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "witness-code"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "original-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "original-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "header-before"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "header-after"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "anchor-transaction"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "anchor-nonce-end"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "anchor-nonce-parent"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "anchor-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "anchor-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "usdc-before-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "usdc-before-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "usdc-after-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "usdc-after-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "husdc-before-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "husdc-before-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "husdc-after-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "husdc-after-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "debt-before-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "debt-before-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "debt-after-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "debt-after-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "husdc-allowance-before-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "husdc-allowance-before-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "husdc-allowance-after-trace"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "husdc-allowance-after-diff"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "direct-usdc-before"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "direct-usdc-after"
+    },
+    {
+      "provider": "A",
+      "caseId": "borrow",
+      "label": "canonical"
+    },
+    {
+      "provider": "B",
+      "caseId": null,
+      "label": "chain"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "header"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "sender-nonce"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "sender-balance"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "sender-code"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "witness-code"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "original-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "original-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "header-before"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "header-after"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "anchor-transaction"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "anchor-nonce-end"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "anchor-nonce-parent"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "anchor-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "anchor-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "usdc-before-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "usdc-before-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "usdc-after-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "usdc-after-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "husdc-before-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "husdc-before-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "husdc-after-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "husdc-after-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "usdc-allowance-before-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "usdc-allowance-before-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "usdc-allowance-after-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "usdc-allowance-after-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "direct-usdc-before"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "direct-usdc-after"
+    },
+    {
+      "provider": "B",
+      "caseId": "supply",
+      "label": "canonical"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "header"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "sender-nonce"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "sender-balance"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "sender-code"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "witness-code"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "original-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "original-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "header-before"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "header-after"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "anchor-transaction"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "anchor-nonce-end"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "anchor-nonce-parent"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "anchor-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "anchor-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "usdc-before-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "usdc-before-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "usdc-after-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "usdc-after-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "husdc-before-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "husdc-before-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "husdc-after-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "husdc-after-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "debt-before-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "debt-before-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "debt-after-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "debt-after-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "husdc-allowance-before-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "husdc-allowance-before-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "husdc-allowance-after-trace"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "husdc-allowance-after-diff"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "direct-usdc-before"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "direct-usdc-after"
+    },
+    {
+      "provider": "B",
+      "caseId": "borrow",
+      "label": "canonical"
+    }
+  ],
+  "policy": {
+    "binding": "The identical EIP-1898 {blockHash,requireCanonical:true} object is used for both original tracers, token queries, state reads and witnesses. Parent anchor read is explicitly separate. No bare-hash/number fallback.",
+    "originalEnvelope": "Exact recorded normalized original from/to/data/value0/gas5000000; omit gasPrice, maxFeePerGas, maxPriorityFeePerGas and nonce everywhere.",
+    "queryEnvelope": "Original external sender, exact fixed token/calldata, explicit zero value, gas300000, no fee or nonce fields. Every before/after tracer is isolated.",
+    "afterOverrides": "All fields from frozen buildStateOverrides(original diff), byte-for-byte identical across all after token queries and direct after eth_call. Never apply a query diff to another query.",
+    "headerWitness": "An isolated predeclared empty-code address receives only ephemeral witness code; after witness adds this disjoint code entry to the complete original overrides. It returns NUMBER,TIMESTAMP,GASLIMIT,BASEFEE,PREVRANDAO,COINBASE,CHAINID,BLOCKHASH(number-1). No block overrides.",
+    "stateAnchor": "Use the first transaction hash in each saved ordinary block list, without replacement. Read its returned sender nonce at selected and parent block hashes, then trace a USDC query from that sender. A nonce visible in query prestate equal to selected state and different from parent is the proposed state-position witness; an equal or unavailable anchor remains inconclusive.",
+    "skips": "After queries require successful original trace, no lifecycle operations, and valid complete original diff. Witnesses additionally require the reserved address to be unused and have empty pinned code. Anchor dependencies may fail independently. A chain/header failure skips that cell; global budget failures skip remaining labels. Every skip is retained.",
+    "caps": "No retries, fallback, replacement blocks/wallets or more than126 scheduled RPCs.8MiB per response,64MiB total,25s per call and10min monotonic overall. A cap-crossing final chunk is counted and discarded; no additional request after total cap. Remaining two authorized RPC slots are unused.",
+    "provenance": "Frozen historical pure path checks are applied to a locally wrapped single current trace only. No historical transaction-index, fee, receipt or executionIdentity label is reused. Runtime bytecode attestation and malicious override controls are outside this capture."
+  }
+}

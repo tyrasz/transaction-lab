@@ -18,7 +18,7 @@ import { projectAccountEffects } from './account-effects.js';
 import { EXAMPLES, METADATA, CAPABILITIES, VERSION } from './config.js';
 
 const ROOT = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
-const engineFiles = ['account-effects.js','affected-balances.js','allowances.js','analyze.js','balances.js','config.js','historical-state.js','lending.js','lending-balances.js','permissions.js','revert.js','rpc.js','server.js','state.js','validate.js'];
+const engineFiles = ['account-effects.js','affected-balances.js','allowances.js','analyze.js','balances.js','config.js','historical-state.js','lending.js','lending-balances.js','permissions.js','query-validation.js','revert.js','rpc.js','server.js','state-diff.js','state.js','validate.js'];
 const engineHash = createHash('sha256');
 for (const name of engineFiles) engineHash.update(name+'\0').update(await readFile(path.join(ROOT,'src',name))).update('\0');
 const implementation = Object.freeze({name:'Transaction Lab',version:VERSION,sourceSha256:engineHash.digest('hex'),sourceFiles:engineFiles});
