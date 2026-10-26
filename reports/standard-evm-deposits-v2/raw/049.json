@@ -1,0 +1,92 @@
+{
+  "sequence": 49,
+  "caseSequence": 19,
+  "startedAt": "2026-10-26T09:07:43.061Z",
+  "request": {
+    "url": "https://eth.drpc.org",
+    "method": "POST",
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 49,
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "to": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "data": "0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "value": "0x0",
+          "gas": "0x493e0"
+        },
+        {
+          "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "prestateTracer",
+          "timeout": "15s",
+          "tracerConfig": {
+            "diffMode": true
+          }
+        }
+      ]
+    },
+    "bodyText": "{\"jsonrpc\":\"2.0\",\"id\":49,\"method\":\"debug_traceCall\",\"params\":[{\"from\":\"0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668\",\"to\":\"0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b\",\"data\":\"0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668\",\"value\":\"0x0\",\"gas\":\"0x493e0\"},{\"blockHash\":\"0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61\",\"requireCanonical\":true},{\"tracer\":\"prestateTracer\",\"timeout\":\"15s\",\"tracerConfig\":{\"diffMode\":true}}]}",
+    "bodyBytes": 465,
+    "bodySha256": "e0e882f2eaf08ce4209138fb195dbcd5c1848bcf3d8b41007752d870cc0ab604"
+  },
+  "http": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-origin": "*",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a5084ff2aaee448f-SIN",
+      "connection": "keep-alive",
+      "content-encoding": "br",
+      "content-length": "138",
+      "content-type": "application/json",
+      "date": "Mon, 26 Oct 2026 09:07:43 GMT",
+      "server": "cloudflare",
+      "strict-transport-security": "max-age=31536000; includeSubDomains",
+      "vary": "Origin, Accept-Encoding",
+      "x-drpc-owner-id": "cb501251-31a8-4028-8b0a-54679f15c385",
+      "x-drpc-owner-tier": "free",
+      "x-drpc-provider-id": "drpc-core-free",
+      "x-drpc-trace-id": "725630a7f277e9b1fc874a688007babc"
+    }
+  },
+  "responseText": "{\"id\":49,\"jsonrpc\":\"2.0\",\"result\":{\"post\":{\"0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668\":{\"nonce\":2261}},\"pre\":{\"0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668\":{\"balance\":\"0x8ccdea90d31cb08c\",\"nonce\":2260}}}}",
+  "response": {
+    "id": 49,
+    "jsonrpc": "2.0",
+    "result": {
+      "post": {
+        "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668": {
+          "nonce": 2261
+        }
+      },
+      "pre": {
+        "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668": {
+          "balance": "0x8ccdea90d31cb08c",
+          "nonce": 2260
+        }
+      }
+    }
+  },
+  "transport": {
+    "complete": true,
+    "receivedBytes": 204,
+    "retainedBytes": 204,
+    "observedPrefixSha256": "f30ed84200fead8ea839371635633e963d787e7bd9967ba47bead9e91f915cb9",
+    "retainedSha256": "f30ed84200fead8ea839371635633e963d787e7bd9967ba47bead9e91f915cb9",
+    "rawFile": "raw/049.body",
+    "rawBase64": "eyJpZCI6NDksImpzb25ycGMiOiIyLjAiLCJyZXN1bHQiOnsicG9zdCI6eyIweDQ0YzNhOTYxODFhZjllMjk1Y2U4ZTE4OGZhOGZjZGQ3MmQxZWI2NjgiOnsibm9uY2UiOjIyNjF9fSwicHJlIjp7IjB4NDRjM2E5NjE4MWFmOWUyOTVjZThlMTg4ZmE4ZmNkZDcyZDFlYjY2OCI6eyJiYWxhbmNlIjoiMHg4Y2NkZWE5MGQzMWNiMDhjIiwibm9uY2UiOjIyNjB9fX19",
+    "durationMs": 307.2181670000009,
+    "timeoutMs": 25000,
+    "responseSha256": "f30ed84200fead8ea839371635633e963d787e7bd9967ba47bead9e91f915cb9"
+  },
+  "finishedAt": "2026-10-26T09:07:43.368Z"
+}

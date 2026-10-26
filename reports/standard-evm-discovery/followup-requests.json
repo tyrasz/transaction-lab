@@ -1,0 +1,383 @@
+[
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "drpc-chain",
+    "method": "eth_chainId",
+    "params": []
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "aave-parent-header",
+    "method": "eth_getBlockByHash",
+    "params": [
+      "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+      false
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "morpho-parent-header",
+    "method": "eth_getBlockByHash",
+    "params": [
+      "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+      false
+    ]
+  },
+  {
+    "kind": "get",
+    "label": "kiln-primary-wrapper-deployment",
+    "url": "https://raw.githubusercontent.com/kilnfi/app-plugin-kiln-v2/develop/PLUGIN_SPECIFICATION.md"
+  },
+  {
+    "kind": "get",
+    "label": "aave-primary-pool-docs",
+    "url": "https://aave.com/docs/aave-v3/smart-contracts/pool"
+  },
+  {
+    "kind": "get",
+    "label": "morpho-primary-metamorpho-source",
+    "url": "https://raw.githubusercontent.com/morpho-org/metamorpho/main/src/MetaMorpho.sol"
+  },
+  {
+    "kind": "get",
+    "label": "wrapper-explorer-verified-source",
+    "url": "https://eth.blockscout.com/api/v2/smart-contracts/0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "usdc-decimals()",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "data": "0x313ce567"
+      },
+      {
+        "blockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "aave-receipt-UNDERLYING_ASSET_ADDRESS()",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+        "data": "0xb16a19de"
+      },
+      {
+        "blockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "aave-receipt-name()",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+        "data": "0x06fdde03"
+      },
+      {
+        "blockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "aave-receipt-symbol()",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+        "data": "0x95d89b41"
+      },
+      {
+        "blockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "aave-receipt-decimals()",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+        "data": "0x313ce567"
+      },
+      {
+        "blockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "morpho-outer-asset()",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+        "data": "0x38d52e0f"
+      },
+      {
+        "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "morpho-outer-name()",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+        "data": "0x06fdde03"
+      },
+      {
+        "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "morpho-outer-symbol()",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+        "data": "0x95d89b41"
+      },
+      {
+        "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "morpho-outer-decimals()",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+        "data": "0x313ce567"
+      },
+      {
+        "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "morpho-inner-asset()",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+        "data": "0x38d52e0f"
+      },
+      {
+        "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "morpho-inner-name()",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+        "data": "0x06fdde03"
+      },
+      {
+        "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "morpho-inner-symbol()",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+        "data": "0x95d89b41"
+      },
+      {
+        "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "morpho-inner-decimals()",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+        "data": "0x313ce567"
+      },
+      {
+        "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "aave-sender-parent-code",
+    "method": "eth_getCode",
+    "params": [
+      "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+      {
+        "blockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "aave-owner-usdc-balance-parent",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+      },
+      {
+        "blockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "morpho-sender-parent-code",
+    "method": "eth_getCode",
+    "params": [
+      "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+      {
+        "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "morpho-owner-usdc-balance-parent",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "data": "0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+      },
+      {
+        "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "aave-owner-pool-allowance-parent",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "data": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+      },
+      {
+        "blockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "morpho-owner-outer-allowance-parent",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "data": "0xdd62ed3e00000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+      },
+      {
+        "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "morpho-outer-inner-allowance-parent",
+    "method": "eth_call",
+    "params": [
+      {
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "data": "0xdd62ed3e000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b000000000000000000000000beef01735c132ada46aa9aa4c54623caa92a64cb"
+      },
+      {
+        "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+        "requireCanonical": true
+      }
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "aave-parent-canonical-number",
+    "method": "eth_getBlockByNumber",
+    "params": [
+      "0x190db12",
+      false
+    ]
+  },
+  {
+    "kind": "rpc",
+    "url": "https://eth.drpc.org",
+    "label": "morpho-parent-canonical-number",
+    "method": "eth_getBlockByNumber",
+    "params": [
+      "0x190db62",
+      false
+    ]
+  }
+]

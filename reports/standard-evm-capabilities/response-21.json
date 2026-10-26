@@ -1,0 +1,84 @@
+{
+  "provider": "ethereum-drpc",
+  "endpoint": "https://eth.drpc.org",
+  "label": "hash-overridden-callTracer-witness",
+  "startedAt": "2026-10-26T07:56:46.046Z",
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 21,
+    "method": "debug_traceCall",
+    "params": [
+      {
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x000000000000000000000000000000000000feed",
+        "data": "0x",
+        "value": "0x0",
+        "gas": "0x493e0"
+      },
+      {
+        "blockHash": "0x888cd3dff00f52b85bb400ab86dbeb503fdd52becb6bcbb36994d856102b2916",
+        "requireCanonical": true
+      },
+      {
+        "tracer": "callTracer",
+        "timeout": "15s",
+        "tracerConfig": {
+          "withLog": true
+        },
+        "stateOverrides": {
+          "0x000000000000000000000000000000000000feed": {
+            "code": "0x60005460005260206000f3",
+            "stateDiff": {
+              "0x0000000000000000000000000000000000000000000000000000000000000000": "0x000000000000000000000000000000000000000000000000000000000000002a"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "requestText": "{\"jsonrpc\":\"2.0\",\"id\":21,\"method\":\"debug_traceCall\",\"params\":[{\"from\":\"0x0000000000000000000000000000000000000000\",\"to\":\"0x000000000000000000000000000000000000feed\",\"data\":\"0x\",\"value\":\"0x0\",\"gas\":\"0x493e0\"},{\"blockHash\":\"0x888cd3dff00f52b85bb400ab86dbeb503fdd52becb6bcbb36994d856102b2916\",\"requireCanonical\":true},{\"tracer\":\"callTracer\",\"timeout\":\"15s\",\"tracerConfig\":{\"withLog\":true},\"stateOverrides\":{\"0x000000000000000000000000000000000000feed\":{\"code\":\"0x60005460005260206000f3\",\"stateDiff\":{\"0x0000000000000000000000000000000000000000000000000000000000000000\":\"0x000000000000000000000000000000000000000000000000000000000000002a\"}}}}]}",
+  "requestSha256": "4b7fcc82cdb8dc5fa8a576110cf1c52ebf5dc16eba0c70c789c3968ae79bde60",
+  "responseBytes": 292,
+  "bodyComplete": true,
+  "http": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-origin": "*",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a507e8041e64600b-SIN",
+      "connection": "keep-alive",
+      "content-encoding": "br",
+      "content-length": "140",
+      "content-type": "application/json",
+      "date": "Mon, 26 Oct 2026 07:56:46 GMT",
+      "server": "cloudflare",
+      "strict-transport-security": "max-age=31536000; includeSubDomains",
+      "vary": "Origin, Accept-Encoding",
+      "x-drpc-owner-id": "cb501251-31a8-4028-8b0a-54679f15c385",
+      "x-drpc-owner-tier": "free",
+      "x-drpc-provider-id": "drpc-core-free",
+      "x-drpc-trace-id": "f6f0d72c75ccd69961000f192cb76cbf"
+    }
+  },
+  "responseBase64": "eyJpZCI6MjEsImpzb25ycGMiOiIyLjAiLCJyZXN1bHQiOnsiZnJvbSI6IjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsImdhcyI6IjB4NDkzZTAiLCJnYXNVc2VkIjoiMHg1YTRlIiwidG8iOiIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMGZlZWQiLCJpbnB1dCI6IjB4Iiwib3V0cHV0IjoiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDJhIiwidmFsdWUiOiIweDAiLCJ0eXBlIjoiQ0FMTCJ9fQ==",
+  "responseText": "{\"id\":21,\"jsonrpc\":\"2.0\",\"result\":{\"from\":\"0x0000000000000000000000000000000000000000\",\"gas\":\"0x493e0\",\"gasUsed\":\"0x5a4e\",\"to\":\"0x000000000000000000000000000000000000feed\",\"input\":\"0x\",\"output\":\"0x000000000000000000000000000000000000000000000000000000000000002a\",\"value\":\"0x0\",\"type\":\"CALL\"}}",
+  "response": {
+    "id": 21,
+    "jsonrpc": "2.0",
+    "result": {
+      "from": "0x0000000000000000000000000000000000000000",
+      "gas": "0x493e0",
+      "gasUsed": "0x5a4e",
+      "to": "0x000000000000000000000000000000000000feed",
+      "input": "0x",
+      "output": "0x000000000000000000000000000000000000000000000000000000000000002a",
+      "value": "0x0",
+      "type": "CALL"
+    }
+  },
+  "rpcOutcome": "result",
+  "responseSha256": "d4d2f611f24ea2749e16bad2f8437caff05be414f9c85c73ae0fa93a5a4508bc",
+  "completedAt": "2026-10-26T07:56:46.418Z",
+  "elapsedMs": 371.867
+}

@@ -1,0 +1,80 @@
+{
+  "provider": "base-official",
+  "endpoint": "https://mainnet.base.org",
+  "label": "hash-overridden-callTracer-witness",
+  "startedAt": "2026-10-26T07:56:51.319Z",
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 33,
+    "method": "debug_traceCall",
+    "params": [
+      {
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x000000000000000000000000000000000000feed",
+        "data": "0x",
+        "value": "0x0",
+        "gas": "0x493e0"
+      },
+      {
+        "blockHash": "0xef10731d2bd3323ed990625fe703a644992642d503ccab31d7a6e9a55d54a8d3",
+        "requireCanonical": true
+      },
+      {
+        "tracer": "callTracer",
+        "timeout": "15s",
+        "tracerConfig": {
+          "withLog": true
+        },
+        "stateOverrides": {
+          "0x000000000000000000000000000000000000feed": {
+            "code": "0x60005460005260206000f3",
+            "stateDiff": {
+              "0x0000000000000000000000000000000000000000000000000000000000000000": "0x000000000000000000000000000000000000000000000000000000000000002a"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "requestText": "{\"jsonrpc\":\"2.0\",\"id\":33,\"method\":\"debug_traceCall\",\"params\":[{\"from\":\"0x0000000000000000000000000000000000000000\",\"to\":\"0x000000000000000000000000000000000000feed\",\"data\":\"0x\",\"value\":\"0x0\",\"gas\":\"0x493e0\"},{\"blockHash\":\"0xef10731d2bd3323ed990625fe703a644992642d503ccab31d7a6e9a55d54a8d3\",\"requireCanonical\":true},{\"tracer\":\"callTracer\",\"timeout\":\"15s\",\"tracerConfig\":{\"withLog\":true},\"stateOverrides\":{\"0x000000000000000000000000000000000000feed\":{\"code\":\"0x60005460005260206000f3\",\"stateDiff\":{\"0x0000000000000000000000000000000000000000000000000000000000000000\":\"0x000000000000000000000000000000000000000000000000000000000000002a\"}}}}]}",
+  "requestSha256": "0c194c3b5b66d662a882736335b3135faa0a90c84f312b0e571fd2e9e4c63a20",
+  "responseBytes": 101,
+  "bodyComplete": true,
+  "http": {
+    "status": 401,
+    "headers": {
+      "access-control-allow-credentials": "true",
+      "access-control-allow-headers": "Content-Type,Authorization,User-Agent",
+      "access-control-allow-methods": "GET, POST, OPTIONS",
+      "access-control-allow-origin": "",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a507e824fae97a47-SIN",
+      "connection": "keep-alive",
+      "content-length": "101",
+      "content-type": "application/json",
+      "date": "Mon, 26 Oct 2026 07:56:51 GMT",
+      "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.01,\"max_age\":604800}",
+      "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=0t3ffbVevtKuty6eJsSawjQCAUjqqqEhaqP%2FXCazpagCtL6PY%2FKQ4D8eMuL8rYbBfZVt%2BLt0wYjqtB6bOAT9J9TLJSbvUmV5cPFpfIbuAIMHuwIiVQ250rwDySx5%2BjqSnGaUThPYYqFGvv2hBg%2BQ3pv6MQzyMYQdxjkwApi0HrxI7dfQwB%2BnqEeE\"}]}",
+      "server": "cloudflare",
+      "set-cookie": "__cf_bm=P_fwKDcoGZPZaFK6cyZKNT5CNRhwnCR33NSdSeMbz9E-1793001411.3555357-1.0.1.1-4qwrS87TvQ_Jq0A6rcHdgpPEWN14754UfgPstfV80GrMZs602cnEQz0hH1ig053X7X5ZAQY16ClB29PnznzZrRzOo_rGoXIDekg1Qqe1VGSyupBv.dJZMGXQIyD0G2HZ; HttpOnly; SameSite=None; Secure; Path=/; Domain=base.org; Expires=Mon, 26 Oct 2026 08:26:51 GMT",
+      "strict-transport-security": "max-age=2592000",
+      "vary": "Accept-Encoding",
+      "x-content-type-options": "nosniff",
+      "x-node-id": "base_base-mainnet_ewr"
+    }
+  },
+  "responseBase64": "eyJqc29ucnBjIjoiMi4wIiwiaWQiOjMzLCJlcnJvciI6eyJjb2RlIjotMzI2MTEsIm1lc3NhZ2UiOiJyZWplY3RlZCBkdWUgdG8gcmVxdWVzdCBmaWx0ZXIgc2V0dGluZ3MifX0=",
+  "responseText": "{\"jsonrpc\":\"2.0\",\"id\":33,\"error\":{\"code\":-32611,\"message\":\"rejected due to request filter settings\"}}",
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 33,
+    "error": {
+      "code": -32611,
+      "message": "rejected due to request filter settings"
+    }
+  },
+  "rpcOutcome": "error",
+  "responseSha256": "8838b577f1dd7784524f4ec599e24405e6a855d65ebc844ba11ba086f7a34575",
+  "completedAt": "2026-10-26T07:56:51.570Z",
+  "elapsedMs": 250.984
+}

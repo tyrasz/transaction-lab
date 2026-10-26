@@ -1,0 +1,94 @@
+{
+  "sequence": 12,
+  "caseSequence": 12,
+  "startedAt": "2026-10-26T08:47:02.218Z",
+  "request": {
+    "url": "https://eth.drpc.org",
+    "method": "POST",
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 12,
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+          "to": "0x000000000000000000000000000000000000ba1a",
+          "data": "0x",
+          "value": "0x0",
+          "gas": "0x493e0"
+        },
+        {
+          "blockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "callTracer",
+          "timeout": "15s",
+          "tracerConfig": {
+            "withLog": true
+          },
+          "stateOverrides": {
+            "0x000000000000000000000000000000000000ba1a": {
+              "code": "0x43600052426020524560405248606052446080524160a0524660c0527f000000000000000000000000000000000000000000000000000000000190db114060e0526101006000f3"
+            }
+          }
+        }
+      ]
+    },
+    "bodyText": "{\"jsonrpc\":\"2.0\",\"id\":12,\"method\":\"debug_traceCall\",\"params\":[{\"from\":\"0x48c16c5652add27eddb0f896748a35fc60b8d1b4\",\"to\":\"0x000000000000000000000000000000000000ba1a\",\"data\":\"0x\",\"value\":\"0x0\",\"gas\":\"0x493e0\"},{\"blockHash\":\"0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7\",\"requireCanonical\":true},{\"tracer\":\"callTracer\",\"timeout\":\"15s\",\"tracerConfig\":{\"withLog\":true},\"stateOverrides\":{\"0x000000000000000000000000000000000000ba1a\":{\"code\":\"0x43600052426020524560405248606052446080524160a0524660c0527f000000000000000000000000000000000000000000000000000000000190db114060e0526101006000f3\"}}}]}",
+    "bodyBytes": 608,
+    "bodySha256": "c0f824c53a12f3c6388e88a458eca810a608c7e6a6c0232a4c83a9c265e2e798"
+  },
+  "http": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-origin": "*",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a50831a71d9e072d-SIN",
+      "connection": "keep-alive",
+      "content-encoding": "br",
+      "content-length": "300",
+      "content-type": "application/json",
+      "date": "Mon, 26 Oct 2026 08:47:02 GMT",
+      "server": "cloudflare",
+      "strict-transport-security": "max-age=31536000; includeSubDomains",
+      "vary": "origin, access-control-request-method, access-control-request-headers, Accept-Encoding",
+      "x-drpc-owner-id": "cb501251-31a8-4028-8b0a-54679f15c385",
+      "x-drpc-owner-tier": "free",
+      "x-drpc-provider-id": "drpc-core-free",
+      "x-drpc-trace-id": "95e3ae8c6c3f4dfe3f3755d211fae146"
+    }
+  },
+  "responseText": "{\"id\":12,\"jsonrpc\":\"2.0\",\"result\":{\"from\":\"0x48c16c5652add27eddb0f896748a35fc60b8d1b4\",\"gas\":\"0x493e0\",\"gasUsed\":\"0x527b\",\"to\":\"0x000000000000000000000000000000000000ba1a\",\"input\":\"0x\",\"output\":\"0x000000000000000000000000000000000000000000000000000000000190db12000000000000000000000000000000000000000000000000000000006ade1b07000000000000000000000000000000000000000000000000000000000392a2200000000000000000000000000000000000000000000000000000000000000000a3125a2860ff49e4dafd407a30414528ace435e36c65ebc9d58c8ad0139035140000000000000000000000004838b106fce9647bdf1e7877bf73ce8b0bad5f9700000000000000000000000000000000000000000000000000000000000000011584d40ec391a339866a3ffd0d514ca44a84660566550105dc658bc18aea1e07\",\"value\":\"0x0\",\"type\":\"CALL\"}}",
+  "response": {
+    "id": 12,
+    "jsonrpc": "2.0",
+    "result": {
+      "from": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+      "gas": "0x493e0",
+      "gasUsed": "0x527b",
+      "to": "0x000000000000000000000000000000000000ba1a",
+      "input": "0x",
+      "output": "0x000000000000000000000000000000000000000000000000000000000190db12000000000000000000000000000000000000000000000000000000006ade1b07000000000000000000000000000000000000000000000000000000000392a2200000000000000000000000000000000000000000000000000000000000000000a3125a2860ff49e4dafd407a30414528ace435e36c65ebc9d58c8ad0139035140000000000000000000000004838b106fce9647bdf1e7877bf73ce8b0bad5f9700000000000000000000000000000000000000000000000000000000000000011584d40ec391a339866a3ffd0d514ca44a84660566550105dc658bc18aea1e07",
+      "value": "0x0",
+      "type": "CALL"
+    }
+  },
+  "transport": {
+    "complete": true,
+    "receivedBytes": 740,
+    "retainedBytes": 740,
+    "observedPrefixSha256": "e56f1c6138d9a0d9a2cd0760d08a234c5ca4503101993ddb74f191f359116c1e",
+    "retainedSha256": "e56f1c6138d9a0d9a2cd0760d08a234c5ca4503101993ddb74f191f359116c1e",
+    "rawFile": "raw/012.body",
+    "rawBase64": "eyJpZCI6MTIsImpzb25ycGMiOiIyLjAiLCJyZXN1bHQiOnsiZnJvbSI6IjB4NDhjMTZjNTY1MmFkZDI3ZWRkYjBmODk2NzQ4YTM1ZmM2MGI4ZDFiNCIsImdhcyI6IjB4NDkzZTAiLCJnYXNVc2VkIjoiMHg1MjdiIiwidG8iOiIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMGJhMWEiLCJpbnB1dCI6IjB4Iiwib3V0cHV0IjoiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAxOTBkYjEyMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA2YWRlMWIwNzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDM5MmEyMjAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwYTMxMjVhMjg2MGZmNDllNGRhZmQ0MDdhMzA0MTQ1MjhhY2U0MzVlMzZjNjVlYmM5ZDU4YzhhZDAxMzkwMzUxNDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDQ4MzhiMTA2ZmNlOTY0N2JkZjFlNzg3N2JmNzNjZThiMGJhZDVmOTcwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAxMTU4NGQ0MGVjMzkxYTMzOTg2NmEzZmZkMGQ1MTRjYTQ0YTg0NjYwNTY2NTUwMTA1ZGM2NThiYzE4YWVhMWUwNyIsInZhbHVlIjoiMHgwIiwidHlwZSI6IkNBTEwifX0=",
+    "durationMs": 289.41604099999995,
+    "timeoutMs": 25000,
+    "responseSha256": "e56f1c6138d9a0d9a2cd0760d08a234c5ca4503101993ddb74f191f359116c1e"
+  },
+  "finishedAt": "2026-10-26T08:47:02.507Z"
+}

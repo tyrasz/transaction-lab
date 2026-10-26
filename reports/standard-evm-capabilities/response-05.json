@@ -1,0 +1,66 @@
+{
+  "provider": "ethereum-publicnode",
+  "endpoint": "https://ethereum-rpc.publicnode.com",
+  "label": "code-stateDiff-hash-call-witness",
+  "startedAt": "2026-10-26T07:56:41.201Z",
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 5,
+    "method": "eth_call",
+    "params": [
+      {
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x000000000000000000000000000000000000feed",
+        "data": "0x",
+        "value": "0x0",
+        "gas": "0x493e0"
+      },
+      {
+        "blockHash": "0x888cd3dff00f52b85bb400ab86dbeb503fdd52becb6bcbb36994d856102b2916",
+        "requireCanonical": true
+      },
+      {
+        "0x000000000000000000000000000000000000feed": {
+          "code": "0x60005460005260206000f3",
+          "stateDiff": {
+            "0x0000000000000000000000000000000000000000000000000000000000000000": "0x000000000000000000000000000000000000000000000000000000000000002a"
+          }
+        }
+      }
+    ]
+  },
+  "requestText": "{\"jsonrpc\":\"2.0\",\"id\":5,\"method\":\"eth_call\",\"params\":[{\"from\":\"0x0000000000000000000000000000000000000000\",\"to\":\"0x000000000000000000000000000000000000feed\",\"data\":\"0x\",\"value\":\"0x0\",\"gas\":\"0x493e0\"},{\"blockHash\":\"0x888cd3dff00f52b85bb400ab86dbeb503fdd52becb6bcbb36994d856102b2916\",\"requireCanonical\":true},{\"0x000000000000000000000000000000000000feed\":{\"code\":\"0x60005460005260206000f3\",\"stateDiff\":{\"0x0000000000000000000000000000000000000000000000000000000000000000\":\"0x000000000000000000000000000000000000000000000000000000000000002a\"}}}]}",
+  "requestSha256": "622696b83e825cc64d5962d122d5379bff91da58efcb9b2e212340494e288216",
+  "responseBytes": 103,
+  "bodyComplete": true,
+  "http": {
+    "status": 200,
+    "headers": {
+      "access-control-max-age": "1728000",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a507e7e5caba7e8d-SIN",
+      "connection": "keep-alive",
+      "content-encoding": "br",
+      "content-type": "application/json",
+      "date": "Mon, 26 Oct 2026 07:56:41 GMT",
+      "server": "cloudflare",
+      "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, accept-encoding",
+      "x-content-type-options": "nosniff",
+      "x-envoy-upstream-service-time": "21"
+    }
+  },
+  "responseBase64": "eyJqc29ucnBjIjoiMi4wIiwiaWQiOjUsInJlc3VsdCI6IjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAyYSJ9Cg==",
+  "responseText": "{\"jsonrpc\":\"2.0\",\"id\":5,\"result\":\"0x000000000000000000000000000000000000000000000000000000000000002a\"}\n",
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 5,
+    "result": "0x000000000000000000000000000000000000000000000000000000000000002a"
+  },
+  "rpcOutcome": "result",
+  "responseSha256": "663a4079e29d8d404fdb80add8c518bf9078eb3bd98395087b0809ed1f86d2a3",
+  "completedAt": "2026-10-26T07:56:41.531Z",
+  "elapsedMs": 329.873
+}

@@ -1,0 +1,71 @@
+{
+  "provider": "base-publicnode",
+  "endpoint": "https://base-rpc.publicnode.com",
+  "label": "usdc-hash-full-prestateTracer",
+  "startedAt": "2026-10-26T07:56:57.520Z",
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 43,
+    "method": "debug_traceCall",
+    "params": [
+      {
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+        "data": "0x70a082310000000000000000000000000000000000000000000000000000000000000000",
+        "value": "0x0",
+        "gas": "0x493e0"
+      },
+      {
+        "blockHash": "0xef10731d2bd3323ed990625fe703a644992642d503ccab31d7a6e9a55d54a8d3",
+        "requireCanonical": true
+      },
+      {
+        "tracer": "prestateTracer",
+        "timeout": "15s",
+        "tracerConfig": {
+          "diffMode": false,
+          "disableCode": false,
+          "disableStorage": false,
+          "includeEmpty": true
+        }
+      }
+    ]
+  },
+  "requestText": "{\"jsonrpc\":\"2.0\",\"id\":43,\"method\":\"debug_traceCall\",\"params\":[{\"from\":\"0x0000000000000000000000000000000000000000\",\"to\":\"0x833589fcd6edb6e08f4c7c32d4f71b54bda02913\",\"data\":\"0x70a082310000000000000000000000000000000000000000000000000000000000000000\",\"value\":\"0x0\",\"gas\":\"0x493e0\"},{\"blockHash\":\"0xef10731d2bd3323ed990625fe703a644992642d503ccab31d7a6e9a55d54a8d3\",\"requireCanonical\":true},{\"tracer\":\"prestateTracer\",\"timeout\":\"15s\",\"tracerConfig\":{\"diffMode\":false,\"disableCode\":false,\"disableStorage\":false,\"includeEmpty\":true}}]}",
+  "requestSha256": "da842feaaa387b1daa716d0d30ff5315e0ead609c7387b848cb146de3bd85bf7",
+  "responseBytes": 121,
+  "bodyComplete": true,
+  "http": {
+    "status": 200,
+    "headers": {
+      "access-control-max-age": "1728000",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a507e84bdd4ccde9-SIN",
+      "connection": "keep-alive",
+      "content-encoding": "br",
+      "content-type": "application/json",
+      "date": "Mon, 26 Oct 2026 07:56:57 GMT",
+      "server": "cloudflare",
+      "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, accept-encoding",
+      "x-content-type-options": "nosniff",
+      "x-envoy-upstream-service-time": "0"
+    }
+  },
+  "responseBase64": "eyJqc29ucnBjIjoiMi4wIiwiZXJyb3IiOnsiY29kZSI6LTMyNjAxLCJtZXNzYWdlIjoidGhlIG1ldGhvZCBkZWJ1Z190cmFjZUNhbGwgZG9lcyBub3QgZXhpc3QvaXMgbm90IGF2YWlsYWJsZSJ9LCJpZCI6NDN9Cg==",
+  "responseText": "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32601,\"message\":\"the method debug_traceCall does not exist/is not available\"},\"id\":43}\n",
+  "response": {
+    "jsonrpc": "2.0",
+    "error": {
+      "code": -32601,
+      "message": "the method debug_traceCall does not exist/is not available"
+    },
+    "id": 43
+  },
+  "rpcOutcome": "error",
+  "responseSha256": "466e24f7880af6866ce08146ced2d99e01c2ac5d5b4b808a689c972dda239d52",
+  "completedAt": "2026-10-26T07:56:57.765Z",
+  "elapsedMs": 245.213
+}

@@ -1,0 +1,213 @@
+{
+  "schemaVersion": "1",
+  "capture": {
+    "path": "reports/standard-evm-deposits/capture.json",
+    "sha256": "e0bde3899b5dc2795206ed70b6faa82f2a8bcaa5f8f82a79c3151f2fa093f778"
+  },
+  "planSha256": "18ca6712e4142cdb52ee80564ed2709437a19422942a151feb58311f628117df",
+  "scope": "Two selected development calls at original parent-block-end state; unsigned unpriced execution, not original-position replay or security assessment.",
+  "accounting": {
+    "attemptedRpc": 41,
+    "completedBodies": 41,
+    "observedResponseBytes": 403724,
+    "retainedResponseBytes": 403724,
+    "durationMs": 18524.999375000003,
+    "sourceBound": true
+  },
+  "sourceUnchanged": true,
+  "runtime": {
+    "node": "v22.23.2",
+    "v8": "12.4.254.21-node.56",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "cases": [
+    {
+      "id": "aave-usdc-supply-with-permit",
+      "originalTransactionHash": "0x6166280a62cdad28e7b8af05ebb622b42b61deff981b3b6cd83dc03b3bb130b2",
+      "stateBlockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+      "rpcCalls": 30,
+      "executionStatus": "success",
+      "gasUsed": "189775",
+      "canonicalStatus": "verified",
+      "measurementFailure": null,
+      "measurements": [
+        {
+          "id": "owner-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+          },
+          "status": "measured",
+          "beforeRaw": "3962903485",
+          "afterRaw": "0",
+          "deltaRaw": "-3962903485",
+          "reason": null
+        },
+        {
+          "id": "beneficiary-aethusdc",
+          "query": {
+            "to": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+            "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+          },
+          "status": "measured",
+          "beforeRaw": "0",
+          "afterRaw": "3962903484",
+          "deltaRaw": "3962903484",
+          "reason": null
+        },
+        {
+          "id": "reserve-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000098c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c"
+          },
+          "status": "measured",
+          "beforeRaw": "151987610826648",
+          "afterRaw": "151991573730133",
+          "deltaRaw": "3962903485",
+          "reason": null
+        },
+        {
+          "id": "owner-pool-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+          },
+          "status": "measured",
+          "beforeRaw": "0",
+          "afterRaw": "0",
+          "deltaRaw": "0",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "morpho-kiln-usdc-deposit",
+      "originalTransactionHash": "0xc46259d8064831c47c68776ca0611af75337adf8c4aee4bee5add0878b8873a7",
+      "stateBlockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+      "rpcCalls": 11,
+      "executionStatus": "success",
+      "gasUsed": "1413682",
+      "canonicalStatus": "unverified",
+      "measurementFailure": "The provider did not complete a valid bounded read-only request.",
+      "measurements": [
+        {
+          "id": "owner-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+          },
+          "status": "unavailable",
+          "beforeRaw": null,
+          "afterRaw": null,
+          "deltaRaw": null,
+          "reason": "The provider did not complete a valid bounded read-only request."
+        },
+        {
+          "id": "beneficiary-wrapper-shares",
+          "query": {
+            "to": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+            "data": "0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+          },
+          "status": "unavailable",
+          "beforeRaw": null,
+          "afterRaw": null,
+          "deltaRaw": null,
+          "reason": "The provider did not complete a valid bounded read-only request."
+        },
+        {
+          "id": "wrapper-vault-shares",
+          "query": {
+            "to": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+            "data": "0x70a08231000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+          },
+          "status": "unavailable",
+          "beforeRaw": null,
+          "afterRaw": null,
+          "deltaRaw": null,
+          "reason": "The provider did not complete a valid bounded read-only request."
+        },
+        {
+          "id": "wrapper-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a08231000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+          },
+          "status": "unavailable",
+          "beforeRaw": null,
+          "afterRaw": null,
+          "deltaRaw": null,
+          "reason": "The provider did not complete a valid bounded read-only request."
+        },
+        {
+          "id": "vault-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a08231000000000000000000000000beef01735c132ada46aa9aa4c54623caa92a64cb"
+          },
+          "status": "unavailable",
+          "beforeRaw": null,
+          "afterRaw": null,
+          "deltaRaw": null,
+          "reason": "The provider did not complete a valid bounded read-only request."
+        },
+        {
+          "id": "blue-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a08231000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+          },
+          "status": "unavailable",
+          "beforeRaw": null,
+          "afterRaw": null,
+          "deltaRaw": null,
+          "reason": "The provider did not complete a valid bounded read-only request."
+        },
+        {
+          "id": "owner-wrapper-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e00000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+          },
+          "status": "unavailable",
+          "beforeRaw": null,
+          "afterRaw": null,
+          "deltaRaw": null,
+          "reason": "The provider did not complete a valid bounded read-only request."
+        },
+        {
+          "id": "wrapper-vault-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b000000000000000000000000beef01735c132ada46aa9aa4c54623caa92a64cb"
+          },
+          "status": "unavailable",
+          "beforeRaw": null,
+          "afterRaw": null,
+          "deltaRaw": null,
+          "reason": "The provider did not complete a valid bounded read-only request."
+        }
+      ]
+    }
+  ],
+  "morphoDiagnosis": {
+    "basis": "Offline reproduction from unchanged RPC41 result",
+    "step": "canonicalStateDiff",
+    "error": "State diff contains unsupported account fields.",
+    "field": "codeHash",
+    "prestateAccountCount": 5,
+    "transportFailure": false,
+    "depositRevert": false,
+    "beforeAfterQueriesPerformed": 0,
+    "finalCanonicalCheckPerformed": false
+  },
+  "verification": {
+    "path": "reports/standard-evm-deposits/verify.mjs",
+    "sha256": "3d10499d98fab682b62ce9ebe833571644d3e4d5287a9b43eee17e154c793203",
+    "networkRequests": 0,
+    "completeRawBodies": 41,
+    "completeEnginePlaybacks": 2,
+    "status": "passed"
+  }
+}

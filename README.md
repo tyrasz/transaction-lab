@@ -6,7 +6,7 @@ The long-term objective is to outperform commercial simulation/security provider
 
 ## Run
 
-Requires Node.js 22 or later. The primary service has no runtime dependencies. The optional experimental local executor has its own pinned dependencies under `engines/local-evm`.
+Requires Node.js 22 or later. The primary service has no runtime dependencies. The optional experiments under `engines/local-evm` and `engines/standard-evm` each have their own pinned dependencies.
 
 ```sh
 npm test
@@ -24,7 +24,7 @@ The default public RPC is `https://hyperliquid.drpc.org`. For dedicated infrastr
 
 `npm run check:coverage` executes the [preregistered prospective pilot](research/coverage-evaluation/PLAN.md): it freezes the local source, waits for two future finalized HyperEVM blocks, keeps every transaction in the denominator, and attempts at most sixteen. It takes at least three minutes when selection succeeds and makes bounded read-only requests to both fixed public providers. Each run saves immutable product outputs before comparator adjudication under `reports/coverage-evaluation/`. This is a feasibility pilot; provider agreement and observed-pair matches are separate from complete transaction replay and all-effects accuracy.
 
-`npm run check:coverage:v2` is the separate [ordinary/system enumeration protocol](research/coverage-evaluation/PLAN-V2.md). It preserves every unresolved occurrence, keeps unsupported system replay explicit, and withholds a combined denominator when identity or enumeration is incomplete. It adds the fixed official enumeration endpoint to the same bounded budget. Review and freeze its source before a live run. The v1 pilot remains unchanged; offline v2 tests are not a new live accuracy result.
+`npm run check:coverage:v2` is the separate [ordinary/system enumeration protocol](research/coverage-evaluation/PLAN-V2.md). It preserves every unresolved occurrence, keeps unsupported system replay explicit, and withholds a combined denominator when identity or enumeration is incomplete. It adds the fixed official enumeration endpoint to the same bounded budget. Review and freeze its source before a live run. Its [first frozen pilot](reports/coverage-evaluation-v2/2026-10-26T07-52-08.304Z-60177bf2/NOTES.md) ended enumeration-inconclusive with no accepted accuracy denominator; the v1 pilot remains unchanged.
 
 Measured current-state balances require `debug_traceCall` with callTracer, prestateTracer diff mode, state overrides and canonical EIP-1898 block-hash queries, plus hash-bound nonce, native balance and code reads. Each configured token query uses four isolated calls: its trace and mutation diff before and after the complete original-call overrides. The profile deliberately omits gas price and verifies synthetic BASEFEE zero; it does not estimate network fees. Historical measurements require archive `debug_traceCallMany` with block-hash and transaction-index state context. If capabilities or validation checks fail, the response retains available execution evidence and marks measurements unavailable.
 
@@ -54,6 +54,8 @@ HYPEREVM_RPC_URL=https://your-provider.example npm start
 - Pricing, malicious-contract detection, independent signature/domain/nonce validation, general NFT support, and general-purpose balance measurement are not implemented. The alternate bytes-signature USDC permit overload, Permit2, DAI-style permits and credit delegation are outside the current permit decoder.
 
 The two public providers were also tested with stateful `eth_simulateV1`. That method is retained as capability evidence; the application uses the prestate-diff route so its primary trace and balance measurements share the original block context. See [capability evidence](reports/capabilities/STATEFUL-BALANCES.md).
+
+An isolated [standard EVM experiment](engines/standard-evm/README.md) extends explicit balance/allowance measurements to selected Ethereum Aave and Morpho-wrapper deposits. It has its own pinned hashing dependency and test suite; it is not exposed by the main API or browser interface. These selected development examples do not establish broad transaction accuracy. [Current checkpoint](STATUS.md#experimental-ethereum-deposits).
 
 Historical reads use a different route because block-end state is insufficient for a transaction in the middle of a block. The providers silently ignored `debug_traceCall`'s tested `txIndex` option, so the adapter uses validated `debug_traceCallMany` state context. It never inserts balance probes into the original transaction's execution sequence. See [historical state evidence](reports/historical-state/README.md).
 

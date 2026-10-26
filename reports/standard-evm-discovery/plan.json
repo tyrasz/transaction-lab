@@ -1,0 +1,9 @@
+{
+  "purpose": "Discover and freeze one historical successful Aave V3 USDC supply and one Morpho Vault V1 USDC deposit, preferably Ethereum mainnet, without simulation or signing.",
+  "mode": "adaptive_bounded_public_discovery",
+  "limits": {"requests":80,"responseBytes":8388608,"totalBytes":67108864,"requestTimeoutMs":25000},
+  "selection": "Choose an explicitly successful direct protocol deposit with decoded USDC input and corroborating receipt events. Preserve errors and rejected candidates; no accuracy score is inferred from selection.",
+  "allowedRpcMethods": ["eth_chainId","eth_blockNumber","eth_getLogs","eth_getTransactionByHash","eth_getTransactionReceipt","eth_getBlockByHash","eth_getBlockByNumber","eth_call","eth_getCode","eth_getStorageAt"],
+  "exclusions": ["No simulation/debug execution calls", "No signing or broadcasting", "No authentication or paid services", "No edits to core/UI/package files"],
+  "webResearch": "Primary documentation is consulted separately through web search/open. Exact fetched source bytes used as artifact evidence are retained through the same bounded request recorder."
+}

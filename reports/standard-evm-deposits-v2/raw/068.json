@@ -1,0 +1,101 @@
+{
+  "sequence": 68,
+  "caseSequence": 38,
+  "startedAt": "2026-10-26T09:07:48.519Z",
+  "request": {
+    "url": "https://eth.drpc.org",
+    "method": "POST",
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 68,
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "data": "0xdd62ed3e00000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "value": "0x0",
+          "gas": "0x493e0"
+        },
+        {
+          "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "callTracer",
+          "timeout": "15s",
+          "tracerConfig": {
+            "withLog": true
+          }
+        }
+      ]
+    },
+    "bodyText": "{\"jsonrpc\":\"2.0\",\"id\":68,\"method\":\"debug_traceCall\",\"params\":[{\"from\":\"0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668\",\"to\":\"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48\",\"data\":\"0xdd62ed3e00000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b\",\"value\":\"0x0\",\"gas\":\"0x493e0\"},{\"blockHash\":\"0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61\",\"requireCanonical\":true},{\"tracer\":\"callTracer\",\"timeout\":\"15s\",\"tracerConfig\":{\"withLog\":true}}]}",
+    "bodyBytes": 524,
+    "bodySha256": "3ac044f53e54e50ca144dff745bd6db174b5514b42bf1fb61476e528a7a03e1b"
+  },
+  "http": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-origin": "*",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a5085014ccdb448f-SIN",
+      "connection": "keep-alive",
+      "content-encoding": "br",
+      "content-length": "304",
+      "content-type": "application/json",
+      "date": "Mon, 26 Oct 2026 09:07:48 GMT",
+      "server": "cloudflare",
+      "strict-transport-security": "max-age=31536000; includeSubDomains",
+      "vary": "origin, access-control-request-method, access-control-request-headers, Accept-Encoding",
+      "x-drpc-owner-id": "cb501251-31a8-4028-8b0a-54679f15c385",
+      "x-drpc-owner-tier": "free",
+      "x-drpc-provider-id": "drpc-core-free",
+      "x-drpc-trace-id": "ada4b30137802cd5d4c3ed79cbb30d3e"
+    }
+  },
+  "responseText": "{\"id\":68,\"jsonrpc\":\"2.0\",\"result\":{\"from\":\"0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668\",\"gas\":\"0x493e0\",\"gasUsed\":\"0x7c04\",\"to\":\"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48\",\"input\":\"0xdd62ed3e00000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b\",\"output\":\"0x000000000000000000000000000000000000000000000000000000517da02c00\",\"calls\":[{\"from\":\"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48\",\"gas\":\"0x411e2\",\"gasUsed\":\"0xa63\",\"to\":\"0x43506849d7c04f9138d1a2050bbf3a0c054402dd\",\"input\":\"0xdd62ed3e00000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b\",\"output\":\"0x000000000000000000000000000000000000000000000000000000517da02c00\",\"value\":\"0x0\",\"type\":\"DELEGATECALL\"}],\"value\":\"0x0\",\"type\":\"CALL\"}}",
+  "response": {
+    "id": 68,
+    "jsonrpc": "2.0",
+    "result": {
+      "from": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+      "gas": "0x493e0",
+      "gasUsed": "0x7c04",
+      "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "input": "0xdd62ed3e00000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+      "output": "0x000000000000000000000000000000000000000000000000000000517da02c00",
+      "calls": [
+        {
+          "from": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "gas": "0x411e2",
+          "gasUsed": "0xa63",
+          "to": "0x43506849d7c04f9138d1a2050bbf3a0c054402dd",
+          "input": "0xdd62ed3e00000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "output": "0x000000000000000000000000000000000000000000000000000000517da02c00",
+          "value": "0x0",
+          "type": "DELEGATECALL"
+        }
+      ],
+      "value": "0x0",
+      "type": "CALL"
+    }
+  },
+  "transport": {
+    "complete": true,
+    "receivedBytes": 839,
+    "retainedBytes": 839,
+    "observedPrefixSha256": "9269e29a8542e26b6caf9d15e0bbd12b9be9b8a12c43790653aec7030ab1049c",
+    "retainedSha256": "9269e29a8542e26b6caf9d15e0bbd12b9be9b8a12c43790653aec7030ab1049c",
+    "rawFile": "raw/068.body",
+    "rawBase64": "eyJpZCI6NjgsImpzb25ycGMiOiIyLjAiLCJyZXN1bHQiOnsiZnJvbSI6IjB4NDRjM2E5NjE4MWFmOWUyOTVjZThlMTg4ZmE4ZmNkZDcyZDFlYjY2OCIsImdhcyI6IjB4NDkzZTAiLCJnYXNVc2VkIjoiMHg3YzA0IiwidG8iOiIweGEwYjg2OTkxYzYyMThiMzZjMWQxOWQ0YTJlOWViMGNlMzYwNmViNDgiLCJpbnB1dCI6IjB4ZGQ2MmVkM2UwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA0NGMzYTk2MTgxYWY5ZTI5NWNlOGUxODhmYThmY2RkNzJkMWViNjY4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMzM0ZjVkMjhhNzE0MzJmOGZjMjFjN2IyYjZmNWRiYmNkOGIzMmE3YiIsIm91dHB1dCI6IjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwNTE3ZGEwMmMwMCIsImNhbGxzIjpbeyJmcm9tIjoiMHhhMGI4Njk5MWM2MjE4YjM2YzFkMTlkNGEyZTllYjBjZTM2MDZlYjQ4IiwiZ2FzIjoiMHg0MTFlMiIsImdhc1VzZWQiOiIweGE2MyIsInRvIjoiMHg0MzUwNjg0OWQ3YzA0ZjkxMzhkMWEyMDUwYmJmM2EwYzA1NDQwMmRkIiwiaW5wdXQiOiIweGRkNjJlZDNlMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwNDRjM2E5NjE4MWFmOWUyOTVjZThlMTg4ZmE4ZmNkZDcyZDFlYjY2ODAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDMzNGY1ZDI4YTcxNDMyZjhmYzIxYzdiMmI2ZjVkYmJjZDhiMzJhN2IiLCJvdXRwdXQiOiIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDUxN2RhMDJjMDAiLCJ2YWx1ZSI6IjB4MCIsInR5cGUiOiJERUxFR0FURUNBTEwifV0sInZhbHVlIjoiMHgwIiwidHlwZSI6IkNBTEwifX0=",
+    "durationMs": 221.86762499999895,
+    "timeoutMs": 25000,
+    "responseSha256": "9269e29a8542e26b6caf9d15e0bbd12b9be9b8a12c43790653aec7030ab1049c"
+  },
+  "finishedAt": "2026-10-26T09:07:48.741Z"
+}

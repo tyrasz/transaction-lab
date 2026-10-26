@@ -1,0 +1,88 @@
+{
+  "provider": "ethereum-drpc",
+  "endpoint": "https://eth.drpc.org",
+  "label": "usdc-hash-callTracer",
+  "startedAt": "2026-10-26T07:56:45.108Z",
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 18,
+    "method": "debug_traceCall",
+    "params": [
+      {
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "data": "0x70a082310000000000000000000000000000000000000000000000000000000000000000",
+        "value": "0x0",
+        "gas": "0x493e0"
+      },
+      {
+        "blockHash": "0x888cd3dff00f52b85bb400ab86dbeb503fdd52becb6bcbb36994d856102b2916",
+        "requireCanonical": true
+      },
+      {
+        "tracer": "callTracer",
+        "timeout": "15s",
+        "tracerConfig": {
+          "withLog": true
+        }
+      }
+    ]
+  },
+  "requestText": "{\"jsonrpc\":\"2.0\",\"id\":18,\"method\":\"debug_traceCall\",\"params\":[{\"from\":\"0x0000000000000000000000000000000000000000\",\"to\":\"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48\",\"data\":\"0x70a082310000000000000000000000000000000000000000000000000000000000000000\",\"value\":\"0x0\",\"gas\":\"0x493e0\"},{\"blockHash\":\"0x888cd3dff00f52b85bb400ab86dbeb503fdd52becb6bcbb36994d856102b2916\",\"requireCanonical\":true},{\"tracer\":\"callTracer\",\"timeout\":\"15s\",\"tracerConfig\":{\"withLog\":true}}]}",
+  "requestSha256": "e33de5f7f41b2e78f53744f15c425fbfb6fb58a8c4a510ef93332ed0f7299863",
+  "responseBytes": 711,
+  "bodyComplete": true,
+  "http": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-origin": "*",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a507e7fe3dfd600b-SIN",
+      "connection": "keep-alive",
+      "content-encoding": "br",
+      "content-length": "243",
+      "content-type": "application/json",
+      "date": "Mon, 26 Oct 2026 07:56:45 GMT",
+      "server": "cloudflare",
+      "strict-transport-security": "max-age=31536000; includeSubDomains",
+      "vary": "origin, access-control-request-method, access-control-request-headers, Accept-Encoding",
+      "x-drpc-owner-id": "cb501251-31a8-4028-8b0a-54679f15c385",
+      "x-drpc-owner-tier": "free",
+      "x-drpc-provider-id": "drpc-core-free",
+      "x-drpc-trace-id": "50b6e5ede0ca5919b42b3faab22b1d46"
+    }
+  },
+  "responseBase64": "eyJpZCI6MTgsImpzb25ycGMiOiIyLjAiLCJyZXN1bHQiOnsiZnJvbSI6IjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMCIsImdhcyI6IjB4NDkzZTAiLCJnYXNVc2VkIjoiMHg3OTM3IiwidG8iOiIweGEwYjg2OTkxYzYyMThiMzZjMWQxOWQ0YTJlOWViMGNlMzYwNmViNDgiLCJpbnB1dCI6IjB4NzBhMDgyMzEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwib3V0cHV0IjoiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwiY2FsbHMiOlt7ImZyb20iOiIweGEwYjg2OTkxYzYyMThiMzZjMWQxOWQ0YTJlOWViMGNlMzYwNmViNDgiLCJnYXMiOiIweDQxNDNiIiwiZ2FzVXNlZCI6IjB4OWY5IiwidG8iOiIweDQzNTA2ODQ5ZDdjMDRmOTEzOGQxYTIwNTBiYmYzYTBjMDU0NDAyZGQiLCJpbnB1dCI6IjB4NzBhMDgyMzEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwib3V0cHV0IjoiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwidmFsdWUiOiIweDAiLCJ0eXBlIjoiREVMRUdBVEVDQUxMIn1dLCJ2YWx1ZSI6IjB4MCIsInR5cGUiOiJDQUxMIn19",
+  "responseText": "{\"id\":18,\"jsonrpc\":\"2.0\",\"result\":{\"from\":\"0x0000000000000000000000000000000000000000\",\"gas\":\"0x493e0\",\"gasUsed\":\"0x7937\",\"to\":\"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48\",\"input\":\"0x70a082310000000000000000000000000000000000000000000000000000000000000000\",\"output\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"calls\":[{\"from\":\"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48\",\"gas\":\"0x4143b\",\"gasUsed\":\"0x9f9\",\"to\":\"0x43506849d7c04f9138d1a2050bbf3a0c054402dd\",\"input\":\"0x70a082310000000000000000000000000000000000000000000000000000000000000000\",\"output\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"value\":\"0x0\",\"type\":\"DELEGATECALL\"}],\"value\":\"0x0\",\"type\":\"CALL\"}}",
+  "response": {
+    "id": 18,
+    "jsonrpc": "2.0",
+    "result": {
+      "from": "0x0000000000000000000000000000000000000000",
+      "gas": "0x493e0",
+      "gasUsed": "0x7937",
+      "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "input": "0x70a082310000000000000000000000000000000000000000000000000000000000000000",
+      "output": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "calls": [
+        {
+          "from": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "gas": "0x4143b",
+          "gasUsed": "0x9f9",
+          "to": "0x43506849d7c04f9138d1a2050bbf3a0c054402dd",
+          "input": "0x70a082310000000000000000000000000000000000000000000000000000000000000000",
+          "output": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "value": "0x0",
+          "type": "DELEGATECALL"
+        }
+      ],
+      "value": "0x0",
+      "type": "CALL"
+    }
+  },
+  "rpcOutcome": "result",
+  "responseSha256": "27a18e0c456405bb13054db9810d3c99a0f6efd5461c67203b09f250c74b1703",
+  "completedAt": "2026-10-26T07:56:45.342Z",
+  "elapsedMs": 233.789
+}

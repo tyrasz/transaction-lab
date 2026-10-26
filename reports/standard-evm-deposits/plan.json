@@ -1,0 +1,660 @@
+{
+  "schemaVersion": "1",
+  "purpose": "Two first-selected public Ethereum deposit inputs, simulated once each at their own parent-block-end state. Development evidence, not an original-position replay or a security evaluation.",
+  "profile": "unsigned_unpriced_parent_block_end",
+  "chainId": "1",
+  "endpoint": "https://eth.drpc.org",
+  "engine": "engines/standard-evm/unsigned-call.js",
+  "receiptsAreComparisonOnly": true,
+  "discoverySelection": {
+    "path": "reports/standard-evm-discovery/selected.json",
+    "bytes": 153456,
+    "sha256": "4c97e73db7a3884ad08bfa016d5ec35a7903a6c40d544a27ca03af4ccd484bb9"
+  },
+  "limits": {
+    "totalRpc": 150,
+    "caseRpc": 75,
+    "responseBytes": 8388608,
+    "totalResponseBytes": 33554432,
+    "requestMs": 25000,
+    "totalMs": 480000
+  },
+  "engineLimits": {
+    "rpc": 64,
+    "queries": 8,
+    "responseBytes": 8388608,
+    "evidenceBytes": 33554432,
+    "wallMs": 120000
+  },
+  "warnings": [
+    "Selected once before simulation outcomes; no retries, replacement transactions, other providers or invented state.",
+    "Historical receipt amounts are reference observations only. Parent-block-end state and header differ from the original transaction position, including permit validity and interest accrual.",
+    "Gas is fixed to 5,000,000 and gas price omitted; this synthetic BASEFEE-zero unsigned execution does not validate the outer transaction signature, transaction fees, transaction inclusion, or security. The EVM may execute the original permit signature checks embedded in the unchanged calldata.",
+    "Explicit query roles cover a bounded subset of accounts, not all economic effects; raw token units are not independently valued.",
+    "Raw public RPC bodies, including errors and public permit signatures, are retained as untrusted local evidence. Terminal output uses fixed diagnostics.",
+    "Byte caps count response entity bytes delivered by fetch after HTTP decompression. An oversized or interrupted body retains only a bounded prefix and is never labeled a complete response.",
+    "This capture has no relationship to a blind holdout or a comparative Blockaid security score."
+  ],
+  "cases": [
+    {
+      "id": "aave-usdc-supply-with-permit",
+      "label": "Aave V3 Ethereum USDC supplyWithPermit",
+      "originalTransactionHash": "0x6166280a62cdad28e7b8af05ebb622b42b61deff981b3b6cd83dc03b3bb130b2",
+      "blockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+      "blockNumber": "26270482",
+      "parentTimestamp": "1792940807",
+      "request": {
+        "from": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+        "to": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+        "data": "0x02c205f0000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000ec351bbd00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b40000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006ade28e5000000000000000000000000000000000000000000000000000000000000001c1fc8457fd931323b0d6826fc26886f225497d878c64a89a6910d343460e195607fbaa6d6119003fd9817e7ca4267763e7ce8663807399d427761dd38b3af48f5",
+        "gas": "0x4c4b40",
+        "value": "0x0"
+      },
+      "references": {
+        "transaction": {
+          "path": "reports/standard-evm-discovery/raw/012.json",
+          "bytes": 2742,
+          "sha256": "f2749840e08a0fcd368161699a852d0b96935d5d119526305edd6cf12beae5ac",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/012.body",
+            "bytes": 1258,
+            "sha256": "df25673083d0f9cdcb358fcd12bf4e29381cb558183b2a34ce9494115444b311"
+          }
+        },
+        "receipt": {
+          "path": "reports/standard-evm-discovery/raw/019.json",
+          "bytes": 8685,
+          "sha256": "82d0e7dcd523b235ed486e45a14677b5b8cb7cba5b273e43cde90c0fb1952920",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/019.body",
+            "bytes": 5852,
+            "sha256": "a905e29b1d1e0047a81918ae17b822630ba851d4a871dc94a4de549e9a89f1e8"
+          }
+        },
+        "originalBlock": {
+          "path": "reports/standard-evm-discovery/raw/021.json",
+          "bytes": 25829,
+          "sha256": "8ed9b66e4812ce1dfbca470e73ac9056e011df79d640c1766583dba4a4c9a1af",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/021.body",
+            "bytes": 20908,
+            "sha256": "eb07a30638bf498b87004ccbaa9c3e99454c1519c20f1b8d3a3b6a9143594637"
+          }
+        },
+        "parentBlock": {
+          "path": "reports/standard-evm-discovery/raw/025.json",
+          "bytes": 26692,
+          "sha256": "e07dce6ae8d184dac5a8fe4739034d30535b0283e96f655ca248bca99302cda9",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/025.body",
+            "bytes": 21673,
+            "sha256": "fc132f5ce4115c24ae88d55404ab7ede2b8a1c7bda31ac2646d4929748e3b0e9"
+          }
+        },
+        "underlyingAsset": {
+          "path": "reports/standard-evm-discovery/raw/032.json",
+          "bytes": 1742,
+          "sha256": "3b0853219a8831fb6cae7deb4d0e798fd3056562d3c010b0270e0b817a64d4e3",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/032.body",
+            "bytes": 103,
+            "sha256": "195189bb6ff72f839c260e5df449b23335d46cc368565f8d55ffa91f02551998"
+          }
+        },
+        "positionName": {
+          "path": "reports/standard-evm-discovery/raw/033.json",
+          "bytes": 1787,
+          "sha256": "5c448d3334d6daac5fa3a2902e8caa58673c794717a36cf558a8146d6cc5021e",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/033.body",
+            "bytes": 231,
+            "sha256": "0cbb030481bdd4a274679a494b946dddedc47d95c8b7227b8e17ca70a28c35d4"
+          }
+        },
+        "positionSymbol": {
+          "path": "reports/standard-evm-discovery/raw/034.json",
+          "bytes": 1789,
+          "sha256": "ee9c63c46755a3fac4ffde8d250ae519538bd136d282bfb1b420bd0e80802137",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/034.body",
+            "bytes": 231,
+            "sha256": "973bfa895489348718b24f9dfd67c6c464d647e80ebfbd0da3edf036b14fd5a2"
+          }
+        },
+        "positionDecimals": {
+          "path": "reports/standard-evm-discovery/raw/035.json",
+          "bytes": 1663,
+          "sha256": "6da7735dd7caf9a189c160fa6a75a07ca05576471b98b72198594d0ee25f21fd",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/035.body",
+            "bytes": 103,
+            "sha256": "67e940c8fb32b092f014e946a2fec69fdf8133721fbe20eefc1d8dfafbfd3c71"
+          }
+        },
+        "usdcDecimals": {
+          "path": "reports/standard-evm-discovery/raw/031.json",
+          "bytes": 1655,
+          "sha256": "68fd25f4ef6d8cb2afd6b078e8b722bb08b5338daa83c98c46e49596cd89a09e",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/031.body",
+            "bytes": 103,
+            "sha256": "6854014e6d51068290b24ea8720edaf62c84387a46bbc0431419248b2f139abb"
+          }
+        }
+      },
+      "queries": [
+        {
+          "id": "owner-usdc",
+          "kind": "balanceOf",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+          "label": "Original sender USDC",
+          "decimals": 6,
+          "call": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+          },
+          "roleEvidence": [
+            {
+              "source": "transaction",
+              "field": "from",
+              "equals": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4"
+            },
+            {
+              "source": "calldataWord",
+              "word": 0,
+              "equals": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+            }
+          ]
+        },
+        {
+          "id": "beneficiary-aethusdc",
+          "kind": "balanceOf",
+          "token": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+          "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+          "label": "Beneficiary aEthUSDC position",
+          "decimals": 6,
+          "call": {
+            "to": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+            "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+          },
+          "roleEvidence": [
+            {
+              "source": "calldataWord",
+              "word": 2,
+              "equals": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4"
+            },
+            {
+              "source": "receiptLog",
+              "arrayIndex": 3,
+              "address": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+              "topic0": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "topicIndex": 2,
+              "equals": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4"
+            }
+          ]
+        },
+        {
+          "id": "reserve-usdc",
+          "kind": "balanceOf",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+          "label": "aEthUSDC reserve USDC custody",
+          "decimals": 6,
+          "call": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000098c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c"
+          },
+          "roleEvidence": [
+            {
+              "source": "receiptLog",
+              "arrayIndex": 2,
+              "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "topic0": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "topicIndex": 2,
+              "equals": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c"
+            }
+          ]
+        },
+        {
+          "id": "owner-pool-usdc",
+          "kind": "allowance",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "owner": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+          "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+          "label": "Sender allowance to Aave Pool",
+          "decimals": 6,
+          "call": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+          },
+          "roleEvidence": [
+            {
+              "source": "receiptLog",
+              "arrayIndex": 0,
+              "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "topic0": "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+              "topicIndex": 1,
+              "equals": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4"
+            },
+            {
+              "source": "receiptLog",
+              "arrayIndex": 0,
+              "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "topic0": "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+              "topicIndex": 2,
+              "equals": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+            }
+          ]
+        }
+      ],
+      "omissions": [
+        "Other reserve, treasury, debt and interest-account positions are not enumerated."
+      ]
+    },
+    {
+      "id": "morpho-kiln-usdc-deposit",
+      "label": "Kiln mstkeUSDC wrapper deposit into Morpho V1 Steakhouse USDC vault",
+      "originalTransactionHash": "0xc46259d8064831c47c68776ca0611af75337adf8c4aee4bee5add0878b8873a7",
+      "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+      "blockNumber": "26270562",
+      "parentTimestamp": "1792941767",
+      "request": {
+        "from": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+        "to": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+        "data": "0x6e553f65000000000000000000000000000000000000000000000000000000517da02c0000000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+        "gas": "0x4c4b40",
+        "value": "0x0"
+      },
+      "references": {
+        "transaction": {
+          "path": "reports/standard-evm-discovery/raw/011.json",
+          "bytes": 2362,
+          "sha256": "9e65adb407703ffaa68c3815d824e311fe7d090f6b431aef4834a4e55826df3d",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/011.body",
+            "bytes": 874,
+            "sha256": "0c119878fae8cb066c3a45da2de8831a28ec43cc640b46e844fa1c4feb5ee985"
+          }
+        },
+        "receipt": {
+          "path": "reports/standard-evm-discovery/raw/020.json",
+          "bytes": 15691,
+          "sha256": "584043d6050dbb7db7ac925fdc0302d6888e229ca7fd1c98008074415a22b456",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/020.body",
+            "bytes": 11241,
+            "sha256": "e9071e013387c2856c87214d47be72ee09c21ecc23f375fa8e413a44c5087899"
+          }
+        },
+        "originalBlock": {
+          "path": "reports/standard-evm-discovery/raw/022.json",
+          "bytes": 31346,
+          "sha256": "eee69c17581f1b1fe8bd481a4969704f2213815d44ce3aa1853a4a39bab209c1",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/022.body",
+            "bytes": 25784,
+            "sha256": "f8666bac0a1da42d9d390e22bb6aac79b177bbece538c62475221c49bb9038e3"
+          }
+        },
+        "parentBlock": {
+          "path": "reports/standard-evm-discovery/raw/026.json",
+          "bytes": 28704,
+          "sha256": "6abaf67305776d021e27544f63de446c79b6e779e21d6bcf8e77dbe0bd3541c4",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/026.body",
+            "bytes": 23449,
+            "sha256": "f7bd9163870d9d4a8d8334d93b57bc758668205f962c7b98b644608cc85729ca"
+          }
+        },
+        "wrapperPrimaryDeployment": {
+          "path": "reports/standard-evm-discovery/raw/027.json",
+          "bytes": 1774,
+          "sha256": "c55fbe2799e282c7df55d0dcc3a73e6ee2823ce587fe9d6071234eccd9fbf9ab",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/027.body",
+            "bytes": 8820,
+            "sha256": "e335351dc80f49372b08d1870528963e34cb55a7956d876b47835a0770ed8501"
+          }
+        },
+        "wrapperUnderlying": {
+          "path": "reports/standard-evm-discovery/raw/036.json",
+          "bytes": 1723,
+          "sha256": "1d2512552b3642a073de6b6a70a83d11939047a1b70892337fffef631f08d3aa",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/036.body",
+            "bytes": 103,
+            "sha256": "dade2334cc14c4112a1433950033a55856021246d4015576386a441c992fa0a2"
+          }
+        },
+        "wrapperName": {
+          "path": "reports/standard-evm-discovery/raw/037.json",
+          "bytes": 1915,
+          "sha256": "855a7b34fa9371945b04756f266c533b55d5d54913b96cce95afeaac3bf9aea3",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/037.body",
+            "bytes": 295,
+            "sha256": "d6a0c6dd2a284fc782d2eeefc813fa873aa13ae10eaade5b2700b9b9da50788d"
+          }
+        },
+        "wrapperSymbol": {
+          "path": "reports/standard-evm-discovery/raw/038.json",
+          "bytes": 1789,
+          "sha256": "5db2e9f16671945bb1e23a5bfc324b84cf3a89eb05569109eaedf3e35bf5f7d2",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/038.body",
+            "bytes": 231,
+            "sha256": "83a5639f1ad1fa203047e7cf3ad779b22e0201cf54ef13a9eb1a4a6bfa9bcabb"
+          }
+        },
+        "wrapperDecimals": {
+          "path": "reports/standard-evm-discovery/raw/039.json",
+          "bytes": 1663,
+          "sha256": "f99bf819a62cfcc9a7e420bec426e164fb6568b10254a470ec4525ce71c6afbf",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/039.body",
+            "bytes": 103,
+            "sha256": "cd9f1e9ab90fc29b17c78506a2b2b4c659a00675856c89a40869eae15b4edc2d"
+          }
+        },
+        "vaultUnderlying": {
+          "path": "reports/standard-evm-discovery/raw/040.json",
+          "bytes": 1723,
+          "sha256": "20847132eccbe693438494135425cb07bfd6a443228cb2df1a04492bd0affe32",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/040.body",
+            "bytes": 103,
+            "sha256": "809c80b9a24bf20efca2c5013c92548103824d796ad3f3ccb810eddd6be82cd4"
+          }
+        },
+        "vaultName": {
+          "path": "reports/standard-evm-discovery/raw/041.json",
+          "bytes": 1787,
+          "sha256": "1fedafc0f3fb9eed488023891308f7af8727d3519bf89db504887236a8d70460",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/041.body",
+            "bytes": 231,
+            "sha256": "1bbad6f01b6fd2b8fc13a1c6c95d60fd183f472344f15b978ecee8b3dce4b892"
+          }
+        },
+        "vaultSymbol": {
+          "path": "reports/standard-evm-discovery/raw/042.json",
+          "bytes": 1852,
+          "sha256": "7150c95318b7e78e3277c67d21023e57a7bbcf51a7e33af3bdfad7ce280a18bd",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/042.body",
+            "bytes": 231,
+            "sha256": "b20fc1962bee1ffcb3bb7c2678799fa05fc0fa17afeb31b869260a4dce2a9eef"
+          }
+        },
+        "vaultDecimals": {
+          "path": "reports/standard-evm-discovery/raw/043.json",
+          "bytes": 1726,
+          "sha256": "bfe993c7767937f8af1da45e9aa4cb8c8d437caa22abef6770e2e980cebf4317",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/043.body",
+            "bytes": 103,
+            "sha256": "d6f8c07a9e561044487a29b36390aa680d6241ebd2fd82ed7ad0ab8e7966038c"
+          }
+        },
+        "usdcDecimals": {
+          "path": "reports/standard-evm-discovery/raw/031.json",
+          "bytes": 1655,
+          "sha256": "68fd25f4ef6d8cb2afd6b078e8b722bb08b5338daa83c98c46e49596cd89a09e",
+          "body": {
+            "path": "reports/standard-evm-discovery/raw/031.body",
+            "bytes": 103,
+            "sha256": "6854014e6d51068290b24ea8720edaf62c84387a46bbc0431419248b2f139abb"
+          }
+        }
+      },
+      "queries": [
+        {
+          "id": "owner-usdc",
+          "kind": "balanceOf",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "label": "Original sender USDC",
+          "decimals": 6,
+          "call": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+          },
+          "roleEvidence": [
+            {
+              "source": "transaction",
+              "field": "from",
+              "equals": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+            },
+            {
+              "source": "receiptLog",
+              "arrayIndex": 1,
+              "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "topic0": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "topicIndex": 1,
+              "equals": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+            }
+          ]
+        },
+        {
+          "id": "beneficiary-wrapper-shares",
+          "kind": "balanceOf",
+          "token": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "label": "Beneficiary mstkeUSDC wrapper shares",
+          "decimals": 6,
+          "call": {
+            "to": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+            "data": "0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+          },
+          "roleEvidence": [
+            {
+              "source": "calldataWord",
+              "word": 1,
+              "equals": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+            },
+            {
+              "source": "receiptLog",
+              "arrayIndex": 2,
+              "address": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+              "topic0": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "topicIndex": 2,
+              "equals": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+            }
+          ]
+        },
+        {
+          "id": "wrapper-vault-shares",
+          "kind": "balanceOf",
+          "token": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+          "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "label": "Wrapper-owned steakUSDC vault shares",
+          "decimals": 18,
+          "call": {
+            "to": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+            "data": "0x70a08231000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+          },
+          "roleEvidence": [
+            {
+              "source": "receiptLog",
+              "arrayIndex": 7,
+              "address": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+              "topic0": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "topicIndex": 2,
+              "equals": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+            }
+          ]
+        },
+        {
+          "id": "wrapper-usdc",
+          "kind": "balanceOf",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "label": "Wrapper USDC custody",
+          "decimals": 6,
+          "call": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a08231000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+          },
+          "roleEvidence": [
+            {
+              "source": "receiptLog",
+              "arrayIndex": 1,
+              "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "topic0": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "topicIndex": 2,
+              "equals": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+            }
+          ]
+        },
+        {
+          "id": "vault-usdc",
+          "kind": "balanceOf",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+          "label": "Inner vault USDC custody",
+          "decimals": 6,
+          "call": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a08231000000000000000000000000beef01735c132ada46aa9aa4c54623caa92a64cb"
+          },
+          "roleEvidence": [
+            {
+              "source": "receiptLog",
+              "arrayIndex": 6,
+              "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "topic0": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "topicIndex": 2,
+              "equals": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb"
+            }
+          ]
+        },
+        {
+          "id": "blue-usdc",
+          "kind": "balanceOf",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+          "label": "Morpho Blue USDC custody",
+          "decimals": 6,
+          "call": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a08231000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+          },
+          "roleEvidence": [
+            {
+              "source": "receiptLog",
+              "arrayIndex": 12,
+              "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "topic0": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "topicIndex": 2,
+              "equals": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+            }
+          ]
+        },
+        {
+          "id": "owner-wrapper-usdc",
+          "kind": "allowance",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "owner": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "spender": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "label": "Sender allowance to wrapper",
+          "decimals": 6,
+          "call": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e00000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+          },
+          "roleEvidence": [
+            {
+              "source": "receiptLog",
+              "arrayIndex": 1,
+              "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "topic0": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "topicIndex": 1,
+              "equals": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+            },
+            {
+              "source": "receiptLog",
+              "arrayIndex": 1,
+              "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "topic0": "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "topicIndex": 2,
+              "equals": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+            }
+          ]
+        },
+        {
+          "id": "wrapper-vault-usdc",
+          "kind": "allowance",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "owner": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "spender": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+          "label": "Wrapper allowance to inner vault",
+          "decimals": 6,
+          "call": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b000000000000000000000000beef01735c132ada46aa9aa4c54623caa92a64cb"
+          },
+          "roleEvidence": [
+            {
+              "source": "receiptLog",
+              "arrayIndex": 3,
+              "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "topic0": "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+              "topicIndex": 1,
+              "equals": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+            },
+            {
+              "source": "receiptLog",
+              "arrayIndex": 3,
+              "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "topic0": "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+              "topicIndex": 2,
+              "equals": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb"
+            }
+          ]
+        }
+      ],
+      "omissions": [
+        "The wrapper self-fee share balance and inner-vault fee recipient shares are not measured.",
+        "The inner-vault allowance to Morpho Blue, market positions, debt, and other reserve/account effects are not measured."
+      ]
+    }
+  ],
+  "sourceInventory": [
+    {
+      "path": "engines/standard-evm/unsigned-call.js",
+      "bytes": 15716,
+      "sha256": "6092acbfae13b57bb9e4c69ac27d129b7625608c3d16ce4e8aa5b51657775faf"
+    },
+    {
+      "path": "reports/standard-evm-deposits/capture.mjs",
+      "bytes": 18901,
+      "sha256": "4f83062ec2d3822365f3f6a2c2d05cf81a11c42bd5e226d4e0b355a0e3490597"
+    },
+    {
+      "path": "src/config.js",
+      "bytes": 10725,
+      "sha256": "b4e5553747d49643f9cbb680faea19afb8b110198b5e98045488df65496873f1"
+    },
+    {
+      "path": "src/query-validation.js",
+      "bytes": 6911,
+      "sha256": "f0f15143af27be41174da93dc0c86008a1f1c41aeae673db40c9c8965cbadb73"
+    },
+    {
+      "path": "src/rpc.js",
+      "bytes": 7011,
+      "sha256": "d354a756cf56e2aa4bb37e8ede134136421dcd4a4e095a65060b8cdcf1c0484a"
+    },
+    {
+      "path": "src/state-diff.js",
+      "bytes": 5004,
+      "sha256": "91aad467697539ffbe9a76b7626799ff72ce043a3875355ec18933fe406e1235"
+    },
+    {
+      "path": "src/state.js",
+      "bytes": 11192,
+      "sha256": "f8e6e7121df5cc94f00e9b377b3b18a49961f9878882d69bcdea8ed816503a2b"
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "sequence": 48,
+  "caseSequence": 18,
+  "startedAt": "2026-10-26T09:07:42.755Z",
+  "request": {
+    "url": "https://eth.drpc.org",
+    "method": "POST",
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 48,
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "to": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "data": "0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "value": "0x0",
+          "gas": "0x493e0"
+        },
+        {
+          "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "callTracer",
+          "timeout": "15s",
+          "tracerConfig": {
+            "withLog": true
+          }
+        }
+      ]
+    },
+    "bodyText": "{\"jsonrpc\":\"2.0\",\"id\":48,\"method\":\"debug_traceCall\",\"params\":[{\"from\":\"0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668\",\"to\":\"0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b\",\"data\":\"0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668\",\"value\":\"0x0\",\"gas\":\"0x493e0\"},{\"blockHash\":\"0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61\",\"requireCanonical\":true},{\"tracer\":\"callTracer\",\"timeout\":\"15s\",\"tracerConfig\":{\"withLog\":true}}]}",
+    "bodyBytes": 460,
+    "bodySha256": "c898f4d7564d53aa999ef5c0eea208276447bfae5028a27decc321870d930c97"
+  },
+  "http": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-origin": "*",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a5084ff0d988448f-SIN",
+      "connection": "keep-alive",
+      "content-encoding": "br",
+      "content-length": "334",
+      "content-type": "application/json",
+      "date": "Mon, 26 Oct 2026 09:07:43 GMT",
+      "server": "cloudflare",
+      "strict-transport-security": "max-age=31536000; includeSubDomains",
+      "vary": "origin, access-control-request-method, access-control-request-headers, Accept-Encoding",
+      "x-drpc-owner-id": "cb501251-31a8-4028-8b0a-54679f15c385",
+      "x-drpc-owner-tier": "free",
+      "x-drpc-provider-id": "drpc-core-free",
+      "x-drpc-trace-id": "782cb0adb92d4b76367847843456753b"
+    }
+  },
+  "responseText": "{\"id\":48,\"jsonrpc\":\"2.0\",\"result\":{\"from\":\"0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668\",\"gas\":\"0x493e0\",\"gasUsed\":\"0x7e39\",\"to\":\"0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b\",\"input\":\"0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668\",\"output\":\"0x0000000000000000000000000000000000000000000000000000010c1305e281\",\"calls\":[{\"from\":\"0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b\",\"gas\":\"0x4249d\",\"gasUsed\":\"0xa02\",\"to\":\"0x15f7f910e5a8c86e609fd11c58f7342d86d3a25c\",\"input\":\"0x5c60da1b\",\"output\":\"0x0000000000000000000000000193ba8d74e8c7f51522a25f89c405691406ef20\",\"type\":\"STATICCALL\"},{\"from\":\"0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b\",\"gas\":\"0x40fbf\",\"gasUsed\":\"0xa71\",\"to\":\"0x0193ba8d74e8c7f51522a25f89c405691406ef20\",\"input\":\"0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668\",\"output\":\"0x0000000000000000000000000000000000000000000000000000010c1305e281\",\"value\":\"0x0\",\"type\":\"DELEGATECALL\"}],\"value\":\"0x0\",\"type\":\"CALL\"}}",
+  "response": {
+    "id": 48,
+    "jsonrpc": "2.0",
+    "result": {
+      "from": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+      "gas": "0x493e0",
+      "gasUsed": "0x7e39",
+      "to": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+      "input": "0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+      "output": "0x0000000000000000000000000000000000000000000000000000010c1305e281",
+      "calls": [
+        {
+          "from": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "gas": "0x4249d",
+          "gasUsed": "0xa02",
+          "to": "0x15f7f910e5a8c86e609fd11c58f7342d86d3a25c",
+          "input": "0x5c60da1b",
+          "output": "0x0000000000000000000000000193ba8d74e8c7f51522a25f89c405691406ef20",
+          "type": "STATICCALL"
+        },
+        {
+          "from": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "gas": "0x40fbf",
+          "gasUsed": "0xa71",
+          "to": "0x0193ba8d74e8c7f51522a25f89c405691406ef20",
+          "input": "0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "output": "0x0000000000000000000000000000000000000000000000000000010c1305e281",
+          "value": "0x0",
+          "type": "DELEGATECALL"
+        }
+      ],
+      "value": "0x0",
+      "type": "CALL"
+    }
+  },
+  "transport": {
+    "complete": true,
+    "receivedBytes": 968,
+    "retainedBytes": 968,
+    "observedPrefixSha256": "6492ca97b4d688426fd7395e48b2af0fc6999f052806feec5721272672ae05c2",
+    "retainedSha256": "6492ca97b4d688426fd7395e48b2af0fc6999f052806feec5721272672ae05c2",
+    "rawFile": "raw/048.body",
+    "rawBase64": "eyJpZCI6NDgsImpzb25ycGMiOiIyLjAiLCJyZXN1bHQiOnsiZnJvbSI6IjB4NDRjM2E5NjE4MWFmOWUyOTVjZThlMTg4ZmE4ZmNkZDcyZDFlYjY2OCIsImdhcyI6IjB4NDkzZTAiLCJnYXNVc2VkIjoiMHg3ZTM5IiwidG8iOiIweDMzNGY1ZDI4YTcxNDMyZjhmYzIxYzdiMmI2ZjVkYmJjZDhiMzJhN2IiLCJpbnB1dCI6IjB4NzBhMDgyMzEwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA0NGMzYTk2MTgxYWY5ZTI5NWNlOGUxODhmYThmY2RkNzJkMWViNjY4Iiwib3V0cHV0IjoiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDEwYzEzMDVlMjgxIiwiY2FsbHMiOlt7ImZyb20iOiIweDMzNGY1ZDI4YTcxNDMyZjhmYzIxYzdiMmI2ZjVkYmJjZDhiMzJhN2IiLCJnYXMiOiIweDQyNDlkIiwiZ2FzVXNlZCI6IjB4YTAyIiwidG8iOiIweDE1ZjdmOTEwZTVhOGM4NmU2MDlmZDExYzU4ZjczNDJkODZkM2EyNWMiLCJpbnB1dCI6IjB4NWM2MGRhMWIiLCJvdXRwdXQiOiIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAxOTNiYThkNzRlOGM3ZjUxNTIyYTI1Zjg5YzQwNTY5MTQwNmVmMjAiLCJ0eXBlIjoiU1RBVElDQ0FMTCJ9LHsiZnJvbSI6IjB4MzM0ZjVkMjhhNzE0MzJmOGZjMjFjN2IyYjZmNWRiYmNkOGIzMmE3YiIsImdhcyI6IjB4NDBmYmYiLCJnYXNVc2VkIjoiMHhhNzEiLCJ0byI6IjB4MDE5M2JhOGQ3NGU4YzdmNTE1MjJhMjVmODljNDA1NjkxNDA2ZWYyMCIsImlucHV0IjoiMHg3MGEwODIzMTAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDQ0YzNhOTYxODFhZjllMjk1Y2U4ZTE4OGZhOGZjZGQ3MmQxZWI2NjgiLCJvdXRwdXQiOiIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMTBjMTMwNWUyODEiLCJ2YWx1ZSI6IjB4MCIsInR5cGUiOiJERUxFR0FURUNBTEwifV0sInZhbHVlIjoiMHgwIiwidHlwZSI6IkNBTEwifX0=",
+    "durationMs": 304.64074999999866,
+    "timeoutMs": 25000,
+    "responseSha256": "6492ca97b4d688426fd7395e48b2af0fc6999f052806feec5721272672ae05c2"
+  },
+  "finishedAt": "2026-10-26T09:07:43.060Z"
+}

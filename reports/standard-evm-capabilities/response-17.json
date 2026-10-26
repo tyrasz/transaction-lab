@@ -1,0 +1,68 @@
+{
+  "provider": "ethereum-drpc",
+  "endpoint": "https://eth.drpc.org",
+  "label": "code-stateDiff-hash-call-witness",
+  "startedAt": "2026-10-26T07:56:44.660Z",
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 17,
+    "method": "eth_call",
+    "params": [
+      {
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x000000000000000000000000000000000000feed",
+        "data": "0x",
+        "value": "0x0",
+        "gas": "0x493e0"
+      },
+      {
+        "blockHash": "0x888cd3dff00f52b85bb400ab86dbeb503fdd52becb6bcbb36994d856102b2916",
+        "requireCanonical": true
+      },
+      {
+        "0x000000000000000000000000000000000000feed": {
+          "code": "0x60005460005260206000f3",
+          "stateDiff": {
+            "0x0000000000000000000000000000000000000000000000000000000000000000": "0x000000000000000000000000000000000000000000000000000000000000002a"
+          }
+        }
+      }
+    ]
+  },
+  "requestText": "{\"jsonrpc\":\"2.0\",\"id\":17,\"method\":\"eth_call\",\"params\":[{\"from\":\"0x0000000000000000000000000000000000000000\",\"to\":\"0x000000000000000000000000000000000000feed\",\"data\":\"0x\",\"value\":\"0x0\",\"gas\":\"0x493e0\"},{\"blockHash\":\"0x888cd3dff00f52b85bb400ab86dbeb503fdd52becb6bcbb36994d856102b2916\",\"requireCanonical\":true},{\"0x000000000000000000000000000000000000feed\":{\"code\":\"0x60005460005260206000f3\",\"stateDiff\":{\"0x0000000000000000000000000000000000000000000000000000000000000000\":\"0x000000000000000000000000000000000000000000000000000000000000002a\"}}}]}",
+  "requestSha256": "f8d5fa5540db95bfbb449f92fa856addda9d5307996d00c545b5ea74d182eaa9",
+  "responseBytes": 103,
+  "bodyComplete": true,
+  "http": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-origin": "*",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a507e7fb69dc600b-SIN",
+      "connection": "keep-alive",
+      "content-encoding": "br",
+      "content-length": "70",
+      "content-type": "application/json",
+      "date": "Mon, 26 Oct 2026 07:56:44 GMT",
+      "server": "cloudflare",
+      "strict-transport-security": "max-age=31536000; includeSubDomains",
+      "vary": "origin, access-control-request-method, access-control-request-headers, Accept-Encoding",
+      "x-drpc-owner-id": "cb501251-31a8-4028-8b0a-54679f15c385",
+      "x-drpc-owner-tier": "free",
+      "x-drpc-provider-id": "drpc-core-free",
+      "x-drpc-trace-id": "d42fb43f8bad2783254f208e87ddbdb4"
+    }
+  },
+  "responseBase64": "eyJpZCI6MTcsImpzb25ycGMiOiIyLjAiLCJyZXN1bHQiOiIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMmEifQ==",
+  "responseText": "{\"id\":17,\"jsonrpc\":\"2.0\",\"result\":\"0x000000000000000000000000000000000000000000000000000000000000002a\"}",
+  "response": {
+    "id": 17,
+    "jsonrpc": "2.0",
+    "result": "0x000000000000000000000000000000000000000000000000000000000000002a"
+  },
+  "rpcOutcome": "result",
+  "responseSha256": "ded163d30387f89a618ed73e2e34f552cdd735f05b3c2594d1cf427d27b1efa3",
+  "completedAt": "2026-10-26T07:56:45.107Z",
+  "elapsedMs": 446.555
+}

@@ -1,0 +1,94 @@
+{
+  "sequence": 42,
+  "caseSequence": 12,
+  "startedAt": "2026-10-26T09:07:40.859Z",
+  "request": {
+    "url": "https://eth.drpc.org",
+    "method": "POST",
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 42,
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "to": "0x000000000000000000000000000000000000ba1a",
+          "data": "0x",
+          "value": "0x0",
+          "gas": "0x493e0"
+        },
+        {
+          "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "callTracer",
+          "timeout": "15s",
+          "tracerConfig": {
+            "withLog": true
+          },
+          "stateOverrides": {
+            "0x000000000000000000000000000000000000ba1a": {
+              "code": "0x43600052426020524560405248606052446080524160a0524660c0527f000000000000000000000000000000000000000000000000000000000190db614060e0526101006000f3"
+            }
+          }
+        }
+      ]
+    },
+    "bodyText": "{\"jsonrpc\":\"2.0\",\"id\":42,\"method\":\"debug_traceCall\",\"params\":[{\"from\":\"0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668\",\"to\":\"0x000000000000000000000000000000000000ba1a\",\"data\":\"0x\",\"value\":\"0x0\",\"gas\":\"0x493e0\"},{\"blockHash\":\"0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61\",\"requireCanonical\":true},{\"tracer\":\"callTracer\",\"timeout\":\"15s\",\"tracerConfig\":{\"withLog\":true},\"stateOverrides\":{\"0x000000000000000000000000000000000000ba1a\":{\"code\":\"0x43600052426020524560405248606052446080524160a0524660c0527f000000000000000000000000000000000000000000000000000000000190db614060e0526101006000f3\"}}}]}",
+    "bodyBytes": 608,
+    "bodySha256": "1436c8794fac946503861483b3f7f5be4c08d149d1ea64c5006de788150e4124"
+  },
+  "http": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-origin": "*",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a5084fe4f897448f-SIN",
+      "connection": "keep-alive",
+      "content-encoding": "br",
+      "content-length": "296",
+      "content-type": "application/json",
+      "date": "Mon, 26 Oct 2026 09:07:41 GMT",
+      "server": "cloudflare",
+      "strict-transport-security": "max-age=31536000; includeSubDomains",
+      "vary": "Origin, Accept-Encoding",
+      "x-drpc-owner-id": "cb501251-31a8-4028-8b0a-54679f15c385",
+      "x-drpc-owner-tier": "free",
+      "x-drpc-provider-id": "drpc-core-free",
+      "x-drpc-trace-id": "1943c99d86303d013c7fe8e4c7c58ec3"
+    }
+  },
+  "responseText": "{\"id\":42,\"jsonrpc\":\"2.0\",\"result\":{\"from\":\"0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668\",\"gas\":\"0x493e0\",\"gasUsed\":\"0x527b\",\"to\":\"0x000000000000000000000000000000000000ba1a\",\"input\":\"0x\",\"output\":\"0x000000000000000000000000000000000000000000000000000000000190db62000000000000000000000000000000000000000000000000000000006ade1ec700000000000000000000000000000000000000000000000000000000039387000000000000000000000000000000000000000000000000000000000000000000df5101e48026c0ad13be25f48fa5779dd47cae0d5a56f0fd9f1ad4a0765e479100000000000000000000000085c2e985a4fb5c3ff25ee27ee424abd851e4cb330000000000000000000000000000000000000000000000000000000000000001b0d0df2431fae0e29eb87edfb90a55553159037ddc25af21c643a2af77547d97\",\"value\":\"0x0\",\"type\":\"CALL\"}}",
+  "response": {
+    "id": 42,
+    "jsonrpc": "2.0",
+    "result": {
+      "from": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+      "gas": "0x493e0",
+      "gasUsed": "0x527b",
+      "to": "0x000000000000000000000000000000000000ba1a",
+      "input": "0x",
+      "output": "0x000000000000000000000000000000000000000000000000000000000190db62000000000000000000000000000000000000000000000000000000006ade1ec700000000000000000000000000000000000000000000000000000000039387000000000000000000000000000000000000000000000000000000000000000000df5101e48026c0ad13be25f48fa5779dd47cae0d5a56f0fd9f1ad4a0765e479100000000000000000000000085c2e985a4fb5c3ff25ee27ee424abd851e4cb330000000000000000000000000000000000000000000000000000000000000001b0d0df2431fae0e29eb87edfb90a55553159037ddc25af21c643a2af77547d97",
+      "value": "0x0",
+      "type": "CALL"
+    }
+  },
+  "transport": {
+    "complete": true,
+    "receivedBytes": 740,
+    "retainedBytes": 740,
+    "observedPrefixSha256": "6f3cd1ae7fbf66ac8c6c71fce109b61d330242972dde7715f05f22e373fea989",
+    "retainedSha256": "6f3cd1ae7fbf66ac8c6c71fce109b61d330242972dde7715f05f22e373fea989",
+    "rawFile": "raw/042.body",
+    "rawBase64": "eyJpZCI6NDIsImpzb25ycGMiOiIyLjAiLCJyZXN1bHQiOnsiZnJvbSI6IjB4NDRjM2E5NjE4MWFmOWUyOTVjZThlMTg4ZmE4ZmNkZDcyZDFlYjY2OCIsImdhcyI6IjB4NDkzZTAiLCJnYXNVc2VkIjoiMHg1MjdiIiwidG8iOiIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMGJhMWEiLCJpbnB1dCI6IjB4Iiwib3V0cHV0IjoiMHgwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAxOTBkYjYyMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDA2YWRlMWVjNzAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDM5Mzg3MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwZGY1MTAxZTQ4MDI2YzBhZDEzYmUyNWY0OGZhNTc3OWRkNDdjYWUwZDVhNTZmMGZkOWYxYWQ0YTA3NjVlNDc5MTAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDg1YzJlOTg1YTRmYjVjM2ZmMjVlZTI3ZWU0MjRhYmQ4NTFlNGNiMzMwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAxYjBkMGRmMjQzMWZhZTBlMjllYjg3ZWRmYjkwYTU1NTUzMTU5MDM3ZGRjMjVhZjIxYzY0M2EyYWY3NzU0N2Q5NyIsInZhbHVlIjoiMHgwIiwidHlwZSI6IkNBTEwifX0=",
+    "durationMs": 222.60020799999984,
+    "timeoutMs": 25000,
+    "responseSha256": "6f3cd1ae7fbf66ac8c6c71fce109b61d330242972dde7715f05f22e373fea989"
+  },
+  "finishedAt": "2026-10-26T09:07:41.082Z"
+}

@@ -1,0 +1,92 @@
+{
+  "sequence": 69,
+  "caseSequence": 39,
+  "startedAt": "2026-10-26T09:07:48.741Z",
+  "request": {
+    "url": "https://eth.drpc.org",
+    "method": "POST",
+    "headers": {
+      "content-type": "application/json"
+    },
+    "body": {
+      "jsonrpc": "2.0",
+      "id": 69,
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "data": "0xdd62ed3e00000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "value": "0x0",
+          "gas": "0x493e0"
+        },
+        {
+          "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "prestateTracer",
+          "timeout": "15s",
+          "tracerConfig": {
+            "diffMode": true
+          }
+        }
+      ]
+    },
+    "bodyText": "{\"jsonrpc\":\"2.0\",\"id\":69,\"method\":\"debug_traceCall\",\"params\":[{\"from\":\"0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668\",\"to\":\"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48\",\"data\":\"0xdd62ed3e00000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b\",\"value\":\"0x0\",\"gas\":\"0x493e0\"},{\"blockHash\":\"0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61\",\"requireCanonical\":true},{\"tracer\":\"prestateTracer\",\"timeout\":\"15s\",\"tracerConfig\":{\"diffMode\":true}}]}",
+    "bodyBytes": 529,
+    "bodySha256": "c8b29ce713b5e0d4ae66658764303ee49530a9a06e6cd0d5880d158af46a4d46"
+  },
+  "http": {
+    "status": 200,
+    "headers": {
+      "access-control-allow-origin": "*",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a50850162ddc448f-SIN",
+      "connection": "keep-alive",
+      "content-encoding": "br",
+      "content-length": "138",
+      "content-type": "application/json",
+      "date": "Mon, 26 Oct 2026 09:07:48 GMT",
+      "server": "cloudflare",
+      "strict-transport-security": "max-age=31536000; includeSubDomains",
+      "vary": "Origin, Accept-Encoding",
+      "x-drpc-owner-id": "cb501251-31a8-4028-8b0a-54679f15c385",
+      "x-drpc-owner-tier": "free",
+      "x-drpc-provider-id": "drpc-core-free",
+      "x-drpc-trace-id": "126b5587bb3e8ce0ecba05d63655f3d2"
+    }
+  },
+  "responseText": "{\"id\":69,\"jsonrpc\":\"2.0\",\"result\":{\"post\":{\"0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668\":{\"nonce\":2261}},\"pre\":{\"0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668\":{\"balance\":\"0x8ccdea90d31cb08c\",\"nonce\":2260}}}}",
+  "response": {
+    "id": 69,
+    "jsonrpc": "2.0",
+    "result": {
+      "post": {
+        "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668": {
+          "nonce": 2261
+        }
+      },
+      "pre": {
+        "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668": {
+          "balance": "0x8ccdea90d31cb08c",
+          "nonce": 2260
+        }
+      }
+    }
+  },
+  "transport": {
+    "complete": true,
+    "receivedBytes": 204,
+    "retainedBytes": 204,
+    "observedPrefixSha256": "2b743257967b0bd25a15d2891c26667e2e299087bd860fb51f47a0777f5fb429",
+    "retainedSha256": "2b743257967b0bd25a15d2891c26667e2e299087bd860fb51f47a0777f5fb429",
+    "rawFile": "raw/069.body",
+    "rawBase64": "eyJpZCI6NjksImpzb25ycGMiOiIyLjAiLCJyZXN1bHQiOnsicG9zdCI6eyIweDQ0YzNhOTYxODFhZjllMjk1Y2U4ZTE4OGZhOGZjZGQ3MmQxZWI2NjgiOnsibm9uY2UiOjIyNjF9fSwicHJlIjp7IjB4NDRjM2E5NjE4MWFmOWUyOTVjZThlMTg4ZmE4ZmNkZDcyZDFlYjY2OCI6eyJiYWxhbmNlIjoiMHg4Y2NkZWE5MGQzMWNiMDhjIiwibm9uY2UiOjIyNjB9fX19",
+    "durationMs": 204.38066700000127,
+    "timeoutMs": 25000,
+    "responseSha256": "2b743257967b0bd25a15d2891c26667e2e299087bd860fb51f47a0777f5fb429"
+  },
+  "finishedAt": "2026-10-26T09:07:48.946Z"
+}

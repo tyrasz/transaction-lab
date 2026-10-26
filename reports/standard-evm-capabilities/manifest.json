@@ -1,0 +1,95 @@
+{
+  "schemaVersion": "1.0",
+  "createdAt": "2026-10-26T07:56:37.289Z",
+  "limits": {
+    "rpc": 48,
+    "responseBytes": 8388608,
+    "totalBytes": 67108864,
+    "requestMs": 25000,
+    "wallMs": 600000
+  },
+  "chains": [
+    {
+      "chainId": 1,
+      "name": "ethereum",
+      "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "providers": [
+        {
+          "id": "ethereum-publicnode",
+          "url": "https://ethereum-rpc.publicnode.com"
+        },
+        {
+          "id": "ethereum-drpc",
+          "url": "https://eth.drpc.org"
+        }
+      ]
+    },
+    {
+      "chainId": 8453,
+      "name": "base",
+      "token": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+      "providers": [
+        {
+          "id": "base-official",
+          "url": "https://mainnet.base.org"
+        },
+        {
+          "id": "base-publicnode",
+          "url": "https://base-rpc.publicnode.com"
+        }
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "url": "https://ethereum.publicnode.com/",
+      "purpose": "Provider-published Ethereum public endpoint."
+    },
+    {
+      "url": "https://drpc.org/docs/ethereum-api",
+      "purpose": "Provider-published Ethereum public endpoint."
+    },
+    {
+      "url": "https://docs.base.org/get-started/connect-to-base",
+      "purpose": "Base-published mainnet endpoint and chain ID."
+    },
+    {
+      "url": "https://base.publicnode.com/",
+      "purpose": "Provider-published Base public endpoint."
+    },
+    {
+      "url": "https://developers.circle.com/stablecoins/usdc-contract-addresses",
+      "purpose": "Circle-issued Ethereum and Base USDC addresses."
+    },
+    {
+      "url": "https://geth.ethereum.org/docs/interacting-with-geth/rpc/objects",
+      "purpose": "Read-only call and ephemeral code/stateDiff override semantics."
+    },
+    {
+      "url": "https://geth.ethereum.org/docs/interacting-with-geth/rpc/ns-debug",
+      "purpose": "debug_traceCall callTracer/prestateTracer and stateOverrides."
+    },
+    {
+      "url": "https://geth.ethereum.org/docs/interacting-with-geth/rpc/ns-eth",
+      "purpose": "eth_simulateV1; numeric parent block creates a subsequent synthetic block."
+    }
+  ],
+  "sourceSha256": "3d35bf6854874c80f5914d95a58c30b8fd6586986d8d82afc54a80de8c9de44b",
+  "scope": "Read-only capability survey, not a deposit simulation or assurance of exact current/historical execution.",
+  "discipline": "At most12 calls per provider,48 total; no retries, endpoint replacement, fallback block or hidden method fallback. The first endpoint per chain selects one finalized header; the second must bind that same hash. Failed prerequisites skip dependent probes.",
+  "witness": "Separate synthetic code+stateDiff override at0x000000000000000000000000000000000000feed returns uint25642. It never changes token balances, allowances, or deposit inputs; it only tests whether ephemeral override parameters are applied.",
+  "probes": [
+    "chain",
+    "fixed-header",
+    "client-version",
+    "usdc-balance-hash-call",
+    "code-stateDiff-hash-call-witness",
+    "usdc-hash-callTracer",
+    "usdc-hash-full-prestateTracer",
+    "usdc-hash-diff-prestateTracer",
+    "hash-overridden-callTracer-witness",
+    "usdc-eth_simulateV1-next-block",
+    "usdc-trace_call-numeric",
+    "canonical-header-recheck"
+  ]
+}

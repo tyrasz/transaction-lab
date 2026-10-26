@@ -1,0 +1,318 @@
+{
+  "schemaVersion": "2",
+  "capture": {
+    "path": "reports/standard-evm-deposits-v2/capture.json",
+    "sha256": "149d80c7e421805dbc403a66acb6fb3410ea1d092876c01cc2776b52c703d86e"
+  },
+  "planSha256": "d458f18ebd659998296a05283e6987f945bb54d7fe5786551abf70c9d7640f8f",
+  "purpose": "Declared provider codeHash adapter fix and regression on the identical two selected cases; not an independent accuracy sample.",
+  "profile": "Unsigned unpriced original-parent-block-end state, not original transaction position.",
+  "accounting": {
+    "attemptedRpc": 76,
+    "completedBodies": 76,
+    "observedResponseBytes": 443865,
+    "retainedResponseBytes": 443865,
+    "durationMs": 21343.629957999998,
+    "sourceBound": true
+  },
+  "sourceUnchanged": true,
+  "archivedSourceFiles": 17,
+  "runtime": {
+    "node": "v22.23.2",
+    "v8": "12.4.254.21-node.56",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "priorCapture": {
+    "path": "reports/standard-evm-deposits/capture.json",
+    "sha256": "e0bde3899b5dc2795206ed70b6faa82f2a8bcaa5f8f82a79c3151f2fa093f778"
+  },
+  "aaveMeasurementAmountsUnchangedFromV1": true,
+  "processCreation": {
+    "initialInvocation": "Automatic approval review timed out before process creation.",
+    "absenceVerified": [
+      "STARTED.json",
+      "capture.json",
+      "raw",
+      "sources"
+    ],
+    "permittedProcessCreationRetry": 1,
+    "executedCaptureSequences": 1,
+    "rpcRetries": 0
+  },
+  "cases": [
+    {
+      "id": "aave-usdc-supply-with-permit",
+      "originalTransactionHash": "0x6166280a62cdad28e7b8af05ebb622b42b61deff981b3b6cd83dc03b3bb130b2",
+      "stateBlockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+      "rpcCalls": 30,
+      "executionStatus": "success",
+      "gasUsed": "189775",
+      "canonicalStatus": "verified",
+      "providerCodeHashChecks": {
+        "basis": "Keccak256_of_explicit_provider_runtime_code_only",
+        "independentStateAttestation": false,
+        "claims": [
+          {
+            "phase": "pre",
+            "address": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+            "codeHash": "0x96107dc4006b4c7fecd1827cfb275ffeef31e6194cd50466f85f8eb24ccf2679",
+            "codeBytes": 2400
+          },
+          {
+            "phase": "pre",
+            "address": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+            "codeHash": "0x82c6d153799b3226525e3b7ec27b843ef44c5f6bca21fcf8b3c80db61ba64881",
+            "codeBytes": 2400
+          },
+          {
+            "phase": "pre",
+            "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "codeHash": "0xd80d4b7c890cb9d6a4893e6b52bc34b56b25335cb13716e0d1d31383e6b41505",
+            "codeBytes": 2186
+          }
+        ]
+      },
+      "measurements": [
+        {
+          "id": "owner-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+          },
+          "decimals": 6,
+          "status": "measured",
+          "beforeRaw": "3962903485",
+          "afterRaw": "0",
+          "deltaRaw": "-3962903485",
+          "reason": null
+        },
+        {
+          "id": "beneficiary-aethusdc",
+          "query": {
+            "to": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+            "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+          },
+          "decimals": 6,
+          "status": "measured",
+          "beforeRaw": "0",
+          "afterRaw": "3962903484",
+          "deltaRaw": "3962903484",
+          "reason": null
+        },
+        {
+          "id": "reserve-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000098c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c"
+          },
+          "decimals": 6,
+          "status": "measured",
+          "beforeRaw": "151987610826648",
+          "afterRaw": "151991573730133",
+          "deltaRaw": "3962903485",
+          "reason": null
+        },
+        {
+          "id": "owner-pool-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+          },
+          "decimals": 6,
+          "status": "measured",
+          "beforeRaw": "0",
+          "afterRaw": "0",
+          "deltaRaw": "0",
+          "reason": null
+        }
+      ]
+    },
+    {
+      "id": "morpho-kiln-usdc-deposit",
+      "originalTransactionHash": "0xc46259d8064831c47c68776ca0611af75337adf8c4aee4bee5add0878b8873a7",
+      "stateBlockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+      "rpcCalls": 46,
+      "executionStatus": "success",
+      "gasUsed": "1413682",
+      "canonicalStatus": "verified",
+      "providerCodeHashChecks": {
+        "basis": "Keccak256_of_explicit_provider_runtime_code_only",
+        "independentStateAttestation": false,
+        "claims": [
+          {
+            "phase": "pre",
+            "address": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+            "codeHash": "0xadde58ed66192b6e998912e7fa41bc6f3bdbcfe3ced6b6689b7b875721dea2dd",
+            "codeBytes": 283
+          },
+          {
+            "phase": "pre",
+            "address": "0x870ac11d48b15db9a138cf899d20f13f79ba00bc",
+            "codeHash": "0x73b578a0cd95d0d6e77f85a3945a670a9b8679670f8fc190ca97e89a1f07f6cd",
+            "codeBytes": 2717
+          },
+          {
+            "phase": "pre",
+            "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "codeHash": "0xd80d4b7c890cb9d6a4893e6b52bc34b56b25335cb13716e0d1d31383e6b41505",
+            "codeBytes": 2186
+          },
+          {
+            "phase": "pre",
+            "address": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+            "codeHash": "0xfa259fa317198f88f5fa3c119f06c066295dbcd47d715e0a30e1bcf94c02ef8c",
+            "codeBytes": 15623
+          },
+          {
+            "phase": "pre",
+            "address": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+            "codeHash": "0x178de337f452135bd08591e764910cb3ac423a6b26f72da7c1d09f15019bdd07",
+            "codeBytes": 19340
+          }
+        ]
+      },
+      "measurements": [
+        {
+          "id": "owner-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+          },
+          "decimals": 6,
+          "status": "measured",
+          "beforeRaw": "704323976173",
+          "afterRaw": "354323976173",
+          "deltaRaw": "-350000000000",
+          "reason": null
+        },
+        {
+          "id": "beneficiary-wrapper-shares",
+          "query": {
+            "to": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+            "data": "0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+          },
+          "decimals": 6,
+          "status": "measured",
+          "beforeRaw": "1151370388097",
+          "afterRaw": "1481867899909",
+          "deltaRaw": "330497511812",
+          "reason": null
+        },
+        {
+          "id": "wrapper-vault-shares",
+          "query": {
+            "to": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+            "data": "0x70a08231000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+          },
+          "decimals": 18,
+          "status": "measured",
+          "beforeRaw": "24549620346225332293026418",
+          "afterRaw": "24855185467391819293915363",
+          "deltaRaw": "305565121166487000888945",
+          "reason": null
+        },
+        {
+          "id": "wrapper-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a08231000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+          },
+          "decimals": 6,
+          "status": "measured",
+          "beforeRaw": "20083625",
+          "afterRaw": "20083625",
+          "deltaRaw": "0",
+          "reason": null
+        },
+        {
+          "id": "vault-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a08231000000000000000000000000beef01735c132ada46aa9aa4c54623caa92a64cb"
+          },
+          "decimals": 6,
+          "status": "measured",
+          "beforeRaw": "6011",
+          "afterRaw": "6011",
+          "deltaRaw": "0",
+          "reason": null
+        },
+        {
+          "id": "blue-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x70a08231000000000000000000000000bbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+          },
+          "decimals": 6,
+          "status": "measured",
+          "beforeRaw": "128890534855869",
+          "afterRaw": "129240534855869",
+          "deltaRaw": "350000000000",
+          "reason": null
+        },
+        {
+          "id": "owner-wrapper-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e00000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+          },
+          "decimals": 6,
+          "status": "measured",
+          "beforeRaw": "350000000000",
+          "afterRaw": "0",
+          "deltaRaw": "-350000000000",
+          "reason": null
+        },
+        {
+          "id": "wrapper-vault-usdc",
+          "query": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0xdd62ed3e000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b000000000000000000000000beef01735c132ada46aa9aa4c54623caa92a64cb"
+          },
+          "decimals": 6,
+          "status": "measured",
+          "beforeRaw": "0",
+          "afterRaw": "0",
+          "deltaRaw": "0",
+          "reason": null
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "frozen": {
+      "path": "reports/standard-evm-deposits-v2/verify.mjs",
+      "sha256": "d0a158253049a8dd0784fad05ff69bc668288b5abb171915bc64c74d8a9cc1cb",
+      "networkRequests": 0,
+      "liveSourceImports": 0,
+      "isolatedPacketOnlyReplay": "passed_without_live_project_source_or_installed_project_dependencies",
+      "completeRawBodies": 76,
+      "completeEnginePlaybacks": 2,
+      "status": "passed",
+      "limitations": [
+        "Does not separately enforce all plan/source inventory and exact case-count equality.",
+        "Does not externally latch all playback request assertion failures if caught by the engine."
+      ]
+    },
+    "supplemental": {
+      "status": "passed",
+      "notes": "reports/standard-evm-deposits-v2/AUDIT-NOTES.md",
+      "result": "reports/standard-evm-deposits-v2/audit.json",
+      "resultSha256": "7c45b68a356343000005c18a1ad4fe226c65f7b81743fc730645f6d5b83edf11",
+      "implementation": "reports/standard-evm-deposits-v2/audit.mjs",
+      "implementationSha256": "5839accb69de9fb0ff96751c38664039365d622a5833934b353ffad04875097e",
+      "networkRequests": 0,
+      "liveSourceImports": 0,
+      "completeRecordedRequests": 76,
+      "completeEngineResults": 2,
+      "syntheticFaultControlsPassed": 7,
+      "independentEvmOrStateOracle": false,
+      "scope": [
+        "Exact plan/source inventory equality",
+        "Exact two-case count",
+        "Externally latched playback request mismatches"
+      ]
+    }
+  }
+}

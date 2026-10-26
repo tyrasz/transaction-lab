@@ -1,0 +1,18 @@
+# Frozen deposit discovery packet
+
+See [`../../research/standard-evm/DEPOSIT-TARGETS.md`](../../research/standard-evm/DEPOSIT-TARGETS.md) for case details and limits. `selected.json` is the machine-readable handoff with full unchanged transaction input and recorded references; historical receipt output is explicitly separated from canonical parent-state metadata/balance observations.
+
+Raw records `raw/NNN.json` retain requested URL, JSON-RPC method/params/id, time, HTTP status/headers, parsed public response or sanitized transport failure and the corresponding raw body hash. `raw/NNN.body` is the exact byte buffer exposed by Fetch after any HTTP content decoding; this is not a capture of TCP framing or compressed wire bytes. Public response errors are retained verbatim. The recorder contains no send, signing, debug or simulation methods. Its final stdout formatting is compact; prior raw records are unmodified.
+
+Discovery selection history:
+
+1. Official Aave and Morpho sources identified Ethereum USDC, Aave V3 pool and Steakhouse V1 vault. A finalized PublicNode header fixed the upper end of the first event search. The search covered 5,001 blocks and returned 256 Aave USDC supplies and 11 Steakhouse deposits.
+2. The first Aave envelope was a larger router operation; the selected direct pool envelope uses `supplyWithPermit`. The first Morpho envelope is a Kiln ERC-4626 deposit that enters the V1 vault. Two further Aave router envelopes and one larger Morpho-containing transaction were inspected and retained as unselected evidence.
+3. A broader Morpho event scan was rejected by PublicNode's archive access policy, then by dRPC's free range limit. The team froze the permit and wrapper examples before any simulation rather than continuing to search for easier executions. No missing result was treated as an empty event list.
+4. The selected historical receipts, blocks, full parent headers and fixed canonical parent metadata reads were captured. The Morpho V2 configuration lookup returned HTTP404; official Kiln source, V1 API, receipt flow and on-chain metadata establish the actual wrapper/V1 structure. The selected cases were not replaced.
+
+The initial three requests failed before a response was obtained in the restricted environment; their delivery to external services is unproven. Subsequent authorized network execution is separately recorded, with no erasure of those attempts. Totals: 52 recorder requests; 46 HTTP successes, three HTTP errors, three transport failures; 996,728 response bytes. Additional web research comprised two search targets, three opened primary documents, three further document opens and two search targets. No packages were installed.
+
+`verify.mjs` makes no network calls. It verifies every retained body and parsed response, the original receipt/transaction/block identity, transaction index membership, parent continuity and canonical-number recheck, original exact selectors/calldata, receipt flow, canonical metadata reads, parent balance/allowance facts and official-address consistency. It reconstructs `selected.json` deterministically and checks exact equality. The verification confirms internal consistency of this observed packet, not cryptographic chain/state authenticity or remote-provider independence.
+
+The recorder and offline verifier have separate responsibilities: this is a discovery artifact, not a prospective evaluator. Source URLs and raw bytes are frozen as observed; mutable upstream documentation and explorer implementation labels do not establish historical implementation/code provenance. Future execution must bind actual runtime code and complete state inputs separately.

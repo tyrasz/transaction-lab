@@ -1,0 +1,68 @@
+{
+  "provider": "base-publicnode",
+  "endpoint": "https://base-rpc.publicnode.com",
+  "label": "usdc-hash-diff-prestateTracer",
+  "startedAt": "2026-10-26T07:56:57.767Z",
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 44,
+    "method": "debug_traceCall",
+    "params": [
+      {
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+        "data": "0x70a082310000000000000000000000000000000000000000000000000000000000000000",
+        "value": "0x0",
+        "gas": "0x493e0"
+      },
+      {
+        "blockHash": "0xef10731d2bd3323ed990625fe703a644992642d503ccab31d7a6e9a55d54a8d3",
+        "requireCanonical": true
+      },
+      {
+        "tracer": "prestateTracer",
+        "timeout": "15s",
+        "tracerConfig": {
+          "diffMode": true
+        }
+      }
+    ]
+  },
+  "requestText": "{\"jsonrpc\":\"2.0\",\"id\":44,\"method\":\"debug_traceCall\",\"params\":[{\"from\":\"0x0000000000000000000000000000000000000000\",\"to\":\"0x833589fcd6edb6e08f4c7c32d4f71b54bda02913\",\"data\":\"0x70a082310000000000000000000000000000000000000000000000000000000000000000\",\"value\":\"0x0\",\"gas\":\"0x493e0\"},{\"blockHash\":\"0xef10731d2bd3323ed990625fe703a644992642d503ccab31d7a6e9a55d54a8d3\",\"requireCanonical\":true},{\"tracer\":\"prestateTracer\",\"timeout\":\"15s\",\"tracerConfig\":{\"diffMode\":true}}]}",
+  "requestSha256": "5830997af95dd31e09c31130cfeb3f831317b7cc88ac13768c23d32e0d8b5a10",
+  "responseBytes": 121,
+  "bodyComplete": true,
+  "http": {
+    "status": 200,
+    "headers": {
+      "access-control-max-age": "1728000",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a507e84d789fcde9-SIN",
+      "connection": "keep-alive",
+      "content-encoding": "br",
+      "content-type": "application/json",
+      "date": "Mon, 26 Oct 2026 07:56:58 GMT",
+      "server": "cloudflare",
+      "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, accept-encoding",
+      "x-content-type-options": "nosniff",
+      "x-envoy-upstream-service-time": "1"
+    }
+  },
+  "responseBase64": "eyJqc29ucnBjIjoiMi4wIiwiZXJyb3IiOnsiY29kZSI6LTMyNjAxLCJtZXNzYWdlIjoidGhlIG1ldGhvZCBkZWJ1Z190cmFjZUNhbGwgZG9lcyBub3QgZXhpc3QvaXMgbm90IGF2YWlsYWJsZSJ9LCJpZCI6NDR9Cg==",
+  "responseText": "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32601,\"message\":\"the method debug_traceCall does not exist/is not available\"},\"id\":44}\n",
+  "response": {
+    "jsonrpc": "2.0",
+    "error": {
+      "code": -32601,
+      "message": "the method debug_traceCall does not exist/is not available"
+    },
+    "id": 44
+  },
+  "rpcOutcome": "error",
+  "responseSha256": "ca0e0d79a2aa995d1d306371ee57cde52068a99c56e379b021a3a58437c7cd1e",
+  "completedAt": "2026-10-26T07:56:58.025Z",
+  "elapsedMs": 258.321
+}

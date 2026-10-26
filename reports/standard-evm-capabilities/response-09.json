@@ -1,0 +1,76 @@
+{
+  "provider": "ethereum-publicnode",
+  "endpoint": "https://ethereum-rpc.publicnode.com",
+  "label": "hash-overridden-callTracer-witness",
+  "startedAt": "2026-10-26T07:56:42.426Z",
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 9,
+    "method": "debug_traceCall",
+    "params": [
+      {
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x000000000000000000000000000000000000feed",
+        "data": "0x",
+        "value": "0x0",
+        "gas": "0x493e0"
+      },
+      {
+        "blockHash": "0x888cd3dff00f52b85bb400ab86dbeb503fdd52becb6bcbb36994d856102b2916",
+        "requireCanonical": true
+      },
+      {
+        "tracer": "callTracer",
+        "timeout": "15s",
+        "tracerConfig": {
+          "withLog": true
+        },
+        "stateOverrides": {
+          "0x000000000000000000000000000000000000feed": {
+            "code": "0x60005460005260206000f3",
+            "stateDiff": {
+              "0x0000000000000000000000000000000000000000000000000000000000000000": "0x000000000000000000000000000000000000000000000000000000000000002a"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "requestText": "{\"jsonrpc\":\"2.0\",\"id\":9,\"method\":\"debug_traceCall\",\"params\":[{\"from\":\"0x0000000000000000000000000000000000000000\",\"to\":\"0x000000000000000000000000000000000000feed\",\"data\":\"0x\",\"value\":\"0x0\",\"gas\":\"0x493e0\"},{\"blockHash\":\"0x888cd3dff00f52b85bb400ab86dbeb503fdd52becb6bcbb36994d856102b2916\",\"requireCanonical\":true},{\"tracer\":\"callTracer\",\"timeout\":\"15s\",\"tracerConfig\":{\"withLog\":true},\"stateOverrides\":{\"0x000000000000000000000000000000000000feed\":{\"code\":\"0x60005460005260206000f3\",\"stateDiff\":{\"0x0000000000000000000000000000000000000000000000000000000000000000\":\"0x000000000000000000000000000000000000000000000000000000000000002a\"}}}}]}",
+  "requestSha256": "fb11092ea34e1cbb5253a01a02ef8573a877194884246874ce9ff72205811021",
+  "responseBytes": 120,
+  "bodyComplete": true,
+  "http": {
+    "status": 200,
+    "headers": {
+      "access-control-max-age": "1728000",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a507e7ed8e887e8d-SIN",
+      "connection": "keep-alive",
+      "content-encoding": "br",
+      "content-type": "application/json",
+      "date": "Mon, 26 Oct 2026 07:56:42 GMT",
+      "server": "cloudflare",
+      "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, accept-encoding",
+      "x-content-type-options": "nosniff",
+      "x-envoy-upstream-service-time": "1"
+    }
+  },
+  "responseBase64": "eyJqc29ucnBjIjoiMi4wIiwiZXJyb3IiOnsiY29kZSI6LTMyNjAxLCJtZXNzYWdlIjoidGhlIG1ldGhvZCBkZWJ1Z190cmFjZUNhbGwgZG9lcyBub3QgZXhpc3QvaXMgbm90IGF2YWlsYWJsZSJ9LCJpZCI6OX0K",
+  "responseText": "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32601,\"message\":\"the method debug_traceCall does not exist/is not available\"},\"id\":9}\n",
+  "response": {
+    "jsonrpc": "2.0",
+    "error": {
+      "code": -32601,
+      "message": "the method debug_traceCall does not exist/is not available"
+    },
+    "id": 9
+  },
+  "rpcOutcome": "error",
+  "responseSha256": "4d4558a50cb1692f6a71d2135ced513c84e2ec145d443c65d7c18e966b0656f4",
+  "completedAt": "2026-10-26T07:56:42.666Z",
+  "elapsedMs": 239.899
+}

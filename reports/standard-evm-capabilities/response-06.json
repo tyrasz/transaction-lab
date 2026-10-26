@@ -1,0 +1,68 @@
+{
+  "provider": "ethereum-publicnode",
+  "endpoint": "https://ethereum-rpc.publicnode.com",
+  "label": "usdc-hash-callTracer",
+  "startedAt": "2026-10-26T07:56:41.532Z",
+  "request": {
+    "jsonrpc": "2.0",
+    "id": 6,
+    "method": "debug_traceCall",
+    "params": [
+      {
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "data": "0x70a082310000000000000000000000000000000000000000000000000000000000000000",
+        "value": "0x0",
+        "gas": "0x493e0"
+      },
+      {
+        "blockHash": "0x888cd3dff00f52b85bb400ab86dbeb503fdd52becb6bcbb36994d856102b2916",
+        "requireCanonical": true
+      },
+      {
+        "tracer": "callTracer",
+        "timeout": "15s",
+        "tracerConfig": {
+          "withLog": true
+        }
+      }
+    ]
+  },
+  "requestText": "{\"jsonrpc\":\"2.0\",\"id\":6,\"method\":\"debug_traceCall\",\"params\":[{\"from\":\"0x0000000000000000000000000000000000000000\",\"to\":\"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48\",\"data\":\"0x70a082310000000000000000000000000000000000000000000000000000000000000000\",\"value\":\"0x0\",\"gas\":\"0x493e0\"},{\"blockHash\":\"0x888cd3dff00f52b85bb400ab86dbeb503fdd52becb6bcbb36994d856102b2916\",\"requireCanonical\":true},{\"tracer\":\"callTracer\",\"timeout\":\"15s\",\"tracerConfig\":{\"withLog\":true}}]}",
+  "requestSha256": "1b7bfb430b481994e8e7bc99234e21ba4388425e877fa3a84a5007b152b51082",
+  "responseBytes": 120,
+  "bodyComplete": true,
+  "http": {
+    "status": 200,
+    "headers": {
+      "access-control-max-age": "1728000",
+      "alt-svc": "h3=\":443\"; ma=86400",
+      "cf-cache-status": "DYNAMIC",
+      "cf-ray": "a507e7e7df997e8d-SIN",
+      "connection": "keep-alive",
+      "content-encoding": "br",
+      "content-type": "application/json",
+      "date": "Mon, 26 Oct 2026 07:56:41 GMT",
+      "server": "cloudflare",
+      "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+      "transfer-encoding": "chunked",
+      "vary": "Origin, accept-encoding",
+      "x-content-type-options": "nosniff",
+      "x-envoy-upstream-service-time": "0"
+    }
+  },
+  "responseBase64": "eyJqc29ucnBjIjoiMi4wIiwiZXJyb3IiOnsiY29kZSI6LTMyNjAxLCJtZXNzYWdlIjoidGhlIG1ldGhvZCBkZWJ1Z190cmFjZUNhbGwgZG9lcyBub3QgZXhpc3QvaXMgbm90IGF2YWlsYWJsZSJ9LCJpZCI6Nn0K",
+  "responseText": "{\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32601,\"message\":\"the method debug_traceCall does not exist/is not available\"},\"id\":6}\n",
+  "response": {
+    "jsonrpc": "2.0",
+    "error": {
+      "code": -32601,
+      "message": "the method debug_traceCall does not exist/is not available"
+    },
+    "id": 6
+  },
+  "rpcOutcome": "error",
+  "responseSha256": "ed38c8b8711f2f04076ba38fdede2863e43d55b4ec9aee5ab222e327d88b1cc2",
+  "completedAt": "2026-10-26T07:56:41.751Z",
+  "elapsedMs": 218.441
+}
