@@ -1,0 +1,184 @@
+{
+  "schemaVersion": "1.0",
+  "planSha256": "ffa5f14e267e3fb4ec2eb53aa3bb2da241ace700368a244cde9042f2b7f1a220",
+  "completedAt": "2026-10-27T03:20:40.485Z",
+  "durationMs": 9472.514541,
+  "workloads": 1,
+  "plannedLocalAttempts": 2,
+  "completedLocalAttempts": 2,
+  "retries": 0,
+  "replacements": 0,
+  "sourceUnchanged": true,
+  "fatal": null,
+  "headerVerification": {
+    "status": "verified",
+    "blockHash": "0xd5c5a3ba092484a5e1b3b54a054de8d1b1df7e24e60717f92517adccb0d6ce9e",
+    "stateRoot": "0x7a9eaf8bef6cb59ee3c58cbf7d96c173c3cc849f2a088ebe073d2069a1793af3",
+    "parentHash": "0x303c1a3363dbc7d2f5dba6ddcd3e921d408e27c1bd0ab27a6c0aeb04b4ff4c6e",
+    "number": "26277709",
+    "timestamp": "1793027927",
+    "hardfork": "bpo2",
+    "encodedBytes": 649,
+    "headerFields": 21,
+    "consensusVerified": false,
+    "finalityVerified": false,
+    "bodyVerified": false
+  },
+  "localCalls": 12,
+  "localObservedBytes": 147941,
+  "product": {
+    "attempted": true,
+    "httpStatus": 200,
+    "status": "completed",
+    "implementation": {
+      "name": "Transaction Lab Ethereum preview",
+      "version": "0.12.0",
+      "sourceSha256": "3b769d18eac4e46548420e51799baf0185f56154c1fbfaaed6914f8b4cb83e60",
+      "sourceFiles": [
+        "engines/standard-evm/discovery.js",
+        "engines/standard-evm/native-effects.js",
+        "engines/standard-evm/node_modules/@noble/hashes/_u64.js",
+        "engines/standard-evm/node_modules/@noble/hashes/package.json",
+        "engines/standard-evm/node_modules/@noble/hashes/sha3.js",
+        "engines/standard-evm/node_modules/@noble/hashes/utils.js",
+        "engines/standard-evm/package-lock.json",
+        "engines/standard-evm/package.json",
+        "engines/standard-evm/provider-state-diff.js",
+        "engines/standard-evm/sequence-state.js",
+        "engines/standard-evm/unsigned-call.js",
+        "package.json",
+        "src/account-effects.js",
+        "src/affected-balances.js",
+        "src/allowances.js",
+        "src/analyze.js",
+        "src/balances.js",
+        "src/config.js",
+        "src/current-state.js",
+        "src/historical-state.js",
+        "src/lending-balances.js",
+        "src/lending.js",
+        "src/permissions.js",
+        "src/query-validation.js",
+        "src/revert.js",
+        "src/rpc.js",
+        "src/server.js",
+        "src/standard-loader.js",
+        "src/standard-rpc.js",
+        "src/standard-simulation.js",
+        "src/state-diff.js",
+        "src/state.js",
+        "src/validate.js"
+      ]
+    },
+    "implementationMatched": true,
+    "rpcCalls": 20,
+    "observedRpcBytes": 62252
+  },
+  "attempts": [
+    {
+      "provider": "publicnode",
+      "executionStatus": "unavailable",
+      "comparison": {
+        "status": "incomplete",
+        "checks": {},
+        "limitations": [
+          "One selected workload; no population score or independent consensus/finality.",
+          "Unsigned unpriced calls; no signature validation, fee settlement or original transaction-position claim.",
+          "All effects outside supported local execution and demanded verified state remain unassessed."
+        ],
+        "reason": "Local execution unavailable"
+      }
+    },
+    {
+      "provider": "drpc",
+      "executionStatus": "success",
+      "comparison": {
+        "status": "matched",
+        "checks": {
+          "executionStatus": true,
+          "returnData": true,
+          "committedLogs": true,
+          "fullObservedStateChanges": true,
+          "gasAccounting": true
+        },
+        "limitations": [
+          "One selected workload; no population score or independent consensus/finality.",
+          "Unsigned unpriced calls; no signature validation, fee settlement or original transaction-position claim.",
+          "All effects outside supported local execution and demanded verified state remain unassessed."
+        ],
+        "providerEvidenceIds": {
+          "trace": 8,
+          "diff": 9,
+          "nonce": 3
+        },
+        "providerLogs": [
+          {
+            "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "topics": [
+              "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+              "0x00000000000000000000000028c6c06298d514db089934071355e5743bf21d60",
+              "0x0000000000000000000000003ff06dc2d15492073973547de56b02a2f72df74b"
+            ],
+            "data": "0x0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        ],
+        "providerChanges": [
+          {
+            "address": "0x28c6c06298d514db089934071355e5743bf21d60",
+            "nonce": {
+              "before": "0x11ff9a9",
+              "after": "0x11ff9aa"
+            }
+          },
+          {
+            "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "storage": [
+              {
+                "slot": "0x07081a045c3dbf2e63b62a407ef205e7586e2629d2e2b95ff093308ca0ff3727",
+                "before": "0x0000000000000000000000000000000000000000000000000000000c3115cbc0",
+                "after": "0x0000000000000000000000000000000000000000000000000000000c3115cbbf"
+              },
+              {
+                "slot": "0x2b57bf39a0390cd692348faee138760e11f8b5b99caa56f3d4975967b789cf51",
+                "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "after": "0x0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            ]
+          }
+        ],
+        "localChanges": [
+          {
+            "address": "0x28c6c06298d514db089934071355e5743bf21d60",
+            "nonce": {
+              "before": "0x11ff9a9",
+              "after": "0x11ff9aa"
+            }
+          },
+          {
+            "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "storage": [
+              {
+                "slot": "0x07081a045c3dbf2e63b62a407ef205e7586e2629d2e2b95ff093308ca0ff3727",
+                "before": "0x0000000000000000000000000000000000000000000000000000000c3115cbc0",
+                "after": "0x0000000000000000000000000000000000000000000000000000000c3115cbbf"
+              },
+              {
+                "slot": "0x2b57bf39a0390cd692348faee138760e11f8b5b99caa56f3d4975967b789cf51",
+                "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "after": "0x0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            ]
+          }
+        ],
+        "providerRootGas": "62224",
+        "localTransactionStyleGas": "62224"
+      }
+    }
+  ],
+  "limitations": [
+    "One constructed development transfer with two independent state-input attempts, not two cases or a scored cohort.",
+    "Execution header hash and initial account/storage/code commitments are verified against the selected hash; consensus, finality and block body are not authenticated.",
+    "The product uses a remote execution engine; matching this workload is not proof of universal local completeness."
+  ],
+  "violations": []
+}

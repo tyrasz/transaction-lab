@@ -4,8 +4,10 @@ import { performance } from 'node:perf_hooks';
 import { createCustomCommon, Hardfork, Mainnet } from '@ethereumjs/common';
 import { createEVM, EVMError } from '@ethereumjs/evm';
 import { bytesToHex, createAddressFromString, hexToBytes } from '@ethereumjs/util';
+import { ethereumCommon } from './ethereum-profile.js';
 
 export const EXECUTION_LIMITS = Object.freeze({ gas: 5000000, steps: 1000000, frames: 1000, depth: 32, logs: 2000, memoryBytes: 1048576, returnBytes: 1048576, calldataBytes: 32768, traceBytes: 8388608, wallMs: 10000 });
+export const ETHEREUM_EXECUTION_LIMITS = Object.freeze({ ...EXECUTION_LIMITS, wallMs: 120000 });
 const ADDRESS = /^0x[0-9a-f]{40}$/i, WORD = /^0x[0-9a-f]{64}$/i, BYTES = /^0x(?:[0-9a-f]{2})*$/i;
 const CORE_WRITER = '0x3333333333333333333333333333333333333333';
 const UINT256_MAX = (1n << 256n) - 1n;
@@ -19,14 +21,14 @@ class ExecutionError extends Error {
   constructor(code, message, status = 'unavailable') { super(message); this.code = code; this.status = status; }
 }
 const reject = (code, message, status) => { throw new ExecutionError(code, message, status); };
-function reserved(value) {
+function supportedAddress(value, chainId) {
   const target = typeof value === 'string' ? address(value) : value?.toString?.();
   if (!target || !ADDRESS.test(target)) return;
   const n = BigInt(target);
   // Official HyperCore reads start at0x0800. Reserve the whole0x08xx band,
   // including unknown future entries, instead of interpreting them as EOAs.
-  if (n >= 0x800n && n <= 0x8ffn) reject('LOCAL_HYPERCORE_UNSUPPORTED', 'HyperCore read precompile execution is unsupported.', 'unsupported');
-  if (target.toLowerCase() === CORE_WRITER) reject('LOCAL_COREWRITER_UNSUPPORTED', 'CoreWriter execution and HyperCore effects are unsupported.', 'unsupported');
+  if (chainId === 999 && n >= 0x800n && n <= 0x8ffn) reject('LOCAL_HYPERCORE_UNSUPPORTED', 'HyperCore read precompile execution is unsupported.', 'unsupported');
+  if (chainId === 999 && target.toLowerCase() === CORE_WRITER) reject('LOCAL_COREWRITER_UNSUPPORTED', 'CoreWriter execution and HyperCore effects are unsupported.', 'unsupported');
   if (n === 10n) reject('LOCAL_BLOB_UNSUPPORTED', 'The KZG point-evaluation precompile is outside this local engine profile.', 'unsupported');
 }
 function safeFailure(error) {
@@ -40,8 +42,9 @@ function safeFailure(error) {
  * retain their state; infrastructure/unsupported/limit failures roll it back.
  * The supplied manager and blockchain must themselves bound asynchronous I/O.
  * `now` is an internal deterministic test clock, never a public request field. */
-export async function executeUnsignedCall({ request, block, stateManager, blockchain, limits: requestedLimits = {}, now = () => performance.now() }) {
-  const limits = { ...EXECUTION_LIMITS }, startedAt = now();
+export async function executeUnsignedCall({ request, block, stateManager, blockchain, chainId = 999, limits: requestedLimits = {}, now = () => performance.now() }) {
+  const ceilings = chainId === 1 ? ETHEREUM_EXECUTION_LIMITS : EXECUTION_LIMITS;
+  const limits = { ...ceilings }, startedAt = now();
   const usage = { steps: 0, frames: 0, maxDepth: 0, logOpcodes: 0, retainedTraceBytes: 0 };
   const semantics = {
     kind: 'unsigned_message', signatureVerification: false, transactionNonceValidation: false,
@@ -54,6 +57,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
   };
   let root = null, environment = null, evm, checkpointDepth = 0, ownsManager = false;
   const stack = [];
+  const reserved = value => supportedAddress(value, chainId);
   function bound(name, value) { if (value > limits[name]) reject('LOCAL_RESOURCE_LIMIT', `Local execution exceeded its ${name} limit.`); }
   function clockCheck() { if (now() - startedAt >= limits.wallMs) reject('LOCAL_RESOURCE_LIMIT', 'Local execution exceeded its wallMs limit.'); }
   function retain(size) { usage.retainedTraceBytes += size; bound('traceBytes', usage.retainedTraceBytes); }
@@ -61,19 +65,24 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     while (checkpointDepth > 0) { await stateManager.revert(); checkpointDepth--; }
   }
   try {
+    if (![1, 999].includes(chainId)) reject('LOCAL_INVALID_INPUT', 'Only the explicit Ethereum mainnet and legacy HyperEVM development profiles are supported.');
     for (const [key, value] of Object.entries(requestedLimits)) {
-      if (!Object.hasOwn(EXECUTION_LIMITS, key) || !Number.isSafeInteger(value) || value <= 0 || value > EXECUTION_LIMITS[key]) reject('LOCAL_INVALID_INPUT', 'Execution limits must be positive integers no greater than the fixed ceilings.');
+      if (!Object.hasOwn(ceilings, key) || !Number.isSafeInteger(value) || value <= 0 || value > ceilings[key]) reject('LOCAL_INVALID_INPUT', 'Execution limits must be positive integers no greater than the fixed ceilings.');
       limits[key] = value;
     }
     if (!stateManager || typeof stateManager !== 'object' || ['getAccount', 'putAccount', 'getCode', 'getStorage', 'checkpoint', 'commit', 'revert'].some(method => typeof stateManager[method] !== 'function')) reject('LOCAL_INVALID_INPUT', 'A compatible explicit state manager is required.');
     if (activeManagers.has(stateManager)) reject('LOCAL_STATE_BUSY', 'Concurrent execution on the same state manager is not supported.');
     const from = address(request?.from), to = address(request?.to), value = quantity(request?.value), gasLimit = quantity(request?.gasLimit);
-    if (!from || !to || value === null || gasLimit === null || gasLimit === 0n || gasLimit > BigInt(limits.gas) || typeof request?.data !== 'string' || !BYTES.test(request.data) || request.data.length > 2 + limits.calldataBytes * 2 || Object.keys(request).some(key => !['from', 'to', 'data', 'value', 'gasLimit'].includes(key))) reject('LOCAL_INVALID_INPUT', 'A bounded unsigned call with explicit from, to, data, value and message gasLimit is required.');
+    if (!from || !to || value === null || gasLimit === null || (chainId === 999 && gasLimit === 0n) || gasLimit > BigInt(limits.gas) || typeof request?.data !== 'string' || !BYTES.test(request.data) || request.data.length > 2 + limits.calldataBytes * 2 || Object.keys(request).some(key => !['from', 'to', 'data', 'value', 'gasLimit'].includes(key))) reject('LOCAL_INVALID_INPUT', 'A bounded unsigned call with explicit from, to, data, value and message gasLimit is required.');
     reserved(from); reserved(to);
     if (!block || ['number', 'timestamp', 'gasLimit', 'baseFeePerGas'].some(field => quantity(block[field]) === null) || quantity(block.gasLimit) === 0n || typeof block.mixHash !== 'string' || !WORD.test(block.mixHash) || !address(block.miner) || ['hash', 'parentHash'].some(field => block[field] !== undefined && (typeof block[field] !== 'string' || !WORD.test(block[field])))) reject('LOCAL_INVALID_INPUT', 'Explicit block number, timestamp, gas limit, base fee, prevRandao and coinbase are required.');
-    environment = { chainId: 999, hardfork: 'cancun', number: quantity(block.number).toString(), timestamp: quantity(block.timestamp).toString(), gasLimit: quantity(block.gasLimit).toString(), baseFeePerGas: quantity(block.baseFeePerGas).toString(), mixHash: block.mixHash.toLowerCase(), miner: address(block.miner), ...(block.hash ? { sourceBlockHash: block.hash.toLowerCase() } : {}), ...(block.parentHash ? { sourceParentHash: block.parentHash.toLowerCase() } : {}), sourceBlockIdentityVerified: false };
+    const common = chainId === 1 ? ethereumCommon(block) : createCustomCommon({ chainId: 999, name: 'experimental-hyperevm-message' }, Mainnet, { hardfork: Hardfork.Cancun });
+    if (chainId === 1) {
+      semantics.chainScope = 'Ethereum_mainnet_pinned_timestamp_selected_fork';
+      semantics.warmAddresses = 'sender_destination_coinbase_and_fork_active_precompiles_no_access_list';
+    }
+    environment = { chainId, hardfork: common.hardfork(), number: quantity(block.number).toString(), timestamp: quantity(block.timestamp).toString(), gasLimit: quantity(block.gasLimit).toString(), baseFeePerGas: quantity(block.baseFeePerGas).toString(), mixHash: block.mixHash.toLowerCase(), miner: address(block.miner), ...(block.hash ? { sourceBlockHash: block.hash.toLowerCase() } : {}), ...(block.parentHash ? { sourceParentHash: block.parentHash.toLowerCase() } : {}), sourceBlockIdentityVerified: false };
     activeManagers.add(stateManager); ownsManager = true;
-    const common = createCustomCommon({ chainId: 999, name: 'experimental-hyperevm-message' }, Mainnet, { hardfork: Hardfork.Cancun });
     const methods = new Map();
     // Bind methods to the real manager; track every nested checkpoint so a host
     // exception in an EVM event cannot leave partially applied state behind.
@@ -107,7 +116,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     // Each invocation is a fresh message/transaction-context boundary for
     // SSTORE refund accounting, even when the caller retains the same manager.
     stateManager.originalStorageCache?.clear();
-    for (const warm of [from, to, address(block.miner), ...Array.from({ length: 10 }, (_, i) => '0x' + (i + 1).toString(16).padStart(40, '0'))]) evm.journal.addAlwaysWarmAddress(warm);
+    for (const warm of [from, to, address(block.miner), ...evm.precompiles.keys()]) evm.journal.addAlwaysWarmAddress(warm);
     evm.events.on('beforeMessage', message => {
       clockCheck();
       if (!message.to) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'Contract creation or destruction is outside this sparse-state engine.', 'unsupported');
@@ -142,6 +151,12 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       const error = result.execResult.exceptionError?.error;
       active.frame.error = error === undefined ? null : evmErrors.has(error) ? error : 'unrecognized EVM exception';
     });
+    if (chainId === 1) {
+      const sender = createAddressFromString(from), account = await guarded.getAccount(sender), code = await guarded.getCode(sender);
+      if (code.length) reject('LOCAL_SENDER_CODE_UNSUPPORTED', 'The unsigned reference requires a sender without runtime code.', 'unsupported');
+      if ((account?.balance ?? 0n) < value) reject('LOCAL_CALL_INSUFFICIENT_BALANCE', 'The sender cannot cover the declared native value.', 'invalid');
+      if ((account?.nonce ?? 0n) >= (1n << 64n) - 1n) reject('LOCAL_CALL_NONCE_OVERFLOW', 'The sender nonce cannot be incremented within uint64.', 'invalid');
+    }
     await guarded.checkpoint();
     const result = await evm.runCall({ caller: createAddressFromString(from), origin: createAddressFromString(from), to: createAddressFromString(to), data: hexToBytes(request.data), value, gasLimit, gasPrice: 0n, block: { header: { number: quantity(block.number), timestamp: quantity(block.timestamp), gasLimit: quantity(block.gasLimit), baseFeePerGas: quantity(block.baseFeePerGas), difficulty: 0n, prevRandao: hexToBytes(block.mixHash), coinbase: createAddressFromString(address(block.miner)), getBlobGasPrice() { reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is unsupported.', 'unsupported'); } } } });
     clockCheck();

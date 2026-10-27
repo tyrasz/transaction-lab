@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "1.0",
+  "status": "reproduced",
+  "packetManifestSha256": "dd8973dd8e50447d38bf9609a078acb126e4061a939a9c7b803892073ec6c463",
+  "planSha256": "ffa5f14e267e3fb4ec2eb53aa3bb2da241ace700368a244cde9042f2b7f1a220",
+  "supplemental": true,
+  "includedInOriginalManifest": false,
+  "source": {
+    "frozenEntriesVerified": 1668,
+    "packetEntriesVerified": 1715,
+    "currentSourceUsed": false,
+    "installedArchiveDependenciesVerified": true,
+    "node": "v22.23.2"
+  },
+  "headerVerification": {
+    "status": "verified",
+    "blockHash": "0xd5c5a3ba092484a5e1b3b54a054de8d1b1df7e24e60717f92517adccb0d6ce9e",
+    "stateRoot": "0x7a9eaf8bef6cb59ee3c58cbf7d96c173c3cc849f2a088ebe073d2069a1793af3",
+    "parentHash": "0x303c1a3363dbc7d2f5dba6ddcd3e921d408e27c1bd0ab27a6c0aeb04b4ff4c6e",
+    "number": "26277709",
+    "timestamp": "1793027927",
+    "hardfork": "bpo2",
+    "encodedBytes": 649,
+    "headerFields": 21,
+    "consensusVerified": false,
+    "finalityVerified": false,
+    "bodyVerified": false
+  },
+  "headerWitnesses": [
+    {
+      "id": 2,
+      "provider": "ethereum-drpc",
+      "method": "eth_getBlockByNumber",
+      "params": [
+        "finalized",
+        false
+      ]
+    },
+    {
+      "id": 6,
+      "provider": "ethereum-drpc",
+      "method": "eth_getBlockByNumber",
+      "params": [
+        "0x190f74d",
+        false
+      ]
+    },
+    {
+      "id": 8,
+      "provider": "ethereum-publicnode",
+      "method": "eth_getBlockByHash",
+      "params": [
+        "0xd5c5a3ba092484a5e1b3b54a054de8d1b1df7e24e60717f92517adccb0d6ce9e",
+        false
+      ]
+    },
+    {
+      "id": 12,
+      "provider": "ethereum-publicnode",
+      "method": "eth_getBlockByNumber",
+      "params": [
+        "0x190f74d",
+        false
+      ]
+    }
+  ],
+  "localCalls": 12,
+  "localWireBytes": 147941,
+  "attempts": [
+    {
+      "provider": "publicnode",
+      "reexecution": "reproduced",
+      "executionStatus": "unavailable",
+      "executionError": {
+        "code": "LOCAL_EXECUTION_FAILED",
+        "message": "Local execution could not complete; arbitrary host error details are omitted."
+      },
+      "inputStatus": "unavailable",
+      "inputFailure": {
+        "code": "RPC_STATE_INPUT_UNAVAILABLE",
+        "message": "Required pinned input-state read failed."
+      },
+      "stateDisposition": "unchanged",
+      "calls": 1,
+      "responseBytes": 159,
+      "provenAccounts": 0,
+      "provenSlots": 0,
+      "proofReadsVerified": 0,
+      "codeReadsVerified": 0,
+      "gasAccounting": null,
+      "outputSha256": "31ab3a93a067433b193f8a15d0489153aee0183baa274c45edbdbca093a4c5b0",
+      "inputsSha256": "d78e5a8165d07e36e48646606faa1bb6a3264895a5c6481a48cd8e55d531d7ca",
+      "changesSha256": "a58199042d2cdb22ab9fdd4e82f269c2414915361678249276217d9ec4650d25",
+      "wireFailures": [
+        {
+          "id": 1,
+          "kind": "rpc_error",
+          "rpcError": {
+            "code": -32000,
+            "message": "historical state 7a9eaf8bef6cb59ee3c58cbf7d96c173c3cc849f2a088ebe073d2069a1793af3 is not available"
+          },
+          "transportComplete": true,
+          "timeout": false
+        }
+      ],
+      "savedProductComparison": "incomplete"
+    },
+    {
+      "provider": "drpc",
+      "reexecution": "reproduced",
+      "executionStatus": "success",
+      "executionError": null,
+      "inputStatus": "available",
+      "inputFailure": null,
+      "stateDisposition": "message_result_retained_in_supplied_manager",
+      "calls": 11,
+      "responseBytes": 147782,
+      "provenAccounts": 3,
+      "provenSlots": 5,
+      "proofReadsVerified": 8,
+      "codeReadsVerified": 3,
+      "gasAccounting": {
+        "beforeRefund": "62224",
+        "appliedRefund": "0",
+        "floorAdjustment": "0",
+        "gasUsed": "62224"
+      },
+      "outputSha256": "772e4166fb788187b29fd076cf626ae8a12bfbbbd442565a7a2cd5532b357e0f",
+      "inputsSha256": "415d9d024b85b663eac7a9f1d4eea7f9e5036380817635e49cc673a4c5f56efd",
+      "changesSha256": "7f99a50b00847154112c6344373bce8f8d01e3b99f6d529e8c40ad0a0ad42374",
+      "wireFailures": [],
+      "savedProductComparison": "matched"
+    }
+  ],
+  "normalization": [
+    "Per-input-evidence durationMs only; execution output, facts, reads, changes, usage and failure identities compared exactly."
+  ],
+  "inputSeparation": "Both local executions consume only frozen plan/header and matching recorded eth_getProof/eth_getCode wires. Saved local/product outputs are parsed for comparison only after both executions finish.",
+  "networkAttempts": 0,
+  "limitations": [
+    "One constructed development workload, two provider input attempts; no population accuracy or coverage score.",
+    "PublicNode historical-state RPC failure remains unavailable/incomplete, not an execution match.",
+    "Reexecution uses the same frozen local engine and proof verifier, not a second independent implementation.",
+    "Header hash and state proofs do not authenticate consensus, finality, chain membership or block-body correctness.",
+    "No timeout occurred in this packet. Complete recorded RPC errors remain distinct from timeout or invalid-proof errors; partial/unsupported transport evidence would fail this fixed audit.",
+    "Original latency is not reproduced; no state or response fallback and no output-derived input repair."
+  ]
+}

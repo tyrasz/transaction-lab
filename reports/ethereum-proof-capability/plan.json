@@ -1,0 +1,132 @@
+{
+  "schemaVersion": "1.0",
+  "purpose": "Development capability discovery for independent Ethereum account/storage proof inputs; no execution trace inputs, transactions, accuracy score or holdout claim.",
+  "providers": [
+    {
+      "id": "ethereum-drpc",
+      "url": "https://eth.drpc.org"
+    },
+    {
+      "id": "ethereum-publicnode",
+      "url": "https://ethereum-rpc.publicnode.com"
+    }
+  ],
+  "limits": {
+    "maxDispatches": 12,
+    "maxResponseBytes": 8388608,
+    "maxObservedResponseBytes": 33554432,
+    "maxRequestMs": 25000,
+    "maxSequenceMs": 360000
+  },
+  "source": {
+    "path": "capture.mjs",
+    "bytes": 12161,
+    "sha256": "6f19a777935e398aed73c4035cf9640400f0f0cbb7cea4b53ec67b90b0691e62"
+  },
+  "targets": {
+    "usdc": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "storageKeys": [
+      "0x0000000000000000000000000000000000000000000000000000000000000000"
+    ],
+    "absenceCandidate": "0x3ff06dc2d15492073973547de56b02a2f72df74b",
+    "absenceSeed": "transaction-lab/eip1186-capability/v1/absent-account",
+    "absenceDerivation": "last20bytes_SHA256_UTF8_seed; existence is determined from returned proof, never assumed; no replacement"
+  },
+  "roles": [
+    {
+      "id": 1,
+      "provider": "ethereum-drpc",
+      "role": "chain",
+      "method": "eth_chainId",
+      "parameterRule": "[]"
+    },
+    {
+      "id": 2,
+      "provider": "ethereum-drpc",
+      "role": "header",
+      "method": "eth_getBlockByNumber",
+      "parameterRule": "[finalized,false], select once"
+    },
+    {
+      "id": 3,
+      "provider": "ethereum-drpc",
+      "role": "usdc-proof",
+      "method": "eth_getProof",
+      "parameterRule": "USDC slot0 at A.selected.hash, requireCanonical:true"
+    },
+    {
+      "id": 4,
+      "provider": "ethereum-drpc",
+      "role": "usdc-code",
+      "method": "eth_getCode",
+      "parameterRule": "USDC at A.selected.hash, requireCanonical:true"
+    },
+    {
+      "id": 5,
+      "provider": "ethereum-drpc",
+      "role": "absence-candidate-proof",
+      "method": "eth_getProof",
+      "parameterRule": "fixed absence-candidate slot0 at A.selected.hash, requireCanonical:true"
+    },
+    {
+      "id": 6,
+      "provider": "ethereum-drpc",
+      "role": "canonical-header",
+      "method": "eth_getBlockByNumber",
+      "parameterRule": "[A.selected.number,false]"
+    },
+    {
+      "id": 7,
+      "provider": "ethereum-publicnode",
+      "role": "chain",
+      "method": "eth_chainId",
+      "parameterRule": "[]"
+    },
+    {
+      "id": 8,
+      "provider": "ethereum-publicnode",
+      "role": "header",
+      "method": "eth_getBlockByHash",
+      "parameterRule": "[A.selected.hash,false]"
+    },
+    {
+      "id": 9,
+      "provider": "ethereum-publicnode",
+      "role": "usdc-proof",
+      "method": "eth_getProof",
+      "parameterRule": "USDC slot0 at A.selected.hash, requireCanonical:true"
+    },
+    {
+      "id": 10,
+      "provider": "ethereum-publicnode",
+      "role": "usdc-code",
+      "method": "eth_getCode",
+      "parameterRule": "USDC at A.selected.hash, requireCanonical:true"
+    },
+    {
+      "id": 11,
+      "provider": "ethereum-publicnode",
+      "role": "absence-candidate-proof",
+      "method": "eth_getProof",
+      "parameterRule": "fixed absence-candidate slot0 at A.selected.hash, requireCanonical:true"
+    },
+    {
+      "id": 12,
+      "provider": "ethereum-publicnode",
+      "role": "canonical-header",
+      "method": "eth_getBlockByNumber",
+      "parameterRule": "[A.selected.number,false]"
+    }
+  ],
+  "policy": {
+    "retries": 0,
+    "redirects": "error",
+    "alternateProviders": false,
+    "latestFallback": false,
+    "selection": "First provider selects one finalized header once. Every dependent read on both providers targets that exact hash.",
+    "headerMismatch": "Retain disagreement and continue fixed hash proof probes only if returned header still has the selected hash and stateRoot. Never substitute a different block.",
+    "missingDependency": "Retain planned role as not_attempted with a fixed reason.",
+    "wire": "Exact UTF-8 bytes retained as .body files with SHA-256. Partial/over-limit/error bodies and all observed bytes are accounted for; no complete-body claim on partial captures.",
+    "authenticity": "Provider header agreement is not consensus authentication. Proof verification must independently bind every account/storage leaf and code hash to the recorded stateRoot."
+  }
+}
