@@ -58,6 +58,19 @@ test('no comparison denominator when every oracle is unavailable', () => {
   assert.deepEqual(report.metrics.exactComparatorAgreementAmongComparable, { numerator: 0, denominator: 0, fraction: null });
 });
 
+test('completed EVM faults are distinct from REVERT and provider failures', () => {
+  const selection = createCohortSelection(input()), rows = outcomes(selection);
+  rows[0] = { ...rows[0], execution: 'failed', comparison: 'match' };
+  rows[1] = { ...rows[1], execution: 'reverted', comparison: 'not_comparable' };
+  rows[2] = { ...rows[2], execution: 'provider_unavailable', comparison: 'not_comparable' };
+  const report = accountCohortOutcomes(selection, rows);
+  assert.equal(report.counts.execution.failed, 1);
+  assert.equal(report.counts.execution.reverted, 1);
+  assert.equal(report.counts.execution.provider_unavailable, 1);
+  assert.deepEqual(report.metrics.executionAvailability, { numerator: 2, denominator: 3, fraction: '2/3' });
+  assert.deepEqual(report.metrics.exactComparatorAgreement, { numerator: 1, denominator: 3, fraction: '1/3' });
+});
+
 test('empty census and zero sample produce no empty-denominator percentage; oversize requests clamp to N', () => {
   for (const sampleSize of [0, 3]) {
     const empty = createCohortSelection(input({ census: [], sampleSize }));

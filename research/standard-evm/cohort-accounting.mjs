@@ -10,7 +10,7 @@ export class CohortAccountingError extends Error {
 const need = (condition, message) => { if (!condition) throw new CohortAccountingError(message); };
 const HASH = /^0x[0-9a-fA-F]{64}$/;
 const ROW_KEYS = ['transactionHash', 'blockHash', 'blockNumber', 'transactionIndex'];
-const EXECUTIONS = ['success', 'reverted', 'unsupported', 'provider_unavailable', 'budget_unattempted'];
+const EXECUTIONS = ['success', 'reverted', 'failed', 'unsupported', 'provider_unavailable', 'budget_unattempted'];
 const COMPARISONS = ['match', 'mismatch', 'oracle_unavailable', 'not_comparable', 'budget_unattempted'];
 const UNKNOWN = ['oracle_unavailable', 'not_comparable', 'budget_unattempted'];
 const ALGORITHM = 'SHA256(seed_32_bytes || transaction_hash_32_bytes); ascending digest, then transaction hash';
@@ -118,7 +118,7 @@ export function accountCohortOutcomes(selection, outcomes) {
     need(!byHash.has(transactionHash), 'Duplicate selected outcome.');
     need(EXECUTIONS.includes(outcome.execution) && COMPARISONS.includes(outcome.comparison), 'Unsupported outcome status.');
     if (outcome.execution === 'budget_unattempted') need(outcome.comparison === 'budget_unattempted', 'An unattempted execution cannot have a comparison result.');
-    else if (outcome.execution !== 'success' && outcome.execution !== 'reverted') need(outcome.comparison === 'not_comparable', 'An unavailable or unsupported execution is not comparable.');
+    else if (!['success', 'reverted', 'failed'].includes(outcome.execution)) need(outcome.comparison === 'not_comparable', 'An unavailable or unsupported execution is not comparable.');
     byHash.set(transactionHash, { transactionHash, execution: outcome.execution, comparison: outcome.comparison });
   }
   need(byHash.size === fixed.sampleSize, 'Missing selected outcomes; retain every selected slot.');
@@ -130,7 +130,7 @@ export function accountCohortOutcomes(selection, outcomes) {
     execution[outcome.execution]++; comparison[outcome.comparison]++;
     return { ...row, execution: outcome.execution, comparison: outcome.comparison };
   });
-  const completed = execution.success + execution.reverted, comparable = comparison.match + comparison.mismatch;
+  const completed = execution.success + execution.reverted + execution.failed, comparable = comparison.match + comparison.mismatch;
   return freeze({
     schemaVersion: '1.0', selectionId: fixed.selectionId, chainId: 1,
     counts: { census: fixed.censusSize, selected: fixed.sampleSize, notSampled: fixed.censusSize - fixed.sampleSize, execution, comparison: { ...comparison, unknown: UNKNOWN.reduce((sum, key) => sum + comparison[key], 0) } },

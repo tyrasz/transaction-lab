@@ -51,4 +51,10 @@ The [prior offline comparison](../../reports/local-execution-comparison-v2/NOTES
 
 The original report is preserved with its exact source inventory. Run `node reports/local-execution-comparison-v1-source/verify.mjs` to reproduce it using archived source without replacing the current engine. The second report adds stricter context, state-disposition, frame and log-order validation; both retain the same real execution results.
 
-The current isolated suite passes 122 checks, including proof rejection, lazy state rollback, fork/gas boundaries and the saved public proof packet. These are regression and development checks, not 122 independent transactions or an accuracy percentage.
+## Process-separated Ethereum calls
+
+`executeIsolatedEthereumCall({request,header,rpc,limits?,signal?})` verifies the supplied header, then starts the fixed `isolated-worker.js` with a 256 MiB V8 old-space ceiling. The parent brokers only canonical same-hash `eth_getProof`/`eth_getCode` reads. The child receives no endpoint, provider trace, expected output or expected poststate. The external `rpc.call(method,params,{signal})` must capture and bound actual wire bytes; IPC result sizes describe parsed JSON separately.
+
+The default process deadline is 145 seconds, with up to 25 seconds of bounded read drain and one second of kill confirmation. Process failure withholds all asserted execution/state output. A completed child can still report unavailable or unsupported EVM execution. Late responses cannot restore success or mutate returned records. No automatic retries occur. This is a process boundary and V8 old-space cap, not an OS network/filesystem sandbox or hard total-RSS limit; runtime source binding remains the runner's responsibility. In-range BLOCKHASH remains unsupported without independently authenticated ancestry.
+
+The current isolated suite passes 139 checks, including 17 process/protocol controls, proof rejection, lazy state rollback, fork/gas boundaries and the saved public proof packet. An actual worker reproduces the archived one-unit USDC execution from its eleven recorded proof/code reads. These are regression and development checks, not 139 independent transactions or an accuracy percentage.
