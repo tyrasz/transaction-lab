@@ -82,7 +82,7 @@ function bindTrace(raw,call){
 }
 /** These checks establish observed query behavior, not honest token economics,
  * source attestation, complete asset discovery or a maliciousness verdict. */
-function validateReadTrace(raw,call,returnBytes){
+function validateReadTrace(raw,call,returnBytes,{allowDelegateAbiChanges=false}={}){
   const root=bindTrace(raw,call);
   need(isBytes(root.output)&&root.output.length===2+returnBytes*2,returnBytes===32?'Query did not return exactly one uint256 word.':'Position query did not return its exact declared static ABI tuple.');
   function check(frame,context,depth){
@@ -90,7 +90,10 @@ function validateReadTrace(raw,call,returnBytes){
     if(depth)need(['STATICCALL','DELEGATECALL'].includes(frame.type),'Query descendants must use STATICCALL or DELEGATECALL.');
     for(const child of frame.calls){
       need(child.from===context,'Query child caller differs from its execution context.');
-      if(child.type==='DELEGATECALL')need(child.input===frame.input&&child.output===frame.output,'Query delegate does not preserve its input and output.');
+      // Scalar token queries retain their proxy-forwarding restriction. A
+      // declared position getter can call a library with a different ABI;
+      // its root tuple and isolated nonce-only mutation proofs still bind it.
+      if(child.type==='DELEGATECALL'&&!allowDelegateAbiChanges)need(child.input===frame.input&&child.output===frame.output,'Query delegate does not preserve its input and output.');
       check(child,child.type==='DELEGATECALL'?context:child.to,depth+1);
     }
   }
@@ -99,10 +102,12 @@ function validateReadTrace(raw,call,returnBytes){
 export function validateQueryTrace(raw,call){
   const root=validateReadTrace(raw,call,32);return {amountRaw:BigInt(root.output).toString(),gasUsed:root.gasUsed};
 }
-function validatePositionTrace(raw,call,position){
-  const root=validateReadTrace(raw,call,position.returnBytes);
+/** Trace-shape validation only. A before/after measurement additionally needs
+ * both isolated mutation proofs, complete state overrides and canonical checks. */
+export function validatePositionTrace(raw,call,position){
+  const root=validateReadTrace(raw,call,position.returnBytes,{allowDelegateAbiChanges:true});
   const decoded=decodePositionResult(position.identity,root.output);
-  need(isDeepStrictEqual(decoded.query,{to:call.to,data:call.data})&&isDeepStrictEqual(decoded.identity,position.identity),'Position query identity differs from the compiled call.');
+  need(isDeepStrictEqual(decoded.query,{to:call.to,data:call.data})&&isDeepStrictEqual({identity:decoded.identity,signature:decoded.signature,returnBytes:decoded.returnBytes},position),'Position query identity differs from the compiled call.');
   return root.output;
 }
 export function validateQueryDiff(raw,{sender,nonce,balance}){

@@ -1,0 +1,318 @@
+{
+  "schemaVersion": "1.0",
+  "basis": "post_seal_exact_recorded_response_comparison_not_new_execution",
+  "manifests": {
+    "v2": {
+      "sha256": "834962759a7629aabaedc4b778b828f4df92b11b4c8e548ad7b3648ff95d2f13"
+    },
+    "v3": {
+      "sha256": "a8a5de3bb276a6669b1ce4abc39d8c641f389889786ad9f13aec0e2664543a26"
+    }
+  },
+  "responseFiles": [
+    {
+      "path": "reports/standard-evm-positions-v2/aave-position-response.json",
+      "sha256": "7ab1e6e063ae9f023ea16935736f19b27994b503c325fe09f8b2c09df94c7571"
+    },
+    {
+      "path": "reports/standard-evm-positions-v3/aave-position-response.json",
+      "sha256": "2a4f5afc747436d0cd9ce4dbb13744aa45604ae417b626942bf4ba62b2481168"
+    },
+    {
+      "path": "reports/standard-evm-positions-v2/morpho-vault-position-response.json",
+      "sha256": "2a48dd1ded959ae40766d8f644a52226388bf61dcaa87e0ac0587d66c1ad5500"
+    },
+    {
+      "path": "reports/standard-evm-positions-v3/morpho-vault-position-response.json",
+      "sha256": "34cec8dab2ff077f79cf3358e4bcff7c4b09b756daf6f4c84e39e04975031edb"
+    },
+    {
+      "path": "reports/standard-evm-positions-v2/aave-approval-position-sequence-response.json",
+      "sha256": "98229a7754a4e518bf4c72b9de321b48f0905c0218248fe056b0642d60d01483"
+    },
+    {
+      "path": "reports/standard-evm-positions-v3/aave-approval-position-sequence-response.json",
+      "sha256": "3aa4be56a2f97ef115b2dd2f90e158e57442be39808ef3503d38391a957c41af"
+    }
+  ],
+  "tokenRows": {
+    "count": 12,
+    "allExactlyEqual": true,
+    "comparisons": [
+      {
+        "caseId": "aave-position",
+        "stepIndex": null,
+        "tokenQueries": 4,
+        "engineTokenRowsExactlyEqual": true,
+        "previewTokenRowsExactlyEqual": true
+      },
+      {
+        "caseId": "morpho-vault-position",
+        "stepIndex": null,
+        "tokenQueries": 3,
+        "engineTokenRowsExactlyEqual": true,
+        "previewTokenRowsExactlyEqual": true
+      },
+      {
+        "caseId": "aave-approval-position-sequence",
+        "stepIndex": 0,
+        "tokenQueries": 1,
+        "engineTokenRowsExactlyEqual": true,
+        "previewTokenRowsExactlyEqual": true
+      },
+      {
+        "caseId": "aave-approval-position-sequence",
+        "stepIndex": 1,
+        "tokenQueries": 4,
+        "engineTokenRowsExactlyEqual": true,
+        "previewTokenRowsExactlyEqual": true
+      }
+    ]
+  },
+  "morphoPosition": {
+    "engineAndPreviewExactlyEqual": true,
+    "owner": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+    "rows": [
+      {
+        "name": "supplyShares",
+        "abiType": "uint256",
+        "beforeRaw": "26565631929266438023",
+        "afterRaw": "26884573979212466695",
+        "deltaRaw": "318942049946028672",
+        "unit": {
+          "kind": "supply_shares",
+          "scale": null,
+          "references": [
+            "https://docs.morpho.org/developers/contracts/blue/#position",
+            "https://github.com/morpho-org/morpho-blue/blob/main/src/interfaces/IMorpho.sol"
+          ]
+        }
+      },
+      {
+        "name": "borrowShares",
+        "abiType": "uint128",
+        "beforeRaw": "0",
+        "afterRaw": "0",
+        "deltaRaw": "0",
+        "unit": {
+          "kind": "borrow_shares",
+          "scale": null,
+          "references": [
+            "https://docs.morpho.org/developers/contracts/blue/#position",
+            "https://github.com/morpho-org/morpho-blue/blob/main/src/interfaces/IMorpho.sol"
+          ]
+        }
+      },
+      {
+        "name": "collateral",
+        "abiType": "uint128",
+        "beforeRaw": "0",
+        "afterRaw": "0",
+        "deltaRaw": "0",
+        "unit": {
+          "kind": "collateral_token_raw_units",
+          "scale": null,
+          "token": null,
+          "references": [
+            "https://docs.morpho.org/developers/contracts/blue/#position"
+          ]
+        }
+      }
+    ]
+  },
+  "aavePosition": {
+    "approvalTupleUnchanged": true,
+    "supplyBeforeEqualsApprovalAfter": true,
+    "supplyBeforeAndAfterMatchStandalone": true,
+    "approvalRows": [
+      {
+        "name": "totalCollateralBase",
+        "abiType": "uint256",
+        "beforeRaw": "114367800827",
+        "afterRaw": "114367800827",
+        "deltaRaw": "0",
+        "unit": {
+          "kind": "oracle_base_units",
+          "scale": null,
+          "currency": null,
+          "references": [
+            "https://aave.com/docs/aave-v3/smart-contracts/pool?language=en#getuseraccountdata",
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/interfaces/IPriceOracleGetter.sol"
+          ]
+        }
+      },
+      {
+        "name": "totalDebtBase",
+        "abiType": "uint256",
+        "beforeRaw": "21216",
+        "afterRaw": "21216",
+        "deltaRaw": "0",
+        "unit": {
+          "kind": "oracle_base_units",
+          "scale": null,
+          "currency": null,
+          "references": [
+            "https://aave.com/docs/aave-v3/smart-contracts/pool?language=en#getuseraccountdata",
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/interfaces/IPriceOracleGetter.sol"
+          ]
+        }
+      },
+      {
+        "name": "availableBorrowsBase",
+        "abiType": "uint256",
+        "beforeRaw": "107494274781",
+        "afterRaw": "107494274781",
+        "deltaRaw": "0",
+        "unit": {
+          "kind": "oracle_base_units",
+          "scale": null,
+          "currency": null,
+          "references": [
+            "https://aave.com/docs/aave-v3/smart-contracts/pool?language=en#getuseraccountdata",
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/interfaces/IPriceOracleGetter.sol"
+          ]
+        }
+      },
+      {
+        "name": "currentLiquidationThreshold",
+        "abiType": "uint256",
+        "beforeRaw": "9599",
+        "afterRaw": "9599",
+        "deltaRaw": "0",
+        "unit": {
+          "kind": "basis_points",
+          "scale": "10000",
+          "references": [
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/protocol/libraries/logic/GenericLogic.sol",
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/protocol/libraries/math/PercentageMath.sol"
+          ]
+        }
+      },
+      {
+        "name": "ltv",
+        "abiType": "uint256",
+        "beforeRaw": "9399",
+        "afterRaw": "9399",
+        "deltaRaw": "0",
+        "unit": {
+          "kind": "basis_points",
+          "scale": "10000",
+          "references": [
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/protocol/libraries/logic/GenericLogic.sol",
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/protocol/libraries/math/PercentageMath.sol"
+          ]
+        }
+      },
+      {
+        "name": "healthFactor",
+        "abiType": "uint256",
+        "beforeRaw": "5175007482545248868778280",
+        "afterRaw": "5175007482545248868778280",
+        "deltaRaw": "0",
+        "unit": {
+          "kind": "ratio",
+          "scale": "1000000000000000000",
+          "references": [
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/protocol/libraries/logic/GenericLogic.sol",
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/protocol/libraries/math/WadRayMath.sol"
+          ]
+        }
+      }
+    ],
+    "supplyRows": [
+      {
+        "name": "totalCollateralBase",
+        "abiType": "uint256",
+        "beforeRaw": "114367800827",
+        "afterRaw": "510592963427",
+        "deltaRaw": "396225162600",
+        "unit": {
+          "kind": "oracle_base_units",
+          "scale": null,
+          "currency": null,
+          "references": [
+            "https://aave.com/docs/aave-v3/smart-contracts/pool?language=en#getuseraccountdata",
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/interfaces/IPriceOracleGetter.sol"
+          ]
+        }
+      },
+      {
+        "name": "totalDebtBase",
+        "abiType": "uint256",
+        "beforeRaw": "21216",
+        "afterRaw": "21216",
+        "deltaRaw": "0",
+        "unit": {
+          "kind": "oracle_base_units",
+          "scale": null,
+          "currency": null,
+          "references": [
+            "https://aave.com/docs/aave-v3/smart-contracts/pool?language=en#getuseraccountdata",
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/interfaces/IPriceOracleGetter.sol"
+          ]
+        }
+      },
+      {
+        "name": "availableBorrowsBase",
+        "abiType": "uint256",
+        "beforeRaw": "107494274781",
+        "afterRaw": "404644902299",
+        "deltaRaw": "297150627518",
+        "unit": {
+          "kind": "oracle_base_units",
+          "scale": null,
+          "currency": null,
+          "references": [
+            "https://aave.com/docs/aave-v3/smart-contracts/pool?language=en#getuseraccountdata",
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/interfaces/IPriceOracleGetter.sol"
+          ]
+        }
+      },
+      {
+        "name": "currentLiquidationThreshold",
+        "abiType": "uint256",
+        "beforeRaw": "9599",
+        "afterRaw": "8203",
+        "deltaRaw": "-1396",
+        "unit": {
+          "kind": "basis_points",
+          "scale": "10000",
+          "references": [
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/protocol/libraries/logic/GenericLogic.sol",
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/protocol/libraries/math/PercentageMath.sol"
+          ]
+        }
+      },
+      {
+        "name": "ltv",
+        "abiType": "uint256",
+        "beforeRaw": "9399",
+        "afterRaw": "7925",
+        "deltaRaw": "-1474",
+        "unit": {
+          "kind": "basis_points",
+          "scale": "10000",
+          "references": [
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/protocol/libraries/logic/GenericLogic.sol",
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/protocol/libraries/math/PercentageMath.sol"
+          ]
+        }
+      },
+      {
+        "name": "healthFactor",
+        "abiType": "uint256",
+        "beforeRaw": "5175007482545248868778280",
+        "afterRaw": "19742109048721719457013574",
+        "deltaRaw": "14567101566176470588235294",
+        "unit": {
+          "kind": "ratio",
+          "scale": "1000000000000000000",
+          "references": [
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/protocol/libraries/logic/GenericLogic.sol",
+            "https://github.com/aave/aave-v3-core/blob/master/contracts/protocol/libraries/math/WadRayMath.sol"
+          ]
+        }
+      }
+    ]
+  }
+}

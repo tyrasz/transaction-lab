@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { compileMeasurementQuery, normalizeMeasurementQuery, normalizeQuery, simulateUnsignedCall, simulateUnsignedSequence } from '../unsigned-call.js';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { compileMeasurementQuery, normalizeMeasurementQuery, normalizeQuery, simulateUnsignedCall, simulateUnsignedSequence, validatePositionTrace, validateQueryTrace } from '../unsigned-call.js';
 
 const address = n => '0x' + BigInt(n).toString(16).padStart(40, '0');
 const word = n => '0x' + BigInt(n).toString(16).padStart(64, '0');
@@ -146,9 +148,9 @@ test('wrong tuple widths, uint128 overflow and failed mutation proofs stay unava
     const row = result.measurements[2]; assert.equal(row.status, 'unavailable'); assertNoAmounts(row); assert.equal(row.position.identity.marketId, MARKET);
   }
 });
-test('tuple query paths retain original strict behavior and context guards', async () => {
+test('tuple query paths retain bounded context, type, value, event and failure guards', async () => {
   for (const change of [
-    t => { t.calls[0].input = '0x'; }, t => { t.calls[0].output = word(0); }, t => { t.calls[0].from = S; },
+    t => { t.calls[0].input = '0x0'; }, t => { t.calls[0].output = '0x0'; }, t => { t.calls[0].from = S; },
     t => { t.calls[0].type = 'CALL'; }, t => { t.calls[0].value = '0x1'; }, t => { t.calls[0].error = 'execution reverted'; },
     t => { t.calls[0].logs = [{ address: AAVE, topics: [], data: '0x' }]; }, t => { t.input = '0xbf92857c' + word(S).slice(2); },
     t => { t.gas = '0x493df'; }, t => { t.error = []; },
@@ -219,4 +221,123 @@ test('a query-local tuple failure does not alter the validated sequence continua
   assert.equal(result.sequence.status, 'completed'); assert.equal(result.canonicalStatus, 'verified');
   assert.equal(result.steps[0].result.measurements[2].status, 'unavailable'); assertNoAmounts(result.steps[0].result.measurements[2]);
   assert.equal(result.steps[1].result.measurements[2].rows[0].beforeRaw, ((1n << 128n) + 2n).toString());
+});
+
+function recordedAaveBeforeTrace() {
+  // Real v0.13.0 evidence stopped at this before-state callTracer result. It
+  // contains NO mutation proof or after-state query for this position. This
+  // fixture validates trace admission only, never a completed measurement.
+  const directory = new URL('../../../reports/standard-evm-positions-v2/', import.meta.url);
+  const sha = bytes => createHash('sha256').update(bytes).digest('hex');
+  const manifestBytes = readFileSync(new URL('manifest.json', directory));
+  assert.equal(sha(manifestBytes), '834962759a7629aabaedc4b778b828f4df92b11b4c8e548ad7b3648ff95d2f13');
+  const bytes = readFileSync(new URL('aave-position-response.json', directory));
+  assert.equal(sha(bytes), '7ab1e6e063ae9f023ea16935736f19b27994b503c325fe09f8b2c09df94c7571');
+  const report = JSON.parse(bytes), manifest = JSON.parse(manifestBytes);
+  assert.deepEqual(manifest.files.find(x => x.path === 'aave-position-response.json'), { path: 'aave-position-response.json', bytes: bytes.length, sha256: sha(bytes) });
+  const row = report.measurements[4];
+  assert.equal(row.status, 'unavailable'); assert.equal(row.reason, 'Query delegate does not preserve its input and output.');
+  assert.deepEqual(row.queryEvidence, [{ state: 'before', traceEvidenceId: 30 }]); assertNoAmounts(row);
+  const evidence = report.evidence[29], wire = report.transportEvidence[29];
+  assert.equal(wire.id, 30); assert.equal(wire.requestText, JSON.stringify(wire.request));
+  assert.equal(sha(wire.requestText), wire.requestSha256);
+  assert.equal(sha(wire.responseText), '61599329ed7d6fad86df5502b7412b73b350d3408a4172bf297fba3702bf8828');
+  assert.equal(wire.transport.responseSha256, sha(wire.responseText));
+  assert.deepEqual(wire.request.params, evidence.params); assert.deepEqual(JSON.parse(wire.responseText).result, evidence.result);
+  assert.equal(evidence.params[2].tracer, 'callTracer'); assert.equal(evidence.params[2].stateOverrides, undefined);
+  return { raw: evidence.result, call: evidence.params[0], position: row.position };
+}
+
+test('real sealed Aave before-trace admits its internal library ABI without inventing a measurement', () => {
+  const { raw, call, position } = recordedAaveBeforeTrace();
+  const proxy = raw.calls[0], library = proxy.calls[1];
+  assert.equal(proxy.to, '0x728a138a4823392c2efa55e028d434f526fe03cf');
+  assert.equal(library.type, 'DELEGATECALL'); assert.equal(library.to, '0xd70593841c57cbaa04957cc3eace95708e48853b');
+  assert.equal(library.from, call.to); assert.equal(proxy.input.slice(0, 10), '0xbf92857c'); assert.equal(library.input.slice(0, 10), '0x26ec273f');
+  assert.notEqual(library.input, proxy.input);
+  assert.equal(validatePositionTrace(raw, call, position), raw.output);
+  assert.equal(raw.output.length, 386);
+});
+
+test('mutations of the real Aave trace still reject context, type, value, events, failures and wrong root tuples', () => {
+  const recorded = recordedAaveBeforeTrace();
+  for (const change of [
+    t => { t.calls[0].calls[1].from = t.calls[0].to; },
+    t => { t.calls[0].calls[1].type = 'CALL'; },
+    t => { t.calls[0].calls[1].type = 'CALLCODE'; },
+    t => { t.calls[0].calls[1].value = '0x1'; },
+    t => { t.calls[0].calls[1].logs = [{ address: t.to, topics: [], data: '0x' }]; },
+    t => { t.calls[0].calls[1].error = 'execution reverted'; },
+    t => { t.calls[0].calls[1].revertReason = 'reverted internal query'; },
+    t => { t.calls[0].calls[1].input = '0x0'; },
+    t => { t.calls[0].calls[1].output = '0x0'; },
+    t => { t.calls[0].calls[1].gasUsed = '0x100000'; },
+    t => { t.output = word(1); },
+    t => { t.input = '0xbf92857c' + word(0).slice(2); },
+    t => { t.gas = '0x493df'; },
+  ]) {
+    const raw = structuredClone(recorded.raw); change(raw);
+    assert.throws(() => validatePositionTrace(raw, recorded.call, recorded.position));
+  }
+  for (const change of [{ signature: 'fake(address)' }, { returnBytes: 32 }, { identity: { ...recorded.position.identity, user: USER } }]) {
+    assert.throws(() => validatePositionTrace(recorded.raw, recorded.call, { ...recorded.position, ...change }));
+  }
+});
+
+const libraryAbi = trace => {
+  // Synthetic valid bytes deliberately differ in selector AND return length:
+  // no selector-specific exception or equal-size assumption is permitted.
+  const delegate = trace.calls[0]; delegate.input = '0x1234'; delegate.output = '0xaabbcc';
+};
+test('synthetic typed library ABI differences remain subject to both state proofs and complete overrides', async () => {
+  const valid = harness({ mutate: x => { if (x.stage === 'aave_trace') libraryAbi(x.result); } });
+  const report = await run(valid); assert.equal(report.measurements[1].status, 'measured');
+  const evidence = report.measurements[1].queryEvidence;
+  assert.equal(evidence.length, 2);
+  for (const proof of evidence) {
+    const trace = report.evidence[proof.traceEvidenceId - 1], diff = report.evidence[proof.mutationEvidenceId - 1];
+    assert.deepEqual(trace.params[2].stateOverrides, diff.params[2].stateOverrides);
+    assert.equal(diff.params[2].tracer, 'prestateTracer');
+  }
+  for (const corrupt of [
+    d => { d.post[AAVE] = { storage: { [word(2)]: word(100) } }; },
+    d => { d.post[S].balance = hex(999999); },
+    d => { d.post[S].nonce = '0x20'; },
+    d => { d.post[S].code = '0x6000'; },
+  ]) {
+    const result = await run(harness({ mutate: x => {
+      if (x.stage === 'aave_trace') libraryAbi(x.result);
+      if (x.stage === 'aave_diff' && x.params[2].stateOverrides) corrupt(x.result);
+    } }));
+    assert.equal(result.canonicalStatus, 'verified'); assert.equal(result.measurements[1].status, 'unavailable');
+    assertNoAmounts(result.measurements[1]); assert.equal(result.measurements[0].status, 'measured');
+  }
+});
+
+test('legacy scalar token delegates still require exact forwarding of input and output', () => {
+  const call = { from: S, to: TOKEN, data: QUERIES[0].data, value: '0x0', gas: '0x493e0' };
+  const raw = { type: 'CALL', from: S, to: TOKEN, input: call.data, output: word(17), value: '0x0', gas: call.gas, gasUsed: '0x1000' };
+  raw.calls = [{ ...raw, type: 'DELEGATECALL', from: TOKEN, to: IMPL, gas: '0x40000', gasUsed: '0x800' }];
+  assert.equal(validateQueryTrace(raw, call).amountRaw, '17');
+  for (const change of [c => { c.input = '0x1234'; }, c => { c.output = '0xaabbcc'; }, c => { c.output = word(18); }]) {
+    const changed = structuredClone(raw); change(changed.calls[0]);
+    assert.throws(() => validateQueryTrace(changed, call), /does not preserve/);
+  }
+});
+
+test('typed library paths cannot retain amounts after single or sequence canonical failure', async () => {
+  for (const ordered of [false, true]) {
+    let canonical = 0;
+    const h = harness({ mutate: x => {
+      if (x.stage === 'aave_trace') libraryAbi(x.result);
+      if (x.method === 'eth_getBlockByNumber' && ++canonical === (ordered ? 3 : 1)) x.result.hash = word(999);
+    } });
+    const output = ordered ? await sequence(h) : await run(h);
+    assert.equal(output.canonicalStatus, 'unverified');
+    const reports = ordered ? output.steps.map(step => step.result) : [output];
+    for (const report of reports) {
+      for (const row of report.measurements) { assert.equal(row.status, 'unavailable'); assertNoAmounts(row); }
+      assert(report.evidence.some(e => e.result?.calls?.[0]?.input === '0x1234'));
+    }
+  }
 });
