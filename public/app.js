@@ -1,11 +1,13 @@
 const $ = (id) => document.getElementById(id);
 const state = { config: null, example: null, result: null, busy: false, benchmarkLoaded: false, sequenceDrafts: [], sequenceControls: [], nextCallKey: 1 };
-const requestFieldIds = ['chain', 'ethereum-call-mode', 'from', 'to', 'data', 'value', 'block', 'standard-manual-queries', 'standard-queries'];
+const requestFieldIds = ['chain', 'ethereum-engine', 'ethereum-call-mode', 'from', 'to', 'data', 'value', 'block', 'standard-manual-queries', 'standard-queries'];
 const ethereumMode = () => $('chain').value === '1';
-const sequenceMode = () => ethereumMode() && $('ethereum-call-mode').value === 'sequence';
+const localMode = () => ethereumMode() && $('ethereum-engine').value === 'local';
+const localAvailable = () => state.config?.localEvm?.available === true;
+const sequenceMode = () => ethereumMode() && !localMode() && $('ethereum-call-mode').value === 'sequence';
 const standardAvailable = () => state.config?.standardEvm?.available === true;
-const sequenceAvailable = () => standardAvailable() && state.config?.standardEvm?.sequenceCapabilities?.available === true;
-const manualQueries = () => ethereumMode() && !sequenceMode() && $('standard-manual-queries').checked;
+const sequenceAvailable = () => !localMode() && standardAvailable() && state.config?.standardEvm?.sequenceCapabilities?.available === true;
+const manualQueries = () => ethereumMode() && !sequenceMode() && (localMode() || $('standard-manual-queries').checked);
 
 function node(tag, className, text) {
   const element = document.createElement(tag);
@@ -22,7 +24,7 @@ function formatTime(value) { if (value === null || value === undefined || value 
 
 async function request(url, body) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), url === '/api/evm/simulate-sequence' ? 300000 : url === '/api/evm/simulate' ? 180000 : 65000);
+  const timer = setTimeout(() => controller.abort(), url === '/api/evm/simulate-sequence' ? 300000 : ['/api/evm/simulate', '/api/evm/local-preview'].includes(url) ? 180000 : 65000);
   try {
     const response = await fetch(url, { method: body ? 'POST' : 'GET', headers: body ? { 'Content-Type': 'application/json' } : undefined, body: body ? JSON.stringify(body) : undefined, signal: controller.signal });
     const result = await response.json();
@@ -34,14 +36,14 @@ async function request(url, body) {
     }
     return result;
   } catch (error) {
-    if (error.name === 'AbortError') throw new Error('The provider took too long to respond. Try again in a moment.');
+    if (error.name === 'AbortError') throw new Error('The preview request took too long to respond. Try again in a moment.');
     throw error;
   } finally { clearTimeout(timer); }
 }
 
 function setBusy(busy, mode) {
   state.busy = busy;
-  $('simulate-button').disabled = busy || (ethereumMode() && !standardAvailable()) || (sequenceMode() && !sequenceAvailable());
+  $('simulate-button').disabled = busy || (ethereumMode() && !(localMode() ? localAvailable() : standardAvailable())) || (sequenceMode() && !sequenceAvailable());
   $('replay-button').disabled = busy;
   $('example').disabled = busy;
   for (const id of requestFieldIds) $(id).disabled = busy;
@@ -49,6 +51,7 @@ function setBusy(busy, mode) {
   document.querySelector('.results-panel').setAttribute('aria-busy', String(busy));
   $('run-status').classList.toggle('loading', busy);
   $('run-status').textContent = busy ? sequenceMode() ? 'Evaluating the calls in order and checking the state after each step. This can take several minutes…' : mode === 'historical_trace' ? 'Retrieving the original execution trace and checking available historical balance evidence…' : ethereumMode() ? manualQueries() ? 'Running the unsigned call, checking the manual query list and measuring selected ETH accounts. This can take a few minutes…' : 'Running the unsigned call and measuring selected ETH accounts, token balances and allowances. This can take a few minutes…' : 'Pinning the block, executing the call, and decoding token events…' : '';
+  if (busy && localMode()) $('run-status').textContent = 'Running the local engine with verified state inputs and your requested queries. This can take a few minutes…';
 }
 
 function clearResult({ inputsChanged = false } = {}) {
@@ -175,32 +178,47 @@ function selectExample({ initial = false } = {}) {
 }
 
 function updateQueryMode() {
-  const standard = ethereumMode(), sequence = sequenceMode(), manual = manualQueries();
+  const standard = ethereumMode(), local = localMode(), sequence = sequenceMode(), manual = manualQueries();
+  $('ethereum-engine-field').hidden = !standard;
+  $('ethereum-engine').disabled = state.busy || !standard;
+  $('local-engine-option').disabled = !localAvailable();
+  $('local-engine-help').textContent = local ? 'Experimental local execution. Single call, manual queries only; no automatic asset or ETH summaries.' : localAvailable() ? 'Provider preview is the default. The independent local engine is available for explicit query checks.' : state.config?.localEvm?.reason || 'Independent local previews are unavailable in this workspace.';
+  if (standard) {
+    const available = local ? localAvailable() : standardAvailable();
+    $('network-help').textContent = available ? local ? 'Experimental independent Ethereum preview. No connected wallet or signature needed.' : 'Experimental provider Ethereum preview. No connected wallet or signature needed.'
+      : (local ? state.config?.localEvm?.reason : state.config?.standardEvm?.reason) || `The selected ${local ? 'local' : 'provider'} engine is unavailable in this workspace.`;
+    $('network-help').classList.toggle('unavailable-note', !available);
+    $('empty-description').textContent = local ? 'Enter a call and one to eight explicit queries. The local preview reports execution separately from measured raw query values.' : 'Choose an example or enter your own inputs. The preview shows which ETH balances, token balances and allowances could be measured for the selected accounts.';
+  }
   $('ethereum-call-mode-field').hidden = !standard;
-  $('ethereum-call-mode').disabled = state.busy || !standard;
+  $('ethereum-call-mode').disabled = state.busy || !standard || local;
   $('sequence-mode-option').disabled = !sequenceAvailable();
-  $('sequence-availability').hidden = !standard || sequenceAvailable();
+  $('sequence-availability').hidden = !standard || local || sequenceAvailable();
   $('sequence-availability').textContent = 'Ordered-call simulations are unavailable in this workspace.';
   $('single-call-target-fields').hidden = sequence; $('single-value-field').hidden = sequence;
   $('common-state-row').classList.toggle('sequence-state-row', sequence);
   $('value-help').hidden = sequence; $('sequence-editor').hidden = !sequence;
-  $('simulate-label').textContent = sequence ? 'Simulate sequence' : 'Simulate';
+  $('simulate-label').textContent = local ? 'Run local preview' : sequence ? 'Simulate sequence' : 'Simulate';
   for (const id of ['to', 'data', 'value']) { $(id).disabled = state.busy || sequence; $(id).required = !sequence; if (sequence) $(id).setCustomValidity(''); }
   $('standard-query-settings').hidden = !standard || sequence;
   $('standard-manual-fields').hidden = !manual;
   $('standard-queries').required = manual;
   $('standard-queries').disabled = state.busy || !manual;
-  $('standard-manual-queries').disabled = state.busy || !standard || sequence;
+  $('standard-manual-queries').disabled = state.busy || !standard || sequence || local;
+  if (local) { $('standard-manual-queries').checked = true; $('standard-query-settings').open = true; }
+  $('query-mode-help').textContent = local ? 'A manual list of one to eight token or position queries is required. There is no automatic token selection or ETH balance summary.' : 'Automatic token checks use observed events and calls. Choose a manual list for specific token or position checks instead. ETH account selection remains automatic.';
   $('standard-checks-help').hidden = !standard;
   $('standard-checks-help').textContent = sequence ? 'Each step checks up to eight observed ETH accounts and eight queries. Automatic queries cover tokens only; position checks require a manual entry. Before and after refer to that step, not the entire sequence.' : manual
     ? 'Your manual list controls token and position checks, up to eight combined. Up to eight observed ETH accounts are still selected automatically; network fees are excluded.'
     : 'Automatically check up to eight observed ETH accounts and eight token balance or allowance queries. Other changes may be missed; network fees are excluded.';
   if (!manual) $('standard-queries').setCustomValidity('');
+  if (local) $('standard-checks-help').textContent = 'Checks only the listed accounts and contracts, in raw units. Network fees, contract identity and complete economic effects are not established.';
   updateSequenceControls();
 }
 
 function selectNetwork({ initial = false } = {}) {
   const standard = ethereumMode();
+  $('ethereum-engine').value = 'provider';
   $('ethereum-call-mode').value = 'single';
   state.sequenceDrafts = [newSequenceDraft(), newSequenceDraft()]; renderSequenceEditor();
   populateExampleOptions();
@@ -797,6 +815,7 @@ function beginResult(result, standard = false) {
   $('result-content').hidden = false;
   $('hyper-result').hidden = standard;
   $('standard-result').hidden = !standard;
+  $('local-result').hidden = true;
   $('sequence-result').hidden = !result.sequence;
   $('execution-label').textContent = 'Execution';
   state.renderStep = null;
@@ -1091,6 +1110,77 @@ function renderDiscovery(discovery, queries) {
   $('standard-discovery-notes').replaceChildren(...notes.map(item => node('li', '', item)));
 }
 
+function localQueryIdentity(descriptor = {}) {
+  if (descriptor.kind) return descriptor;
+  const data = descriptor.data || '';
+  const account = data.length >= 74 ? '0x' + data.slice(34, 74) : null;
+  return { kind: data.startsWith('0xdd62ed3e') ? 'allowance' : 'balanceOf', token: descriptor.to,
+    ...(data.startsWith('0xdd62ed3e') ? { owner: account, spender: '0x' + data.slice(98, 138) } : { account }) };
+}
+
+function localMeasurementRows(result) {
+  const queries = Array.isArray(result.apiRequest?.queries) ? result.apiRequest.queries : [];
+  return queries.map((descriptor, index) => {
+    const row = result.measurements?.[index], identity = localQueryIdentity(descriptor);
+    const fields = identity.kind === 'balanceOf' ? [['balance', 256]] : identity.kind === 'allowance' ? [['allowance', 256]]
+      : identity.kind === 'aave_v3_user_account_data' ? [['totalCollateralBase', 256], ['totalDebtBase', 256], ['availableBorrowsBase', 256], ['currentLiquidationThreshold', 256], ['ltv', 256], ['healthFactor', 256]]
+        : identity.kind === 'morpho_blue_position' ? [['supplyShares', 256], ['borrowShares', 128], ['collateral', 128]] : [];
+    const matching = row?.descriptor && Object.keys(descriptor).length === Object.keys(row.descriptor).length && Object.entries(descriptor).every(([key, value]) => row.descriptor[key] === value);
+    const contextValid = ['complete', 'partial'].includes(result.status) && result.source?.canonicalStatus === 'verified' && ['success', 'reverted', 'failed'].includes(result.execution?.status);
+    const measured = contextValid && matching && row.status === 'measured' && fields.length > 0 && Array.isArray(row.values) && row.values.length === fields.length && fields.every(([name, bits], i) => {
+      const value = row.values[i], raw = n => typeof n === 'string' && /^(?:0|[1-9][0-9]{0,77})$/.test(n) && BigInt(n) < (1n << BigInt(bits));
+      return value?.name === name && raw(value.beforeRaw) && raw(value.afterRaw) && typeof value.deltaRaw === 'string'
+        && /^(?:0|-?[1-9][0-9]{0,77})$/.test(value.deltaRaw) && BigInt(value.deltaRaw) === BigInt(value.afterRaw) - BigInt(value.beforeRaw);
+    });
+    return { index, identity, measured, values: measured ? row.values : [], reason: contextValid && matching ? row.reason || 'This query was not completely measured. Missing values are not zero.' : 'The query result or verified state context is unavailable. Values are withheld.' };
+  });
+}
+
+function renderLocalResult(result) {
+  beginResult(result, true);
+  $('standard-result').hidden = true; $('hyper-result').hidden = true; $('sequence-result').hidden = true; $('local-result').hidden = false;
+  const rows = localMeasurementRows(result), measured = rows.filter(row => row.measured).length;
+  $('result-label').textContent = 'Independent local preview · experimental';
+  $('local-report-status').textContent = `Preview: ${titleCase(result.status)}`;
+  $('execution-status').textContent = titleCase(result.execution?.status || 'unavailable');
+  $('execution-status').className = result.execution?.status === 'success' ? 'success' : ['reverted', 'failed'].includes(result.execution?.status) ? 'failed' : 'partial';
+  $('gas-used').textContent = 'Unsigned execution · network fees excluded';
+  $('coverage-label').textContent = 'Requested checks'; $('coverage-status').textContent = `${measured} / ${rows.length} measured`;
+  $('coverage-status').className = rows.length > 0 && measured === rows.length ? 'success' : 'partial';
+  $('coverage-detail').textContent = 'Explicit query list only · raw units';
+  $('execution-error').hidden = !result.error && !result.execution?.error;
+  $('execution-error').textContent = result.error ? display(result.error.message || result.error) : display(result.execution?.error?.message || result.execution?.error || '');
+  $('contract-revert').hidden = true;
+  $('local-measurements').replaceChildren(...rows.map(row => {
+    const card = node('article', `standard-query-card${row.measured ? '' : ' query-unavailable'}`), heading = node('div', 'permission-heading');
+    heading.append(node('h4', '', `Query ${row.index + 1} · ${titleCase(row.identity.kind)}`), node('span', 'query-status', row.measured ? 'Measured raw values' : 'Unavailable'));
+    const details = node('dl', 'permission-details');
+    for (const key of ['token', 'contract', 'account', 'owner', 'spender', 'user', 'marketId']) if (row.identity[key]) addDefinition(details, readableKey(key), row.identity[key]);
+    card.append(heading, details, node('p', 'query-reference', 'Each query refers to the named account. Contract identity and token units are not verified.'));
+    if (row.measured) {
+      const table = node('table', 'measurement-table position-measurement-table'), head = node('thead'), header = node('tr'), body = node('tbody');
+      for (const label of ['Field / units', 'Before', 'After', 'Change']) { const cell = node('th', '', label); cell.scope = 'col'; header.append(cell); } head.append(header);
+      for (const value of row.values) {
+        const tr = node('tr'), name = node('th'); name.scope = 'row'; name.append(node('span', 'position-field-name', value.name), node('span', 'position-unit', positionUnitLabel(value.unit))); tr.append(name);
+        for (const key of ['beforeRaw', 'afterRaw', 'deltaRaw']) { const cell = node('td'); cell.append(node('strong', '', value[key])); tr.append(cell); } body.append(tr);
+      }
+      table.append(head, body); card.append(table);
+    } else card.append(node('p', 'query-note', row.reason));
+    return card;
+  }));
+  if (!rows.length) $('local-measurements').append(node('p', 'query-note', 'No requested measurements were returned. This does not establish zero balances or no asset changes.'));
+  $('warnings-section').hidden = false;
+  $('warnings-list').replaceChildren(...[
+    'Only the explicit query list is checked. There is no automatic asset discovery, ETH balance summary or total portfolio value.',
+    'Before and after refer to this unsigned call from the selected block-end state, not the original historical transaction position.',
+    'State proofs and code are checked against the selected header. Consensus, finality, contract identity and complete economic effects are not established.',
+    'Network fees and outer transaction signatures are not validated. Execution is not a security verdict.',
+  ].map(text => node('li', '', text)));
+  const details = $('source-details'), selection = result.source?.blockSelection || {}; details.replaceChildren();
+  for (const [label, value] of [['Engine', 'Independent local execution · experimental'], ['Profile', result.source?.profile], ['Requested state', selection.requested || result.apiRequest?.block], ['Resolved block', selection.blockNumber], ['Block hash', selection.blockHash], ['Block binding', result.source?.canonicalStatus], ['Sender', result.apiRequest?.from], ['Recipient', result.apiRequest?.to], ['Native value · wei', result.apiRequest?.value], ['Run ID', result.id]]) addDefinition(details, label, value);
+  $('timing').textContent = Number.isFinite(result.timing?.totalMs) ? `${(result.timing.totalMs / 1000).toFixed(2)}s total` : '';
+}
+
 function renderStandardResult(result, sequenceContext = null) {
   if (!sequenceContext) beginResult(result, true);
   const stepNumber = sequenceContext ? sequenceContext.step.index + 1 : null;
@@ -1323,7 +1413,7 @@ async function run(mode) {
   if (state.busy) return;
   const standard = ethereumMode();
   const sequence = sequenceMode();
-  if (standard && (!standardAvailable() || mode === 'historical_trace')) return;
+  if (standard && (!(localMode() ? localAvailable() : standardAvailable()) || mode === 'historical_trace')) return;
   if (sequence && !sequenceAvailable()) return;
   if (mode === 'historical_trace' && !state.example?.transactionHash) return;
   if (standard && !sequence) validateWeiField($('value'));
@@ -1348,17 +1438,18 @@ async function run(mode) {
     const body = sequence ? { chainId: 1, from: $('from').value.trim(), block: $('block').value.trim(), calls }
       : mode === 'historical_trace' ? { chainId: Number(state.example.request.chainId), transactionHash: state.example.transactionHash } : { chainId: Number($('chain').value), from: $('from').value.trim(), to: $('to').value.trim(), data: $('data').value.trim(), value: $('value').value.trim(), block: $('block').value.trim() };
     if (standard && queries !== undefined) body.queries = queries;
-    const result = await request(sequence ? '/api/evm/simulate-sequence' : standard ? '/api/evm/simulate' : mode === 'historical_trace' ? '/api/replay' : '/api/simulate', body);
+    const result = await request(localMode() ? '/api/evm/local-preview' : sequence ? '/api/evm/simulate-sequence' : standard ? '/api/evm/simulate' : mode === 'historical_trace' ? '/api/replay' : '/api/simulate', body);
     if (fingerprint !== requestFingerprint()) {
       setBusy(false);
       clearResult({ inputsChanged: true });
       return;
     }
-    if (sequence) renderSequenceResult(result);
+    if (localMode()) renderLocalResult(result);
+    else if (sequence) renderSequenceResult(result);
     else if (standard) renderStandardResult(result);
     else renderResult(result);
     setBusy(false);
-    $('run-status').textContent = sequence
+    $('run-status').textContent = localMode() ? 'Local preview returned. Review execution and each requested check separately; unavailable values are not zero.' : sequence
       ? result.sequence?.status === 'completed' ? 'Sequence completed. Select each step to review its balances and allowances. Network fees are excluded.'
         : 'The sequence stopped or could not be established. Review the attempted steps and explicitly skipped calls below.'
       : standard
@@ -1473,6 +1564,15 @@ $('simulation-form').addEventListener('submit', (event) => { event.preventDefaul
 $('replay-button').addEventListener('click', () => run('historical_trace'));
 $('example').addEventListener('change', selectExample);
 $('chain').addEventListener('change', selectNetwork);
+$('ethereum-engine').addEventListener('change', () => {
+  if (state.busy) return;
+  const wasSequence = $('ethereum-call-mode').value === 'sequence';
+  $('ethereum-call-mode').value = 'single';
+  $('standard-manual-queries').checked = localMode();
+  if (wasSequence) { populateExampleOptions(); selectExample(); }
+  else { updateQueryMode(); clearResult({ inputsChanged: true }); }
+  setBusy(false);
+});
 $('ethereum-call-mode').addEventListener('change', () => {
   if (state.busy) return;
   populateExampleOptions(); selectExample(); setBusy(false);
@@ -1483,7 +1583,7 @@ $('add-sequence-call').addEventListener('click', () => {
   state.sequenceControls.at(-1)?.to.focus();
 });
 for (const id of requestFieldIds) {
-  if (id === 'chain' || id === 'ethereum-call-mode') continue;
+  if (id === 'chain' || id === 'ethereum-call-mode' || id === 'ethereum-engine') continue;
   const changed = () => {
     if (id === 'standard-queries') $('standard-queries').setCustomValidity('');
     if (id === 'value') $('value').setCustomValidity('');
@@ -1518,7 +1618,7 @@ async function initialize() {
     state.config = await request('/api/config');
     const chains = state.config.chains || [];
     const choices = chains.length ? [...chains] : [{ name: 'HyperEVM', chainId: 999 }];
-    if (state.config.standardEvm && !choices.some(chain => Number(chain.chainId) === 1)) choices.push({ name: 'Ethereum · experimental', chainId: 1 });
+    if ((state.config.standardEvm || state.config.localEvm) && !choices.some(chain => Number(chain.chainId) === 1)) choices.push({ name: 'Ethereum · experimental', chainId: 1 });
     $('chain').replaceChildren(...choices.map((chain) => { const option = node('option', '', `${chain.name} · ${chain.chainId}`); option.value = chain.chainId; return option; }));
     selectNetwork({ initial: true });
     if (typeof state.config.projectStatus === 'string') $('project-status').textContent = state.config.projectStatus;

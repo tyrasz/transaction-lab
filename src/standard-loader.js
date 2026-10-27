@@ -11,6 +11,7 @@ const files = Object.freeze([
   'src/historical-state.js', 'src/lending-balances.js', 'src/lending.js',
   'src/permissions.js', 'src/revert.js',
   'src/standard-loader.js', 'src/standard-rpc.js', 'src/standard-simulation.js',
+  'src/local-loader.js', 'src/local-simulation.js', 'src/proof-rpc.js',
   'src/rpc.js', 'src/state.js', 'src/state-diff.js', 'src/query-validation.js',
   'engines/standard-evm/package.json', 'engines/standard-evm/package-lock.json',
   'engines/standard-evm/unsigned-call.js', 'engines/standard-evm/position-queries.js', 'engines/standard-evm/provider-state-diff.js', 'engines/standard-evm/discovery.js', 'engines/standard-evm/native-effects.js', 'engines/standard-evm/sequence-state.js',

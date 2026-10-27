@@ -1,0 +1,676 @@
+{
+  "schemaVersion": "1.0",
+  "chainId": 1,
+  "reviewedOn": "2026-10-27",
+  "scope": "Small, non-exhaustive declared address and ABI intent map. No historical deployment range, code/proxy/implementation attestation, execution success, ownership or economic effect is established.",
+  "sourceSnapshot": "Reviewed primary links; remote document bytes and commit revisions are not archived or cryptographically authenticated. Freeze this metadata file before cohort dispatch.",
+  "sources": {
+    "circle_addresses": {
+      "url": "https://developers.circle.com/stablecoins/usdc-contract-addresses",
+      "supports": "Ethereum USDC address"
+    },
+    "erc20": {
+      "url": "https://eips.ethereum.org/EIPS/eip-20",
+      "supports": "transfer, transferFrom and approve interfaces"
+    },
+    "circle_v2": {
+      "url": "https://raw.githubusercontent.com/circlefin/stablecoin-evm/master/contracts/v2/FiatTokenV2.sol",
+      "supports": "permit and allowance adjustment interfaces"
+    },
+    "aave_addresses": {
+      "url": "https://raw.githubusercontent.com/aave-dao/aave-address-book/main/src/AaveV3Ethereum.sol",
+      "supports": "Ethereum V3 Pool address"
+    },
+    "aave_pool": {
+      "url": "https://raw.githubusercontent.com/aave/aave-v3-core/master/contracts/interfaces/IPool.sol",
+      "supports": "Pool supply, withdrawal, borrowing and repayment interfaces"
+    },
+    "morpho_addresses": {
+      "url": "https://docs.morpho.org/developers/contracts/addresses/",
+      "supports": "Ethereum Morpho Blue address"
+    },
+    "morpho_blue": {
+      "url": "https://raw.githubusercontent.com/morpho-org/morpho-blue/main/src/interfaces/IMorpho.sol",
+      "supports": "MarketParams and supply, withdrawal, borrowing and repayment interfaces"
+    },
+    "morpho_vault": {
+      "url": "https://app.morpho.org/ethereum/vault/0xBEEF01735c132Ada46AA9aA4c54623cAA92A64CB/steakhouse-usdc",
+      "supports": "Steakhouse USDC vault address and protocol association"
+    },
+    "metamorpho": {
+      "url": "https://raw.githubusercontent.com/morpho-org/metamorpho/main/src/MetaMorpho.sol",
+      "supports": "ERC4626 vault implementation family; not attestation of deployed runtime"
+    },
+    "erc4626": {
+      "url": "https://eips.ethereum.org/EIPS/eip-4626",
+      "supports": "deposit, mint, withdraw and redeem interfaces"
+    },
+    "uniswap_addresses": {
+      "url": "https://developers.uniswap.org/docs/protocols/v3/deployments/v3-ethereum-deployments",
+      "supports": "Ethereum SwapRouter02 and UniversalRouter addresses"
+    },
+    "uniswap_router": {
+      "url": "https://raw.githubusercontent.com/Uniswap/swap-router-contracts/main/contracts/interfaces/IV3SwapRouter.sol",
+      "supports": "SwapRouter02 exactInputSingle and exactOutputSingle tuple interfaces"
+    }
+  },
+  "methods": [
+    {
+      "id": "transfer",
+      "selector": "0xa9059cbb",
+      "signature": "transfer(address,uint256)",
+      "flattenedAbiTypes": [
+        "address",
+        "uint256"
+      ],
+      "category": "transfer",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "erc20"
+      ]
+    },
+    {
+      "id": "transfer_from",
+      "selector": "0x23b872dd",
+      "signature": "transferFrom(address,address,uint256)",
+      "flattenedAbiTypes": [
+        "address",
+        "address",
+        "uint256"
+      ],
+      "category": "transfer",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "erc20"
+      ]
+    },
+    {
+      "id": "approve",
+      "selector": "0x095ea7b3",
+      "signature": "approve(address,uint256)",
+      "flattenedAbiTypes": [
+        "address",
+        "uint256"
+      ],
+      "category": "approval_permit",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "erc20"
+      ]
+    },
+    {
+      "id": "permit",
+      "selector": "0xd505accf",
+      "signature": "permit(address,address,uint256,uint256,uint8,bytes32,bytes32)",
+      "flattenedAbiTypes": [
+        "address",
+        "address",
+        "uint256",
+        "uint256",
+        "uint8",
+        "bytes32",
+        "bytes32"
+      ],
+      "category": "approval_permit",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "circle_v2"
+      ]
+    },
+    {
+      "id": "increase_allowance",
+      "selector": "0x39509351",
+      "signature": "increaseAllowance(address,uint256)",
+      "flattenedAbiTypes": [
+        "address",
+        "uint256"
+      ],
+      "category": "approval_permit",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "circle_v2"
+      ]
+    },
+    {
+      "id": "decrease_allowance",
+      "selector": "0xa457c2d7",
+      "signature": "decreaseAllowance(address,uint256)",
+      "flattenedAbiTypes": [
+        "address",
+        "uint256"
+      ],
+      "category": "approval_permit",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "circle_v2"
+      ]
+    },
+    {
+      "id": "aave_supply",
+      "selector": "0x617ba037",
+      "signature": "supply(address,uint256,address,uint16)",
+      "flattenedAbiTypes": [
+        "address",
+        "uint256",
+        "address",
+        "uint16"
+      ],
+      "category": "lending",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "aave_pool"
+      ]
+    },
+    {
+      "id": "aave_deposit",
+      "selector": "0xe8eda9df",
+      "signature": "deposit(address,uint256,address,uint16)",
+      "flattenedAbiTypes": [
+        "address",
+        "uint256",
+        "address",
+        "uint16"
+      ],
+      "category": "lending",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "aave_pool"
+      ]
+    },
+    {
+      "id": "aave_supply_permit",
+      "selector": "0x02c205f0",
+      "signature": "supplyWithPermit(address,uint256,address,uint16,uint256,uint8,bytes32,bytes32)",
+      "flattenedAbiTypes": [
+        "address",
+        "uint256",
+        "address",
+        "uint16",
+        "uint256",
+        "uint8",
+        "bytes32",
+        "bytes32"
+      ],
+      "category": "lending",
+      "payable": false,
+      "tags": [
+        "permission_intent",
+        "mixed_intent"
+      ],
+      "sourceIds": [
+        "aave_pool"
+      ]
+    },
+    {
+      "id": "aave_withdraw",
+      "selector": "0x69328dec",
+      "signature": "withdraw(address,uint256,address)",
+      "flattenedAbiTypes": [
+        "address",
+        "uint256",
+        "address"
+      ],
+      "category": "lending",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "aave_pool"
+      ]
+    },
+    {
+      "id": "aave_borrow",
+      "selector": "0xa415bcad",
+      "signature": "borrow(address,uint256,uint256,uint16,address)",
+      "flattenedAbiTypes": [
+        "address",
+        "uint256",
+        "uint256",
+        "uint16",
+        "address"
+      ],
+      "category": "lending",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "aave_pool"
+      ]
+    },
+    {
+      "id": "aave_repay",
+      "selector": "0x573ade81",
+      "signature": "repay(address,uint256,uint256,address)",
+      "flattenedAbiTypes": [
+        "address",
+        "uint256",
+        "uint256",
+        "address"
+      ],
+      "category": "lending",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "aave_pool"
+      ]
+    },
+    {
+      "id": "aave_repay_permit",
+      "selector": "0xee3e210b",
+      "signature": "repayWithPermit(address,uint256,uint256,address,uint256,uint8,bytes32,bytes32)",
+      "flattenedAbiTypes": [
+        "address",
+        "uint256",
+        "uint256",
+        "address",
+        "uint256",
+        "uint8",
+        "bytes32",
+        "bytes32"
+      ],
+      "category": "lending",
+      "payable": false,
+      "tags": [
+        "permission_intent",
+        "mixed_intent"
+      ],
+      "sourceIds": [
+        "aave_pool"
+      ]
+    },
+    {
+      "id": "aave_repay_atokens",
+      "selector": "0x2dad97d4",
+      "signature": "repayWithATokens(address,uint256,uint256)",
+      "flattenedAbiTypes": [
+        "address",
+        "uint256",
+        "uint256"
+      ],
+      "category": "lending",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "aave_pool"
+      ]
+    },
+    {
+      "id": "morpho_supply",
+      "selector": "0xa99aad89",
+      "signature": "supply((address,address,address,address,uint256),uint256,uint256,address,bytes)",
+      "flattenedAbiTypes": [
+        "address",
+        "address",
+        "address",
+        "address",
+        "uint256",
+        "uint256",
+        "uint256",
+        "address",
+        "bytes"
+      ],
+      "category": "lending",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "morpho_blue"
+      ]
+    },
+    {
+      "id": "morpho_repay",
+      "selector": "0x20b76e81",
+      "signature": "repay((address,address,address,address,uint256),uint256,uint256,address,bytes)",
+      "flattenedAbiTypes": [
+        "address",
+        "address",
+        "address",
+        "address",
+        "uint256",
+        "uint256",
+        "uint256",
+        "address",
+        "bytes"
+      ],
+      "category": "lending",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "morpho_blue"
+      ]
+    },
+    {
+      "id": "morpho_withdraw",
+      "selector": "0x5c2bea49",
+      "signature": "withdraw((address,address,address,address,uint256),uint256,uint256,address,address)",
+      "flattenedAbiTypes": [
+        "address",
+        "address",
+        "address",
+        "address",
+        "uint256",
+        "uint256",
+        "uint256",
+        "address",
+        "address"
+      ],
+      "category": "lending",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "morpho_blue"
+      ]
+    },
+    {
+      "id": "morpho_borrow",
+      "selector": "0x50d8cd4b",
+      "signature": "borrow((address,address,address,address,uint256),uint256,uint256,address,address)",
+      "flattenedAbiTypes": [
+        "address",
+        "address",
+        "address",
+        "address",
+        "uint256",
+        "uint256",
+        "uint256",
+        "address",
+        "address"
+      ],
+      "category": "lending",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "morpho_blue"
+      ]
+    },
+    {
+      "id": "morpho_supply_collateral",
+      "selector": "0x238d6579",
+      "signature": "supplyCollateral((address,address,address,address,uint256),uint256,address,bytes)",
+      "flattenedAbiTypes": [
+        "address",
+        "address",
+        "address",
+        "address",
+        "uint256",
+        "uint256",
+        "address",
+        "bytes"
+      ],
+      "category": "lending",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "morpho_blue"
+      ]
+    },
+    {
+      "id": "morpho_withdraw_collateral",
+      "selector": "0x8720316d",
+      "signature": "withdrawCollateral((address,address,address,address,uint256),uint256,address,address)",
+      "flattenedAbiTypes": [
+        "address",
+        "address",
+        "address",
+        "address",
+        "uint256",
+        "uint256",
+        "address",
+        "address"
+      ],
+      "category": "lending",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "morpho_blue"
+      ]
+    },
+    {
+      "id": "vault_deposit",
+      "selector": "0x6e553f65",
+      "signature": "deposit(uint256,address)",
+      "flattenedAbiTypes": [
+        "uint256",
+        "address"
+      ],
+      "category": "vault_wrapper",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "erc4626"
+      ]
+    },
+    {
+      "id": "vault_mint",
+      "selector": "0x94bf804d",
+      "signature": "mint(uint256,address)",
+      "flattenedAbiTypes": [
+        "uint256",
+        "address"
+      ],
+      "category": "vault_wrapper",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "erc4626"
+      ]
+    },
+    {
+      "id": "vault_withdraw",
+      "selector": "0xb460af94",
+      "signature": "withdraw(uint256,address,address)",
+      "flattenedAbiTypes": [
+        "uint256",
+        "address",
+        "address"
+      ],
+      "category": "vault_wrapper",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "erc4626"
+      ]
+    },
+    {
+      "id": "vault_redeem",
+      "selector": "0xba087652",
+      "signature": "redeem(uint256,address,address)",
+      "flattenedAbiTypes": [
+        "uint256",
+        "address",
+        "address"
+      ],
+      "category": "vault_wrapper",
+      "payable": false,
+      "tags": [],
+      "sourceIds": [
+        "erc4626"
+      ]
+    },
+    {
+      "id": "router_exactInputSingle",
+      "selector": "0x04e45aaf",
+      "signature": "exactInputSingle((address,address,uint24,address,uint256,uint256,uint160))",
+      "flattenedAbiTypes": [
+        "address",
+        "address",
+        "uint24",
+        "address",
+        "uint256",
+        "uint256",
+        "uint160"
+      ],
+      "category": "swap",
+      "payable": true,
+      "tags": [
+        "router_intent"
+      ],
+      "sourceIds": [
+        "uniswap_router"
+      ]
+    },
+    {
+      "id": "router_exactOutputSingle",
+      "selector": "0x5023b4df",
+      "signature": "exactOutputSingle((address,address,uint24,address,uint256,uint256,uint160))",
+      "flattenedAbiTypes": [
+        "address",
+        "address",
+        "uint24",
+        "address",
+        "uint256",
+        "uint256",
+        "uint160"
+      ],
+      "category": "swap",
+      "payable": true,
+      "tags": [
+        "router_intent"
+      ],
+      "sourceIds": [
+        "uniswap_router"
+      ]
+    }
+  ],
+  "batchSelectorHints": [
+    {
+      "selector": "0xac9650d8",
+      "signature": "multicall(bytes[])",
+      "kind": "batch",
+      "abiShapeVerified": false
+    },
+    {
+      "selector": "0x5ae401dc",
+      "signature": "multicall(uint256,bytes[])",
+      "kind": "batch",
+      "abiShapeVerified": false
+    },
+    {
+      "selector": "0x1f0464d1",
+      "signature": "multicall(bytes32,bytes[])",
+      "kind": "batch",
+      "abiShapeVerified": false
+    },
+    {
+      "selector": "0x24856bc3",
+      "signature": "execute(bytes,bytes[])",
+      "kind": "router",
+      "abiShapeVerified": false
+    },
+    {
+      "selector": "0x3593564c",
+      "signature": "execute(bytes,bytes[],uint256)",
+      "kind": "router",
+      "abiShapeVerified": false
+    }
+  ],
+  "deployments": [
+    {
+      "id": "ethereum_usdc",
+      "name": "Circle USDC",
+      "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "kind": "token",
+      "methods": [
+        "transfer",
+        "transfer_from",
+        "approve",
+        "permit",
+        "increase_allowance",
+        "decrease_allowance"
+      ],
+      "sourceIds": [
+        "circle_addresses",
+        "erc20",
+        "circle_v2"
+      ]
+    },
+    {
+      "id": "ethereum_aave_v3_pool",
+      "name": "Aave V3 Pool",
+      "address": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+      "kind": "lending",
+      "methods": [
+        "aave_supply",
+        "aave_deposit",
+        "aave_supply_permit",
+        "aave_withdraw",
+        "aave_borrow",
+        "aave_repay",
+        "aave_repay_permit",
+        "aave_repay_atokens"
+      ],
+      "sourceIds": [
+        "aave_addresses",
+        "aave_pool"
+      ]
+    },
+    {
+      "id": "ethereum_morpho_blue",
+      "name": "Morpho Blue",
+      "address": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+      "kind": "lending",
+      "methods": [
+        "morpho_supply",
+        "morpho_repay",
+        "morpho_withdraw",
+        "morpho_borrow",
+        "morpho_supply_collateral",
+        "morpho_withdraw_collateral"
+      ],
+      "sourceIds": [
+        "morpho_addresses",
+        "morpho_blue"
+      ]
+    },
+    {
+      "id": "ethereum_steakhouse_usdc_vault",
+      "name": "Morpho Steakhouse USDC vault",
+      "address": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+      "kind": "vault",
+      "methods": [
+        "transfer",
+        "transfer_from",
+        "approve",
+        "permit",
+        "vault_deposit",
+        "vault_mint",
+        "vault_withdraw",
+        "vault_redeem"
+      ],
+      "sourceIds": [
+        "morpho_vault",
+        "metamorpho",
+        "erc4626"
+      ]
+    },
+    {
+      "id": "ethereum_uniswap_swaprouter02",
+      "name": "Uniswap SwapRouter02",
+      "address": "0x68b3465833fb72a70ecdf485e0e4c7bd8665fc45",
+      "kind": "router",
+      "methods": [
+        "router_exactInputSingle",
+        "router_exactOutputSingle"
+      ],
+      "sourceIds": [
+        "uniswap_addresses",
+        "uniswap_router"
+      ]
+    },
+    {
+      "id": "ethereum_uniswap_universal_router",
+      "name": "Uniswap UniversalRouter",
+      "address": "0x66a9893cc07d91d95644aedd05d03f95e1dba8af",
+      "kind": "router",
+      "methods": [],
+      "sourceIds": [
+        "uniswap_addresses"
+      ]
+    }
+  ]
+}

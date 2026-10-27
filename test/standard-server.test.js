@@ -36,6 +36,7 @@ const post = (base, route, value, headers = {}) => fetch(base + route, { method:
 async function expectedImplementation() {
   const files = [
     'package.json', 'src/config.js', 'src/server.js', 'src/validate.js', 'src/standard-loader.js', 'src/standard-rpc.js', 'src/standard-simulation.js',
+    'src/local-loader.js', 'src/local-simulation.js', 'src/proof-rpc.js',
     'src/rpc.js', 'src/state.js', 'src/state-diff.js', 'src/query-validation.js',
     'src/account-effects.js', 'src/affected-balances.js', 'src/allowances.js', 'src/analyze.js', 'src/balances.js', 'src/current-state.js',
     'src/historical-state.js', 'src/lending-balances.js', 'src/lending.js', 'src/permissions.js', 'src/revert.js',
@@ -62,7 +63,7 @@ test('configuration exposes experimental Ethereum separately and binds its compl
   assert.deepEqual(api.implementation, await expectedImplementation());
   assert.equal(await loadStandardApi(), api, 'The loaded implementation identity is stable for this process.');
   assert.ok(api.implementation.sourceFiles.includes('src/standard-rpc.js'));
-  assert.equal(api.implementation.sourceFiles.length, 34);
+  assert.equal(api.implementation.sourceFiles.length, 37);
   assert.ok(api.implementation.sourceFiles.includes('src/analyze.js'), 'Transitive server imports belong to the standard API identity.');
   assert.ok(api.implementation.sourceFiles.includes('src/historical-state.js'));
   assert.ok(api.implementation.sourceFiles.includes('engines/standard-evm/unsigned-call.js'));

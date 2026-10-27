@@ -1,5 +1,5 @@
 export const CHAIN_ID = 999;
-export const VERSION = '0.13.1';
+export const VERSION = '0.14.0';
 export const DEFAULT_RPC_URL = 'https://hyperliquid.drpc.org';
 export const POOL = '0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b';
 export const USDC = '0xb88339cb7199b77e23db6e890353e22632ba630f';

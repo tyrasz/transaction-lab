@@ -8,6 +8,7 @@ import { createCohortTransport, createCohortWireBudget } from './cohort-wire.mjs
 import { createAppServer } from '../../src/server.js';
 import { loadStandardApi } from '../../src/standard-loader.js';
 import { StandardRpcClient } from '../../src/standard-rpc.js';
+import { VERSION } from '../../src/config.js';
 
 const sha = value => createHash('sha256').update(value).digest('hex');
 const dir = new URL('../../reports/ethereum-lending-local-reference/', import.meta.url);
@@ -113,7 +114,13 @@ test('actual current product handler preserves all recorded Aave request/respons
   assert.equal(mismatch, false); assert.equal(at, records.length); assert.equal(output.dispatch, 'completed'); assert.equal(output.httpStatus, 200);
   assert.equal(output.invocation, 'in_process_archived_http_handler'); assert.equal(output.report.execution.status, 'success');
   assert.equal(sha(output.response.bodyText), output.response.sha256);
-  assert.deepEqual(output.report.preview, saved.preview); assert.deepEqual(output.report.implementation, saved.implementation);
+  assert.deepEqual(output.report.preview, saved.preview);
+  // Preserve the original capture identity. Independently bind current source
+  // additions instead of relabeling the recorded observation as a new capture.
+  const currentFiles = [...saved.implementation.sourceFiles, 'src/local-loader.js', 'src/local-simulation.js', 'src/proof-rpc.js'].sort();
+  const currentHash = createHash('sha256');
+  for (const path of currentFiles) currentHash.update(path + '\0').update(readFileSync(new URL('../../' + path, import.meta.url))).update('\0');
+  assert.deepEqual(output.report.implementation, { name: saved.implementation.name, version: VERSION, sourceSha256: currentHash.digest('hex'), sourceFiles: currentFiles });
   assert.deepEqual(transport.records().map(r => r.responseText), records.map(r => r.responseText));
 });
 

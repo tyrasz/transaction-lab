@@ -1,0 +1,394 @@
+{
+  "schemaVersion": 1,
+  "kind": "supplemental_post_capture_offline_comparison",
+  "status": "passed",
+  "newNetworkRequests": 0,
+  "selectedWorkloads": 1,
+  "files": [
+    {
+      "path": "reports/local-evm-api-live-latest-approve-v1/declaration.json",
+      "bytes": 372,
+      "sha256": "b78c7a14e662a1c8006f65caf74bf40e0b60639bdb754d96a9566202e7395325"
+    },
+    {
+      "path": "reports/local-evm-api-live-latest-approve-v1/request.json",
+      "bytes": 725,
+      "sha256": "1d0ef77941dfb0d6896f6b43dc41681026d030e59d6a71924c88b40898bc6a7e"
+    },
+    {
+      "path": "reports/local-evm-api-live-latest-approve-v1/response.json",
+      "bytes": 1246962,
+      "sha256": "dd9e722a8690e507438f38f2bb026d7531ebd31a561bf6f8fb7c3361963d6a11"
+    },
+    {
+      "path": "reports/local-evm-api-live-latest-approve-v1/metadata.json",
+      "bytes": 2766,
+      "sha256": "3bacf082e8234bf6815d9ed8dd24bcab640551289def9b33ab5232773a4b89bc"
+    },
+    {
+      "path": "reports/local-evm-api-latest-approve-comparison-v1/request.json",
+      "bytes": 700,
+      "sha256": "f4bb4d5fd702cc2abe5aa3832ab98019b362024507cd60497cdd1dae1577aa0d"
+    },
+    {
+      "path": "reports/local-evm-api-latest-approve-comparison-v1/response.json",
+      "bytes": 219060,
+      "sha256": "44fd22c28f37cc8c8fa7d587e5497163206742e4ef00c66ddf09ca302d733b68"
+    },
+    {
+      "path": "reports/local-evm-api-latest-approve-comparison-v1/metadata.json",
+      "bytes": 7221,
+      "sha256": "d69d036f5040e9bee3f081899c9bd4e3fc51bc3d66984991aa001db51d99aefb"
+    }
+  ],
+  "implementations": {
+    "local": {
+      "sha256": "5285db4735d7bdb82653f33f018489a9dbf6649c977dc264881d715ac452ab21",
+      "inventoryFiles": 1701,
+      "runtime": {
+        "node": "v22.23.2",
+        "v8": "12.4.254.21-node.56",
+        "platform": "darwin",
+        "arch": "arm64",
+        "executableBytes": 67024,
+        "executableSha256": "1f72236fcbfc84855d7c884fbcba0f6a7c635d600d7e493b823e77c467f2ae95"
+      }
+    },
+    "provider": {
+      "sha256": "e4895b01e43b14358d83d0747b05bef1b239f70621d18ced84ce40b149f11817",
+      "sourceFiles": 37
+    },
+    "currentDiskBytesVerified": true
+  },
+  "block": {
+    "number": "26283977",
+    "hash": "0xf49851c80d17de911544730943daa320f349e20a381ed5e964c4ac2654916b3c",
+    "stateRoot": "0xd6ea120c68d8a818217f280991c086d3e075667712f8b176dfa9ee8195d56697",
+    "fullInitialAndFinalHeadersEqual": true,
+    "headerCommitmentReverified": true,
+    "consensusVerified": false,
+    "finalityVerified": false,
+    "bodyVerified": false
+  },
+  "transport": {
+    "local": {
+      "calls": 14,
+      "bytes": 212590,
+      "methods": {
+        "eth_chainId": 1,
+        "eth_getBlockByNumber": 2,
+        "eth_getProof": 8,
+        "eth_getCode": 3
+      }
+    },
+    "provider": {
+      "calls": 20,
+      "bytes": 80963,
+      "methods": {
+        "eth_chainId": 1,
+        "eth_getBlockByHash": 1,
+        "eth_getTransactionCount": 1,
+        "eth_getBalance": 1,
+        "eth_getCode": 3,
+        "debug_traceCall": 12,
+        "eth_getBlockByNumber": 1
+      }
+    },
+    "allRequestAndResponseHashesVerified": true,
+    "allParsedEvidenceJoinedToWire": true,
+    "localProofsReverified": 8,
+    "localCodeReads": 3,
+    "localInputOrderBeforeProviderCapture": true
+  },
+  "channels": {
+    "status": "matched",
+    "returnData": "matched",
+    "committedLogs": "matched",
+    "fullObservedChanges": "matched",
+    "unsignedGas": "matched"
+  },
+  "execution": {
+    "status": "success",
+    "returnData": "0x0000000000000000000000000000000000000000000000000000000000000001",
+    "committedLogs": [
+      {
+        "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "topics": [
+          "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+          "0x00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4",
+          "0x00000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+        ],
+        "data": "0x0000000000000000000000000000000000000000000000000000000005f5e100"
+      }
+    ],
+    "changes": [
+      {
+        "address": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+        "nonce": {
+          "before": "0x37",
+          "after": "0x38"
+        }
+      },
+      {
+        "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "storage": [
+          {
+            "slot": "0x26336f21a63aacd3574e840a3278fccb16fd789e8d3e700e5b9587a87e8da134",
+            "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "after": "0x0000000000000000000000000000000000000000000000000000000005f5e100"
+          }
+        ]
+      }
+    ],
+    "gas": {
+      "localMessageGas": "33962",
+      "calldataBytes": 68,
+      "zeroBytes": 41,
+      "nonzeroBytes": 27,
+      "intrinsicGas": "21596",
+      "calldataFloor": "22490",
+      "refundApplied": "0",
+      "floorAdjustment": "0",
+      "comparableGas": "55558",
+      "providerGas": "55558",
+      "feesSettled": false
+    }
+  },
+  "measurements": [
+    {
+      "index": 0,
+      "identity": {
+        "kind": "allowance",
+        "chainId": "1",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "owner": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+        "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+        "contractIdentityVerified": false
+      },
+      "values": [
+        {
+          "name": "allowance",
+          "beforeRaw": "0",
+          "afterRaw": "100000000",
+          "deltaRaw": "100000000",
+          "unit": {
+            "kind": "token_raw_units",
+            "scale": null
+          }
+        }
+      ],
+      "providerEvidence": [
+        {
+          "state": "before",
+          "traceEvidenceId": 12,
+          "mutationEvidenceId": 13
+        },
+        {
+          "state": "after",
+          "traceEvidenceId": 14,
+          "mutationEvidenceId": 15
+        }
+      ],
+      "localNetProbeMutation": "sender_nonce_only",
+      "providerNetProbeMutation": "sender_nonce_only"
+    },
+    {
+      "index": 1,
+      "identity": {
+        "kind": "balanceOf",
+        "chainId": "1",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+        "contractIdentityVerified": false
+      },
+      "values": [
+        {
+          "name": "balance",
+          "beforeRaw": "0",
+          "afterRaw": "0",
+          "deltaRaw": "0",
+          "unit": {
+            "kind": "token_raw_units",
+            "scale": null
+          }
+        }
+      ],
+      "providerEvidence": [
+        {
+          "state": "before",
+          "traceEvidenceId": 16,
+          "mutationEvidenceId": 17
+        },
+        {
+          "state": "after",
+          "traceEvidenceId": 18,
+          "mutationEvidenceId": 19
+        }
+      ],
+      "localNetProbeMutation": "sender_nonce_only",
+      "providerNetProbeMutation": "sender_nonce_only"
+    }
+  ],
+  "verifiedProofs": [
+    {
+      "wireId": 3,
+      "address": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+      "storageKeys": [],
+      "account": {
+        "exists": true,
+        "nonceRaw": "55",
+        "balanceRaw": "2556604017745621669",
+        "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+        "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+      },
+      "storage": []
+    },
+    {
+      "wireId": 5,
+      "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "storageKeys": [],
+      "account": {
+        "exists": true,
+        "nonceRaw": "1",
+        "balanceRaw": "0",
+        "codeHash": "0xd80d4b7c890cb9d6a4893e6b52bc34b56b25335cb13716e0d1d31383e6b41505",
+        "storageRoot": "0x3789118295a8c34df598b8e37c2d9f5c65beff864a01f0d945a8c5c98ebf9c86"
+      },
+      "storage": []
+    },
+    {
+      "wireId": 7,
+      "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "storageKeys": [
+        "0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b"
+      ],
+      "account": {
+        "exists": true,
+        "nonceRaw": "1",
+        "balanceRaw": "0",
+        "codeHash": "0xd80d4b7c890cb9d6a4893e6b52bc34b56b25335cb13716e0d1d31383e6b41505",
+        "storageRoot": "0x3789118295a8c34df598b8e37c2d9f5c65beff864a01f0d945a8c5c98ebf9c86"
+      },
+      "storage": [
+        {
+          "key": "0x10d6a54a4754c8869d6886b5f5d7fbfa5b4522237ea5c60d11bc4e7a1ff9390b",
+          "exists": true,
+          "valueRaw": "733484590217426408439878350902206990279579506130",
+          "valueWord": "0x000000000000000000000000807a96288a1a408dbc13de2b1d087d10356395d2"
+        }
+      ]
+    },
+    {
+      "wireId": 8,
+      "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "storageKeys": [
+        "0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3"
+      ],
+      "account": {
+        "exists": true,
+        "nonceRaw": "1",
+        "balanceRaw": "0",
+        "codeHash": "0xd80d4b7c890cb9d6a4893e6b52bc34b56b25335cb13716e0d1d31383e6b41505",
+        "storageRoot": "0x3789118295a8c34df598b8e37c2d9f5c65beff864a01f0d945a8c5c98ebf9c86"
+      },
+      "storage": [
+        {
+          "key": "0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3",
+          "exists": true,
+          "valueRaw": "384295526066211940175725022778205173214649516765",
+          "valueWord": "0x00000000000000000000000043506849d7c04f9138d1a2050bbf3a0c054402dd"
+        }
+      ]
+    },
+    {
+      "wireId": 9,
+      "address": "0x43506849d7c04f9138d1a2050bbf3a0c054402dd",
+      "storageKeys": [],
+      "account": {
+        "exists": true,
+        "nonceRaw": "1",
+        "balanceRaw": "0",
+        "codeHash": "0xcdfb7d322961af3acae7a8f7ee8b69c205b36f576cc5b077f170c7eb8ecbe3ea",
+        "storageRoot": "0xca544463209edf48973a6420d1f5afa53d2b09ff5ceb205f006b87b3d7c9e845"
+      },
+      "storage": []
+    },
+    {
+      "wireId": 11,
+      "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "storageKeys": [
+        "0x0000000000000000000000000000000000000000000000000000000000000001"
+      ],
+      "account": {
+        "exists": true,
+        "nonceRaw": "1",
+        "balanceRaw": "0",
+        "codeHash": "0xd80d4b7c890cb9d6a4893e6b52bc34b56b25335cb13716e0d1d31383e6b41505",
+        "storageRoot": "0x3789118295a8c34df598b8e37c2d9f5c65beff864a01f0d945a8c5c98ebf9c86"
+      },
+      "storage": [
+        {
+          "key": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "exists": true,
+          "valueRaw": "417223780715013227085836490829281552150151464294",
+          "valueWord": "0x0000000000000000000000004914f61d25e5c567143774b76edbf4d5109a8566"
+        }
+      ]
+    },
+    {
+      "wireId": 12,
+      "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "storageKeys": [
+        "0x26336f21a63aacd3574e840a3278fccb16fd789e8d3e700e5b9587a87e8da134"
+      ],
+      "account": {
+        "exists": true,
+        "nonceRaw": "1",
+        "balanceRaw": "0",
+        "codeHash": "0xd80d4b7c890cb9d6a4893e6b52bc34b56b25335cb13716e0d1d31383e6b41505",
+        "storageRoot": "0x3789118295a8c34df598b8e37c2d9f5c65beff864a01f0d945a8c5c98ebf9c86"
+      },
+      "storage": [
+        {
+          "key": "0x26336f21a63aacd3574e840a3278fccb16fd789e8d3e700e5b9587a87e8da134",
+          "exists": false,
+          "valueRaw": "0",
+          "valueWord": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "wireId": 13,
+      "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "storageKeys": [
+        "0x2119e0282db64a6a833c92ea0c4dfa318ec55878b66dc545cc7ba981d4ff6ce3"
+      ],
+      "account": {
+        "exists": true,
+        "nonceRaw": "1",
+        "balanceRaw": "0",
+        "codeHash": "0xd80d4b7c890cb9d6a4893e6b52bc34b56b25335cb13716e0d1d31383e6b41505",
+        "storageRoot": "0x3789118295a8c34df598b8e37c2d9f5c65beff864a01f0d945a8c5c98ebf9c86"
+      },
+      "storage": [
+        {
+          "key": "0x2119e0282db64a6a833c92ea0c4dfa318ec55878b66dc545cc7ba981d4ff6ce3",
+          "exists": false,
+          "valueRaw": "0",
+          "valueWord": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "One selected approval development workload, not a representative cohort or accuracy/security score.",
+    "Local execution uses proof/code input state only; the cryptographic proof/header checks reuse the pinned local verifier implementation, not a second verifier implementation.",
+    "Both captures use eth.drpc.org input data; agreement is between local execution and provider execution, not independent node consensus.",
+    "Latest was resolved once; provider comparison uses that exact hash. This is unsigned, unpriced block-end simulation, not original-position replay or a signed transaction.",
+    "Only demanded initial state and observed changes are compared; no global post-state root or complete economic-effect proof.",
+    "Queried token identity is calldata/address identity; token label/decimals and deployment semantics are not re-attested.",
+    "The failed historical Aave capture remains a separate retained outcome and is not replaced by this selected approval.",
+    "No VM reexecution or fresh public requests are performed by this audit. Current source/dependency bytes must still match captured identities to rerun."
+  ],
+  "auditScriptSha256": "37246b4feb984ac8451520fd62a6942e47ecfa9cedc4d53ca9368fa68df789cb"
+}

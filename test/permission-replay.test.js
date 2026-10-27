@@ -25,7 +25,7 @@ const guardedCapture=JSON.parse(guardedBytes);
 // Declared current additions are independent of the response under test; the
 // pinned capture inventory and its historical implementation remain unchanged.
 const sourceFiles = guardedCapture.implementation.sourceFiles.flatMap(name => name === 'historical-state.js'
-  ? ['current-state.js', name] : name === 'server.js' ? [name, 'standard-loader.js', 'standard-rpc.js'] : [name]);
+  ? ['current-state.js', name] : name === 'server.js' ? [name, 'standard-loader.js', 'standard-rpc.js'] : name === 'lending-balances.js' ? [name, 'local-loader.js', 'local-simulation.js'] : name === 'permissions.js' ? [name, 'proof-rpc.js'] : [name]);
 const currentSourceHash = createHash('sha256');
 for (const name of sourceFiles) {
   assert.match(name, /^[a-z-]+\.js$/);

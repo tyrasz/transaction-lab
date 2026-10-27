@@ -18,9 +18,11 @@ import { projectAccountEffects } from './account-effects.js';
 import { EXAMPLES, METADATA, CAPABILITIES, VERSION } from './config.js';
 import { StandardRpcClient } from './standard-rpc.js';
 import { loadStandardApi } from './standard-loader.js';
+import { ProofRpcClient, ProofRpcError } from './proof-rpc.js';
+import { loadLocalApi } from './local-loader.js';
 
 const ROOT = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
-const engineFiles = ['account-effects.js','affected-balances.js','allowances.js','analyze.js','balances.js','config.js','current-state.js','historical-state.js','lending.js','lending-balances.js','permissions.js','query-validation.js','revert.js','rpc.js','server.js','standard-loader.js','standard-rpc.js','state-diff.js','state.js','validate.js'];
+const engineFiles = ['account-effects.js','affected-balances.js','allowances.js','analyze.js','balances.js','config.js','current-state.js','historical-state.js','lending.js','lending-balances.js','local-loader.js','local-simulation.js','permissions.js','proof-rpc.js','query-validation.js','revert.js','rpc.js','server.js','standard-loader.js','standard-rpc.js','state-diff.js','state.js','validate.js'];
 const engineHash = createHash('sha256');
 for (const name of engineFiles) engineHash.update(name+'\0').update(await readFile(path.join(ROOT,'src',name))).update('\0');
 const implementation = Object.freeze({name:'Transaction Lab',version:VERSION,sourceSha256:engineHash.digest('hex'),sourceFiles:engineFiles});
@@ -227,7 +229,7 @@ export async function replay(input, rpc) {
   };
 }
 
-export function createAppServer({rpcFactory=()=>new RpcClient(),standardRpcFactory=options=>new StandardRpcClient(options),standardLoader=loadStandardApi,reportDir=path.join(ROOT,'reports'),persist=true}={}) {
+export function createAppServer({rpcFactory=()=>new RpcClient(),standardRpcFactory=options=>new StandardRpcClient(options),standardLoader=loadStandardApi,proofRpcFactory=()=>new ProofRpcClient(),localLoader=loadLocalApi,reportDir=path.join(ROOT,'reports'),persist=true}={}) {
   let inFlight=0;
   return http.createServer(async(req,res)=>{
     try {
@@ -242,32 +244,49 @@ export function createAppServer({rpcFactory=()=>new RpcClient(),standardRpcFacto
       }
       if(req.method==='GET' && url.pathname==='/api/health') return json(res,200,{status:'ok',version:VERSION,readOnly:true});
       if(req.method==='GET' && url.pathname==='/api/config') {
-        const standard = await standardLoader();
+        const [standard, local] = await Promise.all([standardLoader(), localLoader()]);
         return json(res,200,{chains:[{chainId:999,name:'HyperEVM'},{chainId:1,name:'Ethereum',experimental:true}],examples:EXAMPLES,capabilities:CAPABILITIES,
           standardEvm:standard?{available:true,examples:standard.STANDARD_EXAMPLES,capabilities:standard.STANDARD_CAPABILITIES,sequenceExamples:standard.STANDARD_SEQUENCE_EXAMPLES,sequenceCapabilities:standard.STANDARD_SEQUENCE_CAPABILITIES}:{available:false,examples:[],capabilities:null,sequenceExamples:[],sequenceCapabilities:{available:false},reason:'Install the standard EVM experiment dependencies and restart the service to enable Ethereum previews.'},
+          localEvm:local?{available:true,capabilities:local.LOCAL_CAPABILITIES}:{available:false,capabilities:null,reason:'Install the local EVM experiment dependencies and restart the service to enable independent previews.'},
           projectStatus:'Research preview · correctness and coverage under active development'});
       }
       if(req.method==='GET' && url.pathname==='/api/benchmarks') {
         try { return json(res,200,JSON.parse(await readFile(path.join(reportDir,'latest-benchmark.json'),'utf8'))); }
         catch(error) { if(error.code==='ENOENT')return json(res,200,{status:'not_run'}); throw error; }
       }
-      if(req.method==='POST' && ['/api/simulate','/api/replay','/api/evm/simulate','/api/evm/simulate-sequence'].includes(url.pathname)) {
+      if(req.method==='POST' && ['/api/simulate','/api/replay','/api/evm/simulate','/api/evm/simulate-sequence','/api/evm/local-preview'].includes(url.pathname)) {
         if(req.headers.origin && req.headers.origin!=='http://'+host) return json(res,403,{error:{code:'ORIGIN_NOT_ALLOWED',message:'Cross-origin requests are not accepted.'}});
         const isSequence=url.pathname==='/api/evm/simulate-sequence';
         const isStandard=isSequence||url.pathname==='/api/evm/simulate';
+        const isLocal=url.pathname==='/api/evm/local-preview';
         const input=await readJson(req,isSequence?384:128);
         if(inFlight>=2)return json(res,429,{error:{code:'BUSY',message:'Two simulations are already running. Try again shortly.'}});
         // Validate before constructing a provider client or making any network request.
         const standard = isStandard ? await standardLoader() : null;
+        const local = isLocal ? await localLoader() : null;
         if(isStandard && !standard) return json(res,503,{error:{code:'STANDARD_EVM_UNAVAILABLE',message:'Install the standard EVM experiment dependencies and restart the service to enable Ethereum previews.'}});
-        if(standard)(isSequence?standard.validateStandardSequence:standard.validateStandardSimulation)(input);else if(url.pathname==='/api/simulate')validateSimulation(input);else validateReplay(input);
+        if(isLocal && !local) return json(res,503,{error:{code:'LOCAL_EVM_UNAVAILABLE',message:'Install the local EVM experiment dependencies and restart the service to enable independent previews.'}});
+        if(local)local.validateLocalSimulation(input);else if(standard)(isSequence?standard.validateStandardSequence:standard.validateStandardSimulation)(input);else if(url.pathname==='/api/simulate')validateSimulation(input);else validateReplay(input);
         // Loading the optional engine yields; reserve the shared slot only
         // after another check so concurrent imports cannot bypass the limit.
         if(inFlight>=2)return json(res,429,{error:{code:'BUSY',message:'Two simulations are already running. Try again shortly.'}});
         inFlight++;
         try {
           let report;
-          if(standard) {
+          if(local) {
+            const rpc=proofRpcFactory(), controller=new AbortController();
+            const disconnected=()=>{ if(!res.writableEnded){controller.abort();rpc.cancel();} };
+            req.once('aborted',disconnected);res.once('close',disconnected);
+            if(req.aborted||res.destroyed)disconnected();
+            try {
+              report=await local.simulateLocal(input,rpc,{signal:controller.signal});
+              report.implementation=local.implementation;
+            } finally {
+              req.removeListener('aborted',disconnected);res.removeListener('close',disconnected);
+              controller.abort();rpc.cancel();
+            }
+            if(res.destroyed)return;
+          } else if(standard) {
             const rpc=standardRpcFactory({profile:isSequence?'sequence':'single'});
             report=await (isSequence?standard.simulateStandardSequence:standard.simulateStandard)(input,rpc);
             report.implementation=standard.implementation;
@@ -281,6 +300,7 @@ export function createAppServer({rpcFactory=()=>new RpcClient(),standardRpcFacto
     }catch(error){
       if(error instanceof InputError)return json(res,400,{error:{code:error.code,message:error.message}});
       if(error instanceof RpcError)return json(res,502,{error:{code:error.code,message:error.message,detail:error.detail}});
+      if(error instanceof ProofRpcError)return json(res,502,{error:{code:error.code,message:error.message}});
       console.error('Request failed:',error?.name,error?.message);
       return json(res,500,{error:{code:'INTERNAL_ERROR',message:'The request could not be completed.'}});
     }
