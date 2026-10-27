@@ -1,0 +1,87 @@
+{
+  "schemaVersion": "1.0",
+  "completedAt": "2026-10-27T08:01:53.332Z",
+  "developmentOnly": true,
+  "status": "incomplete",
+  "statusMeaning": "Capture process completion, not simulation success or an accuracy verdict. Declared reverts are retained outcomes.",
+  "durationMs": 12.095124999999996,
+  "planSha256": "c3fcbbbe8fb48d7b44cced5781c5aceb62afdafb915345e130e6e91268a90e5d",
+  "implementation": {
+    "name": "Transaction Lab Ethereum preview",
+    "version": "0.13.0",
+    "sourceSha256": "e0f182d2c99e1767ff2c51f9a736b8de6d07b9bb7e3eb4e21017e838d505bda1",
+    "sourceFiles": [
+      "engines/standard-evm/discovery.js",
+      "engines/standard-evm/native-effects.js",
+      "engines/standard-evm/node_modules/@noble/hashes/_u64.js",
+      "engines/standard-evm/node_modules/@noble/hashes/package.json",
+      "engines/standard-evm/node_modules/@noble/hashes/sha3.js",
+      "engines/standard-evm/node_modules/@noble/hashes/utils.js",
+      "engines/standard-evm/package-lock.json",
+      "engines/standard-evm/package.json",
+      "engines/standard-evm/position-queries.js",
+      "engines/standard-evm/provider-state-diff.js",
+      "engines/standard-evm/sequence-state.js",
+      "engines/standard-evm/unsigned-call.js",
+      "package.json",
+      "src/account-effects.js",
+      "src/affected-balances.js",
+      "src/allowances.js",
+      "src/analyze.js",
+      "src/balances.js",
+      "src/config.js",
+      "src/current-state.js",
+      "src/historical-state.js",
+      "src/lending-balances.js",
+      "src/lending.js",
+      "src/permissions.js",
+      "src/query-validation.js",
+      "src/revert.js",
+      "src/rpc.js",
+      "src/server.js",
+      "src/standard-loader.js",
+      "src/standard-rpc.js",
+      "src/standard-simulation.js",
+      "src/state-diff.js",
+      "src/state.js",
+      "src/validate.js"
+    ]
+  },
+  "planned": 3,
+  "attempted": 0,
+  "retries": 0,
+  "replacements": 0,
+  "rpcCalls": 0,
+  "publicDispatches": 0,
+  "observedResponseBytes": 0,
+  "sourceUnchanged": true,
+  "violations": [],
+  "fatal": {
+    "code": "EPERM"
+  },
+  "cases": [
+    {
+      "id": "aave-position",
+      "attempted": false,
+      "reason": "CAPTURE_INTERRUPTED_NO_REPLACEMENT"
+    },
+    {
+      "id": "morpho-vault-position",
+      "attempted": false,
+      "reason": "CAPTURE_INTERRUPTED_NO_REPLACEMENT"
+    },
+    {
+      "id": "aave-approval-position-sequence",
+      "attempted": false,
+      "reason": "CAPTURE_INTERRUPTED_NO_REPLACEMENT"
+    }
+  ],
+  "limitations": [
+    "Three preselected position-query development cases; no prospective population or vendor score.",
+    "Two historical deposit envelopes and one constructed Aave sequence start at their declared historical block ends. Prior outputs identify query subjects only, never state or amounts.",
+    "Sequence calls are ordered, separate unsigned executions, not an atomic bundle or signed transaction sequence.",
+    "Unsigned parent-block-end provider simulation; original signed fees and original transaction-position replay are excluded.",
+    "Provider-reported native and token state consistency is not an independent execution oracle.",
+    "Raw successful provider bodies are retained; rejected/error provider bodies retain only transport hashes/counts and sanitized errors."
+  ]
+}

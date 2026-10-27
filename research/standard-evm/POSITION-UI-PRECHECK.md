@@ -1,0 +1,15 @@
+# Position-query UI precheck
+
+Status on 2026-10-27: implementation and offline checks are complete; actual browser form and tuple-card inspection were not completed.
+
+The current UI has a manual list accepting one to eight token and typed Aave/Morpho position queries combined. Position results use a separate section with explicit user, contract, optional market, original mixed-query index, raw before/after/delta and reference units. No valuation or account-health interpretation is applied. Unverified single or sequence context withholds position rows and resets measured counts while retaining the selected-query denominator. Existing automatic token examples remain unchanged.
+
+The [focused UI tests](../../test/standard-position-ui.test.js) passed **11/11**, and an independent agent repeated them and reviewed the API/UI integration without a blocking finding. They execute the actual UI script against a small synthetic DOM and check validation, exact raw values, identity separation, missing/malformed values, sequence invalidation and legacy automatic behavior. These tests do not establish browser layout or actual captured position measurements.
+
+CUA reported no browser-control surfaces. A native Chrome fallback took 547 seconds to return its initial accessibility tree; subsequent actions twice hit the tool's user-change guard. A separate blank tab was opened, but the local application was not reached or submitted. Foreground work then stopped to avoid interfering with the user. No simulation POST or public RPC was made for this UI smoke attempt, and no browser pass, screenshot inspection or overflow measurement is claimed.
+
+The [first position capture manifest](../../reports/standard-evm-positions/manifest.json), SHA-256 `91c45895cfaf8ed78ad73fc9b19b8b18438086b474837405c40790fc943d43e3`, records a loopback-listen permission failure before any HTTP or RPC dispatch. Its three cases were not attempted. That incomplete attempt remains unchanged.
+
+The separate [v2 capture manifest](../../reports/standard-evm-positions-v2/manifest.json), verified from its bytes as SHA-256 `834962759a7629aabaedc4b778b828f4df92b11b4c8e548ad7b3648ff95d2f13`, seals three HTTP 200 responses and 112 public RPC requests with unchanged sources, no retries and no replacements. Its [results](../../reports/standard-evm-positions-v2/results.json) contain a measured Morpho position; the Aave position query is unavailable because the nested delegate-call guard rejects its query path, both in the single-call case and in each sequence step. Successful transaction execution does not establish availability of every requested measurement. Root independently replayed the saved RPC evidence through the archived API and verified the exact outputs offline.
+
+No saved-wire browser replay or extra replay server was started. Actual tuple-card appearance, layout and raw-panel interaction remain unverified in a browser; the completed API replay is not a browser pass. These are three selected development cases, not a coverage score.

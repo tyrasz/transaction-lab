@@ -1,0 +1,641 @@
+{
+  "status": "reproduced",
+  "captureStatus": "completed",
+  "captureFatal": null,
+  "captureViolations": [],
+  "planSha256": "4296ee6765f6e5734f5ebdc1085987eccaa47fe935e83408effe67bf97d3a0eb",
+  "manifestSha256": "834962759a7629aabaedc4b778b828f4df92b11b4c8e548ad7b3648ff95d2f13",
+  "implementationSha256": "e0f182d2c99e1767ff2c51f9a736b8de6d07b9bb7e3eb4e21017e838d505bda1",
+  "sourceFiles": 117,
+  "sealedFiles": 143,
+  "publicNetworkRequests": 0,
+  "socketsOpened": 0,
+  "liveSourceImports": 0,
+  "replayMode": "archived_createAppServer_handler_with_archived_StandardRpcClient_and_exact_saved_wire_responses",
+  "totals": {
+    "rpcCalls": 112,
+    "responseBytes": 667469
+  },
+  "cases": [
+    {
+      "id": "aave-position",
+      "status": "reproduced",
+      "canonicalStatus": "verified",
+      "execution": "success",
+      "sequence": null,
+      "accounting": {
+        "rpcCalls": 31,
+        "observedBytes": 105406,
+        "retainedBytes": 105406,
+        "durationMs": 7449.551001999998,
+        "withheldErrorBodies": 0
+      },
+      "engineEvidenceCheck": "bound_to_wire",
+      "steps": [
+        {
+          "status": "success",
+          "measurements": [
+            {
+              "index": 0,
+              "status": "measured",
+              "query": {
+                "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+              },
+              "beforeRaw": "3962903485",
+              "afterRaw": "0",
+              "deltaRaw": "-3962903485",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 14,
+                  "mutationEvidenceId": 15
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 16,
+                  "mutationEvidenceId": 17
+                }
+              ]
+            },
+            {
+              "index": 1,
+              "status": "measured",
+              "query": {
+                "to": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+                "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+              },
+              "beforeRaw": "0",
+              "afterRaw": "3962903484",
+              "deltaRaw": "3962903484",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 18,
+                  "mutationEvidenceId": 19
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 20,
+                  "mutationEvidenceId": 21
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "status": "measured",
+              "query": {
+                "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "data": "0x70a0823100000000000000000000000098c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c"
+              },
+              "beforeRaw": "151987610826648",
+              "afterRaw": "151991573730133",
+              "deltaRaw": "3962903485",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 22,
+                  "mutationEvidenceId": 23
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 24,
+                  "mutationEvidenceId": 25
+                }
+              ]
+            },
+            {
+              "index": 3,
+              "status": "measured",
+              "query": {
+                "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "data": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+              },
+              "beforeRaw": "0",
+              "afterRaw": "0",
+              "deltaRaw": "0",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 26,
+                  "mutationEvidenceId": 27
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 28,
+                  "mutationEvidenceId": 29
+                }
+              ]
+            },
+            {
+              "index": 4,
+              "status": "unavailable",
+              "reason": "Query delegate does not preserve its input and output.",
+              "query": {
+                "to": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+                "data": "0xbf92857c00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+              }
+            }
+          ],
+          "originalTraceEvidenceId": 10,
+          "originalDiffEvidenceId": 11,
+          "completeOverridesSha256": "4307ab2ef1e72bb127f509ac416a0b7008d7caafdd5c6cbd8e6621697ea2e132"
+        }
+      ],
+      "playback": {
+        "status": "matched",
+        "consumedRpcIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "excludedGeneratedFields": [
+          "id",
+          "createdAt",
+          "timing",
+          "transportEvidence[].transport.durationMs"
+        ]
+      }
+    },
+    {
+      "id": "morpho-vault-position",
+      "status": "reproduced",
+      "canonicalStatus": "verified",
+      "execution": "success",
+      "sequence": null,
+      "accounting": {
+        "rpcCalls": 31,
+        "observedBytes": 368412,
+        "retainedBytes": 368412,
+        "durationMs": 7768.495412000004,
+        "withheldErrorBodies": 0
+      },
+      "engineEvidenceCheck": "bound_to_wire",
+      "steps": [
+        {
+          "status": "success",
+          "measurements": [
+            {
+              "index": 0,
+              "status": "measured",
+              "query": {
+                "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "data": "0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+              },
+              "beforeRaw": "704323976173",
+              "afterRaw": "354323976173",
+              "deltaRaw": "-350000000000",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 15,
+                  "mutationEvidenceId": 16
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 17,
+                  "mutationEvidenceId": 18
+                }
+              ]
+            },
+            {
+              "index": 1,
+              "status": "measured",
+              "query": {
+                "to": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "data": "0x70a0823100000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668"
+              },
+              "beforeRaw": "1151370388097",
+              "afterRaw": "1481867899909",
+              "deltaRaw": "330497511812",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 19,
+                  "mutationEvidenceId": 20
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 21,
+                  "mutationEvidenceId": 22
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "status": "measured",
+              "query": {
+                "to": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "data": "0x70a08231000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b"
+              },
+              "beforeRaw": "24549620346225332293026418",
+              "afterRaw": "24855185467391819293915363",
+              "deltaRaw": "305565121166487000888945",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 23,
+                  "mutationEvidenceId": 24
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 25,
+                  "mutationEvidenceId": 26
+                }
+              ]
+            },
+            {
+              "index": 3,
+              "status": "measured",
+              "query": {
+                "to": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+                "data": "0x93c5206264d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64000000000000000000000000beef01735c132ada46aa9aa4c54623caa92a64cb"
+              },
+              "position": {
+                "identity": {
+                  "kind": "morpho_blue_position",
+                  "chainId": "1",
+                  "contract": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+                  "user": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                  "marketId": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64"
+                },
+                "signature": "position(bytes32,address)",
+                "returnBytes": 96
+              },
+              "rows": [
+                {
+                  "name": "supplyShares",
+                  "abiType": "uint256",
+                  "beforeRaw": "26565631929266438023",
+                  "afterRaw": "26884573979212466695",
+                  "deltaRaw": "318942049946028672",
+                  "unit": {
+                    "kind": "supply_shares",
+                    "scale": null,
+                    "references": [
+                      "https://docs.morpho.org/developers/contracts/blue/#position",
+                      "https://github.com/morpho-org/morpho-blue/blob/main/src/interfaces/IMorpho.sol"
+                    ]
+                  }
+                },
+                {
+                  "name": "borrowShares",
+                  "abiType": "uint128",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0",
+                  "unit": {
+                    "kind": "borrow_shares",
+                    "scale": null,
+                    "references": [
+                      "https://docs.morpho.org/developers/contracts/blue/#position",
+                      "https://github.com/morpho-org/morpho-blue/blob/main/src/interfaces/IMorpho.sol"
+                    ]
+                  }
+                },
+                {
+                  "name": "collateral",
+                  "abiType": "uint128",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0",
+                  "unit": {
+                    "kind": "collateral_token_raw_units",
+                    "scale": null,
+                    "token": null,
+                    "references": [
+                      "https://docs.morpho.org/developers/contracts/blue/#position"
+                    ]
+                  }
+                }
+              ],
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 27,
+                  "mutationEvidenceId": 28
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 29,
+                  "mutationEvidenceId": 30
+                }
+              ]
+            }
+          ],
+          "originalTraceEvidenceId": 11,
+          "originalDiffEvidenceId": 12,
+          "completeOverridesSha256": "7a02d9d20b00a4c6dd8d3c939cfdcd23f19075f2467b9c1d9cfb8470c7949962"
+        }
+      ],
+      "playback": {
+        "status": "matched",
+        "consumedRpcIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31
+        ],
+        "excludedGeneratedFields": [
+          "id",
+          "createdAt",
+          "timing",
+          "transportEvidence[].transport.durationMs"
+        ]
+      }
+    },
+    {
+      "id": "aave-approval-position-sequence",
+      "status": "reproduced",
+      "canonicalStatus": "verified",
+      "execution": null,
+      "sequence": {
+        "status": "completed",
+        "completedSteps": 2,
+        "attemptedSteps": 2
+      },
+      "accounting": {
+        "rpcCalls": 50,
+        "observedBytes": 193651,
+        "retainedBytes": 193651,
+        "durationMs": 11805.359585000004,
+        "withheldErrorBodies": 0
+      },
+      "engineEvidenceCheck": "bound_to_wire",
+      "steps": [
+        {
+          "status": "success",
+          "measurements": [
+            {
+              "index": 0,
+              "status": "measured",
+              "query": {
+                "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "data": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+              },
+              "beforeRaw": "0",
+              "afterRaw": "3962903485",
+              "deltaRaw": "3962903485",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 13,
+                  "mutationEvidenceId": 14
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 15,
+                  "mutationEvidenceId": 16
+                }
+              ]
+            },
+            {
+              "index": 1,
+              "status": "unavailable",
+              "reason": "Query delegate does not preserve its input and output.",
+              "query": {
+                "to": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+                "data": "0xbf92857c00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+              }
+            }
+          ],
+          "originalTraceEvidenceId": 9,
+          "originalDiffEvidenceId": 10,
+          "completeOverridesSha256": "7f20cea3604741c8ca4d36d1707d43206e80cb884af76ba83dff7f8bd96e3add"
+        },
+        {
+          "status": "success",
+          "measurements": [
+            {
+              "index": 0,
+              "status": "measured",
+              "query": {
+                "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+              },
+              "beforeRaw": "3962903485",
+              "afterRaw": "0",
+              "deltaRaw": "-3962903485",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 14,
+                  "mutationEvidenceId": 15
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 16,
+                  "mutationEvidenceId": 17
+                }
+              ]
+            },
+            {
+              "index": 1,
+              "status": "measured",
+              "query": {
+                "to": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+                "data": "0x70a0823100000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+              },
+              "beforeRaw": "0",
+              "afterRaw": "3962903484",
+              "deltaRaw": "3962903484",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 18,
+                  "mutationEvidenceId": 19
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 20,
+                  "mutationEvidenceId": 21
+                }
+              ]
+            },
+            {
+              "index": 2,
+              "status": "measured",
+              "query": {
+                "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "data": "0x70a0823100000000000000000000000098c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c"
+              },
+              "beforeRaw": "151987610826648",
+              "afterRaw": "151991573730133",
+              "deltaRaw": "3962903485",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 22,
+                  "mutationEvidenceId": 23
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 24,
+                  "mutationEvidenceId": 25
+                }
+              ]
+            },
+            {
+              "index": 3,
+              "status": "measured",
+              "query": {
+                "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "data": "0xdd62ed3e00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b400000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+              },
+              "beforeRaw": "3962903485",
+              "afterRaw": "0",
+              "deltaRaw": "-3962903485",
+              "queryEvidence": [
+                {
+                  "state": "before",
+                  "traceEvidenceId": 26,
+                  "mutationEvidenceId": 27
+                },
+                {
+                  "state": "after",
+                  "traceEvidenceId": 28,
+                  "mutationEvidenceId": 29
+                }
+              ]
+            },
+            {
+              "index": 4,
+              "status": "unavailable",
+              "reason": "Query delegate does not preserve its input and output.",
+              "query": {
+                "to": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+                "data": "0xbf92857c00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b4"
+              }
+            }
+          ],
+          "originalTraceEvidenceId": 10,
+          "originalDiffEvidenceId": 11,
+          "completeOverridesSha256": "863e83cc65f3dd166ab60ec389fe0aaf84001fe70da7ee088e55880674ef93cf"
+        }
+      ],
+      "playback": {
+        "status": "matched",
+        "consumedRpcIds": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50
+        ],
+        "excludedGeneratedFields": [
+          "id",
+          "createdAt",
+          "timing",
+          "transportEvidence[].transport.durationMs"
+        ]
+      }
+    }
+  ],
+  "limitations": [
+    "Three fixed development cases, not representative accuracy or a security score.",
+    "Exact replay of the same archived implementation is reproducibility, not an independent execution engine.",
+    "Before/after consistency uses provider traces and state diffs; the declared protocol ABI does not authenticate the deployment.",
+    "Aave base values retain unknown oracle currency/scale; health-factor maximum is raw uint256. Morpho shares are not assets, and the queried position belongs to the inner vault.",
+    "Only validated isolated query return data yields measured tuples or token amounts."
+  ]
+}
