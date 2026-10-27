@@ -1,4 +1,5 @@
 // Fixed, JSON-only IPC protocol. Limits describe parsed JSON bytes, not wire/RSS.
+import { types } from 'node:util';
 export const ISOLATED_LIMITS = Object.freeze({ wallMs: 145000, requestMs: 25000, drainMs: 25000, killWaitMs: 1000,
   heapMiB: 256, calls: 256, responseBytes: 8 * 1024 * 1024, totalResponseBytes: 32 * 1024 * 1024,
   outputBytes: 64 * 1024 * 1024, stdioBytes: 65536 });
@@ -11,7 +12,7 @@ export class IsolationError extends Error {
 }
 export const need = (ok, code = 'LOCAL_ISOLATED_PROTOCOL', message = 'The isolated worker protocol was invalid.') => { if (!ok) throw new IsolationError(code, message); };
 export function fields(value, names, required = names) {
-  need(value && typeof value === 'object' && !Array.isArray(value) && Object.getPrototypeOf(value) === Object.prototype);
+  need(value && typeof value === 'object' && !types.isProxy(value) && !Array.isArray(value) && Object.getPrototypeOf(value) === Object.prototype);
   const keys = Reflect.ownKeys(value);
   need(keys.every(key => typeof key === 'string' && names.includes(key)) && required.every(key => Object.hasOwn(value, key)));
   for (const key of keys) { const d = Object.getOwnPropertyDescriptor(value, key); need(d.enumerable && Object.hasOwn(d, 'value')); }
@@ -20,8 +21,9 @@ function jsonData(value, depth = 0, counter = { n: 0 }) {
   need(++counter.n <= 2_000_000 && depth <= 128);
   if (value === null || typeof value === 'boolean' || typeof value === 'string') return;
   if (typeof value === 'number') { need(Number.isFinite(value)); return; }
-  need(value && typeof value === 'object');
+  need(value && typeof value === 'object' && !types.isProxy(value));
   if (Array.isArray(value)) {
+    need(Object.getPrototypeOf(value) === Array.prototype);
     need(Reflect.ownKeys(value).length === value.length + 1);
     for (let i = 0; i < value.length; i++) { const d = Object.getOwnPropertyDescriptor(value, String(i)); need(d?.enumerable && Object.hasOwn(d, 'value')); jsonData(d.value, depth + 1, counter); }
   } else {

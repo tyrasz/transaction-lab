@@ -24,3 +24,13 @@ test('all configured limits only tighten fixed ceilings, and nested clocks respe
   assert.equal(limits.inputs.wallMs, 250); assert.equal(limits.execution.wallMs, 250); assert.equal(limits.inputs.slots, 3);
   for (const value of [{ wallMs: 145001 }, { heapMiB: 512 }, { heapMiB: 32 }, { calls: 0 }, { execution: { steps: 1000001 } }, { inputs: { poststate: {} } }, { workerPath: '/tmp/worker' }]) assert.throws(() => normalizeLimits(value));
 });
+
+test('data boundaries reject proxy traps and inherited array serializers before executing caller code', () => {
+  let invoked = 0;
+  const trap = () => { invoked++; throw new Error('must not execute'); };
+  const proxy = new Proxy({}, { get: trap, getPrototypeOf: trap, ownKeys: trap, getOwnPropertyDescriptor: trap });
+  const array = [];
+  Object.setPrototypeOf(array, { toJSON: trap });
+  for (const value of [proxy, { nested: proxy }, array]) assert.throws(() => encode(value, 1024));
+  assert.throws(() => normalizeLimits(proxy)); assert.equal(invoked, 0);
+});

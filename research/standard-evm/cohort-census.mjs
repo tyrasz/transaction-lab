@@ -56,7 +56,7 @@ function copyInput(input) {
 }
 
 const BASE_FIELDS = ['hash', 'from', 'to', 'input', 'value', 'gas', 'nonce', 'blockHash', 'blockNumber', 'transactionIndex'];
-const KNOWN_FIELDS = new Set([...BASE_FIELDS, 'type', 'chainId', 'gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas', 'maxFeePerBlobGas', 'blobVersionedHashes', 'accessList', 'authorizationList', 'v', 'r', 's', 'yParity']);
+const KNOWN_FIELDS = new Set([...BASE_FIELDS, 'blockTimestamp', 'type', 'chainId', 'gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas', 'maxFeePerBlobGas', 'blobVersionedHashes', 'accessList', 'authorizationList', 'v', 'r', 's', 'yParity']);
 function signatureWord(v, label) {
   // Some clients use fixed 32-byte DATA for r/s, others minimal QUANTITY.
   if (typeof v === 'string' && /^0x[0-9a-fA-F]{64}$/.test(v)) return BigInt(v).toString();
@@ -84,6 +84,11 @@ function normalizeEnvelope(tx, header, index) {
     type: has(tx, 'type') ? quantity(tx.type, 'Transaction type', 8) : '0', r: signatureWord(tx.r, 'Transaction r'), s: signatureWord(tx.s, 'Transaction s'),
   };
   need(n.blockHash === header.hash.toLowerCase() && n.blockNumber === BigInt(header.number).toString() && n.transactionIndex === String(index), 'Transaction block identity or contiguous index differs from its position.');
+  // Optional mined-transaction helper in Geth's shared RPCTransaction shape:
+  // https://github.com/ethereum/go-ethereum/pull/33709 . Bind it to the already
+  // verified containing header before omitting the redundant normalized field.
+  // The exact provider field remains in providerEnvelopes/originalHeaders.
+  if (has(tx, 'blockTimestamp')) need(quantity(tx.blockTimestamp, 'Transaction blockTimestamp', 64) === BigInt(header.timestamp).toString(), 'Transaction blockTimestamp disagrees with its containing header.');
   need(BigInt(n.gas) > 0n && BigInt(n.gas) <= BigInt(header.gasLimit), 'Transaction gas exceeds its containing block or is zero.');
   const type = Number(n.type), legacy = type === 0, dynamic = [2, 3, 4].includes(type);
   for (const k of ['gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas', 'maxFeePerBlobGas', 'chainId', 'v', 'yParity']) if (has(tx, k)) n[k] = quantity(tx[k], `Transaction ${k}`);
@@ -238,6 +243,7 @@ export function validateCohortCensus(raw) {
       'Optional typed effective gasPrice is validated against fee caps and header baseFee, then omitted from normalized agreement.',
       'Optional header size, totalDifficulty, withdrawals and uncles are shape-validated but excluded from cross-provider header/body agreement. Header hashes still bind withdrawal and transaction roots.',
       'Unknown envelope extensions are preserved and compared as supplied, and make the unsigned projection unsupported.',
+      'Optional blockTimestamp must be a canonical uint64 quantity equal to the containing header timestamp; the redundant helper is omitted only from normalized envelopes.',
       'Empty transaction lists must match the empty trie root; nonempty transaction tries are not reconstructed.',
     ],
     trust: {

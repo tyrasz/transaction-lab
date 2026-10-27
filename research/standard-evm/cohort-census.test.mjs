@@ -86,6 +86,35 @@ test('creation, access-list, blob, authorization, high-gas, large-input and unkn
   assert.equal(out.envelopes[6].providerEnvelopes[0].envelope.futureContext.id, 'unchanged');
 });
 
+test('optional mined blockTimestamp is header-bound, retained raw and normalized across provider omission', () => {
+  const input = bodyFixture([[legacy(), tx(2)], [tx(3)]]);
+  for (const h of input.observations[0].headers.slice(1, 3)) for (const t of h.transactions) t.blockTimestamp = h.timestamp;
+  input.observations[1].headers[1].transactions[1].blockTimestamp = input.observations[1].headers[1].timestamp.toUpperCase().replace('0X', '0x');
+  const before = clone(input), out = validateCohortCensus(input);
+  assert.deepEqual(input, before);
+  assert.ok(out.selected.every(r => r.projection.status === 'projectable'));
+  for (const e of out.envelopes) {
+    assert.deepEqual(e.normalizedEnvelope.extensions, {});
+    assert.equal(Object.hasOwn(e.normalizedEnvelope, 'blockTimestamp'), false);
+    assert.equal(e.providerEnvelopes[0].envelope.blockTimestamp, input.observations[0].headers.find(h => h.hash === e.blockHash).timestamp);
+  }
+  both(input, o => { o.headers[1].transactions[0].futureTimestamp = o.headers[1].timestamp; });
+  const changed = validateCohortCensus(input);
+  assert.deepEqual(changed.selected[0].projection.reasons, ['unrecognized_envelope_fields']);
+  assert.equal(changed.envelopes[0].normalizedEnvelope.extensions.futureTimestamp, input.observations[0].headers[1].timestamp);
+});
+
+test('blockTimestamp contradictions and malformed quantities reject even when both providers agree', () => {
+  for (const value of [null, 0, '0x00', '0x', '0x10000000000000000', '-1', '0x1']) {
+    const input = bodyFixture(); both(input, o => { o.headers[1].transactions[0].blockTimestamp = value; });
+    expectBad(input, /blockTimestamp/);
+  }
+  const input = bodyFixture();
+  both(input, o => { o.headers[1].transactions[0].blockTimestamp = o.headers[1].timestamp; });
+  input.observations[1].headers[1].transactions[0].blockTimestamp = input.observations[1].headers[2].timestamp;
+  expectBad(input, /blockTimestamp disagrees/);
+});
+
 test('selection ranks the full census before unsupported projection and never replaces selected slots', () => {
   const input = bodyFixture([Array.from({ length: 12 }, (_, i) => tx(i + 1, { to: i % 2 ? addr(2) : null })), Array.from({ length: 12 }, (_, i) => tx(i + 13))]);
   const out = validateCohortCensus(input), expected = createCohortSelection({ chainId: 1, census: out.census, seed: input.seed, sampleSize: 16 });
