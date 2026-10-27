@@ -29,6 +29,8 @@ The subsequent [local-reference packet](../../reports/ethereum-local-reference/N
 
 Run `node reports/ethereum-local-reference/supplemental-offline-audit/verify.mjs --verify` from the repository root to reproduce both saved attempts without network or current engine source. The supplemental audit keeps the unavailable RPC outcome distinct from successful execution and excludes only per-input timing from exact comparison.
 
+The [lending reference](../../reports/ethereum-lending-local-reference/NOTES.md) extends the same independent input path to the previously selected Aave supply-with-permit and Morpho Kiln wrapper deposit. Aave demanded 58 proof/code calls for 15 accounts and 28 slots; Morpho demanded 230 for 17 accounts and 196 slots. Both completed before product access and matched execution status, return bytes, committed logs, complete observed changes and gas (189,775 / 1,413,682). Morpho entered 232 frames and executed 218,974 instructions within the frozen limits. All 364 public requests and exact source/dependency bytes are retained. This remains two selected workloads, not a new population denominator or full call-tree equivalence claim.
+
 ## Original HyperEVM input and execution boundaries
 
 `prestate-inputs.js` accepts only a captured pre-execution state, explicitly observed missing account-field completions, the declared call and its selected block. The interface has no provider trace or post-state input. It subtracts calldata-derived intrinsic gas from the declared gas budget using the explicit Cancun call rule. Actual block base fee and the selected synthetic zero-base-fee execution profile remain distinct.
