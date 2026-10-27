@@ -48,7 +48,7 @@ function setBusy(busy, mode) {
   updateQueryMode();
   document.querySelector('.results-panel').setAttribute('aria-busy', String(busy));
   $('run-status').classList.toggle('loading', busy);
-  $('run-status').textContent = busy ? sequenceMode() ? 'Evaluating the calls in order and checking the state after each step. This can take several minutes…' : mode === 'historical_trace' ? 'Retrieving the original execution trace and checking available historical balance evidence…' : ethereumMode() ? manualQueries() ? 'Running the unsigned call, checking the manual token list and measuring selected ETH accounts. This can take a few minutes…' : 'Running the unsigned call and measuring selected ETH accounts, token balances and allowances. This can take a few minutes…' : 'Pinning the block, executing the call, and decoding token events…' : '';
+  $('run-status').textContent = busy ? sequenceMode() ? 'Evaluating the calls in order and checking the state after each step. This can take several minutes…' : mode === 'historical_trace' ? 'Retrieving the original execution trace and checking available historical balance evidence…' : ethereumMode() ? manualQueries() ? 'Running the unsigned call, checking the manual query list and measuring selected ETH accounts. This can take a few minutes…' : 'Running the unsigned call and measuring selected ETH accounts, token balances and allowances. This can take a few minutes…' : 'Pinning the block, executing the call, and decoding token events…' : '';
 }
 
 function clearResult({ inputsChanged = false } = {}) {
@@ -104,14 +104,14 @@ function renderSequenceEditor() {
       controls[key] = input; wrapper.append(caption, input); return wrapper;
     }
     card.append(field('to', 'Contract / recipient'), field('data', 'Calldata', true), field('value', 'Value · wei'));
-    const advanced = node('details', 'query-settings'), summary = node('summary', '', 'Advanced: token checks');
+    const advanced = node('details', 'query-settings'), summary = node('summary', '', 'Advanced: token & position checks');
     const choice = node('label', 'manual-query-choice'), manual = node('input');
     manual.type = 'checkbox'; manual.checked = draft.manual; manual.id = `sequence-${draft.key}-manual`;
     choice.htmlFor = manual.id; choice.append(manual, document.createTextNode('Use a manual query list'));
     const manualFields = node('div'), queryLabel = node('label', '', 'Query list · JSON'), queries = node('textarea', 'mono');
     queries.id = `sequence-${draft.key}-queries`; queries.rows = 5; queries.spellcheck = false; queries.value = draft.queriesText;
     queryLabel.htmlFor = queries.id; manual.setAttribute('aria-controls', `sequence-${draft.key}-manual-fields`); manualFields.id = `sequence-${draft.key}-manual-fields`;
-    manualFields.append(node('p', 'field-help', 'One to eight token balanceOf or allowance calls, each with to and data. ETH account checks stay automatic.'), queryLabel, queries);
+    manualFields.append(node('p', 'field-help', 'One to eight token or position queries combined. ETH account checks stay automatic.'), queryLabel, queries, positionQueryHelp());
     advanced.append(summary, choice, manualFields); card.append(advanced);
     Object.assign(controls, { manual, manualFields, queries, advanced });
     manual.addEventListener('change', () => { draft.manual = manual.checked; queries.setCustomValidity(''); updateSequenceControls(); clearResult({ inputsChanged: true }); });
@@ -149,7 +149,7 @@ function updateSequenceControls() {
     row.remove.disabled = locked || state.sequenceControls.length <= 2;
   }
   $('add-sequence-call').disabled = locked || state.sequenceControls.length >= 4;
-  $('sequence-call-count').textContent = `${state.sequenceControls.length} of 4 calls · minimum 2. Each step has its own token and ETH account checks.`;
+  $('sequence-call-count').textContent = `${state.sequenceControls.length} of 4 calls · minimum 2. Each step has its own checks; position queries require an explicit manual entry.`;
 }
 
 function selectExample({ initial = false } = {}) {
@@ -192,8 +192,8 @@ function updateQueryMode() {
   $('standard-queries').disabled = state.busy || !manual;
   $('standard-manual-queries').disabled = state.busy || !standard || sequence;
   $('standard-checks-help').hidden = !standard;
-  $('standard-checks-help').textContent = sequence ? 'Each step checks up to eight observed ETH accounts and eight token queries. Before and after refer to that step, not the entire sequence.' : manual
-    ? 'Your manual list controls token checks. Up to eight observed ETH accounts are still selected automatically; network fees are excluded.'
+  $('standard-checks-help').textContent = sequence ? 'Each step checks up to eight observed ETH accounts and eight queries. Automatic queries cover tokens only; position checks require a manual entry. Before and after refer to that step, not the entire sequence.' : manual
+    ? 'Your manual list controls token and position checks, up to eight combined. Up to eight observed ETH accounts are still selected automatically; network fees are excluded.'
     : 'Automatically check up to eight observed ETH accounts and eight token balance or allowance queries. Other changes may be missed; network fees are excluded.';
   if (!manual) $('standard-queries').setCustomValidity('');
   updateSequenceControls();
@@ -229,16 +229,37 @@ function selectNetwork({ initial = false } = {}) {
   setBusy(false);
 }
 
+function positionQueryHelp() {
+  const details = node('details', 'position-query-help');
+  details.append(node('summary', '', 'Query formats'));
+  details.append(node('p', 'field-help', 'Use one of these formats for each entry. Replace the placeholders with full addresses; marketId is a 32-byte hex value. The network comes from the form.'));
+  details.append(node('pre', '', [
+    '{"to":"<token address>","data":"<balanceOf or allowance calldata>"}',
+    '{"kind":"aave_v3_user_account_data","contract":"<pool address>","user":"<account address>"}',
+    '{"kind":"morpho_blue_position","contract":"<Morpho address>","user":"<account address>","marketId":"<0x + 64 hex digits>"}',
+  ].join('\n\n')));
+  details.append(node('p', 'field-help', 'Position results are raw contract values. A matching query format does not verify the contract’s identity.'));
+  return details;
+}
+
 function readStandardQueries(text = $('standard-queries').value) {
   let queries;
   try { queries = JSON.parse(text); }
-  catch { throw new Error('Enter a valid JSON query list in Advanced: balances & allowances to check.'); }
-  if (!Array.isArray(queries) || queries.length < 1 || queries.length > 8) throw new Error('Add between one and eight balance or allowance queries.');
+  catch { throw new Error('Enter a valid JSON query list in Advanced: token & position checks.'); }
+  if (!Array.isArray(queries) || queries.length < 1 || queries.length > 8) throw new Error('Add between one and eight token or position queries combined.');
   for (const query of queries) {
-    if (!query || typeof query !== 'object' || Array.isArray(query) || Object.keys(query).sort().join() !== 'data,to'
-      || typeof query.to !== 'string' || !/^0x[0-9a-f]{40}$/i.test(query.to)
+    const address = value => typeof value === 'string' && /^0x[0-9a-f]{40}$/i.test(value);
+    if (!query || typeof query !== 'object' || Array.isArray(query)) throw new Error('Each query must be a JSON object in one of the listed formats.');
+    const keys = Object.keys(query).sort().join();
+    if (query.kind === 'aave_v3_user_account_data' || query.kind === 'morpho_blue_position') {
+      const morpho = query.kind === 'morpho_blue_position';
+      if (keys !== (morpho ? 'contract,kind,marketId,user' : 'contract,kind,user') || !address(query.contract) || !address(query.user)
+        || (morpho && (typeof query.marketId !== 'string' || !/^0x[0-9a-f]{64}$/i.test(query.marketId)))) {
+        throw new Error('Position queries need only kind, contract and user, plus a full 32-byte marketId for Morpho. Extra fields are not accepted.');
+      }
+    } else if (keys !== 'data,to' || !address(query.to)
       || typeof query.data !== 'string' || !/^0x(?:70a082310{24}[0-9a-f]{40}|dd62ed3e0{24}[0-9a-f]{40}0{24}[0-9a-f]{40})$/i.test(query.data)) {
-      throw new Error('Each query must contain only a token address (to) and a complete balanceOf or allowance call (data).');
+      throw new Error('Use a listed position kind, or a token query containing only to and complete balanceOf or allowance calldata in data.');
     }
   }
   return queries;
@@ -857,6 +878,86 @@ function renderStandardQuery(query, sender) {
   return article;
 }
 
+function standardPositionMeasured(position) {
+  const fields = position.kind === 'aave_v3_user_account_data'
+    ? [['totalCollateralBase', 256], ['totalDebtBase', 256], ['availableBorrowsBase', 256], ['currentLiquidationThreshold', 256], ['ltv', 256], ['healthFactor', 256]]
+    : position.kind === 'morpho_blue_position' ? [['supplyShares', 256], ['borrowShares', 128], ['collateral', 128]] : [];
+  if (position.status !== 'measured' || !fields.length || !Array.isArray(position.rows) || position.rows.length !== fields.length) return false;
+  return fields.every(([name, bits], index) => {
+    const row = position.rows[index], valid = value => typeof value === 'string' && /^(?:0|[1-9][0-9]{0,77})$/.test(value) && BigInt(value) < (1n << BigInt(bits));
+    return row?.name === name && row.abiType === `uint${bits}` && valid(row.beforeRaw) && valid(row.afterRaw)
+      && typeof row.deltaRaw === 'string' && /^(?:0|-?[1-9][0-9]{0,77})$/.test(row.deltaRaw)
+      && BigInt(row.deltaRaw) === BigInt(row.afterRaw) - BigInt(row.beforeRaw);
+  });
+}
+
+function standardPositionViews(result) {
+  return (Array.isArray(result.preview?.positions) ? result.preview.positions : []).map(position => {
+    if (result.canonicalStatus === 'verified' && result.execution?.status === 'success') return position;
+    const view = { ...position, status: 'unavailable', reason: 'The execution or block context was not verified. Position values are withheld.' };
+    delete view.rows; return view;
+  });
+}
+
+function positionUnitLabel(unit) {
+  const labels = {
+    oracle_base_units: 'Oracle base units · currency and scale not verified',
+    basis_points: 'Basis points', ratio: 'Ratio',
+    supply_shares: 'Supply shares · not converted to assets',
+    borrow_shares: 'Borrow shares · not converted to assets',
+    collateral_token_raw_units: 'Collateral token raw units · token and scale not verified',
+  };
+  const label = labels[unit?.kind] || 'Raw units · scale not verified';
+  return `${label}${typeof unit?.scale === 'string' && /^[1-9][0-9]{0,77}$/.test(unit.scale) ? ` · scale ${unit.scale}` : ''}`;
+}
+
+function renderStandardPosition(position, sender) {
+  const measured = standardPositionMeasured(position);
+  const title = position.kind === 'aave_v3_user_account_data' ? 'Aave account data'
+    : position.kind === 'morpho_blue_position' ? 'Morpho market position' : 'Position query';
+  const article = node('article', `standard-query-card standard-position-card${measured ? '' : ' query-unavailable'}`);
+  const heading = node('div', 'permission-heading');
+  heading.append(node('h4', '', title), node('span', `query-status ${measured ? 'measured' : 'unavailable'}`, measured ? 'Measured raw values' : position.status === 'not_applicable' ? 'Not applied' : 'Unavailable'));
+  const details = node('dl', 'permission-details');
+  if (Number.isSafeInteger(position.index) && position.index >= 0) addDefinition(details, 'Manual query', position.index + 1);
+  addDefinition(details, 'Network', position.chainId === '1' || position.chainId === 1 ? 'Ethereum · chain 1' : position.chainId);
+  addDefinition(details, 'Contract', position.contract); addDefinition(details, 'User', position.user);
+  if (typeof sender === 'string' && typeof position.user === 'string' && sender.toLowerCase() === position.user.toLowerCase()) addDefinition(details, 'User role', 'Transaction sender');
+  addDefinition(details, 'Market ID', position.marketId);
+  article.append(heading, details, node('p', 'query-reference', 'Explicit query. Contract identity is not verified; units follow the reference interface.'));
+  if (measured) {
+    const table = node('table', 'measurement-table position-measurement-table'), head = node('thead'), columns = node('tr'), body = node('tbody');
+    const labels = state.renderStep ? ['Field / units', `Before step ${state.renderStep}`, `After step ${state.renderStep}`, `Step ${state.renderStep} change`] : ['Field / units', 'Before', 'After', 'Change'];
+    for (const label of labels) { const th = node('th', '', label); th.scope = 'col'; columns.append(th); }
+    head.append(columns);
+    for (const row of position.rows) {
+      const tr = node('tr'), field = node('th'); field.scope = 'row';
+      field.append(node('span', 'position-field-name', row.name), node('span', 'position-unit', `${row.abiType} · ${positionUnitLabel(row.unit)}`)); tr.append(field);
+      for (const name of ['beforeRaw', 'afterRaw', 'deltaRaw']) { const cell = node('td'); cell.append(node('strong', '', row[name])); tr.append(cell); }
+      body.append(tr);
+    }
+    table.append(node('caption', 'sr-only', `${title} raw before, after and change for ${position.user}`), head, body); article.append(table);
+  } else article.append(node('p', 'query-note', position.status === 'measured'
+    ? 'The returned position values are inconsistent or incomplete and are withheld.'
+    : position.reason || 'This position was not measured. Missing values are not zero.'));
+  const limits = node('details', 'permission-limits'); limits.append(node('summary', '', 'Units & measurement limits'));
+  const list = node('ul');
+  list.append(node('li', '', 'Values are raw integers. No totals, asset conversion, currency valuation or account-health interpretation is applied.'));
+  for (const limitation of Array.isArray(position.limitations) ? position.limitations : []) list.append(node('li', '', display(limitation)));
+  limits.append(list);
+  if (Array.isArray(position.references)) {
+    const references = node('ul');
+    for (const value of position.references) {
+      try {
+        const url = new URL(value); if (url.protocol !== 'https:') continue;
+        const item = node('li'), link = node('a', '', url.hostname + url.pathname); link.href = url.href; link.target = '_blank'; link.rel = 'noopener noreferrer'; item.append(link); references.append(item);
+      } catch {}
+    }
+    if (references.children.length) limits.append(references);
+  }
+  article.append(limits); return article;
+}
+
 function renderStandardNativeBalance(balance, sender) {
   const measured = standardMeasured(balance);
   const article = node('article', `standard-query-card${measured ? '' : ' query-unavailable'}`);
@@ -998,6 +1099,7 @@ function renderStandardResult(result, sequenceContext = null) {
   const execution = result.execution || {};
   const queries = Array.isArray(result.preview?.queries) ? result.preview.queries : [];
   const measured = queries.filter(standardMeasured).length;
+  const positions = standardPositionViews(result), positionsMeasured = positions.filter(standardPositionMeasured).length;
   const nativeRows = Array.isArray(result.preview?.nativeBalances) ? result.preview.nativeBalances : [];
   const nativeMeasured = nativeRows.filter(standardMeasured).length;
   const nativeSelected = nativeSelectionCount(result.nativeEffects, nativeRows);
@@ -1010,8 +1112,8 @@ function renderStandardResult(result, sequenceContext = null) {
   $('execution-status').textContent = execution.status === 'success' ? 'Completed' : execution.status === 'reverted_or_failed' ? 'Failed / reverted' : 'Unavailable';
   $('execution-status').className = execution.status === 'success' ? 'success' : execution.status === 'reverted_or_failed' ? 'failed' : 'partial';
   $('gas-used').textContent = execution.gasUsed ? `${numberLabel(execution.gasUsed)} gas used · fees not estimated` : 'Gas usage unavailable';
-  $('coverage-status').textContent = `ETH ${nativeSelected === null ? '—' : `${nativeMeasured}/${nativeSelected}`} · tokens ${tokenSelectionKnown ? `${measured}/${queries.length}` : '—'}`;
-  $('coverage-status').className = `combined-coverage ${tokenSelectionKnown && nativeSelected !== null && nativeMeasured + measured > 0 && nativeMeasured === nativeSelected && measured === queries.length ? 'success' : 'partial'}`;
+  $('coverage-status').textContent = `ETH ${nativeSelected === null ? '—' : `${nativeMeasured}/${nativeSelected}`} · tokens ${tokenSelectionKnown ? `${measured}/${queries.length}` : '—'}${positions.length ? ` · positions ${positionsMeasured}/${positions.length}` : ''}`;
+  $('coverage-status').className = `combined-coverage ${tokenSelectionKnown && nativeSelected !== null && nativeMeasured + measured + positionsMeasured > 0 && nativeMeasured === nativeSelected && measured === queries.length && positionsMeasured === positions.length ? 'success' : 'partial'}`;
   $('coverage-detail').textContent = 'Measured / selected · network fees excluded';
   renderStandardNative(result.nativeEffects, nativeRows, sender);
   renderDiscovery(result.discovery, queries);
@@ -1039,6 +1141,9 @@ function renderStandardResult(result, sequenceContext = null) {
     $(`standard-${group}-count`).textContent = `${rows.filter(standardMeasured).length} / ${rows.length} measured`;
     $(`standard-${group}`).replaceChildren(...rows.map(query => renderStandardQuery(query, sender)));
   }
+  $('standard-positions-section').hidden = positions.length === 0;
+  $('standard-positions-count').textContent = `${positionsMeasured} / ${positions.length} measured`;
+  $('standard-positions').replaceChildren(...positions.map(position => renderStandardPosition(position, sender)));
   $('standard-metadata-note').textContent = queries.length ? 'Amounts are exact token quantities, not prices or dollar valuations. Other accounts, tokens, debts, and permissions may not be included.' : 'No token balance or allowance measurements were returned. ETH checks are shown separately. Missing measurements are not zero balances.';
   const warnings = [...new Set((result.preview?.warnings?.length ? result.preview.warnings : [
     'Only the listed balances and allowances are checked. Other changes may be omitted.',
@@ -1057,7 +1162,7 @@ function renderStandardResult(result, sequenceContext = null) {
   const nativeValue = result.apiRequest?.value;
   addDefinition(details, 'Native value', typeof nativeValue === 'string' && /^(?:0|[1-9][0-9]*)$/.test(nativeValue) ? `${nativeValue} wei` : 'Not available');
   addDefinition(details, 'Network fees', 'Not estimated');
-  addDefinition(details, 'Measurement method', result.executionIdentity ? 'Separate selected ETH balance and token checks before and after applying the call’s full state changes' : 'Measurement context not established');
+  addDefinition(details, 'Measurement method', result.executionIdentity ? `Separate selected ETH balance, token${positions.length ? ' and explicit position' : ''} checks before and after applying the call’s full state changes` : 'Measurement context not established');
   addDefinition(details, 'Run ID', result.id || sequenceContext?.sequence.id);
   const elapsed = result.timing?.totalMs ?? sequenceContext?.sequence.timing?.totalMs;
   $('timing').textContent = elapsed !== undefined ? `${(elapsed / 1000).toFixed(2)}s ${sequenceContext ? 'sequence total' : 'total'}` : '';
@@ -1075,6 +1180,9 @@ function sequenceStepView(sequence, step) {
   for (const row of [...(result.preview?.queries || []), ...(result.preview?.nativeBalances || [])]) {
     row.status = 'unavailable'; row.reason = reason;
     for (const key of ['before', 'after', 'delta', 'beforeRaw', 'afterRaw', 'deltaRaw']) delete row[key];
+  }
+  for (const position of result.preview?.positions || []) {
+    position.status = 'unavailable'; position.reason = reason; delete position.rows;
   }
   if (result.nativeEffects) { result.nativeEffects.status = 'unavailable'; result.nativeEffects.reason = reason; if (result.nativeEffects.counts) result.nativeEffects.counts.measured = 0; }
   return result;
@@ -1122,11 +1230,12 @@ function renderSequenceResult(result) {
     const view = sequenceStepView(result, step);
     if (view) {
       const queries = Array.isArray(view.preview?.queries) ? view.preview.queries : [];
+      const positions = standardPositionViews(view);
       const nativeRows = Array.isArray(view.preview?.nativeBalances) ? view.preview.nativeBalances : [];
       const nativeSelected = nativeSelectionCount(view.nativeEffects, nativeRows);
       const automatic = view.preview?.scope === 'observed_queried_accounts' || Boolean(view.discovery);
       const tokenSelected = queries.length > 0 || !automatic || ['discovered', 'none'].includes(view.discovery?.status);
-      button.append(node('span', 'sequence-step-counts', `ETH: ${nativeSelected === null ? 'not established' : `${nativeRows.filter(standardMeasured).length}/${nativeSelected} measured`} · token checks: ${tokenSelected ? `${queries.filter(standardMeasured).length}/${queries.length} measured` : 'not established'}`));
+      button.append(node('span', 'sequence-step-counts', `ETH: ${nativeSelected === null ? 'not established' : `${nativeRows.filter(standardMeasured).length}/${nativeSelected} measured`} · token checks: ${tokenSelected ? `${queries.filter(standardMeasured).length}/${queries.length} measured` : 'not established'}${positions.length ? ` · position checks: ${positions.filter(standardPositionMeasured).length}/${positions.length} measured` : ''}`));
       for (const allowance of queries.filter(row => row.kind === 'allowance' && standardMeasured(row))) {
         const metadata = allowance.metadata;
         const amount = field => exactAmount(metadata ? allowance[field] : undefined, allowance[`${field}Raw`], metadata?.symbol);
@@ -1420,5 +1529,6 @@ async function initialize() {
   }
 }
 
+$('standard-query-formats').replaceChildren(positionQueryHelp());
 clearResult();
 initialize();

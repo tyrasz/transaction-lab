@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { isDeepStrictEqual } from 'node:util';
-import { simulateUnsignedCall, simulateUnsignedSequence, normalizeQuery } from '../engines/standard-evm/unsigned-call.js';
+import { simulateUnsignedCall, simulateUnsignedSequence, compileMeasurementQuery } from '../engines/standard-evm/unsigned-call.js';
+import { comparePositionResults } from '../engines/standard-evm/position-queries.js';
 import { InputError } from './validate.js';
 import { RpcError, assertNoProviderErrorResult } from './rpc.js';
 
@@ -207,10 +208,11 @@ export const STANDARD_EXAMPLES = freeze([
 
 export const STANDARD_CAPABILITIES = freeze({
   chainId: 1, name: 'Ethereum', status: 'experimental',
-  operation: 'unsigned_call_with_ERC20_queries_and_native_balances',
+  operation: 'unsigned_call_with_token_position_and_native_measurements',
   querySelection: ['automatic_from_observed_trace', 'explicit'],
   blockSelection: ['latest', 'canonical_hex_number', 'block_hash'],
-  queryTypes: ['balanceOf', 'allowance'],
+  queryTypes: ['balanceOf', 'allowance', 'aave_v3_user_account_data', 'morpho_blue_position'],
+  positionSelection: 'explicit_only',
   limits: { queries: 8, nativeAccounts: 8, calldataBytes: 32768, gas: 5000000, engineRpcCalls: 64, blockSelectionRpcCalls: 1, totalRpcCalls: 65 },
   profile: 'unsigned_unpriced_block_end',
   limitations: [
@@ -220,6 +222,7 @@ export const STANDARD_CAPABILITIES = freeze({
     'Historical block-end state is not the original transaction position.',
     'Token labels and decimals are historical reference metadata, not verified again for the requested state.',
     'Provider codeHash consistency is not independent state or source-code attestation.',
+    'Position queries use declared contract, user and market identities. Raw fields do not establish deployment identity, asset value or account health.',
     'No security verdict or comparative detection score is produced.',
   ],
 });
@@ -294,16 +297,17 @@ export function validateStandardSimulation(input) {
   const block = input.block === undefined ? 'latest' : input.block;
   if (typeof block !== 'string' || !(block === 'latest' || NUMBER.test(block) || HASH.test(block))) throw new InputError('block must be latest, a canonical hexadecimal block number, or a 32-byte block hash.');
   if (!Object.hasOwn(input, 'queries')) return { chainId: 1, from, to, data: input.data.toLowerCase(), value, block: block.toLowerCase() };
-  if (!Array.isArray(input.queries) || input.queries.length < 1 || input.queries.length > 8) throw new InputError('Omit queries for automatic selection, or supply between one and eight explicit balanceOf or allowance queries.');
+  if (!Array.isArray(input.queries) || input.queries.length < 1 || input.queries.length > 8) throw new InputError('Omit queries for automatic token selection, or supply between one and eight explicit token or position queries.');
   const seen = new Set(), queries = [];
   for (const query of input.queries) {
-    fields(query, ['to', 'data'], 'query');
-    let normalized;
-    try { normalized = normalizeQuery(query); }
-    catch { throw new InputError('Each query must contain only to and canonical balanceOf(address) or allowance(address,address) calldata.'); }
-    const key = normalized.to + normalized.data;
+    fields(query, ['to', 'data', 'kind', 'contract', 'user', 'marketId'], 'query');
+    let compiled;
+    try { compiled = compileMeasurementQuery(query, 1); }
+    catch { throw new InputError('Each query must be a canonical token call or a typed Aave account-data or Morpho Blue position declaration.'); }
+    const key = compiled.query.to + compiled.query.data;
     if (seen.has(key)) throw new InputError('Duplicate queries are not supported.');
-    seen.add(key); queries.push(normalized);
+    if (compiled.query.to === RESERVED_WITNESS) throw new InputError('Query target overlaps the reserved execution witness.');
+    seen.add(key); queries.push(compiled.descriptor);
   }
   return { chainId: 1, from, to, data: input.data.toLowerCase(), value, block: block.toLowerCase(), queries };
 }
@@ -315,7 +319,7 @@ export function validateStandardSequence(input) {
   const calls = Array.from(input.calls, call => {
     fields(call, ['to', 'data', 'value', 'queries'], 'sequence call');
     const normalized = validateStandardSimulation({ ...call, chainId: input.chainId, from: input.from, ...(Object.hasOwn(input, 'block') ? { block: input.block } : {}) });
-    if (normalized.from === RESERVED_WITNESS || normalized.to === RESERVED_WITNESS || normalized.queries?.some(query => query.to === RESERVED_WITNESS)) throw new InputError('Sequence inputs overlap the reserved execution witness.');
+    if (normalized.from === RESERVED_WITNESS || normalized.to === RESERVED_WITNESS || normalized.queries?.some(query => compileMeasurementQuery(query, normalized.chainId).query.to === RESERVED_WITNESS)) throw new InputError('Sequence inputs overlap the reserved execution witness.');
     const { chainId, from, block, ...step } = normalized;
     shared = { chainId, from, block };
     return step;
@@ -355,13 +359,42 @@ function nativePreview(input, result) {
     return entry;
   });
 }
+function positionPreview(input, descriptor, measurement, index, result) {
+  const compiled = compileMeasurementQuery(descriptor, input.chainId);
+  const { identity, signature, returnBytes } = compiled.position;
+  const entry = { index, ...identity, userIsSender: identity.user === input.from,
+    signature, returnBytes, query: compiled.query, contractIdentityVerified: false,
+    status: measurement?.status ?? 'unavailable' };
+  if (!measurement || !isDeepStrictEqual(measurement.query, compiled.query) || !isDeepStrictEqual(measurement.position, compiled.position)) {
+    return { ...entry, status: 'unavailable', reason: 'The measurement does not match the declared position query.' };
+  }
+  if (measurement.reason) entry.reason = measurement.reason;
+  if (measurement.status !== 'measured') return entry;
+  try {
+    if (result.canonicalStatus !== 'verified' || result.execution?.status !== 'success'
+      || measurement.contractIdentityVerified !== false
+      || measurement.basis !== 'isolated_traced_ABI_queries_with_nonce_only_effects') throw new Error();
+    const decoded = comparePositionResults({ request: identity, before: measurement.beforeReturnData, after: measurement.afterReturnData });
+    if (!isDeepStrictEqual(measurement.rows, decoded.rows)) throw new Error();
+    Object.assign(entry, { rows: structuredClone(decoded.rows), basis: measurement.basis,
+      queryEvidence: structuredClone(measurement.queryEvidence ?? []),
+      unitBasis: decoded.unitBasis, references: decoded.references,
+      limitations: decoded.limitations.slice(1) });
+  } catch {
+    return { ...entry, status: 'unavailable', reason: 'The position measurement is malformed, inconsistent or has unverified execution context.' };
+  }
+  return entry;
+}
+
 export function projectStandardPreview(input, result) {
   const automatic = input.queries === undefined;
   const queries = automatic ? result.request?.queries ?? [] : input.queries;
   const warnings = [...STANDARD_CAPABILITIES.limitations];
   if (automatic) warnings[0] = 'Queries selected from bounded observed token calls and events only; silent, ambiguous, unselected and other economic effects may be omitted.';
-  return { scope: automatic ? 'observed_queried_accounts' : 'explicit_queried_accounts', warnings, nativeBalances: nativePreview(input, result), queries: queries.map((query, index) => {
+  const positions = [];
+  const tokenRows = queries.map((query, index) => {
     const measurement = result.measurements[index];
+    if (query.kind !== undefined) { positions.push(positionPreview(input, query, measurement, index, result)); return null; }
     const metadata = METADATA[query.to] ? structuredClone(METADATA[query.to]) : null;
     const entry = { index, ...queryIdentity(query, input.from), metadata, status: measurement?.status ?? 'unavailable' };
     if (!measurement || measurement.query?.to !== query.to || measurement.query?.data !== query.data) return { ...entry, status: 'unavailable', reason: 'The measurement does not match the requested token query.' };
@@ -373,7 +406,9 @@ export function projectStandardPreview(input, result) {
       }
     }
     return entry;
-  }) };
+  }).filter(Boolean);
+  return { scope: automatic ? 'observed_queried_accounts' : 'explicit_queried_accounts', warnings,
+    nativeBalances: nativePreview(input, result), queries: tokenRows, ...(positions.length ? { positions } : {}) };
 }
 
 /** rpc is supplied by the server's bounded fixed-provider transport. Hash

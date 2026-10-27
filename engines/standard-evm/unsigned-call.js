@@ -10,6 +10,7 @@ import { assertNoProviderErrorResult } from '../../src/rpc.js';
 import { discoverTokenQueries } from './discovery.js';
 import { collectNativeEffects } from './native-effects.js';
 import { composeSequenceOverrides } from './sequence-state.js';
+import { encodePositionQuery, decodePositionResult, comparePositionResults, PositionQueryError } from './position-queries.js';
 
 const ADDRESS=/^0x[0-9a-f]{40}$/i, WORD=/^0x[0-9a-f]{64}$/i, BYTES=/^0x(?:[0-9a-f]{2})*$/i;
 const BALANCE=/^0x70a082310{24}[0-9a-f]{40}$/i, ALLOWANCE=/^0xdd62ed3e0{24}[0-9a-f]{40}0{24}[0-9a-f]{40}$/i;
@@ -26,7 +27,7 @@ const continuations = new WeakMap();
 export const SEQUENCE_LIMITS=Object.freeze({minCalls:2,maxCalls:4,rpc:257,responseBytes:8*1024*1024,evidenceBytes:128*1024*1024,wallMs:240000});
 class ValidationError extends Error {}
 const need=(condition,message)=>{if(!condition)throw new ValidationError(message);};
-const publicError=e=>e instanceof ValidationError||e instanceof StateValidationError?e.message:'The provider did not complete a valid bounded read-only request.';
+const publicError=e=>e instanceof ValidationError||e instanceof StateValidationError?e.message:e instanceof PositionQueryError?'The declared position query or its returned ABI words are invalid.':'The provider did not complete a valid bounded read-only request.';
 const tracer=diff=>({tracer:diff?'prestateTracer':'callTracer',timeout:'15s',tracerConfig:diff?{diffMode:true}:{withLog:true}});
 const failed=frame=>Boolean(frame.error||frame.revertReason);
 const visit=(frame,fn)=>{fn(frame);for(const child of frame.calls)visit(child,fn);};
@@ -41,6 +42,27 @@ function header(raw){
 export function normalizeQuery(query){
   need(record(query)&&Object.keys(query).sort().join()==='data,to'&&isAddress(query.to)&&typeof query.data==='string'&&(BALANCE.test(query.data)||ALLOWANCE.test(query.data)),'Only canonical ERC-20 balanceOf and allowance queries are supported.');
   return {to:lower(query.to),data:lower(query.data)};
+}
+/** The legacy raw ERC-20 form is unchanged. Typed descriptors declare an ABI,
+ * not a verified protocol deployment; chain identity comes only from the call. */
+export function normalizeMeasurementQuery(query,chainId){
+  if(!record(query)||!Object.hasOwn(query,'kind'))return normalizeQuery(query);
+  for(const key of Reflect.ownKeys(query)){
+    const descriptor=Object.getOwnPropertyDescriptor(query,key);
+    need(typeof key==='string'&&['kind','contract','user','marketId'].includes(key)&&descriptor.enumerable&&Object.hasOwn(descriptor,'value'),'Unsupported typed position-query field.');
+  }
+  const {identity}=encodePositionQuery({...query,chainId});
+  return {kind:identity.kind,contract:identity.contract,user:identity.user,...(identity.marketId===undefined?{}:{marketId:identity.marketId})};
+}
+export function compileMeasurementQuery(query,chainId){
+  const descriptor=normalizeMeasurementQuery(query,chainId);
+  if(!Object.hasOwn(descriptor,'kind'))return {descriptor,query:{...descriptor}};
+  const {identity,query:compiled,signature,returnBytes}=encodePositionQuery({...descriptor,chainId});
+  return {descriptor,query:compiled,position:{identity,signature,returnBytes}};
+}
+const newMeasurement=compiled=>({query:structuredClone(compiled.query),status:'unavailable',reason:'Not reached.',...(compiled.position?{position:structuredClone(compiled.position),contractIdentityVerified:false}:{})});
+function clearMeasurementAmounts(entry){
+  for(const field of ['beforeRaw','afterRaw','deltaRaw','basis','beforeReturnData','afterReturnData','rows'])delete entry[field];
 }
 function bindTrace(raw,call){
   const stack=[{frame:raw,depth:0}];let count=0;
@@ -60,8 +82,9 @@ function bindTrace(raw,call){
 }
 /** These checks establish observed query behavior, not honest token economics,
  * source attestation, complete asset discovery or a maliciousness verdict. */
-export function validateQueryTrace(raw,call){
-  const root=bindTrace(raw,call);need(WORD.test(root.output),'Query did not return exactly one uint256 word.');
+function validateReadTrace(raw,call,returnBytes){
+  const root=bindTrace(raw,call);
+  need(isBytes(root.output)&&root.output.length===2+returnBytes*2,returnBytes===32?'Query did not return exactly one uint256 word.':'Position query did not return its exact declared static ABI tuple.');
   function check(frame,context,depth){
     need(!failed(frame)&&frame.value==='0'&&frame.logs.length===0,'Query trace has a failure, native transfer or event.');
     if(depth)need(['STATICCALL','DELEGATECALL'].includes(frame.type),'Query descendants must use STATICCALL or DELEGATECALL.');
@@ -71,7 +94,16 @@ export function validateQueryTrace(raw,call){
       check(child,child.type==='DELEGATECALL'?context:child.to,depth+1);
     }
   }
-  check(root,root.to,0);return {amountRaw:BigInt(root.output).toString(),gasUsed:root.gasUsed};
+  check(root,root.to,0);return root;
+}
+export function validateQueryTrace(raw,call){
+  const root=validateReadTrace(raw,call,32);return {amountRaw:BigInt(root.output).toString(),gasUsed:root.gasUsed};
+}
+function validatePositionTrace(raw,call,position){
+  const root=validateReadTrace(raw,call,position.returnBytes);
+  const decoded=decodePositionResult(position.identity,root.output);
+  need(isDeepStrictEqual(decoded.query,{to:call.to,data:call.data})&&isDeepStrictEqual(decoded.identity,position.identity),'Position query identity differs from the compiled call.');
+  return root.output;
 }
 export function validateQueryDiff(raw,{sender,nonce,balance}){
   need(isAddress(sender)&&typeof nonce==='bigint'&&nonce>=0n&&nonce<MAX_NONCE&&typeof balance==='bigint'&&balance>=0n&&balance<=MAX,'Explicit independently read sender state is required.');
@@ -143,10 +175,15 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
     need(quantity(chainId,BigInt(Number.MAX_SAFE_INTEGER))!==null&&BigInt(chainId)>0n&&isWord(blockHash),'A positive chain ID and explicit block hash are required.');
     need(record(request)&&Object.keys(request).sort().join()==='data,from,gas,to,value'&&isAddress(request.from)&&isAddress(request.to)&&typeof request.data==='string'&&request.data.length<=65538&&isBytes(request.data)&&quantity(request.value)!==null&&quantity(request.gas)!==null&&BigInt(request.gas)>21000n&&BigInt(request.gas)<=5000000n,'Unsupported unsigned call envelope.');
     need(automatic||(Array.isArray(queries)&&queries.length>0&&queries.length<=LIMITS.queries),'Between one and eight explicit queries are required.');
-    let normalized=automatic?[]:queries.map(normalizeQuery);need(new Set(normalized.map(q=>q.to+q.data)).size===normalized.length,'Duplicate queries must be removed before execution.');
-    measurements.push(...normalized.map(query=>({query,status:'unavailable',reason:'Not reached.'})));
+    let compiled=automatic?[]:queries.map(query=>compileMeasurementQuery(query,chainId)),normalized=compiled.map(item=>item.descriptor);
+    need(new Set(compiled.map(item=>item.query.to+item.query.data)).size===compiled.length,'Duplicate queries must be removed before execution.');
+    measurements.push(...compiled.map(newMeasurement));
+    if(compiled.some(item=>item.position)){
+      result.schemaVersion='0.4';result.scope.queries='observed_ERC20_queries_and_declared_position_ABI_fields';
+      result.scope.positionContracts='caller_declared_not_authenticated';
+    }
     originalCall={from:lower(request.from),to:lower(request.to),data:lower(request.data),gas:hex(request.gas),value:hex(request.value)};
-    need(originalCall.from!==PROBE&&originalCall.to!==PROBE&&normalized.every(q=>q.to!==PROBE),'Input overlaps the reserved header witness.');
+    need(originalCall.from!==PROBE&&originalCall.to!==PROBE&&compiled.every(item=>item.query.to!==PROBE),'Input overlaps the reserved header witness.');
     pinned={blockHash:lower(blockHash),requireCanonical:true};
     if(previous!==undefined){
       predecessor=record(previous)?continuations.get(previous):undefined;
@@ -168,8 +205,8 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
     const pinnedSenderBalance=balance;balance=startingBasic(originalCall.from,'balance',balance,evidence.length);
     nativeAnchors.set(originalCall.from,{value:balance,pinnedValue:pinnedSenderBalance,evidenceId:evidence.length});
     need(await call('eth_getCode',[originalCall.from,pinned])==='0x','Only code-free senders are supported.');
-    for(const target of new Set([originalCall.to,...normalized.map(q=>q.to)])){
-      const code=await call('eth_getCode',[target,pinned]);need(typeof code==='string'&&BYTES.test(code)&&(code!=='0x'||(target===originalCall.to&&!normalized.some(q=>q.to===target))),'A declared target has no valid runtime code.');targetCodes.set(target,code);
+    for(const target of new Set([originalCall.to,...compiled.map(item=>item.query.to)])){
+      const code=await call('eth_getCode',[target,pinned]);need(typeof code==='string'&&BYTES.test(code)&&(code!=='0x'||(target===originalCall.to&&!compiled.some(item=>item.query.to===target))),'A declared target has no valid runtime code.');targetCodes.set(target,code);
     }
     need(await call('eth_getCode',[PROBE,pinned])==='0x','Reserved header witness address is not code-free.');
     const rawTrace=await call('debug_traceCall',[originalCall,pinned,{...tracer(false),...initialOptions()}]),trace=bindTrace(rawTrace,originalCall);
@@ -183,10 +220,10 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
       if(automatic){
         result.discovery=discoverTokenQueries({request:originalCall,trace:rawTrace,maxQueries:LIMITS.queries});
         need(record(result.discovery)&&Array.isArray(result.discovery.queries)&&result.discovery.queries.length<=LIMITS.queries,'Automatic query selection exceeded its supported bounds.');
-        normalized=result.discovery.queries.map(normalizeQuery);
+        normalized=result.discovery.queries.map(normalizeQuery);compiled=normalized.map(query=>compileMeasurementQuery(query,chainId));
         need(new Set(normalized.map(q=>q.to+q.data)).size===normalized.length&&normalized.every(q=>q.to!==PROBE),'Automatic query selection contains duplicate or reserved targets.');
         result.request.queries=normalized;
-        measurements.push(...normalized.map(query=>({query,status:'unavailable',reason:'Not reached.'})));
+        measurements.push(...compiled.map(newMeasurement));
         // Observed token calls/logs are hypotheses about query targets, not
         // balance measurements. Every selected target still needs pinned code,
         // and each before/after query follows the existing trace/diff checks.
@@ -273,12 +310,16 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
             const queryCall={from:originalCall.from,...entry.query,value:'0x0',gas:'0x493e0'},extra=afterState?{stateOverrides:overrides}:initialOptions();
             const proof={state:afterState?'after':'before',traceEvidenceId:evidence.length+1};entry.queryEvidence.push(proof);
             const qTrace=await call('debug_traceCall',[queryCall,pinned,{...tracer(false),...extra}]);
-            const observed=validateQueryTrace(qTrace,queryCall);
+            const value=entry.position?validatePositionTrace(qTrace,queryCall,entry.position):validateQueryTrace(qTrace,queryCall).amountRaw;
             proof.mutationEvidenceId=evidence.length+1;
             const qDiff=await call('debug_traceCall',[queryCall,pinned,{...tracer(true),...extra}]);
-            validateQueryDiff(qDiff,{sender:originalCall.from,nonce:nonce+(afterState?1n:0n),balance:afterState?postBalance:balance});values.push(observed.amountRaw);
+            validateQueryDiff(qDiff,{sender:originalCall.from,nonce:nonce+(afterState?1n:0n),balance:afterState?postBalance:balance});values.push(value);
           }
-          delete entry.reason;Object.assign(entry,{status:'measured',beforeRaw:values[0],afterRaw:values[1],deltaRaw:(BigInt(values[1])-BigInt(values[0])).toString(),basis:'isolated_traced_ABI_queries_with_nonce_only_effects'});
+          const payload=entry.position?{
+            beforeReturnData:values[0],afterReturnData:values[1],
+            rows:comparePositionResults({request:entry.position.identity,before:values[0],after:values[1]}).rows,
+          }:{beforeRaw:values[0],afterRaw:values[1],deltaRaw:(BigInt(values[1])-BigInt(values[0])).toString()};
+          delete entry.reason;Object.assign(entry,{status:'measured',...payload,basis:'isolated_traced_ABI_queries_with_nonce_only_effects'});
         }catch(error){entry.reason=publicError(error);}
       }
     }
@@ -286,7 +327,7 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
     need(JSON.stringify(confirmed)===JSON.stringify(identity)&&isDeepStrictEqual(confirmedRaw,rawHeader),'Canonical header or block contents changed during simulation.');
     result.canonicalStatus='verified';
   }catch(error){latched=publicError(error);}
-  if(latched){result.measurementFailure=latched;result.canonicalStatus='unverified';result.nativeEffects.status='unavailable';result.nativeEffects.reason=latched;if(result.nativeEffects.counts)result.nativeEffects.counts.measured=0;for(const entry of [...measurements,...result.nativeEffects.measurements]){delete entry.beforeRaw;delete entry.afterRaw;delete entry.deltaRaw;delete entry.basis;Object.assign(entry,{status:'unavailable',reason:latched});}}
+  if(latched){result.measurementFailure=latched;result.canonicalStatus='unverified';result.nativeEffects.status='unavailable';result.nativeEffects.reason=latched;if(result.nativeEffects.counts)result.nativeEffects.counts.measured=0;for(const entry of [...measurements,...result.nativeEffects.measurements]){clearMeasurementAmounts(entry);Object.assign(entry,{status:'unavailable',reason:latched});}}
   result.accounting={rpcCalls:evidence.length,retainedResultBytes:retained,limits:LIMITS};
   if(!latched&&result.execution.status==='success'&&result.canonicalStatus==='verified'&&overrides){
     continuations.set(result,{chainId:BigInt(chainId).toString(),blockHash:pinned.blockHash,sender:originalCall.from,priorCalls:(predecessor?.priorCalls??0)+1,rawHeader:structuredClone(rawHeader),overrides:structuredClone(overrides),resultSha256:sha(result)});
@@ -300,7 +341,7 @@ function invalidateSequenceAmounts(result,reason){
   result.nativeEffects.status='unavailable';result.nativeEffects.reason=reason;
   if(result.nativeEffects.counts)result.nativeEffects.counts.measured=0;
   for(const entry of [...result.measurements,...result.nativeEffects.measurements]){
-    for(const field of ['beforeRaw','afterRaw','deltaRaw','basis'])delete entry[field];
+    clearMeasurementAmounts(entry);
     Object.assign(entry,{status:'unavailable',reason});
   }
 }
@@ -322,8 +363,8 @@ export async function simulateUnsignedSequence({rpc,chainId,blockHash,calls,now=
     need(lower(request.from)!==PROBE&&lower(request.to)!==PROBE,'Input overlaps the reserved header witness.');
     if(input.queries!==undefined){
       need(Array.isArray(input.queries)&&input.queries.length>0&&input.queries.length<=LIMITS.queries,'Between one and eight explicit queries are required.');
-      const queries=input.queries.map(normalizeQuery);
-      need(queries.every(q=>q.to!==PROBE)&&new Set(queries.map(q=>q.to+q.data)).size===queries.length,'Sequence queries contain duplicate or reserved targets.');
+      const queries=input.queries.map(query=>compileMeasurementQuery(query,chainId));
+      need(queries.every(item=>item.query.to!==PROBE)&&new Set(queries.map(item=>item.query.to+item.query.data)).size===queries.length,'Sequence queries contain duplicate or reserved targets.');
     }
     return structuredClone(input);
   });

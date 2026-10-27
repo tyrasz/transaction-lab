@@ -39,7 +39,7 @@ async function expectedImplementation() {
     'src/rpc.js', 'src/state.js', 'src/state-diff.js', 'src/query-validation.js',
     'src/account-effects.js', 'src/affected-balances.js', 'src/allowances.js', 'src/analyze.js', 'src/balances.js', 'src/current-state.js',
     'src/historical-state.js', 'src/lending-balances.js', 'src/lending.js', 'src/permissions.js', 'src/revert.js',
-    'engines/standard-evm/package.json', 'engines/standard-evm/package-lock.json', 'engines/standard-evm/unsigned-call.js', 'engines/standard-evm/provider-state-diff.js', 'engines/standard-evm/discovery.js', 'engines/standard-evm/native-effects.js', 'engines/standard-evm/sequence-state.js',
+    'engines/standard-evm/package.json', 'engines/standard-evm/package-lock.json', 'engines/standard-evm/unsigned-call.js', 'engines/standard-evm/position-queries.js', 'engines/standard-evm/provider-state-diff.js', 'engines/standard-evm/discovery.js', 'engines/standard-evm/native-effects.js', 'engines/standard-evm/sequence-state.js',
     ...['package.json', 'sha3.js', '_u64.js', 'utils.js'].map(name => 'engines/standard-evm/node_modules/@noble/hashes/' + name),
   ].sort();
   const hash = createHash('sha256');
@@ -62,7 +62,7 @@ test('configuration exposes experimental Ethereum separately and binds its compl
   assert.deepEqual(api.implementation, await expectedImplementation());
   assert.equal(await loadStandardApi(), api, 'The loaded implementation identity is stable for this process.');
   assert.ok(api.implementation.sourceFiles.includes('src/standard-rpc.js'));
-  assert.equal(api.implementation.sourceFiles.length, 33);
+  assert.equal(api.implementation.sourceFiles.length, 34);
   assert.ok(api.implementation.sourceFiles.includes('src/analyze.js'), 'Transitive server imports belong to the standard API identity.');
   assert.ok(api.implementation.sourceFiles.includes('src/historical-state.js'));
   assert.ok(api.implementation.sourceFiles.includes('engines/standard-evm/unsigned-call.js'));
