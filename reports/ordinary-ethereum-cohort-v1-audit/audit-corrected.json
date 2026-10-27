@@ -1,0 +1,671 @@
+{
+  "schemaVersion": "1.0",
+  "createdAt": "2026-10-27T11:30:17.282Z",
+  "basis": "Offline audit of sealed pilot; original files and frozen projection unchanged",
+  "sourceArtifacts": {
+    "evidence-manifest.json": {
+      "bytes": 45036,
+      "sha256": "fdb96c50015b6854f63d28d1d84dd715b36db19146d04086aa824ce55edbf50b"
+    },
+    "source-manifest.json": {
+      "bytes": 582559,
+      "sha256": "ff2a3423955e67ebe1ab9f5a9273c77ae27b69b555a6a49aaa4482525adb7c9e"
+    },
+    "plan.json": {
+      "bytes": 144800,
+      "sha256": "15562308f7062868166a80e6c7bbdcff7d3b27660238ea977ff91676e6bc6d0c"
+    },
+    "selection.json": {
+      "bytes": 21750288,
+      "sha256": "d09b465370f7011a27bf49e7a5355a84ffb326c91dba926cfecfb1d5f6e693d6"
+    },
+    "results.json": {
+      "bytes": 237510,
+      "sha256": "c494dd75916f7455ad1e419cd2a694208ed5cfd19e94f2d14cc1079399752d96"
+    }
+  },
+  "offlineVerification": {
+    "status": "verified",
+    "reportStatus": "complete",
+    "selectionStatus": "complete",
+    "expectedManifestSha256": "fdb96c50015b6854f63d28d1d84dd715b36db19146d04086aa824ce55edbf50b",
+    "sourceManifestSha256": "ff2a3423955e67ebe1ab9f5a9273c77ae27b69b555a6a49aaa4482525adb7c9e",
+    "planSha256": "15562308f7062868166a80e6c7bbdcff7d3b27660238ea977ff91676e6bc6d0c",
+    "filesVerified": 294,
+    "sourceFilesVerified": 1777,
+    "wiresVerified": 68,
+    "proofChecks": 0,
+    "censusTransactions": 436,
+    "selectedTransactions": 16,
+    "outcomesRecomputed": true,
+    "unboundWireRecords": 0,
+    "unattributedWireRecords": 0,
+    "phaseDeclaredOnlyWireRecords": 0,
+    "independentlyJoinedWireRecords": 68,
+    "completeWireBinding": true,
+    "limitations": {
+      "newIndependentExecution": false,
+      "executionReplayed": false,
+      "consensusOrFinalityProven": false,
+      "sourceSafetyAttested": false,
+      "unretainedBodyBytesVerified": true,
+      "originalTransactionReplay": false,
+      "allEffectsAccuracyEstablished": false
+    }
+  },
+  "population": {
+    "N": 436,
+    "S": 16,
+    "normalizedExtensionCounts": {
+      "blockTimestamp": 436
+    },
+    "selectedNormalizedExtensionCounts": {
+      "blockTimestamp": 16
+    },
+    "transactionTypes": {
+      "0": 41,
+      "2": 388,
+      "3": 4,
+      "4": 3
+    },
+    "selectedTransactionTypes": {
+      "0": 2,
+      "2": 14
+    },
+    "unsupportedUnderFrozenRules": 436,
+    "unsupportedSelected": 16,
+    "reasonOccurrencesAll": {
+      "unrecognized_envelope_fields": 436,
+      "access_list_context_unsupported": 4,
+      "blob_context_unsupported": 4,
+      "authorization_context_unsupported": 3,
+      "calldata_exceeds_profile": 1,
+      "original_gas_limit_exceeds_profile": 5
+    },
+    "reasonOccurrencesSelected": {
+      "unrecognized_envelope_fields": 16,
+      "original_gas_limit_exceeds_profile": 1
+    },
+    "onlyUnrecognizedFieldAll": 420,
+    "onlyUnrecognizedFieldSelected": 15,
+    "additionalIndependentReasonsAll": 16,
+    "additionalIndependentReasonsSelected": 1,
+    "perBlock": [
+      {
+        "blockNumber": "26283332",
+        "N": 225,
+        "S": 7,
+        "unsupportedUnderFrozenRules": 225,
+        "onlyUnrecognizedField": 217,
+        "additionalIndependentReasons": 8
+      },
+      {
+        "blockNumber": "26283333",
+        "N": 211,
+        "S": 9,
+        "unsupportedUnderFrozenRules": 211,
+        "onlyUnrecognizedField": 203,
+        "additionalIndependentReasons": 8
+      }
+    ],
+    "maxCalldataBytes": 37380
+  },
+  "providerTimestampChecks": [
+    {
+      "provider": "drpc",
+      "all": 436,
+      "selected": 16,
+      "timestampPresent": 436,
+      "timestampCanonicalUint64": 436,
+      "timestampEqualsHeader": 436,
+      "timestampEqualsHeaderLiterally": 436,
+      "selectedTimestampEqualsHeader": 16,
+      "unknownFields": {
+        "blockTimestamp": 436
+      },
+      "selectedUnknownFields": {
+        "blockTimestamp": 16
+      },
+      "blocks": [
+        {
+          "number": "26283332",
+          "hash": "0xdbd372a195b9aba14e1488677300c13799ef85461864ad84385b6dfb857ae71f",
+          "timestamp": "0x6ae07763",
+          "timestampDecimal": "1793095523",
+          "transactions": 225,
+          "selected": 7,
+          "headerHashVerified": true
+        },
+        {
+          "number": "26283333",
+          "hash": "0x43376715c9933c3fdaafdbdbdd634fe288cd3f68f17f9737eae3f9d24d8ba8ff",
+          "timestamp": "0x6ae0776f",
+          "timestampDecimal": "1793095535",
+          "transactions": 211,
+          "selected": 9,
+          "headerHashVerified": true
+        }
+      ]
+    },
+    {
+      "provider": "publicnode",
+      "all": 436,
+      "selected": 16,
+      "timestampPresent": 436,
+      "timestampCanonicalUint64": 436,
+      "timestampEqualsHeader": 436,
+      "timestampEqualsHeaderLiterally": 436,
+      "selectedTimestampEqualsHeader": 16,
+      "unknownFields": {
+        "blockTimestamp": 436
+      },
+      "selectedUnknownFields": {
+        "blockTimestamp": 16
+      },
+      "blocks": [
+        {
+          "number": "26283332",
+          "hash": "0xdbd372a195b9aba14e1488677300c13799ef85461864ad84385b6dfb857ae71f",
+          "timestamp": "0x6ae07763",
+          "timestampDecimal": "1793095523",
+          "transactions": 225,
+          "selected": 7,
+          "headerHashVerified": true
+        },
+        {
+          "number": "26283333",
+          "hash": "0x43376715c9933c3fdaafdbdbdd634fe288cd3f68f17f9737eae3f9d24d8ba8ff",
+          "timestamp": "0x6ae0776f",
+          "timestampDecimal": "1793095535",
+          "transactions": 211,
+          "selected": 9,
+          "headerHashVerified": true
+        }
+      ]
+    }
+  ],
+  "anomalies": [],
+  "selectedRows": [
+    {
+      "transactionHash": "0x697270c2a66349e9a42b7dd5053afe31c6a3432b4fad2eb231df556010630f40",
+      "blockNumber": "26283332",
+      "transactionIndex": "35",
+      "type": "0",
+      "selected": true,
+      "reasons": [
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 68,
+      "otherReasons": []
+    },
+    {
+      "transactionHash": "0xb94b80b464b42da4887ca8adde79195656b4b7a8e9fd4e8ed9790ae3bc803aec",
+      "blockNumber": "26283332",
+      "transactionIndex": "97",
+      "type": "2",
+      "selected": true,
+      "reasons": [
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 68,
+      "otherReasons": []
+    },
+    {
+      "transactionHash": "0xe47e4673dba2a9a7e3be7802b842f0cd1678df6162bf764dbe203f473997dada",
+      "blockNumber": "26283332",
+      "transactionIndex": "101",
+      "type": "2",
+      "selected": true,
+      "reasons": [
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 100,
+      "otherReasons": []
+    },
+    {
+      "transactionHash": "0xf00233dbdcdc984eeef83b7f8a58dd270fd116a8cf1bedfd6f03aa76f55d2b8f",
+      "blockNumber": "26283332",
+      "transactionIndex": "159",
+      "type": "2",
+      "selected": true,
+      "reasons": [
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 68,
+      "otherReasons": []
+    },
+    {
+      "transactionHash": "0x6ad408a82e22e98d5b9b7648b073f916c06f6b9eec4cc3db2a07e3e3a80d4e56",
+      "blockNumber": "26283332",
+      "transactionIndex": "167",
+      "type": "2",
+      "selected": true,
+      "reasons": [
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 68,
+      "otherReasons": []
+    },
+    {
+      "transactionHash": "0x50954623e4c71f6c57a96419e93b840349e362f617e92342372c9c9db471d48b",
+      "blockNumber": "26283332",
+      "transactionIndex": "201",
+      "type": "2",
+      "selected": true,
+      "reasons": [
+        "unrecognized_envelope_fields",
+        "original_gas_limit_exceeds_profile"
+      ],
+      "calldataBytes": 1284,
+      "otherReasons": [
+        "original_gas_limit_exceeds_profile"
+      ]
+    },
+    {
+      "transactionHash": "0x215a0d04012376a527b66c44d1206fb2d8cbc28d3623455a75e29ef7d191aa13",
+      "blockNumber": "26283332",
+      "transactionIndex": "218",
+      "type": "2",
+      "selected": true,
+      "reasons": [
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 68,
+      "otherReasons": []
+    },
+    {
+      "transactionHash": "0xae795a5d1a4c732fae04551f9bfad0c5a1c8a5cdc01e9508826a1b4e513fb469",
+      "blockNumber": "26283333",
+      "transactionIndex": "4",
+      "type": "2",
+      "selected": true,
+      "reasons": [
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 516,
+      "otherReasons": []
+    },
+    {
+      "transactionHash": "0xb4e89c80a20b535f8ca527b4462510e04534cc01f271988b31aeacc48429f397",
+      "blockNumber": "26283333",
+      "transactionIndex": "10",
+      "type": "2",
+      "selected": true,
+      "reasons": [
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 0,
+      "otherReasons": []
+    },
+    {
+      "transactionHash": "0x2602ee353d02fb23e1fc0e2de7c737f2b9027d78918e9feb85cc33666e8aadeb",
+      "blockNumber": "26283333",
+      "transactionIndex": "28",
+      "type": "0",
+      "selected": true,
+      "reasons": [
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 2372,
+      "otherReasons": []
+    },
+    {
+      "transactionHash": "0xe4bf38d958a7c47d8480e3fa407ddeb56f4f12c3569be7d63cd5419e0b523fd7",
+      "blockNumber": "26283333",
+      "transactionIndex": "88",
+      "type": "2",
+      "selected": true,
+      "reasons": [
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 68,
+      "otherReasons": []
+    },
+    {
+      "transactionHash": "0x043e422a74792b3c42e4cc4beef449a6ebe4abbce382fc38ac4730d442ef9616",
+      "blockNumber": "26283333",
+      "transactionIndex": "99",
+      "type": "2",
+      "selected": true,
+      "reasons": [
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 68,
+      "otherReasons": []
+    },
+    {
+      "transactionHash": "0xa4e0ec85e2f57355c42a7244ce761b2856ec0f9efee1749a26c4ebdb6413e2d9",
+      "blockNumber": "26283333",
+      "transactionIndex": "137",
+      "type": "2",
+      "selected": true,
+      "reasons": [
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 68,
+      "otherReasons": []
+    },
+    {
+      "transactionHash": "0x5f0460e198281a8abf723a5f81e536d3310ac1b165f1dad0e9d1dd4599944e15",
+      "blockNumber": "26283333",
+      "transactionIndex": "168",
+      "type": "2",
+      "selected": true,
+      "reasons": [
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 68,
+      "otherReasons": []
+    },
+    {
+      "transactionHash": "0x25abc1e41339e13de2d92a0946f6935d4dec1f0e7446625cd71e04b164bfa662",
+      "blockNumber": "26283333",
+      "transactionIndex": "170",
+      "type": "2",
+      "selected": true,
+      "reasons": [
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 68,
+      "otherReasons": []
+    },
+    {
+      "transactionHash": "0x46103749388337f1ba640825a9433310c49142483585422292df534054cd9417",
+      "blockNumber": "26283333",
+      "transactionIndex": "208",
+      "type": "2",
+      "selected": true,
+      "reasons": [
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 0,
+      "otherReasons": []
+    }
+  ],
+  "retainedOutcomeCounts": {
+    "census": 436,
+    "selected": 16,
+    "notSampled": 420,
+    "execution": {
+      "success": 0,
+      "reverted": 0,
+      "failed": 0,
+      "unsupported": 16,
+      "provider_unavailable": 0,
+      "budget_unattempted": 0
+    },
+    "comparison": {
+      "match": 0,
+      "mismatch": 0,
+      "oracle_unavailable": 0,
+      "not_comparable": 16,
+      "budget_unattempted": 0,
+      "unknown": 16
+    }
+  },
+  "limitations": [
+    "No original outcome was reclassified or retried.",
+    "Counterfactual removal of a redundant timestamp field is not an observed execution outcome.",
+    "Header RLP hashes and provider agreement do not establish consensus, finality or independent provider implementations.",
+    "No VM execution or new network request was performed by this audit."
+  ],
+  "parentProvidedPrimarySource": {
+    "url": "https://github.com/ethereum/go-ethereum/pull/33709",
+    "description": "Parent reports Geth mined-transaction blockTimestamp serialization, merged February 2 2026. Not independently fetched during this offline audit."
+  },
+  "supersedes": {
+    "path": "audit.json",
+    "sha256": "064da1bb39b9de0f49a308bba1aca1fc048fde09a31a3de0969a60d69ad18630",
+    "reason": "Initial supplemental all-population blocker count used64KiB instead of frozen32KiB calldata bound. Corrected independently; original sealed report and all timestamp checks unchanged."
+  },
+  "projectionCriteria": {
+    "simulationGas": 5000000,
+    "simulationCalldataBytes": 32768,
+    "source": "reports/ordinary-ethereum-cohort-v1/runtime/research/standard-evm/cohort-census.mjs",
+    "sourceSha256": "2179f6bf23068650303c736602fb984b0087ff580190c2562901d58475784315"
+  },
+  "additionalBlockerRows": [
+    {
+      "transactionHash": "0x004ad71f8116b227060f0ca742552d9c024abdebf7f544de729cf7e1bcf465e3",
+      "blockNumber": "26283332",
+      "transactionIndex": "45",
+      "type": "2",
+      "selected": false,
+      "reasons": [
+        "access_list_context_unsupported",
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 1028,
+      "otherReasons": [
+        "access_list_context_unsupported"
+      ]
+    },
+    {
+      "transactionHash": "0x41967e0cbc595e7ca6ed0398612c83aa763c0491c0cdc32752496a7701e3b4c3",
+      "blockNumber": "26283332",
+      "transactionIndex": "52",
+      "type": "3",
+      "selected": false,
+      "reasons": [
+        "blob_context_unsupported",
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 0,
+      "otherReasons": [
+        "blob_context_unsupported"
+      ]
+    },
+    {
+      "transactionHash": "0x72b35b27a0f3916f1fb90deffb84631693170224a6bbb6e3aec7eb4d2780c051",
+      "blockNumber": "26283332",
+      "transactionIndex": "80",
+      "type": "3",
+      "selected": false,
+      "reasons": [
+        "blob_context_unsupported",
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 0,
+      "otherReasons": [
+        "blob_context_unsupported"
+      ]
+    },
+    {
+      "transactionHash": "0x00bcf2aa8498d7ee152eb15aafb688385e2802f00184356e61f448c473da2c61",
+      "blockNumber": "26283332",
+      "transactionIndex": "81",
+      "type": "3",
+      "selected": false,
+      "reasons": [
+        "blob_context_unsupported",
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 0,
+      "otherReasons": [
+        "blob_context_unsupported"
+      ]
+    },
+    {
+      "transactionHash": "0x970e42e4b1472001ab4936a5bd6ac01a1df006fa393989ecb7c0d055ad2f4278",
+      "blockNumber": "26283332",
+      "transactionIndex": "107",
+      "type": "4",
+      "selected": false,
+      "reasons": [
+        "authorization_context_unsupported",
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 36,
+      "otherReasons": [
+        "authorization_context_unsupported"
+      ]
+    },
+    {
+      "transactionHash": "0xbd210a0d36501b0c7ff91f46c6251538ad42941782cbef188f75654148453e43",
+      "blockNumber": "26283332",
+      "transactionIndex": "111",
+      "type": "0",
+      "selected": false,
+      "reasons": [
+        "unrecognized_envelope_fields",
+        "calldata_exceeds_profile"
+      ],
+      "calldataBytes": 37380,
+      "otherReasons": [
+        "calldata_exceeds_profile"
+      ]
+    },
+    {
+      "transactionHash": "0x45e63947db62bb9f5e5458b99fd55cefbc7c1f509e4d5676c42e9211c100af72",
+      "blockNumber": "26283332",
+      "transactionIndex": "199",
+      "type": "2",
+      "selected": false,
+      "reasons": [
+        "unrecognized_envelope_fields",
+        "original_gas_limit_exceeds_profile"
+      ],
+      "calldataBytes": 644,
+      "otherReasons": [
+        "original_gas_limit_exceeds_profile"
+      ]
+    },
+    {
+      "transactionHash": "0x50954623e4c71f6c57a96419e93b840349e362f617e92342372c9c9db471d48b",
+      "blockNumber": "26283332",
+      "transactionIndex": "201",
+      "type": "2",
+      "selected": true,
+      "reasons": [
+        "unrecognized_envelope_fields",
+        "original_gas_limit_exceeds_profile"
+      ],
+      "calldataBytes": 1284,
+      "otherReasons": [
+        "original_gas_limit_exceeds_profile"
+      ]
+    },
+    {
+      "transactionHash": "0xbaf0d7d6e0d86bcfbbe2248d7614278eb19b1067ebbcafae143763f2d292a5aa",
+      "blockNumber": "26283333",
+      "transactionIndex": "0",
+      "type": "2",
+      "selected": false,
+      "reasons": [
+        "access_list_context_unsupported",
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 452,
+      "otherReasons": [
+        "access_list_context_unsupported"
+      ]
+    },
+    {
+      "transactionHash": "0xc5b43ed8d12b01a4f93de43255d857388fc313f8365428c7996cc125eb44433c",
+      "blockNumber": "26283333",
+      "transactionIndex": "2",
+      "type": "2",
+      "selected": false,
+      "reasons": [
+        "access_list_context_unsupported",
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 452,
+      "otherReasons": [
+        "access_list_context_unsupported"
+      ]
+    },
+    {
+      "transactionHash": "0x5e2f85b986385900e3b2c2203da8f367b0171bb0084e063b8ad98c96211df06e",
+      "blockNumber": "26283333",
+      "transactionIndex": "29",
+      "type": "4",
+      "selected": false,
+      "reasons": [
+        "authorization_context_unsupported",
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 2628,
+      "otherReasons": [
+        "authorization_context_unsupported"
+      ]
+    },
+    {
+      "transactionHash": "0xf1dfc0181ba2ad6d4c2e06be4930eb657f8928db972675c4443249d505b526b8",
+      "blockNumber": "26283333",
+      "transactionIndex": "31",
+      "type": "2",
+      "selected": false,
+      "reasons": [
+        "access_list_context_unsupported",
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 546,
+      "otherReasons": [
+        "access_list_context_unsupported"
+      ]
+    },
+    {
+      "transactionHash": "0x42d8c9e6e71bf6b361f022950a3e1f528779d9126bc45fbbb810cedf8d668de9",
+      "blockNumber": "26283333",
+      "transactionIndex": "57",
+      "type": "3",
+      "selected": false,
+      "reasons": [
+        "blob_context_unsupported",
+        "unrecognized_envelope_fields",
+        "original_gas_limit_exceeds_profile"
+      ],
+      "calldataBytes": 836,
+      "otherReasons": [
+        "blob_context_unsupported",
+        "original_gas_limit_exceeds_profile"
+      ]
+    },
+    {
+      "transactionHash": "0x2fcbd88e87393e7fbc05b7c62ab3de28ade85214e4e592ec7ad44a70cfa29bc9",
+      "blockNumber": "26283333",
+      "transactionIndex": "193",
+      "type": "4",
+      "selected": false,
+      "reasons": [
+        "authorization_context_unsupported",
+        "unrecognized_envelope_fields"
+      ],
+      "calldataBytes": 2660,
+      "otherReasons": [
+        "authorization_context_unsupported"
+      ]
+    },
+    {
+      "transactionHash": "0x4f178c536014bb901e9f9f0edd1bb088c1c3cac2fcc132ff2fce124223e82841",
+      "blockNumber": "26283333",
+      "transactionIndex": "194",
+      "type": "2",
+      "selected": false,
+      "reasons": [
+        "unrecognized_envelope_fields",
+        "original_gas_limit_exceeds_profile"
+      ],
+      "calldataBytes": 2884,
+      "otherReasons": [
+        "original_gas_limit_exceeds_profile"
+      ]
+    },
+    {
+      "transactionHash": "0xa06bafb5d08402e19d579e9efa6f1e1028b0fd5e639f1d19d42f5ce18a356e66",
+      "blockNumber": "26283333",
+      "transactionIndex": "196",
+      "type": "2",
+      "selected": false,
+      "reasons": [
+        "unrecognized_envelope_fields",
+        "original_gas_limit_exceeds_profile"
+      ],
+      "calldataBytes": 1348,
+      "otherReasons": [
+        "original_gas_limit_exceeds_profile"
+      ]
+    }
+  ]
+}
