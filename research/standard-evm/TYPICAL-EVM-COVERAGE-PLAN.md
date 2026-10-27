@@ -1,6 +1,8 @@
 # Ordinary Ethereum coverage: next evidence plan
 
-**Implemented pilot; no live cohort result yet.** Start with Ethereum mainnet (chain 1). Existing deposits, transfers, swaps and sequences are development evidence, not holdouts. The product's unsigned block-end profile has a code-free sender, fixed 5M gas, synthetic zero base fee and bounded explicit/discovered queries. It does not establish “90% of typical EVM transactions.”
+**Implemented and frozen; first live run started October 27 at 10:05:18 UTC, with no cohort result yet.** Start with Ethereum mainnet (chain 1). Existing deposits, transfers, swaps and sequences are development evidence, not holdouts. The product's unsigned block-end profile has a code-free sender, fixed 5M gas, synthetic zero base fee and bounded explicit/discovered queries. It does not establish “90% of typical EVM transactions.”
+
+The [first live packet](../../reports/ordinary-ethereum-cohort-v1/plan.json) froze 1,777 runtime entries, plan SHA-256 `15562308f7062868166a80e6c7bbdcff7d3b27660238ea977ff91676e6bc6d0c`, source-manifest SHA-256 `ff2a3423955e67ebe1ab9f5a9273c77ae27b69b555a6a49aaa4482525adb7c9e`. It observed anchor 26,283,331 and durably declared targets **26,283,332 and 26,283,333**, with a wait deadline of **10:25:18.448 UTC** before observing finalized tips. The run is in progress; do not restart or modify its packet. No selected cohort or accuracy denominator exists until collection completes.
 
 ## Freeze and prospective selection
 
