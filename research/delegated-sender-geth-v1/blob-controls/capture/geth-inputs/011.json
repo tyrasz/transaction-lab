@@ -1,0 +1,89 @@
+{
+  "blob_sender_equals_coinbase": {
+    "_info": {
+      "comment": "Fixed synthetic blob-fee controls. Expected root is product deltas applied to a third MPT; full-VM agreement remains separate. No sidecar, body-capacity or parent-excess validation."
+    },
+    "config": {
+      "chainid": "0x01"
+    },
+    "env": {
+      "currentCoinbase": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+      "currentDifficulty": "0x0",
+      "currentRandom": "0xb4490f4a119a322bbce1cca15bd37107dd11bd35876d278866a7f1c0cebb538d",
+      "currentGasLimit": "0x3938700",
+      "currentNumber": "0x175d720",
+      "currentTimestamp": "0x695db057",
+      "currentBaseFee": "0x7",
+      "currentExcessBlobGas": "0x164967e"
+    },
+    "pre": {
+      "0x1111111111111111111111111111111111111111": {
+        "nonce": "0x7",
+        "balance": "0x3e8",
+        "code": "0x00",
+        "storage": {}
+      },
+      "0x2222222222222222222222222222222222222222": {
+        "nonce": "0x1",
+        "balance": "0xf4240",
+        "code": "0x",
+        "storage": {}
+      },
+      "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+        "nonce": "0x1",
+        "balance": "0xe8d4a51000",
+        "code": "0x",
+        "storage": {}
+      },
+      "0x4444444444444444444444444444444444444444": {
+        "nonce": "0x1",
+        "balance": "0x0",
+        "code": "0x4a6000556000496001556001496002556002496003553a6004554860055533316006554a60005260004960205260b160406000a100",
+        "storage": {}
+      },
+      "0x9999999999999999999999999999999999999999": {
+        "nonce": "0x1",
+        "balance": "0x1",
+        "code": "0x",
+        "storage": {}
+      }
+    },
+    "transaction": {
+      "sender": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+      "chainId": "0x1",
+      "to": "0x4444444444444444444444444444444444444444",
+      "data": [
+        "0x"
+      ],
+      "value": [
+        "0x0"
+      ],
+      "gasLimit": [
+        "0x493e0"
+      ],
+      "maxFeePerGas": "0xd",
+      "maxPriorityFeePerGas": "0x3",
+      "nonce": "0x1",
+      "secretKey": "0x0101010101010101010101010101010101010101010101010101010101010101",
+      "maxFeePerBlobGas": "0x64",
+      "blobVersionedHashes": [
+        "0x0100000000000000000000000000000000000000000000000000000000000001",
+        "0x0100000000000000000000000000000000000000000000000000000000000002"
+      ]
+    },
+    "post": {
+      "BPO2": [
+        {
+          "hash": "0xb527e02d468a2c714a301b109ce6dc8f5df65c0f7b7aae0d8279169c32240f25",
+          "logs": "0x8e505cb90e28651e746cd1d34c296dd8f4c934ff4c825f1c043501c308795104",
+          "txbytes": "0x03f8a80101030d830493e09444444444444444444444444444444444444444448080c064f842a00100000000000000000000000000000000000000000000000000000000000001a0010000000000000000000000000000000000000000000000000000000000000280a083361408eb10bf3eadb76309f31d969005f509feec3522d9fcdd0e2e320a7130a06a466d493201bd9015509b97970d16d78bf640eb2a58d03da90dec7d29646e57",
+          "indexes": {
+            "data": 0,
+            "gas": 0,
+            "value": 0
+          }
+        }
+      ]
+    }
+  }
+}
