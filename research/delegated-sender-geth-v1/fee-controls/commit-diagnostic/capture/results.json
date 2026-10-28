@@ -1,0 +1,58 @@
+{
+  "planSha256": "e8dbd73cad60e090cef0280fdda27e8f43226751f9ee1647d178102a6f4d7838",
+  "status": "complete",
+  "usable": true,
+  "sourceUnchanged": true,
+  "artifactIntegrityVerified": true,
+  "fatal": null,
+  "steps": [
+    "modules-before",
+    "build",
+    "raw",
+    "modules-after"
+  ],
+  "diagnostic": {
+    "status": "corroborated",
+    "checks": {
+      "originalSlot": true,
+      "emptyControlSlot": true,
+      "bothDeleted": true,
+      "sameIntermediateRoot": true,
+      "guardError": true,
+      "failedCommitZero": true,
+      "controlCommit": true
+    },
+    "observation": {
+      "rows": [
+        {
+          "name": "original_nonempty_storage",
+          "beforeRoot": "0x57c5fc226ba160d29f18d1b8f917ce70a456da4d1760594f5267d31e96fa5012",
+          "beforeSlot": "0x000000000000000000000000000000000000000000000000000000000000005b",
+          "intermediateRoot": "0xf59c7d63a4249f1ab3093109a4306dceda125b7c53242425ede4d60780fc443f",
+          "commitRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "commitError": "unexpected storage wiping, 9999999999999999999999999999999999999999",
+          "accountExistsAfter": false
+        },
+        {
+          "name": "only_coinbase_storage_empty",
+          "beforeRoot": "0x679ee9251061aad8b61bd9b7e647324ff9f8539c2131869de020665683aa23fa",
+          "beforeSlot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "intermediateRoot": "0xf59c7d63a4249f1ab3093109a4306dceda125b7c53242425ede4d60780fc443f",
+          "commitRoot": "0xf59c7d63a4249f1ab3093109a4306dceda125b7c53242425ede4d60780fc443f",
+          "commitError": null,
+          "accountExistsAfter": false
+        }
+      ]
+    }
+  },
+  "wallElapsedMs": 15145,
+  "monotonicElapsedMs": 15145.255208,
+  "scope": {
+    "transactionExecutions": 0,
+    "VMExecutions": 0,
+    "statetestExecutions": 0,
+    "publicRpc": 0,
+    "originalOutcomeChanged": false,
+    "syntheticPersistenceDiagnosticOnly": true
+  }
+}

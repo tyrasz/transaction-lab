@@ -1,0 +1,67 @@
+import { types } from 'node:util';
+
+export const ETHEREUM_FEE_PROFILE = 'unsigned_eip1559_block_end';
+const MAX = (1n << 256n) - 1n;
+const DECIMAL = /^(?:0|[1-9][0-9]{0,77})$/;
+const QUANTITY = /^(?:0x(?:0|[1-9a-f][0-9a-f]*)|0|[1-9][0-9]*)$/i;
+function need(ok) {
+  if (!ok) throw Object.assign(new Error('The explicit EIP-1559 fee profile is malformed or inconsistent.'), { code: 'LOCAL_ETHEREUM_INPUT_INVALID' });
+}
+function plain(value) {
+  need(value !== null && typeof value === 'object' && !types.isProxy(value) && !Array.isArray(value) && [Object.prototype, null].includes(Object.getPrototypeOf(value)));
+}
+function own(value, key) {
+  const d = Object.getOwnPropertyDescriptor(value, key);
+  need(d?.enumerable && Object.hasOwn(d, 'value')); return d.value;
+}
+function quantity(value, decimal = false) {
+  need(typeof value === 'string' && value.length <= 80 && (decimal ? DECIMAL : QUANTITY).test(value));
+  const n = BigInt(value); need(n <= MAX); return n;
+}
+function bounded(n) { need(n >= 0n && n <= MAX); return n; }
+
+/** Explicit opt-in only. This is unsigned call pricing, not outer signature,
+ * transaction-position, or blob-fee validation. The default adds no fields. */
+export function normalizeEthereumFees(request) {
+  plain(request);
+  const profile = Object.getOwnPropertyDescriptor(request, 'executionProfile'), fees = Object.getOwnPropertyDescriptor(request, 'fees');
+  if (profile === undefined && fees === undefined) return {};
+  need(own(request, 'executionProfile') === ETHEREUM_FEE_PROFILE);
+  const input = own(request, 'fees'); plain(input);
+  need(Reflect.ownKeys(input).length === 2);
+  const maxFeePerGas = own(input, 'maxFeePerGas'), maxPriorityFeePerGas = own(input, 'maxPriorityFeePerGas');
+  const cap = quantity(maxFeePerGas, true), priority = quantity(maxPriorityFeePerGas, true);
+  need(priority <= cap && !Object.hasOwn(request, 'blobVersionedHashes'));
+  return Object.freeze({ executionProfile: ETHEREUM_FEE_PROFILE, fees: Object.freeze({ maxFeePerGas, maxPriorityFeePerGas }) });
+}
+
+/** Derive admission and prepayment from a total-gas envelope and header. No
+ * state or claimed execution outcome enters this calculation. */
+export function ethereumFeePlan(request, header) {
+  const normalized = normalizeEthereumFees(request);
+  if (!normalized.executionProfile) return null;
+  plain(header);
+  const gasLimit = quantity(own(request, 'gas')), value = quantity(own(request, 'value'));
+  const baseFeePerGas = quantity(own(header, 'baseFeePerGas')), blockGasLimit = quantity(own(header, 'gasLimit'));
+  const coinbase = own(header, 'miner'); need(typeof coinbase === 'string' && /^0x[0-9a-f]{40}$/i.test(coinbase));
+  const maxFeePerGas = BigInt(normalized.fees.maxFeePerGas), maxPriorityFeePerGas = BigInt(normalized.fees.maxPriorityFeePerGas);
+  need(maxFeePerGas >= baseFeePerGas && gasLimit >= 21000n && gasLimit <= 5000000n && gasLimit <= blockGasLimit);
+  // Avoid an overflowing base+tip intermediate: cap-base bounds the tip first.
+  const priorityFeePerGas = maxPriorityFeePerGas < maxFeePerGas - baseFeePerGas ? maxPriorityFeePerGas : maxFeePerGas - baseFeePerGas;
+  const effectiveGasPrice = baseFeePerGas + priorityFeePerGas;
+  return Object.freeze({ gasLimit, maxFeePerGas, maxPriorityFeePerGas, baseFeePerGas, effectiveGasPrice, priorityFeePerGas,
+    maximumRequiredBalance: bounded(gasLimit * maxFeePerGas + value), upfrontGasDebit: bounded(gasLimit * effectiveGasPrice), coinbase: coinbase.toLowerCase() });
+}
+
+/** gasUsed is the final charged gas AFTER the refund cap and calldata floor.
+ * Coinbase credit may subsequently burn during account deletion; this record
+ * describes settlement operations, not a guaranteed surviving balance delta. */
+export function settleEthereumFees(plan, { gasUsed }) {
+  plain(plan); need(typeof gasUsed === 'bigint' && gasUsed >= 0n && gasUsed <= plan.gasLimit);
+  const gasCharge = bounded(gasUsed * plan.effectiveGasPrice), senderRefund = bounded(plan.upfrontGasDebit - gasCharge);
+  const baseFeeBurn = bounded(gasUsed * plan.baseFeePerGas), coinbaseTip = bounded(gasUsed * plan.priorityFeePerGas);
+  need(gasCharge === baseFeeBurn + coinbaseTip);
+  return Object.freeze({ kind: 'eip1559', ...Object.fromEntries(Object.entries({ gasLimit: plan.gasLimit, effectiveGasPrice: plan.effectiveGasPrice,
+    baseFeePerGas: plan.baseFeePerGas, priorityFeePerGas: plan.priorityFeePerGas, maximumRequiredBalance: plan.maximumRequiredBalance,
+    upfrontGasDebit: plan.upfrontGasDebit, chargedGas: gasUsed, gasCharge, senderRefund, baseFeeBurn, coinbaseTip }).map(([key, value]) => [key, value.toString()])), coinbase: plan.coinbase });
+}
