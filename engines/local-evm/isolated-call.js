@@ -145,7 +145,10 @@ async function executeIsolated(options, previewMode) {
     if (output === null) { need(!complete); return; }
     const costs = ethereumCallGas(call.data, ethereumCommon(header), call), gas = ethereumQuantity(call.gas);
     if (Object.hasOwn(output, 'lifecycle')) {
-      need(complete && ethereumCommon(header).isActivatedEIP(6780));
+      need(complete);
+      // EIP-161 cleanup predates Cancun. Only the currently supported
+      // same-invocation SELFDESTRUCT finalizer requires EIP-6780 here.
+      if (Object.hasOwn(output.lifecycle, 'finalizedDeletions')) need(ethereumCommon(header).isActivatedEIP(6780));
       const traceBytes = Buffer.byteLength(JSON.stringify({ trace: output.trace, logs: output.logs, lifecycle: output.lifecycle }));
       need(output.usage?.retainedTraceBytes === traceBytes && traceBytes <= limits.execution.traceBytes);
     }

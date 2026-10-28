@@ -3,6 +3,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import childProcess from 'node:child_process';
+import { RLP } from '@ethereumjs/rlp';
+import { keccak_256 } from '@noble/hashes/sha3.js';
 import { executeIsolatedEthereumCall, executeIsolatedEthereumPreview } from '../isolated-call.js';
 import { canonicalStateChanges, validateQueryMutation } from '../preview-mutations.js';
 import { validateExecutionLifecycle } from '../execution-changes.js';
@@ -17,6 +19,19 @@ const call=(target=TARGET,{kind='f1',gas=65535,value=0}={})=>'6000600060006000'+
 const empty=(nonemptyStorage=false)=>({nonce:0n,balance:0n,code:'0x',...(nonemptyStorage?{storage:{[word(0)]:word(42)}}:{})});
 const row=address=>({address,existence:{before:true,after:false,basis:BASIS}});
 const run=f=>executeIsolatedEthereumCall({request:f.request,header:f.header,rpc:f.rpc});
+function shanghai(f) {
+  // Rehash synthetic MPT state into the exact Shanghai header field layout.
+  const header=f.header;header.number='0x112a880';header.timestamp='0x'+(1710338134).toString(16);
+  for(const key of ['blobGasUsed','excessBlobGas','parentBeaconBlockRoot','requestsHash'])delete header[key];
+  const order=['parentHash','sha3Uncles','miner','stateRoot','transactionsRoot','receiptsRoot','logsBloom','difficulty','number','gasLimit','gasUsed','timestamp','extraData','mixHash','nonce','baseFeePerGas','withdrawalsRoot'];
+  const integers=new Set(['difficulty','number','gasLimit','gasUsed','timestamp','baseFeePerGas']);
+  header.hash='0x'+Buffer.from(keccak_256(RLP.encode(order.map(key=>{
+    let value=header[key].slice(2);
+    if(integers.has(key)){value=BigInt(header[key])===0n?'':BigInt(header[key]).toString(16);if(value.length%2)value='0'+value;}
+    return Buffer.from(value,'hex');
+  })))).toString('hex');
+  return f;
+}
 async function fixture({target=TARGET,kind='f1',gas=65535,value=0,revert=false,nonemptyStorage=false,code}={}) {
   return lifecycleFixture({code:code??'0x'+call(target,{kind,gas,value})+'50'+(revert?'60006000fd':'00'),accounts:{[target]:empty(nonemptyStorage)}});
 }
@@ -65,6 +80,18 @@ test('ordinary reverted touches retain the empty account while RIPEMD160 OOG tou
     assert.deepEqual(r.changes.accounts.filter(a=>a.address!==SENDER),sticky?[row(RIPEMD)]:[]);
     assert.deepEqual(r.changes.accounts.find(a=>a.address===SENDER).nonce,{before:'0x1',after:'0x2'});
   }
+});
+
+test('Shanghai parent admits EIP-161 cleanup including root-revert stickiness but retains the Cancun deletion gate',async t=>{
+  for(const options of [{nonemptyStorage:true},{target:RIPEMD,gas:0,revert:true,nonemptyStorage:true}]){
+    const f=shanghai(await fixture(options)),r=await run(f),target=options.target??TARGET;
+    assert.equal(r.status,'completed',JSON.stringify(r.error));assert.equal(r.output.environment.hardfork,'shanghai');
+    assert.equal(r.output.execution.status,options.revert?'reverted':'success');assert.deepEqual(r.changes.accounts.find(a=>a.address===target),row(target));
+    assert.equal(r.output.lifecycle.finalizedDeletions,undefined);assert.equal(r.output.lifecycle.emptyAccountCleanup.deletions[0].address,target);
+  }
+  const unsupported=await run(shanghai(await lifecycleFixture({code:'0x73'+TARGET.slice(2)+'ff'})));
+  assert.equal(unsupported.status,'completed');assert.equal(unsupported.output.execution.status,'unsupported');assert.equal(unsupported.output.lifecycle,undefined);assert.deepEqual(unsupported.changes.accounts,[]);
+  await tamper(t,shanghai(await fixture()),r=>{r.output.lifecycle.finalizedDeletions=[{address:FACTORY,scope:'entire_account_including_code_and_storage',initialStorageRoot:EMPTY_STORAGE_ROOT}];});
 });
 
 test('BALANCE-only, delegated code targets and positive value transfers never become empty cleanup',async()=>{
