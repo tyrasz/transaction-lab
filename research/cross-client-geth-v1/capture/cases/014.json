@@ -1,0 +1,144 @@
+{
+  "tests/berlin/eip2929_gas_cost_increases/test_warm_status_revert.py::test_account_warm_status_reverted_by_subcall[fork_Osaka-state_test]": {
+    "env": {
+      "currentCoinbase": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba",
+      "currentGasLimit": "0x07270e00",
+      "currentNumber": "0x01",
+      "currentTimestamp": "0x03e8",
+      "currentRandom": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "currentDifficulty": "0x00",
+      "currentBaseFee": "0x07",
+      "currentExcessBlobGas": "0x00"
+    },
+    "pre": {
+      "0xf36afef4dcb45e52f80cb039335952f77cec8960": {
+        "nonce": "0x00",
+        "balance": "0x01",
+        "code": "0x",
+        "storage": {}
+      },
+      "0x5198e4fa4c9bd0424cafa092d312b90e700b4cf2": {
+        "nonce": "0x01",
+        "balance": "0x00",
+        "code": "0x73f36afef4dcb45e52f80cb039335952f77cec8960315060006000fd",
+        "storage": {}
+      },
+      "0x77627fd9e3195a59e3c6eb0c15614b29c357fa34": {
+        "nonce": "0x01",
+        "balance": "0x00",
+        "code": "0x60006000600060006000735198e4fa4c9bd0424cafa092d312b90e700b4cf2620186a0f1505a73f36afef4dcb45e52f80cb039335952f77cec8960315a9050900360035a5a9003019003600055",
+        "storage": {}
+      },
+      "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+        "nonce": "0x00",
+        "balance": "0x033b2e3c9fd0803ce8000000",
+        "code": "0x",
+        "storage": {}
+      }
+    },
+    "transaction": {
+      "chainId": "0x01",
+      "nonce": "0x00",
+      "gasPrice": "0x0a",
+      "gasLimit": [
+        "0x0f4240"
+      ],
+      "to": "0x77627fd9e3195a59e3c6eb0c15614b29c357fa34",
+      "value": [
+        "0x00"
+      ],
+      "data": [
+        "0x"
+      ],
+      "sender": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+      "secretKey": "0x1ad604b3d94e06ec50b27732ec677f3d857c4d588f082f0016317697dd3a2d92"
+    },
+    "post": {
+      "Osaka": [
+        {
+          "hash": "0x3b7568c2076efbb5f7fa10873212ff9dc4c7f711733f19e21fb5a39007b772d7",
+          "logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+          "receipt": {
+            "transactionHash": "0x365dbd5109115b2b272fad0cd1b470717425b3b040b26508cb5c0d9f80e32a09",
+            "type": "0x00",
+            "cumulativeGasUsed": "0xc721",
+            "bloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "logs": [],
+            "status": true,
+            "rlp": "0xf901080182c721b9010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c0"
+          },
+          "txbytes": "0xf860800a830f42409477627fd9e3195a59e3c6eb0c15614b29c357fa34808026a033bb758eece34f4cde597e9196870bed2598af923fec1a148cb48679592ae260a0359bf544797d6bc7152cd149232395cba91e217cdb9bff4c2edda36ea0a5784c",
+          "indexes": {
+            "data": 0,
+            "gas": 0,
+            "value": 0
+          },
+          "state": {
+            "0xf36afef4dcb45e52f80cb039335952f77cec8960": {
+              "nonce": "0x00",
+              "balance": "0x01",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x5198e4fa4c9bd0424cafa092d312b90e700b4cf2": {
+              "nonce": "0x01",
+              "balance": "0x00",
+              "code": "0x73f36afef4dcb45e52f80cb039335952f77cec8960315060006000fd",
+              "storage": {}
+            },
+            "0x77627fd9e3195a59e3c6eb0c15614b29c357fa34": {
+              "nonce": "0x01",
+              "balance": "0x00",
+              "code": "0x60006000600060006000735198e4fa4c9bd0424cafa092d312b90e700b4cf2620186a0f1505a73f36afef4dcb45e52f80cb039335952f77cec8960315a9050900360035a5a9003019003600055",
+              "storage": {
+                "0x00": "0x0a28"
+              }
+            },
+            "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+              "nonce": "0x01",
+              "balance": "0x033b2e3c9fd0803ce7f838b6",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba": {
+              "nonce": "0x00",
+              "balance": "0x025563",
+              "code": "0x",
+              "storage": {}
+            }
+          }
+        }
+      ]
+    },
+    "config": {
+      "blobSchedule": {
+        "Cancun": {
+          "target": "0x03",
+          "max": "0x06",
+          "baseFeeUpdateFraction": "0x32f0ed"
+        },
+        "Prague": {
+          "target": "0x06",
+          "max": "0x09",
+          "baseFeeUpdateFraction": "0x4c6964"
+        },
+        "Osaka": {
+          "target": "0x06",
+          "max": "0x09",
+          "baseFeeUpdateFraction": "0x4c6964"
+        }
+      },
+      "chainid": "0x01"
+    },
+    "_info": {
+      "hash": "0xba799bcb0c300ef54a5bd73f6ef35a73afb19b686527aec4fb85f38619a31b4e",
+      "fixture-format": "state_test",
+      "comment": "`execution-specs` generated test",
+      "filling-transition-tool": "2.19.0",
+      "description": "Test that account warm status is reverted when a sub-call reverts.\n\nInner call does BALANCE(target) then REVERTs. After revert,\nBALANCE(target) in the outer call must be a cold access.",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/tests/berlin/eip2929_gas_cost_increases/test_warm_status_revert.py#L98",
+      "reference-spec": "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-2929.md",
+      "reference-spec-version": "0e11417265a623adb680c527b15d0cb6701b870b"
+    }
+  }
+}

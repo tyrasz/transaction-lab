@@ -1,0 +1,120 @@
+{
+  "tests/frontier/precompiles/test_ripemd.py::test_precompiles[fork_Osaka-state_test-oog_False-full block]": {
+    "env": {
+      "currentCoinbase": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba",
+      "currentGasLimit": "0x07270e00",
+      "currentNumber": "0x01",
+      "currentTimestamp": "0x03e8",
+      "currentRandom": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "currentDifficulty": "0x00",
+      "currentBaseFee": "0x07",
+      "currentExcessBlobGas": "0x00"
+    },
+    "pre": {
+      "0x7b8f0defeb2ea763c53e98cebc229ad700420bf4": {
+        "nonce": "0x01",
+        "balance": "0x00",
+        "code": "0x6040600060003760005160206040604060006000600361c350f160405160005500",
+        "storage": {
+          "0x00": "0xdeadbeef"
+        }
+      },
+      "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+        "nonce": "0x00",
+        "balance": "0x033b2e3c9fd0803ce8000000",
+        "code": "0x",
+        "storage": {}
+      }
+    },
+    "transaction": {
+      "chainId": "0x01",
+      "nonce": "0x00",
+      "gasPrice": "0x0a",
+      "gasLimit": [
+        "0x01000000"
+      ],
+      "to": "0x7b8f0defeb2ea763c53e98cebc229ad700420bf4",
+      "value": [
+        "0x00"
+      ],
+      "data": [
+        "0x61616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161"
+      ],
+      "sender": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+      "secretKey": "0x1ad604b3d94e06ec50b27732ec677f3d857c4d588f082f0016317697dd3a2d92"
+    },
+    "post": {
+      "Osaka": [
+        {
+          "hash": "0xd67973badcab82a234689111eed038440d70aac9e0af2936eaa3e31ca35734d8",
+          "logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+          "receipt": {
+            "transactionHash": "0x6c2f37de5f9f0cd097d6f08e5c0f834f0717ff99fc10d851edfd4d1fed6f8f13",
+            "type": "0x00",
+            "cumulativeGasUsed": "0x6d7b",
+            "bloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "logs": [],
+            "status": true,
+            "rlp": "0xf9010801826d7bb9010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c0"
+          },
+          "txbytes": "0xf8a2800a8401000000947b8f0defeb2ea763c53e98cebc229ad700420bf480b8406161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616161616126a0a0a52c7cd79aefe4b38cf21ecdc8ea030f2c8ddeee2ee4d7cfee247b6d7e78f2a0116dd2a5e832b6b3e133056c0e39bd661c8f2130a3e46805593981d6365de179",
+          "indexes": {
+            "data": 0,
+            "gas": 0,
+            "value": 0
+          },
+          "state": {
+            "0x7b8f0defeb2ea763c53e98cebc229ad700420bf4": {
+              "nonce": "0x01",
+              "balance": "0x00",
+              "code": "0x6040600060003760005160206040604060006000600361c350f160405160005500",
+              "storage": {
+                "0x00": "0x9dfb7d374ad924f3f88de96291c33e9abed53e32"
+              }
+            },
+            "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+              "nonce": "0x01",
+              "balance": "0x033b2e3c9fd0803ce7fbb932",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba": {
+              "nonce": "0x00",
+              "balance": "0x014871",
+              "code": "0x",
+              "storage": {}
+            }
+          }
+        }
+      ]
+    },
+    "config": {
+      "blobSchedule": {
+        "Cancun": {
+          "target": "0x03",
+          "max": "0x06",
+          "baseFeeUpdateFraction": "0x32f0ed"
+        },
+        "Prague": {
+          "target": "0x06",
+          "max": "0x09",
+          "baseFeeUpdateFraction": "0x4c6964"
+        },
+        "Osaka": {
+          "target": "0x06",
+          "max": "0x09",
+          "baseFeeUpdateFraction": "0x4c6964"
+        }
+      },
+      "chainid": "0x01"
+    },
+    "_info": {
+      "hash": "0xdc009695186e14b857e9116c22a02b5decaa271974866be1dea5bb2fe285b599",
+      "fixture-format": "state_test",
+      "comment": "`execution-specs` generated test",
+      "filling-transition-tool": "2.19.0",
+      "description": "Tests the behavior of `RIPEMD-160` precompiled contract.",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/tests/frontier/precompiles/test_ripemd.py#L14"
+    }
+  }
+}

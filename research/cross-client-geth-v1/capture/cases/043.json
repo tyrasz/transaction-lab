@@ -1,0 +1,153 @@
+{
+  "tests/cancun/eip6780_selfdestruct/test_collision_selfdestruct.py::test_selfdestruct_after_create2_collision[fork_Osaka-state_test]": {
+    "env": {
+      "currentCoinbase": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba",
+      "currentGasLimit": "0x07270e00",
+      "currentNumber": "0x01",
+      "currentTimestamp": "0x03e8",
+      "currentRandom": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "currentDifficulty": "0x00",
+      "currentBaseFee": "0x07",
+      "currentExcessBlobGas": "0x00"
+    },
+    "pre": {
+      "0x1da394b1266aa3edf12d385f12df0bd00d6fe958": {
+        "nonce": "0x01",
+        "balance": "0x00",
+        "code": "0x36600060003760003660006000f5600055",
+        "storage": {
+          "0x00": "0xba5e"
+        }
+      },
+      "0xab62ad2053d4b25c9ec365469788cbb7ec7fdf0e": {
+        "nonce": "0x01",
+        "balance": "0x01",
+        "code": "0x73c0f6dc9e5836f54caadbf59cc69346c508e1992bff",
+        "storage": {}
+      },
+      "0xc05e53421f24def8d3d0c763bf494dd40489f149": {
+        "nonce": "0x01",
+        "balance": "0x00",
+        "code": "0x366000600037600060003660006000731da394b1266aa3edf12d385f12df0bd00d6fe958620c8320f16000556000600060006000600073ab62ad2053d4b25c9ec365469788cbb7ec7fdf0e6207a120f160015500",
+        "storage": {}
+      },
+      "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+        "nonce": "0x00",
+        "balance": "0x033b2e3c9fd0803ce8000000",
+        "code": "0x",
+        "storage": {}
+      }
+    },
+    "transaction": {
+      "chainId": "0x01",
+      "nonce": "0x00",
+      "gasPrice": "0x0a",
+      "gasLimit": [
+        "0x01000000"
+      ],
+      "to": "0xc05e53421f24def8d3d0c763bf494dd40489f149",
+      "value": [
+        "0x00"
+      ],
+      "data": [
+        "0x610001600081600b8239f300"
+      ],
+      "sender": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+      "secretKey": "0x1ad604b3d94e06ec50b27732ec677f3d857c4d588f082f0016317697dd3a2d92"
+    },
+    "post": {
+      "Osaka": [
+        {
+          "hash": "0x11d5263797ba235ab5851bccabef4ef6066dcbd41cdf08161632ee9253325684",
+          "logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+          "receipt": {
+            "transactionHash": "0xdd02116923639117a405024d3a383f4377795c36f8dbcb0b7a8e4cf979cfb6fb",
+            "type": "0x00",
+            "cumulativeGasUsed": "0x0ddd47",
+            "bloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "logs": [],
+            "status": true,
+            "rlp": "0xf9010901830ddd47b9010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c0"
+          },
+          "txbytes": "0xf86d800a840100000094c05e53421f24def8d3d0c763bf494dd40489f149808c610001600081600b8239f30025a0b46d60331dd027aedd65f9ad979269bc67511e9832975ef8977b5fc144b352aba03d7363a126c76b4864ce6f8dbef7c0572549c9f234ff11955816bc941be64a61",
+          "indexes": {
+            "data": 0,
+            "gas": 0,
+            "value": 0
+          },
+          "state": {
+            "0x1da394b1266aa3edf12d385f12df0bd00d6fe958": {
+              "nonce": "0x02",
+              "balance": "0x00",
+              "code": "0x36600060003760003660006000f5600055",
+              "storage": {}
+            },
+            "0xab62ad2053d4b25c9ec365469788cbb7ec7fdf0e": {
+              "nonce": "0x01",
+              "balance": "0x00",
+              "code": "0x73c0f6dc9e5836f54caadbf59cc69346c508e1992bff",
+              "storage": {}
+            },
+            "0xc05e53421f24def8d3d0c763bf494dd40489f149": {
+              "nonce": "0x01",
+              "balance": "0x00",
+              "code": "0x366000600037600060003660006000731da394b1266aa3edf12d385f12df0bd00d6fe958620c8320f16000556000600060006000600073ab62ad2053d4b25c9ec365469788cbb7ec7fdf0e6207a120f160015500",
+              "storage": {
+                "0x00": "0x01",
+                "0x01": "0x01"
+              }
+            },
+            "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+              "nonce": "0x01",
+              "balance": "0x033b2e3c9fd0803ce7755b3a",
+              "code": "0x",
+              "storage": {}
+            },
+            "0xc0f6dc9e5836f54caadbf59cc69346c508e1992b": {
+              "nonce": "0x00",
+              "balance": "0x01",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba": {
+              "nonce": "0x00",
+              "balance": "0x2997d5",
+              "code": "0x",
+              "storage": {}
+            }
+          }
+        }
+      ]
+    },
+    "config": {
+      "blobSchedule": {
+        "Cancun": {
+          "target": "0x03",
+          "max": "0x06",
+          "baseFeeUpdateFraction": "0x32f0ed"
+        },
+        "Prague": {
+          "target": "0x06",
+          "max": "0x09",
+          "baseFeeUpdateFraction": "0x4c6964"
+        },
+        "Osaka": {
+          "target": "0x06",
+          "max": "0x09",
+          "baseFeeUpdateFraction": "0x4c6964"
+        }
+      },
+      "chainid": "0x01"
+    },
+    "_info": {
+      "hash": "0x1f2014edaa9707c787c424162da9d141f8fdc352da7294bda9e931ae468a6f95",
+      "fixture-format": "state_test",
+      "comment": "`execution-specs` generated test",
+      "filling-transition-tool": "2.19.0",
+      "description": "Test that a failed CREATE2 collision does not count as creation.\n\nA CREATE2 that collides with an existing contract fails. A\nsubsequent SELFDESTRUCT on the same address must not destroy the\ncontract because EIP-6780 only allows destruction if the contract\nwas created in the same transaction.",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/tests/cancun/eip6780_selfdestruct/test_collision_selfdestruct.py#L26",
+      "reference-spec": "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-6780.md",
+      "reference-spec-version": "1b6a0e94cc47e859b9866e570391cf37dc55059a"
+    }
+  }
+}
