@@ -13,6 +13,8 @@ const SHARED_CONTEXT = 'engines/evm-context.js';
 const REQUIRED_LOCAL = ['isolated-call.js', 'isolated-worker.js', 'isolated-protocol.js', 'ethereum-call.js', 'ethereum-profile.js', 'ethereum-header.js', 'execute.js', 'rpc-state-inputs.js', 'proof-state.js', 'verified-state-proof.js', 'package.json', 'package-lock.json'].map(p => `${LOCAL_ROOT}/${p}`);
 const WIRE = 'reports/ethereum-lending-local-reference/wire.mjs';
 const POLICY = 'Current isolated local product engine and complete installed local/standard dependencies; source-bound ordinary-local coverage and reused cohort modules. Engine-only comparison, no API or asset-inventory coverage.';
+const COVERAGE_ROOT = 'research/ordinary-local-coverage-v1', MAX_DOCUMENT = 1024 * 1024;
+const DOCUMENTS = new Set([COVERAGE_ROOT + '/PLAN.md', COVERAGE_ROOT + '/NOTES.md']);
 const sha = value => createHash('sha256').update(value).digest('hex');
 const need = (ok, message) => { if (!ok) throw Object.assign(new Error(message), { code: 'COHORT_FREEZE_INVALID' }); };
 const ordered = values => [...values].sort();
@@ -99,6 +101,20 @@ export async function verifyNodeRuntime(expected) {
   const actual = await inspectNodeRuntime(); need(isDeepStrictEqual(actual, expected), 'Current Node executable/runtime differs from the frozen runtime.'); return actual;
 }
 
+/** Optional named documentation is included in the exact source inventory.
+ * Other non-runtime files remain rejected, including nested Markdown files. */
+export async function inspectCoverageSourcePaths(root) {
+  const paths = (await walk(root, COVERAGE_ROOT)).filter(path => !path.endsWith('.test.mjs'));
+  for (const path of paths) {
+    need(path.endsWith('.mjs') || DOCUMENTS.has(path), 'Unexpected coverage source file.');
+    if (DOCUMENTS.has(path)) {
+      const item = await entry(root, path);
+      need(item.kind === 'file' && item.bytes <= MAX_DOCUMENT, 'Coverage documentation exceeds its byte limit.');
+    }
+  }
+  return paths;
+}
+
 /** Read-only inventory. extras only add files; they cannot replace derived paths. */
 export async function inspectCohortSources({ repoRoot, extraFiles = [] }) {
   const root = await realpath(resolve(repoRoot)); await directory(root);
@@ -109,8 +125,7 @@ export async function inspectCohortSources({ repoRoot, extraFiles = [] }) {
   const standardSources = standard.filter(path => path.endsWith('.js') || ['package.json', 'package-lock.json'].includes(posix.basename(path)));
   const research = await walk(root, 'research/standard-evm');
   const cohort = research.filter(path => posix.dirname(path) === 'research/standard-evm' && /^cohort-.*\.mjs$/.test(posix.basename(path)) && !path.endsWith('.test.mjs'));
-  const owned = (await walk(root, 'research/ordinary-local-coverage-v1')).filter(path => !path.endsWith('.test.mjs'));
-  need(owned.every(path => path.endsWith('.mjs') || path.endsWith('/PLAN.md')), 'Unexpected coverage source file.');
+  const owned = await inspectCoverageSourcePaths(root);
   const dependencyPaths = (await Promise.all(DEPS.map(path => walk(root, path)))).flat();
   const paths = ordered(new Set(['package.json', ...localSources, ...standardSources, ...REQUIRED_LOCAL, SHARED_CONTEXT, ...dependencyPaths, ...cohort, ...owned, WIRE, 'research/standard-evm/cohort-deployments.json']));
   const files = await inventory(root, paths), runtime = await inspectNodeRuntime();

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "command": "node --test research/delegated-sender-geth-v1-audit/verify.test.mjs",
+  "passed": 12,
+  "failed": 0,
+  "skipped": 0,
+  "testSourceSha256": "0eacf85a90d94f4ce5c9a53ec192728b41cfeb4666e49de7cfed3ac02275c90b",
+  "controls": [
+    "actual raw record and all 14 data-only fixture bindings validate without execution",
+    "exit-zero passfalse and wrong root remain mismatches",
+    "foreign result identity and pass/error contradiction never pass",
+    "process failure, signal and timeout cannot count as a match",
+    "missing, negative, nonfinite elapsed and invalid timeout are rejected",
+    "partial output, noncanonical base64 and raw hash tampering are rejected",
+    "invalid UTF8 and oversized combined output cannot pass",
+    "exact argv, wrapper hash and stderr root alias are bound",
+    "changed prestate, header and signed bytes fail independent fixture preparation",
+    "product delta alteration and duplicate changed accounts fail root reconstruction",
+    "unknown transaction context and mismatched expected log hash are rejected",
+    "exact inventory rejects missing, added, modified and linked evidence"
+  ],
+  "newGethOrVMExecutions": 0,
+  "publicRequests": 0
+}

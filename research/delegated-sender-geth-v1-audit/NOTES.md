@@ -1,0 +1,21 @@
+# Supplemental audit of 14 delegated-sender Geth controls
+
+The raw saved results independently classify as **14 matched, zero mismatched, unavailable or unattempted**: 13 Osaka fixtures and one Prague fixture. Every declared case is present in its original order. The observed Geth dispatch lasted 636.513 ms and retained 3,550 bytes across stdout/stderr. This audit makes no new Geth invocation, VM execution or public request.
+
+[The audit report](audit.json) verifies the exact 30-file capture inventory, externally supplied capture/plan/fixture hashes, three bound adjacent source files, all 14 generated input wrappers, immediate input identities, recorded arguments, strict raw byte/count/hash bindings, process exit/signal/error and positive bounded timeout, and result identity/fork/root/pass status. It independently classifies raw output rather than importing the producer adjudicator. An exit-zero `pass:false` remains a mismatch. The pinned Geth binary and toolchain manifest match their expected digests; the retained Geth interpretation sources are also rehashed. The toolchain's source/build claims were not independently rebuilt by this audit.
+
+Separate data-only code recomputes each synthetic header RLP hash, initial account/storage MPT root, fork selection, exact legacy signed transaction and recovered sender. It verifies request/envelope equality, the existing `ef0100…` sender designation, zero gas price/base fee, fixed 5M gas, and absence of authorization-list processing. It independently applies every exported product change to the complete initial allocation and obtains the same full poststate root as the frozen expectation. This uses pinned EthereumJS MPT/signature/hash libraries, not their EVM execution. No expected poststate is supplied as an initial account fact.
+
+Geth's recorded `pass:true` means its internal state-test checks accepted both the supplied poststate root and log hash. All **14 expected log lists are empty**, so this packet provides no nonempty-log ordering evidence. The exported reference executions contain 13 successes and one root revert; these status labels are fixture data, not a separately returned Geth status channel. Gas, return bytes, receipts, traces and execution status were not independently compared against Geth output.
+
+**Product source provenance remains unestablished.** The capture binds frozen fixture expectations and exports claiming product/full-VM results, with the runner explicitly recording `productSourceProvenanceEstablished:false`. It does not freeze the complete product/generator dependency closure at expectation generation. The audit's independently reconstructed delta root strengthens consistency of those exported data, but cannot prove which product executable produced them. The audit records its own present dependency-tree identity for reproducibility; that is separate from capture-time product provenance. These synthetic development controls are neither official-vector conformance nor a population or product-accuracy rate.
+
+Original evidence: [results](../delegated-sender-geth-v1/capture/results.json), [plan](../delegated-sender-geth-v1/capture/PLAN.json), [frozen fixtures](../delegated-sender-geth-v1/fixtures.json). External identities:
+
+- Capture manifest: `aa861c891ee5da6e17df280fda2a163ab392ebb89fa090c2e38c10c2e043c702`
+- Plan: `3a49788c774929e9fe377dd36a33e8404a9a10fd0db9b4ffc97506047614fe4b`
+- Fixtures: `7b5bf7a815934953951908002cac69c1b74ae5a3d7ddd0dfc652b65a1a40959a`
+- Geth binary: `10385eddbfd76c3d05b9853f30f4372f2468f6a8c1ac64c445a7490694fc3521`
+- Toolchain manifest: `791a91bca058b516b21a66097787f96959477958219eaee9dd20e73367b21333`
+
+Run `node research/delegated-sender-geth-v1-audit/verify.mjs --verify` from the repository root for a data-only audit. An expected audit-manifest SHA can be supplied as a final argument. `node --test research/delegated-sender-geth-v1-audit/verify.test.mjs` runs 12 focused controls covering changed roots/inputs, failed assertions, process faults, timing, partial/invalid output, wrappers, signatures, delta application and inventory tampering. Neither command invokes Geth or a VM. The original capture, driver and fixtures were not changed.

@@ -1,0 +1,15 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {adjudicate,validateFixture,sha} from './run.mjs';
+const fixtures=JSON.parse(fs.readFileSync(new URL('./fixtures.json',import.meta.url)));
+const expected={name:'example',fork:'Prague',stateRoot:'0x'+'11'.repeat(32)};
+const stream=value=>{const b=Buffer.isBuffer(value)?value:Buffer.from(value);return{base64:b.toString('base64'),bytes:b.length,sha256:sha(b)};};
+const raw=(row={name:expected.name,fork:expected.fork,stateRoot:expected.stateRoot,pass:true})=>({error:null,exitCode:0,signal:null,elapsedMs:1,timeoutMs:5000,stdout:stream(JSON.stringify([row])),stderr:stream('')});
+test('all fixed fixtures bind header, initial root, signed envelope and expected roots without target execution',async()=>{assert.equal(fixtures.cases.length,14);for(const c of fixtures.cases)await validateFixture(c);});
+test('valid exact record matches but exit-zero failed assertion remains mismatch',()=>{assert.equal(adjudicate(raw(),expected).status,'matched');const r=raw({name:expected.name,fork:expected.fork,stateRoot:expected.stateRoot,pass:false,error:'logs mismatch'});assert.equal(adjudicate(r,expected).status,'mismatched');});
+test('different state root cannot pass',()=>{const r=raw({name:expected.name,fork:expected.fork,stateRoot:'0x'+'22'.repeat(32),pass:true});assert.equal(adjudicate(r,expected).status,'mismatched');});
+test('foreign fork/name, absent root and extra result rows are unavailable',()=>{for(const change of [r=>r.fork='Osaka',r=>r.name='foreign',r=>delete r.stateRoot]){const r={name:expected.name,fork:expected.fork,stateRoot:expected.stateRoot,pass:true};change(r);assert.equal(adjudicate(raw(r),expected).status,'unavailable');}const r=raw();r.stdout=stream('[]');assert.equal(adjudicate(r,expected).status,'unavailable');});
+test('process failure, missing or invalid timing and oversized output cannot report matches',()=>{for(const patch of [{error:'ETIMEDOUT'},{error:undefined},{exitCode:1},{signal:'SIGKILL'},{elapsedMs:5001},{elapsedMs:-1},{elapsedMs:undefined},{elapsedMs:NaN},{timeoutMs:undefined},{timeoutMs:0}])assert.equal(adjudicate({...raw(),...patch},expected).status,'unavailable');const r=raw();r.stderr=stream(' '.repeat(1048577));assert.equal(adjudicate(r,expected).status,'unavailable');});
+test('invalid UTF8 and forged raw stream metadata are unavailable',()=>{const r=raw();r.stdout=stream(Buffer.from([255]));assert.equal(adjudicate(r,expected).status,'unavailable');for(const name of ['stdout','stderr']){const x=raw();x[name].sha256='0'.repeat(64);assert.equal(adjudicate(x,expected).status,'unavailable');}});
+test('changed calldata, initial root, gas and expected root fail preparation',async()=>{for(const change of [c=>c.request.data='0x00',c=>c.header.stateRoot='0x'+'22'.repeat(32),c=>c.request.gas='4000000',c=>c.fullVM.stateRoot='0x'+'33'.repeat(32)]){const c=structuredClone(fixtures.cases[0]);change(c);await assert.rejects(()=>validateFixture(c));}});

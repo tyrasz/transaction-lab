@@ -13,6 +13,8 @@ export const sha=b=>createHash('sha256').update(b).digest('hex');
 export const need=(v,m)=>{if(!v)throw Object.assign(Error(m),{code:'SYNTHETIC_GETH_INVALID'});};
 const DEPS=['engines/local-evm/node_modules','engines/fixture-evm/node_modules'];
 const MAX_FILES=20000,MAX_TOTAL=512*1024*1024,MAX_FILE=32*1024*1024;
+const HARNESS='research/cross-client-synthetic-geth-v1',MAX_DOCUMENT=1024*1024;
+const DOCUMENTS=new Set([HARNESS+'/PLAN.md',HARNESS+'/NOTES.md']);
 export const SEMANTICS=['cmd/evm/staterunner.go','cmd/evm/reporter.go','tests/state_test_util.go','tests/init.go'];
 export function safePath(p){need(typeof p==='string'&&p.length>0&&p.length<=1024&&!path.isAbsolute(p)&&!p.includes('\\')&&!p.includes('\0')&&path.posix.normalize(p)===p&&!p.split('/').some(x=>['','.','..'].includes(x)),'Unsafe path');return p;}
 export function read(root,p){safePath(p);let current=root;for(const part of p.split('/')){current=path.join(current,part);need(!fs.lstatSync(current).isSymbolicLink(),'Linked artifact path');}const s=fs.lstatSync(current);need(s.isFile()&&s.size<=MAX_FILE,'Bounded regular artifact required');return fs.readFileSync(current);}
@@ -22,11 +24,18 @@ function syncDir(p){const fd=fs.openSync(p,'r');try{fs.fsyncSync(fd);}finally{fs
 function walk(root,p='',skip=()=>false){const found=[];for(const e of fs.readdirSync(path.join(root,p),{withFileTypes:true})){const next=p?p+'/'+e.name:e.name;safePath(next);if(skip(next,e))continue;if(e.isDirectory())found.push(...walk(root,next,skip));else{need(e.isFile()||e.isSymbolicLink(),'Special archive member');found.push(next);}need(found.length<=MAX_FILES,'Archive file limit');}return found.sort();}
 function entry(root,p){const s=fs.lstatSync(path.join(root,p));if(s.isSymbolicLink()){const dep=DEPS.find(d=>p.startsWith(d+'/'));need(dep,'Only dependency links are supported');const target=fs.readlinkSync(path.join(root,p));need(!path.isAbsolute(target)&&!target.includes('\\')&&!target.includes('\0'),'Unsafe dependency link');const resolved=path.posix.normalize(path.posix.join(path.posix.dirname(p),target));need(resolved.startsWith(dep+'/'),'Dependency link escapes closure');read(root,resolved);return{path:p,kind:'symlink',target};}return{path:p,kind:'file',...identity(root,p),mode:s.mode&0o777};}
 function inventory(root,paths){need(paths.length<=MAX_FILES&&new Set(paths.map(p=>p.toLowerCase())).size===paths.length,'Duplicate/large inventory');const rows=paths.slice().sort().map(p=>entry(root,p));need(rows.reduce((s,r)=>s+(r.bytes??0),0)<=MAX_TOTAL,'Archive byte limit');const byPath=new Map(rows.map(r=>[r.path,r]));for(const r of rows)if(r.kind==='symlink')need(byPath.get(path.posix.normalize(path.posix.join(path.posix.dirname(r.path),r.target)))?.kind==='file','Dependency link target absent');return rows;}
+// Named documentation is optional and source-bound when present. This does
+// not admit arbitrary Markdown or relax the exact archive membership check.
+export function inspectHarnessSourcePaths(root){
+ const paths=walk(root,HARNESS,(p,e)=>e.isDirectory());
+ for(const p of paths){need(p.endsWith('.mjs')||DOCUMENTS.has(p),'Unexpected harness source');if(DOCUMENTS.has(p))need(read(root,p).length<=MAX_DOCUMENT,'Harness documentation exceeds its byte limit');}
+ return paths;
+}
 export async function inspectSources(repoRoot){
  const root=fs.realpathSync(repoRoot),paths=new Set(['package.json','engines/evm-context.js','research/standard-evm/cohort-freeze.mjs','research/cross-client-geth-v1/run.mjs','research/evm-lifecycle-differential-v1/runtime.mjs']);
  for(const engine of ['engines/local-evm','engines/fixture-evm'])for(const p of walk(root,engine,(p)=>p===engine+'/test'||p===engine+'/node_modules'))if(p.endsWith('.js')||['package.json','package-lock.json'].includes(path.basename(p)))paths.add(p);
  for(const dep of DEPS)for(const p of walk(root,dep))paths.add(p);
- for(const p of walk(root,'research/cross-client-synthetic-geth-v1',(p,e)=>e.isDirectory())){need(p.endsWith('.mjs')||p.endsWith('/PLAN.md'),'Unexpected harness source');paths.add(p);}
+ for(const p of inspectHarnessSourcePaths(root))paths.add(p);
  const manifestBytes=read(root,CORPUS.directory+'/manifest.json');need(sha(manifestBytes)===CORPUS.manifestSha256,'Original corpus manifest drift');const old=JSON.parse(manifestBytes);need(old.planSha256===CORPUS.planSha256&&old.files.length===100,'Original corpus identity/count drift');
  paths.add(CORPUS.directory+'/manifest.json');for(const r of old.files){safePath(r.path);const p=CORPUS.directory+'/'+r.path;need(equal(identity(root,p),{bytes:r.bytes,sha256:r.sha256}),'Original artifact drift');paths.add(p);}
  need(identity(root,'research/cross-client-geth-v1/run.mjs').sha256===RELEASED_DISPATCH_SHA,'Released dispatcher drift');
