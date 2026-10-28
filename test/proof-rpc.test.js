@@ -227,3 +227,49 @@ test('backward or nonfinite clock closes all future dispatch without NaN telemet
   clock = NaN; const usage = rpc.usage(); assert.equal(usage.clockValid, false); assert.equal(usage.calls, 0); assert.equal(usage.elapsedMs, 0); assert.equal(usage.cancelled, true);
   clock = 20; await assert.rejects(rpc.call('eth_chainId'), errorCode('RPC_CLOCK'));
 });
+
+test('header-aware pin allows only source rechecks and sequential hash-selected parents', async () => {
+  const hashAt=n=>'0x'+BigInt(n).toString(16).padStart(64,'0');
+  const headerAt=n=>({hash:hashAt(n),number:'0x'+n.toString(16),parentHash:hashAt(n-1)});
+  const seen=[],rpc=make({fetchImpl:async(_url,options)=>{const request=JSON.parse(options.body);seen.push(request);return new Response(body(options,headerAt(Number(BigInt(request.params[0])))));}});
+  rpc.pinBlockHash(hashAt(300),headerAt(300));
+  await assert.rejects(rpc.call('eth_getBlockByNumber',['latest',false]),errorCode('RPC_INVALID_INPUT'));
+  await assert.rejects(rpc.call('eth_getBlockByNumber',['0x12b',false]),errorCode('RPC_INVALID_INPUT'));
+  await assert.rejects(rpc.call('eth_getBlockByHash',[hashAt(298),false]),errorCode('RPC_INVALID_INPUT'));
+  await rpc.call('eth_getBlockByHash',[hashAt(299),false]);
+  rpc.pinBlockHash(hashAt(300),headerAt(300)); // Repeating the pin must not reset ancestry.
+  await assert.rejects(rpc.call('eth_getBlockByHash',[hashAt(299),false]),errorCode('RPC_INVALID_INPUT'));
+  await rpc.call('eth_getBlockByHash',[hashAt(298),false]);
+  await rpc.call('eth_getBlockByHash',[hashAt(300),false]);await rpc.call('eth_getBlockByNumber',['0x12c',false]);
+  assert.equal(seen.length,4);assert.equal(rpc.snapshotEvidence().length,4);
+  assert.throws(()=>rpc.pinBlockHash(hashAt(300),{...headerAt(300),parentHash:H}),errorCode('RPC_PIN_CHANGED'));
+});
+
+test('transport ancestry rejects malformed or skipped header numbers without advancing the gate',async()=>{
+  const root={hash:H,number:'0x10',parentHash:OTHER},parent={hash:OTHER,number:'0xf',parentHash:S};let value={...parent,number:'0xe'};
+  const rpc=make({fetchImpl:async(_url,options)=>new Response(body(options,value))});rpc.pinBlockHash(H,root);
+  await assert.rejects(rpc.call('eth_getBlockByHash',[OTHER,false]),errorCode('RPC_INVALID_RESPONSE'));
+  assert.equal(rpc.snapshotEvidence()[0].status,'failed');assert.equal(Object.hasOwn(rpc.snapshotEvidence()[0],'responseText'),false);
+  await assert.rejects(rpc.call('eth_getBlockByHash',[S,false]),errorCode('RPC_INVALID_INPUT'));
+  value=parent;assert.deepEqual(await rpc.call('eth_getBlockByHash',[OTHER,false]),parent);
+  assert.equal(rpc.usage().calls,2);
+});
+
+test('transport bounds ancestry to255 fetched intermediate headers inside its unchanged shared call cap',async()=>{
+  const hashAt=n=>'0x'+BigInt(n).toString(16).padStart(64,'0'),headerAt=n=>({hash:hashAt(n),number:'0x'+n.toString(16),parentHash:hashAt(n-1)});
+  const rpc=make({fetchImpl:async(_url,options)=>new Response(body(options,headerAt(Number(BigInt(JSON.parse(options.body).params[0])))))});
+  rpc.pinBlockHash(hashAt(300),headerAt(300));
+  for(let n=299;n>=45;n--)await rpc.call('eth_getBlockByHash',[hashAt(n),false]);
+  assert.equal(rpc.usage().calls,255);await assert.rejects(rpc.call('eth_getBlockByHash',[hashAt(44),false]),errorCode('RPC_INVALID_INPUT'));
+  await rpc.call('eth_getCode',[A,{blockHash:hashAt(300),requireCanonical:true}]).catch(()=>{});assert.equal(rpc.usage().calls,256);
+});
+
+test('ancestor gate prevents concurrent chain advancement and preserves cancellation evidence',async()=>{
+  const waiting=deferred(),rpc=make({fetchImpl:async()=>waiting.promise});rpc.pinBlockHash(H,{hash:H,number:'0x10',parentHash:OTHER});
+  const controller=new AbortController(),pending=rpc.call('eth_getBlockByHash',[OTHER,false],{signal:controller.signal});
+  await assert.rejects(rpc.call('eth_getBlockByHash',[OTHER,false]),errorCode('RPC_INVALID_INPUT'));
+  controller.abort();await assert.rejects(pending,errorCode('RPC_CANCELLED'));
+  const saved=JSON.stringify(rpc.snapshotEvidence());waiting.resolve(new Response(JSON.stringify({jsonrpc:'2.0',id:1,result:{hash:OTHER,number:'0xf',parentHash:S}})));
+  assert.equal((await rpc.drain({timeoutMs:100})).complete,true);assert.equal(JSON.stringify(rpc.snapshotEvidence()),saved);
+  await assert.rejects(rpc.call('eth_getBlockByHash',[S,false]),errorCode('RPC_INVALID_INPUT'));
+});

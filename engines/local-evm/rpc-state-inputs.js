@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { isDeepStrictEqual } from 'node:util';
 import { verifyStateProof } from './verified-state-proof.js';
+import { createAuthenticatedAncestry } from './authenticated-ancestry.js';
 
 const ADDRESS = /^0x[0-9a-f]{40}$/i, WORD = /^0x[0-9a-f]{64}$/i;
 const ZERO = '0x' + '00'.repeat(32);
@@ -57,6 +58,7 @@ export function createRpcStateInputs(options) {
     selector: { blockHash, requireCanonical: true }, stateRootTrust: 'caller_supplied_header',
     provenance: 'verified_eip1186_proofs_and_code_hash', expectedOutputsUsed: false };
   const facts = new Map(), evidence = [], reads = new Map();
+  let ancestry = null;
   let failure = null, totalBytes = 0, slotCount = 0, readCount = 0, started = null, pending = Promise.resolve();
   function live() {
     if (failure) throw new RpcStateInputError(failure.code, failure.message);
@@ -79,7 +81,7 @@ export function createRpcStateInputs(options) {
   }
   async function call(method, params) {
     live();
-    if (!['eth_getProof', 'eth_getCode'].includes(method)) fail('RPC_STATE_INPUT_INVALID', 'Only proof and code reads are permitted.');
+    if (!['eth_getProof', 'eth_getCode', 'eth_getBlockByHash'].includes(method)) fail('RPC_STATE_INPUT_INVALID', 'Only proof, code and authenticated ancestor reads are permitted.');
     if (evidence.length >= limits.calls || totalBytes >= limits.totalBytes) fail('RPC_STATE_INPUT_LIMIT', 'Input-state RPC budget was exhausted.');
     const request = { method, params: structuredClone(params) }, requestText = JSON.stringify(request);
     const entry = { id: evidence.length + 1, request, requestText, requestSha256: sha(requestText), status: 'pending',
@@ -134,6 +136,22 @@ export function createRpcStateInputs(options) {
   }
   const collector = Object.freeze({
     context: freeze(structuredClone(context)),
+    blockchain: Object.freeze({ getBlock(number) { return schedule(async () => {
+      if (typeof number === 'number' && Number.isSafeInteger(number) && number >= 0) number = BigInt(number);
+      if (chainId !== 1 || typeof number !== 'bigint' || BigInt(context.header.number) > BigInt(Number.MAX_SAFE_INTEGER)) fail('RPC_STATE_INPUT_INVALID', 'Authenticated ancestry requires an exact Ethereum block number.');
+      demand('blockhash', number.toString());
+      ancestry ??= createAuthenticatedAncestry(context.header);
+      while (ancestry.peek(number) === null) {
+        const nextHash = ancestry.nextHash();
+        if (nextHash === null) fail('RPC_STATE_INPUT_LIMIT', 'The authenticated ancestry bound was exhausted.');
+        const read = await call('eth_getBlockByHash', [nextHash, false]);
+        try { ancestry.accept(read.result, read.evidenceId); }
+        catch { evidence[read.evidenceId - 1].verification = 'rejected'; delete evidence[read.evidenceId - 1].result; fail('RPC_STATE_INPUT_INVALID_ANCESTRY', 'Ancestor header did not match its committed parent link.'); }
+        live(); evidence[read.evidenceId - 1].verification = 'verified';
+      }
+      const hash = ancestry.record(number);
+      return { hash: () => Uint8Array.from(Buffer.from(hash.slice(2), 'hex')) };
+    }); } }),
     getAccount(rawAddress) { return schedule(async () => { const key = address(rawAddress); demand('account', key); return structuredClone((await load(key)).account); }); },
     getCode(rawAddress) { return schedule(async () => { const key = address(rawAddress); demand('code', key); return (await load(key)).code; }); },
     getStorage(rawAddress, rawSlot) { return schedule(async () => {
@@ -159,6 +177,7 @@ export function createRpcStateInputs(options) {
       for (const [key, entry] of facts) accounts[key] = entry.account.exists ? { exists: true, nonce: entry.account.nonceRaw, balance: entry.account.balanceRaw,
         code: entry.code, storage: Object.fromEntries([...entry.storage].map(([slot, row]) => [slot, row.value])) } : { exists: false };
       return { status: failure ? 'unavailable' : 'available', context: structuredClone(context), accounts,
+        ...(ancestry ? { ancestry: ancestry.snapshot() } : {}),
         provenance: [...facts].map(([account, entry]) => ({ account, accountProof: structuredClone(entry.account), proofEvidenceId: entry.proofEvidenceId,
           codeEvidenceId: entry.codeEvidenceId, storage: [...entry.storage].map(([key, value]) => ({ key, ...value })) })),
         coverage: 'Only demanded, proof-verified initial accounts and storage keys; unrequested storage is unknown.', ...(failure ? { failure: structuredClone(failure) } : {}) };

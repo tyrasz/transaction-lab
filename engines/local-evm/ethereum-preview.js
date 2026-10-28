@@ -74,7 +74,7 @@ export async function executeEthereumPreview(options) {
     if (!available()) return null;
     const remaining = Object.fromEntries(EXECUTION_COUNTS.map(key => [key, limits[key] - counters[key]]));
     const { rootReturnBytes, ...executionRemaining } = remaining;
-    const output = await executeEthereumCall({ request: call, header, stateManager: manager, now,
+    const output = await executeEthereumCall({ request: call, header, stateManager: manager, blockchain: inputs.blockchain, now,
       limits: { ...executionRemaining, gas: limits.gas, depth: limits.depth, memoryBytes: limits.memoryBytes, calldataBytes: limits.calldataBytes,
         returnBytes: rootReturnBytes, wallMs: Math.max(1, Math.min(120000, Math.floor(limits.wallMs - elapsed()))) } });
     counters.executions++;

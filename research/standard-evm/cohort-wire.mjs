@@ -1,3 +1,4 @@
+import { createAuthenticatedAncestry } from '../../engines/local-evm/authenticated-ancestry.js';
 import { performance } from 'node:perf_hooks';
 import { captureHttp } from '../../reports/ethereum-lending-local-reference/wire.mjs';
 
@@ -56,13 +57,14 @@ export function createCohortWireBudget({ limits = {} } = {}) {
   states.set(budget, state); return budget;
 }
 
-function validParams(profile, method, params, blockHash) {
+function validParams(profile, method, params, blockHash, nextAncestorHash = null) {
   if (!Array.isArray(params)) return false;
   const pinned = value => exact(value, ['blockHash', 'requireCanonical']) && value.blockHash === blockHash && value.requireCanonical === true;
   if (method === 'eth_chainId') return profile !== 'local' && params.length === 0;
   if (method === 'eth_getBlockByNumber') return profile !== 'local' && params.length === 2 &&
     typeof params[0] === 'string' && (QUANTITY.test(params[0]) || (profile === 'census' && ['latest', 'finalized'].includes(params[0]))) &&
     typeof params[1] === 'boolean' && (profile === 'census' || params[1] === false);
+  if (method === 'eth_getBlockByHash' && profile === 'local') return nextAncestorHash !== null && params.length === 2 && params[0] === nextAncestorHash && params[1] === false;
   if (method === 'eth_getBlockByHash') return profile !== 'local' && params.length === 2 && matches(params[0], WORD) &&
     typeof params[1] === 'boolean' && (profile === 'census' || (params[0] === blockHash && params[1] === false));
   if (profile === 'census') return false;
@@ -85,10 +87,17 @@ function validParams(profile, method, params, blockHash) {
  * Limits count observed fetch entity bytes, including oversize chunks; these
  * are not TCP byte or process-memory caps. No retries or provider fallback.
  */
-export function createCohortTransport({ budget, provider, profile, blockHash, limits = {}, save = () => {}, fetchImpl = fetch }) {
+export function createCohortTransport({ budget, provider, profile, blockHash, header, limits = {}, save = () => {}, fetchImpl = fetch }) {
   const shared = states.get(budget);
   if (!shared || !Object.hasOwn(COHORT_PROVIDERS, provider) || !Object.hasOwn(profiles, profile) || typeof save !== 'function' || typeof fetchImpl !== 'function') fail('invalid_transport');
   if (profile === 'census' ? blockHash !== undefined : typeof blockHash !== 'string' || !WORD.test(blockHash)) fail('invalid_state_binding');
+  if (header !== undefined && profile !== 'local') fail('invalid_state_binding');
+  let ancestry = null;
+  if (header !== undefined) {
+    try { ancestry = createAuthenticatedAncestry(header); } catch { fail('invalid_state_binding'); }
+    if (ancestry.snapshot().anchorBlockHash !== blockHash) fail('invalid_state_binding');
+  }
+  let ancestryFailure = false;
   const fixed = limitsBelow({ ...profiles[profile], requestMs: 25000, responseBytes: 8 * 1024 * 1024, wallMs: profile === 'census' ? 3600000 : 145000 }, limits);
   const scope = { bytes: 0, maxBytes: fixed.totalBytes }, records = [], denied = [], pending = new Set();
   let calls = 0, dispatches = 0, nextId = 0, busy = false, start = null;
@@ -102,13 +111,14 @@ export function createCohortTransport({ budget, provider, profile, blockHash, li
     const method = body?.method;
     try { body = snapshotRequest(body); } catch (error) { deny(error.code ?? 'request_not_allowed', method); }
     if (!exact(body, ['jsonrpc', 'id', 'method', 'params']) || body.jsonrpc !== '2.0' || !Number.isSafeInteger(body.id) || body.id < 1 ||
-      typeof method !== 'string' || !validParams(profile, method, body.params, blockHash)) deny('request_not_allowed', method);
+      typeof method !== 'string' || !validParams(profile, method, body.params, blockHash, ancestry?.nextHash() ?? null)) deny('request_not_allowed', method);
     const requestText = JSON.stringify(body);
     if (Buffer.byteLength(requestText) > MAX_REQUEST) deny('request_byte_budget', method);
     if (signal?.aborted) deny('cancelled_before_dispatch', method);
     if (busy) deny('concurrent_dispatch', method);
     if (ids.has(body.id)) deny('duplicate_request_id', method);
     if (shared.saveFailure) deny('wire_save_failed', method);
+    if (ancestryFailure) deny('ancestor_header_invalid', method);
     const now = performance.now(), deadline = Math.min(shared.deadline, (start ?? now) + fixed.wallMs);
     if (calls >= fixed.calls || shared.calls >= shared.limits.calls || now >= deadline || scope.bytes >= scope.maxBytes || shared.bytes >= shared.maxBytes) deny('attempt_budget', method);
     start ??= now; busy = true; calls++; shared.calls++; ids.add(body.id);
@@ -124,6 +134,13 @@ export function createCohortTransport({ budget, provider, profile, blockHash, li
         wire.status = 'failed'; wire.error = 'jsonrpc_envelope';
       }
       if (wire.status === 'completed' && Object.hasOwn(p, 'error')) { wire.status = 'failed'; wire.error = 'rpc_error'; }
+      if (profile === 'local' && method === 'eth_getBlockByHash') {
+        if (wire.status === 'completed') {
+          try { ancestry.accept(p.result, calls); wire.ancestorVerification = 'verified'; }
+          catch { wire.status = 'failed'; wire.error = 'ancestor_header_invalid'; wire.ancestorVerification = 'rejected'; }
+        }
+        if (wire.status !== 'completed') ancestryFailure = true;
+      }
       records.push(wire);
       try {
         const saved = save(structuredClone(wire));
@@ -160,6 +177,7 @@ export function createCohortTransport({ budget, provider, profile, blockHash, li
       // Complete HTTP/RPC/JSON failures are replayed verbatim for the product
       // parser (which also rejects invalid UTF-8). Truncated or timed-out
       // entities never masquerade as a complete response.
+      if (profile === 'local' && wire.error === 'ancestor_header_invalid') fail(wire.error);
       if (!wire.transport.complete || wire.error === 'deadline' || !Number.isInteger(wire.httpStatus)) fail(wire.error ?? 'incomplete_transport');
       const raw = Buffer.from(wire.rawBase64, 'base64');
       if ([204, 205, 304].includes(wire.httpStatus)) return new Response(null, { status: wire.httpStatus, headers: wire.headers });

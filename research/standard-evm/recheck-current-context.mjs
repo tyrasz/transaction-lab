@@ -164,7 +164,7 @@ export async function runCurrentContext({ outputDirectory, expectedPlanSha256 })
   // Verify the archived source, plan and input bytes before every phase.
   const sourceCheck = async () => { try { await checkCurrentContext({ outputDirectory: directory, expectedPlanSha256 }); } catch { fatal = 'source_or_input_drift'; throw Object.assign(new Error(fatal), { code: fatal }); } };
   function transport(c, profile) {
-    const rpc = createCohortTransport({ budget, provider: 'drpc', profile, blockHash: c.header.hash,
+    const rpc = createCohortTransport({ budget, provider: 'drpc', profile, blockHash: c.header.hash, ...(profile === 'local' ? { header: c.header } : {}),
       limits: { calls: profile === 'local' ? plan.policy.localCalls : plan.policy.productCalls, totalBytes: plan.policy.phaseBytes, responseBytes: plan.policy.responseBytes, requestMs: plan.policy.requestMs, wallMs: Math.max(1, Math.min(plan.policy.phaseWallMs, remaining())) },
       save: wire => writer.write(`wire/${String(wire.globalId).padStart(6, '0')}.json`, { ...wire, caseId: c.id }) });
     active.add(rpc); return rpc;

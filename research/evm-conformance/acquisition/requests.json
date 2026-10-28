@@ -1,0 +1,73 @@
+{
+  "logicalFetches": 8,
+  "requests": [
+    {
+      "requestUrl": "https://api.github.com/repos/ethereum/execution-specs/releases/tags/tests%40v21.0.2",
+      "headersFile": "acquisition/release.headers",
+      "httpStatusChain": [
+        200
+      ],
+      "automaticRetries": 0
+    },
+    {
+      "requestUrl": "https://registry.npmjs.org/@ethereumjs%2fvm/10.1.3",
+      "headersFile": "acquisition/vm.headers",
+      "httpStatusChain": [
+        200
+      ],
+      "automaticRetries": 0
+    },
+    {
+      "requestUrl": "https://registry.npmjs.org/@ethereumjs%2ftx/10.1.3",
+      "headersFile": "acquisition/tx.headers",
+      "httpStatusChain": [
+        200
+      ],
+      "automaticRetries": 0
+    },
+    {
+      "requestUrl": "https://registry.npmjs.org/@ethereumjs%2fblock/10.1.3",
+      "headersFile": "acquisition/block.headers",
+      "httpStatusChain": [
+        200
+      ],
+      "automaticRetries": 0
+    },
+    {
+      "requestUrl": "https://github.com/ethereum/execution-specs/releases/download/tests%40v21.0.2/fixtures.tar.gz",
+      "headersFile": "acquisition/fixtures.headers",
+      "httpStatusChain": [
+        302,
+        200
+      ],
+      "automaticRetries": 0
+    },
+    {
+      "requestUrl": "https://raw.githubusercontent.com/ethereumjs/ethereumjs-monorepo/29f404f305be4473907d4aa4f7ece85633bb73da/packages/vm/test/tester/runners/GeneralStateTestsRunner.ts",
+      "headersFile": "acquisition/ethereumjs-state-runner.headers",
+      "httpStatusChain": [
+        404
+      ],
+      "automaticRetries": 0
+    },
+    {
+      "requestUrl": "https://raw.githubusercontent.com/ethereum/execution-specs/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum_test_fixtures/state.py",
+      "headersFile": "acquisition/state-format.headers",
+      "httpStatusChain": [
+        404
+      ],
+      "automaticRetries": 0
+    },
+    {
+      "requestUrl": "https://api.github.com/repos/ethereumjs/ethereumjs-monorepo/contents/packages/vm/test?ref=29f404f305be4473907d4aa4f7ece85633bb73da",
+      "headersFile": "acquisition/vm-test-tree.headers",
+      "httpStatusChain": [
+        200
+      ],
+      "automaticRetries": 0
+    }
+  ],
+  "dependencyFetches": "dependencies/records.json",
+  "archiveBody": "Temporary path and exact digest recorded in archive.json; not retained in git.",
+  "notes": "Two pinned source-path lookups returned404; bodies/headers retained. They are not dependencies or fixture inputs."
+}

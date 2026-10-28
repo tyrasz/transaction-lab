@@ -153,3 +153,24 @@ test('manifest identity, file bytes and unlisted/link artifacts fail before any 
     await assert.rejects(verifyCohortEvidence({ outputDirectory: dir, expectedManifestSha256: sha(text) }), /regular file/);
   } finally { await rm(dir, { recursive: true, force: true }); }
 });
+
+test('actual child ancestor inputs join captured wire and verify independently; tampering or missing archive support fails',async()=>{
+ const [{fixture,blockhashCode},ancestry,{executeIsolatedEthereumCall}]=await Promise.all([
+  import('../../engines/local-evm/test/ancestry-fixture.js'),import('../../engines/local-evm/authenticated-ancestry.js'),import('../../engines/local-evm/isolated-call.js')]);
+ const f=await fixture(blockhashCode(2)),rpc=createCohortTransport({budget:createCohortWireBudget(),provider:'drpc',profile:'local',blockHash:f.header.hash,header:f.header,fetchImpl:async(_url,options)=>{
+  const r=JSON.parse(options.body),result=await f.rpc.call(r.method,r.params);return new Response(JSON.stringify({jsonrpc:'2.0',id:r.id,result}));
+ }});
+ const attempt=await executeIsolatedEthereumCall({request:f.request,header:f.header,rpc}),local={dispatch:'completed',attempt},wires=rpc.records(),modules={verifyStateProof,...ancestry};
+ assert.equal(attempt.output.execution.status,'success');assert.equal(wires.length,5);wires.forEach(verifyCohortWireRecord);assert.equal(wires.at(-1).ancestorVerification,'verified');
+ assert.equal((await verifyLocalBindings(local,wires,f.header,modules)).proofsVerified,2);
+ for(const mutate of [x=>{x.attempt.inputs.ancestry.lookups[0].hash='0x'+'1'.repeat(64);},x=>{delete x.attempt.inputs.ancestry;},x=>{delete x.attempt.inputEvidence[4].result;}]){
+  const changed=structuredClone(local);mutate(changed);await assert.rejects(verifyLocalBindings(changed,wires,f.header,modules));
+ }
+ await assert.rejects(verifyLocalBindings(local,wires,f.header,{verifyStateProof}),/ancestor verifier/);
+ const substituted=structuredClone(wires);substituted.at(-1).request.params[0]='0x'+'1'.repeat(64);await assert.rejects(verifyLocalBindings(local,substituted,f.header,modules),/committed next parent/);
+ const bad=await fixture(blockhashCode(2),4,({method,result})=>method==='eth_getBlockByHash'?{...result,gasUsed:'0x0'}:result);
+ const transport=createCohortTransport({budget:createCohortWireBudget(),provider:'drpc',profile:'local',blockHash:bad.header.hash,header:bad.header,fetchImpl:async(_url,options)=>{const r=JSON.parse(options.body);return new Response(JSON.stringify({jsonrpc:'2.0',id:r.id,result:await bad.rpc.call(r.method,r.params)}));}});
+ const failed=await executeIsolatedEthereumCall({request:bad.request,header:bad.header,rpc:transport});
+ assert.equal(failed.output.execution.status,'unavailable');assert.equal(transport.records().at(-1).error,'ancestor_header_invalid');transport.records().forEach(verifyCohortWireRecord);
+ assert.equal((await verifyLocalBindings({dispatch:'completed',attempt:failed},transport.records(),bad.header,modules)).proofsVerified,2);
+});

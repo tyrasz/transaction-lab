@@ -190,3 +190,40 @@ test('limits can only tighten and endpoint selection cannot be caller URLs', () 
   assert.throws(() => make({ profile: 'local' }), code('invalid_state_binding'));
   assert.throws(() => make({ profile: 'local', blockHash, limits: { calls: 257 } }), code('invalid_limits'));
 });
+
+test('optional verified local header admits only successive committed ancestor hashes',async()=>{
+ const {chain}=await import('../../engines/local-evm/test/ancestry-fixture.js');const c=chain(3),saved=[];
+ const rpc=make({profile:'local',blockHash:c.header.hash,header:c.header,save:wire=>{saved.push(wire);},fetchImpl:async(_url,options)=>{const r=JSON.parse(options.body);return new Response(JSON.stringify({jsonrpc:'2.0',id:r.id,result:c.byHash.get(r.params[0])}));}});
+ for(const [method,params]of [['eth_getBlockByNumber',[c.blocks[0].number,false]],['eth_getBlockByHash',[c.blocks[0].hash,false]],['eth_getBlockByHash',[c.header.parentHash,true]]])await assert.rejects(rpc.call(method,params),code('request_not_allowed'));
+ const first=await rpc.call('eth_getBlockByHash',[c.header.parentHash,false]);assert.equal(first.hash,c.header.parentHash);assert.equal(saved[0].ancestorVerification,'verified');
+ await rpc.call('eth_getBlockByHash',[first.parentHash,false]);assert.equal(rpc.records().length,2);
+ await assert.rejects(rpc.call('eth_getBlockByHash',[c.header.parentHash,false]),code('request_not_allowed'));
+ const legacy=make({profile:'local',blockHash:c.header.hash});await assert.rejects(legacy.call('eth_getBlockByHash',[c.header.parentHash,false]),code('request_not_allowed'));
+ assert.throws(()=>make({profile:'local',blockHash,header:c.header}),code('invalid_state_binding'));
+ let touched=0;const getter={...c.header};Object.defineProperty(getter,'hash',{enumerable:true,get(){touched++;return c.header.hash;}});
+ assert.throws(()=>make({profile:'local',blockHash:c.header.hash,header:getter}),code('invalid_state_binding'));
+ const proxy=new Proxy(c.header,{get(){touched++;throw Error('trap');},ownKeys(){touched++;throw Error('trap');}});
+ assert.throws(()=>make({profile:'local',blockHash:c.header.hash,header:proxy}),code('invalid_state_binding'));assert.equal(touched,0);
+});
+
+test('invalid ancestor bytes remain losslessly saved failures and poison further local reads',async()=>{
+ const {chain}=await import('../../engines/local-evm/test/ancestry-fixture.js');const c=chain(2),bad={...c.blocks.at(-2),gasUsed:'0x0'};
+ const rpc=make({profile:'local',blockHash:c.header.hash,header:c.header,fetchImpl:ok(bad)});
+ await assert.rejects(rpc.call('eth_getBlockByHash',[c.header.parentHash,false]),code('ancestor_header_invalid'));
+ const wire=rpc.records()[0];assert.deepEqual(wire.parsed.result,bad);assert.equal(wire.ancestorVerification,'rejected');assert.equal(wire.status,'failed');assert.equal(wire.transport.complete,true);
+ assert.equal(JSON.parse(Buffer.from(wire.rawBase64,'base64')).result.gasUsed,'0x0');
+ await assert.rejects(rpc.call('eth_getCode',[account,{blockHash:c.header.hash,requireCanonical:true}]),code('ancestor_header_invalid'));assert.equal(rpc.records().length,1);
+ const viaFetch=make({profile:'local',blockHash:c.header.hash,header:c.header,fetchImpl:ok(bad)});
+ await assert.rejects(viaFetch.fetch(viaFetch.url,{method:'POST',redirect:'error',headers:{'content-type':'application/json'},body:JSON.stringify({jsonrpc:'2.0',id:1,method:'eth_getBlockByHash',params:[c.header.parentHash,false]})}),code('ancestor_header_invalid'));
+ assert.equal(viaFetch.records().length,1);
+});
+
+test('ancestor traversal has255 intermediate-header ceiling and shares existing local call limits',async()=>{
+ const {chain}=await import('../../engines/local-evm/test/ancestry-fixture.js');const c=chain();
+ const options={profile:'local',blockHash:c.header.hash,header:c.header,fetchImpl:async(_url,options)=>{const r=JSON.parse(options.body);return new Response(JSON.stringify({jsonrpc:'2.0',id:r.id,result:c.byHash.get(r.params[0])}));}};
+ const rpc=make(options);let hash=c.header.parentHash;
+ for(let i=0;i<255;i++)hash=(await rpc.call('eth_getBlockByHash',[hash,false])).parentHash;
+ await assert.rejects(rpc.call('eth_getBlockByHash',[hash,false]),code('request_not_allowed'));assert.equal(rpc.usage().attempts,255);
+ const capped=make({...options,limits:{calls:1}}),parent=await capped.call('eth_getBlockByHash',[c.header.parentHash,false]);
+ await assert.rejects(capped.call('eth_getBlockByHash',[parent.parentHash,false]),code('attempt_budget'));assert.equal(capped.records().length,1);
+});

@@ -97,7 +97,7 @@ function nestedError(result) {
  * reports that distinction and never waits beyond its explicit finite ceiling. */
 export class ProofRpcClient {
   #href; #provider; #fetch; #now; #started; #last; #limits; #secrets; #shortSecrets;
-  #pin = null; #closed = null; #evidence = []; #pending = new Set(); #adapters = new Set(); #stops = new Set();
+  #pin = null; #ancestry = null; #ancestorPending = false; #closed = null; #evidence = []; #pending = new Set(); #adapters = new Set(); #stops = new Set();
   #observed = 0; #retained = 0; #successful = 0; #dispatched = 0; #rpcMs = 0; #clockValid = true;
   constructor(options = {}) {
     fields(options, ['url', 'fetchImpl', 'now', 'limits'], []);
@@ -127,9 +127,18 @@ export class ProofRpcClient {
   }
   #stopAll(code) { this.#closed ??= code; for (const stop of this.#stops) stop(new ProofRpcError(this.#closed)); }
   cancel() { this.#stopAll('RPC_CANCELLED'); }
-  pinBlockHash(value) {
+  pinBlockHash(value, header) {
     need(typeof value === 'string' && /^0x[0-9a-fA-F]{64}$/.test(value));
-    const lower = value.toLowerCase(); need(this.#pin === null || this.#pin === lower, 'RPC_PIN_CHANGED'); this.#pin = lower;
+    const lower = value.toLowerCase(); need(this.#pin === null || this.#pin === lower, 'RPC_PIN_CHANGED');
+    if (header !== undefined) {
+      need(header && typeof header === 'object' && !types.isProxy(header) && !Array.isArray(header));
+      fields(header, Object.keys(header));
+      need(header.hash === lower && isHash(header.parentHash) && typeof header.number === 'string' && /^0x(?:0|[1-9a-f][0-9a-f]*)$/.test(header.number) && header.number.length <= 18);
+      const anchor = { hash: lower, number: header.number, parentHash: header.parentHash };
+      if (this.#ancestry) need(JSON.stringify(anchor) === JSON.stringify(this.#ancestry.anchor), 'RPC_PIN_CHANGED');
+      else this.#ancestry = { anchor, nextHash: header.parentHash, number: BigInt(header.number), fetched: 0 };
+    }
+    this.#pin = lower;
   }
   snapshotEvidence() { return structuredClone(this.#evidence); }
   usage() {
@@ -162,6 +171,12 @@ export class ProofRpcClient {
     fields(options, ['signal'], []); const signal = options.signal;
     if (signal !== undefined) { need(signal !== null && typeof signal === 'object' && !types.isProxy(signal) && signal instanceof AbortSignal); try { signalAborted(signal); } catch { fail('RPC_INVALID_INPUT'); } }
     const copied = validateParams(method, params, this.#pin);
+    let ancestor = false;
+    if (this.#ancestry && method === 'eth_getBlockByNumber') need(copied[0] === this.#ancestry.anchor.number);
+    if (this.#ancestry && method === 'eth_getBlockByHash' && copied[0] !== this.#pin) {
+      need(!this.#ancestorPending && this.#ancestry.fetched < 255 && this.#ancestry.number > 0n && copied[0] === this.#ancestry.nextHash);
+      ancestor = true;
+    }
     need(!signalAborted(signal), 'RPC_CANCELLED'); if (this.#closed) fail(this.#closed);
     const start = this.#clock();
     need(this.#evidence.length < this.#limits.calls && start - this.#started < this.#limits.wallMs && this.#observed < this.#limits.totalBytes, 'RPC_BUDGET');
@@ -169,10 +184,12 @@ export class ProofRpcClient {
     need(Buffer.byteLength(requestText) <= MAX_REQUEST_BYTES);
     const item = { id: request.id, provider: this.#provider, request, requestText, requestBytes: Buffer.byteLength(requestText), requestSha256: hash(requestText), status: 'pending', dispatched: false };
     this.#evidence.push(item);
-    const task = this.#perform(item, start, signal); this.#pending.add(task);
-    task.then(() => this.#pending.delete(task), () => this.#pending.delete(task)); return task;
+    if (ancestor) this.#ancestorPending = true;
+    const task = this.#perform(item, start, signal, ancestor); this.#pending.add(task);
+    const settled = () => { this.#pending.delete(task); if (ancestor) this.#ancestorPending = false; };
+    task.then(settled, settled); return task;
   }
-  async #perform(item, start, signal) {
+  async #perform(item, start, signal, ancestor) {
     const realStart = performance.now();
     const timeoutMs = Math.max(1, Math.floor(Math.min(this.#limits.requestMs, this.#limits.wallMs - (start - this.#started))));
     const controller = new AbortController(), digest = createHash('sha256'), chunks = [];
@@ -227,6 +244,13 @@ export class ProofRpcClient {
       need(!this.#secrets.some(secret => text.includes(secret) || text.includes(JSON.stringify(secret).slice(1, -1)) || canonical.includes(JSON.stringify(secret).slice(1, -1))), 'RPC_INVALID_RESPONSE');
       need(!this.#shortSecrets.some(secret => canonical.includes(JSON.stringify(secret))), 'RPC_INVALID_RESPONSE');
       nestedError(payload.result); check();
+      if (ancestor) {
+        // This gate constrains transport to the committed next parent. The
+        // collector and isolated broker independently recompute its RLP hash.
+        const next = payload.result;
+        need(next && typeof next === 'object' && next.hash === item.request.params[0] && isHash(next.parentHash) && typeof next.number === 'string' && /^0x(?:0|[1-9a-f][0-9a-f]*)$/.test(next.number) && next.number.length <= 18 && BigInt(next.number) === this.#ancestry.number - 1n, 'RPC_INVALID_RESPONSE');
+        this.#ancestry.nextHash = next.parentHash; this.#ancestry.number = BigInt(next.number); this.#ancestry.fetched++;
+      }
       item.responseText = text; item.status = 'completed'; this.#successful += bytes.length;
       return structuredClone(payload.result);
     } catch (error) {

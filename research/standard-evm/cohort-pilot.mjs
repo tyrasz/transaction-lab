@@ -144,8 +144,8 @@ export async function runFrozenPilot({ outputDirectory, expectedPlanSha256 }) {
     need(!integrity.phaseFailure, integrity.phaseFailure);
   }
   function canAttempt() { assertHealthy(); const b = budget.snapshot(); return !controller.signal.aborted && remaining() > 1000 && b.calls < b.limits.calls && b.observedBytes < b.limits.totalBytes; }
-  function transport(profile, provider, blockHash) {
-    const instance = createCohortTransport({ budget, profile, provider, ...(blockHash ? { blockHash } : {}),
+  function transport(profile, provider, blockHash, header) {
+    const instance = createCohortTransport({ budget, profile, provider, ...(blockHash ? { blockHash } : {}), ...(header ? { header } : {}),
       save: wire => save(`wire/${String(wire.globalId).padStart(6, '0')}.json`, wire) });
     transports.add(instance); return instance;
   }
@@ -169,7 +169,7 @@ export async function runFrozenPilot({ outputDirectory, expectedPlanSha256 }) {
         save, canAttempt, assertHealthy,
         executeLocal: async ({ id, row, request, header }) => {
           await sourcesStillMatch(); assertHealthy();
-          const rpc = transport('local', 'drpc', row.parentBlockHash), phaseStarted = performance.now();
+          const rpc = transport('local', 'drpc', row.parentBlockHash, header), phaseStarted = performance.now();
           const wallMs = Math.max(1, Math.min(plan.policy.localWallMs, remaining()));
           const attempt = await executeIsolatedEthereumCall({ request, header, rpc, signal: controller.signal, limits: { wallMs, drainMs: plan.policy.terminalDrainMs } });
           await rpc.drain(); assertHealthy();

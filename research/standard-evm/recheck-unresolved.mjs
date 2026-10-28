@@ -161,7 +161,7 @@ export async function runRecheck({ outputDirectory, expectedPlanSha256 }) {
   // every phase and at sealing, alongside the complete archived runtime.
   const sourceCheck = async () => { try { await checkRecheck({ outputDirectory: directory, expectedPlanSha256 }); } catch { fatal = 'source_or_input_drift'; throw Object.assign(new Error(fatal), { code: fatal }); } };
   function transport(c, profile) {
-    const rpc = createCohortTransport({ budget, provider: 'drpc', profile, blockHash: c.header.hash,
+    const rpc = createCohortTransport({ budget, provider: 'drpc', profile, blockHash: c.header.hash, ...(profile === 'local' ? { header: c.header } : {}),
       limits: { wallMs: Math.max(1, Math.min(plan.policy.phaseWallMs, remaining())) },
       save: wire => writer.write(`wire/${String(wire.globalId).padStart(6, '0')}.json`, { ...wire, caseId: c.id }) });
     active.add(rpc); return rpc;

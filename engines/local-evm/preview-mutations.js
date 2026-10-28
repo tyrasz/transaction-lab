@@ -1,10 +1,11 @@
 import { isDeepStrictEqual, types } from 'node:util';
 
 const SCOPE = 'Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.';
-const ADDRESS = /^0x[0-9a-f]{40}$/, WORD = /^0x[0-9a-f]{64}$/;
+const ADDRESS = /^0x[0-9a-f]{40}$/, WORD = /^0x[0-9a-f]{64}$/, DATA = /^0x(?:[0-9a-f]{2})*$/;
 const UINT256 = (1n << 256n) - 1n, UINT64 = (1n << 64n) - 1n;
-const MAX_ACCOUNTS = 128, MAX_SLOTS = 1024;
-const EXISTENCE_BASES = ['unsigned_sender_nonce_materialization', 'positive_native_funding_of_proof_absent_account'];
+const MAX_ACCOUNTS = 128, MAX_SLOTS = 1024, MAX_CODE_BYTES = 24576;
+const EXISTENCE_BASES = ['unsigned_sender_nonce_materialization', 'positive_native_funding_of_proof_absent_account', 'internal_contract_creation'];
+const ZERO_WORD = '0x' + '00'.repeat(32);
 
 export class QueryMutationError extends Error {
   constructor() {
@@ -43,7 +44,7 @@ function canonical(snapshot) {
   fields(snapshot, ['scope', 'accounts']); need(snapshot.scope === SCOPE); array(snapshot.accounts, MAX_ACCOUNTS);
   const accounts = [], addresses = new Set(); let slots = 0;
   for (const account of snapshot.accounts) {
-    fields(account, ['address'], ['existence', 'nonce', 'balance', 'storage']);
+    fields(account, ['address'], ['existence', 'nonce', 'balance', 'storage', 'code']);
     need(matches(account.address, ADDRESS) && !addresses.has(account.address)); addresses.add(account.address);
     const row = { address: account.address };
     if (Object.hasOwn(account, 'existence')) {
@@ -52,6 +53,11 @@ function canonical(snapshot) {
       row.existence = { before: false, after: true, basis: value.basis };
     }
     for (const field of ['nonce', 'balance']) if (Object.hasOwn(account, field)) row[field] = delta(account[field], field === 'nonce' ? UINT64 : UINT256);
+    if (Object.hasOwn(account, 'code')) {
+      const value = account.code; fields(value, ['before', 'after']);
+      need(value.before === '0x' && typeof value.after === 'string' && value.after.length > 2 && value.after.length <= 2 + MAX_CODE_BYTES * 2 && DATA.test(value.after));
+      row.code = { before: '0x', after: value.after };
+    }
     if (Object.hasOwn(account, 'storage')) {
       array(account.storage, MAX_SLOTS); need(account.storage.length > 0); const seen = new Set();
       row.storage = account.storage.map(value => {
@@ -60,17 +66,35 @@ function canonical(snapshot) {
         seen.add(value.slot); return { slot: value.slot, before: value.before, after: value.after };
       }).sort((a, b) => a.slot < b.slot ? -1 : a.slot > b.slot ? 1 : 0);
     }
+    const creation = row.existence?.basis === 'internal_contract_creation';
+    if (creation || row.code) {
+      // Deployment starts from nonce0 and a proven empty code/storage state.
+      // A prefunded deployable target already existed, so has no existence row.
+      need(row.nonce?.before === '0x0' && BigInt(row.nonce.after) > 0n);
+      need(!row.existence || creation);
+      need(!row.storage || row.storage.every(value => value.before === ZERO_WORD));
+    }
     if (row.existence) {
-      // ProofStateManager supports only native funding and sender nonce
-      // materialization from a proven absent account, whose basic state is zero.
-      need(!row.storage && (!row.balance || row.balance.before === '0x0'));
-      if (row.existence.basis === 'unsigned_sender_nonce_materialization') need(row.nonce?.before === '0x0' && BigInt(row.nonce.after) > 0n);
-      else need(!row.nonce && row.balance?.before === '0x0' && BigInt(row.balance.after) > 0n);
+      need(!row.balance || row.balance.before === '0x0');
+      if (!creation) {
+        need(!row.storage && !row.code);
+        if (row.existence.basis === 'unsigned_sender_nonce_materialization') need(row.nonce?.before === '0x0' && BigInt(row.nonce.after) > 0n);
+        else need(!row.nonce && row.balance?.before === '0x0' && BigInt(row.balance.after) > 0n);
+      }
     }
     need(Object.keys(row).length > 1); accounts.push(row);
   }
   accounts.sort((a, b) => a.address < b.address ? -1 : a.address > b.address ? 1 : 0);
   return { scope: SCOPE, accounts };
+}
+
+/** Validate and detach the bounded local overlay schema. This validates shape,
+ * not proof provenance or execution: callers must bind the initial account
+ * facts separately. Empty-runtime prefunded creation has no code/existence
+ * delta and is intentionally not inferred from a generic nonce delta. */
+export function canonicalStateChanges(snapshot) {
+  try { return canonical(snapshot); }
+  catch { throw new QueryMutationError(); }
 }
 
 /** Compare two overlay snapshots from one disposable query fork. These are
@@ -86,7 +110,7 @@ export function validateQueryMutation(options) {
     need(matches(sender, ADDRESS) && typeof senderExistedBefore === 'boolean');
     need(typeof nonceBefore === 'string' && nonceBefore.length <= 20 && /^(?:0|[1-9][0-9]*)$/.test(nonceBefore));
     const nonce = BigInt(nonceBefore); need(nonce < UINT64);
-    const before = canonical(options.before), after = canonical(options.after);
+    const before = canonicalStateChanges(options.before), after = canonicalStateChanges(options.after);
     const prior = before.accounts.find(row => row.address === sender), next = after.accounts.find(row => row.address === sender);
     const hex = value => '0x' + value.toString(16);
     if (prior?.nonce) need(prior.nonce.after === hex(nonce));

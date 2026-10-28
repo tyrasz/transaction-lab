@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validateQueryMutation } from '../preview-mutations.js';
+import { validateQueryMutation, canonicalStateChanges } from '../preview-mutations.js';
 
 const A = '0x' + '11'.repeat(20), B = '0x' + '22'.repeat(20), C = '0x' + '33'.repeat(20);
 const word = n => '0x' + BigInt(n).toString(16).padStart(64, '0');
@@ -103,4 +103,93 @@ test('identical net snapshots do not claim to rule out transient writes', () => 
   // from a net diff. Opcode/log restrictions belong to the query executor.
   assert.deepEqual(check([], [{ address: A, nonce }]), valid);
   assert.equal(Object.hasOwn(valid, 'pureView'), false);
+});
+
+const created = (address = B) => ({ address, existence: { before: false, after: true, basis: 'internal_contract_creation' }, nonce: { before: '0x0', after: '0x1' }, code: { before: '0x', after: '0x60005460005260206000f3' }, storage: [changed(0, 0, 42)] });
+
+test('nested creation-shaped original rows and prefunded deployment carry unchanged through a disposable query', () => {
+  // Synthetic output shapes from nested CREATE/CREATE2, not claimed execution
+  // evidence: the outer created contract also creates a child (nonce1 ->2).
+  const outer = { ...created(B), nonce: { before: '0x0', after: '0x2' }, storage: [changed(2, 0, 8), changed(1, 0, 7)] };
+  const inner = created(C), prefunded = { ...created('0x' + '44'.repeat(20)), balance: { before: '0x10', after: '0x5' } };
+  delete prefunded.existence;
+  const before = [outer, inner, prefunded, { address: A, nonce: { before: '0x6', after: '0x7' } }];
+  const after = [prefunded, { address: A, nonce: { before: '0x6', after: '0x8' } }, inner, { ...outer, storage: [...outer.storage].reverse() }];
+  const saved = structuredClone({ before, after });
+  assert.deepEqual(check(before, after), valid); assert.deepEqual({ before, after }, saved);
+  const normalized = canonicalStateChanges(snapshot(before));
+  normalized.accounts.find(row => row.address === B).code.after = '0x00';
+  normalized.accounts.find(row => row.address === C).storage[0].after = word(9);
+  assert.deepEqual({ before, after }, saved, 'Canonical output must be detached');
+});
+
+test('empty-runtime creation and prefunded empty-runtime nonce/storage changes remain explicit deltas', () => {
+  const empty = created(); delete empty.code;
+  assert.deepEqual(check([empty], [{ address: A, nonce }, empty]), valid);
+  const prefunded = { address: C, nonce: { before: '0x0', after: '0x1' }, storage: [changed(0, 0, 3)] };
+  assert.deepEqual(check([prefunded], [prefunded, { address: A, nonce }]), valid);
+  // No lifecycle label is invented where the delta cannot identify creation.
+  assert.equal(Object.hasOwn(canonicalStateChanges(snapshot([prefunded])).accounts[0], 'existence'), false);
+});
+
+test('queries cannot introduce creation, change/remove deployed code or mutate carried creation state', () => {
+  const prior = created();
+  rejected(() => check([], [{ address: A, nonce }, prior]));
+  for (const mutate of [
+    row => { row.code.after = '0x00'; }, row => { delete row.code; },
+    row => { row.nonce.after = '0x2'; }, row => { row.storage[0].after = word(43); },
+    row => { delete row.existence; }, row => { row.balance = { before: '0x0', after: '0x1' }; },
+  ]) {
+    const next = structuredClone(prior); mutate(next);
+    rejected(() => check([prior], [{ address: A, nonce }, next]));
+  }
+  rejected(() => check([prior], [{ address: A, nonce }]));
+  rejected(() => check([prior], [{ address: A, nonce }, prior, created(C)]));
+  rejected(() => check([], [{ ...created(A), nonce: { before: '0x0', after: '0x1' } }], { nonceBefore: '0', senderExistedBefore: false }));
+});
+
+test('deployment schema rejects unsupported replacement, impossible origin and nonzero initial storage', () => {
+  const mutations = [
+    row => { row.code.before = '0x00'; }, row => { row.code.after = '0x'; },
+    row => { row.code.after = '0x0'; }, row => { row.code.after = '0xAA'; },
+    row => { row.code.hash = word(1); }, row => { row.nonce.before = '0x1'; row.nonce.after = '0x2'; },
+    row => { delete row.nonce; }, row => { row.storage[0].before = word(1); },
+    row => { row.balance = { before: '0x1', after: '0x2' }; },
+    row => { row.existence.basis = 'unsigned_sender_nonce_materialization'; },
+    row => { row.existence.before = true; }, row => { row.existence.after = false; },
+  ];
+  for (const mutate of mutations) {
+    const row = created(); mutate(row);
+    rejected(() => canonicalStateChanges(snapshot([row])));
+    rejected(() => check([row], [{ address: A, nonce }, row]));
+  }
+  const prefunded = created(); delete prefunded.existence; prefunded.storage[0].before = word(2);
+  rejected(() => canonicalStateChanges(snapshot([prefunded])));
+});
+
+test('creation code and aggregate output slots obey fixed bounds without weakening duplicate checks', () => {
+  const maximum = created(); maximum.code.after = '0x' + '00'.repeat(24576);
+  assert.deepEqual(check([maximum], [maximum, { address: A, nonce }]), valid);
+  const excess = structuredClone(maximum); excess.code.after += '00'; rejected(() => canonicalStateChanges(snapshot([excess])));
+  const first = created(), second = created(C);
+  first.storage = Array.from({ length: 512 }, (_, i) => changed(i, 0, 1));
+  second.storage = Array.from({ length: 512 }, (_, i) => changed(i, 0, 1));
+  assert.deepEqual(check([first, second], [second, { address: A, nonce }, first]), valid);
+  second.storage.push(changed(512, 0, 1)); rejected(() => canonicalStateChanges(snapshot([first, second])));
+  rejected(() => canonicalStateChanges(snapshot([created(), created()])));
+  const duplicate = created(); duplicate.storage.push({ ...duplicate.storage[0] }); rejected(() => canonicalStateChanges(snapshot([duplicate])));
+});
+
+test('new code and existence fields reject hostile nested descriptors without evaluating them', () => {
+  let calls = 0;
+  const row = created(); Object.defineProperty(row.code, 'after', { enumerable: true, get() { calls++; throw new Error('PRIVATE'); } });
+  rejected(() => canonicalStateChanges(snapshot([row])));
+  const proxy = created(); proxy.code = new Proxy(proxy.code, { ownKeys() { calls++; throw new Error('PRIVATE'); } });
+  rejected(() => canonicalStateChanges(snapshot([proxy])));
+  const existence = created(); Object.defineProperty(existence.existence, 'basis', { enumerable: true, get() { calls++; return 'internal_contract_creation'; } });
+  rejected(() => canonicalStateChanges(snapshot([existence])));
+  const hidden = created(); Object.defineProperty(hidden.code, 'ignored', { value: true }); rejected(() => canonicalStateChanges(snapshot([hidden])));
+  const symbolic = created(); symbolic.code[Symbol('ignored')] = true; rejected(() => canonicalStateChanges(snapshot([symbolic])));
+  const inherited = created(); Object.setPrototypeOf(inherited.code, { after: '0x00' }); rejected(() => canonicalStateChanges(snapshot([inherited])));
+  assert.equal(calls, 0);
 });

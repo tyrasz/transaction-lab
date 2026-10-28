@@ -27,6 +27,8 @@ export const LOCAL_CAPABILITIES = freeze({
   available: true, chainId: 1, status: 'experimental', operation: 'isolated_proof_backed_unsigned_call',
   profile: 'unsigned_unpriced_block_end', blockSelection: ['latest', 'canonical_hex_number', 'block_hash'],
   transactionContext: { optionalFields: ['accessList', 'blobVersionedHashes'], limits: EVM_CONTEXT_LIMITS, blobFeeScope: 'synthetic_zero_no_blob_fee_settlement_or_sidecar_validation' },
+  internalCreation: 'CREATE_CREATE2_with_proven_empty_deployable_targets',
+  historicalBlockHashes: 'authenticated_parent_hash_chain_with_shared_input_limits',
   querySelection: 'explicit_only', queryTypes: ['balanceOf', 'allowance', 'aave_v3_user_account_data', 'morpho_blue_position'],
   limits: { queries: 8, calldataBytes: 32768, gas: 5000000, proofRpcCalls: 256, totalRpcCalls: 260,
     responseBytes: 8 * 1024 * 1024, wireBytes: 32 * 1024 * 1024, wallMs: WALL, drainMs: DRAIN, apiOutputBytes: RESPONSE },
@@ -34,7 +36,8 @@ export const LOCAL_CAPABILITIES = freeze({
     'Only explicit query pairs are measured; automatic token discovery, native-effect summaries and sequences are not provided by this endpoint.',
     'Proofs and runtime code are checked against the selected header, whose hash is recomputed. Consensus, finality and contract identity are not independently established.',
     'Unsigned execution uses zero gas price and BASEFEE, without outer signature validation or fee settlement. Contract signature checks still execute.',
-    'Contract lifecycle changes, coded senders, KZG point evaluation and in-range BLOCKHASH without supplied ancestry remain unsupported. Explicit blob context uses zero blob base fee without sidecar or inclusion validation.',
+    'Internal CREATE and CREATE2 require a proven deployable target. Top-level creation, SELFDESTRUCT, coded senders and KZG point evaluation remain unsupported. Explicit blob context uses zero blob base fee without sidecar or inclusion validation.',
+    'In-range BLOCKHASH follows authenticated parent headers within the shared read and time budgets; missing ancestry is unavailable.',
     'The pinned EthereumJS Shanghai-through-BPO2 schedule and fixed execution/state budgets bound supported execution.',
     'Process separation and a V8 heap limit are not an OS network/filesystem sandbox or a hard total-RSS limit.',
     'No security verdict, complete economic-effect coverage or accuracy percentage is established.',
@@ -115,7 +118,7 @@ export async function simulateLocal(input, rpc, { signal } = {}) {
     const blockHash = header.hash.toLowerCase();
     report.source.blockSelection = { requested: apiRequest.block, kind: byHash ? 'pinned_hash' : apiRequest.block === 'latest' ? 'resolved_latest' : 'resolved_number',
       blockHash, blockNumber: BigInt(header.number).toString(), headerVerification: verified, header };
-    rpc.pinBlockHash(blockHash);
+    rpc.pinBlockHash(blockHash, header);
     const usage = rpc.usage(), wallMs = Math.floor(remaining() - FINAL_RESERVE);
     const calls = Math.min(256, usage.limits.calls - usage.calls - 1), totalResponseBytes = Math.min(32 * 1024 * 1024, usage.limits.totalBytes - usage.observedBytes);
     if (wallMs <= 0 || calls <= 0 || totalResponseBytes <= 0) stop('LOCAL_PREVIEW_BUDGET');

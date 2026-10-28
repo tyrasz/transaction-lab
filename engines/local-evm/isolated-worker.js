@@ -69,7 +69,7 @@ async function run({ request, header, mode, queries }) {
       ...limits.inputs, calls: limits.calls, requestMs: limits.requestMs, responseBytes: limits.responseBytes, totalBytes: limits.totalResponseBytes,
     } });
     const state = createProofStateManager({ inputs });
-    const output = await executeEthereumCall({ request, header, stateManager: state, limits: limits.execution });
+    const output = await executeEthereumCall({ request, header, stateManager: state, blockchain: inputs.blockchain, limits: limits.execution });
     result = { output, inputs: inputs.snapshotInputs(), inputEvidence: inputs.snapshotEvidence(), inputUsage: inputs.snapshotUsage(),
       inputReads: inputs.snapshotReads(), stateReads: state.snapshotReads(), changes: state.snapshotChanges() };
   }

@@ -1,0 +1,130 @@
+{
+    "tests/cancun/eip1153_tstore/test_tstorage_execution_contexts.py::test_tstore_rollback_on_callcode_revert[fork_Osaka-state_test]": {
+        "env": {
+            "currentCoinbase": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba",
+            "currentGasLimit": "0x07270e00",
+            "currentNumber": "0x01",
+            "currentTimestamp": "0x03e8",
+            "currentRandom": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "currentDifficulty": "0x00",
+            "currentBaseFee": "0x07",
+            "currentExcessBlobGas": "0x00"
+        },
+        "pre": {
+            "0xa6e20bc314e69b410e7c6e079670ecaffdf8c586": {
+                "nonce": "0x01",
+                "balance": "0x00",
+                "code": "0x600160045d6000600060006000600060065af15060006000fd",
+                "storage": {}
+            },
+            "0xb8e4d48f2d50feb3598f77f139e2d5e69b979b92": {
+                "nonce": "0x01",
+                "balance": "0x00",
+                "code": "0x6000600060006000600073a6e20bc314e69b410e7c6e079670ecaffdf8c5865af260005560045c600155",
+                "storage": {}
+            },
+            "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+                "nonce": "0x00",
+                "balance": "0x033b2e3c9fd0803ce8000000",
+                "code": "0x",
+                "storage": {}
+            }
+        },
+        "transaction": {
+            "chainId": "0x01",
+            "nonce": "0x00",
+            "gasPrice": "0x0a",
+            "gasLimit": [
+                "0x01000000"
+            ],
+            "to": "0xb8e4d48f2d50feb3598f77f139e2d5e69b979b92",
+            "value": [
+                "0x00"
+            ],
+            "data": [
+                "0x"
+            ],
+            "sender": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+            "secretKey": "0x1ad604b3d94e06ec50b27732ec677f3d857c4d588f082f0016317697dd3a2d92"
+        },
+        "post": {
+            "Osaka": [
+                {
+                    "hash": "0xfe95fd755a018c98a2a281be4d0df607a334a166afa7424d8b2f304285d7c611",
+                    "logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+                    "receipt": {
+                        "transactionHash": "0x8ce2c1800a6f5fc14a1ce0d1d1bab093913c75d485badfc4f28d0f8737465715",
+                        "type": "0x00",
+                        "cumulativeGasUsed": "0x6f61",
+                        "bloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                        "logs": [],
+                        "status": true,
+                        "rlp": "0xf9010801826f61b9010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c0"
+                    },
+                    "txbytes": "0xf861800a840100000094b8e4d48f2d50feb3598f77f139e2d5e69b979b92808026a0e9f498b54144e177ca1bb4f86650473d085e500b2090d8101e1eef032fa1abdda01051bb5e3f5a8481c96bb95c3cfeeca8101f9d0cd24ea9a1edc6a882db1476cf",
+                    "indexes": {
+                        "data": 0,
+                        "gas": 0,
+                        "value": 0
+                    },
+                    "state": {
+                        "0xa6e20bc314e69b410e7c6e079670ecaffdf8c586": {
+                            "nonce": "0x01",
+                            "balance": "0x00",
+                            "code": "0x600160045d6000600060006000600060065af15060006000fd",
+                            "storage": {}
+                        },
+                        "0xb8e4d48f2d50feb3598f77f139e2d5e69b979b92": {
+                            "nonce": "0x01",
+                            "balance": "0x00",
+                            "code": "0x6000600060006000600073a6e20bc314e69b410e7c6e079670ecaffdf8c5865af260005560045c600155",
+                            "storage": {}
+                        },
+                        "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+                            "nonce": "0x01",
+                            "balance": "0x033b2e3c9fd0803ce7fba636",
+                            "code": "0x",
+                            "storage": {}
+                        },
+                        "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba": {
+                            "nonce": "0x00",
+                            "balance": "0x014e23",
+                            "code": "0x",
+                            "storage": {}
+                        }
+                    }
+                }
+            ]
+        },
+        "config": {
+            "blobSchedule": {
+                "Cancun": {
+                    "target": "0x03",
+                    "max": "0x06",
+                    "baseFeeUpdateFraction": "0x32f0ed"
+                },
+                "Prague": {
+                    "target": "0x06",
+                    "max": "0x09",
+                    "baseFeeUpdateFraction": "0x4c6964"
+                },
+                "Osaka": {
+                    "target": "0x06",
+                    "max": "0x09",
+                    "baseFeeUpdateFraction": "0x4c6964"
+                }
+            },
+            "chainid": "0x01"
+        },
+        "_info": {
+            "hash": "0x6e3f934ef60518320ec42baa1d7266bc1790314865417eb5648ad6dd851c5ca2",
+            "fixture-format": "state_test",
+            "comment": "`execution-specs` generated test",
+            "filling-transition-tool": "2.19.0",
+            "description": "Test TSTORE is rolled back after CALLCODE sub-call reverts.\n\nRegression test for\nhttps://github.com/ethereum/execution-specs/issues/911\n\nContract `callee` does TSTORE(4, 1), calls a precompile, then\nREVERTs. Contract `caller` uses CALLCODE to invoke `callee`, then\nchecks TLOAD(4). Because CALLCODE executes in the caller's context\nand the sub-call reverted, TLOAD(4) must return 0.",
+            "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/tests/cancun/eip1153_tstore/test_tstorage_execution_contexts.py#L389",
+            "reference-spec": "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1153.md",
+            "reference-spec-version": "1eb863b534a5a3e19e9c196ab2a7f3db4bb9da17"
+        }
+    }
+}

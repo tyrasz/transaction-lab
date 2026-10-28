@@ -59,9 +59,14 @@ export function envelope(value, type, names) {
   fields(value, ['v', 'type', 'id', ...names]);
   need(value.v === PROTOCOL_VERSION && value.type === type && Number.isSafeInteger(value.id) && value.id >= 1);
 }
-export function validateRpcRequest(message, blockHash, expectedId) {
+export function validateRpcRequest(message, blockHash, expectedId, nextAncestorHash = null) {
   envelope(message, 'rpc', ['method', 'params']); need(message.id === expectedId);
-  const p = message.params, address = /^0x[0-9a-f]{40}$/, word = /^0x[0-9a-f]{64}$/;
+  const p = message.params;
+  if (message.method === 'eth_getBlockByHash') {
+    need(typeof nextAncestorHash === 'string' && /^0x[0-9a-f]{64}$/.test(nextAncestorHash) && Array.isArray(p) && p.length === 2 && p[0] === nextAncestorHash && p[1] === false);
+    return message;
+  }
+  const address = /^0x[0-9a-f]{40}$/, word = /^0x[0-9a-f]{64}$/;
   need(Array.isArray(p) && typeof p[0] === 'string' && address.test(p[0]));
   need(message.method === 'eth_getProof' || message.method === 'eth_getCode');
   need(p.length === (message.method === 'eth_getProof' ? 3 : 2));

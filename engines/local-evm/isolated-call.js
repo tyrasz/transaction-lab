@@ -4,10 +4,13 @@ import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
+import { createAuthenticatedAncestry, validateAncestryEvidence } from './authenticated-ancestry.js';
 import { verifyEthereumHeader } from './ethereum-header.js';
 import { ethereumQuantity, ethereumCallGas, ethereumCommon, ethereumContextProfile, ethereumUsedGas } from './ethereum-profile.js';
 import { compilePreviewQueries, decodePreviewValues } from './preview-queries.js';
 import { validateQueryMutation } from './preview-mutations.js';
+import { validateExecutionChanges } from './execution-changes.js';
+import { validateInputFacts } from './input-facts.js';
 import { ISOLATED_LIMITS, IsolationError, decode, encode, envelope, fields, need, normalizeLimits, validateRpcRequest } from './isolated-protocol.js';
 export { ISOLATED_LIMITS, IsolationError } from './isolated-protocol.js';
 
@@ -60,6 +63,7 @@ async function executeIsolated(options, previewMode) {
   } catch {
     return { status: 'unavailable', error: safe('LOCAL_ISOLATED_INPUT', previewMode ? 'The fixed call, header, queries or limits are invalid.' : 'The fixed call, header or limits are invalid.'), ...emptyResult, headerVerification: null, isolation: null, broker: { calls: 0, records: [], pendingAtReturn: 0 } };
   }
+  const ancestry = createAuthenticatedAncestry(header);
   const began = performance.now(), records = [], active = new Set(), controllers = new Set();
   let child, closed = false, sealed = false, failure = null, candidate = null, pendingId = null, totalBytes = 0, stdioBytes = 0, dispatches = 0, timer, killTimer;
   let exitCode = null, exitSignal = null, terminateRequested = false, completion;
@@ -99,6 +103,10 @@ async function executeIsolated(options, previewMode) {
       const text = encode(result, limits.responseBytes); totalBytes += Buffer.byteLength(text);
       entry.resultBytes = Buffer.byteLength(text); entry.resultSha256 = sha(text);
       need(totalBytes <= limits.totalResponseBytes, 'LOCAL_ISOLATED_SIZE', 'Parent state reads exceeded their total byte limit.');
+      if (message.method === 'eth_getBlockByHash') {
+        try { ancestry.accept(JSON.parse(text), message.id); }
+        catch { throw new IsolationError('LOCAL_ISOLATED_ANCESTRY', 'The ancestor header did not match the authenticated parent chain.'); }
+      }
       entry.status = 'received'; pendingId = null;
       send({ v: 1, type: 'rpc_result', id: message.id, result: JSON.parse(text) }, limits.responseBytes + 1024);
     } catch (error) {
@@ -115,6 +123,7 @@ async function executeIsolated(options, previewMode) {
     const context = result.inputs?.context;
     need(context?.chainId === 1 && context.blockHash === header.hash && context.stateRoot === header.stateRoot.toLowerCase() && isDeepStrictEqual(context.header, header));
     need(Array.isArray(result.inputEvidence) && result.inputEvidence.length === count && result.inputUsage?.calls === count);
+    validateAncestryEvidence(header, result.inputs.ancestry, result.inputEvidence);
     for (const [i, entry] of result.inputEvidence.entries()) {
       need(entry.id === i + 1 && isDeepStrictEqual(entry.request, records[i].request));
       if (Object.hasOwn(entry, 'result')) need(sha(encode(entry.result, limits.responseBytes)) === records[i].resultSha256);
@@ -171,7 +180,7 @@ async function executeIsolated(options, previewMode) {
     need((allowNullOutput && result.output === null) || (result.output && ['success', 'reverted', 'failed', 'unsupported', 'unavailable', 'invalid'].includes(result.output.execution?.status)));
     validateInputs(result, count);
     executionContext(result.output, request, ['success', 'reverted', 'failed'].includes(result.output?.execution?.status));
-    need(Array.isArray(result.changes?.accounts));
+    validateExecutionChanges({ changes: result.changes, inputs: result.inputs, output: result.output, sender: request.from });
     for (const reads of [result.stateReads, result.inputReads]) validateReads(reads);
     return result;
   }
@@ -267,7 +276,7 @@ async function executeIsolated(options, previewMode) {
           const message = decode(raw, limits.outputBytes);
           if (message.type === 'rpc') {
             need(pendingId === null && records.length < limits.calls);
-            validateRpcRequest(message, header.hash, records.length + 1); pendingId = message.id;
+            validateRpcRequest(message, header.hash, records.length + 1, ancestry.nextHash()); pendingId = message.id;
             void broker(message);
           } else if (message.type === 'result') {
             envelope(message, 'result', ['result']); need(message.id === 1 && pendingId === null); candidate = previewMode ? validatePreviewResult(message.result) : validateCallResult(message.result);
@@ -284,6 +293,17 @@ async function executeIsolated(options, previewMode) {
       send({ v: 1, type: 'start', id: 1, payload: { request, header, limits, ...(previewMode ? { mode: 'preview', queries: compiledQueries.map(row => row.descriptor) } : {}) } }, 256 * 1024);
     }
     await finished;
+    if (!failure && candidate) {
+      try {
+        const cache = new Map(), check = () => need(!expired() && !signal?.aborted);
+        const views = previewMode ? [candidate.preview.original, candidate.preview] : [candidate];
+        for (const view of views) {
+          check();
+          await validateInputFacts({ inputs: view.inputs, inputEvidence: view.inputEvidence, stateRoot: header.stateRoot.toLowerCase(), cache, check });
+          check();
+        }
+      } catch { fail('LOCAL_ISOLATED_PROTOCOL', 'The isolated worker input facts did not match verified parent evidence.'); }
+    }
   } catch { fail('LOCAL_ISOLATED_PROCESS', 'The isolated process could not run.'); await finished; }
   clearTimeout(timer); clearTimeout(killTimer); signal?.removeEventListener('abort', cancel);
   for (const controller of controllers) controller.abort();
@@ -305,6 +325,6 @@ async function executeIsolated(options, previewMode) {
       wallMs: limits.wallMs, drainMs: limits.drainMs, durationMs: performance.now() - began,
       terminateRequested, processClosed: closed, exitCode, exitSignal, stdioBytes, limits },
     broker: { calls: records.length, dispatches, accountedParsedResultBytes: totalBytes, records: structuredClone(records), pendingAtReturn: active.size,
-      rawWireCaptured: false, inRangeBlockhash: 'unsupported_without_independent_ancestry' },
+      rawWireCaptured: false, inRangeBlockhash: 'authenticated_parent_hash_chain_with_shared_input_limits' },
   };
 }

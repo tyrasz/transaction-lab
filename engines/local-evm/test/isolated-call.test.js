@@ -156,12 +156,15 @@ test('call and cumulative byte ceilings do not create replacement reads; pre-abo
   assert.equal(cancelled.error.code, 'LOCAL_ISOLATED_CANCELLED'); assert.equal(mock.mock.callCount(), 0);
 });
 
-test('an in-range BLOCKHASH has no fabricated ancestry and remains explicitly unsupported', async () => {
+test('N-1 BLOCKHASH uses the verified source header commitment without another provider read', async () => {
   const previous = BigInt(plan.header.number) - 1n;
-  const result = await run(await fixture('0x63' + previous.toString(16).padStart(8, '0') + '4060005260206000f3'));
-  assert.equal(result.status, 'completed'); assert.equal(result.output.execution.status, 'unsupported');
-  assert.equal(result.output.execution.error.code, 'LOCAL_BLOCKHASH_MISSING'); assert.deepEqual(result.changes.accounts, []);
-  assert.equal(result.broker.inRangeBlockhash, 'unsupported_without_independent_ancestry');
+  const f = await fixture('0x63' + previous.toString(16).padStart(8, '0') + '4060005260206000f3');
+  const result = await run(f);
+  assert.equal(result.status, 'completed'); assert.equal(result.output.execution.status, 'success');
+  assert.equal(result.output.execution.returnData, f.header.parentHash);
+  assert.equal(result.inputs.ancestry.headers.length, 0);
+  assert.equal(f.calls.length, 4);
+  assert.equal(result.broker.inRangeBlockhash, 'authenticated_parent_hash_chain_with_shared_input_limits');
 });
 
 function fakeWorker(emit) {

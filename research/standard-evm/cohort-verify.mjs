@@ -72,7 +72,8 @@ export function verifyCohortWireRecord(wire) {
   const validEnvelope = record(parsed) && parsed.jsonrpc === '2.0' && parsed.id === wire.id && own(parsed, 'result') !== own(parsed, 'error');
   if (wire.status === 'completed') need(wire.dispatched && t.complete && wire.httpStatus >= 200 && wire.httpStatus < 300 && validEnvelope && own(parsed, 'result') && equal(wire.parsed, parsed) && !own(wire, 'error'), 'Completed wire lacks a valid successful response.');
   else {
-    need(wire.status === 'failed' && ['deadline', 'byte_budget', 'response_byte_budget', 'missing_body', 'http_error', 'transport_or_encoding_error', 'jsonrpc_envelope', 'rpc_error'].includes(wire.error), 'Unknown wire failure state.');
+    need(wire.status === 'failed' && ['deadline', 'byte_budget', 'response_byte_budget', 'missing_body', 'http_error', 'transport_or_encoding_error', 'jsonrpc_envelope', 'rpc_error', 'ancestor_header_invalid'].includes(wire.error), 'Unknown wire failure state.');
+    if (wire.error === 'ancestor_header_invalid') need(wire.profile === 'local' && wire.request.method === 'eth_getBlockByHash' && wire.ancestorVerification === 'rejected' && t.complete && validEnvelope && own(parsed, 'result'), 'Ancestor failure lacks its captured header response.');
     if (wire.error === 'rpc_error') need(t.complete && validEnvelope && own(parsed, 'error'), 'RPC-error label contradicts retained envelope.');
     if (wire.error === 'jsonrpc_envelope') need(t.complete && parsed !== undefined && !validEnvelope, 'Malformed-envelope label contradicts bytes.');
     if (wire.error === 'http_error') need(integer(wire.httpStatus) && (wire.httpStatus < 200 || wire.httpStatus >= 300), 'HTTP-error label contradicts status.');
@@ -202,7 +203,7 @@ function wireIds(phase, wires, claimed, expectedProfile, parentHash) {
   need(Array.isArray(ids) && new Set(ids).size === ids.length && ids.every(id => integer(id) && id > 0), 'Phase wire IDs are malformed.');
   const result = ids.map(id => { const w = wires.get(id); need(w && !claimed.has(id) && w.profile === expectedProfile && w.provider === 'drpc', 'Phase wire ID is missing, reused or misattributed.'); claimed.add(id); return w; });
   need(result.every((w, i) => i === 0 || w.globalId > result[i - 1].globalId), 'Phase wire IDs are not ordered.');
-  for (const w of result) if (expectedProfile === 'local') need(['eth_getProof', 'eth_getCode'].includes(w.request.method) && equal(w.request.params.at(-1), { blockHash: parentHash, requireCanonical: true }), 'Local input read is not a pinned proof/code request.');
+  for (const w of result) if (expectedProfile === 'local') need((['eth_getProof', 'eth_getCode'].includes(w.request.method) && equal(w.request.params.at(-1), { blockHash: parentHash, requireCanonical: true })) || (w.request.method === 'eth_getBlockByHash' && w.request.params.length === 2 && WORD.test(w.request.params[0]) && w.request.params[1] === false), 'Local input read is not a pinned state or hash-selected ancestor request.');
   if (phase.transportUsage) {
     const u = phase.transportUsage;
     need(u.attempts === result.length && u.dispatches === result.filter(w => w.dispatched).length && u.observedBytes === result.reduce((n, w) => n + w.transport.observedBytes, 0), 'Phase transport accounting differs.');
@@ -242,6 +243,24 @@ export function verifyProductBindings(product, wires, request) {
 }
 
 export async function verifyLocalBindings(local, wires, header, modules) {
+  const headerWires = wires.filter(w => w.request.method === 'eth_getBlockByHash');
+  if (headerWires.length) {
+    need(typeof modules.createAuthenticatedAncestry === 'function', 'Archived ancestor verifier is missing.');
+    const ancestry = modules.createAuthenticatedAncestry(header); let failed = false;
+    for (const w of wires) {
+      need(!failed, 'Local input reads continued after an ancestor failure.');
+      if (w.request.method !== 'eth_getBlockByHash') continue;
+      need(equal(w.request.params, [ancestry.nextHash(), false]), 'Ancestor wire was not selected from the committed next parent.');
+      if (w.status === 'completed') { need(w.ancestorVerification === 'verified', 'Completed ancestor lacks its verification marker.'); ancestry.accept(w.parsed.result, w.request.id); }
+      else {
+        if (w.error === 'ancestor_header_invalid') {
+          let rejected = false; try { ancestry.accept(w.parsed.result, w.request.id); } catch { rejected = true; }
+          need(rejected, 'Ancestor rejection differs from the actual header bytes.');
+        }
+        failed = true;
+      }
+    }
+  }
   const attempt = local.attempt;
   if (!attempt) { need(local.dispatch !== 'completed' && wires.length === 0, 'Local phase without an attempt cannot claim wires.'); return { proofsVerified: 0 }; }
   const broker = attempt.broker;
@@ -270,6 +289,10 @@ export async function verifyLocalBindings(local, wires, header, modules) {
     const e = attempt.inputEvidence[i], b = broker.records[i], w = bound.get(b.id);
     need(e.id === i + 1 && b.id === i + 1 && equal(e.request, b.request) && e.requestText === JSON.stringify(e.request) && e.requestSha256 === sha(e.requestText), 'Local input evidence differs from broker.');
     if (own(e, 'result')) need(w?.status === 'completed' && equal(e.result, w.parsed.result) && e.resultSha256 === sha(JSON.stringify(e.result)), 'Worker input result differs from actual wire.');
+  }
+  if (attempt.inputs.ancestry !== undefined || headerWires.length) {
+    need(typeof modules.validateAncestryEvidence === 'function', 'Archived ancestor evidence verifier is missing.');
+    modules.validateAncestryEvidence(header, attempt.inputs.ancestry, attempt.inputEvidence);
   }
   for (const p of attempt.inputs.provenance ?? []) {
     const proof = attempt.inputEvidence[p.proofEvidenceId - 1], code = attempt.inputEvidence[p.codeEvidenceId - 1];
@@ -308,6 +331,7 @@ export async function verifyCohortEvidence({ outputDirectory, expectedManifestSh
   await verifyNodeRuntime(sources.manifest.runtime);
   const archived = async path => { need(sources.manifest.files.some(e => e.path === path), 'Required archived verifier dependency absent.'); return import(pathToFileURL(join(p.root, 'runtime', path))); };
   const modules = Object.assign({}, ...await Promise.all(['cohort-census.mjs', 'cohort-classification.mjs', 'cohort-outcomes.mjs', 'cohort-accounting.mjs', 'cohort-runner.mjs', 'cohort-pilot.mjs'].map(n => archived('research/standard-evm/' + n))), await archived('engines/local-evm/verified-state-proof.js'), await archived('engines/local-evm/ethereum-header.js'));
+  if (sources.manifest.files.some(e => e.path === 'engines/local-evm/authenticated-ancestry.js')) Object.assign(modules, await archived('engines/local-evm/authenticated-ancestry.js'));
   const plan = await p.read('plan.json'), frozen = await p.read('FROZEN.json'), started = await p.read('STARTED.json'), results = await p.read('results.json');
   await modules.loadPilotPlan({ outputDirectory: p.root, expectedPlanSha256: p.manifest.planSha256 });
   need(results.planSha256 === p.manifest.planSha256 && results.sourceManifestSha256 === p.manifest.sourceManifestSha256 && plan.sourceManifestSha256 === p.manifest.sourceManifestSha256, 'Run/plan source binding differs.');

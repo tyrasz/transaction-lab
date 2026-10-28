@@ -1,5 +1,6 @@
 import { SimpleStateManager } from '@ethereumjs/statemanager';
 import { Account, bytesToHex, createAccountFromRLP, hexToBytes } from '@ethereumjs/util';
+import { keccak_256 } from '@noble/hashes/sha3.js';
 import { isRpcStateInputs } from './rpc-state-inputs.js';
 import { EMPTY_CODE_HASH, EMPTY_STORAGE_ROOT } from './verified-state-proof.js';
 
@@ -15,7 +16,8 @@ function fail(code, message) { throw Object.assign(new Error(message), { code })
  * Lazy facts are seeded into every existing checkpoint: discovering an input
  * inside a reverted child never turns that input into an invented zero. */
 class ProofStateManager extends SimpleStateManager {
-  constructor(inputs) { super(); this.inputs = inputs; this.base = new Map(); this.loading = new Map(); this.slotLoading = new Map(); this.reads = new Map(); this.readCount = 0; }
+  constructor(inputs) { super(); this.inputs = inputs; this.base = new Map(); this.loading = new Map(); this.slotLoading = new Map(); this.reads = new Map(); this.readCount = 0; this.creationStack = [new Set()]; }
+  created(key) { return this.creationStack.at(-1).has(key); }
   addressKey(address) {
     const value = address?.toString();
     if (typeof value !== 'string' || !ADDRESS.test(value)) fail('LOCAL_STATE_INVALID', 'A full state address is required.');
@@ -86,21 +88,50 @@ class ProofStateManager extends SimpleStateManager {
   }
   async putStorage(address, key, value) {
     const account = this.addressKey(address), slot = this.slotKey(key), base = await this.loadAccount(account);
-    if (!base.exists) fail('LOCAL_STATE_UNSUPPORTED', 'Storage writes to newly materialized accounts are unsupported.');
+    if (!base.exists && !this.created(account)) fail('LOCAL_STATE_UNSUPPORTED', 'Storage writes require an existing account or an authenticated creation target.');
     if (!(value instanceof Uint8Array) || value.length > 32) fail('LOCAL_STATE_INVALID', 'Storage values cannot exceed 32 bytes.');
     await this.loadSlot(account, slot);
     this.topStorageStack().set(account + '_' + slot, new Uint8Array(value));
   }
-  async putCode() { fail('LOCAL_STATE_UNSUPPORTED', 'Runtime code changes are unsupported.'); }
-  async clearStorage() { fail('LOCAL_STATE_UNSUPPORTED', 'Storage clearing is unsupported.'); }
+  async clearStorage(address) {
+    const key = this.addressKey(address); await this.loadAccount(key); this.assertDeployable(key);
+  }
+  assertDeployable(key) {
+    const base = this.base.get(key), current = this.topAccountStack().get(key);
+    // CREATE first checks collisions, then clears storage before newContract.
+    // A sparse manager cannot clear an unknown trie. A proven empty initial
+    // root plus a still-deployable current account makes this an exact no-op.
+    if (!base || base.storageRoot !== EMPTY_STORAGE_ROOT || base.code !== '0x' || base.nonceRaw !== '0' ||
+        (current && (current.nonce !== 0n || bytesToHex(current.codeHash) !== EMPTY_CODE_HASH)) || this.created(key)) {
+      fail('LOCAL_STATE_UNSUPPORTED', 'Storage clearing requires a proven empty deployable creation target.');
+    }
+    for (const [slot, value] of this.topStorageStack()) if (slot.startsWith(key + '_') && value.some(byte => byte !== 0)) {
+      fail('LOCAL_STATE_UNSUPPORTED', 'Creation cannot clear an existing storage overlay.');
+    }
+  }
+  beginContractCreation(address) {
+    if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'Contract creation requires an active rollback checkpoint.');
+    const key = this.addressKey(address); this.assertDeployable(key);
+    this.creationStack.at(-1).add(key);
+  }
+  async putCode(address, value) {
+    const key = this.addressKey(address), base = await this.loadAccount(key), current = this.topAccountStack().get(key);
+    if (!this.created(key) || base.code !== '0x' || !current || current.nonce === 0n || bytesToHex(current.codeHash) !== EMPTY_CODE_HASH) {
+      fail('LOCAL_STATE_UNSUPPORTED', 'Code installation requires a new authenticated contract creation.');
+    }
+    if (!(value instanceof Uint8Array) || value.length === 0 || value.length > 24576) fail('LOCAL_STATE_INVALID', 'Created runtime code exceeds the supported contract-code bound.');
+    const copy = copyAccount(current); copy.codeHash = keccak_256(value);
+    this.topCodeStack().set(key, new Uint8Array(value)); this.topAccountStack().set(key, copy);
+  }
   async deleteAccount() { fail('LOCAL_STATE_UNSUPPORTED', 'Account deletion is unsupported.'); }
   async consumeBAL() { fail('LOCAL_STATE_UNSUPPORTED', 'External state changes cannot be imported into the proof-backed overlay.'); }
   async checkpoint() {
     if (this.accountStack.length >= LIMITS.checkpoints) fail('LOCAL_STATE_LIMIT', 'State checkpoint limit exceeded.');
     await super.checkpoint();
+    this.creationStack.push(new Set(this.creationStack.at(-1)));
   }
-  async commit() { if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'No state checkpoint exists to commit.'); await super.commit(); }
-  async revert() { if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'No state checkpoint exists to revert.'); await super.revert(); }
+  async commit() { if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'No state checkpoint exists to commit.'); await super.commit(); this.creationStack.splice(-2, 1); }
+  async revert() { if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'No state checkpoint exists to revert.'); await super.revert(); this.creationStack.pop(); }
   shallowCopy() {
     if (this.accountStack.length !== 1 || [...this.loading.keys()].some(key => !this.base.has(key)) || [...this.slotLoading.keys()].some(id => !this.topStorageStack().has(id))) fail('LOCAL_STATE_UNSUPPORTED', 'Copy only a settled state manager outside active checkpoints.');
     const copy = new ProofStateManager(this.inputs);
@@ -108,6 +139,7 @@ class ProofStateManager extends SimpleStateManager {
     copy.accountStack = this.accountStack.map(frame => new Map([...frame].map(([key, value]) => [key, copyAccount(value)])));
     copy.codeStack = this.codeStack.map(frame => new Map([...frame].map(([key, value]) => [key, new Uint8Array(value)])));
     copy.storageStack = this.storageStack.map(frame => new Map([...frame].map(([key, value]) => [key, new Uint8Array(value)])));
+    copy.creationStack = this.creationStack.map(frame => new Set(frame));
     return copy;
   }
   snapshotReads() { return { total: this.readCount, distinct: this.reads.size, reads: structuredClone([...this.reads.values()]) }; }
@@ -119,7 +151,7 @@ class ProofStateManager extends SimpleStateManager {
     for (const [address, base] of this.base) {
       const current = this.topAccountStack().get(address), changes = {};
       if (!base.exists) {
-        if (current !== undefined) changes.existence = { before: false, after: true, basis: current.nonce > 0n ? 'unsigned_sender_nonce_materialization' : 'positive_native_funding_of_proof_absent_account' };
+        if (current !== undefined) changes.existence = { before: false, after: true, basis: this.created(address) ? 'internal_contract_creation' : current.nonce > 0n ? 'unsigned_sender_nonce_materialization' : 'positive_native_funding_of_proof_absent_account' };
       }
       if (current !== undefined) for (const field of ['nonce', 'balance']) {
         const before = BigInt(base[field + 'Raw']);
@@ -131,6 +163,8 @@ class ProofStateManager extends SimpleStateManager {
         if (before !== after) storage.push({ slot, before, after });
       }
       if (storage.length) changes.storage = storage;
+      const code = bytesToHex(this.topCodeStack().get(address));
+      if (code !== base.code) changes.code = { before: base.code, after: code };
       if (Object.keys(changes).length) accounts.push({ address, ...changes });
     }
     return { scope: 'Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.', accounts };

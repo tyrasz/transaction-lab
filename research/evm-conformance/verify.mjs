@@ -1,0 +1,28 @@
+// Post-seal audit helper; not part of the original run or result manifest.
+import fs from'node:fs';import path from'node:path';import assert from'node:assert/strict';import{createHash}from'node:crypto';import{fileURLToPath}from'node:url';
+const base=path.dirname(fileURLToPath(import.meta.url)),hash=b=>createHash('sha256').update(b).digest('hex');
+const PLAN='013b68e6ca21f380c7ae40143fb2d23792900445b29d3df30f7913bd4058f620',MANIFEST='0927d39012f7f53df1b294c0630afe549eed65537fab1f4f0ca18bc1d3c63df9';
+export function validateCapturedRow(row,captured,fixture){
+ assert.equal(captured.index,row.index);assert.equal(captured.id,row.id);assert.equal(captured.family,row.family);
+ assert.equal(captured.status,'completed');assert.equal(captured.exitCode,0);assert.equal(captured.signal,null);assert.equal(captured.reason,null);assert.deepEqual(JSON.parse(captured.stdout),captured.result);
+ const result=captured.result.result,o=result.observed,p=fixture.post.Osaka[row.postIndex];
+ assert.equal(o.serializedTransaction,p.txbytes.toLowerCase());assert.equal(o.sender,fixture.transaction.sender.toLowerCase());assert.equal(o.stateRoot,p.hash.toLowerCase());assert.equal(o.logsHash,p.logs.toLowerCase());assert.deepEqual(o.logs,p.receipt.logs);assert.equal(o.receiptStatus,p.receipt.status);assert.equal(o.gasUsed,BigInt(p.receipt.cumulativeGasUsed).toString());assert.equal(o.transactionHash,p.receipt.transactionHash.toLowerCase());assert.equal(o.receiptBloom,p.receipt.bloom.toLowerCase());assert.equal(o.admission,'accepted');assert.equal(p.expectException,undefined);assert.equal(result.comparison.status,'matched');assert.deepEqual(Object.keys(result.comparison.checks).sort(),['admission','stateRoot','logsHash','receiptStatus','gasUsed','transactionHash','receiptBloom'].sort());assert(Object.values(result.comparison.checks).every(x=>x===true));return result;
+}
+export async function verify({replay=false}={}){
+ const rawPlan=fs.readFileSync(path.join(base,'frozen-plan.json'));assert.equal(hash(rawPlan),PLAN);const plan=JSON.parse(rawPlan);
+ const rawManifest=fs.readFileSync(path.join(base,'results-manifest.json'));assert.equal(hash(rawManifest),MANIFEST);const manifest=JSON.parse(rawManifest);assert.equal(manifest.planSha256,PLAN);
+ const expected=['STARTED.json','results.json',...Array.from({length:32},(_,i)=>'results/'+String(i+1).padStart(3,'0')+'.json')].sort();assert.deepEqual(manifest.files.map(r=>r.path).sort(),expected);
+ for(const r of manifest.files){const bytes=fs.readFileSync(path.join(base,r.path));assert.equal(bytes.length,r.bytes);assert.equal(hash(bytes),r.sha256);}
+ const runBytes=fs.readFileSync(path.join(base,'run.mjs'));assert.equal(hash(runBytes),plan.sourceFiles.find(r=>r.path==='harness/run.mjs').sha256);
+ const {verifyFrozen,dispatchVector}=await import('./run.mjs');const checked=verifyFrozen();assert.equal(checked.planSha256,PLAN);
+ const started=JSON.parse(fs.readFileSync(path.join(base,'STARTED.json'))),results=JSON.parse(fs.readFileSync(path.join(base,'results.json')));assert.equal(started.planSha256,PLAN);assert.equal(started.selectionSha256,plan.selectionSha256);assert.equal(results.sourceUnchanged,true);assert.equal(results.planSha256,PLAN);assert.equal(results.selectionSha256,plan.selectionSha256);assert.equal(results.rows.length,32);
+ const counts={selected:32,matched:0,mismatched:0,unavailable:0,not_attempted:0},families={},types={},executions={},replayed=[];let logCount=0;const start=performance.now();
+ for(const row of checked.selection.selected){
+  const captured=JSON.parse(fs.readFileSync(path.join(base,'results',String(row.index).padStart(3,'0')+'.json'))),raw=fs.readFileSync(path.join(base,'source/fixtures',row.file));assert.equal(hash(raw),row.fileSha256);const fixture=JSON.parse(raw)[row.id];const result=validateCapturedRow(row,captured,fixture);
+  assert.deepEqual(results.rows[row.index-1],{index:row.index,id:row.id,family:row.family,status:captured.status,reason:captured.reason,comparison:result.comparison});counts.matched++;families[row.family]=(families[row.family]??0)+1;
+  const lead=Number.parseInt(result.observed.serializedTransaction.slice(2,4),16),type=lead>=0xc0?'legacy':String(lead);types[type]=(types[type]??0)+1;executions[result.observed.execution]=(executions[result.observed.execution]??0)+1;logCount+=result.observed.logs.length;
+  if(replay){const remaining=360000-(performance.now()-start);assert(remaining>0);const actual=await dispatchVector({row,timeoutMs:Math.min(10000,remaining)});assert.equal(actual.status,captured.status);assert.deepEqual(actual.result,captured.result,'Archived reexecution differs at vector '+row.index);assert.equal(actual.stdout,captured.stdout);assert.equal(actual.stderr,captured.stderr);assert.equal(actual.exitCode,captured.exitCode);assert.equal(actual.signal,captured.signal);replayed.push(row.index);}
+ }
+ assert.deepEqual(counts,results.counts);verifyFrozen();return{schemaVersion:1,verifiedAt:new Date().toISOString(),originalPlanSha256:PLAN,originalResultsManifestSha256:MANIFEST,sourceFiles:plan.sourceFiles.length,counts,families,transactionTypes:types,topLevelExecutions:executions,committedLogs:logCount,archivedVectorsReexecuted:replayed,normalizations:['Child host elapsedMs only; all VM outputs/observed state and comparison fields are exact.'],limitations:['This fixed selected dependency-conformance slice is not a product or all-EVM accuracy rate.','All selected vectors have successful top-level executions and empty committed logs.','No header consensus, signed block processing, blob/KZG sidecars or future-fork coverage is established.']};
+}
+if(process.argv[1]===fileURLToPath(import.meta.url))console.log(JSON.stringify(await verify({replay:process.argv.includes('--replay')}),null,2));

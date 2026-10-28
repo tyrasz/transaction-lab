@@ -15,6 +15,7 @@ const UINT256_MAX = (1n << 256n) - 1n;
 const activeManagers = new WeakSet();
 const evmErrors = new Set(Object.values(EVMError.errorMessages));
 const callOpcodes = new Map([[0xf1, 'CALL'], [0xf2, 'CALLCODE'], [0xf4, 'DELEGATECALL'], [0xfa, 'STATICCALL']]);
+const createOpcodes = new Map([[0xf0, 'CREATE'], [0xf5, 'CREATE2']]);
 const hex = value => '0x' + BigInt(value).toString(16);
 const address = value => typeof value === 'string' && ADDRESS.test(value) ? value.toLowerCase() : null;
 const quantity = value => typeof value === 'bigint' && value >= 0n && value <= UINT256_MAX ? value : typeof value === 'string' && value.length <= 80 && /^(?:0x[0-9a-f]+|[0-9]+)$/i.test(value) && BigInt(value) <= UINT256_MAX ? BigInt(value) : Number.isSafeInteger(value) && value >= 0 ? BigInt(value) : null;
@@ -80,6 +81,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     reserved(from); reserved(to);
     if (!block || ['number', 'timestamp', 'gasLimit', 'baseFeePerGas'].some(field => quantity(block[field]) === null) || quantity(block.gasLimit) === 0n || typeof block.mixHash !== 'string' || !WORD.test(block.mixHash) || !address(block.miner) || ['hash', 'parentHash'].some(field => block[field] !== undefined && (typeof block[field] !== 'string' || !WORD.test(block[field])))) reject('LOCAL_INVALID_INPUT', 'Explicit block number, timestamp, gas limit, base fee, prevRandao and coinbase are required.');
     const common = chainId === 1 ? ethereumCommon(block) : createCustomCommon({ chainId: 999, name: 'experimental-hyperevm-message' }, Mainnet, { hardfork: Hardfork.Cancun });
+    const canCreate = chainId === 1 && typeof stateManager.beginContractCreation === 'function';
     if (chainId === 1) {
       try { ethereumContextProfile(context, block, common); } catch { reject('LOCAL_INVALID_INPUT', 'Optional execution context does not match the selected fork/header.'); }
       semantics.chainScope = 'Ethereum_mainnet_pinned_timestamp_selected_fork';
@@ -95,7 +97,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       if (typeof member !== 'function') return member;
       if (!methods.has(property)) methods.set(property, async (...args) => {
         clockCheck();
-        if (['getAccount', 'putAccount', 'deleteAccount', 'modifyAccountFields', 'getCode', 'putCode', 'getCodeSize', 'getStorage', 'putStorage', 'clearStorage'].includes(property)) reserved(args[0]);
+        if (['getAccount', 'putAccount', 'deleteAccount', 'modifyAccountFields', 'getCode', 'putCode', 'getCodeSize', 'getStorage', 'putStorage', 'clearStorage', 'beginContractCreation'].includes(property)) reserved(args[0]);
         const result = await member.apply(target, args);
         if (property === 'checkpoint') checkpointDepth++;
         else if (property === 'commit' || property === 'revert') checkpointDepth--;
@@ -127,25 +129,35 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     }
     evm.events.on('beforeMessage', message => {
       clockCheck();
-      if (!message.to) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'Contract creation or destruction is outside this sparse-state engine.', 'unsupported');
-      reserved(message.to); reserved(message.codeAddress);
+      const creation = !message.to;
+      if (creation && (!canCreate || !stack.length)) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'This profile requires a supported internal contract creation.', 'unsupported');
+      if (!creation) { reserved(message.to); reserved(message.codeAddress); }
       bound('frames', ++usage.frames); bound('depth', message.depth); usage.maxDepth = Math.max(usage.maxDepth, message.depth);
       bound('calldataBytes', message.data.length); retain(512 + message.data.length * 2);
-      const parent = stack.at(-1), type = parent ? parent.pendingCall ?? (message.delegatecall ? 'DELEGATECALL' : message.isStatic ? 'STATICCALL' : 'CALL') : 'CALL';
-      const frame = { type, from: parent?.frame.executionAddress ?? message.caller.toString(), to: message.codeAddress.toString(), executionAddress: message.to.toString(), caller: message.caller.toString(), value: hex(message.value), input: bytesToHex(message.data), gas: hex(message.gasLimit), gasUsed: null, output: null, error: null, depth: message.depth, calls: [] };
+      const parent = stack.at(-1), type = parent ? parent.pendingCall ?? (creation ? 'CREATE' : message.delegatecall ? 'DELEGATECALL' : message.isStatic ? 'STATICCALL' : 'CALL') : 'CALL';
+      if (creation) semantics.lifecycle = 'internal_CREATE_CREATE2_with_proven_deployable_targets_SELFDESTRUCT_unsupported';
+      const frame = { type, from: parent?.frame.executionAddress ?? message.caller.toString(), to: creation ? null : message.codeAddress.toString(), executionAddress: creation ? null : message.to.toString(), caller: message.caller.toString(), value: hex(message.value), input: bytesToHex(message.data), gas: hex(message.gasLimit), gasUsed: null, output: null, error: null, depth: message.depth, calls: [] };
       if (parent) parent.frame.calls.push(frame); else root = frame;
       stack.push({ frame, pendingCall: null });
     });
+    evm.events.on('newContract', event => {
+      clockCheck(); const active = stack.at(-1), target = event.address.toString();
+      if (!canCreate || !active || !['CREATE', 'CREATE2'].includes(active.frame.type) || active.frame.to !== null) reject('LOCAL_TRACE_INVALID', 'Creation event does not match the entered creation frame.');
+      // EthereumJS does not await one-argument event listeners. The manager's
+      // marker is synchronous over facts already loaded by clearStorage.
+      reserved(target); stateManager.beginContractCreation(event.address);
+      active.frame.to = target; active.frame.executionAddress = target;
+    });
     evm.events.on('step', step => {
       clockCheck(); bound('steps', ++usage.steps); bound('memoryBytes', step.memory.length);
-      if ([0xf0, 0xf5, 0xff].includes(step.opcode.code)) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'Contract creation or destruction is outside this sparse-state engine.', 'unsupported');
+      if (step.opcode.code === 0xff || (createOpcodes.has(step.opcode.code) && !canCreate)) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'This local profile does not support the requested lifecycle operation.', 'unsupported');
       // On Ethereum, absent blob hashes are the empty transaction list: BLOBHASH
       // returns zero through the fork-selected EVM opcode. BLOBBASEFEE still
       // requires our explicit synthetic fee context; keep the legacy999 scope.
       if ((step.opcode.code === 0x4a || (step.opcode.code === 0x49 && chainId !== 1)) && !context.blobVersionedHashes) reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is outside this local engine profile.', 'unsupported');
       if (step.opcode.code >= 0xa0 && step.opcode.code <= 0xa4) bound('logs', ++usage.logOpcodes);
       const active = stack.at(-1);
-      if (active) active.pendingCall = callOpcodes.get(step.opcode.code) ?? null;
+      if (active) active.pendingCall = callOpcodes.get(step.opcode.code) ?? createOpcodes.get(step.opcode.code) ?? null;
       if (callOpcodes.has(step.opcode.code) && step.stack.length >= 2) reserved('0x' + (step.stack.at(-2) & ((1n << 160n) - 1n)).toString(16).padStart(40, '0'));
     });
     evm.events.on('afterMessage', result => {
@@ -156,6 +168,11 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       if (memoryWords !== undefined) bound('memoryBytes', memoryWords * 32n);
       const active = stack.pop();
       if (!active) reject('LOCAL_TRACE_INVALID', 'Local call-tree event nesting is inconsistent.');
+      if (['CREATE', 'CREATE2'].includes(active.frame.type)) {
+        const created = result.createdAddress?.toString() ?? null;
+        if (active.frame.to !== null && active.frame.to !== created) reject('LOCAL_TRACE_INVALID', 'Creation result address disagrees with its entered frame.');
+        active.frame.to = created; active.frame.executionAddress = created;
+      }
       const output = result.execResult.returnValue;
       bound('returnBytes', output.length); retain(output.length * 2 + 128);
       active.frame.gasUsed = hex(result.execResult.executionGasUsed); active.frame.output = bytesToHex(output);

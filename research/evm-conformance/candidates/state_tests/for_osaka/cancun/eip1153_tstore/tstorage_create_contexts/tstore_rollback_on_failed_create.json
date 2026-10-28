@@ -1,0 +1,234 @@
+{
+    "tests/cancun/eip1153_tstore/test_tstorage_create_contexts.py::test_tstore_rollback_on_failed_create[fork_Osaka-state_test-create_opcode_CREATE2]": {
+        "env": {
+            "currentCoinbase": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba",
+            "currentGasLimit": "0x07270e00",
+            "currentNumber": "0x01",
+            "currentTimestamp": "0x03e8",
+            "currentRandom": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "currentDifficulty": "0x00",
+            "currentBaseFee": "0x07",
+            "currentExcessBlobGas": "0x00"
+        },
+        "pre": {
+            "0xf381568c822bfdca9793ee39d6093e8d73c72b86": {
+                "nonce": "0x01",
+                "balance": "0x00",
+                "code": "0x6000516dffffffffffffffffffffffffffff167f60015c630000600a0361600060015d6000f30000000000000000000000000000176000526000601260006000f5506000601260006000f550",
+                "storage": {}
+            },
+            "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+                "nonce": "0x00",
+                "balance": "0x033b2e3c9fd0803ce8000000",
+                "code": "0x",
+                "storage": {}
+            }
+        },
+        "transaction": {
+            "chainId": "0x01",
+            "nonce": "0x00",
+            "gasPrice": "0x0a",
+            "gasLimit": [
+                "0x01000000"
+            ],
+            "to": "0xf381568c822bfdca9793ee39d6093e8d73c72b86",
+            "value": [
+                "0x00"
+            ],
+            "data": [
+                "0x"
+            ],
+            "sender": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+            "secretKey": "0x1ad604b3d94e06ec50b27732ec677f3d857c4d588f082f0016317697dd3a2d92"
+        },
+        "post": {
+            "Osaka": [
+                {
+                    "hash": "0x5dca2b89a7c119db7164d61e8abb35e6cd30162f41df2c455d870246ce2d7c12",
+                    "logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+                    "receipt": {
+                        "transactionHash": "0xd95fcbf30c4b0bff4dce5e7e15a77f3538cff432456b829a65633a186347aa30",
+                        "type": "0x00",
+                        "cumulativeGasUsed": "0xfff204",
+                        "bloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                        "logs": [],
+                        "status": true,
+                        "rlp": "0xf901090183fff204b9010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c0"
+                    },
+                    "txbytes": "0xf861800a840100000094f381568c822bfdca9793ee39d6093e8d73c72b86808026a0b4aa5a4d1af1c56fba1f0c52e889e651f36b24d5523b5a013868f3a538de5b89a043d165a24c41b8264666dcdbdcb2f08e2d48b06d999b4057cce729d82d359bed",
+                    "indexes": {
+                        "data": 0,
+                        "gas": 0,
+                        "value": 0
+                    },
+                    "state": {
+                        "0xf381568c822bfdca9793ee39d6093e8d73c72b86": {
+                            "nonce": "0x03",
+                            "balance": "0x00",
+                            "code": "0x6000516dffffffffffffffffffffffffffff167f60015c630000600a0361600060015d6000f30000000000000000000000000000176000526000601260006000f5506000601260006000f550",
+                            "storage": {}
+                        },
+                        "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+                            "nonce": "0x01",
+                            "balance": "0x033b2e3c9fd0803cde008bd8",
+                            "code": "0x",
+                            "storage": {}
+                        },
+                        "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba": {
+                            "nonce": "0x00",
+                            "balance": "0x02ffd60c",
+                            "code": "0x",
+                            "storage": {}
+                        }
+                    }
+                }
+            ]
+        },
+        "config": {
+            "blobSchedule": {
+                "Cancun": {
+                    "target": "0x03",
+                    "max": "0x06",
+                    "baseFeeUpdateFraction": "0x32f0ed"
+                },
+                "Prague": {
+                    "target": "0x06",
+                    "max": "0x09",
+                    "baseFeeUpdateFraction": "0x4c6964"
+                },
+                "Osaka": {
+                    "target": "0x06",
+                    "max": "0x09",
+                    "baseFeeUpdateFraction": "0x4c6964"
+                }
+            },
+            "chainid": "0x01"
+        },
+        "_info": {
+            "hash": "0x1cbecd378ebd0c1ca5949421b86c668ef68a3da241a5129aede901cefd2214ef",
+            "fixture-format": "state_test",
+            "comment": "`execution-specs` generated test",
+            "filling-transition-tool": "2.19.0",
+            "description": "Test TSTORE is rolled back after failed CREATE/CREATE2 initcode.\n\nRegression test for\nhttps://github.com/ethereum/execution-specs/issues/917\n\nInitcode does TLOAD(1) to compute a return size, then does\nTSTORE(1, max_code_size), then returns data of the computed size.\nWhen TLOAD(1) is 0, the return size exceeds the max code size, so\ncreation fails.\n\nThe caller invokes CREATE/CREATE2 twice with the same initcode.\nIf TSTORE from the first (failed) creation is properly rolled\nback, the second CREATE2 also sees TLOAD(1)==0 and fails the same\nway, so nothing is deployed. If it were not rolled back, the\nsecond CREATE2 would see TLOAD(1)==max_code_size, return a small\nvalid contract and succeed; the post-state therefore asserts the\ntarget address is non-existent.\n\nThe create results are not recorded with SSTORE: a failed create\nburns its full 63/64 gas forward, and under the EIP-8037\ntransaction gas-limit cap two of them in sequence leave too little\nregular gas to write the result. Asserting account non-existence\nchecks the same rollback property without that write.",
+            "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/tests/cancun/eip1153_tstore/test_tstorage_create_contexts.py#L263",
+            "reference-spec": "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1153.md",
+            "reference-spec-version": "1eb863b534a5a3e19e9c196ab2a7f3db4bb9da17"
+        }
+    },
+    "tests/cancun/eip1153_tstore/test_tstorage_create_contexts.py::test_tstore_rollback_on_failed_create[fork_Osaka-state_test-create_opcode_CREATE]": {
+        "env": {
+            "currentCoinbase": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba",
+            "currentGasLimit": "0x07270e00",
+            "currentNumber": "0x01",
+            "currentTimestamp": "0x03e8",
+            "currentRandom": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "currentDifficulty": "0x00",
+            "currentBaseFee": "0x07",
+            "currentExcessBlobGas": "0x00"
+        },
+        "pre": {
+            "0x9c0d1ca1cbcdb9d6e5e99e59839bbb7bc9254332": {
+                "nonce": "0x01",
+                "balance": "0x00",
+                "code": "0x6000516dffffffffffffffffffffffffffff167f60015c630000600a0361600060015d6000f3000000000000000000000000000017600052601260006000f050601260006000f050",
+                "storage": {}
+            },
+            "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+                "nonce": "0x00",
+                "balance": "0x033b2e3c9fd0803ce8000000",
+                "code": "0x",
+                "storage": {}
+            }
+        },
+        "transaction": {
+            "chainId": "0x01",
+            "nonce": "0x00",
+            "gasPrice": "0x0a",
+            "gasLimit": [
+                "0x01000000"
+            ],
+            "to": "0x9c0d1ca1cbcdb9d6e5e99e59839bbb7bc9254332",
+            "value": [
+                "0x00"
+            ],
+            "data": [
+                "0x"
+            ],
+            "sender": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+            "secretKey": "0x1ad604b3d94e06ec50b27732ec677f3d857c4d588f082f0016317697dd3a2d92"
+        },
+        "post": {
+            "Osaka": [
+                {
+                    "hash": "0xe93f442511e8f8cfae1077dbc412a1e9c942bc63835949c2ba44e23f22176342",
+                    "logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+                    "receipt": {
+                        "transactionHash": "0xa4533d6c6e7c0d6b41aad3bffa192b4fb4992677a7512043f5844afeb7104dc0",
+                        "type": "0x00",
+                        "cumulativeGasUsed": "0xfff204",
+                        "bloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                        "logs": [],
+                        "status": true,
+                        "rlp": "0xf901090183fff204b9010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c0"
+                    },
+                    "txbytes": "0xf861800a8401000000949c0d1ca1cbcdb9d6e5e99e59839bbb7bc9254332808025a047941300f62c0542d8d807b5c0137b40badf8bb87d797f3f311771fe1ab03ff6a01c3971460ebf3d8f0ffca183c6f2e13312debfbe2c4e08031f96c56359ab46bf",
+                    "indexes": {
+                        "data": 0,
+                        "gas": 0,
+                        "value": 0
+                    },
+                    "state": {
+                        "0x9c0d1ca1cbcdb9d6e5e99e59839bbb7bc9254332": {
+                            "nonce": "0x03",
+                            "balance": "0x00",
+                            "code": "0x6000516dffffffffffffffffffffffffffff167f60015c630000600a0361600060015d6000f3000000000000000000000000000017600052601260006000f050601260006000f050",
+                            "storage": {}
+                        },
+                        "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+                            "nonce": "0x01",
+                            "balance": "0x033b2e3c9fd0803cde008bd8",
+                            "code": "0x",
+                            "storage": {}
+                        },
+                        "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba": {
+                            "nonce": "0x00",
+                            "balance": "0x02ffd60c",
+                            "code": "0x",
+                            "storage": {}
+                        }
+                    }
+                }
+            ]
+        },
+        "config": {
+            "blobSchedule": {
+                "Cancun": {
+                    "target": "0x03",
+                    "max": "0x06",
+                    "baseFeeUpdateFraction": "0x32f0ed"
+                },
+                "Prague": {
+                    "target": "0x06",
+                    "max": "0x09",
+                    "baseFeeUpdateFraction": "0x4c6964"
+                },
+                "Osaka": {
+                    "target": "0x06",
+                    "max": "0x09",
+                    "baseFeeUpdateFraction": "0x4c6964"
+                }
+            },
+            "chainid": "0x01"
+        },
+        "_info": {
+            "hash": "0xdf1eb0aa8da75c42fb5389d4e843e8a42f6a0331ef36e3f64597654e3aa9881d",
+            "fixture-format": "state_test",
+            "comment": "`execution-specs` generated test",
+            "filling-transition-tool": "2.19.0",
+            "description": "Test TSTORE is rolled back after failed CREATE/CREATE2 initcode.\n\nRegression test for\nhttps://github.com/ethereum/execution-specs/issues/917\n\nInitcode does TLOAD(1) to compute a return size, then does\nTSTORE(1, max_code_size), then returns data of the computed size.\nWhen TLOAD(1) is 0, the return size exceeds the max code size, so\ncreation fails.\n\nThe caller invokes CREATE/CREATE2 twice with the same initcode.\nIf TSTORE from the first (failed) creation is properly rolled\nback, the second CREATE2 also sees TLOAD(1)==0 and fails the same\nway, so nothing is deployed. If it were not rolled back, the\nsecond CREATE2 would see TLOAD(1)==max_code_size, return a small\nvalid contract and succeed; the post-state therefore asserts the\ntarget address is non-existent.\n\nThe create results are not recorded with SSTORE: a failed create\nburns its full 63/64 gas forward, and under the EIP-8037\ntransaction gas-limit cap two of them in sequence leave too little\nregular gas to write the result. Asserting account non-existence\nchecks the same rollback property without that write.",
+            "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/tests/cancun/eip1153_tstore/test_tstorage_create_contexts.py#L263",
+            "reference-spec": "https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1153.md",
+            "reference-spec-version": "1eb863b534a5a3e19e9c196ab2a7f3db4bb9da17"
+        }
+    }
+}
