@@ -104,10 +104,11 @@ test('unpriced probes omit original blob hashes and fees; BLOBBASEFEE remains ex
   }
 });
 
-test('KZG remains unsupported and zero-tip cleanup uses the blob-specific transaction scope',async()=>{
+test('malformed KZG retains blob fees and zero-tip cleanup uses the blob-specific transaction scope',async()=>{
   const f=await blobFeeFixture({gas:'100000',to:'0x'+'00'.repeat(19)+'0a'}),o=await execute(f);
-  assert.equal(o.execution.status,'unsupported');assert.equal(o.execution.error.code,'LOCAL_BLOB_UNSUPPORTED');assert.equal(o.feeAccounting,undefined);
-  assert.deepEqual(f.stateManager.snapshotChanges().accounts,[]);
+  assert.equal(o.execution.status,'failed');assert.equal(o.execution.error,'invalid input length');assert.equal(o.feeAccounting.kind,'eip4844');
+  assert.equal(o.gasAccounting.gasUsed,'100000');assert.equal(await balance(f.stateManager,TX_SENDER),FUNDS-BigInt(o.feeAccounting.totalFeeCharge));
+  assert.equal((await account(f.stateManager,TX_SENDER)).nonce,2n);assert.equal(await balance(f.stateManager,'0x'+'00'.repeat(19)+'0a'),0n);
   const z=await blobFeeFixture({gas:'30000',priorityFee:0n,accounts:{[COINBASE]:{nonce:0n,balance:0n,code:'0x'}}}),zo=await execute(z);
   assert.equal(zo.execution.status,'success');assert.equal(zo.lifecycle.emptyAccountCleanup.scope,'unsigned_eip4844_transaction_touches');
   assert.equal(await account(z.stateManager,COINBASE),undefined);await compareFullVM(z,zo);

@@ -382,6 +382,7 @@ function transactionContextHelp() {
   help.append(node('p', 'field-help', 'Leave blank for ordinary calls. Add accessList, blobVersionedHashes, or both. Order and duplicates are preserved; this applies only to this call, not its balance or position checks.'));
   help.append(node('pre', '', '{"accessList":[{"address":"<0x + 40 hex digits>","storageKeys":["<0x + 64 hex digits>"]}],"blobVersionedHashes":["<0x01 + 62 hex digits>"]}'));
   help.append(node('p', 'field-help', 'The default blob profile uses zero blob fees. The independent local engine can include fees when transaction fees are enabled and a blob fee cap is provided. Blob data and sidecar validity are not checked.'));
+  help.append(node('p', 'field-help', 'In the independent local engine, Cancun-or-later calls to point evaluation (0x0a) check single-point KZG proofs. Supplying blob hashes alone does not run that check or validate a whole blob.'));
   return help;
 }
 
@@ -1397,6 +1398,7 @@ function renderLocalResult(result) {
     'Only the explicit query list is checked. There is no automatic asset discovery, ETH balance summary or total portfolio value.',
     'Before and after refer to this unsigned call from the selected block-end state, not the original historical transaction position.',
     'State proofs and code are checked against the selected header. Consensus, finality, contract identity and complete economic effects are not established.',
+    'On Cancun or later, local KZG proof checking applies only when a point-evaluation call (0x0a) executes. This preview does not provide a blanket proof verdict or validate blob sidecars, whole-blob validity or inclusion.',
     feeRequested ? 'Fee amounts are shown only for a complete validated simulation. Measurement queries do not repeat fees. Outer transaction signatures are not validated.' : 'Network fees and outer transaction signatures are not validated. Execution is not a security verdict.',
   ].map(text => node('li', '', text)));
   const details = $('source-details'), selection = result.source?.blockSelection || {}; details.replaceChildren();
@@ -1405,7 +1407,7 @@ function renderLocalResult(result) {
     for (const [label, key] of [['Gas charged', 'chargedGas'], ['Effective gas price · wei', 'effectiveGasPrice'], [fee.kind === 'eip4844' ? 'Execution fee charged · wei' : 'Fee charged in simulation · wei', 'gasCharge'], ['Unused upfront gas debit returned · wei', 'senderRefund'], ['Execution base fee burned · wei', 'baseFeeBurn'], ['Block beneficiary tip · wei', 'coinbaseTip']]) addDefinition(details, label, fee[key]);
     if (fee.kind === 'eip4844') {
       for (const [label, key] of [['Declared blobs', 'blobCount'], ['Blob gas used', 'blobGasUsed'], ['Blob base fee · wei', 'blobBaseFeePerGas'], ['Blob fee burned · wei', 'blobFeeBurn'], ['Total fee charged · wei', 'totalFeeCharge'], ['Total fee burned · wei', 'totalFeeBurn']]) addDefinition(details, label, fee[key]);
-      $('warnings-list').append(node('li', '', 'Blob fees are burned without refund or beneficiary tip. Sidecars, KZG proofs and inclusion are not checked. Measurement queries stay unpriced and receive no blob hashes.'));
+      $('warnings-list').append(node('li', '', 'Blob fees are burned without refund or beneficiary tip. Blob sidecars, whole-blob validity and inclusion are not checked. Measurement queries stay unpriced and receive no blob hashes.'));
     }
     addDefinition(details, 'Block beneficiary', fee.coinbase);
     $('warnings-list').append(node('li', '', 'The simulated beneficiary tip is a fee allocation, not a claim about its surviving balance after account deletion.'));

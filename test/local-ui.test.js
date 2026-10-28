@@ -448,7 +448,7 @@ test('all pinned blob forks use exact integer pricing and retained execution, bl
     assert(ui.elements.get('source-details').textContent.includes('Blob fee burned · wei' + fee.blobFeeBurn));
     assert(ui.elements.get('source-details').textContent.includes('Total fee charged · wei' + fee.totalFeeCharge));
     assert.match(ui.elements.get('source-details').textContent, /Block beneficiary tip · wei42000/);
-    assert.match(ui.elements.get('warnings-list').textContent, /Sidecars, KZG proofs and inclusion are not checked/);
+    assert.match(ui.elements.get('warnings-list').textContent, /Blob sidecars, whole-blob validity and inclusion are not checked/);
   }
   for (const status of ['success', 'reverted', 'failed']) {
     const result = blobSample(); result.execution.status = result.attempt.preview.original.output.execution.status = status; result.status = 'partial';

@@ -143,12 +143,12 @@ test('declared blob context exposes ordered hashes, bounded index zero and synth
  assert.equal(r.profile.feesSettled,false);assert.equal(Object.hasOwn(r.profile,'accessList'),false);
 });
 
-test('blob transaction context propagates through nested calls without enabling KZG or implicit BLOBBASEFEE',async()=>{
+test('blob context propagates through nested calls while absent BLOBBASEFEE stays unsupported and malformed KZG fails normally',async()=>{
  const target=addr(0x3333),hash='0x01'+'ab'.repeat(31),invoke='6020600060006000600073'+target.slice(2)+'61fffff15060206000f3';
  const f=await fixture('0x'+invoke,{[target]:account('0x60004960005260206000f3')});f.header.excessBlobGas='0';f.request.blobVersionedHashes=[hash];
  const r=await executeEthereumCall(f);assert.equal(r.execution.status,'success');assert.equal(r.execution.returnData,hash);assert.equal(r.trace.calls[0].output,hash);
  const missing=await fixture('0x4a00');const noFee=await executeEthereumCall(missing);assert.equal(noFee.execution.status,'unsupported');assert.equal(noFee.execution.error.code,'LOCAL_BLOB_UNSUPPORTED');assert.deepEqual(missing.stateManager.snapshotChanges().accounts,[]);
- const kzg=await fixture('0x00');kzg.request.to=addr(10);kzg.request.blobVersionedHashes=[hash];kzg.header.excessBlobGas='0';const bad=await executeEthereumCall(kzg);assert.equal(bad.execution.status,'unsupported');assert.deepEqual(kzg.stateManager.snapshotChanges().accounts,[]);
+ const kzg=await fixture('0x00',{[addr(10)]:account('0x')});kzg.request.to=addr(10);kzg.request.blobVersionedHashes=[hash];kzg.header.excessBlobGas='0';const bad=await executeEthereumCall(kzg);assert.equal(bad.execution.status,'failed');assert.equal(bad.execution.error,'invalid input length');assert.deepEqual(kzg.stateManager.snapshotChanges().accounts,[{address:FROM,nonce:{before:'0x7',after:'0x8'}}]);
 });
 
 test('access intrinsic and blob fork/header validity reject before state reads',async()=>{

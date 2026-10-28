@@ -12,6 +12,8 @@ import { EMPTY_STORAGE_ROOT } from './verified-state-proof.js';
 import { existingDelegationTarget } from './sender-delegation.js';
 import { normalizeAuthorizationList, recoverAuthorization, authorizationStateDecision } from './authorization-list.js';
 import { normalizeEthereumFees, ethereumFeePlan, settleEthereumFees } from './ethereum-fees.js';
+import { verifyKzgProof } from './kzg-point-evaluation.js';
+import { guardKzgVerifier } from './kzg-runtime.js';
 
 export const EXECUTION_LIMITS = Object.freeze({ gas: 5000000, steps: 1000000, frames: 1000, depth: 32, logs: 2000, memoryBytes: 1048576, returnBytes: 1048576, calldataBytes: 32768, traceBytes: 8388608, wallMs: 10000 });
 export const ETHEREUM_EXECUTION_LIMITS = Object.freeze({ ...EXECUTION_LIMITS, wallMs: 120000 });
@@ -37,7 +39,7 @@ function supportedAddress(value, chainId) {
   // including unknown future entries, instead of interpreting them as EOAs.
   if (chainId === 999 && n >= 0x800n && n <= 0x8ffn) reject('LOCAL_HYPERCORE_UNSUPPORTED', 'HyperCore read precompile execution is unsupported.', 'unsupported');
   if (chainId === 999 && target.toLowerCase() === CORE_WRITER) reject('LOCAL_COREWRITER_UNSUPPORTED', 'CoreWriter execution and HyperCore effects are unsupported.', 'unsupported');
-  if (n === 10n) reject('LOCAL_BLOB_UNSUPPORTED', 'The KZG point-evaluation precompile is outside this local engine profile.', 'unsupported');
+  if (chainId === 999 && n === 10n) reject('LOCAL_BLOB_UNSUPPORTED', 'The KZG point-evaluation precompile is outside the legacy HyperEVM profile.', 'unsupported');
 }
 function safeFailure(error) {
   if (error instanceof ExecutionError) return { status: error.status, error: { code: error.code, message: error.message } };
@@ -64,7 +66,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     lifecycle: chainId === 1 ? 'no_lifecycle_operation_encountered' : 'CREATE_CREATE2_SELFDESTRUCT_unsupported', deadline: 'cooperative_until_final_atomic_commit_no_forceful_IO_cancellation',
   };
   let root = null, environment = null, evm, checkpointDepth = 0, ownsManager = false;
-  let managerFailed = false, managerError;
+  let hostFailed = false, hostError;
   let delegatedSenderNonce = null, retainedSenderCreations = 0;
   let authorizationProcessing = null, authorizationSenderIncrements = 0, authorizationBaseline = null;
   let feePlan = null, feeCosts = null, feeAccounting = null;
@@ -75,7 +77,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     // Some EVM paths catch balance-write errors as if they were EVM faults.
     // A host/adapter rejection must never become success or a catchable CALL
     // result. Keep the first failure outside the library's exception wrapper.
-    if (managerFailed) throw managerError;
+    if (hostFailed) throw hostError;
     if (now() - startedAt >= limits.wallMs) reject('LOCAL_RESOURCE_LIMIT', 'Local execution exceeded its wallMs limit.');
   }
   function retain(size) { usage.retainedTraceBytes += size; bound('traceBytes', usage.retainedTraceBytes); }
@@ -98,6 +100,11 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     reserved(from); reserved(to);
     if (!block || ['number', 'timestamp', 'gasLimit', 'baseFeePerGas'].some(field => quantity(block[field]) === null) || quantity(block.gasLimit) === 0n || typeof block.mixHash !== 'string' || !WORD.test(block.mixHash) || !address(block.miner) || ['hash', 'parentHash'].some(field => block[field] !== undefined && (typeof block[field] !== 'string' || !WORD.test(block[field])))) reject('LOCAL_INVALID_INPUT', 'Explicit block number, timestamp, gas limit, base fee, prevRandao and coinbase are required.');
     const common = chainId === 1 ? ethereumCommon(block) : createCustomCommon({ chainId: 999, name: 'experimental-hyperevm-message' }, Mainnet, { hardfork: Hardfork.Cancun });
+    if (chainId === 1 && common.isActivatedEIP(4844)) {
+      common.customCrypto.kzg = guardKzgVerifier(verifyKzgProof, clockCheck, error => {
+        if (!hostFailed) { hostFailed = true; hostError = error; }
+      });
+    }
     if (authorizationList !== undefined && (!common.isActivatedEIP(7702) || topLevelCreation || context.blobVersionedHashes !== undefined)) reject('LOCAL_INVALID_INPUT', 'Authorization lists require a Prague-or-later Ethereum call without blob context.', 'invalid');
     if (authorizationList !== undefined && typeof stateManager.applyAuthorization !== 'function') reject('LOCAL_STATE_UNSUPPORTED', 'Authorization lists require an authenticated authorization-capable state manager.', 'unsupported');
     const canCreate = chainId === 1 && typeof stateManager.beginContractCreation === 'function';
@@ -151,7 +158,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
           clockCheck();
           return result;
         } catch (error) {
-          if (!managerFailed) { managerFailed = true; managerError = error; }
+          if (!hostFailed) { hostFailed = true; hostError = error; }
           throw error;
         }
       });
