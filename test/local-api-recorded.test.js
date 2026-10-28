@@ -10,6 +10,7 @@ import path from 'node:path';
 import { createAppServer } from '../src/server.js';
 import { ProofRpcClient } from '../src/proof-rpc.js';
 import { loadLocalApi } from '../src/local-loader.js';
+import { assertReadsWithCleanup } from '../engines/local-evm/test/cleanup-read-regression.js';
 
 // Composite saved-input development regression, not a new observation or an
 // exact original wire replay. Metadata envelopes are constructed around the
@@ -172,7 +173,7 @@ function assertOriginal(report, c, saved) {
   assert.equal(saved.output.semantics.lifecycle, 'CREATE_CREATE2_SELFDESTRUCT_unsupported');
   normalized.semantics.lifecycle = saved.output.semantics.lifecycle;
   assert.deepEqual(normalized, saved.output); assert.deepEqual(original.changes, saved.changes);
-  assert.deepEqual(original.inputs, saved.inputs); assert.deepEqual(original.stateReads, saved.stateReads);
+  assert.deepEqual(original.inputs, saved.inputs); assertReadsWithCleanup(original.stateReads, saved.stateReads, saved.output.trace);
   const omitDuration = rows => rows.map(({ durationMs, ...row }) => row);
   assert.deepEqual(omitDuration(original.inputEvidence), omitDuration(saved.inputEvidence));
   assert.deepEqual(report.attempt.headerVerification, saved.headerVerification);

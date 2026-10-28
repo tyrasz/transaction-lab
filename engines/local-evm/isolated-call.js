@@ -216,7 +216,7 @@ async function executeIsolated(options, previewMode) {
       need(originalComplete && side.reason === null && side.output?.execution?.status === 'success' && side.output.stateDisposition === 'message_result_retained_in_supplied_manager' && Array.isArray(side.output.logs) && side.output.logs.length === 0);
       const trace = side.output.trace, queryRequest = { from: request.from.toLowerCase(), ...compiled.query, value: '0', gas: '1000000' };
       executionContext(side.output, queryRequest, true); need(trace.error === null);
-      validateExecutionLifecycle({ output: side.output, inputs: value.inputs, destination: queryRequest.to });
+      validateExecutionLifecycle({ output: side.output, inputs: value.inputs, destination: queryRequest.to, changes: side.changesAfter, startingChanges: side.changesBefore });
       need(isDeepStrictEqual(side.values, decodePreviewValues(compiled, side.output.execution.returnData)));
       need(side.changesBefore && side.changesAfter);
       if (phase === 'before') need(side.changesBefore.accounts?.length === 0);

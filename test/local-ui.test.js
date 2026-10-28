@@ -169,3 +169,14 @@ test('verified same-call deletion is visible without claiming the contract remai
   assert.doesNotMatch(ui.elements.get('source-details').textContent, /Contracts removed in this call/);
   assert.doesNotMatch(ui.elements.get('warnings-list').textContent, /do not remain deployed/);
 });
+
+test('verified empty-account cleanup is visible after a reverted call and hidden when unverified', () => {
+  const ui=setup(),result=sample();result.execution.status='reverted';
+  result.attempt={status:'completed',preview:{original:{output:{execution:{status:'reverted'},lifecycle:{emptyAccountCleanup:{basis:'eip161_transaction_end',scope:'unsigned_message_touches_no_fee_settlement',deletions:[{address:T,scope:'entire_account_including_code_and_storage',initialStorageRoot:H}]}}}}}};
+  ui.context.renderLocalResult(result);
+  assert.match(ui.elements.get('source-details').textContent,/Empty accounts removed/);assert(ui.elements.get('source-details').textContent.includes(T));
+  assert.doesNotMatch(ui.elements.get('source-details').textContent,/Contracts removed in this call/);
+  assert.deepEqual(JSON.parse(ui.elements.get('raw-json').textContent),result);
+  result.source.canonicalStatus='unverified';ui.context.renderLocalResult(result);
+  assert.doesNotMatch(ui.elements.get('source-details').textContent,/Empty accounts removed/);
+});

@@ -1251,6 +1251,10 @@ function renderLocalResult(result) {
     addDefinition(details, 'Contracts removed in this call', deletions.map(row => row.address).join(', '));
     $('warnings-list').append(node('li', '', 'The listed contracts were created and removed within this call. They do not remain deployed after it.'));
   }
+  const cleanup = original?.lifecycle?.emptyAccountCleanup;
+  if (['complete', 'partial'].includes(result.status) && ['success', 'reverted', 'failed'].includes(result.execution?.status) && original?.execution?.status === result.execution.status && result.source?.canonicalStatus === 'verified' && result.attempt?.status === 'completed' && cleanup?.basis === 'eip161_transaction_end' && cleanup.scope === 'unsigned_message_touches_no_fee_settlement' && Array.isArray(cleanup.deletions) && cleanup.deletions.length > 0 && cleanup.deletions.length <= 128 && cleanup.deletions.every(row => typeof row.address === 'string' && /^0x[0-9a-f]{40}$/.test(row.address) && row.scope === 'entire_account_including_code_and_storage' && /^0x[0-9a-f]{64}$/.test(row.initialStorageRoot))) {
+    addDefinition(details, 'Empty accounts removed', cleanup.deletions.map(row => row.address).join(', '));
+  }
   $('timing').textContent = Number.isFinite(result.timing?.totalMs) ? `${(result.timing.totalMs / 1000).toFixed(2)}s total` : '';
 }
 

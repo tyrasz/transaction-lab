@@ -23,7 +23,7 @@ function noDeletion(f){assert.ok(f.stateManager.snapshotChanges().accounts.every
 test('Cancun SELFDESTRUCT transfers value to a proven absent beneficiary and preserves code/storage/nonce',async()=>{
   const f=await fixture();f.request.value='5';const result=await executeEthereumCall(f);
   assert.equal(result.execution.status,'success',JSON.stringify(result));assert.equal(result.execution.returnData,'0x');assert.equal(result.execution.gasRefundCounter,'0');
-  assert.equal(result.semantics.lifecycle,'preexisting_Cancun_SELFDESTRUCT_without_deletion_Shanghai_SELFDESTRUCT_and_full_EIP161_cleanup_unsupported');
+  assert.equal(result.semantics.lifecycle,'preexisting_Cancun_SELFDESTRUCT_without_deletion_Shanghai_SELFDESTRUCT_unsupported');
   assert.equal((await account(f,FACTORY)).balance,0n);assert.equal((await account(f,FACTORY)).nonce,7n);
   assert.equal((await account(f,BENEFICIARY)).balance,1005n);assert.equal((await account(f,BENEFICIARY)).nonce,0n);
   assert.equal((await account(f,SENDER)).balance,999995n);assert.equal(await code(f,FACTORY),'0x'+sd(BENEFICIARY));assert.equal(await storage(f,FACTORY),9n);
@@ -127,9 +127,10 @@ test('fresh query SELFDESTRUCT transfer is rejected by net-mutation checks witho
   assert.equal(result.original.changes.accounts.some(row=>row.address===BENEFICIARY),false);
 });
 
-test('proven existing empty account and all direct deletion operations remain refused',async()=>{
+test('SELFDESTRUCT funds a proven existing empty beneficiary while arbitrary direct deletion remains refused',async()=>{
   const f=await fixture({accounts:{[BENEFICIARY]:{nonce:0n,balance:0n,code:'0x'}}}),result=await executeEthereumCall(f);
-  assert.equal(result.execution.status,'unsupported');assert.equal(result.execution.error.code,'LOCAL_STATE_UNSUPPORTED');assert.deepEqual(f.stateManager.snapshotChanges().accounts,[]);
+  assert.equal(result.execution.status,'success');assert.equal((await account(f,BENEFICIARY)).balance,1000n);
+  assert.equal(result.lifecycle,undefined);assert.equal((await account(f,FACTORY)).balance,0n);
   await assert.rejects(f.stateManager.deleteAccount(createAddressFromString(FACTORY)),{code:'LOCAL_STATE_UNSUPPORTED'});
 });
 

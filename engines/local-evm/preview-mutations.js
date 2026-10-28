@@ -6,6 +6,7 @@ const UINT256 = (1n << 256n) - 1n, UINT64 = (1n << 64n) - 1n;
 const MAX_ACCOUNTS = 128, MAX_SLOTS = 1024, MAX_CODE_BYTES = 24576;
 const CREATION_BASES = ['internal_contract_creation', 'top_level_contract_creation'];
 const DELETION_BASIS = 'same_invocation_created_contract_deletion';
+const EMPTY_CLEANUP_BASIS = 'eip161_empty_account_cleanup';
 const EXISTENCE_BASES = ['unsigned_sender_nonce_materialization', 'positive_native_funding_of_proof_absent_account', ...CREATION_BASES];
 const ZERO_WORD = '0x' + '00'.repeat(32);
 
@@ -51,7 +52,7 @@ function canonical(snapshot) {
     const row = { address: account.address };
     if (Object.hasOwn(account, 'existence')) {
       const value = account.existence; fields(value, ['before', 'after', 'basis']);
-      const deletion = value.before === true && value.after === false && value.basis === DELETION_BASIS;
+      const deletion = value.before === true && value.after === false && [DELETION_BASIS, EMPTY_CLEANUP_BASIS].includes(value.basis);
       need(deletion || (value.before === false && value.after === true && EXISTENCE_BASES.includes(value.basis)));
       row.existence = { before: value.before, after: value.after, basis: value.basis };
     }
@@ -77,7 +78,12 @@ function canonical(snapshot) {
       need(!row.existence || creation);
       need(!row.storage || row.storage.every(value => value.before === ZERO_WORD));
     }
-    if (row.existence?.basis === DELETION_BASIS) {
+    if (row.existence?.basis === EMPTY_CLEANUP_BASIS) {
+      // The whole initial empty account, including unrequested storage, was
+      // removed. Its authenticated prior root is bound by lifecycle evidence.
+      // Individual slot deltas would misleadingly imply exhaustive coverage.
+      need(!row.nonce && !row.balance && !row.code && !row.storage);
+    } else if (row.existence?.basis === DELETION_BASIS) {
       // The immutable base was an existing deployable account. Finalization
       // removes the whole account; its original code/nonce/storage were empty.
       need(!row.nonce && !row.code && !row.storage);

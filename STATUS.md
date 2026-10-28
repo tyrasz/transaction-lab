@@ -1,8 +1,18 @@
-# Transaction Lab checkpoint — 0.18.0
+# Transaction Lab checkpoint — 0.19.0
 
 Updated October 28, 2026. The user's long-term objective remains to improve measured correctness and coverage; no background goal-runner status is implied. **No representative 90% or 100% accuracy rate or superiority to Blockaid has been established.** This is a working prototype with narrow measured coverage, not a general EVM simulation or security product.
 
 The app uses http://127.0.0.1:5174/ without a wallet connection or Dynamic authentication. Version 0.14 adds `POST /api/evm/local-preview`: an experimental Ethereum call executed in an isolated local worker from verified starting-state proofs/code, with explicit before/after token and Aave/Morpho position queries. The existing provider-backed Ethereum path retains automatic token/native measurements, typed positions and complete state continuation across ordered sequences. HyperEVM endpoints retain their semantics. The new local endpoint has its own availability, source/runtime identity, transport bounds and failure handling; it does not establish full signed-transaction support or complete economic-effect coverage. Security remains `not_assessed`. No signing or broadcasting occurs.
+
+## Transaction-end empty-account cleanup — 0.19.0
+
+The independent Ethereum route now admits proof-verified existing empty accounts and performs EIP-161 cleanup using the pinned EVM's retained touch journal. Cleanup occurs after message execution and created-contract deletion, inside the outer rollback checkpoint. It removes the whole account and storage trie, including undemanded storage. A reverted message normally restores its touches; the RIPEMD160 precompile's historical sticky-touch exception is retained and tested on both successful and reverted roots. Access-list warmth, BALANCE reads and a DELEGATECALL code address alone cannot justify deletion. Funding an empty account preserves it.
+
+The parent independently checks cleanup metadata against authenticated initial facts, frame context, retained touches and an ordered native-value ledger. Review found two ways to hide required cleanup using fabricated nonce or balance changes, and a burn-timing error when a newly created self-destructing contract is funded again. These are fixed and tested against actual child output. The ledger is a bounded consistency check, not a second EVM or a proof of the poststate root. Copied query overlays preserve removal; the browser displays validated empty-account removal even when the original message reverted.
+
+The settled application suite passes **618/618**, the local engine suite **360/360**, and the research suite **179/179**. A timing-dependent cancellation control now synchronizes reader startup and a mocked deadline; no transport behavior changed. Recorded Aave, Morpho and USDC outputs retain identical execution, state, proof requests and distinct read sets; the only expected counter difference is one cached account lookup per retained cleanup touch. Frozen evidence remains unchanged. The running app remains 0.18.0 until release verification finishes.
+
+The unsigned profile still omits fee settlement and fee-induced coinbase touches. Shanghai SELFDESTRUCT, authorization preprocessing, code-bearing senders and KZG remain unsupported. Rematerializing an account whose cleanup removed a nonempty original storage trie is conservatively rejected until the output can carry explicit storage-reset provenance. Provider-backed lifecycle measurements are unchanged. The prospective denominator remains **12 fully compared / 16 selected**; these regression controls do not establish a population accuracy rate.
 
 ## Cancun contract deletion — 0.18.0
 

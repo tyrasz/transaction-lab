@@ -71,13 +71,26 @@ test('late fetch ignoring AbortSignal cannot mutate a closed record and its body
   assert.equal(JSON.stringify(budget.records), sealed); assert.equal(budget.responseBytes, snapshot.responseBytes); assert.equal(canceled, 1);
 });
 
-test('late reader ignoring cancellation cannot mutate or hash a closed record twice', async () => {
-  let release, canceled = 0;
-  const budget = mockBudget(async () => ({ status: 200, ok: true, body: { getReader() { return { read() { return new Promise(resolve => { release = resolve; }); }, async cancel() { canceled++; } }; } } }), { requestMs: 5 });
-  await assert.rejects(budget.client('A', { phase: 'selection' }).call('eth_chainId'), { code: 'RPC_TIMEOUT' });
+test('late reader ignoring cancellation cannot mutate or hash a closed record twice', async t => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  let release, reading, lateCanceled, canceled = 0, now = 1000;
+  const readerStarted = new Promise(resolve => { reading = resolve; });
+  const lateReadCanceled = new Promise(resolve => { lateCanceled = resolve; });
+  const budget = mockBudget(async () => ({ status: 200, ok: true, body: { getReader() { return {
+    read() { return new Promise(resolve => { release = resolve; reading(); }); },
+    async cancel() { if (++canceled === 2) lateCanceled(); },
+  }; } } }), { requestMs: 5 }, () => now);
+  const timedOut = assert.rejects(budget.client('A', { phase: 'selection' }).call('eth_chainId'), { code: 'RPC_TIMEOUT' });
+  // Start the body read before firing its deadline. Real scheduling delays
+  // must not turn this into a test of timing out before read() was entered.
+  await readerStarted;
+  now += 5; t.mock.timers.tick(5);
+  await timedOut;
+  assert.equal(canceled, 1);
   const sealed = JSON.stringify(budget.records);
-  release({ done: false, value: new Uint8Array(100) }); await delay(5);
-  assert.equal(JSON.stringify(budget.records), sealed); assert.equal(budget.responseBytes, 0); assert.ok(canceled);
+  release({ done: false, value: new Uint8Array(100) });
+  await lateReadCanceled;
+  assert.equal(JSON.stringify(budget.records), sealed); assert.equal(budget.responseBytes, 0); assert.equal(canceled, 2);
 });
 
 test('stream wall limit is checked even if the injected clock jumps before the timer fires', async () => {

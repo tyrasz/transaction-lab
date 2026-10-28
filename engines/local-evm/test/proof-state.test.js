@@ -76,14 +76,18 @@ test('invalid storage proof blocks a write and prior overlay state remains avail
   await assert.rejects(manager.getAccount(address), { code: 'LOCAL_STATE_MISSING' });
 });
 
-test('proven existing empty accounts fail closed rather than inventing transaction-cleanup semantics', async () => {
+test('proven existing empty accounts remain present until explicit transaction-end cleanup', async () => {
   const trie = await createMPT({ useKeyHashing: true });
   await trie.put(bytes(A), RLP.encode([new Uint8Array(), new Uint8Array(), bytes(EMPTY_STORAGE_ROOT), bytes(EMPTY_CODE_HASH)]));
   const proof = { address: A, accountProof: await minimalProof(trie, A), balance: '0x0', nonce: '0x0', codeHash: EMPTY_CODE_HASH, storageHash: EMPTY_STORAGE_ROOT, storageProof: [] };
   const inputs = createRpcStateInputs({ chainId: 1, blockHash, header: { hash: blockHash, stateRoot: hex(trie.root()) }, rpc: { async call(method) { return method === 'eth_getProof' ? structuredClone(proof) : '0x'; } } });
   const manager = createProofStateManager({ inputs }); await manager.checkpoint();
-  await assert.rejects(manager.getAccount(address), { code: 'LOCAL_STATE_UNSUPPORTED' }); await manager.revert();
+  assert.equal((await manager.getAccount(address)).isEmpty(), true);
+  manager.beginEmptyAccountCleanup(); await manager.deleteAccount(address);
+  assert.deepEqual(manager.endEmptyAccountCleanup(), [{ address: A, scope: 'entire_account_including_code_and_storage', initialStorageRoot: EMPTY_STORAGE_ROOT }]);
+  assert.equal(await manager.getAccount(address), undefined); await manager.revert();
   assert.deepEqual(manager.snapshotChanges().accounts, []);
+  assert.equal((await manager.getAccount(address)).isEmpty(), true);
   assert.deepEqual(inputs.snapshotInputs().accounts[A], { exists: true, nonce: '0', balance: '0', code: '0x', storage: {} });
 });
 

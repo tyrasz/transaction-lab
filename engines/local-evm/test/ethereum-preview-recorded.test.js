@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { executeEthereumPreview } from '../ethereum-preview.js';
+import { assertReadsWithCleanup } from './cleanup-read-regression.js';
 
 // Development regression inputs, not held-out accuracy cases. The RPC adapter
 // below serves only independently captured eth_getProof/eth_getCode results.
@@ -91,7 +92,7 @@ function originalUnchanged(result, fixture) {
   assert.deepEqual(output, fixture.original.output);
   assert.deepEqual(result.original.changes, fixture.original.changes);
   assert.deepEqual(result.original.inputs, fixture.original.inputs);
-  assert.deepEqual(result.original.stateReads, fixture.original.stateReads);
+  assertReadsWithCleanup(result.original.stateReads, fixture.original.stateReads, fixture.original.output.trace);
   assert.equal(result.original.inputUsage.status, 'available');
   assert.equal(result.original.inputUsage.calls, fixture.original.transport.length);
   assert.equal(result.original.inputEvidence.length, fixture.original.inputEvidence.length);

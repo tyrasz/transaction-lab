@@ -85,9 +85,10 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     const common = chainId === 1 ? ethereumCommon(block) : createCustomCommon({ chainId: 999, name: 'experimental-hyperevm-message' }, Mainnet, { hardfork: Hardfork.Cancun });
     const canCreate = chainId === 1 && typeof stateManager.beginContractCreation === 'function';
     const canFinalizeDeletion = chainId === 1 && typeof stateManager.finalizeCreatedContractDeletion === 'function';
+    const canCleanupEmpty = chainId === 1 && typeof stateManager.beginEmptyAccountCleanup === 'function' && typeof stateManager.endEmptyAccountCleanup === 'function';
     let observedCreation = false, observedSelfdestruct = false, observedCreatedSelfdestruct = false;
     function describeLifecycle() {
-      const unsupported = canFinalizeDeletion ? 'Shanghai_SELFDESTRUCT_and_full_EIP161_cleanup_unsupported' : 'same_invocation_creation_and_Shanghai_SELFDESTRUCT_unsupported';
+      const unsupported = canFinalizeDeletion ? (canCleanupEmpty ? 'Shanghai_SELFDESTRUCT_unsupported' : 'Shanghai_SELFDESTRUCT_and_full_EIP161_cleanup_unsupported') : 'same_invocation_creation_and_Shanghai_SELFDESTRUCT_unsupported';
       if (observedCreatedSelfdestruct) semantics.lifecycle = 'Cancun_created_account_SELFDESTRUCT_with_root_commit_gated_deletion_' + unsupported;
       else if (observedSelfdestruct) semantics.lifecycle = (observedCreation ? (topLevelCreation ? 'top_level_CREATE_and_' : '') + 'internal_CREATE_CREATE2_and_' : '') + 'preexisting_Cancun_SELFDESTRUCT_without_deletion_' + unsupported;
       else if (observedCreation) semantics.lifecycle = (topLevelCreation ? 'top_level_CREATE_and_' : '') + 'internal_CREATE_CREATE2_with_proven_deployable_targets_' + unsupported;
@@ -230,7 +231,24 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
         finalizedDeletions.push({ address: key, scope: 'entire_account_including_code_and_storage', initialStorageRoot: EMPTY_STORAGE_ROOT });
       }
     }
-    const lifecycle = finalizedDeletions.length ? { finalizedDeletions } : null;
+    let emptyAccountCleanup = null;
+    if (canCleanupEmpty) {
+      const touchedAccounts = [...evm.journal.touched].map(key => '0x' + key).sort();
+      if (touchedAccounts.some(key => !ADDRESS.test(key))) reject('LOCAL_TRACE_INVALID', 'The retained empty-account touch set is malformed.');
+      clockCheck(); stateManager.beginEmptyAccountCleanup();
+      let deletions;
+      try { clockCheck(); await evm.journal.cleanup(); }
+      finally { deletions = stateManager.endEmptyAccountCleanup(); }
+      clockCheck();
+      if (deletions.length) {
+        emptyAccountCleanup = { basis: 'eip161_transaction_end', scope: 'unsigned_message_touches_no_fee_settlement', touchedAccounts, deletions };
+        semantics.lifecycle = (semantics.lifecycle === 'no_lifecycle_operation_encountered' ? '' : semantics.lifecycle + '_and_') + 'EIP161_empty_account_cleanup';
+      }
+    }
+    const lifecycle = finalizedDeletions.length || emptyAccountCleanup ? {
+      ...(finalizedDeletions.length ? { finalizedDeletions } : {}),
+      ...(emptyAccountCleanup ? { emptyAccountCleanup } : {}),
+    } : null;
     const logs = (result.execResult.logs ?? []).map(([emitter, topics, data]) => ({ address: bytesToHex(emitter), topics: topics.map(bytesToHex), data: bytesToHex(data) }));
     bound('logs', logs.length); bound('returnBytes', result.execResult.returnValue.length);
     usage.retainedTraceBytes = Buffer.byteLength(JSON.stringify({ trace: root, logs, ...(lifecycle ? { lifecycle } : {}) }), 'utf8'); bound('traceBytes', usage.retainedTraceBytes);

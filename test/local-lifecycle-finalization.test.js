@@ -23,5 +23,30 @@ test('actual local API exposes constructor deletion and carries it through stabl
   assert.equal(result.measurements[0].status,'measured');assert.equal(result.measurements[0].values[0].deltaRaw,'0');
   assert.deepEqual(result.attempt.preview.measurements[0].after.changesBefore,original.changes);
   assert.equal(LOCAL_CAPABILITIES.selfdestruct,'Cancun_or_later_existing_balance_transfer_and_same_invocation_created_contract_deletion');
-  assert(LOCAL_CAPABILITIES.limitations.some(value=>value.includes('Shanghai destruction and general empty-account cleanup remain unsupported')));
+  assert(LOCAL_CAPABILITIES.limitations.some(value=>value.includes('Shanghai destruction remains unsupported')));
+});
+
+test('actual local API retains authenticated empty-account cleanup even after a root revert', async () => {
+  const target='0x0000000000000000000000000000000000000003',getter='0x7777777777777777777777777777777777777777';
+  const word=n=>'0x'+BigInt(n).toString(16).padStart(64,'0');
+  for(const reverts of [false,true]) {
+    const f=await lifecycleFixture({code:'0x6000600060006000600060036001f1'+(reverts?'5060006000fd':'60005260206000f3'),accounts:{
+      [target]:{nonce:0n,balance:0n,code:'0x',storage:{[word(0)]:word(42)}},
+      [getter]:{nonce:1n,balance:0n,code:'0x602a60005260206000f3'},
+    }});
+    const rpc=new ProofRpcClient({url:'https://fixture.invalid',fetchImpl:async(_url,options)=>{
+      const request=JSON.parse(options.body);
+      const result=request.method==='eth_chainId'?'0x1':['eth_getBlockByHash','eth_getBlockByNumber'].includes(request.method)?f.header:await f.rpc.call(request.method,request.params);
+      return new Response(JSON.stringify({jsonrpc:'2.0',id:request.id,result}));
+    }});
+    const result=await simulateLocal({chainId:1,from:SENDER,to:FACTORY,data:'0x',value:'0',block:f.header.hash,queries:[{to:getter,data:'0x70a08231'+SENDER.slice(2).padStart(64,'0')}]},rpc);
+    assert.equal(result.status,'complete',JSON.stringify(result.error));assert.equal(result.execution.status,reverts?'reverted':'success');
+    assert.equal(result.source.canonicalStatus,'verified');
+    const original=result.attempt.preview.original;
+    assert.equal(original.output.lifecycle.emptyAccountCleanup.deletions[0].address,target);
+    assert.deepEqual(original.changes.accounts.find(row=>row.address===target),{address:target,existence:{before:true,after:false,basis:'eip161_empty_account_cleanup'}});
+    assert.equal(result.measurements[0].status,'measured');assert.equal(result.measurements[0].values[0].deltaRaw,'0');
+    assert.deepEqual(result.attempt.preview.measurements[0].after.changesBefore,original.changes);
+  }
+  assert.equal(LOCAL_CAPABILITIES.emptyAccountCleanup,'EIP161_retained_unsigned_message_touches_including_RIPEMD160_exception');
 });

@@ -9,6 +9,7 @@ import { RLP } from '@ethereumjs/rlp';
 import { keccak_256 } from '@noble/hashes/sha3.js';
 import { executeIsolatedEthereumCall } from '../isolated-call.js';
 import { proofFixture, A, B, word } from './proof-fixture.js';
+import { assertReadsWithCleanup } from './cleanup-read-regression.js';
 
 const read = name => readFileSync(new URL('../../../reports/ethereum-local-reference/' + name, import.meta.url));
 const planBytes = read('plan.json'), recordedBytes = read('drpc-local.json');
@@ -56,7 +57,7 @@ test('real saved proof/code wire replays in an actual fixed worker with exact ob
   assert.equal(recorded.output.semantics.lifecycle, 'CREATE_CREATE2_SELFDESTRUCT_unsupported');
   normalized.semantics.lifecycle = recorded.output.semantics.lifecycle;
   assert.deepEqual(normalized, recorded.output); assert.deepEqual(result.inputs, recorded.inputs);
-  assert.deepEqual(result.changes, recorded.changes); assert.deepEqual(result.stateReads, recorded.stateReads);
+  assert.deepEqual(result.changes, recorded.changes); assertReadsWithCleanup(result.stateReads, recorded.stateReads, recorded.output.trace);
   assert.deepEqual(result.headerVerification, recorded.headerVerification);
   assert.equal(result.isolation.processSeparated, true); assert.notEqual(result.isolation.childPid, process.pid);
   assert.equal(result.isolation.processClosed, true); assert.equal(result.isolation.exitCode, 0); assert.equal(result.isolation.v8OldSpaceMiB, 256);
