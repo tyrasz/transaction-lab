@@ -2,6 +2,7 @@ import { executeUnsignedCall } from './execute.js';
 import { ethereumCallGas, ethereumCommon, ethereumQuantity, ethereumUsedGas, ethereumContextProfile, profileError } from './ethereum-profile.js';
 
 import { normalizeEvmContext } from '../evm-context.js';
+import { normalizeAuthorizationList } from './authorization-list.js';
 
 const ADDRESS = /^0x[0-9a-f]{40}$/i, WORD = /^0x[0-9a-f]{64}$/i;
 const input = (condition, message) => { if (!condition) throw profileError('LOCAL_ETHEREUM_INPUT_INVALID', message); };
@@ -12,8 +13,9 @@ const input = (condition, message) => { if (!condition) throw profileError('LOCA
 export async function executeEthereumCall({ request, header, stateManager, blockchain, limits, now } = {}) {
   let common, costs, totalGas, normalized, block, profile;
   try {
-    const context = normalizeEvmContext(request);
-    input(['data', 'from', 'gas', 'to', 'value'].every(key => Object.hasOwn(request, key)) && Object.keys(request).every(key => ['data', 'from', 'gas', 'to', 'value', 'accessList', 'blobVersionedHashes'].includes(key)), 'Only the unsigned envelope and declared access-list/blob-hash context are accepted.');
+    const evmContext = normalizeEvmContext(request), authorizationList = normalizeAuthorizationList(request);
+    const context = { ...evmContext, ...(authorizationList ? { authorizationList } : {}) };
+    input(['data', 'from', 'gas', 'to', 'value'].every(key => Object.hasOwn(request, key)) && Object.keys(request).every(key => ['data', 'from', 'gas', 'to', 'value', 'accessList', 'blobVersionedHashes', 'authorizationList'].includes(key)), 'Only the unsigned envelope and declared local transaction context are accepted.');
     input(typeof request.from === 'string' && ADDRESS.test(request.from) && (request.to === null || (typeof request.to === 'string' && ADDRESS.test(request.to))), 'An explicit sender and recipient address or null creation destination are required.');
     common = ethereumCommon(header);
     input(header && WORD.test(header.hash) && WORD.test(header.parentHash) && WORD.test(header.stateRoot) && WORD.test(header.mixHash) && ADDRESS.test(header.miner), 'A source header with block hashes, state root, randomness and coinbase is required.');
@@ -44,7 +46,7 @@ export async function executeEthereumCall({ request, header, stateManager, block
   const complete = ['success', 'reverted', 'failed'].includes(result.execution.status);
   return {
     ...result, profile,
-    gasAccounting: complete ? Object.fromEntries(Object.entries(ethereumUsedGas({ messageGasUsed: BigInt(result.execution.executionGasUsed), refundCounter: BigInt(result.execution.gasRefundCounter), intrinsic: costs.intrinsic, floor: costs.floor })).map(([k, v]) => [k, v.toString()])) : null,
+    gasAccounting: complete ? Object.fromEntries(Object.entries(ethereumUsedGas({ messageGasUsed: BigInt(result.execution.executionGasUsed), refundCounter: BigInt(result.execution.gasRefundCounter) + (normalized.authorizationList ? BigInt(result.authorizationProcessing.gasRefundCounter) : 0n), intrinsic: costs.intrinsic, floor: costs.floor })).map(([k, v]) => [k, v.toString()])) : null,
     gasAccountingScope: 'Unsigned call gas including intrinsic, one-fifth refund cap and active calldata floor; no fee settlement or signed-transaction validity claim.',
   };
 }

@@ -8,7 +8,8 @@ const CREATION_BASES = ['internal_contract_creation', 'top_level_contract_creati
 const DELETION_BASIS = 'same_invocation_created_contract_deletion';
 const SHANGHAI_DELETION_BASIS = 'shanghai_selfdestruct_deletion';
 const EMPTY_CLEANUP_BASIS = 'eip161_empty_account_cleanup';
-const EXISTENCE_BASES = ['unsigned_sender_nonce_materialization', 'positive_native_funding_of_proof_absent_account', ...CREATION_BASES];
+const AUTHORIZATION_BASIS = 'eip7702_authorization_materialization';
+const EXISTENCE_BASES = ['unsigned_sender_nonce_materialization', 'positive_native_funding_of_proof_absent_account', AUTHORIZATION_BASIS, ...CREATION_BASES];
 const ZERO_WORD = '0x' + '00'.repeat(32);
 
 export class QueryMutationError extends Error {
@@ -60,8 +61,10 @@ function canonical(snapshot) {
     for (const field of ['nonce', 'balance']) if (Object.hasOwn(account, field)) row[field] = delta(account[field], field === 'nonce' ? UINT64 : UINT256);
     if (Object.hasOwn(account, 'code')) {
       const value = account.code; fields(value, ['before', 'after']);
-      need(value.before === '0x' && typeof value.after === 'string' && value.after.length > 2 && value.after.length <= 2 + MAX_CODE_BYTES * 2 && DATA.test(value.after));
-      row.code = { before: '0x', after: value.after };
+      const designation = code => code === '0x' || (typeof code === 'string' && /^0xef0100[0-9a-f]{40}$/.test(code));
+      const delegationChange = value.before !== value.after && designation(value.before) && designation(value.after);
+      need(delegationChange || (value.before === '0x' && typeof value.after === 'string' && value.after.length > 2 && value.after.length <= 2 + MAX_CODE_BYTES * 2 && DATA.test(value.after)));
+      row.code = { before: value.before, after: value.after };
     }
     if (Object.hasOwn(account, 'storage')) {
       array(account.storage, MAX_SLOTS); need(account.storage.length > 0); const seen = new Set();
@@ -72,12 +75,20 @@ function canonical(snapshot) {
       }).sort((a, b) => a.slot < b.slot ? -1 : a.slot > b.slot ? 1 : 0);
     }
     const creation = CREATION_BASES.includes(row.existence?.basis);
-    if (creation || row.code) {
+    const authorization = row.existence?.basis === AUTHORIZATION_BASIS;
+    const delegationCode = row.code && [row.code.before, row.code.after].every(code => code === '0x' || /^0xef0100[0-9a-f]{40}$/.test(code));
+    if (creation || (row.code && !delegationCode)) {
       // Deployment starts from nonce0 and a proven empty code/storage state.
       // A prefunded deployable target already existed, so has no existence row.
       need(row.nonce?.before === '0x0' && BigInt(row.nonce.after) > 0n);
       need(!row.existence || creation);
       need(!row.storage || row.storage.every(value => value.before === ZERO_WORD));
+    }
+    if (delegationCode || authorization) {
+      // Shape only. The parent must independently recover signatures and bind
+      // this delta to the ordered prepared state; a designation is not proof.
+      need(row.nonce && BigInt(row.nonce.after) > BigInt(row.nonce.before));
+      need(!row.existence || authorization);
     }
     if (row.existence?.basis === EMPTY_CLEANUP_BASIS) {
       // The whole initial empty account, including unrequested storage, was
@@ -92,7 +103,10 @@ function canonical(snapshot) {
       need(!row.balance || (BigInt(row.balance.before) > 0n && row.balance.after === '0x0'));
     } else if (row.existence) {
       need(!row.balance || row.balance.before === '0x0');
-      if (!creation) {
+      if (authorization) {
+        need(row.nonce?.before === '0x0' && BigInt(row.nonce.after) > 0n);
+        need(!row.storage || row.storage.every(value => value.before === ZERO_WORD));
+      } else if (!creation) {
         need(!row.storage && !row.code);
         if (row.existence.basis === 'unsigned_sender_nonce_materialization') need(row.nonce?.before === '0x0' && BigInt(row.nonce.after) > 0n);
         else need(!row.nonce && row.balance?.before === '0x0' && BigInt(row.balance.after) > 0n);

@@ -6,6 +6,7 @@ import { executeIsolatedEthereumPreview } from '../engines/local-evm/isolated-ca
 import { compilePreviewQueries } from '../engines/local-evm/preview-queries.js';
 import { verifyEthereumHeader } from '../engines/local-evm/ethereum-header.js';
 import { normalizeEvmContext, EVM_CONTEXT_LIMITS } from '../engines/evm-context.js';
+import { normalizeAuthorizationList, MAX_AUTHORIZATIONS } from '../engines/local-evm/authorization-list.js';
 
 const ADDRESS = /^0x[0-9a-f]{40}$/i, HASH = /^0x[0-9a-f]{64}$/i;
 const NUMBER = /^0x(?:0|[1-9a-f][0-9a-f]{0,15})$/i, DATA = /^0x(?:[0-9a-f]{2})*$/i;
@@ -26,8 +27,9 @@ const freeze = value => { if (value && typeof value === 'object') { for (const c
 export const LOCAL_CAPABILITIES = freeze({
   available: true, chainId: 1, status: 'experimental', operation: 'isolated_proof_backed_unsigned_call',
   profile: 'unsigned_unpriced_block_end', blockSelection: ['latest', 'canonical_hex_number', 'block_hash'],
-  transactionContext: { optionalFields: ['accessList', 'blobVersionedHashes'], limits: EVM_CONTEXT_LIMITS, blobFeeScope: 'synthetic_zero_no_blob_fee_settlement_or_sidecar_validation' },
-  senderCode: 'empty_or_exact_existing_EIP7702_delegation_on_Prague_or_later_no_authorization_processing',
+  transactionContext: { optionalFields: ['accessList', 'blobVersionedHashes', 'authorizationList'], limits: { ...EVM_CONTEXT_LIMITS, authorizations: MAX_AUTHORIZATIONS }, blobFeeScope: 'synthetic_zero_no_blob_fee_settlement_or_sidecar_validation' },
+  senderCode: 'empty_or_exact_existing_EIP7702_delegation_on_Prague_or_later',
+  authorizations: 'ordered_EIP7702_signed_tuples_on_Prague_or_later_before_unsigned_message_no_outer_signature_or_fee_settlement',
   internalCreation: 'CREATE_CREATE2_with_proven_empty_deployable_targets',
   topLevelCreation: 'explicit_null_destination_CREATE_with_proven_empty_deployable_target',
   selfdestruct: 'fork_selected_Shanghai_whole_account_deletion_and_Cancun_created_only_deletion',
@@ -42,7 +44,7 @@ export const LOCAL_CAPABILITIES = freeze({
     'Unsigned execution uses zero gas price and BASEFEE, without outer signature validation or fee settlement. Contract signature checks still execute.',
     'Explicit to:null deploys initcode with CREATE; internal CREATE and CREATE2 require a proven deployable target with empty initial code/storage and zero nonce. Shanghai SELFDESTRUCT removes every committed execution account at transaction end. Cancun-or-later transfers preexisting balances while deleting only contracts created in that invocation.',
     'Transaction-end EIP-161 cleanup removes touched empty accounts and their entire storage, including the retained RIPEMD160 touch exception. It adds no fee-related coinbase touch. Rematerializing a deleted account with original code, nonzero nonce or nonempty storage remains unsupported.',
-    'Sender code must be empty or an exact existing EIP-7702 delegation on Prague or later. Authorization lists, other coded senders and KZG point evaluation remain unsupported. Blob context requires a call destination and uses zero blob base fee without sidecar or inclusion validation.',
+    'Sender code must initially be empty or an exact existing EIP-7702 delegation on Prague or later. Up to sixteen signed authorization tuples may install, replace or clear delegations before a call; their changes survive message failure. Authorization lists cannot accompany deployment or blob context. Other coded senders and KZG point evaluation remain unsupported. Blob calls use zero blob base fee without sidecar or inclusion validation.',
     'In-range BLOCKHASH follows authenticated parent headers within the shared read and time budgets; missing ancestry is unavailable.',
     'The pinned EthereumJS Shanghai-through-BPO2 schedule and fixed execution/state budgets bound supported execution.',
     'Process separation and a V8 heap limit are not an OS network/filesystem sandbox or a hard total-RSS limit.',
@@ -58,7 +60,7 @@ function record(value, allowed) {
   }
 }
 export function validateLocalSimulation(input) {
-  record(input, ['chainId', 'from', 'to', 'data', 'value', 'block', 'queries', 'accessList', 'blobVersionedHashes']);
+  record(input, ['chainId', 'from', 'to', 'data', 'value', 'block', 'queries', 'accessList', 'blobVersionedHashes', 'authorizationList']);
   if (input.chainId !== 1 && input.chainId !== '1') throw new InputError('Only Ethereum chain 1 is supported.', 'UNSUPPORTED_CHAIN');
   if (typeof input.from !== 'string' || !ADDRESS.test(input.from)) throw new InputError('from must be a 20-byte hex address.');
   if (input.to !== null && (typeof input.to !== 'string' || !ADDRESS.test(input.to))) throw new InputError('to must be a 20-byte hex address, or explicit null for contract deployment.');
@@ -67,12 +69,14 @@ export function validateLocalSimulation(input) {
   if (typeof value !== 'string' || !DECIMAL.test(value) || BigInt(value) > MAX) throw new InputError('value must be a canonical decimal uint256 wei string.');
   const block = input.block === undefined ? 'latest' : input.block;
   if (typeof block !== 'string' || !(block === 'latest' || NUMBER.test(block) || HASH.test(block))) throw new InputError('block must be latest, a canonical hexadecimal number, or a 32-byte block hash.');
-  let queries, context;
+  let queries, context, authorizationList;
   try { context = normalizeEvmContext(input); } catch { throw new InputError('The access list or versioned blob hashes are malformed or exceed the declared bounds.'); }
+  try { authorizationList = normalizeAuthorizationList(input); } catch { throw new InputError('The authorization list must contain one to sixteen canonical bounded authorization tuples.'); }
+  if (authorizationList && (input.to === null || context.blobVersionedHashes)) throw new InputError('Authorization lists require a call destination without blob context.');
   if (input.to === null && context.blobVersionedHashes) throw new InputError('Blob context requires a call destination; contract deployment cannot carry blob hashes.');
   try { queries = compilePreviewQueries(input.queries).map(row => structuredClone(row.descriptor)); }
   catch { throw new InputError('Supply one to eight distinct canonical token or typed position queries.'); }
-  return { chainId: 1, from: input.from.toLowerCase(), to: input.to === null ? null : input.to.toLowerCase(), data: input.data.toLowerCase(), value, block: block.toLowerCase(), queries, ...context };
+  return { chainId: 1, from: input.from.toLowerCase(), to: input.to === null ? null : input.to.toLowerCase(), data: input.data.toLowerCase(), value, block: block.toLowerCase(), queries, ...context, ...(authorizationList ? { authorizationList } : {}) };
 }
 
 function projection(core) {
@@ -130,7 +134,7 @@ export async function simulateLocal(input, rpc, { signal } = {}) {
     const usage = rpc.usage(), wallMs = Math.floor(remaining() - FINAL_RESERVE);
     const calls = Math.min(256, usage.limits.calls - usage.calls - 1), totalResponseBytes = Math.min(32 * 1024 * 1024, usage.limits.totalBytes - usage.observedBytes);
     if (wallMs <= 0 || calls <= 0 || totalResponseBytes <= 0) stop('LOCAL_PREVIEW_BUDGET');
-    report.attempt = await executeIsolatedEthereumPreview({ request: { from: apiRequest.from, to: apiRequest.to, data: apiRequest.data, value: apiRequest.value, gas: '5000000', ...normalizeEvmContext(apiRequest) },
+    report.attempt = await executeIsolatedEthereumPreview({ request: { from: apiRequest.from, to: apiRequest.to, data: apiRequest.data, value: apiRequest.value, gas: '5000000', ...normalizeEvmContext(apiRequest), ...(apiRequest.authorizationList ? { authorizationList: apiRequest.authorizationList } : {}) },
       header, queries: apiRequest.queries, rpc, signal: controller.signal,
       limits: { wallMs, calls, totalResponseBytes } });
     if (controller.signal.aborted || signal?.aborted) stop(signal?.aborted ? 'LOCAL_PREVIEW_CANCELLED' : 'LOCAL_PREVIEW_BUDGET');

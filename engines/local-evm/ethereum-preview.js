@@ -1,4 +1,5 @@
 import { normalizeEvmContext } from '../evm-context.js';
+import { normalizeAuthorizationList } from './authorization-list.js';
 // Owned execution and explicit queries over verified initial state. No provider
 // execution trace, override, expected result or poststate enters this module.
 import { performance } from 'node:perf_hooks';
@@ -44,8 +45,10 @@ export async function executeEthereumPreview(options) {
     now = options.now ?? (() => performance.now()); need(typeof now === 'function');
     queries = compilePreviewQueries(options.queries);
     request = decode(encode(options.request, 128 * 1024), 128 * 1024);
-    fields(request, ['from', 'to', 'data', 'value', 'gas', 'accessList', 'blobVersionedHashes'], ['from', 'to', 'data', 'value', 'gas']);
+    fields(request, ['from', 'to', 'data', 'value', 'gas', 'accessList', 'blobVersionedHashes', 'authorizationList'], ['from', 'to', 'data', 'value', 'gas']);
     Object.assign(request, normalizeEvmContext(request));
+    const authorizationList = normalizeAuthorizationList(request);
+    if (authorizationList) request.authorizationList = authorizationList;
     need(typeof request.from === 'string' && /^0x[0-9a-f]{40}$/i.test(request.from));
     need(request.to === null || (typeof request.to === 'string' && /^0x[0-9a-f]{40}$/i.test(request.to)));
     request.from = request.from.toLowerCase(); request.to = request.to === null ? null : request.to.toLowerCase();

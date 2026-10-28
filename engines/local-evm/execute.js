@@ -1,13 +1,15 @@
-// Experimental message execution. No provider trace, expected output, signature,
-// transaction broadcast, or transaction fee settlement enters this module.
+// Experimental message execution. No provider trace, expected output, outer
+// transaction signature, broadcast or fee settlement enters this module.
+// Explicit bounded EIP-7702 authorization signatures are processed separately.
 import { performance } from 'node:perf_hooks';
 import { createCustomCommon, Hardfork, Mainnet } from '@ethereumjs/common';
 import { createEVM, EVMError } from '@ethereumjs/evm';
-import { bytesToHex, createAddressFromString, hexToBytes } from '@ethereumjs/util';
+import { Account, bytesToHex, createAddressFromString, hexToBytes } from '@ethereumjs/util';
 import { ethereumCommon, ethereumContextProfile } from './ethereum-profile.js';
 import { normalizeEvmContext } from '../evm-context.js';
 import { EMPTY_STORAGE_ROOT } from './verified-state-proof.js';
 import { existingDelegationTarget } from './sender-delegation.js';
+import { normalizeAuthorizationList, recoverAuthorization, authorizationStateDecision } from './authorization-list.js';
 
 export const EXECUTION_LIMITS = Object.freeze({ gas: 5000000, steps: 1000000, frames: 1000, depth: 32, logs: 2000, memoryBytes: 1048576, returnBytes: 1048576, calldataBytes: 32768, traceBytes: 8388608, wallMs: 10000 });
 export const ETHEREUM_EXECUTION_LIMITS = Object.freeze({ ...EXECUTION_LIMITS, wallMs: 120000 });
@@ -62,6 +64,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
   let root = null, environment = null, evm, checkpointDepth = 0, ownsManager = false;
   let managerFailed = false, managerError;
   let delegatedSenderNonce = null, retainedSenderCreations = 0;
+  let authorizationProcessing = null, authorizationSenderIncrements = 0, authorizationBaseline = null;
   const stack = [];
   const reserved = value => supportedAddress(value, chainId);
   function bound(name, value) { if (value > limits[name]) reject('LOCAL_RESOURCE_LIMIT', `Local execution exceeded its ${name} limit.`); }
@@ -84,14 +87,16 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     }
     if (!stateManager || typeof stateManager !== 'object' || ['getAccount', 'putAccount', 'getCode', 'getStorage', 'checkpoint', 'commit', 'revert'].some(method => typeof stateManager[method] !== 'function')) reject('LOCAL_INVALID_INPUT', 'A compatible explicit state manager is required.');
     if (activeManagers.has(stateManager)) reject('LOCAL_STATE_BUSY', 'Concurrent execution on the same state manager is not supported.');
-    let context; try { context = normalizeEvmContext(request); } catch { reject('LOCAL_INVALID_INPUT', 'Optional EVM context is malformed.'); }
-    if (chainId !== 1 && Object.keys(context).length) reject('LOCAL_INVALID_INPUT', 'Optional execution context requires the Ethereum profile.');
+    let context, authorizationList; try { context = normalizeEvmContext(request); authorizationList = normalizeAuthorizationList(request); } catch { reject('LOCAL_INVALID_INPUT', 'Optional EVM context is malformed.'); }
+    if (chainId !== 1 && (Object.keys(context).length || authorizationList !== undefined)) reject('LOCAL_INVALID_INPUT', 'Optional execution context requires the Ethereum profile.');
     const topLevelCreation = chainId === 1 && request?.to === null;
     const from = address(request?.from), to = address(request?.to), value = quantity(request?.value), gasLimit = quantity(request?.gasLimit);
-    if (!from || (!to && !topLevelCreation) || (topLevelCreation && context.blobVersionedHashes !== undefined) || value === null || gasLimit === null || (chainId === 999 && gasLimit === 0n) || gasLimit > BigInt(limits.gas) || typeof request?.data !== 'string' || !BYTES.test(request.data) || request.data.length > 2 + limits.calldataBytes * 2 || Object.keys(request).some(key => !['from', 'to', 'data', 'value', 'gasLimit', 'accessList', 'blobVersionedHashes'].includes(key))) reject('LOCAL_INVALID_INPUT', 'A bounded unsigned message with explicit from, destination (or Ethereum creation null), data, value and message gasLimit is required.');
+    if (!from || (!to && !topLevelCreation) || (topLevelCreation && context.blobVersionedHashes !== undefined) || value === null || gasLimit === null || (chainId === 999 && gasLimit === 0n) || gasLimit > BigInt(limits.gas) || typeof request?.data !== 'string' || !BYTES.test(request.data) || request.data.length > 2 + limits.calldataBytes * 2 || Object.keys(request).some(key => !['from', 'to', 'data', 'value', 'gasLimit', 'accessList', 'blobVersionedHashes', 'authorizationList'].includes(key))) reject('LOCAL_INVALID_INPUT', 'A bounded unsigned message with explicit from, destination (or Ethereum creation null), data, value and message gasLimit is required.');
     reserved(from); reserved(to);
     if (!block || ['number', 'timestamp', 'gasLimit', 'baseFeePerGas'].some(field => quantity(block[field]) === null) || quantity(block.gasLimit) === 0n || typeof block.mixHash !== 'string' || !WORD.test(block.mixHash) || !address(block.miner) || ['hash', 'parentHash'].some(field => block[field] !== undefined && (typeof block[field] !== 'string' || !WORD.test(block[field])))) reject('LOCAL_INVALID_INPUT', 'Explicit block number, timestamp, gas limit, base fee, prevRandao and coinbase are required.');
     const common = chainId === 1 ? ethereumCommon(block) : createCustomCommon({ chainId: 999, name: 'experimental-hyperevm-message' }, Mainnet, { hardfork: Hardfork.Cancun });
+    if (authorizationList !== undefined && (!common.isActivatedEIP(7702) || topLevelCreation || context.blobVersionedHashes !== undefined)) reject('LOCAL_INVALID_INPUT', 'Authorization lists require a Prague-or-later Ethereum call without blob context.', 'invalid');
+    if (authorizationList !== undefined && typeof stateManager.applyAuthorization !== 'function') reject('LOCAL_STATE_UNSUPPORTED', 'Authorization lists require an authenticated authorization-capable state manager.', 'unsupported');
     const canCreate = chainId === 1 && typeof stateManager.beginContractCreation === 'function';
     const canFinalizeDeletion = chainId === 1 && typeof stateManager.finalizeCreatedContractDeletion === 'function';
     const canFinalizeShanghai = chainId === 1 && typeof stateManager.finalizeShanghaiContractDeletion === 'function';
@@ -123,7 +128,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       if (!methods.has(property)) methods.set(property, async (...args) => {
         try {
           clockCheck();
-          if (['getAccount', 'putAccount', 'deleteAccount', 'modifyAccountFields', 'getCode', 'putCode', 'getCodeSize', 'getStorage', 'putStorage', 'clearStorage', 'beginContractCreation', 'finalizeCreatedContractDeletion', 'finalizeShanghaiContractDeletion'].includes(property)) reserved(args[0]);
+          if (['getAccount', 'putAccount', 'deleteAccount', 'modifyAccountFields', 'getCode', 'putCode', 'getCodeSize', 'getStorage', 'putStorage', 'clearStorage', 'beginContractCreation', 'finalizeCreatedContractDeletion', 'finalizeShanghaiContractDeletion', 'applyAuthorization'].includes(property)) reserved(args[0]);
           const result = await member.apply(target, args);
           if (property === 'checkpoint') checkpointDepth++;
           else if (property === 'commit' || property === 'revert') checkpointDepth--;
@@ -250,9 +255,40 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       }
       if ((account?.balance ?? 0n) < value) reject('LOCAL_CALL_INSUFFICIENT_BALANCE', 'The sender cannot cover the declared native value.', 'invalid');
       if ((account?.nonce ?? 0n) >= (1n << 64n) - 1n) reject('LOCAL_CALL_NONCE_OVERFLOW', 'The sender nonce cannot be incremented within uint64.', 'invalid');
+      if (authorizationList !== undefined) delegatedSenderNonce = account?.nonce ?? 0n;
     }
+    if (authorizationList !== undefined) authorizationBaseline = { callerNonce: semantics.callerNonce, warmAddresses: semantics.warmAddresses, senderDelegation: semantics.senderDelegation };
     await guarded.checkpoint();
-    const result = await evm.runCall({ caller: createAddressFromString(from), origin: createAddressFromString(from), ...(to ? { to: createAddressFromString(to) } : {}), data: hexToBytes(request.data), value, gasLimit, gasPrice: 0n, ...(context.blobVersionedHashes ? { blobVersionedHashes: [...context.blobVersionedHashes] } : {}), block: { header: { number: quantity(block.number), timestamp: quantity(block.timestamp), gasLimit: quantity(block.gasLimit), baseFeePerGas: quantity(block.baseFeePerGas), difficulty: 0n, prevRandao: hexToBytes(block.mixHash), coinbase: createAddressFromString(address(block.miner)), getBlobGasPrice() { if (context.blobVersionedHashes) return 0n; reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is unsupported.', 'unsupported'); } } } });
+    if (authorizationList !== undefined) {
+      const sender = createAddressFromString(from), account = await guarded.getAccount(sender) ?? new Account();
+      account.nonce++; await evm.journal.putAccount(sender, account);
+      const entries = []; let gasRefund = 0n;
+      for (let index = 0; index < authorizationList.length; index++) {
+        clockCheck(); const tuple = authorizationList[index], recovered = recoverAuthorization(tuple);
+        let reason = recovered.reason;
+        if (reason === null) {
+          const authority = createAddressFromString(recovered.authority);
+          // Warming survives a later nonce/code rejection, and message revert.
+          evm.journal.addAlwaysWarmAddress(recovered.authority);
+          const prior = await guarded.getAccount(authority), code = bytesToHex(await guarded.getCode(authority));
+          const decision = authorizationStateDecision(tuple, { exists: prior !== undefined, nonce: prior?.nonce ?? 0n, code });
+          reason = decision.reason;
+          if (reason === null) {
+            await guarded.applyAuthorization(authority, BigInt(tuple.nonce), tuple.address);
+            gasRefund += decision.gasRefund;
+            if (recovered.authority === from) authorizationSenderIncrements++;
+          }
+        }
+        entries.push({ index, authority: recovered.authority, status: reason === null ? 'applied' : 'skipped', reason }); retain(256);
+      }
+      authorizationProcessing = { entries, gasRefundCounter: gasRefund.toString() };
+      const effective = existingDelegationTarget(bytesToHex(await guarded.getCode(sender)), common);
+      delete semantics.senderDelegation;
+      if (effective !== null) semantics.senderDelegation = { address: effective, authorizationListProcessed: true };
+      semantics.callerNonce = 'outer_increment_authorizations_and_committed_sender_creation_attempts';
+      semantics.warmAddresses += '_and_recovered_authorities';
+    }
+    const result = await evm.runCall({ caller: createAddressFromString(from), origin: createAddressFromString(from), ...(to ? { to: createAddressFromString(to) } : {}), data: hexToBytes(request.data), value, gasLimit, gasPrice: 0n, ...(authorizationList !== undefined ? { skipNonceIncrement: true } : {}), ...(context.blobVersionedHashes ? { blobVersionedHashes: [...context.blobVersionedHashes] } : {}), block: { header: { number: quantity(block.number), timestamp: quantity(block.timestamp), gasLimit: quantity(block.gasLimit), baseFeePerGas: quantity(block.baseFeePerGas), difficulty: 0n, prevRandao: hexToBytes(block.mixHash), coinbase: createAddressFromString(address(block.miner)), getBlobGasPrice() { if (context.blobVersionedHashes) return 0n; reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is unsupported.', 'unsupported'); } } } });
     clockCheck();
     if (stack.length || checkpointDepth !== 1) reject('LOCAL_TRACE_INVALID', 'Local call-tree or checkpoint completion is inconsistent.');
     const finalizedDeletions = [];
@@ -289,16 +325,16 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     } : null;
     const logs = (result.execResult.logs ?? []).map(([emitter, topics, data]) => ({ address: bytesToHex(emitter), topics: topics.map(bytesToHex), data: bytesToHex(data) }));
     bound('logs', logs.length); bound('returnBytes', result.execResult.returnValue.length);
-    usage.retainedTraceBytes = Buffer.byteLength(JSON.stringify({ trace: root, logs, ...(lifecycle ? { lifecycle } : {}) }), 'utf8'); bound('traceBytes', usage.retainedTraceBytes);
+    usage.retainedTraceBytes = Buffer.byteLength(JSON.stringify({ trace: root, logs, ...(lifecycle ? { lifecycle } : {}), ...(authorizationProcessing ? { authorizationProcessing } : {}) }), 'utf8'); bound('traceBytes', usage.retainedTraceBytes);
     const error = root.error, status = !error ? 'success' : error === 'revert' ? 'reverted' : 'failed';
-    const report = { execution: { status, executionGasUsed: result.execResult.executionGasUsed.toString(), gasRefundCounter: (result.execResult.gasRefund ?? 0n).toString(), returnData: bytesToHex(result.execResult.returnValue), error }, trace: root, logs, environment, semantics, limits, usage, ...(lifecycle ? { lifecycle } : {}), stateDisposition: 'message_result_retained_in_supplied_manager' };
+    const report = { execution: { status, executionGasUsed: result.execResult.executionGasUsed.toString(), gasRefundCounter: (result.execResult.gasRefund ?? 0n).toString(), returnData: bytesToHex(result.execResult.returnValue), error }, trace: root, logs, environment, semantics, limits, usage, ...(lifecycle ? { lifecycle } : {}), ...(authorizationProcessing ? { authorizationProcessing } : {}), stateDisposition: 'message_result_retained_in_supplied_manager' };
     // Transient writes in reverted subtrees are gone now. Any remaining whole
     // namespace reset must be representable before the invocation is retained,
     // including when a caller supplied an already-checkpointed manager.
     if (typeof stateManager.assertRepresentableAccountResets === 'function') await guarded.assertRepresentableAccountResets();
     if (delegatedSenderNonce !== null) {
       const senderAfter = await guarded.getAccount(createAddressFromString(from));
-      if (senderAfter?.nonce !== delegatedSenderNonce + 1n + BigInt(retainedSenderCreations)) reject('LOCAL_TRACE_INVALID', 'Delegated sender nonce disagrees with its committed creation attempts.');
+      if (senderAfter?.nonce !== delegatedSenderNonce + 1n + BigInt(authorizationSenderIncrements) + BigInt(retainedSenderCreations)) reject('LOCAL_TRACE_INVALID', 'Sender nonce disagrees with its authorization and committed creation attempts.');
     }
     clockCheck();
     // Final atomic commit is the irreversible terminal step: no subsequent
@@ -306,6 +342,14 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     await stateManager.commit(); checkpointDepth--;
     return report;
   } catch (error) {
+    // No completed preparation record is exposed for a rolled-back attempt.
+    // Keep incomplete metadata bound to the independently known sender input.
+    if (authorizationBaseline) {
+      semantics.callerNonce = authorizationBaseline.callerNonce;
+      semantics.warmAddresses = authorizationBaseline.warmAddresses;
+      delete semantics.senderDelegation;
+      if (authorizationBaseline.senderDelegation) semantics.senderDelegation = authorizationBaseline.senderDelegation;
+    }
     let stateDisposition = 'unchanged';
     if (checkpointDepth > 0) {
       try { await restore(); stateDisposition = 'rolled_back'; }

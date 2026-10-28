@@ -16,7 +16,7 @@ function fail(code, message) { throw Object.assign(new Error(message), { code })
  * Lazy facts are seeded into every existing checkpoint: discovering an input
  * inside a reverted child never turns that input into an invented zero. */
 class ProofStateManager extends SimpleStateManager {
-  constructor(inputs) { super(); this.inputs = inputs; this.base = new Map(); this.loading = new Map(); this.slotLoading = new Map(); this.reads = new Map(); this.readCount = 0; this.creationStack = [new Map()]; this.resetStack = [new Map()]; this.emptyCleanup = null; }
+  constructor(inputs) { super(); this.inputs = inputs; this.base = new Map(); this.loading = new Map(); this.slotLoading = new Map(); this.reads = new Map(); this.readCount = 0; this.creationStack = [new Map()]; this.resetStack = [new Map()]; this.authorizationStack = [new Set()]; this.emptyCleanup = null; }
   created(key) { return this.creationStack.at(-1).has(key); }
   addressKey(address) {
     const value = address?.toString();
@@ -96,7 +96,7 @@ class ProofStateManager extends SimpleStateManager {
   }
   async putStorage(address, key, value) {
     const account = this.addressKey(address), slot = this.slotKey(key), base = await this.loadAccount(account);
-    if ((!base.exists || this.resetStack.at(-1).has(account)) && !this.created(account)) fail('LOCAL_STATE_UNSUPPORTED', 'Storage writes require an existing account or an authenticated creation target.');
+    if ((!base.exists || this.resetStack.at(-1).has(account)) && !this.created(account) && !this.authorizationStack.at(-1).has(account)) fail('LOCAL_STATE_UNSUPPORTED', 'Storage writes require an existing account, authenticated creation or authorized materialization.');
     if (!(value instanceof Uint8Array) || value.length > 32) fail('LOCAL_STATE_INVALID', 'Storage values cannot exceed 32 bytes.');
     await this.loadSlot(account, slot);
     this.topStorageStack().set(account + '_' + slot, new Uint8Array(value));
@@ -131,6 +131,20 @@ class ProofStateManager extends SimpleStateManager {
     if (!(value instanceof Uint8Array) || value.length === 0 || value.length > 24576) fail('LOCAL_STATE_INVALID', 'Created runtime code exceeds the supported contract-code bound.');
     const copy = copyAccount(current); copy.codeHash = keccak_256(value);
     this.topCodeStack().set(key, new Uint8Array(value)); this.topAccountStack().set(key, copy);
+  }
+  /** Only the explicit pre-message authorization phase may install/clear an
+   * exact delegation. Generic EVM putCode remains creation-only. The executor
+   * recovers the signature; the parent independently reconstructs that fold. */
+  async applyAuthorization(address, expectedNonce, delegateAddress) {
+    if (this.accountStack.length < 2 || typeof expectedNonce !== 'bigint' || expectedNonce < 0n || expectedNonce >= MAX_NONCE || typeof delegateAddress !== 'string' || !/^0x[0-9a-f]{40}$/.test(delegateAddress)) fail('LOCAL_STATE_INVALID', 'Authorization requires an active checkpoint and bounded canonical values.');
+    const key = this.addressKey(address); await this.loadAccount(key);
+    const current = this.topAccountStack().get(key), priorCode = bytesToHex(this.topCodeStack().get(key));
+    if ((current?.nonce ?? 0n) !== expectedNonce || (priorCode !== '0x' && !/^0xef0100[0-9a-f]{40}$/.test(priorCode))) fail('LOCAL_STATE_INVALID', 'Authorization does not match the current nonce and delegation code.');
+    const code = delegateAddress === '0x' + '00'.repeat(20) ? new Uint8Array() : hexToBytes('0xef0100' + delegateAddress.slice(2));
+    const account = current ? copyAccount(current) : new Account();
+    account.nonce = expectedNonce + 1n; account.codeHash = keccak_256(code);
+    this.topCodeStack().set(key, code); this.topAccountStack().set(key, account);
+    this.authorizationStack.at(-1).add(key);
   }
   async deleteAccount(address) {
     if (this.emptyCleanup === null || this.accountStack.length < 2) fail('LOCAL_STATE_UNSUPPORTED', 'Account deletion requires the transaction-end empty-account cleanup window.');
@@ -182,6 +196,7 @@ class ProofStateManager extends SimpleStateManager {
     await super.checkpoint();
     this.creationStack.push(new Map(this.creationStack.at(-1)));
     this.resetStack.push(new Map(this.resetStack.at(-1)));
+    this.authorizationStack.push(new Set(this.authorizationStack.at(-1)));
   }
   assertRepresentableAccountResets() {
     for (const address of this.resetStack.at(-1).keys()) {
@@ -195,9 +210,9 @@ class ProofStateManager extends SimpleStateManager {
     if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'No state checkpoint exists to commit.');
     // Nested message commits may still be reverted by an enclosing message.
     if (this.accountStack.length === 2) this.assertRepresentableAccountResets();
-    await super.commit(); this.creationStack.splice(-2, 1); this.resetStack.splice(-2, 1);
+    await super.commit(); this.creationStack.splice(-2, 1); this.resetStack.splice(-2, 1); this.authorizationStack.splice(-2, 1);
   }
-  async revert() { if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'No state checkpoint exists to revert.'); await super.revert(); this.creationStack.pop(); this.resetStack.pop(); }
+  async revert() { if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'No state checkpoint exists to revert.'); await super.revert(); this.creationStack.pop(); this.resetStack.pop(); this.authorizationStack.pop(); }
   shallowCopy() {
     if (this.emptyCleanup !== null || this.accountStack.length !== 1 || [...this.loading.keys()].some(key => !this.base.has(key)) || [...this.slotLoading.keys()].some(id => !this.topStorageStack().has(id))) fail('LOCAL_STATE_UNSUPPORTED', 'Copy only a settled state manager outside active checkpoints.');
     const copy = new ProofStateManager(this.inputs);
@@ -207,6 +222,7 @@ class ProofStateManager extends SimpleStateManager {
     copy.storageStack = this.storageStack.map(frame => new Map([...frame].map(([key, value]) => [key, new Uint8Array(value)])));
     copy.creationStack = this.creationStack.map(frame => new Map(frame));
     copy.resetStack = this.resetStack.map(frame => new Map(frame));
+    copy.authorizationStack = this.authorizationStack.map(frame => new Set(frame));
     return copy;
   }
   snapshotReads() { return { total: this.readCount, distinct: this.reads.size, reads: structuredClone([...this.reads.values()]) }; }
@@ -219,7 +235,7 @@ class ProofStateManager extends SimpleStateManager {
     for (const [address, base] of this.base) {
       const current = this.topAccountStack().get(address), changes = {};
       if (!base.exists) {
-        if (current !== undefined) changes.existence = { before: false, after: true, basis: this.creationStack.at(-1).get(address) ?? (current.nonce > 0n ? 'unsigned_sender_nonce_materialization' : 'positive_native_funding_of_proof_absent_account') };
+        if (current !== undefined) changes.existence = { before: false, after: true, basis: this.creationStack.at(-1).get(address) ?? (this.authorizationStack.at(-1).has(address) ? 'eip7702_authorization_materialization' : current.nonce > 0n ? 'unsigned_sender_nonce_materialization' : 'positive_native_funding_of_proof_absent_account') };
       } else if (current === undefined && this.resetStack.at(-1).has(address)) {
         changes.existence = { before: true, after: false, basis: this.resetStack.at(-1).get(address) };
         if (BigInt(base.balanceRaw) !== 0n) changes.balance = { before: quantity(BigInt(base.balanceRaw)), after: '0x0' };

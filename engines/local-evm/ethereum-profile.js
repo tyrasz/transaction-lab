@@ -1,5 +1,6 @@
 import { Common, Mainnet } from '@ethereumjs/common';
 import { normalizeEvmContext } from '../evm-context.js';
+import { normalizeAuthorizationList } from './authorization-list.js';
 
 const SUPPORTED = new Set(['shanghai', 'cancun', 'prague', 'osaka', 'bpo1', 'bpo2']);
 const BYTES = /^0x(?:[0-9a-f]{2})*$/i;
@@ -22,7 +23,8 @@ export function ethereumCommon(header) {
 }
 
 export function ethereumCallGas(data, common, request = {}) {
-  const context = normalizeEvmContext(request);
+  const context = normalizeEvmContext(request), authorizationList = normalizeAuthorizationList(request);
+  if (authorizationList && (!common.isActivatedEIP(7702) || request.to === null || context.blobVersionedHashes)) throw profileError('LOCAL_ETHEREUM_INPUT_INVALID', 'Authorization lists require a Prague-or-later call without blob context.');
   if (typeof data !== 'string' || !BYTES.test(data) || data.length > 65538) throw profileError('LOCAL_ETHEREUM_INPUT_INVALID', 'Expected bounded even-length calldata.');
   const creation = request.to === null;
   if (creation && context.blobVersionedHashes) throw profileError('LOCAL_ETHEREUM_INPUT_INVALID', 'Unsigned creation does not accept blob transaction context.');
@@ -35,9 +37,10 @@ export function ethereumCallGas(data, common, request = {}) {
   // CREATE2 pay their own opcode/initcode charges inside the EVM instead.
   const creationCosts = creation ? { creationIntrinsic: 32000n, initcodeBytes: zeroBytes + nonzeroBytes,
     initcodeWordGas: common.isActivatedEIP(3860) ? 2n * ((zeroBytes + nonzeroBytes + 31n) / 32n) : 0n } : {};
-  const intrinsic = 21000n + tokens * 4n + accessListGas + (creationCosts.creationIntrinsic ?? 0n) + (creationCosts.initcodeWordGas ?? 0n);
+  const authorizationCosts = authorizationList ? { authorizationCount: BigInt(authorizationList.length), authorizationIntrinsic: 25000n * BigInt(authorizationList.length) } : {};
+  const intrinsic = 21000n + tokens * 4n + accessListGas + (creationCosts.creationIntrinsic ?? 0n) + (creationCosts.initcodeWordGas ?? 0n) + (authorizationCosts.authorizationIntrinsic ?? 0n);
   const floor = common.isActivatedEIP(7623) ? 21000n + tokens * 10n : 0n;
-  return { intrinsic, floor, minimum: intrinsic > floor ? intrinsic : floor, zeroBytes, nonzeroBytes, ...creationCosts };
+  return { intrinsic, floor, minimum: intrinsic > floor ? intrinsic : floor, zeroBytes, nonzeroBytes, ...creationCosts, ...authorizationCosts };
 }
 
 export function ethereumUsedGas({ messageGasUsed, refundCounter, intrinsic, floor }) {
@@ -50,7 +53,11 @@ export function ethereumUsedGas({ messageGasUsed, refundCounter, intrinsic, floo
 /** Optional context metadata is conditional so legacy response identity stays
  * unchanged. Actual blob fee settlement and KZG validation remain excluded. */
 export function ethereumContextProfile(request, header, common = ethereumCommon(header)) {
-  const context = normalizeEvmContext(request), profile = { ...context };
+  const context = normalizeEvmContext(request), authorizationList = normalizeAuthorizationList(request), profile = { ...context };
+  if (authorizationList) {
+    const costs = ethereumCallGas(request.data, common, request);
+    Object.assign(profile, { authorizationList, authorizationCount: costs.authorizationCount.toString(), authorizationIntrinsicGas: costs.authorizationIntrinsic.toString() });
+  }
   if (request.to === null) {
     const costs = ethereumCallGas(request.data, common, request);
     Object.assign(profile, { operation: 'create', initcodeBytes: costs.initcodeBytes.toString(),

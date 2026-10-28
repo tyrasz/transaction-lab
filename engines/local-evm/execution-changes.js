@@ -3,6 +3,7 @@ import { EMPTY_CODE_HASH, EMPTY_STORAGE_ROOT } from './verified-state-proof.js';
 import { isDeepStrictEqual, types } from 'node:util';
 import { createAddressFromString, createContractAddress } from '@ethereumjs/util';
 import { existingDelegationTarget } from './sender-delegation.js';
+import { deriveAuthorizationPreparation } from './authorization-validation.js';
 
 const ADDRESS = /^0x[0-9a-f]{40}$/, WORD = /^0x[0-9a-f]{64}$/, DATA = /^0x(?:[0-9a-f]{2})*$/;
 const ZERO = '0x' + '00'.repeat(32);
@@ -218,9 +219,12 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
 /** Bind the bounded overlay schema to the worker's immutable input facts and
  * committed creation frames. This is result-consistency validation, not an
  * independent EVM execution or a recomputed post-state-root proof. */
-export function validateExecutionChanges({ changes, inputs, output, sender, destination, selfdestructOnlyCreated = true, common }) {
+export function validateExecutionChanges({ changes, inputs, output, sender, destination, selfdestructOnlyCreated = true, common, request }) {
   const snapshot = canonicalStateChanges(changes), complete = ['success', 'reverted', 'failed'].includes(output?.execution?.status);
   const topCreation = destination === null, senderAddress = sender.toLowerCase(), senderInitial = inputs?.accounts?.[senderAddress];
+  const preparation = complete && request ? deriveAuthorizationPreparation({ request, inputs, common }) : null;
+  if (preparation) need(isDeepStrictEqual(output.authorizationProcessing, preparation.processing));
+  else need(output?.authorizationProcessing === undefined);
   // Derive the root CREATE address from independently reverified initial facts,
   // never from the worker's trace or its claimed after-nonce. An unfinished
   // frame may not have resolved a destination yet.
@@ -234,7 +238,7 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
       need(root.to === createContractAddress(createAddressFromString(senderAddress), nonce).toString());
     }
   }
-  const { created, creationAttempts, deleted, emptyDeleted } = validateExecutionLifecycle({ output, inputs, destination, changes: snapshot, selfdestructOnlyCreated });
+  const { created, creationAttempts, deleted, emptyDeleted } = validateExecutionLifecycle({ output, inputs, destination, changes: snapshot, startingChanges: preparation?.snapshot, selfdestructOnlyCreated });
   if (!complete) { need(snapshot.accounts.length === 0); return; }
   need(senderInitial && typeof senderInitial.exists === 'boolean');
   need(output.trace.from === senderAddress && output.trace.caller === senderAddress);
@@ -245,7 +249,7 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
   // a creator on collision without entering a child and needs another ledger.
   if (delegated) need(common.chainId() === 1n && !common.isActivatedEIP(7928));
   const senderNonce = senderInitial.exists ? BigInt(senderInitial.nonce) : 0n;
-  const nonceAfter = senderNonce + 1n + (delegated ? BigInt(creationAttempts.get(senderAddress) ?? 0) : 0n);
+  const nonceAfter = (preparation?.accounts.get(senderAddress).current.nonce ?? senderNonce + 1n) + (delegated || preparation ? BigInt(creationAttempts.get(senderAddress) ?? 0) : 0n);
   need(senderNonce < (1n << 64n) - 1n && nonceAfter < (1n << 64n));
   need(isDeepStrictEqual(snapshot.accounts.find(row => row.address === senderAddress)?.nonce,
     { before: hex(senderNonce), after: hex(nonceAfter) }));
@@ -255,9 +259,24 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
     const nonce = initial.exists ? BigInt(initial.nonce) : 0n;
     const row = { address, ...(!initial.exists ? { existence: { before: false, after: true, basis: 'unsigned_sender_nonce_materialization' } } : {}), nonce: { before: hex(nonce), after: hex(nonce + 1n) } };
     need([...emptyDeleted].every(account => account === RIPEMD160));
-    need(isDeepStrictEqual(snapshot.accounts, [...emptyDeleted].map(cleanupRow).concat(row).sort((a, b) => a.address.localeCompare(b.address))));
+    need(isDeepStrictEqual(snapshot.accounts, [...emptyDeleted].map(cleanupRow).concat(preparation?.snapshot.accounts ?? [row]).sort((a, b) => a.address.localeCompare(b.address))));
   }
   const rows = new Map(snapshot.accounts.map(row => [row.address, row]));
+  // EVM execution changes nonces only for the outer sender, successfully
+  // prepared authorizations, new contracts and entered creation attempts whose
+  // parent commits. In particular, a recovered but skipped authority earns no
+  // nonce change. Check missing rows too, so omission cannot hide increments.
+  const nonceAccounts = new Set([senderAddress, ...rows.keys(), ...created.keys(), ...creationAttempts.keys(), ...(preparation?.accounts.keys() ?? [])]);
+  for (const address of nonceAccounts) {
+    if (deleted.has(address) || emptyDeleted.has(address)) continue;
+    const initial = inputs.accounts?.[address]; need(initial && typeof initial.exists === 'boolean');
+    const before = initial.exists ? BigInt(initial.nonce) : 0n;
+    let after = preparation?.accounts.get(address)?.current.nonce ?? before + (address === senderAddress ? 1n : 0n);
+    if (created.has(address)) after = 1n;
+    after += BigInt(creationAttempts.get(address) ?? 0);
+    need(after < (1n << 64n));
+    need(isDeepStrictEqual(rows.get(address)?.nonce, before === after ? undefined : { before: hex(before), after: hex(after) }));
+  }
   for (const row of snapshot.accounts) {
     const initial = inputs.accounts?.[row.address];
     need(initial && typeof initial.exists === 'boolean');
@@ -270,12 +289,26 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
       need(initial.exists === false);
       if (['internal_contract_creation', 'top_level_contract_creation'].includes(row.existence.basis)) need(created.get(row.address)?.basis === row.existence.basis);
       if (row.existence.basis === 'unsigned_sender_nonce_materialization') need(row.address === sender.toLowerCase());
+      if (row.existence.basis === 'eip7702_authorization_materialization') need(preparation?.applied.has(row.address));
     } else need(initial.exists);
-    if (row.code) need(created.has(row.address) && row.code.after === created.get(row.address).frame.output && (!initial.exists || initial.code === '0x'));
+    if (row.code) {
+      if (preparation?.applied.has(row.address)) need(row.code.before === (initial.exists ? initial.code : '0x') && row.code.after === preparation.accounts.get(row.address).current.code);
+      else need(created.has(row.address) && row.code.after === created.get(row.address).frame.output && (!initial.exists || initial.code === '0x'));
+    }
     for (const slot of row.storage ?? []) {
       need(slot.before === (initial.exists ? initial.storage?.[slot.slot] : ZERO));
-      if (!initial.exists) need(created.has(row.address));
+      if (!initial.exists) need(created.has(row.address) || preparation?.applied.has(row.address));
     }
+  }
+  for (const address of preparation?.applied ?? []) {
+    const { initial, current } = preparation.accounts.get(address), row = rows.get(address);
+    const nonce = current.nonce + BigInt(creationAttempts.get(address) ?? 0);
+    need(nonce < (1n << 64n));
+    need(isDeepStrictEqual(row?.nonce, { before: hex(initial.nonce), after: hex(nonce) }));
+    const code = initial.code === current.code ? undefined : { before: initial.code, after: current.code };
+    need(isDeepStrictEqual(row.code, code));
+    if (!initial.exists) need(isDeepStrictEqual(row.existence, { before: false, after: true, basis: 'eip7702_authorization_materialization' }));
+    else need(row.existence === undefined);
   }
   for (const [address, { frame, basis }] of created) {
     const initial = deployableFact(inputs, address), row = rows.get(address);
