@@ -82,15 +82,17 @@ test('ordinary reverted touches retain the empty account while RIPEMD160 OOG tou
   }
 });
 
-test('Shanghai parent admits EIP-161 cleanup including root-revert stickiness but retains the Cancun deletion gate',async t=>{
+test('Shanghai parent admits EIP-161 cleanup and committed SELFDESTRUCT but rejects unrelated deletion evidence',async t=>{
   for(const options of [{nonemptyStorage:true},{target:RIPEMD,gas:0,revert:true,nonemptyStorage:true}]){
     const f=shanghai(await fixture(options)),r=await run(f),target=options.target??TARGET;
     assert.equal(r.status,'completed',JSON.stringify(r.error));assert.equal(r.output.environment.hardfork,'shanghai');
     assert.equal(r.output.execution.status,options.revert?'reverted':'success');assert.deepEqual(r.changes.accounts.find(a=>a.address===target),row(target));
     assert.equal(r.output.lifecycle.finalizedDeletions,undefined);assert.equal(r.output.lifecycle.emptyAccountCleanup.deletions[0].address,target);
   }
-  const unsupported=await run(shanghai(await lifecycleFixture({code:'0x73'+TARGET.slice(2)+'ff'})));
-  assert.equal(unsupported.status,'completed');assert.equal(unsupported.output.execution.status,'unsupported');assert.equal(unsupported.output.lifecycle,undefined);assert.deepEqual(unsupported.changes.accounts,[]);
+  const destroyed=await run(shanghai(await lifecycleFixture({code:'0x73'+TARGET.slice(2)+'ff'})));
+  assert.equal(destroyed.status,'completed',JSON.stringify(destroyed.error));assert.equal(destroyed.output.execution.status,'success');
+  assert.equal(destroyed.output.lifecycle.finalizedDeletions[0].address,FACTORY);
+  assert.equal(destroyed.changes.accounts.find(a=>a.address===FACTORY).existence.basis,'shanghai_selfdestruct_deletion');
   await tamper(t,shanghai(await fixture()),r=>{r.output.lifecycle.finalizedDeletions=[{address:FACTORY,scope:'entire_account_including_code_and_storage',initialStorageRoot:EMPTY_STORAGE_ROOT}];});
 });
 

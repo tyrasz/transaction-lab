@@ -37,7 +37,7 @@ test('explicit root CREATE executes constructor storage/value and derives addres
   assert.equal((await f.stateManager.getAccount(senderAddress)).nonce,2n);assert.equal((await f.stateManager.getAccount(senderAddress)).balance,999995n);
   assert.equal(r.stateDisposition,'message_result_retained_in_supplied_manager');
   assert.equal(r.semantics.warmAddresses,'sender_coinbase_and_fork_active_precompiles_creation_target_warmed_by_EVM_no_access_list');
-  assert.equal(r.semantics.lifecycle,'top_level_CREATE_and_internal_CREATE_CREATE2_with_proven_deployable_targets_Shanghai_SELFDESTRUCT_unsupported');
+  assert.equal(r.semantics.lifecycle,'top_level_CREATE_and_internal_CREATE_CREATE2_with_proven_deployable_targets_fork_selected_SELFDESTRUCT_finalization');
 });
 
 test('constructor ADDRESS, CALLER, ORIGIN and CALLVALUE use the new root context',async()=>{

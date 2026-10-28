@@ -59,10 +59,17 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     lifecycle: chainId === 1 ? 'no_lifecycle_operation_encountered' : 'CREATE_CREATE2_SELFDESTRUCT_unsupported', deadline: 'cooperative_until_final_atomic_commit_no_forceful_IO_cancellation',
   };
   let root = null, environment = null, evm, checkpointDepth = 0, ownsManager = false;
+  let managerFailed = false, managerError;
   const stack = [];
   const reserved = value => supportedAddress(value, chainId);
   function bound(name, value) { if (value > limits[name]) reject('LOCAL_RESOURCE_LIMIT', `Local execution exceeded its ${name} limit.`); }
-  function clockCheck() { if (now() - startedAt >= limits.wallMs) reject('LOCAL_RESOURCE_LIMIT', 'Local execution exceeded its wallMs limit.'); }
+  function clockCheck() {
+    // Some EVM paths catch balance-write errors as if they were EVM faults.
+    // A host/adapter rejection must never become success or a catchable CALL
+    // result. Keep the first failure outside the library's exception wrapper.
+    if (managerFailed) throw managerError;
+    if (now() - startedAt >= limits.wallMs) reject('LOCAL_RESOURCE_LIMIT', 'Local execution exceeded its wallMs limit.');
+  }
   function retain(size) { usage.retainedTraceBytes += size; bound('traceBytes', usage.retainedTraceBytes); }
   async function restore() {
     while (checkpointDepth > 0) { await stateManager.revert(); checkpointDepth--; }
@@ -85,11 +92,13 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     const common = chainId === 1 ? ethereumCommon(block) : createCustomCommon({ chainId: 999, name: 'experimental-hyperevm-message' }, Mainnet, { hardfork: Hardfork.Cancun });
     const canCreate = chainId === 1 && typeof stateManager.beginContractCreation === 'function';
     const canFinalizeDeletion = chainId === 1 && typeof stateManager.finalizeCreatedContractDeletion === 'function';
+    const canFinalizeShanghai = chainId === 1 && typeof stateManager.finalizeShanghaiContractDeletion === 'function';
     const canCleanupEmpty = chainId === 1 && typeof stateManager.beginEmptyAccountCleanup === 'function' && typeof stateManager.endEmptyAccountCleanup === 'function';
     let observedCreation = false, observedSelfdestruct = false, observedCreatedSelfdestruct = false;
     function describeLifecycle() {
-      const unsupported = canFinalizeDeletion ? (canCleanupEmpty ? 'Shanghai_SELFDESTRUCT_unsupported' : 'Shanghai_SELFDESTRUCT_and_full_EIP161_cleanup_unsupported') : 'same_invocation_creation_and_Shanghai_SELFDESTRUCT_unsupported';
-      if (observedCreatedSelfdestruct) semantics.lifecycle = 'Cancun_created_account_SELFDESTRUCT_with_root_commit_gated_deletion_' + unsupported;
+      const unsupported = canFinalizeDeletion ? (canCleanupEmpty ? (canFinalizeShanghai ? 'fork_selected_SELFDESTRUCT_finalization' : 'Shanghai_SELFDESTRUCT_unsupported') : 'Shanghai_SELFDESTRUCT_and_full_EIP161_cleanup_unsupported') : 'same_invocation_creation_and_Shanghai_SELFDESTRUCT_unsupported';
+      if (observedSelfdestruct && !common.isActivatedEIP(6780)) semantics.lifecycle = 'Shanghai_SELFDESTRUCT_with_root_commit_gated_whole_account_deletion';
+      else if (observedCreatedSelfdestruct) semantics.lifecycle = 'Cancun_created_account_SELFDESTRUCT_with_root_commit_gated_deletion_' + unsupported;
       else if (observedSelfdestruct) semantics.lifecycle = (observedCreation ? (topLevelCreation ? 'top_level_CREATE_and_' : '') + 'internal_CREATE_CREATE2_and_' : '') + 'preexisting_Cancun_SELFDESTRUCT_without_deletion_' + unsupported;
       else if (observedCreation) semantics.lifecycle = (topLevelCreation ? 'top_level_CREATE_and_' : '') + 'internal_CREATE_CREATE2_with_proven_deployable_targets_' + unsupported;
     }
@@ -110,13 +119,18 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       const member = Reflect.get(target, property, target);
       if (typeof member !== 'function') return member;
       if (!methods.has(property)) methods.set(property, async (...args) => {
-        clockCheck();
-        if (['getAccount', 'putAccount', 'deleteAccount', 'modifyAccountFields', 'getCode', 'putCode', 'getCodeSize', 'getStorage', 'putStorage', 'clearStorage', 'beginContractCreation', 'finalizeCreatedContractDeletion'].includes(property)) reserved(args[0]);
-        const result = await member.apply(target, args);
-        if (property === 'checkpoint') checkpointDepth++;
-        else if (property === 'commit' || property === 'revert') checkpointDepth--;
-        clockCheck();
-        return result;
+        try {
+          clockCheck();
+          if (['getAccount', 'putAccount', 'deleteAccount', 'modifyAccountFields', 'getCode', 'putCode', 'getCodeSize', 'getStorage', 'putStorage', 'clearStorage', 'beginContractCreation', 'finalizeCreatedContractDeletion', 'finalizeShanghaiContractDeletion'].includes(property)) reserved(args[0]);
+          const result = await member.apply(target, args);
+          if (property === 'checkpoint') checkpointDepth++;
+          else if (property === 'commit' || property === 'revert') checkpointDepth--;
+          clockCheck();
+          return result;
+        } catch (error) {
+          if (!managerFailed) { managerFailed = true; managerError = error; }
+          throw error;
+        }
       });
       return methods.get(property);
     } });
@@ -172,8 +186,10 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
         // runCall applies the balance transfer but leaves transaction-end
         // deletion to our bounded finalizer after the committed root result.
         const executionAddress = step.address.toString();
-        if (chainId !== 1 || !common.isActivatedEIP(6780) || !active || active.frame.executionAddress !== executionAddress || !(active.createdAddresses instanceof Set) || (active.createdAddresses.has(executionAddress) && !canFinalizeDeletion)) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'SELFDESTRUCT deletion or unsupported fork context is outside this local profile.', 'unsupported');
-        observedCreatedSelfdestruct ||= active.createdAddresses.has(executionAddress);
+        const cancun = common.isActivatedEIP(6780);
+        if (chainId !== 1 || !active || active.frame.executionAddress !== executionAddress ||
+            (cancun ? !(active.createdAddresses instanceof Set) || (active.createdAddresses.has(executionAddress) && !canFinalizeDeletion) : !canFinalizeShanghai)) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'SELFDESTRUCT deletion or unsupported fork context is outside this local profile.', 'unsupported');
+        observedCreatedSelfdestruct ||= cancun && active.createdAddresses.has(executionAddress);
         // The step event precedes gas/static/stack checks. Promote this into
         // trace evidence only if this frame actually completes successfully.
         if (step.stack.length) active.pendingSelfdestruct = '0x' + (step.stack.at(-1) & ((1n << 160n) - 1n)).toString(16).padStart(40, '0');
@@ -222,13 +238,16 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     if (stack.length || checkpointDepth !== 1) reject('LOCAL_TRACE_INVALID', 'Local call-tree or checkpoint completion is inconsistent.');
     const finalizedDeletions = [];
     if (!result.execResult.exceptionError && result.execResult.selfdestruct?.size) {
-      if (!(result.execResult.selfdestruct instanceof Map) || !(result.execResult.createdAddresses instanceof Set)) reject('LOCAL_TRACE_INVALID', 'Committed lifecycle collections are malformed.');
-      const deletions = [...result.execResult.selfdestruct.keys()].filter(key => result.execResult.createdAddresses.has(key)).sort();
+      const cancun = common.isActivatedEIP(6780);
+      if (!(result.execResult.selfdestruct instanceof Map) || (cancun && !(result.execResult.createdAddresses instanceof Set))) reject('LOCAL_TRACE_INVALID', 'Committed lifecycle collections are malformed.');
+      const deletions = [...result.execResult.selfdestruct.keys()].filter(key => !cancun || result.execResult.createdAddresses.has(key)).sort();
       bound('frames', deletions.length);
       for (const key of deletions) {
-        if (!canFinalizeDeletion || !common.isActivatedEIP(6780) || !ADDRESS.test(key)) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'Committed deletion requires an authenticated Cancun finalizer.', 'unsupported');
-        await guarded.finalizeCreatedContractDeletion(createAddressFromString(key));
-        finalizedDeletions.push({ address: key, scope: 'entire_account_including_code_and_storage', initialStorageRoot: EMPTY_STORAGE_ROOT });
+        if (!ADDRESS.test(key) || (cancun ? !canFinalizeDeletion : !canFinalizeShanghai)) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'Committed deletion requires an authenticated fork-appropriate finalizer.', 'unsupported');
+        if (cancun) {
+          await guarded.finalizeCreatedContractDeletion(createAddressFromString(key));
+          finalizedDeletions.push({ address: key, scope: 'entire_account_including_code_and_storage', initialStorageRoot: EMPTY_STORAGE_ROOT });
+        } else finalizedDeletions.push(await guarded.finalizeShanghaiContractDeletion(createAddressFromString(key)));
       }
     }
     let emptyAccountCleanup = null;

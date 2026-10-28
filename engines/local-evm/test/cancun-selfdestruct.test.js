@@ -23,7 +23,7 @@ function noDeletion(f){assert.ok(f.stateManager.snapshotChanges().accounts.every
 test('Cancun SELFDESTRUCT transfers value to a proven absent beneficiary and preserves code/storage/nonce',async()=>{
   const f=await fixture();f.request.value='5';const result=await executeEthereumCall(f);
   assert.equal(result.execution.status,'success',JSON.stringify(result));assert.equal(result.execution.returnData,'0x');assert.equal(result.execution.gasRefundCounter,'0');
-  assert.equal(result.semantics.lifecycle,'preexisting_Cancun_SELFDESTRUCT_without_deletion_Shanghai_SELFDESTRUCT_unsupported');
+  assert.equal(result.semantics.lifecycle,'preexisting_Cancun_SELFDESTRUCT_without_deletion_fork_selected_SELFDESTRUCT_finalization');
   assert.equal((await account(f,FACTORY)).balance,0n);assert.equal((await account(f,FACTORY)).nonce,7n);
   assert.equal((await account(f,BENEFICIARY)).balance,1005n);assert.equal((await account(f,BENEFICIARY)).nonce,0n);
   assert.equal((await account(f,SENDER)).balance,999995n);assert.equal(await code(f,FACTORY),'0x'+sd(BENEFICIARY));assert.equal(await storage(f,FACTORY),9n);
@@ -78,9 +78,10 @@ test('root revert and caught ancestor revert undo successful SELFDESTRUCT transf
   }
 });
 
-test('Shanghai and legacy999 SELFDESTRUCT stay unsupported with complete rollback',async()=>{
+test('Shanghai without its authenticated finalizer and legacy999 SELFDESTRUCT stay unsupported with complete rollback',async()=>{
   for(const chainId of [1,999]){
     const f=await fixture();
+    if(chainId===1) f.stateManager.finalizeShanghaiContractDeletion=undefined;
     const request={from:SENDER,to:FACTORY,data:'0x',value:'0',gasLimit:'100000'};
     const actual=await executeUnsignedCall({chainId,request,block:{...f.header,baseFeePerGas:'0',...(chainId===1?{timestamp:'1710338134'}:{})},stateManager:f.stateManager});
     assert.equal(actual.execution.status,'unsupported');assert.equal(actual.execution.error.code,'LOCAL_LIFECYCLE_UNSUPPORTED');

@@ -82,7 +82,7 @@ class ProofStateManager extends SimpleStateManager {
     const reset = this.resetStack.at(-1).has(key);
     if ((!base.exists || reset) && account.nonce === 0n && account.balance === 0n && emptyRoots) { this.topAccountStack().set(key, undefined); return; }
     if (current === undefined) {
-      if (reset && base.storageRoot !== EMPTY_STORAGE_ROOT) fail('LOCAL_STATE_UNSUPPORTED', 'Rematerializing a deleted account with a nonempty original trie requires explicit storage-reset provenance.');
+      if (reset && (base.storageRoot !== EMPTY_STORAGE_ROOT || base.code !== '0x' || base.nonceRaw !== '0')) fail('LOCAL_STATE_UNSUPPORTED', 'Rematerializing a deleted account with original code, nonce or storage requires explicit account-reset provenance.');
       if ((base.exists && !reset) || account.nonce > 1n || !emptyRoots) {
         fail('LOCAL_STATE_UNSUPPORTED', 'Only native funding or the unsigned sender nonce may materialize a proof-absent account.');
       }
@@ -160,6 +160,18 @@ class ProofStateManager extends SimpleStateManager {
       fail('LOCAL_STATE_UNSUPPORTED', 'Finalized deletion requires an authenticated newly created contract with an initially empty storage trie.');
     }
     this.#resetAccount(key, 'same_invocation_created_contract_deletion');
+  }
+  async finalizeShanghaiContractDeletion(address) {
+    if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'Contract deletion requires an active rollback checkpoint.');
+    const key = this.addressKey(address), base = await this.loadAccount(key), current = this.topAccountStack().get(key);
+    // Execution authorizes this entrypoint only for Shanghai's committed
+    // SELFDESTRUCT set. The original account proof authenticates the entire
+    // removed namespace; no enumeration of undemanded slots is necessary.
+    if (!current || (!this.created(key) && (!base.exists || base.code === '0x'))) {
+      fail('LOCAL_STATE_UNSUPPORTED', 'Shanghai deletion requires an authenticated execution account or a tracked contract creation.');
+    }
+    this.#resetAccount(key, 'shanghai_selfdestruct_deletion');
+    return { address: key, scope: 'entire_account_including_code_and_storage', initialStorageRoot: base.storageRoot };
   }
   async consumeBAL() { fail('LOCAL_STATE_UNSUPPORTED', 'External state changes cannot be imported into the proof-backed overlay.'); }
   async checkpoint() {

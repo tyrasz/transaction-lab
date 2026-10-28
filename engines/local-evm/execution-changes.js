@@ -9,6 +9,7 @@ const need = value => { if (!value) throw new Error('Local execution changes do 
 const hex = value => '0x' + BigInt(value).toString(16);
 
 const DELETION_BASIS = 'same_invocation_created_contract_deletion';
+const SHANGHAI_DELETION_BASIS = 'shanghai_selfdestruct_deletion';
 const EMPTY_CLEANUP_BASIS = 'eip161_empty_account_cleanup';
 const RIPEMD160 = '0x0000000000000000000000000000000000000003';
 const cleanupRow = address => ({ address, existence: { before: true, after: false, basis: EMPTY_CLEANUP_BASIS } });
@@ -47,7 +48,8 @@ function emptyFact(inputs, address) {
 /** Check invocation-local lifecycle evidence without assuming a query starts
  * from the immutable base. Net query effects are validated separately. This is
  * trace/result consistency, not an independent replay or post-state-root proof. */
-export function validateExecutionLifecycle({ output, inputs, destination, changes, startingChanges }) {
+export function validateExecutionLifecycle({ output, inputs, destination, changes, startingChanges, selfdestructOnlyCreated = true }) {
+  need(typeof selfdestructOnlyCreated === 'boolean');
   const created = new Map(), destructed = new Set(), eligibleTouches = new Set(), justifiedTouches = new Set(); let frames = 0;
   const lifecycle = output === null ? undefined : ownData(output, 'lifecycle');
   const complete = ['success', 'reverted', 'failed'].includes(output?.execution?.status);
@@ -127,16 +129,17 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     }
     for (const child of frame.calls) walk(child, commits, depth + 1, frame);
     // SELFDESTRUCT is terminal in its own frame, after all entered children.
-    // A preexisting Cancun self-beneficiary keeps balance; an account created
-    // in this invocation burns it immediately and may be funded again before
-    // final deletion. Keep those two burns distinct in the ordered ledger.
+    // Shanghai always burns a self-beneficiary balance immediately. Cancun
+    // does so only for this invocation's creations. Later refills precede the
+    // separate end-of-invocation deletion burn.
     if (selfdestruct !== undefined && commits) {
       if (selfdestruct.beneficiary !== frame.executionAddress) transfer(frame.executionAddress, selfdestruct.beneficiary, balance(frame.executionAddress));
-      else if (created.has(frame.executionAddress)) balances.set(frame.executionAddress, 0n);
+      else if (!selfdestructOnlyCreated || created.has(frame.executionAddress)) balances.set(frame.executionAddress, 0n);
     }
   }
   walk(output.trace, true, 0);
-  const deleted = new Set([...created.keys()].filter(address => destructed.has(address)).sort());
+  const deleted = new Set([...destructed].filter(address => !selfdestructOnlyCreated || created.has(address)).sort());
+  const deletionBasis = selfdestructOnlyCreated ? DELETION_BASIS : SHANGHAI_DELETION_BASIS;
   if (lifecycle !== undefined) { fields(lifecycle, [], ['finalizedDeletions', 'emptyAccountCleanup']); need(Object.keys(lifecycle).length > 0); }
   if (deleted.size === 0) need(lifecycle?.finalizedDeletions === undefined);
   else {
@@ -144,8 +147,25 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     need(lifecycle.finalizedDeletions.length === deleted.size);
     for (const [index, address] of [...deleted].entries()) {
       const row = lifecycle.finalizedDeletions[index]; fields(row, ['address', 'scope', 'initialStorageRoot']);
-      need(row.address === address && row.scope === 'entire_account_including_code_and_storage' && row.initialStorageRoot === EMPTY_STORAGE_ROOT);
-      deployableFact(inputs, address);
+      const initial = inputs.accounts?.[address], proof = inputs.provenance?.find(item => item.account === address)?.accountProof;
+      need(initial && proof && proof.exists === initial.exists && typeof proof.storageRoot === 'string' && WORD.test(proof.storageRoot));
+      need(row.address === address && row.scope === 'entire_account_including_code_and_storage' && row.initialStorageRoot === proof.storageRoot);
+      if (selfdestructOnlyCreated) deployableFact(inputs, address);
+      else {
+        const prior = priorRows.get(address);
+        // A disposable after-query can start with a creation made by the
+        // original invocation. Its base proof may still prove absence. A
+        // carried deletion alone can never justify executing deleted code.
+        const priorCreation = prior?.existence?.after !== false && prior?.nonce?.before === '0x0' && BigInt(prior.nonce.after) > 0n &&
+          (['internal_contract_creation', 'top_level_contract_creation'].includes(prior.existence?.basis) || Boolean(prior.code));
+        need(created.has(address) || priorCreation || (initial.exists && initial.code !== '0x' && prior?.existence?.after !== false));
+        if (created.has(address) || priorCreation) deployableFact(inputs, address);
+      }
+      // Snapshots remain relative to the immutable base, including in queries.
+      // Absent -> created -> deleted leaves no net row; existing deletion
+      // removes the entire namespace, not an enumeration of known slots.
+      const expected = initial.exists ? { address, existence: { before: true, after: false, basis: deletionBasis }, ...(BigInt(initial.balance) > 0n ? { balance: { before: hex(initial.balance), after: '0x0' } } : {}) } : undefined;
+      need(changes !== undefined && isDeepStrictEqual(rows.get(address), expected));
     }
   }
   for (const address of deleted) balances.set(address, 0n);
@@ -191,7 +211,7 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
 /** Bind the bounded overlay schema to the worker's immutable input facts and
  * committed creation frames. This is result-consistency validation, not an
  * independent EVM execution or a recomputed post-state-root proof. */
-export function validateExecutionChanges({ changes, inputs, output, sender, destination }) {
+export function validateExecutionChanges({ changes, inputs, output, sender, destination, selfdestructOnlyCreated = true }) {
   const snapshot = canonicalStateChanges(changes), complete = ['success', 'reverted', 'failed'].includes(output?.execution?.status);
   const topCreation = destination === null, senderAddress = sender.toLowerCase(), senderInitial = inputs?.accounts?.[senderAddress];
   // Derive the root CREATE address from independently reverified initial facts,
@@ -207,7 +227,7 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
       need(root.to === createContractAddress(createAddressFromString(senderAddress), nonce).toString());
     }
   }
-  const { created, deleted, emptyDeleted } = validateExecutionLifecycle({ output, inputs, destination, changes: snapshot });
+  const { created, deleted, emptyDeleted } = validateExecutionLifecycle({ output, inputs, destination, changes: snapshot, selfdestructOnlyCreated });
   if (!complete) { need(snapshot.accounts.length === 0); return; }
   need(senderInitial && typeof senderInitial.exists === 'boolean');
   const senderNonce = senderInitial.exists ? BigInt(senderInitial.nonce) : 0n;
@@ -228,8 +248,8 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
     for (const name of ['balance', 'nonce']) if (row[name]) need(row[name].before === hex(initial.exists ? initial[name] : '0'));
     if (row.existence?.basis === EMPTY_CLEANUP_BASIS) {
       need(emptyDeleted.has(row.address) && initial.exists);
-    } else if (row.existence?.basis === DELETION_BASIS) {
-      need(deleted.has(row.address) && initial.exists);
+    } else if ([DELETION_BASIS, SHANGHAI_DELETION_BASIS].includes(row.existence?.basis)) {
+      need(deleted.has(row.address) && initial.exists && row.existence.basis === (selfdestructOnlyCreated ? DELETION_BASIS : SHANGHAI_DELETION_BASIS));
     } else if (row.existence) {
       need(initial.exists === false);
       if (['internal_contract_creation', 'top_level_contract_creation'].includes(row.existence.basis)) need(created.get(row.address)?.basis === row.existence.basis);
@@ -244,8 +264,7 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
   for (const [address, { frame, basis }] of created) {
     const initial = deployableFact(inputs, address), row = rows.get(address);
     if (deleted.has(address)) {
-      if (!initial.exists) need(row === undefined);
-      else need(isDeepStrictEqual(row, { address, existence: { before: true, after: false, basis: DELETION_BASIS }, ...(BigInt(initial.balance) > 0n ? { balance: { before: hex(initial.balance), after: '0x0' } } : {}) }));
+      // Its exact whole-account row was checked with the fork-specific basis.
       continue;
     }
     need(row?.nonce?.before === '0x0' && BigInt(row.nonce.after) > 0n);
