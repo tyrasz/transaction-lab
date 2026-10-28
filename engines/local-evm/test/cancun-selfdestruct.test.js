@@ -23,7 +23,7 @@ function noDeletion(f){assert.ok(f.stateManager.snapshotChanges().accounts.every
 test('Cancun SELFDESTRUCT transfers value to a proven absent beneficiary and preserves code/storage/nonce',async()=>{
   const f=await fixture();f.request.value='5';const result=await executeEthereumCall(f);
   assert.equal(result.execution.status,'success',JSON.stringify(result));assert.equal(result.execution.returnData,'0x');assert.equal(result.execution.gasRefundCounter,'0');
-  assert.equal(result.semantics.lifecycle,'preexisting_Cancun_SELFDESTRUCT_without_deletion_same_invocation_creation_and_Shanghai_SELFDESTRUCT_unsupported');
+  assert.equal(result.semantics.lifecycle,'preexisting_Cancun_SELFDESTRUCT_without_deletion_Shanghai_SELFDESTRUCT_and_full_EIP161_cleanup_unsupported');
   assert.equal((await account(f,FACTORY)).balance,0n);assert.equal((await account(f,FACTORY)).nonce,7n);
   assert.equal((await account(f,BENEFICIARY)).balance,1005n);assert.equal((await account(f,BENEFICIARY)).nonce,0n);
   assert.equal((await account(f,SENDER)).balance,999995n);assert.equal(await code(f,FACTORY),'0x'+sd(BENEFICIARY));assert.equal(await storage(f,FACTORY),9n);
@@ -91,15 +91,16 @@ test('Shanghai and legacy999 SELFDESTRUCT stay unsupported with complete rollbac
   assert.equal((await executeEthereumCall(ordinary)).semantics.lifecycle,'no_lifecycle_operation_encountered');
 });
 
-test('constructor SELFDESTRUCT and later calls to freshly created runtime stay unsupported',async()=>{
+test('constructor and fresh-runtime SELFDESTRUCT require the authenticated deletion finalizer',async()=>{
   const direct=await lifecycleFixture();
+  direct.stateManager.finalizeCreatedContractDeletion=undefined;
   const root=await executeEthereumCall({...direct,request:{from:SENDER,to:null,data:'0x'+sd(BENEFICIARY),value:'5',gas:'5000000'}});
   assert.equal(root.execution.status,'unsupported');assert.deepEqual(direct.stateManager.snapshotChanges().accounts,[]);
   for(const kind of ['CREATE','CREATE2']){
     const init=initcode(sd(BENEFICIARY),'');
     // Save the created address and CALL its retained runtime in this same tx.
     const tail='6000526000600060006000600060005161fffff15000';
-    const f=await lifecycleFixture({code:factoryCode(init,{kind,value:5,tail})});const result=await executeEthereumCall(f);
+    const f=await lifecycleFixture({code:factoryCode(init,{kind,value:5,tail})});f.stateManager.finalizeCreatedContractDeletion=undefined;const result=await executeEthereumCall(f);
     assert.equal(result.execution.status,'unsupported');assert.equal(result.execution.error.code,'LOCAL_LIFECYCLE_UNSUPPORTED');
     assert.deepEqual(f.stateManager.snapshotChanges().accounts,[]);assert.equal((await account(f,SENDER)).nonce,1n);
   }

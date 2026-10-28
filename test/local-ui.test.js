@@ -154,3 +154,18 @@ test('typed identity is separate, unsafe text stays text, and a later provider r
   assert.equal(nodes(ui.elements.get('local-measurements')).filter(n => n.tagName === 'SCRIPT').length, 0);
   ui.context.renderStandardResult({ execution: {}, source: {}, preview: {} }); assert.equal(ui.elements.get('local-result').hidden, true);
 });
+
+test('verified same-call deletion is visible without claiming the contract remains deployed', () => {
+  const ui = setup(), result = sample();
+  result.apiRequest.to = null;
+  result.attempt = { status: 'completed', preview: { original: { output: { execution: { status: 'success' }, lifecycle: { finalizedDeletions: [{ address: T, scope: 'entire_account_including_code_and_storage' }] } } } } };
+  ui.context.renderLocalResult(result);
+  assert.match(ui.elements.get('source-details').textContent, /Contracts removed in this call/);
+  assert(ui.elements.get('source-details').textContent.includes(T));
+  assert.match(ui.elements.get('warnings-list').textContent, /do not remain deployed/);
+  assert.deepEqual(JSON.parse(ui.elements.get('raw-json').textContent), result);
+  result.source.canonicalStatus = 'unverified';
+  ui.context.renderLocalResult(result);
+  assert.doesNotMatch(ui.elements.get('source-details').textContent, /Contracts removed in this call/);
+  assert.doesNotMatch(ui.elements.get('warnings-list').textContent, /do not remain deployed/);
+});

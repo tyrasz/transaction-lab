@@ -9,7 +9,7 @@ import { verifyEthereumHeader } from './ethereum-header.js';
 import { ethereumQuantity, ethereumCallGas, ethereumCommon, ethereumContextProfile, ethereumUsedGas } from './ethereum-profile.js';
 import { compilePreviewQueries, decodePreviewValues } from './preview-queries.js';
 import { validateQueryMutation } from './preview-mutations.js';
-import { validateExecutionChanges } from './execution-changes.js';
+import { validateExecutionChanges, validateExecutionLifecycle } from './execution-changes.js';
 import { validateInputFacts } from './input-facts.js';
 import { ISOLATED_LIMITS, IsolationError, decode, encode, envelope, fields, need, normalizeLimits, validateRpcRequest } from './isolated-protocol.js';
 export { ISOLATED_LIMITS, IsolationError } from './isolated-protocol.js';
@@ -144,6 +144,11 @@ async function executeIsolated(options, previewMode) {
   function executionContext(output, call, complete) {
     if (output === null) { need(!complete); return; }
     const costs = ethereumCallGas(call.data, ethereumCommon(header), call), gas = ethereumQuantity(call.gas);
+    if (Object.hasOwn(output, 'lifecycle')) {
+      need(complete && ethereumCommon(header).isActivatedEIP(6780));
+      const traceBytes = Buffer.byteLength(JSON.stringify({ trace: output.trace, logs: output.logs, lifecycle: output.lifecycle }));
+      need(output.usage?.retainedTraceBytes === traceBytes && traceBytes <= limits.execution.traceBytes);
+    }
     const environment = { chainId: 1, hardfork: ethereumCommon(header).hardfork(),
       number: ethereumQuantity(header.number).toString(), timestamp: ethereumQuantity(header.timestamp).toString(),
       gasLimit: ethereumQuantity(header.gasLimit).toString(), baseFeePerGas: '0', mixHash: header.mixHash.toLowerCase(), miner: header.miner.toLowerCase(),
@@ -211,6 +216,7 @@ async function executeIsolated(options, previewMode) {
       need(originalComplete && side.reason === null && side.output?.execution?.status === 'success' && side.output.stateDisposition === 'message_result_retained_in_supplied_manager' && Array.isArray(side.output.logs) && side.output.logs.length === 0);
       const trace = side.output.trace, queryRequest = { from: request.from.toLowerCase(), ...compiled.query, value: '0', gas: '1000000' };
       executionContext(side.output, queryRequest, true); need(trace.error === null);
+      validateExecutionLifecycle({ output: side.output, inputs: value.inputs, destination: queryRequest.to });
       need(isDeepStrictEqual(side.values, decodePreviewValues(compiled, side.output.execution.returnData)));
       need(side.changesBefore && side.changesAfter);
       if (phase === 'before') need(side.changesBefore.accounts?.length === 0);
@@ -218,7 +224,7 @@ async function executeIsolated(options, previewMode) {
       const current = side.changesBefore.accounts.find(row => row.address === queryRequest.from), initial = value.inputs.accounts?.[queryRequest.from];
       need(initial && typeof initial.exists === 'boolean');
       const nonceBefore = current?.nonce ? BigInt(current.nonce.after).toString() : initial.exists ? initial.nonce : '0';
-      const mutation = validateQueryMutation({ before: side.changesBefore, after: side.changesAfter, sender: queryRequest.from, nonceBefore, senderExistedBefore: initial.exists || current?.existence?.after === true });
+      const mutation = validateQueryMutation({ before: side.changesBefore, after: side.changesAfter, sender: queryRequest.from, nonceBefore, senderExistedBefore: current?.existence ? current.existence.after : initial.exists });
       need(isDeepStrictEqual(side.mutationValidation, mutation));
     }
     for (let i = 0; i < compiledQueries.length; i++) {

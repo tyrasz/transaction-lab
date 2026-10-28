@@ -1245,6 +1245,12 @@ function renderLocalResult(result) {
   ].map(text => node('li', '', text)));
   const details = $('source-details'), selection = result.source?.blockSelection || {}; details.replaceChildren();
   for (const [label, value] of [['Engine', 'Independent local execution · experimental'], ['Profile', result.source?.profile], ['Requested state', selection.requested || result.apiRequest?.block], ['Resolved block', selection.blockNumber], ['Block hash', selection.blockHash], ['Block binding', result.source?.canonicalStatus], ['Sender', result.apiRequest?.from], ['Recipient', result.apiRequest?.to === null ? 'Contract deployment' : result.apiRequest?.to], ['Native value · wei', result.apiRequest?.value], ['Run ID', result.id]]) addDefinition(details, label, value);
+  const original = result.attempt?.preview?.original?.output;
+  const deletions = original?.lifecycle?.finalizedDeletions;
+  if (['complete', 'partial'].includes(result.status) && result.execution?.status === 'success' && result.source?.canonicalStatus === 'verified' && result.attempt?.status === 'completed' && original?.execution?.status === 'success' && Array.isArray(deletions) && deletions.length > 0 && deletions.length <= 128 && deletions.every(row => typeof row.address === 'string' && /^0x[0-9a-f]{40}$/.test(row.address) && row.scope === 'entire_account_including_code_and_storage')) {
+    addDefinition(details, 'Contracts removed in this call', deletions.map(row => row.address).join(', '));
+    $('warnings-list').append(node('li', '', 'The listed contracts were created and removed within this call. They do not remain deployed after it.'));
+  }
   $('timing').textContent = Number.isFinite(result.timing?.totalMs) ? `${(result.timing.totalMs / 1000).toFixed(2)}s total` : '';
 }
 

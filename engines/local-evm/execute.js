@@ -6,6 +6,7 @@ import { createEVM, EVMError } from '@ethereumjs/evm';
 import { bytesToHex, createAddressFromString, hexToBytes } from '@ethereumjs/util';
 import { ethereumCommon, ethereumContextProfile } from './ethereum-profile.js';
 import { normalizeEvmContext } from '../evm-context.js';
+import { EMPTY_STORAGE_ROOT } from './verified-state-proof.js';
 
 export const EXECUTION_LIMITS = Object.freeze({ gas: 5000000, steps: 1000000, frames: 1000, depth: 32, logs: 2000, memoryBytes: 1048576, returnBytes: 1048576, calldataBytes: 32768, traceBytes: 8388608, wallMs: 10000 });
 export const ETHEREUM_EXECUTION_LIMITS = Object.freeze({ ...EXECUTION_LIMITS, wallMs: 120000 });
@@ -83,10 +84,13 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     if (!block || ['number', 'timestamp', 'gasLimit', 'baseFeePerGas'].some(field => quantity(block[field]) === null) || quantity(block.gasLimit) === 0n || typeof block.mixHash !== 'string' || !WORD.test(block.mixHash) || !address(block.miner) || ['hash', 'parentHash'].some(field => block[field] !== undefined && (typeof block[field] !== 'string' || !WORD.test(block[field])))) reject('LOCAL_INVALID_INPUT', 'Explicit block number, timestamp, gas limit, base fee, prevRandao and coinbase are required.');
     const common = chainId === 1 ? ethereumCommon(block) : createCustomCommon({ chainId: 999, name: 'experimental-hyperevm-message' }, Mainnet, { hardfork: Hardfork.Cancun });
     const canCreate = chainId === 1 && typeof stateManager.beginContractCreation === 'function';
-    let observedCreation = false, observedSelfdestruct = false;
+    const canFinalizeDeletion = chainId === 1 && typeof stateManager.finalizeCreatedContractDeletion === 'function';
+    let observedCreation = false, observedSelfdestruct = false, observedCreatedSelfdestruct = false;
     function describeLifecycle() {
-      if (observedSelfdestruct) semantics.lifecycle = (observedCreation ? (topLevelCreation ? 'top_level_CREATE_and_' : '') + 'internal_CREATE_CREATE2_and_' : '') + 'preexisting_Cancun_SELFDESTRUCT_without_deletion_same_invocation_creation_and_Shanghai_SELFDESTRUCT_unsupported';
-      else if (observedCreation) semantics.lifecycle = topLevelCreation ? 'top_level_CREATE_and_internal_CREATE_CREATE2_with_proven_deployable_targets_same_invocation_creation_and_Shanghai_SELFDESTRUCT_unsupported' : 'internal_CREATE_CREATE2_with_proven_deployable_targets_same_invocation_creation_and_Shanghai_SELFDESTRUCT_unsupported';
+      const unsupported = canFinalizeDeletion ? 'Shanghai_SELFDESTRUCT_and_full_EIP161_cleanup_unsupported' : 'same_invocation_creation_and_Shanghai_SELFDESTRUCT_unsupported';
+      if (observedCreatedSelfdestruct) semantics.lifecycle = 'Cancun_created_account_SELFDESTRUCT_with_root_commit_gated_deletion_' + unsupported;
+      else if (observedSelfdestruct) semantics.lifecycle = (observedCreation ? (topLevelCreation ? 'top_level_CREATE_and_' : '') + 'internal_CREATE_CREATE2_and_' : '') + 'preexisting_Cancun_SELFDESTRUCT_without_deletion_' + unsupported;
+      else if (observedCreation) semantics.lifecycle = (topLevelCreation ? 'top_level_CREATE_and_' : '') + 'internal_CREATE_CREATE2_with_proven_deployable_targets_' + unsupported;
     }
     if (topLevelCreation && !canCreate) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'Top-level creation requires an authenticated creation-capable state manager.', 'unsupported');
     if (chainId === 1) {
@@ -106,7 +110,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       if (typeof member !== 'function') return member;
       if (!methods.has(property)) methods.set(property, async (...args) => {
         clockCheck();
-        if (['getAccount', 'putAccount', 'deleteAccount', 'modifyAccountFields', 'getCode', 'putCode', 'getCodeSize', 'getStorage', 'putStorage', 'clearStorage', 'beginContractCreation'].includes(property)) reserved(args[0]);
+        if (['getAccount', 'putAccount', 'deleteAccount', 'modifyAccountFields', 'getCode', 'putCode', 'getCodeSize', 'getStorage', 'putStorage', 'clearStorage', 'beginContractCreation', 'finalizeCreatedContractDeletion'].includes(property)) reserved(args[0]);
         const result = await member.apply(target, args);
         if (property === 'checkpoint') checkpointDepth++;
         else if (property === 'commit' || property === 'revert') checkpointDepth--;
@@ -164,10 +168,14 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       const active = stack.at(-1);
       if (createOpcodes.has(step.opcode.code) && !canCreate) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'This local profile does not support the requested lifecycle operation.', 'unsupported');
       if (step.opcode.code === 0xff) {
-        // runCall applies the EIP-6780 balance transfer, but never performs VM
-        // transaction-end deletion. Admit only paths that require no deletion.
+        // runCall applies the balance transfer but leaves transaction-end
+        // deletion to our bounded finalizer after the committed root result.
         const executionAddress = step.address.toString();
-        if (chainId !== 1 || !common.isActivatedEIP(6780) || !active || active.frame.executionAddress !== executionAddress || !(active.createdAddresses instanceof Set) || active.createdAddresses.has(executionAddress)) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'SELFDESTRUCT deletion or unsupported fork context is outside this local profile.', 'unsupported');
+        if (chainId !== 1 || !common.isActivatedEIP(6780) || !active || active.frame.executionAddress !== executionAddress || !(active.createdAddresses instanceof Set) || (active.createdAddresses.has(executionAddress) && !canFinalizeDeletion)) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'SELFDESTRUCT deletion or unsupported fork context is outside this local profile.', 'unsupported');
+        observedCreatedSelfdestruct ||= active.createdAddresses.has(executionAddress);
+        // The step event precedes gas/static/stack checks. Promote this into
+        // trace evidence only if this frame actually completes successfully.
+        if (step.stack.length) active.pendingSelfdestruct = '0x' + (step.stack.at(-1) & ((1n << 160n) - 1n)).toString(16).padStart(40, '0');
         observedSelfdestruct = true; describeLifecycle();
       }
       // On Ethereum, absent blob hashes are the empty transaction list: BLOBHASH
@@ -196,6 +204,10 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       active.frame.gasUsed = hex(result.execResult.executionGasUsed); active.frame.output = bytesToHex(output);
       const error = result.execResult.exceptionError?.error;
       active.frame.error = error === undefined ? null : evmErrors.has(error) ? error : 'unrecognized EVM exception';
+      if (error === undefined && active.pendingSelfdestruct !== undefined) {
+        if (result.execResult.selfdestruct?.get(active.frame.executionAddress) !== active.pendingSelfdestruct) reject('LOCAL_TRACE_INVALID', 'Successful SELFDESTRUCT disagrees with its frame result.');
+        active.frame.selfdestruct = { beneficiary: active.pendingSelfdestruct }; retain(96);
+      }
     });
     if (chainId === 1) {
       const sender = createAddressFromString(from), account = await guarded.getAccount(sender), code = await guarded.getCode(sender);
@@ -207,11 +219,23 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     const result = await evm.runCall({ caller: createAddressFromString(from), origin: createAddressFromString(from), ...(to ? { to: createAddressFromString(to) } : {}), data: hexToBytes(request.data), value, gasLimit, gasPrice: 0n, ...(context.blobVersionedHashes ? { blobVersionedHashes: [...context.blobVersionedHashes] } : {}), block: { header: { number: quantity(block.number), timestamp: quantity(block.timestamp), gasLimit: quantity(block.gasLimit), baseFeePerGas: quantity(block.baseFeePerGas), difficulty: 0n, prevRandao: hexToBytes(block.mixHash), coinbase: createAddressFromString(address(block.miner)), getBlobGasPrice() { if (context.blobVersionedHashes) return 0n; reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is unsupported.', 'unsupported'); } } } });
     clockCheck();
     if (stack.length || checkpointDepth !== 1) reject('LOCAL_TRACE_INVALID', 'Local call-tree or checkpoint completion is inconsistent.');
+    const finalizedDeletions = [];
+    if (!result.execResult.exceptionError && result.execResult.selfdestruct?.size) {
+      if (!(result.execResult.selfdestruct instanceof Map) || !(result.execResult.createdAddresses instanceof Set)) reject('LOCAL_TRACE_INVALID', 'Committed lifecycle collections are malformed.');
+      const deletions = [...result.execResult.selfdestruct.keys()].filter(key => result.execResult.createdAddresses.has(key)).sort();
+      bound('frames', deletions.length);
+      for (const key of deletions) {
+        if (!canFinalizeDeletion || !common.isActivatedEIP(6780) || !ADDRESS.test(key)) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'Committed deletion requires an authenticated Cancun finalizer.', 'unsupported');
+        await guarded.finalizeCreatedContractDeletion(createAddressFromString(key));
+        finalizedDeletions.push({ address: key, scope: 'entire_account_including_code_and_storage', initialStorageRoot: EMPTY_STORAGE_ROOT });
+      }
+    }
+    const lifecycle = finalizedDeletions.length ? { finalizedDeletions } : null;
     const logs = (result.execResult.logs ?? []).map(([emitter, topics, data]) => ({ address: bytesToHex(emitter), topics: topics.map(bytesToHex), data: bytesToHex(data) }));
     bound('logs', logs.length); bound('returnBytes', result.execResult.returnValue.length);
-    usage.retainedTraceBytes = Buffer.byteLength(JSON.stringify({ trace: root, logs }), 'utf8'); bound('traceBytes', usage.retainedTraceBytes);
+    usage.retainedTraceBytes = Buffer.byteLength(JSON.stringify({ trace: root, logs, ...(lifecycle ? { lifecycle } : {}) }), 'utf8'); bound('traceBytes', usage.retainedTraceBytes);
     const error = root.error, status = !error ? 'success' : error === 'revert' ? 'reverted' : 'failed';
-    const report = { execution: { status, executionGasUsed: result.execResult.executionGasUsed.toString(), gasRefundCounter: (result.execResult.gasRefund ?? 0n).toString(), returnData: bytesToHex(result.execResult.returnValue), error }, trace: root, logs, environment, semantics, limits, usage, stateDisposition: 'message_result_retained_in_supplied_manager' };
+    const report = { execution: { status, executionGasUsed: result.execResult.executionGasUsed.toString(), gasRefundCounter: (result.execResult.gasRefund ?? 0n).toString(), returnData: bytesToHex(result.execResult.returnValue), error }, trace: root, logs, environment, semantics, limits, usage, ...(lifecycle ? { lifecycle } : {}), stateDisposition: 'message_result_retained_in_supplied_manager' };
     clockCheck();
     // Final atomic commit is the irreversible terminal step: no subsequent
     // deadline/output validation may mislabel retained state as rolled back.

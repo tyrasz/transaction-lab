@@ -5,6 +5,7 @@ const ADDRESS = /^0x[0-9a-f]{40}$/, WORD = /^0x[0-9a-f]{64}$/, DATA = /^0x(?:[0-
 const UINT256 = (1n << 256n) - 1n, UINT64 = (1n << 64n) - 1n;
 const MAX_ACCOUNTS = 128, MAX_SLOTS = 1024, MAX_CODE_BYTES = 24576;
 const CREATION_BASES = ['internal_contract_creation', 'top_level_contract_creation'];
+const DELETION_BASIS = 'same_invocation_created_contract_deletion';
 const EXISTENCE_BASES = ['unsigned_sender_nonce_materialization', 'positive_native_funding_of_proof_absent_account', ...CREATION_BASES];
 const ZERO_WORD = '0x' + '00'.repeat(32);
 
@@ -50,8 +51,9 @@ function canonical(snapshot) {
     const row = { address: account.address };
     if (Object.hasOwn(account, 'existence')) {
       const value = account.existence; fields(value, ['before', 'after', 'basis']);
-      need(value.before === false && value.after === true && EXISTENCE_BASES.includes(value.basis));
-      row.existence = { before: false, after: true, basis: value.basis };
+      const deletion = value.before === true && value.after === false && value.basis === DELETION_BASIS;
+      need(deletion || (value.before === false && value.after === true && EXISTENCE_BASES.includes(value.basis)));
+      row.existence = { before: value.before, after: value.after, basis: value.basis };
     }
     for (const field of ['nonce', 'balance']) if (Object.hasOwn(account, field)) row[field] = delta(account[field], field === 'nonce' ? UINT64 : UINT256);
     if (Object.hasOwn(account, 'code')) {
@@ -75,7 +77,12 @@ function canonical(snapshot) {
       need(!row.existence || creation);
       need(!row.storage || row.storage.every(value => value.before === ZERO_WORD));
     }
-    if (row.existence) {
+    if (row.existence?.basis === DELETION_BASIS) {
+      // The immutable base was an existing deployable account. Finalization
+      // removes the whole account; its original code/nonce/storage were empty.
+      need(!row.nonce && !row.code && !row.storage);
+      need(!row.balance || (BigInt(row.balance.before) > 0n && row.balance.after === '0x0'));
+    } else if (row.existence) {
       need(!row.balance || row.balance.before === '0x0');
       if (!creation) {
         need(!row.storage && !row.code);

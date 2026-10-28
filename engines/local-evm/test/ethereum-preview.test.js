@@ -95,7 +95,7 @@ test('proven absent sender is materialized once by original; query-only nonce ma
 });
 
 test('unsupported original has no after-state measurements or speculative getter reads', async () => {
-  const result = await run(await fixture({ original: '626000ff6000526003601d6000f000' }));
+  const result = await run(await fixture({ original: '4a00' }));
   assert.equal(result.status, 'unavailable'); assert.equal(result.original.output.execution.status, 'unsupported');
   assert.equal(result.usage.executions, 1); assert.equal(result.measurements[0].status, 'not_attempted');
   assert.equal(result.measurements[0].before, null); assert.equal(result.measurements[0].after, null); assert.equal(result.measurements[0].values, null);

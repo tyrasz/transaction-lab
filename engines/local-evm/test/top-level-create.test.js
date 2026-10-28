@@ -6,8 +6,9 @@ import { lifecycleFixture, createdAddress, factoryCode, initcode, RUNTIME, SENDE
 
 const target=createdAddress({creator:SENDER,nonce:1n});
 const senderAddress=createAddressFromString(SENDER),targetAddress=createAddressFromString(target);
-async function run({init=initcode(),value='5',gasLimit='5000000',accounts={},limits,chainId=1,to=null,requestPatch={}}={}){
+async function run({init=initcode(),value='5',gasLimit='5000000',accounts={},limits,chainId=1,to=null,requestPatch={},withoutDeletionFinalizer=false}={}){
   const f=await lifecycleFixture({accounts}),origins=[];
+  if(withoutDeletionFinalizer)f.stateManager.finalizeCreatedContractDeletion=undefined;
   const begin=f.stateManager.beginContractCreation.bind(f.stateManager);
   f.stateManager.beginContractCreation=(address,origin)=>{origins.push({address:address.toString(),origin});return begin(address,origin);};
   const request={from:SENDER,to,data:'0x'+init,value,gasLimit,...requestPatch};
@@ -36,7 +37,7 @@ test('explicit root CREATE executes constructor storage/value and derives addres
   assert.equal((await f.stateManager.getAccount(senderAddress)).nonce,2n);assert.equal((await f.stateManager.getAccount(senderAddress)).balance,999995n);
   assert.equal(r.stateDisposition,'message_result_retained_in_supplied_manager');
   assert.equal(r.semantics.warmAddresses,'sender_coinbase_and_fork_active_precompiles_creation_target_warmed_by_EVM_no_access_list');
-  assert.equal(r.semantics.lifecycle,'top_level_CREATE_and_internal_CREATE_CREATE2_with_proven_deployable_targets_same_invocation_creation_and_Shanghai_SELFDESTRUCT_unsupported');
+  assert.equal(r.semantics.lifecycle,'top_level_CREATE_and_internal_CREATE_CREATE2_with_proven_deployable_targets_Shanghai_SELFDESTRUCT_and_full_EIP161_cleanup_unsupported');
 });
 
 test('constructor ADDRESS, CALLER, ORIGIN and CALLVALUE use the new root context',async()=>{
@@ -101,8 +102,8 @@ test('root constructor can perform nested creation with distinct origin markers 
   assert.equal(bytesToHex(await f.stateManager.getCode(createAddressFromString(nested))),'0x'+RUNTIME);
 });
 
-test('unsupported SELFDESTRUCT and host resource failure roll back all changes including sender nonce',async()=>{
-  const destruct=await run({init:'602a60005573'+SENDER.slice(2)+'ff'});
+test('missing deletion finalizer and host resource failure roll back all changes including sender nonce',async()=>{
+  const destruct=await run({init:'602a60005573'+SENDER.slice(2)+'ff',withoutDeletionFinalizer:true});
   assert.equal(destruct.result.execution.status,'unsupported');assert.equal(destruct.result.execution.error.code,'LOCAL_LIFECYCLE_UNSUPPORTED');
   assert.deepEqual(destruct.stateManager.snapshotChanges().accounts,[]);assert.equal((await destruct.stateManager.getAccount(senderAddress)).nonce,1n);
   const limited=await run({limits:{returnBytes:1}});

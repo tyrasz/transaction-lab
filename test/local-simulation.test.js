@@ -122,9 +122,11 @@ test('completed revert retains execution and independently measured zero effect,
   const result = await simulateLocal(input, revert.rpc);
   assert.equal(result.status, 'complete'); assert.equal(result.execution.status, 'reverted');
   assert.equal(result.measurements[0].values[0].deltaRaw, '0');
-  const unsupported = await fixture({ original: '626000ff6000526003601d6000f000' });
+  // BLOBBASEFEE without explicit blob context remains outside this profile.
+  const unsupported = await fixture({ original: '4a00' });
   const unavailable = await simulateLocal(input, unsupported.rpc);
   assert.equal(unavailable.status, 'unavailable'); assert.equal(unavailable.execution.status, 'unsupported');
+  assert.equal(unavailable.execution.error.code, 'LOCAL_BLOB_UNSUPPORTED');
   assert.equal(unavailable.measurements[0].status, 'not_attempted'); assert.equal(unavailable.measurements[0].values, null);
 });
 

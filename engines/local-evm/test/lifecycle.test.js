@@ -57,8 +57,8 @@ test('empty-runtime creation is still an existing nonce-one account',async()=>{
   assert.deepEqual(change.existence,{before:false,after:true,basis:'internal_contract_creation'});assert.deepEqual(change.nonce,{before:'0x0',after:'0x1'});assert.equal(Object.hasOwn(change,'code'),false);
 });
 
-test('SELFDESTRUCT in constructor remains unsupported and atomically removes all attempted changes',async()=>{
-  const f=await lifecycleFixture({code:factoryCode('602a60005573'+SENDER.slice(2)+'ff')}),r=await executeEthereumCall(f);
+test('constructor SELFDESTRUCT without a deletion finalizer atomically rolls back attempted changes',async()=>{
+  const f=await lifecycleFixture({code:factoryCode('602a60005573'+SENDER.slice(2)+'ff')});f.stateManager.finalizeCreatedContractDeletion=undefined;const r=await executeEthereumCall(f);
   assert.equal(r.execution.status,'unsupported');assert.equal(r.execution.error.code,'LOCAL_LIFECYCLE_UNSUPPORTED');assert.deepEqual(f.stateManager.snapshotChanges().accounts,[]);
 });
 
