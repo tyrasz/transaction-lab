@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { readFile } from 'node:fs/promises';
+import { ethereumBlobContext } from '../engines/local-evm/ethereum-blob-fees.js';
 
 const html = await readFile(new URL('../public/index.html', import.meta.url), 'utf8');
 const app = await readFile(new URL('../public/app.js', import.meta.url), 'utf8');
@@ -295,6 +296,7 @@ test('fees opt in only for local mode and leave default and provider payloads un
   assert.deepEqual(request.queries, [query]);
   for (const mode of ['provider', 'sequence', 'hyper', 'historical']) {
     const ui = setup(); enableFees(ui, 'invalid hidden field', '');
+    ui.elements.get('local-max-blob-fee').value = 'invalid hidden blob cap';
     if (mode === 'sequence') { ui.elements.get('ethereum-call-mode').value = 'sequence'; ui.state.sequenceDrafts = [ui.context.newSequenceDraft({ to: T }), ui.context.newSequenceDraft({ to: A })]; ui.context.renderSequenceEditor(); }
     if (mode === 'hyper' || mode === 'historical') ui.elements.get('chain').value = '999';
     if (mode === 'historical') ui.state.example = { transactionHash: H, request: { chainId: 999 } };
@@ -305,7 +307,7 @@ test('fees opt in only for local mode and leave default and provider payloads un
   }
 });
 
-test('both canonical fee inputs and their relationship are checked before dispatch, including blob exclusion', async () => {
+test('both canonical fee inputs and their relationship are checked before dispatch, including the required blob cap', async () => {
   for (const pair of [['', ''], ['100', ''], ['', '0'], ['01', '0'], ['100', '101'], ['0x10', '0'], ['1e9', '0'], ['1,000', '0'], [(1n << 256n).toString(), '0'], ['100', '-1']]) {
     const ui = setup(); chooseLocal(ui); enableFees(ui, ...pair); await ui.context.run('simulation');
     assert.equal(ui.requests.length, 0); assert.equal(ui.elements.get('local-fee-settings').open, true); assert.notEqual(ui.elements.get('local-max-fee').validationMessage, '');
@@ -313,7 +315,7 @@ test('both canonical fee inputs and their relationship are checked before dispat
   }
   const ui = setup(); chooseLocal(ui); enableFees(ui);
   ui.elements.get('transaction-context').value = JSON.stringify({ blobVersionedHashes: ['0x01' + '11'.repeat(31)] });
-  await ui.context.run('simulation'); assert.equal(ui.requests.length, 0); assert.match(ui.elements.get('transaction-context').validationMessage, /cannot be combined with blob/);
+  await ui.context.run('simulation'); assert.equal(ui.requests.length, 0); assert.match(ui.elements.get('local-max-fee').validationMessage, /Blob hashes require/);
   ui.elements.get('local-fees-enabled').checked = false; ui.elements.get('local-fees-enabled').dispatch('change');
   assert.equal(ui.elements.get('transaction-context').validationMessage, ''); await ui.context.run('simulation'); assert.equal(ui.requests.length, 1);
 });
@@ -370,4 +372,151 @@ test('priced cleanup is labeled only with its matching completed fee context', (
   ui.context.renderLocalResult(result); assert.match(ui.elements.get('source-details').textContent, /Empty accounts removed/);
   result.attempt.preview.original.output.feeAccounting.gasCharge = '0'; ui.context.renderLocalResult(result);
   assert.doesNotMatch(ui.elements.get('source-details').textContent, /Empty accounts removed/);
+});
+
+const blobProfile = 'unsigned_eip4844_block_end', blobHash = '0x01' + '44'.repeat(31);
+const blobForks = { cancun: [1710338135n, 6, 6, 3338477n], prague: [1746612311n, 9, 9, 5007716n],
+  osaka: [1764798551n, 9, 6, 5007716n], bpo1: [1765290071n, 15, 6, 8346193n], bpo2: [1767747671n, 21, 6, 11684671n] };
+// Synthetic retained response, not a recorded public-chain or browser result.
+function blobSample({ fork = 'osaka', excess = 0n, count = 1, used = 0n } = {}) {
+  const result = feeSample(), output = result.attempt.preview.original.output, rule = blobForks[fork];
+  const header = { hash: H, stateRoot: '0x' + '55'.repeat(32), number: '0x191c9e0', timestamp: '0x' + rule[0].toString(16),
+    miner: T, gasLimit: '0x1c9c380', baseFeePerGas: '0xa', excessBlobGas: '0x' + excess.toString(16), blobGasUsed: '0x' + used.toString(16) };
+  const blob = ethereumBlobContext(header), blobGas = BigInt(count) * 131072n, burn = blobGas * blob.blobBaseFeePerGas;
+  result.apiRequest.executionProfile = result.source.profile = output.profile.executionProfile = blobProfile;
+  result.apiRequest.fees.maxFeePerBlobGas = '100'; output.profile.fees = { ...result.apiRequest.fees };
+  result.apiRequest.blobVersionedHashes = Array.from({ length: count }, (_, i) => '0x01' + (44 + i).toString(16).repeat(31));
+  result.source.blockSelection = { requested: H, blockHash: H, blockNumber: BigInt(header.number).toString(), header,
+    headerVerification: { status: 'verified', blockHash: H, stateRoot: header.stateRoot, number: BigInt(header.number).toString(), timestamp: rule[0].toString(), hardfork: fork } };
+  Object.assign(output.profile, { name: 'ethereum_unsigned_eip4844_call', chainId: 1, hardfork: fork,
+    forkSchedule: 'pinned_ethereumjs_common_10.1.3_mainnet', sourceBlockHash: H, sourceStateRoot: header.stateRoot,
+    actualBlockBaseFee: '10', executionBlobBaseFee: blob.blobBaseFeePerGas.toString(), sourceExcessBlobGas: excess.toString(),
+    blobVersionedHashes: [...result.apiRequest.blobVersionedHashes] });
+  Object.assign(output.feeAccounting, { kind: 'eip4844', maximumRequiredBalance: (5000000n + blobGas * 100n).toString(),
+    blobCount: String(count), blobGasUsed: blobGas.toString(), maxFeePerBlobGas: '100', blobBaseFeePerGas: blob.blobBaseFeePerGas.toString(), blobFeeBurn: burn.toString(),
+    totalUpfrontDebit: (600000n + burn).toString(), totalFeeCharge: (252000n + burn).toString(), totalFeeBurn: (210000n + burn).toString() });
+  return result;
+}
+function enterBlobFees(ui, cap = '100', hashes = [blobHash]) {
+  enableFees(ui); ui.elements.get('local-max-blob-fee').value = cap;
+  ui.elements.get('transaction-context').value = JSON.stringify({ blobVersionedHashes: hashes });
+}
+
+test('blob pricing selects only the local profile; missing, malformed, stray and excessive blob caps or counts do not dispatch', async () => {
+  const ui = setup(); chooseLocal(ui); enterBlobFees(ui, '9007199254740993'); await ui.context.run('simulation');
+  const body = JSON.parse(ui.requests[0].options.body); assert.equal(body.executionProfile, blobProfile);
+  assert.deepEqual(body.fees, { maxFeePerGas: '100', maxPriorityFeePerGas: '2', maxFeePerBlobGas: '9007199254740993' });
+  assert.deepEqual(body.blobVersionedHashes, [blobHash]); assert.deepEqual(body.queries, [query]);
+  for (const cap of ['', '01', '-1', '0x1', '1.0', '1e3', (1n << 256n).toString()]) {
+    const bad = setup(); chooseLocal(bad); enterBlobFees(bad, cap); await bad.context.run('simulation'); assert.equal(bad.requests.length, 0, cap);
+  }
+  const stray = setup(); chooseLocal(stray); enableFees(stray); stray.elements.get('local-max-blob-fee').value = '100';
+  await stray.context.run('simulation'); assert.equal(stray.requests.length, 0); assert.match(stray.elements.get('local-max-fee').validationMessage, /requires blob versioned hashes/);
+  for (const count of [9, 10]) {
+    const countUi = setup(); chooseLocal(countUi); enterBlobFees(countUi, '100', Array(count).fill(blobHash)); await countUi.context.run('simulation');
+    assert.equal(countUi.requests.length, count === 9 ? 1 : 0);
+  }
+  const unpriced = setup(); chooseLocal(unpriced); enterBlobFees(unpriced, 'invalid');
+  unpriced.elements.get('local-fees-enabled').checked = false; unpriced.elements.get('local-fees-enabled').dispatch('change');
+  await unpriced.context.run('simulation'); const plainBody = JSON.parse(unpriced.requests[0].options.body);
+  assert.equal(Object.hasOwn(plainBody, 'fees'), false); assert.equal(Object.hasOwn(plainBody, 'executionProfile'), false); assert.deepEqual(plainBody.blobVersionedHashes, [blobHash]);
+});
+
+test('blob fee field participates in reset, examples, busy locks, stale invalidation and pending fingerprints', async () => {
+  const ui = setup(); chooseLocal(ui); enterBlobFees(ui); ui.context.renderLocalResult(blobSample());
+  ui.elements.get('local-max-blob-fee').dispatch('input'); assert.equal(ui.state.result, null); assert.equal(ui.elements.get('download-json').disabled, true);
+  ui.state.config.standardEvm.examples = [{ id: 'blob', input: blobSample().apiRequest }, { id: 'plain', input: sample().apiRequest }];
+  ui.elements.get('example').value = 'blob'; ui.context.selectExample(); assert.equal(ui.elements.get('local-max-blob-fee').value, '100'); assert.equal(ui.elements.get('local-fees-enabled').checked, true);
+  ui.elements.get('example').value = 'plain'; ui.context.selectExample(); assert.equal(ui.elements.get('local-max-blob-fee').value, '');
+  enterBlobFees(ui); ui.elements.get('local-max-blob-fee').setCustomValidity('old'); ui.elements.get('simulation-form').dispatch('reset');
+  assert.equal(ui.elements.get('local-max-blob-fee').value, ''); assert.equal(ui.elements.get('local-max-blob-fee').validationMessage, ''); assert.equal(ui.elements.get('local-max-blob-fee').disabled, true);
+  let finish; const pending = setup(() => new Promise(resolve => { finish = resolve; })); chooseLocal(pending); enterBlobFees(pending);
+  const running = pending.context.run('simulation'); assert.equal(pending.elements.get('local-max-blob-fee').disabled, true);
+  pending.elements.get('local-max-blob-fee').value = '101'; finish({ ok: true, json: async () => blobSample() }); await running;
+  assert.equal(pending.state.result, null); assert.equal(pending.elements.get('local-max-blob-fee').disabled, false);
+  pending.elements.get('chain').value = '999'; pending.context.selectNetwork(); assert.equal(pending.elements.get('local-max-blob-fee').value, ''); assert.equal(pending.elements.get('local-max-blob-fee').disabled, true);
+});
+
+test('all pinned blob forks use exact integer pricing and retained execution, blob burn and total amounts', () => {
+  const ui = setup(); chooseLocal(ui); enterBlobFees(ui, '999999');
+  for (const [fork, rule] of Object.entries(blobForks)) for (const [multiple, expectedPrice] of [[0n, 1n], [1n, 2n], [2n, 7n], [3n, 20n]]) {
+    const result = blobSample({ fork, excess: rule[3] * multiple, count: rule[2], used: BigInt(rule[1]) * 131072n });
+    const fee = result.attempt.preview.original.output.feeAccounting; assert.equal(fee.blobBaseFeePerGas, expectedPrice.toString());
+    assert.deepEqual(plain(ui.context.localFeeAccounting(result)), fee, fork);
+    ui.context.renderLocalResult(result);
+    assert.match(ui.elements.get('gas-used').textContent, /execution fee: 252,000 wei · blob burn: .* wei · total fee:/);
+    assert(ui.elements.get('source-details').textContent.includes('Blob fee burned · wei' + fee.blobFeeBurn));
+    assert(ui.elements.get('source-details').textContent.includes('Total fee charged · wei' + fee.totalFeeCharge));
+    assert.match(ui.elements.get('source-details').textContent, /Block beneficiary tip · wei42000/);
+    assert.match(ui.elements.get('warnings-list').textContent, /Sidecars, KZG proofs and inclusion are not checked/);
+  }
+  for (const status of ['success', 'reverted', 'failed']) {
+    const result = blobSample(); result.execution.status = result.attempt.preview.original.output.execution.status = status; result.status = 'partial';
+    assert.notEqual(ui.context.localFeeAccounting(result), null); ui.context.renderLocalResult(result); assert.match(ui.elements.get('gas-used').textContent, /blob burn: 131,072 wei/);
+  }
+});
+
+test('blob fee displays reject malformed arithmetic, identities, fork limits, unbounded price and lost final-header binding', () => {
+  const ui = setup(), mutate = [
+    r => { r.source.canonicalStatus = 'unverified'; }, r => { r.status = 'unavailable'; }, r => { r.attempt.status = 'unavailable'; },
+    r => { r.attempt.preview.original.output.profile.feesSettled = false; }, r => { r.attempt.preview.original.output.execution.status = 'invalid'; },
+    r => { r.source.profile = feeProfile; }, r => { r.apiRequest.executionProfile = feeProfile; },
+    r => { r.apiRequest.to = null; }, r => { r.apiRequest.authorizationList = []; }, r => { r.apiRequest.fees.extra = '1'; },
+    r => { r.apiRequest.fees.maxFeePerBlobGas = '0'; }, r => { r.apiRequest.blobVersionedHashes = []; },
+    r => { r.apiRequest.blobVersionedHashes[0] = '0x02' + '44'.repeat(31); }, r => { r.apiRequest.blobVersionedHashes[0] = { toString: null }; },
+    r => { r.attempt.preview.original.output.profile.blobVersionedHashes.reverse(); },
+    r => { r.source.blockSelection.headerVerification.hardfork = 'prague'; }, r => { r.source.blockSelection.headerVerification.status = 'unverified'; },
+    r => { r.attempt.preview.original.output.profile.hardfork = 'shanghai'; }, r => { r.attempt.preview.original.output.profile.forkSchedule = 'other'; },
+    r => { r.source.blockSelection.header.hash = '0x' + '66'.repeat(32); }, r => { r.source.blockSelection.headerVerification.stateRoot = H; },
+    r => { r.source.blockSelection.headerVerification.number = '1'; }, r => { r.source.blockSelection.headerVerification.timestamp = '1'; },
+    r => { r.source.blockSelection.requested = 'latest'; }, r => { r.apiRequest.block = '0x1'; },
+    r => { r.source.blockSelection.header.excessBlobGas = '0x1'; }, r => { r.source.blockSelection.header.blobGasUsed = '0x1'; },
+    r => { r.source.blockSelection.header.blobGasUsed = '0x140000'; }, r => { r.source.blockSelection.header.excessBlobGas = '0x10000000000000000'; },
+    r => { r.source.blockSelection.header.excessBlobGas = '0xffffffffffffffff'; r.attempt.preview.original.output.profile.sourceExcessBlobGas = '18446744073709551615'; },
+    r => { r.source.blockSelection.header.gasLimit = '0x5208'; }, r => { r.source.blockSelection.header.baseFeePerGas = '0xb'; },
+    r => { r.attempt.preview.original.output.profile.executionBlobBaseFee = '2'; }, r => { r.attempt.preview.original.output.profile.sourceBlockHash = '0x' + '66'.repeat(32); },
+    r => { r.attempt.preview.original.output.feeAccounting.coinbase = { toString: null }; }, r => { r.attempt.preview.original.output.feeAccounting.blobFeeBurn = { toString: null }; },
+  ];
+  for (const key of ['maximumRequiredBalance', 'upfrontGasDebit', 'chargedGas', 'gasCharge', 'senderRefund', 'baseFeeBurn', 'coinbaseTip', 'blobCount', 'blobGasUsed', 'maxFeePerBlobGas', 'blobBaseFeePerGas', 'blobFeeBurn', 'totalUpfrontDebit', 'totalFeeCharge', 'totalFeeBurn']) {
+    mutate.push(r => { const f = r.attempt.preview.original.output.feeAccounting; f[key] = (BigInt(f[key]) + 1n).toString(); });
+  }
+  for (const change of mutate) {
+    const result = blobSample({ count: 2 }); change(result); ui.context.renderLocalResult(result);
+    assert.match(ui.elements.get('gas-used').textContent, /fee result unavailable/, change.toString());
+    assert.doesNotMatch(ui.elements.get('source-details').textContent, /Blob fee burned|Total fee charged|Execution fee charged/);
+    assert.deepEqual(JSON.parse(ui.elements.get('raw-json').textContent), result);
+  }
+  for (const fork of ['cancun', 'osaka', 'bpo1', 'bpo2']) assert.equal(ui.context.localFeeAccounting(blobSample({ fork, count: 7 })), null, fork);
+  const early = blobSample(); early.source.blockSelection.header.timestamp = '0x0'; assert.equal(ui.context.localFeeAccounting(early), null);
+});
+
+test('blob cleanup requires validated blob fee scope and loses its label when fee evidence fails', () => {
+  const ui = setup(), result = blobSample(); result.attempt.preview.original.output.lifecycle = { emptyAccountCleanup: {
+    basis: 'eip161_transaction_end', scope: 'unsigned_eip4844_transaction_touches', deletions: [{ address: T, scope: 'entire_account_including_code_and_storage', initialStorageRoot: H }] } };
+  ui.context.renderLocalResult(result); assert.match(ui.elements.get('source-details').textContent, /Empty accounts removed/);
+  result.attempt.preview.original.output.lifecycle.emptyAccountCleanup.scope = 'unsigned_eip1559_transaction_touches';
+  ui.context.renderLocalResult(result); assert.doesNotMatch(ui.elements.get('source-details').textContent, /Empty accounts removed/);
+  result.attempt.preview.original.output.lifecycle.emptyAccountCleanup.scope = 'unsigned_eip4844_transaction_touches'; result.attempt.preview.original.output.feeAccounting.blobFeeBurn = '0';
+  ui.context.renderLocalResult(result); assert.doesNotMatch(ui.elements.get('source-details').textContent, /Empty accounts removed/);
+});
+
+test('actual offline blob API response renders validated totals; canonical recheck failure withholds them', async () => {
+  const [{ blobFeeFixture, TARGET, TX_SENDER }, { simulateLocal }, { ProofRpcClient }] = await Promise.all([
+    import('../engines/local-evm/test/blob-fee-fixture.js'), import('../src/local-simulation.js'), import('../src/proof-rpc.js'),
+  ]);
+  for (const failFinal of [false, true]) {
+    const f = await blobFeeFixture({ fork: 'bpo2', excessBlobGas: 11684671n, blobCount: 2 }), ui = setup(); let headers = 0;
+    const rpc = new ProofRpcClient({ url: 'https://fixture.invalid', fetchImpl: async (_url, options) => {
+      const request = JSON.parse(options.body); let result;
+      if (request.method === 'eth_chainId') result = '0x1';
+      else if (request.method.startsWith('eth_getBlock')) result = ++headers > 1 && failFinal ? { ...f.header, transactions: [] } : f.header;
+      else result = await f.rpc.call(request.method, request.params);
+      return new Response(JSON.stringify({ jsonrpc: '2.0', id: request.id, result }));
+    } });
+    const report = await simulateLocal({ chainId: 1, ...f.request, block: f.header.hash,
+      queries: [{ to: TARGET, data: '0x70a08231' + TX_SENDER.slice(2).padStart(64, '0') }] }, rpc);
+    ui.context.renderLocalResult(report);
+    if (failFinal) { assert.equal(report.source.canonicalStatus, 'unverified'); assert.match(ui.elements.get('gas-used').textContent, /fee result unavailable/); assert.equal(ui.elements.get('coverage-status').textContent, '0 / 1 measured'); }
+    else { assert.equal(report.source.canonicalStatus, 'verified'); assert.deepEqual(plain(ui.context.localFeeAccounting(report)), report.attempt.preview.original.output.feeAccounting); assert.match(ui.elements.get('gas-used').textContent, /blob burn: 524,288 wei/); }
+  }
 });

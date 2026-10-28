@@ -28,7 +28,7 @@ export async function feeFixture({fork='osaka',baseFee=7n,maxFee=13n,priorityFee
   const supplied={ [TX_SENDER]:{nonce:1n,balance:1000000000000n,code:'0x',...sender},...(target===null?{}:{[TARGET]:target}),...accounts };
   const f=await lifecycleFixture({code:'0x00',accounts:supplied,limits});
   const [number,timestamp,length]=forks[fork];
-  Object.assign(f.header,{number:qty(number),timestamp:qty(timestamp),baseFeePerGas:qty(baseFee),miner:coinbase,gasUsed:'0x0'});
+  Object.assign(f.header,{number:qty(number),timestamp:qty(timestamp),baseFeePerGas:qty(baseFee),miner:coinbase,gasUsed:'0x0',blobGasUsed:'0x0'});
   for(const key of order.slice(length))delete f.header[key];
   f.header.hash=bytesToHex(keccak_256(RLP.encode(order.slice(0,length).map(k=>numeric.has(k)?integer(BigInt(f.header[k])):bytes(f.header[k])))));
   f.headerVerification=verifyEthereumHeader({header:f.header,expectedHash:f.header.hash});assert.equal(f.headerVerification.hardfork,fork);

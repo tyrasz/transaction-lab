@@ -147,7 +147,7 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     }
   }
   if (fees) {
-    const before = balance(fees.sender), debit = fees.plan.upfrontGasDebit;
+    const before = balance(fees.sender), debit = fees.plan.totalUpfrontDebit ?? fees.plan.upfrontGasDebit;
     need(before >= debit); balances.set(fees.sender, before - debit);
   }
   walk(output.trace, true, 0);
@@ -209,7 +209,9 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
   const emptyDeleted = new Set(), cleanup = lifecycle?.emptyAccountCleanup;
   if (cleanup !== undefined) {
     fields(cleanup, ['basis', 'scope', 'touchedAccounts', 'deletions']);
-    need(cleanup.basis === 'eip161_transaction_end' && cleanup.scope === (fees ? 'unsigned_eip1559_transaction_touches' : 'unsigned_message_touches_no_fee_settlement'));
+    const cleanupScope = !fees ? 'unsigned_message_touches_no_fee_settlement'
+      : fees.accounting.kind === 'eip4844' ? 'unsigned_eip4844_transaction_touches' : 'unsigned_eip1559_transaction_touches';
+    need(cleanup.basis === 'eip161_transaction_end' && cleanup.scope === cleanupScope);
     boundedArray(cleanup.touchedAccounts, 128); boundedArray(cleanup.deletions, 128); need(cleanup.deletions.length > 0);
     let previous = '';
     for (const address of cleanup.touchedAccounts) {

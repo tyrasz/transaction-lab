@@ -30,7 +30,7 @@ export function deriveVerifiedFees({ request, header, inputs, output }) {
 export function revertedFeeRows({ baseRows, fees, inputs }) {
   if (!fees) return baseRows;
   const rows = new Map(baseRows.map(row => [row.address, structuredClone(row)]));
-  const deltas = new Map([[fees.sender, -BigInt(fees.accounting.gasCharge)]]);
+  const deltas = new Map([[fees.sender, -BigInt(fees.accounting.totalFeeCharge ?? fees.accounting.gasCharge)]]);
   const coinbase = fees.plan.coinbase;
   deltas.set(coinbase, (deltas.get(coinbase) ?? 0n) + BigInt(fees.accounting.coinbaseTip));
   for (const [address, delta] of deltas) {

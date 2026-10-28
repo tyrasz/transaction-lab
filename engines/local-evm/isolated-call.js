@@ -181,11 +181,12 @@ async function executeIsolated(options, previewMode) {
     const environment = { chainId: 1, hardfork: ethereumCommon(header).hardfork(),
       number: ethereumQuantity(header.number).toString(), timestamp: ethereumQuantity(header.timestamp).toString(),
       gasLimit: ethereumQuantity(header.gasLimit).toString(), baseFeePerGas: feePlan?.baseFeePerGas.toString() ?? '0', mixHash: header.mixHash.toLowerCase(), miner: header.miner.toLowerCase(),
-      sourceBlockHash: header.hash, sourceParentHash: header.parentHash.toLowerCase(), sourceBlockIdentityVerified: false };
+      sourceBlockHash: header.hash, sourceParentHash: header.parentHash.toLowerCase(), sourceBlockIdentityVerified: false,
+      ...(feePlan?.blobContext ? { blobBaseFeePerGas: feePlan.blobContext.blobBaseFeePerGas.toString() } : {}) };
     if (complete || output.environment !== null) need(isDeepStrictEqual(output.environment, environment));
     if (complete || output.profile !== null) {
       const profile = {
-        name: feePlan ? 'ethereum_unsigned_eip1559_call' : 'ethereum_unsigned_unpriced_call', chainId: 1, hardfork: environment.hardfork,
+        name: call.executionProfile === 'unsigned_eip4844_block_end' ? 'ethereum_unsigned_eip4844_call' : feePlan ? 'ethereum_unsigned_eip1559_call' : 'ethereum_unsigned_unpriced_call', chainId: 1, hardfork: environment.hardfork,
         forkSchedule: 'pinned_ethereumjs_common_10.1.3_mainnet', sourceBlockHash: header.hash, sourceStateRoot: header.stateRoot.toLowerCase(),
         sourceBlockIdentityVerified: false, sourceStateProofVerified: false,
         actualBlockBaseFee: ethereumQuantity(header.baseFeePerGas).toString(), executionBaseFee: feePlan?.baseFeePerGas.toString() ?? '0', gasPrice: feePlan?.effectiveGasPrice.toString() ?? '0',

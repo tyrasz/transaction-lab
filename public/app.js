@@ -1,8 +1,9 @@
 const $ = (id) => document.getElementById(id);
 const state = { config: null, example: null, result: null, busy: false, benchmarkLoaded: false, sequenceDrafts: [], sequenceControls: [], nextCallKey: 1 };
-const requestFieldIds = ['chain', 'ethereum-engine', 'ethereum-call-mode', 'local-operation', 'local-gas', 'local-fees-enabled', 'local-max-fee', 'local-priority-fee', 'from', 'to', 'data', 'value', 'block', 'standard-manual-queries', 'standard-queries', 'transaction-context'];
+const requestFieldIds = ['chain', 'ethereum-engine', 'ethereum-call-mode', 'local-operation', 'local-gas', 'local-fees-enabled', 'local-max-fee', 'local-priority-fee', 'local-max-blob-fee', 'from', 'to', 'data', 'value', 'block', 'standard-manual-queries', 'standard-queries', 'transaction-context'];
 const DEFAULT_LOCAL_GAS = '5000000';
 const LOCAL_FEE_PROFILE = 'unsigned_eip1559_block_end';
+const LOCAL_BLOB_FEE_PROFILE = 'unsigned_eip4844_block_end';
 const ethereumMode = () => $('chain').value === '1';
 const localMode = () => ethereumMode() && $('ethereum-engine').value === 'local';
 const creationMode = () => localMode() && $('local-operation').value === 'create';
@@ -95,18 +96,26 @@ function resetLocalGas(value = '') {
 }
 
 function decimalWei(value) { return typeof value === 'string' && /^(?:0|[1-9][0-9]{0,77})$/.test(value) && BigInt(value) < (1n << 256n); }
-function readLocalFees() {
+function readLocalFees(context) {
   if (!$('local-fees-enabled').checked) return undefined;
   const maxFeePerGas = $('local-max-fee').value.trim(), maxPriorityFeePerGas = $('local-priority-fee').value.trim();
   if (!decimalWei(maxFeePerGas) || !decimalWei(maxPriorityFeePerGas)) throw new Error('Enter both fee amounts as whole wei, without commas or leading zeros.');
   if (BigInt(maxPriorityFeePerGas) > BigInt(maxFeePerGas)) throw new Error('Priority fee cannot exceed the maximum fee per gas.');
+  const maxFeePerBlobGas = $('local-max-blob-fee').value.trim(), hashes = context?.blobVersionedHashes;
+  if (hashes) {
+    if (!decimalWei(maxFeePerBlobGas)) throw new Error('Blob hashes require a maximum fee per blob gas in whole wei, without commas or leading zeros.');
+    if (hashes.length > 9) throw new Error('Priced blob calls accept at most nine hashes; the selected block may impose a lower limit.');
+    return { executionProfile: LOCAL_BLOB_FEE_PROFILE, fees: { maxFeePerGas, maxPriorityFeePerGas, maxFeePerBlobGas } };
+  }
+  if (maxFeePerBlobGas) throw new Error('A maximum fee per blob gas requires blob versioned hashes. Add the hashes to optional context, or clear the blob fee field.');
   return { executionProfile: LOCAL_FEE_PROFILE, fees: { maxFeePerGas, maxPriorityFeePerGas } };
 }
 function resetLocalFees(request = {}) {
-  $('local-fees-enabled').checked = request.executionProfile === LOCAL_FEE_PROFILE;
+  $('local-fees-enabled').checked = [LOCAL_FEE_PROFILE, LOCAL_BLOB_FEE_PROFILE].includes(request.executionProfile);
   $('local-max-fee').value = typeof request.fees?.maxFeePerGas === 'string' ? request.fees.maxFeePerGas : '';
   $('local-priority-fee').value = typeof request.fees?.maxPriorityFeePerGas === 'string' ? request.fees.maxPriorityFeePerGas : '';
-  for (const id of ['local-max-fee', 'local-priority-fee']) $(id).setCustomValidity('');
+  $('local-max-blob-fee').value = typeof request.fees?.maxFeePerBlobGas === 'string' ? request.fees.maxFeePerBlobGas : '';
+  for (const id of ['local-max-fee', 'local-priority-fee', 'local-max-blob-fee']) $(id).setCustomValidity('');
   $('local-fee-settings').open = false;
 }
 
@@ -266,6 +275,8 @@ function updateQueryMode() {
     $(id).disabled = state.busy || !feesEnabled; $(id).required = feesEnabled;
     if (!feesEnabled) $(id).setCustomValidity('');
   }
+  $('local-max-blob-fee').disabled = state.busy || !feesEnabled;
+  if (!feesEnabled) $('local-max-blob-fee').setCustomValidity('');
   if (standard) $('block-help').textContent = local
     ? `Use latest, a hexadecimal block number, or a block hash. Execution starts at the end of that block with your selected gas limit${feesEnabled ? ' and the selected block’s base fee.' : ' and no transaction fee settlement.'}`
     : 'Use latest, a hexadecimal block number, or a block hash. Execution starts at the end of that block with a fixed gas limit and no transaction fee settlement.';
@@ -1260,14 +1271,61 @@ function localMeasurementRows(result) {
   });
 }
 
+// Keep the finite schedule and bounded integer series aligned with
+// local-evm/ethereum-blob-fees.js and pinned Common 10.1.3. No floating point.
+function localBlobContext(api, profile, selection) {
+  const schedule = [
+    ['cancun', 1710338135n, 6n, 6n, 3338477n], ['prague', 1746612311n, 9n, 9n, 5007716n],
+    ['osaka', 1764798551n, 9n, 6n, 5007716n], ['bpo1', 1765290071n, 15n, 6n, 8346193n],
+    ['bpo2', 1767747671n, 21n, 6n, 11684671n],
+  ];
+  const header = selection?.header, verified = selection?.headerVerification;
+  const quantity = value => {
+    if (typeof value !== 'string' || value.length > 18 || !/^0x(?:0|[1-9a-f][0-9a-f]*)$/i.test(value)) throw Error('Malformed blob header quantity');
+    const n = BigInt(value); if (n >= 1n << 64n) throw Error('Blob header quantity exceeds uint64'); return n;
+  };
+  const timestamp = quantity(header?.timestamp), number = quantity(header?.number), excess = quantity(header?.excessBlobGas), used = quantity(header?.blobGasUsed);
+  const rule = schedule.filter(([, start]) => timestamp >= start).at(-1);
+  const word = value => typeof value === 'string' && /^0x[0-9a-f]{64}$/.test(value);
+  if (!rule || verified?.status !== 'verified' || verified.hardfork !== rule[0] || profile.hardfork !== rule[0]
+    || profile.forkSchedule !== 'pinned_ethereumjs_common_10.1.3_mainnet' || profile.chainId !== 1 || api.chainId !== 1
+    || profile.name !== 'ethereum_unsigned_eip4844_call' || !word(header.hash) || !word(header.stateRoot)
+    || selection.blockHash !== header.hash || verified.blockHash !== header.hash || profile.sourceBlockHash !== header.hash
+    || selection.blockNumber !== number.toString() || verified.number !== number.toString() || verified.timestamp !== timestamp.toString()
+    || verified.stateRoot !== header.stateRoot || profile.sourceStateRoot !== header.stateRoot || selection.requested !== api.block
+    || (api.block !== 'latest' && (word(api.block) ? api.block !== header.hash : quantity(api.block) !== number))) return null;
+  const hashes = api.blobVersionedHashes;
+  if (!Array.isArray(hashes) || hashes.length < 1 || BigInt(hashes.length) > rule[3]
+    || hashes.some(hash => typeof hash !== 'string' || !/^0x01[0-9a-f]{62}$/.test(hash))
+    || !Array.isArray(profile.blobVersionedHashes) || profile.blobVersionedHashes.length !== hashes.length
+    || hashes.some((hash, i) => hash !== profile.blobVersionedHashes[i]) || Object.hasOwn(api, 'authorizationList') || Object.hasOwn(profile, 'authorizationList')
+    || typeof api.to !== 'string' || !/^0x[0-9a-f]{40}$/.test(api.to) || profile.operation === 'create'
+    || used % 131072n !== 0n || used > rule[2] * 131072n || profile.sourceExcessBlobGas !== excess.toString()) return null;
+  let accumulator = rule[4], sum = 0n;
+  for (let i = 1n; i <= 1024n; i++) {
+    sum += accumulator;
+    if (sum >= (1n << 256n) * rule[4]) return null;
+    accumulator = accumulator * excess / (rule[4] * i);
+    if (accumulator === 0n) {
+      const price = sum / rule[4];
+      return profile.executionBlobBaseFee === price.toString() ? { count: BigInt(hashes.length), gas: BigInt(hashes.length) * 131072n, price } : null;
+    }
+  }
+  return null; // Never display a truncated or approximate price.
+}
+
 function localFeeAccounting(result) {
   const output = result.attempt?.preview?.original?.output, profile = output?.profile, fee = output?.feeAccounting, api = result.apiRequest;
+  const blob = api?.executionProfile === LOCAL_BLOB_FEE_PROFILE, expectedProfile = blob ? LOCAL_BLOB_FEE_PROFILE : LOCAL_FEE_PROFILE;
   if (!['complete', 'partial'].includes(result.status) || result.source?.canonicalStatus !== 'verified' || result.attempt?.status !== 'completed'
     || !['success', 'reverted', 'failed'].includes(result.execution?.status) || output?.execution?.status !== result.execution.status
-    || result.source.profile !== LOCAL_FEE_PROFILE || api?.executionProfile !== LOCAL_FEE_PROFILE || profile?.executionProfile !== LOCAL_FEE_PROFILE
-    || profile.feesSettled !== true || fee?.kind !== 'eip1559' || typeof fee.coinbase !== 'string' || !/^0x[0-9a-f]{40}$/.test(fee.coinbase)) return null;
+    || result.source.profile !== expectedProfile || api?.executionProfile !== expectedProfile || profile?.executionProfile !== expectedProfile
+    || profile.feesSettled !== true || fee?.kind !== (blob ? 'eip4844' : 'eip1559') || typeof fee.coinbase !== 'string' || !/^0x[0-9a-f]{40}$/.test(fee.coinbase)) return null;
   try {
-    if (!['maxFeePerGas', 'maxPriorityFeePerGas'].every(key => decimalWei(api.fees?.[key]) && profile.fees?.[key] === api.fees[key])) return null;
+    const capKeys = ['maxFeePerGas', 'maxPriorityFeePerGas', ...(blob ? ['maxFeePerBlobGas'] : [])];
+    if (!capKeys.every(key => decimalWei(api.fees?.[key]) && profile.fees?.[key] === api.fees[key])
+      || Object.keys(api.fees).length !== capKeys.length || Object.keys(profile.fees).length !== capKeys.length) return null;
+    if (!blob && (Object.hasOwn(api, 'blobVersionedHashes') || Object.hasOwn(profile, 'blobVersionedHashes'))) return null;
     if (!['gasLimit', 'effectiveGasPrice', 'baseFeePerGas', 'priorityFeePerGas', 'maximumRequiredBalance', 'upfrontGasDebit', 'chargedGas', 'gasCharge', 'senderRefund', 'baseFeeBurn', 'coinbaseTip'].every(key => decimalWei(fee[key]))) return null;
     const gas = readLocalGas(api.gas), header = result.source.blockSelection?.header;
     if (!gas || fee.gasLimit !== gas || profile.declaredGasLimit !== gas || fee.chargedGas !== output.gasAccounting?.gasUsed
@@ -1277,8 +1335,20 @@ function localFeeAccounting(result) {
     const cap = BigInt(api.fees.maxFeePerGas), maxTip = BigInt(api.fees.maxPriorityFeePerGas), base = BigInt(fee.baseFeePerGas);
     if (maxTip > cap || cap < base) return null;
     const tip = cap - base < maxTip ? cap - base : maxTip, price = base + tip, limit = BigInt(gas), charged = BigInt(fee.chargedGas);
+    let blobMaximum = 0n;
+    if (blob) {
+      const context = localBlobContext(api, profile, result.source.blockSelection);
+      if (!context || !['blobCount', 'blobGasUsed', 'maxFeePerBlobGas', 'blobBaseFeePerGas', 'blobFeeBurn', 'totalUpfrontDebit', 'totalFeeCharge', 'totalFeeBurn'].every(key => decimalWei(fee[key]))) return null;
+      const blobCap = BigInt(api.fees.maxFeePerBlobGas), burn = context.gas * context.price;
+      if (blobCap < context.price || fee.maxFeePerBlobGas !== api.fees.maxFeePerBlobGas || profile.actualBlockBaseFee !== fee.baseFeePerGas
+        || typeof header.gasLimit !== 'string' || !/^0x(?:0|[1-9a-f][0-9a-f]*)$/i.test(header.gasLimit) || header.gasLimit.length > 18 || limit > BigInt(header.gasLimit)
+        || BigInt(fee.blobCount) !== context.count || BigInt(fee.blobGasUsed) !== context.gas || BigInt(fee.blobBaseFeePerGas) !== context.price
+        || BigInt(fee.blobFeeBurn) !== burn || BigInt(fee.totalUpfrontDebit) !== limit * price + burn
+        || BigInt(fee.totalFeeCharge) !== charged * price + burn || BigInt(fee.totalFeeBurn) !== charged * base + burn) return null;
+      blobMaximum = context.gas * blobCap;
+    }
     if (charged > limit || BigInt(fee.priorityFeePerGas) !== tip || BigInt(fee.effectiveGasPrice) !== price
-      || BigInt(fee.maximumRequiredBalance) !== limit * cap + BigInt(api.value) || BigInt(fee.upfrontGasDebit) !== limit * price
+      || BigInt(fee.maximumRequiredBalance) !== limit * cap + BigInt(api.value) + blobMaximum || BigInt(fee.upfrontGasDebit) !== limit * price
       || BigInt(fee.gasCharge) !== charged * price || BigInt(fee.senderRefund) !== (limit - charged) * price
       || BigInt(fee.baseFeeBurn) !== charged * base || BigInt(fee.coinbaseTip) !== charged * tip) return null;
     return fee;
@@ -1296,8 +1366,8 @@ function renderLocalResult(result) {
   const reportedGas = result.apiRequest?.gas ?? result.attempt?.preview?.original?.output?.profile?.declaredGasLimit ?? DEFAULT_LOCAL_GAS;
   let gasLabel = 'Not available';
   try { gasLabel = numberLabel(readLocalGas(reportedGas)); } catch { /* Keep malformed result context explicit. */ }
-  const fee = localFeeAccounting(result), feeRequested = result.apiRequest?.executionProfile !== undefined || result.apiRequest?.fees !== undefined || result.source?.profile === LOCAL_FEE_PROFILE;
-  $('gas-used').textContent = `Gas limit: ${gasLabel} · ${fee ? `simulated fee: ${numberLabel(fee.gasCharge)} wei` : feeRequested ? 'fee result unavailable' : 'network fees excluded'}`;
+  const fee = localFeeAccounting(result), feeRequested = result.apiRequest?.executionProfile !== undefined || result.apiRequest?.fees !== undefined || [LOCAL_FEE_PROFILE, LOCAL_BLOB_FEE_PROFILE].includes(result.source?.profile);
+  $('gas-used').textContent = `Gas limit: ${gasLabel} · ${fee ? fee.kind === 'eip4844' ? `execution fee: ${numberLabel(fee.gasCharge)} wei · blob burn: ${numberLabel(fee.blobFeeBurn)} wei · total fee: ${numberLabel(fee.totalFeeCharge)} wei` : `simulated fee: ${numberLabel(fee.gasCharge)} wei` : feeRequested ? 'fee result unavailable' : 'network fees excluded'}`;
   $('coverage-label').textContent = 'Requested checks'; $('coverage-status').textContent = `${measured} / ${rows.length} measured`;
   $('coverage-status').className = rows.length > 0 && measured === rows.length ? 'success' : 'partial';
   $('coverage-detail').textContent = 'Explicit query list only · raw units';
@@ -1332,7 +1402,11 @@ function renderLocalResult(result) {
   const details = $('source-details'), selection = result.source?.blockSelection || {}; details.replaceChildren();
   for (const [label, value] of [['Engine', 'Independent local execution · experimental'], ['Profile', result.source?.profile], ['Requested state', selection.requested || result.apiRequest?.block], ['Resolved block', selection.blockNumber], ['Block hash', selection.blockHash], ['Block binding', result.source?.canonicalStatus], ['Sender', result.apiRequest?.from], ['Recipient', result.apiRequest?.to === null ? 'Contract deployment' : result.apiRequest?.to], ['Native value · wei', result.apiRequest?.value], ['Run ID', result.id]]) addDefinition(details, label, value);
   if (fee) {
-    for (const [label, key] of [['Gas charged', 'chargedGas'], ['Effective gas price · wei', 'effectiveGasPrice'], ['Fee charged in simulation · wei', 'gasCharge'], ['Unused upfront gas debit returned · wei', 'senderRefund'], ['Base fee burned · wei', 'baseFeeBurn'], ['Block beneficiary tip · wei', 'coinbaseTip']]) addDefinition(details, label, fee[key]);
+    for (const [label, key] of [['Gas charged', 'chargedGas'], ['Effective gas price · wei', 'effectiveGasPrice'], [fee.kind === 'eip4844' ? 'Execution fee charged · wei' : 'Fee charged in simulation · wei', 'gasCharge'], ['Unused upfront gas debit returned · wei', 'senderRefund'], ['Execution base fee burned · wei', 'baseFeeBurn'], ['Block beneficiary tip · wei', 'coinbaseTip']]) addDefinition(details, label, fee[key]);
+    if (fee.kind === 'eip4844') {
+      for (const [label, key] of [['Declared blobs', 'blobCount'], ['Blob gas used', 'blobGasUsed'], ['Blob base fee · wei', 'blobBaseFeePerGas'], ['Blob fee burned · wei', 'blobFeeBurn'], ['Total fee charged · wei', 'totalFeeCharge'], ['Total fee burned · wei', 'totalFeeBurn']]) addDefinition(details, label, fee[key]);
+      $('warnings-list').append(node('li', '', 'Blob fees are burned without refund or beneficiary tip. Sidecars, KZG proofs and inclusion are not checked. Measurement queries stay unpriced and receive no blob hashes.'));
+    }
     addDefinition(details, 'Block beneficiary', fee.coinbase);
     $('warnings-list').append(node('li', '', 'The simulated beneficiary tip is a fee allocation, not a claim about its surviving balance after account deletion.'));
   } else if (feeRequested) addDefinition(details, 'Transaction fees', 'Unavailable; no validated fee amounts are shown.');
@@ -1343,7 +1417,7 @@ function renderLocalResult(result) {
     $('warnings-list').append(node('li', '', 'The listed contracts are removed at the end of this call. They do not remain deployed after it.'));
   }
   const cleanup = original?.lifecycle?.emptyAccountCleanup;
-  if (['complete', 'partial'].includes(result.status) && ['success', 'reverted', 'failed'].includes(result.execution?.status) && original?.execution?.status === result.execution.status && result.source?.canonicalStatus === 'verified' && result.attempt?.status === 'completed' && cleanup?.basis === 'eip161_transaction_end' && cleanup.scope === (fee ? 'unsigned_eip1559_transaction_touches' : 'unsigned_message_touches_no_fee_settlement') && Array.isArray(cleanup.deletions) && cleanup.deletions.length > 0 && cleanup.deletions.length <= 128 && cleanup.deletions.every(row => typeof row.address === 'string' && /^0x[0-9a-f]{40}$/.test(row.address) && row.scope === 'entire_account_including_code_and_storage' && /^0x[0-9a-f]{64}$/.test(row.initialStorageRoot))) {
+  if (['complete', 'partial'].includes(result.status) && ['success', 'reverted', 'failed'].includes(result.execution?.status) && original?.execution?.status === result.execution.status && result.source?.canonicalStatus === 'verified' && result.attempt?.status === 'completed' && cleanup?.basis === 'eip161_transaction_end' && cleanup.scope === (fee ? fee.kind === 'eip4844' ? 'unsigned_eip4844_transaction_touches' : 'unsigned_eip1559_transaction_touches' : 'unsigned_message_touches_no_fee_settlement') && Array.isArray(cleanup.deletions) && cleanup.deletions.length > 0 && cleanup.deletions.length <= 128 && cleanup.deletions.every(row => typeof row.address === 'string' && /^0x[0-9a-f]{40}$/.test(row.address) && row.scope === 'entire_account_including_code_and_storage' && /^0x[0-9a-f]{64}$/.test(row.initialStorageRoot))) {
     addDefinition(details, 'Empty accounts removed', cleanup.deletions.map(row => row.address).join(', '));
   }
   $('timing').textContent = Number.isFinite(result.timing?.totalMs) ? `${(result.timing.totalMs / 1000).toFixed(2)}s total` : '';
@@ -1592,18 +1666,19 @@ async function run(mode) {
     $('local-gas').setCustomValidity('');
     try { gas = readLocalGas(); }
     catch (error) { $('local-gas-settings').open = true; $('local-gas').setCustomValidity(error.message); $('local-gas').reportValidity(); return; }
-    for (const id of ['local-max-fee', 'local-priority-fee']) $(id).setCustomValidity('');
-    try { feeContext = readLocalFees(); }
-    catch (error) { $('local-fee-settings').open = true; $('local-max-fee').setCustomValidity(error.message); $('local-max-fee').reportValidity(); return; }
   }
   if (standard && !sequence) {
     $('transaction-context').setCustomValidity('');
     try {
       context = readTransactionContext($('transaction-context').value);
       if (creationMode() && context?.blobVersionedHashes) throw new Error('Contract deployment cannot carry blob hashes. Remove blobVersionedHashes from the optional context.');
-      if (feeContext && context?.blobVersionedHashes) throw new Error('Transaction fees cannot be combined with blob context. Remove blobVersionedHashes or turn off transaction fees.');
     }
     catch (error) { $('transaction-context-settings').open = true; $('transaction-context').setCustomValidity(error.message); $('transaction-context').reportValidity(); return; }
+  }
+  if (localMode()) {
+    for (const id of ['local-max-fee', 'local-priority-fee', 'local-max-blob-fee']) $(id).setCustomValidity('');
+    try { feeContext = readLocalFees(context); }
+    catch (error) { $('local-fee-settings').open = true; $('local-max-fee').setCustomValidity(error.message); $('local-max-fee').reportValidity(); return; }
   }
   if (standard && manualQueries()) {
     $('standard-queries').setCustomValidity('');
@@ -1779,11 +1854,14 @@ for (const id of requestFieldIds) {
   if (id === 'chain' || id === 'ethereum-call-mode' || id === 'ethereum-engine') continue;
   const changed = () => {
     if (id === 'standard-queries') $('standard-queries').setCustomValidity('');
-    if (id === 'transaction-context') $('transaction-context').setCustomValidity('');
+    if (id === 'transaction-context') {
+      $('transaction-context').setCustomValidity('');
+      for (const feeId of ['local-max-fee', 'local-priority-fee', 'local-max-blob-fee']) $(feeId).setCustomValidity('');
+    }
     if (id === 'value') $('value').setCustomValidity('');
     if (id === 'local-gas') { $('local-gas').setCustomValidity(''); updateLocalGasSelection(); }
-    if (['local-fees-enabled', 'local-max-fee', 'local-priority-fee'].includes(id)) {
-      $('local-max-fee').setCustomValidity(''); $('local-priority-fee').setCustomValidity('');
+    if (['local-fees-enabled', 'local-max-fee', 'local-priority-fee', 'local-max-blob-fee'].includes(id)) {
+      for (const feeId of ['local-max-fee', 'local-priority-fee', 'local-max-blob-fee']) $(feeId).setCustomValidity('');
       if (id === 'local-fees-enabled') { $('transaction-context').setCustomValidity(''); updateQueryMode(); }
     }
     if (id === 'standard-manual-queries') updateQueryMode();

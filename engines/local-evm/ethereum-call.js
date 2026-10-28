@@ -3,7 +3,7 @@ import { ethereumCallGas, ethereumCommon, ethereumQuantity, ethereumUsedGas, eth
 
 import { normalizeEvmContext } from '../evm-context.js';
 import { normalizeAuthorizationList } from './authorization-list.js';
-import { normalizeEthereumFees, ethereumFeePlan } from './ethereum-fees.js';
+import { normalizeEthereumFees, ethereumFeePlan, ETHEREUM_BLOB_FEE_PROFILE } from './ethereum-fees.js';
 
 const ADDRESS = /^0x[0-9a-f]{40}$/i, WORD = /^0x[0-9a-f]{64}$/i;
 const input = (condition, message) => { if (!condition) throw profileError('LOCAL_ETHEREUM_INPUT_INVALID', message); };
@@ -30,9 +30,9 @@ export async function executeEthereumCall({ request, header, stateManager, block
     input(totalGas >= costs.minimum && totalGas <= 5000000n, 'The bounded gas limit must cover both intrinsic gas and the fork calldata floor.');
     feePlan = ethereumFeePlan(request, header);
     normalized = { from: request.from.toLowerCase(), to: request.to === null ? null : request.to.toLowerCase(), data: request.data.toLowerCase(), value: value.toString(), gasLimit: (totalGas - costs.intrinsic).toString(), ...context };
-    block = { ...Object.fromEntries(['number', 'timestamp', 'gasLimit', 'mixHash', 'miner', 'parentHash', 'hash'].map(k => [k, header[k]])), baseFeePerGas: feePlan ? sourceBaseFee.toString() : '0', ...(context.blobVersionedHashes ? { excessBlobGas: header.excessBlobGas } : {}) };
+    block = { ...Object.fromEntries(['number', 'timestamp', 'gasLimit', 'mixHash', 'miner', 'parentHash', 'hash'].map(k => [k, header[k]])), baseFeePerGas: feePlan ? sourceBaseFee.toString() : '0', ...(context.blobVersionedHashes ? { excessBlobGas: header.excessBlobGas } : {}), ...(feePlan?.blobContext ? { excessBlobGas: header.excessBlobGas, blobGasUsed: header.blobGasUsed } : {}) };
     profile = {
-      name: feePlan ? 'ethereum_unsigned_eip1559_call' : 'ethereum_unsigned_unpriced_call', chainId: 1, hardfork: common.hardfork(),
+      name: context.executionProfile === ETHEREUM_BLOB_FEE_PROFILE ? 'ethereum_unsigned_eip4844_call' : feePlan ? 'ethereum_unsigned_eip1559_call' : 'ethereum_unsigned_unpriced_call', chainId: 1, hardfork: common.hardfork(),
       forkSchedule: 'pinned_ethereumjs_common_10.1.3_mainnet', sourceBlockHash: header.hash.toLowerCase(), sourceStateRoot: header.stateRoot.toLowerCase(),
       sourceBlockIdentityVerified: false, sourceStateProofVerified: false,
       actualBlockBaseFee: sourceBaseFee.toString(), executionBaseFee: feePlan ? sourceBaseFee.toString() : '0', gasPrice: feePlan ? feePlan.effectiveGasPrice.toString() : '0',
@@ -42,14 +42,14 @@ export async function executeEthereumCall({ request, header, stateManager, block
       ...contextProfile,
     };
   } catch (error) {
-    const known = ['LOCAL_ETHEREUM_INPUT_INVALID', 'LOCAL_ETHEREUM_FORK_UNSUPPORTED'].includes(error?.code);
-    return { execution: { status: error?.code === 'LOCAL_ETHEREUM_FORK_UNSUPPORTED' ? 'unsupported' : 'invalid', error: { code: known ? error.code : 'LOCAL_ETHEREUM_INPUT_INVALID', message: known ? error.message : 'The Ethereum call input is incomplete or malformed.' }, executionGasUsed: null, returnData: null }, trace: null, logs: [], profile: null, stateDisposition: 'unchanged' };
+    const known = ['LOCAL_ETHEREUM_INPUT_INVALID', 'LOCAL_ETHEREUM_FORK_UNSUPPORTED', 'LOCAL_ETHEREUM_BLOB_PRICE_LIMIT'].includes(error?.code);
+    return { execution: { status: ['LOCAL_ETHEREUM_FORK_UNSUPPORTED', 'LOCAL_ETHEREUM_BLOB_PRICE_LIMIT'].includes(error?.code) ? 'unsupported' : 'invalid', error: { code: known ? error.code : 'LOCAL_ETHEREUM_INPUT_INVALID', message: known ? error.message : 'The Ethereum call input is incomplete or malformed.' }, executionGasUsed: null, returnData: null }, trace: null, logs: [], profile: null, stateDisposition: 'unchanged' };
   }
   const result = await executeUnsignedCall({ request: normalized, block, chainId: 1, stateManager, blockchain, limits, now });
   const complete = ['success', 'reverted', 'failed'].includes(result.execution.status);
   return {
     ...result, profile: feePlan ? { ...profile, feesSettled: complete } : profile,
     gasAccounting: complete ? Object.fromEntries(Object.entries(ethereumUsedGas({ messageGasUsed: BigInt(result.execution.executionGasUsed), refundCounter: BigInt(result.execution.gasRefundCounter) + (normalized.authorizationList ? BigInt(result.authorizationProcessing.gasRefundCounter) : 0n), intrinsic: costs.intrinsic, floor: costs.floor })).map(([k, v]) => [k, v.toString()])) : null,
-    gasAccountingScope: feePlan ? 'Unsigned EIP-1559 gas including intrinsic, one-fifth refund cap and active calldata floor; fees settled only on completed execution, without an outer signed-transaction validity claim.' : 'Unsigned call gas including intrinsic, one-fifth refund cap and active calldata floor; no fee settlement or signed-transaction validity claim.',
+    gasAccountingScope: normalized.executionProfile === ETHEREUM_BLOB_FEE_PROFILE ? 'Unsigned EIP-4844 execution gas including intrinsic, one-fifth refund cap and active calldata floor; execution and blob fees settled only on completed execution, without outer signature, sidecar or inclusion validation.' : feePlan ? 'Unsigned EIP-1559 gas including intrinsic, one-fifth refund cap and active calldata floor; fees settled only on completed execution, without an outer signed-transaction validity claim.' : 'Unsigned call gas including intrinsic, one-fifth refund cap and active calldata floor; no fee settlement or signed-transaction validity claim.',
   };
 }

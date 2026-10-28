@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { normalizeEthereumFees, ethereumFeePlan, settleEthereumFees, ETHEREUM_FEE_PROFILE } from '../ethereum-fees.js';
 
 const miner = '0x' + 'ab'.repeat(20), max = (1n << 256n) - 1n;
-const header = { baseFeePerGas: '17', gasLimit: '30000000', miner };
+const header = { number: '18000000', timestamp: '1681338455', baseFeePerGas: '17', gasLimit: '30000000', miner };
 const request = (changes = {}) => ({ executionProfile: ETHEREUM_FEE_PROFILE, fees: { maxFeePerGas: '30', maxPriorityFeePerGas: '5' }, gas: '100000', value: '7', ...changes });
 const invalid = fn => assert.throws(fn, { code: 'LOCAL_ETHEREUM_INPUT_INVALID' });
 

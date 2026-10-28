@@ -2,6 +2,7 @@ import { Common, Mainnet } from '@ethereumjs/common';
 import { normalizeEvmContext } from '../evm-context.js';
 import { normalizeAuthorizationList } from './authorization-list.js';
 import { normalizeEthereumFees } from './ethereum-fees.js';
+import { ethereumBlobContext } from './ethereum-blob-fees.js';
 
 const SUPPORTED = new Set(['shanghai', 'cancun', 'prague', 'osaka', 'bpo1', 'bpo2']);
 const BYTES = /^0x(?:[0-9a-f]{2})*$/i;
@@ -51,8 +52,8 @@ export function ethereumUsedGas({ messageGasUsed, refundCounter, intrinsic, floo
   return { beforeRefund, appliedRefund, floorAdjustment: floor > afterRefund ? floor - afterRefund : 0n, gasUsed: floor > afterRefund ? floor : afterRefund };
 }
 
-/** Optional context metadata is conditional so legacy response identity stays
- * unchanged. Actual blob fee settlement and KZG validation remain excluded. */
+/** Optional context metadata is conditional so the unpriced response identity
+ * stays unchanged. Priced block context does not establish KZG/sidecar validity. */
 export function ethereumContextProfile(request, header, common = ethereumCommon(header)) {
   const context = normalizeEvmContext(request), authorizationList = normalizeAuthorizationList(request), profile = { ...context, ...normalizeEthereumFees(request) };
   if (authorizationList) {
@@ -73,6 +74,10 @@ export function ethereumContextProfile(request, header, common = ethereumCommon(
     const excess = ethereumQuantity(header.excessBlobGas);
     if (excess >= 1n << 64n) throw profileError('LOCAL_ETHEREUM_INPUT_INVALID', 'Source excess blob gas exceeds uint64.');
     Object.assign(profile, { executionBlobBaseFee: '0', sourceExcessBlobGas: excess.toString() });
+  }
+  if (profile.executionProfile) {
+    const blobContext = ethereumBlobContext(header);
+    if (blobContext) Object.assign(profile, { executionBlobBaseFee: blobContext.blobBaseFeePerGas.toString(), sourceExcessBlobGas: blobContext.excessBlobGas.toString() });
   }
   return profile;
 }

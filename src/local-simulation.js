@@ -29,7 +29,7 @@ const freeze = value => { if (value && typeof value === 'object') { for (const c
 export const LOCAL_CAPABILITIES = freeze({
   available: true, chainId: 1, status: 'experimental', operation: 'isolated_proof_backed_unsigned_call',
   profile: 'unsigned_unpriced_block_end', blockSelection: ['latest', 'canonical_hex_number', 'block_hash'],
-  transactionContext: { optionalFields: ['accessList', 'blobVersionedHashes', 'authorizationList'], limits: { ...EVM_CONTEXT_LIMITS, authorizations: MAX_AUTHORIZATIONS }, blobFeeScope: 'synthetic_zero_no_blob_fee_settlement_or_sidecar_validation' },
+  transactionContext: { optionalFields: ['accessList', 'blobVersionedHashes', 'authorizationList'], limits: { ...EVM_CONTEXT_LIMITS, authorizations: MAX_AUTHORIZATIONS }, blobFeeScope: 'default_synthetic_zero_or_explicit_fork_priced_blob_fees_without_sidecar_validation' },
   senderCode: 'empty_or_exact_existing_EIP7702_delegation_on_Prague_or_later',
   authorizations: 'ordered_EIP7702_signed_tuples_on_Prague_or_later_before_unsigned_message_no_outer_signature_validation',
   internalCreation: 'CREATE_CREATE2_with_proven_empty_deployable_targets',
@@ -42,18 +42,19 @@ export const LOCAL_CAPABILITIES = freeze({
     scope: 'total_transaction_gas_including_intrinsic', selectedForkMinimumRequired: true, queryGas: '1000000' },
   feeSelection: { executionProfile: 'unsigned_eip1559_block_end', requiredFields: ['maxFeePerGas', 'maxPriorityFeePerGas'],
     encoding: 'canonical_decimal_uint256_wei_strings', default: 'unsigned_unpriced_block_end', blobContext: false,
+    blobProfile: { executionProfile: 'unsigned_eip4844_block_end', requiredFields: ['maxFeePerGas', 'maxPriorityFeePerGas', 'maxFeePerBlobGas'], requiredContext: 'nonempty_blobVersionedHashes', forkSpecificCountMaximum: true, sidecarsVerified: false },
     scope: 'original_execution_only', queryProfile: 'unsigned_unpriced_block_end', settlementRequiresCompleteValidatedOutput: true },
   limits: { queries: 8, calldataBytes: 32768, gas: 5000000, proofRpcCalls: 256, totalRpcCalls: 260,
     responseBytes: 8 * 1024 * 1024, wireBytes: 32 * 1024 * 1024, wallMs: WALL, drainMs: DRAIN, apiOutputBytes: RESPONSE },
   limitations: [
     'Only explicit query pairs are measured; automatic token discovery, native-effect summaries and sequences are not provided by this endpoint.',
     'Proofs and runtime code are checked against the selected header, whose hash is recomputed. Consensus, finality and contract identity are not independently established.',
-    'The default unsigned profile uses zero gas price and BASEFEE without fee settlement. The optional EIP-1559 profile uses the selected block base fee and caller fee caps; settlement is reported only for a complete validated execution. Neither profile validates an outer transaction signature. Contract signature checks still execute.',
+    'The default unsigned profile uses zero gas price and BASEFEE without fee settlement. Explicit EIP-1559 and EIP-4844 profiles use the selected block fee context and caller caps; settlement is reported only for a complete validated execution. No profile validates an outer transaction signature. Contract signature checks still execute.',
     'Optional gas selects the original transaction gas limit within 21,000–5,000,000; the selected fork also requires sufficient intrinsic gas and calldata floor. Each measurement query retains a separate 1,000,000 gas limit.',
     'Explicit to:null deploys initcode with CREATE; internal CREATE and CREATE2 require a proven deployable target with empty initial code/storage and zero nonce. Shanghai SELFDESTRUCT removes every committed execution account at transaction end. Cancun-or-later transfers preexisting balances while deleting only contracts created in that invocation.',
     'Transaction-end EIP-161 cleanup removes touched empty accounts and their entire storage, including the retained RIPEMD160 touch exception. The default profile adds no fee-related coinbase touch. Rematerializing a deleted account with original code, nonzero nonce or nonempty storage remains unsupported.',
-    'Optional fees require both maxFeePerGas and maxPriorityFeePerGas as raw wei strings and cannot accompany blob context. Measurement queries stay unpriced and do not repeat fee settlement.',
-    'Sender code must initially be empty or an exact existing EIP-7702 delegation on Prague or later. Up to sixteen signed authorization tuples may install, replace or clear delegations before a call; their changes survive message failure. Authorization lists cannot accompany deployment or blob context. Other coded senders and KZG point evaluation remain unsupported. Blob calls use zero blob base fee without sidecar or inclusion validation.',
+    'Optional fees require maxFeePerGas and maxPriorityFeePerGas as raw wei strings. The explicit EIP-4844 profile also requires maxFeePerBlobGas and nonempty versioned hashes; its actual blob charge is burned without refund or beneficiary tip. Measurement queries stay unpriced, receive no blob hashes, do not repeat fees and still do not support BLOBBASEFEE.',
+    'Sender code must initially be empty or an exact existing EIP-7702 delegation on Prague or later. Up to sixteen signed authorization tuples may install, replace or clear delegations before a call; their changes survive message failure. Authorization lists cannot accompany deployment or blob context. Other coded senders and KZG point evaluation remain unsupported. Default blob calls use zero blob base fee. Explicit priced calls derive BLOBBASEFEE from the verified current header and pinned fork parameters; parent excess evolution, sidecars and inclusion remain unverified.',
     'In-range BLOCKHASH follows authenticated parent headers within the shared read and time budgets; missing ancestry is unavailable.',
     'The pinned EthereumJS Shanghai-through-BPO2 schedule and fixed execution/state budgets bound supported execution.',
     'Process separation and a V8 heap limit are not an OS network/filesystem sandbox or a hard total-RSS limit.',
@@ -85,7 +86,7 @@ export function validateLocalSimulation(input) {
   try { authorizationList = normalizeAuthorizationList(input); } catch { throw new InputError('The authorization list must contain one to sixteen canonical bounded authorization tuples.'); }
   if (authorizationList && (input.to === null || context.blobVersionedHashes)) throw new InputError('Authorization lists require a call destination without blob context.');
   if (input.to === null && context.blobVersionedHashes) throw new InputError('Blob context requires a call destination; contract deployment cannot carry blob hashes.');
-  try { fees = normalizeEthereumFees(input); } catch { throw new InputError('Optional transaction fees require the unsigned_eip1559_block_end profile and canonical decimal uint256 maxFeePerGas and maxPriorityFeePerGas, with priority no higher than the cap and no blob context.'); }
+  try { fees = normalizeEthereumFees(input); } catch { throw new InputError('Transaction fees require an explicit supported profile and canonical decimal uint256 wei caps. EIP-1559 requires maxFeePerGas and maxPriorityFeePerGas without blobs; EIP-4844 additionally requires maxFeePerBlobGas and nonempty versioned hashes, without authorizations or deployment. Priority cannot exceed the execution fee cap.'); }
   try { queries = compilePreviewQueries(input.queries).map(row => structuredClone(row.descriptor)); }
   catch { throw new InputError('Supply one to eight distinct canonical token or typed position queries.'); }
   return { chainId: 1, from: input.from.toLowerCase(), to: input.to === null ? null : input.to.toLowerCase(), data: input.data.toLowerCase(), value, gas, block: block.toLowerCase(), queries, ...context, ...(authorizationList ? { authorizationList } : {}), ...fees };

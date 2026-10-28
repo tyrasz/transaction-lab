@@ -111,7 +111,10 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
         const totalGas = gasLimit + feeCosts.intrinsic;
         if (totalGas < feeCosts.minimum) reject('LOCAL_INVALID_INPUT', 'The priced envelope cannot cover the selected fork gas minimum.', 'invalid');
         feePlan = ethereumFeePlan({ ...request, value: value.toString(), gas: totalGas.toString() }, block);
-      } catch { reject('LOCAL_INVALID_INPUT', 'The explicit fee profile does not match the selected header or gas envelope.', 'invalid'); }
+      } catch (error) {
+        if (error?.code === 'LOCAL_ETHEREUM_BLOB_PRICE_LIMIT') reject(error.code, 'Blob base fee exceeds the bounded exact calculation profile.', 'unsupported');
+        reject('LOCAL_INVALID_INPUT', 'The explicit fee profile does not match the selected header or gas envelope.', 'invalid');
+      }
       semantics.gasPrice = feePlan.effectiveGasPrice.toString();
     }
     let observedCreation = false, observedSelfdestruct = false, observedCreatedSelfdestruct = false;
@@ -130,7 +133,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
         ? context.accessList ? 'sender_coinbase_fork_active_precompiles_and_declared_access_list_creation_target_warmed_by_EVM' : 'sender_coinbase_and_fork_active_precompiles_creation_target_warmed_by_EVM_no_access_list'
         : context.accessList ? 'sender_destination_coinbase_fork_active_precompiles_and_declared_access_list' : 'sender_destination_coinbase_and_fork_active_precompiles_no_access_list';
     }
-    environment = { chainId, hardfork: common.hardfork(), number: quantity(block.number).toString(), timestamp: quantity(block.timestamp).toString(), gasLimit: quantity(block.gasLimit).toString(), baseFeePerGas: quantity(block.baseFeePerGas).toString(), mixHash: block.mixHash.toLowerCase(), miner: address(block.miner), ...(block.hash ? { sourceBlockHash: block.hash.toLowerCase() } : {}), ...(block.parentHash ? { sourceParentHash: block.parentHash.toLowerCase() } : {}), sourceBlockIdentityVerified: false };
+    environment = { chainId, hardfork: common.hardfork(), number: quantity(block.number).toString(), timestamp: quantity(block.timestamp).toString(), gasLimit: quantity(block.gasLimit).toString(), baseFeePerGas: quantity(block.baseFeePerGas).toString(), mixHash: block.mixHash.toLowerCase(), miner: address(block.miner), ...(block.hash ? { sourceBlockHash: block.hash.toLowerCase() } : {}), ...(block.parentHash ? { sourceParentHash: block.parentHash.toLowerCase() } : {}), sourceBlockIdentityVerified: false, ...(feePlan?.blobContext ? { blobBaseFeePerGas: feePlan.blobContext.blobBaseFeePerGas.toString() } : {}) };
     activeManagers.add(stateManager); ownsManager = true;
     const methods = new Map();
     // Bind methods to the real manager; track every nested checkpoint so a host
@@ -222,9 +225,9 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
         observedSelfdestruct = true; describeLifecycle();
       }
       // On Ethereum, absent blob hashes are the empty transaction list: BLOBHASH
-      // returns zero through the fork-selected EVM opcode. BLOBBASEFEE still
-      // requires our explicit synthetic fee context; keep the legacy999 scope.
-      if ((step.opcode.code === 0x4a || (step.opcode.code === 0x49 && chainId !== 1)) && !context.blobVersionedHashes) reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is outside this local engine profile.', 'unsupported');
+      // returns zero through the fork-selected EVM opcode. Real BLOBBASEFEE
+      // belongs only to explicit priced contexts; unpriced probes stay fresh.
+      if (((step.opcode.code === 0x4a && !feePlan?.blobContext) || (step.opcode.code === 0x49 && chainId !== 1)) && !context.blobVersionedHashes) reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is outside this local engine profile.', 'unsupported');
       if (step.opcode.code >= 0xa0 && step.opcode.code <= 0xa4) bound('logs', ++usage.logOpcodes);
       if (active) active.pendingCall = callOpcodes.get(step.opcode.code) ?? createOpcodes.get(step.opcode.code) ?? null;
       if (callOpcodes.has(step.opcode.code) && step.stack.length >= 2) reserved('0x' + (step.stack.at(-2) & ((1n << 160n) - 1n)).toString(16).padStart(40, '0'));
@@ -274,7 +277,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     await guarded.checkpoint();
     if (feePlan) {
       const sender = createAddressFromString(from), account = await guarded.getAccount(sender) ?? new Account();
-      account.balance -= feePlan.upfrontGasDebit; await evm.journal.putAccount(sender, account);
+      account.balance -= feePlan.totalUpfrontDebit ?? feePlan.upfrontGasDebit; await evm.journal.putAccount(sender, account);
     }
     if (authorizationList !== undefined) {
       const sender = createAddressFromString(from), account = await guarded.getAccount(sender) ?? new Account();
@@ -305,7 +308,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       semantics.callerNonce = 'outer_increment_authorizations_and_committed_sender_creation_attempts';
       semantics.warmAddresses += '_and_recovered_authorities';
     }
-    const result = await evm.runCall({ caller: createAddressFromString(from), origin: createAddressFromString(from), ...(to ? { to: createAddressFromString(to) } : {}), data: hexToBytes(request.data), value, gasLimit, gasPrice: feePlan?.effectiveGasPrice ?? 0n, ...(authorizationList !== undefined ? { skipNonceIncrement: true } : {}), ...(context.blobVersionedHashes ? { blobVersionedHashes: [...context.blobVersionedHashes] } : {}), block: { header: { number: quantity(block.number), timestamp: quantity(block.timestamp), gasLimit: quantity(block.gasLimit), baseFeePerGas: quantity(block.baseFeePerGas), difficulty: 0n, prevRandao: hexToBytes(block.mixHash), coinbase: createAddressFromString(address(block.miner)), getBlobGasPrice() { if (context.blobVersionedHashes) return 0n; reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is unsupported.', 'unsupported'); } } } });
+    const result = await evm.runCall({ caller: createAddressFromString(from), origin: createAddressFromString(from), ...(to ? { to: createAddressFromString(to) } : {}), data: hexToBytes(request.data), value, gasLimit, gasPrice: feePlan?.effectiveGasPrice ?? 0n, ...(authorizationList !== undefined ? { skipNonceIncrement: true } : {}), ...(context.blobVersionedHashes ? { blobVersionedHashes: [...context.blobVersionedHashes] } : {}), block: { header: { number: quantity(block.number), timestamp: quantity(block.timestamp), gasLimit: quantity(block.gasLimit), baseFeePerGas: quantity(block.baseFeePerGas), difficulty: 0n, prevRandao: hexToBytes(block.mixHash), coinbase: createAddressFromString(address(block.miner)), getBlobGasPrice() { if (feePlan?.blobContext) return feePlan.blobContext.blobBaseFeePerGas; if (context.blobVersionedHashes) return 0n; reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is unsupported.', 'unsupported'); } } } });
     clockCheck();
     if (stack.length || checkpointDepth !== 1) reject('LOCAL_TRACE_INVALID', 'Local call-tree or checkpoint completion is inconsistent.');
     if (feePlan) {
@@ -346,7 +349,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       finally { deletions = stateManager.endEmptyAccountCleanup(); }
       clockCheck();
       if (deletions.length) {
-        emptyAccountCleanup = { basis: 'eip161_transaction_end', scope: feePlan ? 'unsigned_eip1559_transaction_touches' : 'unsigned_message_touches_no_fee_settlement', touchedAccounts, deletions };
+        emptyAccountCleanup = { basis: 'eip161_transaction_end', scope: feePlan?.blobGasUsed ? 'unsigned_eip4844_transaction_touches' : feePlan ? 'unsigned_eip1559_transaction_touches' : 'unsigned_message_touches_no_fee_settlement', touchedAccounts, deletions };
         semantics.lifecycle = (semantics.lifecycle === 'no_lifecycle_operation_encountered' ? '' : semantics.lifecycle + '_and_') + 'EIP161_empty_account_cleanup';
       }
     }
