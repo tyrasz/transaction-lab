@@ -32,4 +32,4 @@ Offline verification from the repository root:
 node research/ordinary-local-coverage-v1/verify.mjs reports/ordinary-local-coverage-v1 d1c82c2237351ce871ab7a789d72aee264a5006b51c6f42c1207a9cf144ecd40
 ```
 
-Keep the sealed capture and its archived sources unchanged. A separate supplemental audit is being prepared alongside this research directory.
+Keep the sealed capture and its archived sources unchanged. The [separate supplemental audit](../ordinary-local-coverage-v1-audit/NOTES.md) independently reproduced all 16 archived executions from saved proof/code responses, checked raw comparison channels and chronology, and passed 12 tamper controls. Its manifest SHA-256 is `1b0459606aa8c147abe0a3b3f8a5b7705be0b1ef127708523614a7a4ccc76f1e`. The audit explicitly reuses the frozen verifier for cryptographic proof/header and collector joins; it is not an independent opcode engine.
