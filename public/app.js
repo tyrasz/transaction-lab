@@ -1,8 +1,9 @@
 const $ = (id) => document.getElementById(id);
 const state = { config: null, example: null, result: null, busy: false, benchmarkLoaded: false, sequenceDrafts: [], sequenceControls: [], nextCallKey: 1 };
-const requestFieldIds = ['chain', 'ethereum-engine', 'ethereum-call-mode', 'from', 'to', 'data', 'value', 'block', 'standard-manual-queries', 'standard-queries', 'transaction-context'];
+const requestFieldIds = ['chain', 'ethereum-engine', 'ethereum-call-mode', 'local-operation', 'from', 'to', 'data', 'value', 'block', 'standard-manual-queries', 'standard-queries', 'transaction-context'];
 const ethereumMode = () => $('chain').value === '1';
 const localMode = () => ethereumMode() && $('ethereum-engine').value === 'local';
+const creationMode = () => localMode() && $('local-operation').value === 'create';
 const localAvailable = () => state.config?.localEvm?.available === true;
 const sequenceMode = () => ethereumMode() && !localMode() && $('ethereum-call-mode').value === 'sequence';
 const standardAvailable = () => state.config?.standardEvm?.available === true;
@@ -166,6 +167,7 @@ function selectExample({ initial = false } = {}) {
   const example = state.example;
   if (example) {
     const transaction = (ethereumMode() ? example.input : example.request) || {};
+    $('local-operation').value = localMode() && transaction.to === null ? 'create' : 'call';
     for (const field of sequenceMode() ? ['from'] : ['from', 'to', 'data', 'value']) $(field).value = transaction[field] ?? (field === 'data' ? '0x' : field === 'value' ? '0' : '');
     $('block').value = ethereumMode() ? transaction.block || 'latest' : 'latest';
     if (sequenceMode()) { state.sequenceDrafts = (transaction.calls || []).map(newSequenceDraft); renderSequenceEditor(); }
@@ -197,7 +199,7 @@ function updateQueryMode() {
     $('network-help').textContent = available ? local ? 'Experimental independent Ethereum preview. No connected wallet or signature needed.' : 'Experimental provider Ethereum preview. No connected wallet or signature needed.'
       : (local ? state.config?.localEvm?.reason : state.config?.standardEvm?.reason) || `The selected ${local ? 'local' : 'provider'} engine is unavailable in this workspace.`;
     $('network-help').classList.toggle('unavailable-note', !available);
-    $('empty-description').textContent = local ? 'Enter a call and one to eight explicit queries. The local preview reports execution separately from measured raw query values.' : 'Choose an example or enter your own inputs. The preview shows which ETH balances, token balances and allowances could be measured for the selected accounts.';
+    $('empty-description').textContent = local ? 'Enter a call or deployment and one to eight explicit queries. The local preview reports execution separately from measured raw query values.' : 'Choose an example or enter your own inputs. The preview shows which ETH balances, token balances and allowances could be measured for the selected accounts.';
   }
   $('ethereum-call-mode-field').hidden = !standard;
   $('ethereum-call-mode').disabled = state.busy || !standard || local;
@@ -209,6 +211,12 @@ function updateQueryMode() {
   $('value-help').hidden = sequence; $('sequence-editor').hidden = !sequence;
   $('simulate-label').textContent = local ? 'Run local preview' : sequence ? 'Simulate sequence' : 'Simulate';
   for (const id of ['to', 'data', 'value']) { $(id).disabled = state.busy || sequence; $(id).required = !sequence; if (sequence) $(id).setCustomValidity(''); }
+  $('local-operation-field').hidden = !local;
+  $('local-operation').disabled = state.busy || !local;
+  $('local-operation-help').hidden = !creationMode();
+  $('recipient-field').hidden = creationMode();
+  $('data-label').textContent = creationMode() ? 'Deployment bytecode' : 'Calldata';
+  if (creationMode()) { $('to').disabled = true; $('to').required = false; $('to').setCustomValidity(''); }
   $('standard-query-settings').hidden = !standard || sequence;
   $('transaction-context-settings').hidden = !standard || sequence;
   $('transaction-context').disabled = state.busy || !standard || sequence;
@@ -232,6 +240,7 @@ function selectNetwork({ initial = false } = {}) {
   const standard = ethereumMode();
   $('ethereum-engine').value = 'provider';
   $('ethereum-call-mode').value = 'single';
+  $('local-operation').value = 'call';
   state.sequenceDrafts = [newSequenceDraft(), newSequenceDraft()]; renderSequenceEditor();
   populateExampleOptions();
   for (const id of ['from', 'to']) $(id).value = '';
@@ -1235,7 +1244,7 @@ function renderLocalResult(result) {
     'Network fees and outer transaction signatures are not validated. Execution is not a security verdict.',
   ].map(text => node('li', '', text)));
   const details = $('source-details'), selection = result.source?.blockSelection || {}; details.replaceChildren();
-  for (const [label, value] of [['Engine', 'Independent local execution · experimental'], ['Profile', result.source?.profile], ['Requested state', selection.requested || result.apiRequest?.block], ['Resolved block', selection.blockNumber], ['Block hash', selection.blockHash], ['Block binding', result.source?.canonicalStatus], ['Sender', result.apiRequest?.from], ['Recipient', result.apiRequest?.to], ['Native value · wei', result.apiRequest?.value], ['Run ID', result.id]]) addDefinition(details, label, value);
+  for (const [label, value] of [['Engine', 'Independent local execution · experimental'], ['Profile', result.source?.profile], ['Requested state', selection.requested || result.apiRequest?.block], ['Resolved block', selection.blockNumber], ['Block hash', selection.blockHash], ['Block binding', result.source?.canonicalStatus], ['Sender', result.apiRequest?.from], ['Recipient', result.apiRequest?.to === null ? 'Contract deployment' : result.apiRequest?.to], ['Native value · wei', result.apiRequest?.value], ['Run ID', result.id]]) addDefinition(details, label, value);
   $('timing').textContent = Number.isFinite(result.timing?.totalMs) ? `${(result.timing.totalMs / 1000).toFixed(2)}s total` : '';
 }
 
@@ -1480,7 +1489,10 @@ async function run(mode) {
   let queries, context;
   if (standard && !sequence) {
     $('transaction-context').setCustomValidity('');
-    try { context = readTransactionContext($('transaction-context').value); }
+    try {
+      context = readTransactionContext($('transaction-context').value);
+      if (creationMode() && context?.blobVersionedHashes) throw new Error('Contract deployment cannot carry blob hashes. Remove blobVersionedHashes from the optional context.');
+    }
     catch (error) { $('transaction-context-settings').open = true; $('transaction-context').setCustomValidity(error.message); $('transaction-context').reportValidity(); return; }
   }
   if (standard && manualQueries()) {
@@ -1499,7 +1511,7 @@ async function run(mode) {
   try {
     const fingerprint = requestFingerprint();
     const body = sequence ? { chainId: 1, from: $('from').value.trim(), block: $('block').value.trim(), calls }
-      : mode === 'historical_trace' ? { chainId: Number(state.example.request.chainId), transactionHash: state.example.transactionHash } : { chainId: Number($('chain').value), from: $('from').value.trim(), to: $('to').value.trim(), data: $('data').value.trim(), value: $('value').value.trim(), block: $('block').value.trim() };
+      : mode === 'historical_trace' ? { chainId: Number(state.example.request.chainId), transactionHash: state.example.transactionHash } : { chainId: Number($('chain').value), from: $('from').value.trim(), to: creationMode() ? null : $('to').value.trim(), data: $('data').value.trim(), value: $('value').value.trim(), block: $('block').value.trim() };
     if (standard && queries !== undefined) body.queries = queries;
     if (context !== undefined) Object.assign(body, context);
     const result = await request(localMode() ? '/api/evm/local-preview' : sequence ? '/api/evm/simulate-sequence' : standard ? '/api/evm/simulate' : mode === 'historical_trace' ? '/api/replay' : '/api/simulate', body);
@@ -1629,6 +1641,10 @@ $('simulation-form').addEventListener('reset', () => { clearTransactionContexts(
 $('replay-button').addEventListener('click', () => run('historical_trace'));
 $('example').addEventListener('change', selectExample);
 $('chain').addEventListener('change', selectNetwork);
+$('local-operation').addEventListener('change', () => {
+  if (state.busy) return;
+  updateQueryMode(); clearResult({ inputsChanged: true });
+});
 $('ethereum-engine').addEventListener('change', () => {
   if (state.busy) return;
   const wasSequence = $('ethereum-call-mode').value === 'sequence';

@@ -46,7 +46,8 @@ async function executeIsolated(options, previewMode) {
     if (previewMode) compiledQueries = compilePreviewQueries(options.queries);
     request = decode(encode(options.request, 128 * 1024), 128 * 1024); fields(request, ['from', 'to', 'data', 'value', 'gas', 'accessList', 'blobVersionedHashes'], ['from', 'to', 'data', 'value', 'gas']);
     Object.assign(request, normalizeEvmContext(request));
-    need(['from', 'to'].every(k => typeof request[k] === 'string' && /^0x[0-9a-f]{40}$/i.test(request[k])));
+    need(typeof request.from === 'string' && /^0x[0-9a-f]{40}$/i.test(request.from));
+    need(request.to === null || (typeof request.to === 'string' && /^0x[0-9a-f]{40}$/i.test(request.to)));
     ethereumQuantity(request.value); const gas = ethereumQuantity(request.gas);
     header = decode(encode(options.header, 128 * 1024), 128 * 1024);
     headerVerification = verifyEthereumHeader({ header, expectedHash: header.hash });
@@ -163,6 +164,9 @@ async function executeIsolated(options, previewMode) {
     }
     if (complete) {
       need(output.stateDisposition === 'message_result_retained_in_supplied_manager');
+      const error = output.execution.error;
+      need(error === null || (typeof error === 'string' && error.length > 0));
+      need(output.execution.status === (error === null ? 'success' : error === 'revert' ? 'reverted' : 'failed'));
       const messageGasUsed = ethereumQuantity(output.execution.executionGasUsed), refundCounter = ethereumQuantity(output.execution.gasRefundCounter);
       need(messageGasUsed <= gas - costs.intrinsic);
       const accounting = ethereumUsedGas({ messageGasUsed, refundCounter, intrinsic: costs.intrinsic, floor: costs.floor });
@@ -170,7 +174,8 @@ async function executeIsolated(options, previewMode) {
     }
     if (complete || output.trace !== null) {
       const trace = output.trace;
-      need(trace?.type === 'CALL' && trace.from === call.from.toLowerCase() && trace.to === call.to.toLowerCase() && trace.executionAddress === call.to.toLowerCase() && trace.caller === call.from.toLowerCase() && trace.input === call.data.toLowerCase() && trace.value === '0x' + ethereumQuantity(call.value).toString(16) && trace.gas === '0x' + (gas - costs.intrinsic).toString(16));
+      need(trace?.type === (call.to === null ? 'CREATE' : 'CALL') && trace.from === call.from.toLowerCase() && trace.caller === call.from.toLowerCase() && trace.input === call.data.toLowerCase() && trace.value === '0x' + ethereumQuantity(call.value).toString(16) && trace.gas === '0x' + (gas - costs.intrinsic).toString(16));
+      if (call.to !== null) need(trace.to === call.to.toLowerCase() && trace.executionAddress === call.to.toLowerCase());
       if (complete) need(trace.output === output.execution.returnData && trace.error === output.execution.error && ethereumQuantity(trace.gasUsed) === ethereumQuantity(output.execution.executionGasUsed));
     }
   }
@@ -180,7 +185,7 @@ async function executeIsolated(options, previewMode) {
     need((allowNullOutput && result.output === null) || (result.output && ['success', 'reverted', 'failed', 'unsupported', 'unavailable', 'invalid'].includes(result.output.execution?.status)));
     validateInputs(result, count);
     executionContext(result.output, request, ['success', 'reverted', 'failed'].includes(result.output?.execution?.status));
-    validateExecutionChanges({ changes: result.changes, inputs: result.inputs, output: result.output, sender: request.from });
+    validateExecutionChanges({ changes: result.changes, inputs: result.inputs, output: result.output, sender: request.from, destination: request.to });
     for (const reads of [result.stateReads, result.inputReads]) validateReads(reads);
     return result;
   }

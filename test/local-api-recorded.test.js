@@ -164,9 +164,13 @@ function assertOriginal(report, c, saved) {
   assert.equal(report.attempt.isolation.processClosed, true); assert.equal(report.attempt.broker.pendingAtReturn, 0);
   const original = report.attempt.preview.original, normalized = structuredClone(original.output);
   assert.deepEqual(report.execution, original.output.execution);
-  // Only the generated remaining cooperative deadline varies with preparation.
+  // The generated remaining deadline varies with preparation. 0.17 also
+  // replaces the old blanket lifecycle policy with observed-operation metadata.
   assert.ok(Number.isSafeInteger(normalized.limits.wallMs) && normalized.limits.wallMs > 0 && normalized.limits.wallMs <= 120000);
   normalized.limits.wallMs = saved.output.limits.wallMs;
+  assert.equal(normalized.semantics.lifecycle, 'no_lifecycle_operation_encountered');
+  assert.equal(saved.output.semantics.lifecycle, 'CREATE_CREATE2_SELFDESTRUCT_unsupported');
+  normalized.semantics.lifecycle = saved.output.semantics.lifecycle;
   assert.deepEqual(normalized, saved.output); assert.deepEqual(original.changes, saved.changes);
   assert.deepEqual(original.inputs, saved.inputs); assert.deepEqual(original.stateReads, saved.stateReads);
   const omitDuration = rows => rows.map(({ durationMs, ...row }) => row);

@@ -90,6 +90,37 @@ test('empty manual queries block local dispatch and a changed fingerprint suppre
   assert.equal(ui.state.result, null); assert.equal(ui.elements.get('result-content').hidden, true); assert.equal(ui.elements.get('download-json').disabled, true);
 });
 
+test('deployment selection sends explicit null only to local execution and restores the call recipient on engine change', async () => {
+  const ui = setup(); chooseLocal(ui);
+  ui.elements.get('local-operation').value = 'create'; ui.elements.get('local-operation').dispatch('change');
+  assert.equal(ui.elements.get('recipient-field').hidden, true);
+  assert.equal(ui.elements.get('to').disabled, true); assert.equal(ui.elements.get('to').required, false);
+  assert.equal(ui.elements.get('data-label').textContent, 'Deployment bytecode');
+  await ui.context.run('simulation');
+  assert.equal(ui.requests[0].url, '/api/evm/local-preview');
+  assert.equal(JSON.parse(ui.requests[0].options.body).to, null);
+  ui.elements.get('ethereum-engine').value = 'provider'; ui.elements.get('ethereum-engine').dispatch('change');
+  assert.equal(ui.elements.get('local-operation-field').hidden, true);
+  assert.equal(ui.elements.get('recipient-field').hidden, false);
+  assert.equal(ui.elements.get('to').disabled, false); assert.equal(ui.elements.get('to').required, true);
+  await ui.context.run('simulation');
+  assert.equal(ui.requests[1].url, '/api/evm/simulate');
+  assert.equal(JSON.parse(ui.requests[1].options.body).to, T);
+});
+
+test('deployment rejects blob context before dispatch and changes invalidate pending results', async () => {
+  const invalid = setup(); chooseLocal(invalid); invalid.elements.get('local-operation').value = 'create';
+  invalid.elements.get('transaction-context').value = JSON.stringify({ blobVersionedHashes: ['0x01' + '11'.repeat(31)] });
+  await invalid.context.run('simulation'); assert.equal(invalid.requests.length, 0);
+  assert.match(invalid.elements.get('transaction-context').validationMessage, /deployment cannot carry blob hashes/);
+  let finish; const ui = setup(() => new Promise(resolve => { finish = resolve; })); chooseLocal(ui);
+  const running = ui.context.run('simulation');
+  assert.equal(ui.elements.get('local-operation').disabled, true);
+  ui.elements.get('local-operation').value = 'create';
+  finish({ ok: true, json: async () => sample() }); await running;
+  assert.equal(ui.state.result, null); assert.equal(ui.elements.get('download-json').disabled, true);
+});
+
 test('local exact values remain raw, identities explicit, full JSON intact, provider summaries hidden', () => {
   const ui = setup(), result = sample(); ui.context.renderLocalResult(result);
   const section = ui.elements.get('local-measurements');

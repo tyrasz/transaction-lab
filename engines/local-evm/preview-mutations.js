@@ -4,7 +4,8 @@ const SCOPE = 'Demanded proof-verified inputs and local overlay writes only; no 
 const ADDRESS = /^0x[0-9a-f]{40}$/, WORD = /^0x[0-9a-f]{64}$/, DATA = /^0x(?:[0-9a-f]{2})*$/;
 const UINT256 = (1n << 256n) - 1n, UINT64 = (1n << 64n) - 1n;
 const MAX_ACCOUNTS = 128, MAX_SLOTS = 1024, MAX_CODE_BYTES = 24576;
-const EXISTENCE_BASES = ['unsigned_sender_nonce_materialization', 'positive_native_funding_of_proof_absent_account', 'internal_contract_creation'];
+const CREATION_BASES = ['internal_contract_creation', 'top_level_contract_creation'];
+const EXISTENCE_BASES = ['unsigned_sender_nonce_materialization', 'positive_native_funding_of_proof_absent_account', ...CREATION_BASES];
 const ZERO_WORD = '0x' + '00'.repeat(32);
 
 export class QueryMutationError extends Error {
@@ -66,7 +67,7 @@ function canonical(snapshot) {
         seen.add(value.slot); return { slot: value.slot, before: value.before, after: value.after };
       }).sort((a, b) => a.slot < b.slot ? -1 : a.slot > b.slot ? 1 : 0);
     }
-    const creation = row.existence?.basis === 'internal_contract_creation';
+    const creation = CREATION_BASES.includes(row.existence?.basis);
     if (creation || row.code) {
       // Deployment starts from nonce0 and a proven empty code/storage state.
       // A prefunded deployable target already existed, so has no existence row.

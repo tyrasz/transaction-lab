@@ -50,7 +50,12 @@ test('real saved proof/code wire replays in an actual fixed worker with exact ob
     return structuredClone(row.parsed.result); // Proof/code only; no expected output enters the child.
   } } });
   assert.equal(mismatch, null); assert.equal(at, 11); assert.equal(result.status, 'completed'); assert.equal(result.error, null);
-  assert.deepEqual(result.output, recorded.output); assert.deepEqual(result.inputs, recorded.inputs);
+  const normalized = structuredClone(result.output);
+  // 0.17 changes only this descriptive label for ordinary Ethereum calls.
+  assert.equal(normalized.semantics.lifecycle, 'no_lifecycle_operation_encountered');
+  assert.equal(recorded.output.semantics.lifecycle, 'CREATE_CREATE2_SELFDESTRUCT_unsupported');
+  normalized.semantics.lifecycle = recorded.output.semantics.lifecycle;
+  assert.deepEqual(normalized, recorded.output); assert.deepEqual(result.inputs, recorded.inputs);
   assert.deepEqual(result.changes, recorded.changes); assert.deepEqual(result.stateReads, recorded.stateReads);
   assert.deepEqual(result.headerVerification, recorded.headerVerification);
   assert.equal(result.isolation.processSeparated, true); assert.notEqual(result.isolation.childPid, process.pid);

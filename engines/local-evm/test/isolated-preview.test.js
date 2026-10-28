@@ -72,6 +72,11 @@ function sameOriginalOutput(actual, expected = recorded.output) {
   assert.ok(Number.isSafeInteger(actual.limits.wallMs) && actual.limits.wallMs > 0 && actual.limits.wallMs <= 120000);
   const normalized = structuredClone(actual);
   normalized.limits.wallMs = expected.limits.wallMs;
+  // The 0.17 lifecycle label describes observed activity, replacing the old
+  // blanket unsupported policy; no execution/state evidence is normalized.
+  assert.equal(normalized.semantics.lifecycle, 'no_lifecycle_operation_encountered');
+  assert.equal(expected.semantics.lifecycle, 'CREATE_CREATE2_SELFDESTRUCT_unsupported');
+  normalized.semantics.lifecycle = expected.semantics.lifecycle;
   assert.deepEqual(normalized, expected);
 }
 

@@ -60,7 +60,7 @@ test('local input is normalized independently, with explicit bounded queries and
   const normalized = validateLocalSimulation(input);
   assert.equal(normalized.block, 'latest'); assert.deepEqual(normalized.queries, [query]);
   assert.equal(LOCAL_CAPABILITIES.querySelection, 'explicit_only');
-  for (const change of [{ chainId: 8453 }, { queries: undefined }, { queries: [] }, { queries: [query, query] }, { gas: '1' }, { stateOverrides: {} }, { value: '0x0' }, { block: 'pending' }, { to: null }, { data: '0xa' }]) {
+  for (const change of [{ chainId: 8453 }, { queries: undefined }, { queries: [] }, { queries: [query, query] }, { gas: '1' }, { stateOverrides: {} }, { value: '0x0' }, { block: 'pending' }, { to: undefined }, { data: '0xa' }]) {
     await assert.rejects(simulateLocal({ ...input, ...change }, { call() { assert.fail('Invalid input reached RPC'); } }), InputError);
   }
   const bad = { ...input }; Object.defineProperty(bad, 'from', { get() { assert.fail('Accessor executed'); }, enumerable: true });
@@ -122,10 +122,22 @@ test('completed revert retains execution and independently measured zero effect,
   const result = await simulateLocal(input, revert.rpc);
   assert.equal(result.status, 'complete'); assert.equal(result.execution.status, 'reverted');
   assert.equal(result.measurements[0].values[0].deltaRaw, '0');
-  const unsupported = await fixture({ original: '6000ff' });
+  const unsupported = await fixture({ original: '626000ff6000526003601d6000f000' });
   const unavailable = await simulateLocal(input, unsupported.rpc);
   assert.equal(unavailable.status, 'unavailable'); assert.equal(unavailable.execution.status, 'unsupported');
   assert.equal(unavailable.measurements[0].status, 'not_attempted'); assert.equal(unavailable.measurements[0].values, null);
+});
+
+test('Cancun existing-contract SELFDESTRUCT retains storage queries and reports native balance transfer', async () => {
+  const f = await fixture({ original: '6000ff' }), result = await simulateLocal(input, f.rpc);
+  assert.equal(result.status, 'complete'); assert.equal(result.execution.status, 'success');
+  assert.equal(result.source.canonicalStatus, 'verified');
+  const original = result.attempt.preview.original, source = original.changes.accounts.find(row => row.address === A);
+  assert.equal(source.balance.after, '0x0'); assert.equal(source.code, undefined); assert.equal(source.storage, undefined);
+  assert.equal(original.changes.accounts.some(row => row.existence?.after === false), false);
+  assert.equal(result.measurements[0].values[0].beforeRaw, '7');
+  assert.equal(result.measurements[0].values[0].afterRaw, '7');
+  assert.equal(result.measurements[0].values[0].deltaRaw, '0');
 });
 
 test('query mutation produces partial availability; proof failures do not leak provider text', async () => {

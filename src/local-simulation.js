@@ -28,6 +28,8 @@ export const LOCAL_CAPABILITIES = freeze({
   profile: 'unsigned_unpriced_block_end', blockSelection: ['latest', 'canonical_hex_number', 'block_hash'],
   transactionContext: { optionalFields: ['accessList', 'blobVersionedHashes'], limits: EVM_CONTEXT_LIMITS, blobFeeScope: 'synthetic_zero_no_blob_fee_settlement_or_sidecar_validation' },
   internalCreation: 'CREATE_CREATE2_with_proven_empty_deployable_targets',
+  topLevelCreation: 'explicit_null_destination_CREATE_with_proven_empty_deployable_target',
+  selfdestruct: 'Cancun_or_later_preexisting_contract_balance_transfer_without_deletion',
   historicalBlockHashes: 'authenticated_parent_hash_chain_with_shared_input_limits',
   querySelection: 'explicit_only', queryTypes: ['balanceOf', 'allowance', 'aave_v3_user_account_data', 'morpho_blue_position'],
   limits: { queries: 8, calldataBytes: 32768, gas: 5000000, proofRpcCalls: 256, totalRpcCalls: 260,
@@ -36,7 +38,8 @@ export const LOCAL_CAPABILITIES = freeze({
     'Only explicit query pairs are measured; automatic token discovery, native-effect summaries and sequences are not provided by this endpoint.',
     'Proofs and runtime code are checked against the selected header, whose hash is recomputed. Consensus, finality and contract identity are not independently established.',
     'Unsigned execution uses zero gas price and BASEFEE, without outer signature validation or fee settlement. Contract signature checks still execute.',
-    'Internal CREATE and CREATE2 require a proven deployable target. Top-level creation, SELFDESTRUCT, coded senders and KZG point evaluation remain unsupported. Explicit blob context uses zero blob base fee without sidecar or inclusion validation.',
+    'Explicit to:null deploys initcode with CREATE; internal CREATE and CREATE2 require a proven deployable target. Cancun-or-later SELFDESTRUCT supports existing contracts without deletion; same-invocation creation/destruction, Shanghai destruction and empty-account cleanup remain unsupported.',
+    'Coded senders and KZG point evaluation remain unsupported. Blob context requires a call destination and uses zero blob base fee without sidecar or inclusion validation.',
     'In-range BLOCKHASH follows authenticated parent headers within the shared read and time budgets; missing ancestry is unavailable.',
     'The pinned EthereumJS Shanghai-through-BPO2 schedule and fixed execution/state budgets bound supported execution.',
     'Process separation and a V8 heap limit are not an OS network/filesystem sandbox or a hard total-RSS limit.',
@@ -54,7 +57,8 @@ function record(value, allowed) {
 export function validateLocalSimulation(input) {
   record(input, ['chainId', 'from', 'to', 'data', 'value', 'block', 'queries', 'accessList', 'blobVersionedHashes']);
   if (input.chainId !== 1 && input.chainId !== '1') throw new InputError('Only Ethereum chain 1 is supported.', 'UNSUPPORTED_CHAIN');
-  for (const field of ['from', 'to']) if (typeof input[field] !== 'string' || !ADDRESS.test(input[field])) throw new InputError(`${field} must be a 20-byte hex address.`);
+  if (typeof input.from !== 'string' || !ADDRESS.test(input.from)) throw new InputError('from must be a 20-byte hex address.');
+  if (input.to !== null && (typeof input.to !== 'string' || !ADDRESS.test(input.to))) throw new InputError('to must be a 20-byte hex address, or explicit null for contract deployment.');
   if (typeof input.data !== 'string' || input.data.length > 65538 || !DATA.test(input.data)) throw new InputError('data must be even-length hexadecimal calldata of at most 32 KiB.');
   const value = input.value === undefined ? '0' : input.value;
   if (typeof value !== 'string' || !DECIMAL.test(value) || BigInt(value) > MAX) throw new InputError('value must be a canonical decimal uint256 wei string.');
@@ -62,9 +66,10 @@ export function validateLocalSimulation(input) {
   if (typeof block !== 'string' || !(block === 'latest' || NUMBER.test(block) || HASH.test(block))) throw new InputError('block must be latest, a canonical hexadecimal number, or a 32-byte block hash.');
   let queries, context;
   try { context = normalizeEvmContext(input); } catch { throw new InputError('The access list or versioned blob hashes are malformed or exceed the declared bounds.'); }
+  if (input.to === null && context.blobVersionedHashes) throw new InputError('Blob context requires a call destination; contract deployment cannot carry blob hashes.');
   try { queries = compilePreviewQueries(input.queries).map(row => structuredClone(row.descriptor)); }
   catch { throw new InputError('Supply one to eight distinct canonical token or typed position queries.'); }
-  return { chainId: 1, from: input.from.toLowerCase(), to: input.to.toLowerCase(), data: input.data.toLowerCase(), value, block: block.toLowerCase(), queries, ...context };
+  return { chainId: 1, from: input.from.toLowerCase(), to: input.to === null ? null : input.to.toLowerCase(), data: input.data.toLowerCase(), value, block: block.toLowerCase(), queries, ...context };
 }
 
 function projection(core) {

@@ -14,17 +14,17 @@ export async function executeEthereumCall({ request, header, stateManager, block
   try {
     const context = normalizeEvmContext(request);
     input(['data', 'from', 'gas', 'to', 'value'].every(key => Object.hasOwn(request, key)) && Object.keys(request).every(key => ['data', 'from', 'gas', 'to', 'value', 'accessList', 'blobVersionedHashes'].includes(key)), 'Only the unsigned envelope and declared access-list/blob-hash context are accepted.');
-    input(ADDRESS.test(request.from) && ADDRESS.test(request.to), 'Explicit sender and recipient addresses are required.');
+    input(typeof request.from === 'string' && ADDRESS.test(request.from) && (request.to === null || (typeof request.to === 'string' && ADDRESS.test(request.to))), 'An explicit sender and recipient address or null creation destination are required.');
     common = ethereumCommon(header);
     input(header && WORD.test(header.hash) && WORD.test(header.parentHash) && WORD.test(header.stateRoot) && WORD.test(header.mixHash) && ADDRESS.test(header.miner), 'A source header with block hashes, state root, randomness and coinbase is required.');
     for (const field of ['number', 'timestamp', 'gasLimit']) input(ethereumQuantity(header[field]) < 1n << 64n, 'Header quantities exceed uint64.');
     input(ethereumQuantity(header.gasLimit) > 0n, 'A nonzero block gas limit is required.');
     const sourceBaseFee = ethereumQuantity(header.baseFeePerGas), value = ethereumQuantity(request.value);
     totalGas = ethereumQuantity(request.gas);
-    const contextProfile = ethereumContextProfile(context, header, common);
-    costs = ethereumCallGas(request.data, common, context);
+    const contextProfile = ethereumContextProfile(request, header, common);
+    costs = ethereumCallGas(request.data, common, request);
     input(totalGas >= costs.minimum && totalGas <= 5000000n, 'The bounded gas limit must cover both intrinsic gas and the fork calldata floor.');
-    normalized = { from: request.from.toLowerCase(), to: request.to.toLowerCase(), data: request.data.toLowerCase(), value: value.toString(), gasLimit: (totalGas - costs.intrinsic).toString(), ...context };
+    normalized = { from: request.from.toLowerCase(), to: request.to === null ? null : request.to.toLowerCase(), data: request.data.toLowerCase(), value: value.toString(), gasLimit: (totalGas - costs.intrinsic).toString(), ...context };
     block = { ...Object.fromEntries(['number', 'timestamp', 'gasLimit', 'mixHash', 'miner', 'parentHash', 'hash'].map(k => [k, header[k]])), baseFeePerGas: '0', ...(context.blobVersionedHashes ? { excessBlobGas: header.excessBlobGas } : {}) };
     profile = {
       name: 'ethereum_unsigned_unpriced_call', chainId: 1, hardfork: common.hardfork(),

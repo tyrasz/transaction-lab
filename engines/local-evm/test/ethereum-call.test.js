@@ -101,7 +101,7 @@ test('code-bearing sender and lifecycle operations remain explicit unsupported o
 });
 
 test('unsupported transaction extras and malformed inputs are rejected before state reads', async () => {
-  for (const change of [f => { f.request.accessList = [{ address: TO, storageKeys: ['0x1'] }]; }, f => { f.request.authorizationList = []; }, f => { f.request.blobVersionedHashes = []; }, f => { f.request.value = '-1'; }, f => { f.request.gas = '0x00'; }, f => { delete f.header.stateRoot; }, f => { f.request.to = null; }]) {
+  for (const change of [f => { f.request.accessList = [{ address: TO, storageKeys: ['0x1'] }]; }, f => { f.request.authorizationList = []; }, f => { f.request.blobVersionedHashes = []; }, f => { f.request.value = '-1'; }, f => { f.request.gas = '0x00'; }, f => { delete f.header.stateRoot; }, f => { delete f.request.to; }]) {
     const f = await fixture(); change(f); const r = await executeEthereumCall(f); assert.equal(r.execution.status, 'invalid'); assert.equal(f.stateManager.snapshotReads().total, 0); assert.deepEqual(f.stateManager.snapshotChanges().accounts, []);
   }
 });

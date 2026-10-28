@@ -16,7 +16,7 @@ function fail(code, message) { throw Object.assign(new Error(message), { code })
  * Lazy facts are seeded into every existing checkpoint: discovering an input
  * inside a reverted child never turns that input into an invented zero. */
 class ProofStateManager extends SimpleStateManager {
-  constructor(inputs) { super(); this.inputs = inputs; this.base = new Map(); this.loading = new Map(); this.slotLoading = new Map(); this.reads = new Map(); this.readCount = 0; this.creationStack = [new Set()]; }
+  constructor(inputs) { super(); this.inputs = inputs; this.base = new Map(); this.loading = new Map(); this.slotLoading = new Map(); this.reads = new Map(); this.readCount = 0; this.creationStack = [new Map()]; }
   created(key) { return this.creationStack.at(-1).has(key); }
   addressKey(address) {
     const value = address?.toString();
@@ -109,10 +109,11 @@ class ProofStateManager extends SimpleStateManager {
       fail('LOCAL_STATE_UNSUPPORTED', 'Creation cannot clear an existing storage overlay.');
     }
   }
-  beginContractCreation(address) {
+  beginContractCreation(address, basis = 'internal_contract_creation') {
+    if (!['internal_contract_creation', 'top_level_contract_creation'].includes(basis)) fail('LOCAL_STATE_INVALID', 'Contract creation origin is invalid.');
     if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'Contract creation requires an active rollback checkpoint.');
     const key = this.addressKey(address); this.assertDeployable(key);
-    this.creationStack.at(-1).add(key);
+    this.creationStack.at(-1).set(key, basis);
   }
   async putCode(address, value) {
     const key = this.addressKey(address), base = await this.loadAccount(key), current = this.topAccountStack().get(key);
@@ -128,7 +129,7 @@ class ProofStateManager extends SimpleStateManager {
   async checkpoint() {
     if (this.accountStack.length >= LIMITS.checkpoints) fail('LOCAL_STATE_LIMIT', 'State checkpoint limit exceeded.');
     await super.checkpoint();
-    this.creationStack.push(new Set(this.creationStack.at(-1)));
+    this.creationStack.push(new Map(this.creationStack.at(-1)));
   }
   async commit() { if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'No state checkpoint exists to commit.'); await super.commit(); this.creationStack.splice(-2, 1); }
   async revert() { if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'No state checkpoint exists to revert.'); await super.revert(); this.creationStack.pop(); }
@@ -139,7 +140,7 @@ class ProofStateManager extends SimpleStateManager {
     copy.accountStack = this.accountStack.map(frame => new Map([...frame].map(([key, value]) => [key, copyAccount(value)])));
     copy.codeStack = this.codeStack.map(frame => new Map([...frame].map(([key, value]) => [key, new Uint8Array(value)])));
     copy.storageStack = this.storageStack.map(frame => new Map([...frame].map(([key, value]) => [key, new Uint8Array(value)])));
-    copy.creationStack = this.creationStack.map(frame => new Set(frame));
+    copy.creationStack = this.creationStack.map(frame => new Map(frame));
     return copy;
   }
   snapshotReads() { return { total: this.readCount, distinct: this.reads.size, reads: structuredClone([...this.reads.values()]) }; }
@@ -151,7 +152,7 @@ class ProofStateManager extends SimpleStateManager {
     for (const [address, base] of this.base) {
       const current = this.topAccountStack().get(address), changes = {};
       if (!base.exists) {
-        if (current !== undefined) changes.existence = { before: false, after: true, basis: this.created(address) ? 'internal_contract_creation' : current.nonce > 0n ? 'unsigned_sender_nonce_materialization' : 'positive_native_funding_of_proof_absent_account' };
+        if (current !== undefined) changes.existence = { before: false, after: true, basis: this.creationStack.at(-1).get(address) ?? (current.nonce > 0n ? 'unsigned_sender_nonce_materialization' : 'positive_native_funding_of_proof_absent_account') };
       }
       if (current !== undefined) for (const field of ['nonce', 'balance']) {
         const before = BigInt(base[field + 'Raw']);

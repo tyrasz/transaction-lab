@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -10,6 +11,20 @@ import { validateReplay } from '../src/validate.js';
 import { compareHistoricalReports, loadHistoricalCases, runHistoricalChecks } from '../src/check-historical.js';
 
 const cases = await loadHistoricalCases();
+
+test('historical supply resolves to a byte-exact committed capture without an ignored live-report dependency', async () => {
+  const supply = cases.find(item => item.operation === 'supply');
+  const path = 'fixtures/source-evidence/hyperlend-live-2026-10-23T14-21-41-661Z.json';
+  assert.equal(supply.evidence.sourceArtifact, 'reports/live/2026-10-23T14-21-41-661Z.json');
+  assert.equal(supply.evidence.sourceReadArtifact, path);
+  const bytes = await readFile(new URL('../' + path, import.meta.url));
+  const digest = createHash('sha256').update(bytes).digest('hex');
+  assert.equal(digest, 'c56d1f509ce94a86c3229da52459ec58e6d084775b122c64239225733137a6ef');
+  assert.equal(digest, supply.evidence.sourceSha256);
+  const original = JSON.parse(bytes).results.find(row => row.id === 'hyperlend-historical-supply').response.evidence;
+  assert.deepEqual(supply.evidence.receipt, original.receipt);
+  assert.deepEqual(supply.evidence.trace, original.traceResponse);
+});
 // Original execution is captured public evidence; these balance pairs are
 // explicitly synthetic so helper tests do not invent historical RPC evidence.
 function responseFor(item, positionAdjustment = 0n) {

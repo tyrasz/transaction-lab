@@ -13,6 +13,14 @@ export const HISTORICAL_PROVIDERS = [
 ];
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const DEFAULT_DIRECTORY = resolve(ROOT, 'reports/historical-comparisons');
+// Keep the original provenance unchanged while resolving this early ignored
+// report to its byte-exact, committed public capture. Never depend on an
+// untracked reports/live file or silently choose alternate execution evidence.
+const PRESERVED_SOURCE = Object.freeze({
+  original: 'reports/live/2026-10-23T14-21-41-661Z.json',
+  artifact: 'fixtures/source-evidence/hyperlend-live-2026-10-23T14-21-41-661Z.json',
+  sha256: 'c56d1f509ce94a86c3229da52459ec58e6d084775b122c64239225733137a6ef',
+});
 const HASH = /^0x[0-9a-f]{64}$/i;
 const ADDRESS = /^0x[0-9a-f]{40}$/i;
 const UINT = /^(?:0x[0-9a-f]+|[0-9]+)$/i;
@@ -96,7 +104,10 @@ export async function loadHistoricalCases() {
     const fixturePath = `fixtures/hyperlend-observed-historical-${operation}.json`;
     const fixtureBytes = await readFile(resolve(ROOT, fixturePath));
     const fixture = JSON.parse(fixtureBytes);
-    const sourceBytes = await readFile(resolve(ROOT, fixture.provenance.sourceArtifact));
+    const preserved = fixture.provenance.sourceArtifact === PRESERVED_SOURCE.original;
+    if (preserved && fixture.provenance.sourceSha256 !== PRESERVED_SOURCE.sha256) throw new Error('Saved historical source identity differs from its preserved capture.');
+    const sourceReadArtifact = preserved ? PRESERVED_SOURCE.artifact : fixture.provenance.sourceArtifact;
+    const sourceBytes = await readFile(resolve(ROOT, sourceReadArtifact));
     // Earlier fixtures used sorted-key canonical JSON; later captures retained
     // insertion order. Verify either recorded encoding, then compare source data.
     const traceHashes = [sha256(JSON.stringify(fixture.input.trace)), sha256(JSON.stringify(stable(fixture.input.trace)))];
@@ -109,7 +120,7 @@ export async function loadHistoricalCases() {
     const block = fixture.input.block;
     cases.push({ id, operation, request: { chainId: 999, transactionHash: example.transactionHash }, originalRequest: fixture.input.request,
       expected: { ...KNOWN[operation], transactionHash: example.transactionHash, transactionIndex, block, account: lower(fixture.input.request.from) },
-      evidence: { fixture: fixturePath, fixtureSha256: sha256(fixtureBytes), sourceArtifact: fixture.provenance.sourceArtifact, sourceSha256: fixture.provenance.sourceSha256, traceCanonicalJsonSha256: fixture.provenance.traceCanonicalJsonSha256, receipt, trace: fixture.input.trace },
+      evidence: { fixture: fixturePath, fixtureSha256: sha256(fixtureBytes), sourceArtifact: fixture.provenance.sourceArtifact, sourceReadArtifact, sourceSha256: fixture.provenance.sourceSha256, traceCanonicalJsonSha256: fixture.provenance.traceCanonicalJsonSha256, receipt, trace: fixture.input.trace },
     });
   }
   return cases;

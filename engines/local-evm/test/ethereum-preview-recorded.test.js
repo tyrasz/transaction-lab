@@ -82,7 +82,13 @@ function playback(c, { expectedMissing = [] } = {}) {
 }
 
 function originalUnchanged(result, fixture) {
-  assert.deepEqual(result.original.output, fixture.original.output);
+  // 0.17 describes observed lifecycle activity instead of advertising the old
+  // blanket unsupported policy. Preserve every execution/state byte below.
+  const output = structuredClone(result.original.output);
+  assert.equal(output.semantics.lifecycle, 'no_lifecycle_operation_encountered');
+  assert.equal(fixture.original.output.semantics.lifecycle, 'CREATE_CREATE2_SELFDESTRUCT_unsupported');
+  output.semantics.lifecycle = fixture.original.output.semantics.lifecycle;
+  assert.deepEqual(output, fixture.original.output);
   assert.deepEqual(result.original.changes, fixture.original.changes);
   assert.deepEqual(result.original.inputs, fixture.original.inputs);
   assert.deepEqual(result.original.stateReads, fixture.original.stateReads);

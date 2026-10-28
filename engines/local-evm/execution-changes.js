@@ -1,6 +1,7 @@
 import { canonicalStateChanges } from './preview-mutations.js';
 import { EMPTY_CODE_HASH, EMPTY_STORAGE_ROOT } from './verified-state-proof.js';
 import { isDeepStrictEqual } from 'node:util';
+import { createAddressFromString, createContractAddress } from '@ethereumjs/util';
 
 const ADDRESS = /^0x[0-9a-f]{40}$/, DATA = /^0x(?:[0-9a-f]{2})*$/;
 const ZERO = '0x' + '00'.repeat(32);
@@ -10,10 +11,23 @@ const hex = value => '0x' + BigInt(value).toString(16);
 /** Bind the bounded overlay schema to the worker's immutable input facts and
  * committed creation frames. This is result-consistency validation, not an
  * independent EVM execution or a recomputed post-state-root proof. */
-export function validateExecutionChanges({ changes, inputs, output, sender }) {
+export function validateExecutionChanges({ changes, inputs, output, sender, destination }) {
   const snapshot = canonicalStateChanges(changes), complete = ['success', 'reverted', 'failed'].includes(output?.execution?.status);
+  const topCreation = destination === null, senderAddress = sender.toLowerCase(), senderInitial = inputs?.accounts?.[senderAddress];
+  // Derive the root CREATE address from independently reverified initial facts,
+  // never from the worker's trace or its claimed after-nonce. An unfinished
+  // frame may not have resolved a destination yet.
+  if (topCreation && output?.trace) {
+    const root = output.trace;
+    need(root.type === 'CREATE' && root.from === senderAddress && root.caller === senderAddress);
+    need(root.to === root.executionAddress);
+    if (complete || root.to !== null) {
+      need(senderInitial && typeof senderInitial.exists === 'boolean');
+      const nonce = senderInitial.exists ? BigInt(senderInitial.nonce) : 0n;
+      need(root.to === createContractAddress(createAddressFromString(senderAddress), nonce).toString());
+    }
+  }
   if (!complete) { need(snapshot.accounts.length === 0); return; }
-  const senderAddress = sender.toLowerCase(), senderInitial = inputs.accounts?.[senderAddress];
   need(senderInitial && typeof senderInitial.exists === 'boolean');
   const senderNonce = senderInitial.exists ? BigInt(senderInitial.nonce) : 0n;
   need(isDeepStrictEqual(snapshot.accounts.find(row => row.address === senderAddress)?.nonce,
@@ -34,7 +48,7 @@ export function validateExecutionChanges({ changes, inputs, output, sender }) {
     const commits = retained && frame.error === null;
     if (['CREATE', 'CREATE2'].includes(frame.type) && commits) {
       need(typeof frame.to === 'string' && ADDRESS.test(frame.to) && frame.executionAddress === frame.to && !created.has(frame.to));
-      created.set(frame.to, frame);
+      created.set(frame.to, { frame, basis: depth === 0 && topCreation ? 'top_level_contract_creation' : 'internal_contract_creation' });
     }
     for (const child of frame.calls) walk(child, commits, depth + 1);
   }
@@ -46,21 +60,21 @@ export function validateExecutionChanges({ changes, inputs, output, sender }) {
     for (const name of ['balance', 'nonce']) if (row[name]) need(row[name].before === hex(initial.exists ? initial[name] : '0'));
     if (row.existence) {
       need(initial.exists === false);
-      if (row.existence.basis === 'internal_contract_creation') need(created.has(row.address));
+      if (['internal_contract_creation', 'top_level_contract_creation'].includes(row.existence.basis)) need(created.get(row.address)?.basis === row.existence.basis);
       if (row.existence.basis === 'unsigned_sender_nonce_materialization') need(row.address === sender.toLowerCase());
     } else need(initial.exists);
-    if (row.code) need(created.has(row.address) && row.code.after === created.get(row.address).output && (!initial.exists || initial.code === '0x'));
+    if (row.code) need(created.has(row.address) && row.code.after === created.get(row.address).frame.output && (!initial.exists || initial.code === '0x'));
     for (const slot of row.storage ?? []) {
       need(slot.before === (initial.exists ? initial.storage?.[slot.slot] : ZERO));
       if (!initial.exists) need(created.has(row.address));
     }
   }
-  for (const [address, frame] of created) {
+  for (const [address, { frame, basis }] of created) {
     const initial = inputs.accounts?.[address], row = rows.get(address);
     const proof = inputs.provenance?.find(item => item.account === address)?.accountProof;
     need(initial && proof && proof.storageRoot === EMPTY_STORAGE_ROOT && proof.codeHash === EMPTY_CODE_HASH && proof.nonceRaw === '0');
     need(row?.nonce?.before === '0x0' && BigInt(row.nonce.after) > 0n);
-    if (!initial.exists) need(row.existence?.basis === 'internal_contract_creation');
+    if (!initial.exists) need(row.existence?.basis === basis);
     if (frame.output !== '0x') need(row.code?.after === frame.output);
     else need(!row.code);
   }

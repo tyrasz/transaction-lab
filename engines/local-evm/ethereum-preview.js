@@ -46,8 +46,9 @@ export async function executeEthereumPreview(options) {
     request = decode(encode(options.request, 128 * 1024), 128 * 1024);
     fields(request, ['from', 'to', 'data', 'value', 'gas', 'accessList', 'blobVersionedHashes'], ['from', 'to', 'data', 'value', 'gas']);
     Object.assign(request, normalizeEvmContext(request));
-    need(['from', 'to'].every(key => typeof request[key] === 'string' && /^0x[0-9a-f]{40}$/i.test(request[key])));
-    request.from = request.from.toLowerCase(); request.to = request.to.toLowerCase();
+    need(typeof request.from === 'string' && /^0x[0-9a-f]{40}$/i.test(request.from));
+    need(request.to === null || (typeof request.to === 'string' && /^0x[0-9a-f]{40}$/i.test(request.to)));
+    request.from = request.from.toLowerCase(); request.to = request.to === null ? null : request.to.toLowerCase();
     ethereumQuantity(request.value); const gas = ethereumQuantity(request.gas);
     header = decode(encode(options.header, 128 * 1024), 128 * 1024);
     headerVerification = verifyEthereumHeader({ header, expectedHash: header.hash });

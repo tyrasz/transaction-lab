@@ -24,14 +24,20 @@ export function ethereumCommon(header) {
 export function ethereumCallGas(data, common, request = {}) {
   const context = normalizeEvmContext(request);
   if (typeof data !== 'string' || !BYTES.test(data) || data.length > 65538) throw profileError('LOCAL_ETHEREUM_INPUT_INVALID', 'Expected bounded even-length calldata.');
+  const creation = request.to === null;
+  if (creation && context.blobVersionedHashes) throw profileError('LOCAL_ETHEREUM_INPUT_INVALID', 'Unsigned creation does not accept blob transaction context.');
   let zeroBytes = 0n, nonzeroBytes = 0n;
   for (let i = 2; i < data.length; i += 2) data.slice(i, i + 2) === '00' ? zeroBytes++ : nonzeroBytes++;
   const tokens = zeroBytes + nonzeroBytes * 4n;
   const addressCount = BigInt(context.accessList?.length ?? 0), storageKeyCount = BigInt(context.accessList?.reduce((n, row) => n + row.storageKeys.length, 0) ?? 0);
   const accessListGas = 2400n * addressCount + 1900n * storageKeyCount;
-  const intrinsic = 21000n + tokens * 4n + accessListGas;
+  // The declared root envelope pays these charges once. Internal CREATE and
+  // CREATE2 pay their own opcode/initcode charges inside the EVM instead.
+  const creationCosts = creation ? { creationIntrinsic: 32000n, initcodeBytes: zeroBytes + nonzeroBytes,
+    initcodeWordGas: common.isActivatedEIP(3860) ? 2n * ((zeroBytes + nonzeroBytes + 31n) / 32n) : 0n } : {};
+  const intrinsic = 21000n + tokens * 4n + accessListGas + (creationCosts.creationIntrinsic ?? 0n) + (creationCosts.initcodeWordGas ?? 0n);
   const floor = common.isActivatedEIP(7623) ? 21000n + tokens * 10n : 0n;
-  return { intrinsic, floor, minimum: intrinsic > floor ? intrinsic : floor, zeroBytes, nonzeroBytes };
+  return { intrinsic, floor, minimum: intrinsic > floor ? intrinsic : floor, zeroBytes, nonzeroBytes, ...creationCosts };
 }
 
 export function ethereumUsedGas({ messageGasUsed, refundCounter, intrinsic, floor }) {
@@ -45,6 +51,11 @@ export function ethereumUsedGas({ messageGasUsed, refundCounter, intrinsic, floo
  * unchanged. Actual blob fee settlement and KZG validation remain excluded. */
 export function ethereumContextProfile(request, header, common = ethereumCommon(header)) {
   const context = normalizeEvmContext(request), profile = { ...context };
+  if (request.to === null) {
+    const costs = ethereumCallGas(request.data, common, request);
+    Object.assign(profile, { operation: 'create', initcodeBytes: costs.initcodeBytes.toString(),
+      creationIntrinsicGas: costs.creationIntrinsic.toString(), initcodeWordGas: costs.initcodeWordGas.toString() });
+  }
   if (context.accessList) {
     const addresses = BigInt(context.accessList.length), slots = BigInt(context.accessList.reduce((n, item) => n + item.storageKeys.length, 0));
     Object.assign(profile, { accessListAddressCount: addresses.toString(), accessListStorageKeyCount: slots.toString(), accessListIntrinsicGas: (addresses * 2400n + slots * 1900n).toString() });
