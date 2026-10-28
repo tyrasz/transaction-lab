@@ -1,0 +1,93 @@
+{
+  "case": {
+    "index": 6,
+    "id": "tests/cancun/eip6780_selfdestruct/test_selfdestruct_finalization.py::test_selfdestruct_clears_nonce_and_storage[fork_Osaka-state_test-nonce_and_storage-funded-self]",
+    "category": "clear_nonce_storage_self",
+    "path": "cases/006.json",
+    "expected": {
+      "stateRoot": "0xfaa7d131f45bfc030065907121e007f831db8e145d0d0f3bc67edd3b057c5f97",
+      "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+    },
+    "compatibility": {
+      "examinedCodeItems": 9,
+      "instructionBoundaryContextOpcodeHits": [],
+      "staticScanOnly": true,
+      "reachabilityOrOpcodeCoverageEstablished": false,
+      "coinbaseAbsentBeforeAndInSealedReference": true,
+      "legacyTransactionOnly": true,
+      "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+      "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+      "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+    },
+    "originalArtifacts": [
+      {
+        "path": "declarations/006.json",
+        "bytes": 6393,
+        "sha256": "3bd9ff57cd2d93e1dd4a082a77a027771a868f7eb279cfc9c8a3fe43a0f61b3c"
+      },
+      {
+        "path": "results/006-reference.json",
+        "bytes": 7105,
+        "sha256": "300ddf9727805cd8f2141ac51aa73bb9267f87e6541529844760ac718251b378"
+      },
+      {
+        "path": "results/006-product.json",
+        "bytes": 62340,
+        "sha256": "838db7c8d8519db7462726204925e9fdc1fb2698a3a89e04c7d8d575ae3dc993"
+      },
+      {
+        "path": "results/006-comparison.json",
+        "bytes": 8601,
+        "sha256": "f1b2a73fae26068c55668e308b800cce1a7cd8e69c543df401a5bb056b56a3b8"
+      },
+      {
+        "path": "results/006-PRODUCT_SEALED.json",
+        "bytes": 434,
+        "sha256": "4979c794699cfb8062d4511d9242330e17f059b9058aa46668cb052f08332d16"
+      }
+    ],
+    "bytes": 2337,
+    "sha256": "2a46afb1297dd2d2c2b9aae9b261f9eb9e29a8d8370c9311973b98505be06c3e"
+  },
+  "raw": {
+    "args": [
+      "statetest",
+      "--statetest.fork=Osaka",
+      "--run=^tests/cancun/eip6780_selfdestruct/test_selfdestruct_finalization\\.py::test_selfdestruct_clears_nonce_and_storage\\[fork_Osaka-state_test-nonce_and_storage-funded-self\\]$",
+      "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v020/research/cross-client-synthetic-geth-v1/capture/cases/006.json"
+    ],
+    "reason": null,
+    "exitCode": 0,
+    "signal": null,
+    "processClosed": true,
+    "stdoutRaw": {
+      "base64": "WwogIHsKICAgICJuYW1lIjogInRlc3RzL2NhbmN1bi9laXA2NzgwX3NlbGZkZXN0cnVjdC90ZXN0X3NlbGZkZXN0cnVjdF9maW5hbGl6YXRpb24ucHk6OnRlc3Rfc2VsZmRlc3RydWN0X2NsZWFyc19ub25jZV9hbmRfc3RvcmFnZVtmb3JrX09zYWthLXN0YXRlX3Rlc3Qtbm9uY2VfYW5kX3N0b3JhZ2UtZnVuZGVkLXNlbGZdIiwKICAgICJwYXNzIjogdHJ1ZSwKICAgICJzdGF0ZVJvb3QiOiAiMHhmYWE3ZDEzMWY0NWJmYzAzMDA2NTkwNzEyMWUwMDdmODMxZGI4ZTE0NWQwZDBmM2JjNjdlZGQzYjA1N2M1Zjk3IiwKICAgICJmb3JrIjogIk9zYWthIgogIH0KXQo=",
+      "bytes": 317,
+      "sha256": "d2fcf069058a907df4071b69bbd75b4a9d9be286c4515dadedb2525cc96bf4c3"
+    },
+    "stdout": "[\n  {\n    \"name\": \"tests/cancun/eip6780_selfdestruct/test_selfdestruct_finalization.py::test_selfdestruct_clears_nonce_and_storage[fork_Osaka-state_test-nonce_and_storage-funded-self]\",\n    \"pass\": true,\n    \"stateRoot\": \"0xfaa7d131f45bfc030065907121e007f831db8e145d0d0f3bc67edd3b057c5f97\",\n    \"fork\": \"Osaka\"\n  }\n]\n",
+    "stderrRaw": {
+      "base64": "eyJzdGF0ZVJvb3QiOiAiMHhmYWE3ZDEzMWY0NWJmYzAzMDA2NTkwNzEyMWUwMDdmODMxZGI4ZTE0NWQwZDBmM2JjNjdlZGQzYjA1N2M1Zjk3In0K",
+      "bytes": 84,
+      "sha256": "64130f04db049219ab3165d5b73e18c2c052c0ea1b7cae0a924c78f615305bcd"
+    },
+    "stderr": "{\"stateRoot\": \"0xfaa7d131f45bfc030065907121e007f831db8e145d0d0f3bc67edd3b057c5f97\"}\n",
+    "observedBytes": 401,
+    "durationMs": 16.73354100000006
+  },
+  "observed": {
+    "status": "matched",
+    "result": {
+      "name": "tests/cancun/eip6780_selfdestruct/test_selfdestruct_finalization.py::test_selfdestruct_clears_nonce_and_storage[fork_Osaka-state_test-nonce_and_storage-funded-self]",
+      "pass": true,
+      "stateRoot": "0xfaa7d131f45bfc030065907121e007f831db8e145d0d0f3bc67edd3b057c5f97",
+      "fork": "Osaka"
+    },
+    "checks": {
+      "reportedPass": true,
+      "stateRoot": true,
+      "logHashCheckedByGeth": true
+    },
+    "scope": "Synthetic sealed-reference full state root plus Geth internal log-hash assertion; gas/return/receipt and current-product coverage not checked."
+  }
+}

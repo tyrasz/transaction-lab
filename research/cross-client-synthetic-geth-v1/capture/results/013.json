@@ -1,0 +1,93 @@
+{
+  "case": {
+    "index": 13,
+    "id": "tests/ported_static/stRevertTest/test_revert_opcode_in_init.py::test_revert_opcode_in_init[fork_Osaka-state_test-tx_value_0]",
+    "category": "root_create_revert_zero",
+    "path": "cases/013.json",
+    "expected": {
+      "stateRoot": "0x6542b7d637a71dc92b45bd29e53ab327cc62267bcda5d728683fe2793819b3c1",
+      "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+    },
+    "compatibility": {
+      "examinedCodeItems": 3,
+      "instructionBoundaryContextOpcodeHits": [],
+      "staticScanOnly": true,
+      "reachabilityOrOpcodeCoverageEstablished": false,
+      "coinbaseAbsentBeforeAndInSealedReference": true,
+      "legacyTransactionOnly": true,
+      "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+      "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+      "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+    },
+    "originalArtifacts": [
+      {
+        "path": "declarations/013.json",
+        "bytes": 5765,
+        "sha256": "9d3a36d8213014fae930a3d330d62fa856bb9378802ab102b51693328c48302d"
+      },
+      {
+        "path": "results/013-reference.json",
+        "bytes": 3378,
+        "sha256": "bb1e3df0585c253ed7038366b1a3a3cca9e8c95e26c3b8f7d9a4d1b90d63e235"
+      },
+      {
+        "path": "results/013-product.json",
+        "bytes": 24576,
+        "sha256": "5909eeebf03d2fe5577e55b9ad7975b4992ffd7e41a3e8b703879d7d35cb77c0"
+      },
+      {
+        "path": "results/013-comparison.json",
+        "bytes": 2365,
+        "sha256": "a29e75b6af6c06e980b106a2b8d85a704ff3cc4cf60d42a040ff0f68a8db29bc"
+      },
+      {
+        "path": "results/013-PRODUCT_SEALED.json",
+        "bytes": 395,
+        "sha256": "e8dc8c6565668107a00f99bdb454c906aee272a2c74340dae0eb1764f4b53b97"
+      }
+    ],
+    "bytes": 1693,
+    "sha256": "ed1d8c2c2e43134fcf3bf197c4395f5fc8ff1b4cf9781cee89942782cc34f377"
+  },
+  "raw": {
+    "args": [
+      "statetest",
+      "--statetest.fork=Osaka",
+      "--run=^tests/ported_static/stRevertTest/test_revert_opcode_in_init\\.py::test_revert_opcode_in_init\\[fork_Osaka-state_test-tx_value_0\\]$",
+      "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v020/research/cross-client-synthetic-geth-v1/capture/cases/013.json"
+    ],
+    "reason": null,
+    "exitCode": 0,
+    "signal": null,
+    "processClosed": true,
+    "stdoutRaw": {
+      "base64": "WwogIHsKICAgICJuYW1lIjogInRlc3RzL3BvcnRlZF9zdGF0aWMvc3RSZXZlcnRUZXN0L3Rlc3RfcmV2ZXJ0X29wY29kZV9pbl9pbml0LnB5Ojp0ZXN0X3JldmVydF9vcGNvZGVfaW5faW5pdFtmb3JrX09zYWthLXN0YXRlX3Rlc3QtdHhfdmFsdWVfMF0iLAogICAgInBhc3MiOiB0cnVlLAogICAgInN0YXRlUm9vdCI6ICIweDY1NDJiN2Q2MzdhNzFkYzkyYjQ1YmQyOWU1M2FiMzI3Y2M2MjI2N2JjZGE1ZDcyODY4M2ZlMjc5MzgxOWIzYzEiLAogICAgImZvcmsiOiAiT3Nha2EiCiAgfQpdCg==",
+      "bytes": 277,
+      "sha256": "dec88b3740fa23f40048e253229222b6fa917b79324843459b1e856699c323b3"
+    },
+    "stdout": "[\n  {\n    \"name\": \"tests/ported_static/stRevertTest/test_revert_opcode_in_init.py::test_revert_opcode_in_init[fork_Osaka-state_test-tx_value_0]\",\n    \"pass\": true,\n    \"stateRoot\": \"0x6542b7d637a71dc92b45bd29e53ab327cc62267bcda5d728683fe2793819b3c1\",\n    \"fork\": \"Osaka\"\n  }\n]\n",
+    "stderrRaw": {
+      "base64": "eyJzdGF0ZVJvb3QiOiAiMHg2NTQyYjdkNjM3YTcxZGM5MmI0NWJkMjllNTNhYjMyN2NjNjIyNjdiY2RhNWQ3Mjg2ODNmZTI3OTM4MTliM2MxIn0K",
+      "bytes": 84,
+      "sha256": "6ca2be19ed3798757808992db49915fef4652dc27eecf92907b8472d57f656b2"
+    },
+    "stderr": "{\"stateRoot\": \"0x6542b7d637a71dc92b45bd29e53ab327cc62267bcda5d728683fe2793819b3c1\"}\n",
+    "observedBytes": 361,
+    "durationMs": 15.68729200000007
+  },
+  "observed": {
+    "status": "matched",
+    "result": {
+      "name": "tests/ported_static/stRevertTest/test_revert_opcode_in_init.py::test_revert_opcode_in_init[fork_Osaka-state_test-tx_value_0]",
+      "pass": true,
+      "stateRoot": "0x6542b7d637a71dc92b45bd29e53ab327cc62267bcda5d728683fe2793819b3c1",
+      "fork": "Osaka"
+    },
+    "checks": {
+      "reportedPass": true,
+      "stateRoot": true,
+      "logHashCheckedByGeth": true
+    },
+    "scope": "Synthetic sealed-reference full state root plus Geth internal log-hash assertion; gas/return/receipt and current-product coverage not checked."
+  }
+}

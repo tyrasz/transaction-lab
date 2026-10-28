@@ -1,0 +1,64 @@
+{
+  "tests/cancun/eip6780_selfdestruct/test_selfdestruct_revert.py::test_selfdestruct_created_in_same_tx_with_revert[fork_Osaka-state_test-outer_selfdestruct_after_inner_call-same_tx]": {
+    "env": {
+      "currentCoinbase": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba",
+      "currentDifficulty": "0x0",
+      "currentRandom": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "currentGasLimit": "0x7270e00",
+      "currentNumber": "0x14fb180",
+      "currentTimestamp": "0x6930b057",
+      "currentBaseFee": "0x0",
+      "currentExcessBlobGas": "0x0"
+    },
+    "pre": {
+      "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+        "nonce": "0x00",
+        "balance": "0x033b2e3c9fd0803ce8000000",
+        "code": "0x",
+        "storage": {}
+      },
+      "0x778dedfea1f3fc68cd39ff49df44ff787786bd38": {
+        "nonce": "0x01",
+        "balance": "0x00",
+        "code": "0x61003a600081600b8239f35f3573c0f6dc9e5836f54caadbf59cc69346c508e1992b90805f14602f57600114602557005b6001805401600155ff5b60015f54015f555f80f3",
+        "storage": {}
+      },
+      "0xf8d665db9ddc6a25fa2e41e1e6b733276828375c": {
+        "nonce": "0x01",
+        "balance": "0x03",
+        "code": "0x5f356001734fbb0487ec2c708cbff85af8369a3ea87055e31b9190815f14603a5750600114602957005b5f6020816001819481835245f15f80fd5b5f602081600186829583805283808681868645f150835282808581803045f1508031825581835245f15f80f3",
+        "storage": {}
+      }
+    },
+    "transaction": {
+      "gasPrice": "0x0",
+      "nonce": "0x0",
+      "to": "",
+      "data": [
+        "0x60456000600073778dedfea1f3fc68cd39ff49df44ff787786bd383c604560006000f06000556000600060006000600073f8d665db9ddc6a25fa2e41e1e6b733276828375c45f1"
+      ],
+      "gasLimit": [
+        "0x4c4b40"
+      ],
+      "value": [
+        "0x0"
+      ],
+      "secretKey": "0x1ad604b3d94e06ec50b27732ec677f3d857c4d588f082f0016317697dd3a2d92",
+      "sender": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff"
+    },
+    "post": {
+      "Osaka": [
+        {
+          "hash": "0x1f5e23731acb65ac1f4bbc56bf3e5e069f7a3252044587b12a2e4c5e0c6fb202",
+          "logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+          "txbytes": "0xf8948080834c4b408080b84760456000600073778dedfea1f3fc68cd39ff49df44ff787786bd383c604560006000f06000556000600060006000600073f8d665db9ddc6a25fa2e41e1e6b733276828375c45f125a064591b3f592437c6a31141c5f695454c927b171e5454ee956bab9820a4644985a0089060840b53d5581fea61ff82450122feb9bbe73350a2d82b8d953c4f56ab4e",
+          "indexes": {
+            "data": 0,
+            "gas": 0,
+            "value": 0
+          }
+        }
+      ]
+    }
+  }
+}
