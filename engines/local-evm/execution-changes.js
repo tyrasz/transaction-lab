@@ -2,6 +2,7 @@ import { canonicalStateChanges } from './preview-mutations.js';
 import { EMPTY_CODE_HASH, EMPTY_STORAGE_ROOT } from './verified-state-proof.js';
 import { isDeepStrictEqual, types } from 'node:util';
 import { createAddressFromString, createContractAddress } from '@ethereumjs/util';
+import { existingDelegationTarget } from './sender-delegation.js';
 
 const ADDRESS = /^0x[0-9a-f]{40}$/, WORD = /^0x[0-9a-f]{64}$/, DATA = /^0x(?:[0-9a-f]{2})*$/;
 const ZERO = '0x' + '00'.repeat(32);
@@ -50,10 +51,10 @@ function emptyFact(inputs, address) {
  * trace/result consistency, not an independent replay or post-state-root proof. */
 export function validateExecutionLifecycle({ output, inputs, destination, changes, startingChanges, selfdestructOnlyCreated = true }) {
   need(typeof selfdestructOnlyCreated === 'boolean');
-  const created = new Map(), destructed = new Set(), eligibleTouches = new Set(), justifiedTouches = new Set(); let frames = 0;
+  const created = new Map(), creationAttempts = new Map(), destructed = new Set(), eligibleTouches = new Set(), justifiedTouches = new Set(); let frames = 0;
   const lifecycle = output === null ? undefined : ownData(output, 'lifecycle');
   const complete = ['success', 'reverted', 'failed'].includes(output?.execution?.status);
-  if (!complete) { need(lifecycle === undefined); return { created, deleted: new Set(), emptyDeleted: new Set() }; }
+  if (!complete) { need(lifecycle === undefined); return { created, creationAttempts, deleted: new Set(), emptyDeleted: new Set() }; }
   const rows = new Map(changes ? canonicalStateChanges(changes).accounts.map(row => [row.address, row]) : []);
   const priorRows = new Map(startingChanges ? canonicalStateChanges(startingChanges).accounts.map(row => [row.address, row]) : []);
   // Only value transfers are reconstructed, from the already-bound complete
@@ -94,6 +95,12 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
       else need(frame.executionAddress === frame.to);
     }
     const commits = retained && frame.error === null;
+    // CREATE increments its creator before entering the constructor. A child
+    // revert or collision retains that increment when its parent commits;
+    // a reverted parent discards it. Do not count the root transaction CREATE.
+    if (depth > 0 && retained && ['CREATE', 'CREATE2'].includes(frame.type)) {
+      creationAttempts.set(frame.from, (creationAttempts.get(frame.from) ?? 0) + 1);
+    }
     if (depth === 0) justifiedTouches.add(frame.from); // Root nonce is outside its message checkpoint.
     if (commits && frame.type !== 'DELEGATECALL') {
       justifiedTouches.add(frame.from); justifiedTouches.add(frame.executionAddress);
@@ -205,13 +212,13 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     }
   }
   need(isDeepStrictEqual([...emptyDeleted].sort(), [...requiredCleanup].sort()));
-  return { created, deleted, emptyDeleted };
+  return { created, creationAttempts, deleted, emptyDeleted };
 }
 
 /** Bind the bounded overlay schema to the worker's immutable input facts and
  * committed creation frames. This is result-consistency validation, not an
  * independent EVM execution or a recomputed post-state-root proof. */
-export function validateExecutionChanges({ changes, inputs, output, sender, destination, selfdestructOnlyCreated = true }) {
+export function validateExecutionChanges({ changes, inputs, output, sender, destination, selfdestructOnlyCreated = true, common }) {
   const snapshot = canonicalStateChanges(changes), complete = ['success', 'reverted', 'failed'].includes(output?.execution?.status);
   const topCreation = destination === null, senderAddress = sender.toLowerCase(), senderInitial = inputs?.accounts?.[senderAddress];
   // Derive the root CREATE address from independently reverified initial facts,
@@ -227,12 +234,21 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
       need(root.to === createContractAddress(createAddressFromString(senderAddress), nonce).toString());
     }
   }
-  const { created, deleted, emptyDeleted } = validateExecutionLifecycle({ output, inputs, destination, changes: snapshot, selfdestructOnlyCreated });
+  const { created, creationAttempts, deleted, emptyDeleted } = validateExecutionLifecycle({ output, inputs, destination, changes: snapshot, selfdestructOnlyCreated });
   if (!complete) { need(snapshot.accounts.length === 0); return; }
   need(senderInitial && typeof senderInitial.exists === 'boolean');
+  need(output.trace.from === senderAddress && output.trace.caller === senderAddress);
+  const senderCode = senderInitial.exists ? senderInitial.code : '0x';
+  const delegated = common && existingDelegationTarget(senderCode, common) !== null;
+  need(senderCode === '0x' || delegated);
+  // The trusted supported schedule stops at BPO2. Later EIP-7928 can increment
+  // a creator on collision without entering a child and needs another ledger.
+  if (delegated) need(common.chainId() === 1n && !common.isActivatedEIP(7928));
   const senderNonce = senderInitial.exists ? BigInt(senderInitial.nonce) : 0n;
+  const nonceAfter = senderNonce + 1n + (delegated ? BigInt(creationAttempts.get(senderAddress) ?? 0) : 0n);
+  need(senderNonce < (1n << 64n) - 1n && nonceAfter < (1n << 64n));
   need(isDeepStrictEqual(snapshot.accounts.find(row => row.address === senderAddress)?.nonce,
-    { before: hex(senderNonce), after: hex(senderNonce + 1n) }));
+    { before: hex(senderNonce), after: hex(nonceAfter) }));
   if (['reverted', 'failed'].includes(output.execution.status)) {
     const address = sender.toLowerCase(), initial = inputs.accounts?.[address];
     need(initial && typeof initial.exists === 'boolean');

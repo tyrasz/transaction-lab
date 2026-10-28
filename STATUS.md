@@ -1,8 +1,24 @@
-# Transaction Lab checkpoint — 0.20.1
+# Transaction Lab checkpoint — 0.21.0
 
 Updated October 28, 2026. The user's long-term objective remains to improve measured correctness and coverage; no background goal-runner status is implied. **No representative 90% or 100% accuracy rate or superiority to Blockaid has been established.** This is a working prototype with narrow measured coverage, not a general EVM simulation or security product.
 
 The app uses http://127.0.0.1:5174/ without a wallet connection or Dynamic authentication. Version 0.14 adds `POST /api/evm/local-preview`: an experimental Ethereum call executed in an isolated local worker from verified starting-state proofs/code, with explicit before/after token and Aave/Morpho position queries. The existing provider-backed Ethereum path retains automatic token/native measurements, typed positions and complete state continuation across ordered sequences. HyperEVM endpoints retain their semantics. The new local endpoint has its own availability, source/runtime identity, transport bounds and failure handling; it does not establish full signed-transaction support or complete economic-effect coverage. Security remains `not_assessed`. No signing or broadcasting occurs.
+
+## Existing EIP-7702 delegated senders — 0.21.0
+
+The local Ethereum engine now admits an exact existing 23-byte EIP-7702 designation on Prague or later. It executes direct transfers, self-calls, callbacks and deployments while preserving the wallet's storage/address context and implementation warming. The child and parent independently validate sender nonces: one outer increment plus entered CREATE/CREATE2 attempts whose parent ancestry commits. Constructor reverts and collisions retain the increment; enclosing reverts remove it. Other runtime-code senders and authorization-list processing remain unsupported. Query neutrality still requires exactly one probe nonce increment and no other net mutation.
+
+All **619 application** and **419 local-engine** controls pass, including **20 new execution/parent controls**. Independent review exercised ten further direct/full-VM/third-MPT/real-child edge cases with exact state roots and gas, including delegate/CALLCODE context, static/OOG failures, constructor callbacks and ancestor rollback. No concrete blocker was found. These full-VM comparisons share the opcode dependency. A separate pinned Geth run matched all **14** frozen synthetic fixture state roots and internal log-hash assertions (13 Osaka, one Prague), with no retries. That Geth packet does not independently check gas/return/receipt fields and explicitly leaves product-source provenance of the previously exported expectations unestablished; it is a fixture cross-check, not a current-product accuracy score.
+
+The code is prepared as 0.21.0; the running app remains 0.20.1 until the verified release is started. The two known delegated-sender failures below are scheduled for a separate bounded development recheck, preserving the original benchmark denominator.
+
+## Fresh prospective local-engine sample
+
+The [frozen 0.20.0 pilot](research/ordinary-local-coverage-v1/NOTES.md) selected **16 of 285 transactions** from two future Ethereum blocks. **14 completed and matched all five comparison channels; two were unsupported; zero mismatched or unavailable.** Both unsupported calls were USDT transfers from wallets with existing EIP-7702 delegations. Sample execution availability and exact agreement are **14/16 (87.5%)**; comparable-only agreement is 14/14. This small two-block sample does not establish a broad EVM accuracy rate, and fixes/rechecks cannot turn its recorded result into 16/16.
+
+The [supplemental audit](research/ordinary-local-coverage-v1-audit/NOTES.md) independently reproduced all 16 archived child executions from saved proof/code responses, rechecked raw comparison channels and the deterministic selection/order, and passed 12 tamper controls. Root repeated the sealed audit and its controls. The capture retains 302 public read-only wire records and 153 verified proofs. It evaluates the unsigned, zero-price, parent-block-end isolated kernel: not original transaction-position replay, HTTP API availability, complete asset/position discovery, fees, consensus or security. The requested oracle context has no independent execution attestation.
+
+The separate [16-case Geth lifecycle check](research/cross-client-synthetic-geth-v1/NOTES.md) also matched all frozen synthetic 0.18 fixture roots/log hashes. Its independent audit and nine controls pass. It adds a second opcode implementation to already-inspected development fixtures; no new current-product or population denominator is claimed.
 
 ## Reverted funding in after-state queries — 0.20.1
 

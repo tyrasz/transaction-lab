@@ -11,6 +11,7 @@ import { compilePreviewQueries, decodePreviewValues } from './preview-queries.js
 import { validateQueryMutation } from './preview-mutations.js';
 import { validateExecutionChanges, validateExecutionLifecycle } from './execution-changes.js';
 import { validateInputFacts } from './input-facts.js';
+import { existingDelegationTarget } from './sender-delegation.js';
 import { ISOLATED_LIMITS, IsolationError, decode, encode, envelope, fields, need, normalizeLimits, validateRpcRequest } from './isolated-protocol.js';
 export { ISOLATED_LIMITS, IsolationError } from './isolated-protocol.js';
 
@@ -141,9 +142,19 @@ async function executeIsolated(options, previewMode) {
     fields(reads, ['total', 'distinct', 'reads']);
     need(Number.isSafeInteger(reads.total) && reads.total >= 0 && Number.isSafeInteger(reads.distinct) && reads.distinct >= 0 && reads.distinct <= reads.total && Array.isArray(reads.reads) && reads.reads.length === reads.distinct);
   }
-  function executionContext(output, call, complete) {
+  function executionContext(output, call, complete, inputs) {
     if (output === null) { need(!complete); return; }
-    const costs = ethereumCallGas(call.data, ethereumCommon(header), call), gas = ethereumQuantity(call.gas);
+    const common = ethereumCommon(header), costs = ethereumCallGas(call.data, common, call), gas = ethereumQuantity(call.gas);
+    const initial = inputs?.accounts?.[call.from.toLowerCase()];
+    const code = initial?.exists === true ? initial.code : initial?.exists === false ? '0x' : null;
+    const delegation = existingDelegationTarget(code, common), advertised = output.semantics?.senderDelegation;
+    if (complete) need(code === '0x' || delegation !== null);
+    if (complete && delegation !== null || advertised !== undefined) {
+      need(delegation !== null && isDeepStrictEqual(advertised, { address: delegation, authorizationListProcessed: false }));
+      need(output.semantics.callerNonce === 'runCall_increment_and_committed_sender_creation_attempts');
+    } else {
+      need(advertised === undefined && output.semantics?.callerNonce === 'runCall_increments_once_including_EVM_revert');
+    }
     if (Object.hasOwn(output, 'lifecycle')) {
       need(complete);
       // Lifecycle rules are checked below using the authenticated header's
@@ -191,8 +202,8 @@ async function executeIsolated(options, previewMode) {
     fields(result, Object.keys(EMPTY));
     need((allowNullOutput && result.output === null) || (result.output && ['success', 'reverted', 'failed', 'unsupported', 'unavailable', 'invalid'].includes(result.output.execution?.status)));
     validateInputs(result, count);
-    executionContext(result.output, request, ['success', 'reverted', 'failed'].includes(result.output?.execution?.status));
-    validateExecutionChanges({ changes: result.changes, inputs: result.inputs, output: result.output, sender: request.from, destination: request.to, selfdestructOnlyCreated: ethereumCommon(header).isActivatedEIP(6780) });
+    executionContext(result.output, request, ['success', 'reverted', 'failed'].includes(result.output?.execution?.status), result.inputs);
+    validateExecutionChanges({ changes: result.changes, inputs: result.inputs, output: result.output, sender: request.from, destination: request.to, selfdestructOnlyCreated: ethereumCommon(header).isActivatedEIP(6780), common: ethereumCommon(header) });
     for (const reads of [result.stateReads, result.inputReads]) validateReads(reads);
     return result;
   }
@@ -217,7 +228,7 @@ async function executeIsolated(options, previewMode) {
       if (side.status === 'unavailable') { need(side.values === null && typeof side.reason === 'string'); return; }
       need(originalComplete && side.reason === null && side.output?.execution?.status === 'success' && side.output.stateDisposition === 'message_result_retained_in_supplied_manager' && Array.isArray(side.output.logs) && side.output.logs.length === 0);
       const trace = side.output.trace, queryRequest = { from: request.from.toLowerCase(), ...compiled.query, value: '0', gas: '1000000' };
-      executionContext(side.output, queryRequest, true); need(trace.error === null);
+      executionContext(side.output, queryRequest, true, value.inputs); need(trace.error === null);
       validateExecutionLifecycle({ output: side.output, inputs: value.inputs, destination: queryRequest.to, changes: side.changesAfter, startingChanges: side.changesBefore, selfdestructOnlyCreated: ethereumCommon(header).isActivatedEIP(6780) });
       need(isDeepStrictEqual(side.values, decodePreviewValues(compiled, side.output.execution.returnData)));
       need(side.changesBefore && side.changesAfter);

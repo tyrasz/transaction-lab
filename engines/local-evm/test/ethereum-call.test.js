@@ -94,8 +94,8 @@ test('Osaka CLZ executes only after the fork and a pre-fork invalid opcode consu
   }
 });
 
-test('code-bearing sender and lifecycle operations remain explicit unsupported outcomes with no retained writes', async () => {
-  const sender = await fixture('0x00', { [FROM]: account('0xef0100' + TO.slice(2), '1000') });
+test('ordinary contract sender and unsupported-manager lifecycle operations retain no writes', async () => {
+  const sender = await fixture('0x00', { [FROM]: account('0x00', '1000') });
   const r = await executeEthereumCall(sender); assert.equal(r.execution.status, 'unsupported'); assert.equal(r.execution.error.code, 'LOCAL_SENDER_CODE_UNSUPPORTED'); assert.deepEqual(sender.stateManager.snapshotChanges().accounts, []);
   const lifecycle = await fixture('0x600060006000f0'); const failed = await executeEthereumCall(lifecycle); assert.equal(failed.execution.status, 'unsupported'); assert.deepEqual(lifecycle.stateManager.snapshotChanges().accounts, []);
 });

@@ -7,6 +7,7 @@ import { bytesToHex, createAddressFromString, hexToBytes } from '@ethereumjs/uti
 import { ethereumCommon, ethereumContextProfile } from './ethereum-profile.js';
 import { normalizeEvmContext } from '../evm-context.js';
 import { EMPTY_STORAGE_ROOT } from './verified-state-proof.js';
+import { existingDelegationTarget } from './sender-delegation.js';
 
 export const EXECUTION_LIMITS = Object.freeze({ gas: 5000000, steps: 1000000, frames: 1000, depth: 32, logs: 2000, memoryBytes: 1048576, returnBytes: 1048576, calldataBytes: 32768, traceBytes: 8388608, wallMs: 10000 });
 export const ETHEREUM_EXECUTION_LIMITS = Object.freeze({ ...EXECUTION_LIMITS, wallMs: 120000 });
@@ -60,6 +61,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
   };
   let root = null, environment = null, evm, checkpointDepth = 0, ownsManager = false;
   let managerFailed = false, managerError;
+  let delegatedSenderNonce = null, retainedSenderCreations = 0;
   const stack = [];
   const reserved = value => supportedAddress(value, chainId);
   function bound(name, value) { if (value > limits[name]) reject('LOCAL_RESOURCE_LIMIT', `Local execution exceeded its ${name} limit.`); }
@@ -166,9 +168,15 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       if (creation) { observedCreation = true; describeLifecycle(); }
       const frame = { type, from: parent?.frame.executionAddress ?? message.caller.toString(), to: creation ? null : message.codeAddress.toString(), executionAddress: creation ? null : message.to.toString(), caller: message.caller.toString(), value: hex(message.value), input: bytesToHex(message.data), gas: hex(message.gasLimit), gasUsed: null, output: null, error: null, depth: message.depth, calls: [] };
       if (parent) parent.frame.calls.push(frame); else root = frame;
+      // CREATE increments the creator before the child's checkpoint. A failed
+      // constructor or collision keeps that increment if its parent commits.
+      // Count entered attempts in the parent, then merge only committed
+      // descendants. The supported fork range excludes EIP-7928's alternate
+      // collision path, which would need a different observation point.
+      if (delegatedSenderNonce !== null && creation && parent && frame.from === from) parent.senderCreations++;
       // This is the EVM's invocation-local creation set. The state manager's
       // creation marker deliberately survives copied after-state query forks.
-      stack.push({ frame, pendingCall: null, createdAddresses: message.createdAddresses });
+      stack.push({ frame, pendingCall: null, createdAddresses: message.createdAddresses, senderCreations: 0 });
     });
     evm.events.on('newContract', event => {
       clockCheck(); const active = stack.at(-1), target = event.address.toString();
@@ -221,6 +229,11 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       active.frame.gasUsed = hex(result.execResult.executionGasUsed); active.frame.output = bytesToHex(output);
       const error = result.execResult.exceptionError?.error;
       active.frame.error = error === undefined ? null : evmErrors.has(error) ? error : 'unrecognized EVM exception';
+      if (error === undefined) {
+        const parent = stack.at(-1);
+        if (parent) parent.senderCreations += active.senderCreations;
+        else retainedSenderCreations = active.senderCreations;
+      }
       if (error === undefined && active.pendingSelfdestruct !== undefined) {
         if (result.execResult.selfdestruct?.get(active.frame.executionAddress) !== active.pendingSelfdestruct) reject('LOCAL_TRACE_INVALID', 'Successful SELFDESTRUCT disagrees with its frame result.');
         active.frame.selfdestruct = { beneficiary: active.pendingSelfdestruct }; retain(96);
@@ -228,7 +241,13 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     });
     if (chainId === 1) {
       const sender = createAddressFromString(from), account = await guarded.getAccount(sender), code = await guarded.getCode(sender);
-      if (code.length) reject('LOCAL_SENDER_CODE_UNSUPPORTED', 'The unsigned reference requires a sender without runtime code.', 'unsupported');
+      if (code.length) {
+        const delegation = existingDelegationTarget(bytesToHex(code), common);
+        if (delegation === null) reject('LOCAL_SENDER_CODE_UNSUPPORTED', 'The unsigned reference requires an empty-code sender or an exact existing EIP-7702 delegation on Prague or later.', 'unsupported');
+        delegatedSenderNonce = account?.nonce ?? 0n;
+        semantics.senderDelegation = { address: delegation, authorizationListProcessed: false };
+        semantics.callerNonce = 'runCall_increment_and_committed_sender_creation_attempts';
+      }
       if ((account?.balance ?? 0n) < value) reject('LOCAL_CALL_INSUFFICIENT_BALANCE', 'The sender cannot cover the declared native value.', 'invalid');
       if ((account?.nonce ?? 0n) >= (1n << 64n) - 1n) reject('LOCAL_CALL_NONCE_OVERFLOW', 'The sender nonce cannot be incremented within uint64.', 'invalid');
     }
@@ -277,6 +296,10 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     // namespace reset must be representable before the invocation is retained,
     // including when a caller supplied an already-checkpointed manager.
     if (typeof stateManager.assertRepresentableAccountResets === 'function') await guarded.assertRepresentableAccountResets();
+    if (delegatedSenderNonce !== null) {
+      const senderAfter = await guarded.getAccount(createAddressFromString(from));
+      if (senderAfter?.nonce !== delegatedSenderNonce + 1n + BigInt(retainedSenderCreations)) reject('LOCAL_TRACE_INVALID', 'Delegated sender nonce disagrees with its committed creation attempts.');
+    }
     clockCheck();
     // Final atomic commit is the irreversible terminal step: no subsequent
     // deadline/output validation may mislabel retained state as rolled back.
