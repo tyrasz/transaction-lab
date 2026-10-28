@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {createHash} from 'node:crypto';
+import {verifyWire,verifyHeaderBinding,parityChanges,compareObserved,auditPacket} from './verify.mjs';
+const read=p=>JSON.parse(readFileSync(new URL('../ethereum-deployment-capability-v1/'+p,import.meta.url)));
+const plan=read('plan.json'),local=read('reference/local.json').attempt;
+const wires=Array.from({length:12},(_,i)=>read(`wire/${String(i+1).padStart(3,'0')}.json`));
+const parity=wires[2].parsed.result,request=plan.rows[2].request.params[0],target=plan.target.address;
+const sha=x=>createHash('sha256').update(x).digest('hex');
+function rebody(wire,json){const text=JSON.stringify(json),raw=Buffer.from(text);Object.assign(wire,{responseText:text,responseSha256:sha(raw),rawBase64:raw.toString('base64'),parsed:json});Object.assign(wire.transport,{observedBytes:raw.length,retainedBytes:raw.length,observedSha256:sha(raw),retainedSha256:sha(raw)});}
+test('sealed positive packet rederives all source, proof, wire and observed-field checks without network',async()=>{const result=await auditPacket();assert.equal(result.capabilityCalls,12);assert.equal(result.capabilityBytes,53671);assert.equal(result.wireRecords,19);assert.equal(result.exploratoryObservedComparison.observedStateChanges,'equal');assert.equal(result.exploratoryObservedComparison.fiveChannelAgreement,false);});
+test('wire bytes cannot be altered, truncated or represented by a different decoded text',()=>{for(const mutate of [w=>{w.rawBase64=Buffer.from('tamper').toString('base64');},w=>{w.transport.complete=false;},w=>{w.responseText+=' ';}]){const w=structuredClone(wires[2]);mutate(w);assert.throws(()=>verifyWire(w,plan.rows[2].request));}});
+test('self-consistent changed request still fails frozen-plan binding',()=>{const w=structuredClone(wires[2]);w.request.params[0].to=target;w.requestText=JSON.stringify(w.request);w.requestSha256=sha(w.requestText);w.requestBytes=Buffer.byteLength(w.requestText);assert.throws(()=>verifyWire(w,plan.rows[2].request));});
+test('coherently rehashed wrong response ID is rejected',()=>{const w=structuredClone(wires[2]),json=structuredClone(w.parsed);json.id++;rebody(w,json);assert.throws(()=>verifyWire(w,plan.rows[2].request));});
+test('HTTP and RPC errors never become successful rows',()=>{for(const id of [7,11]){const w=structuredClone(wires[id-1]);w.status='completed';delete w.error;assert.throws(()=>verifyWire(w));}});
+test('same hash does not hide a complete-header disagreement',()=>{const changed=structuredClone(wires),json=changed[3].parsed;json.result.stateRoot='0x'+'11'.repeat(32);rebody(changed[3],json);assert.throws(()=>verifyHeaderBinding(changed,plan.header));});
+test('missing state channel and unsupported operators are incomplete, never equal',()=>{for(const mutate of [p=>{delete p.stateDiff;},p=>{delete p.stateDiff[target].nonce;},p=>{p.stateDiff[target].code={'-':'0x'};},p=>{p.stateDiff[request.from].nonce['*'].from='0x2';}]){const p=structuredClone(parity);mutate(p);assert.throws(()=>compareObserved(p,local,request,target));}});
+test('real output, gas and storage discrepancies remain visible',()=>{const p=structuredClone(parity);p.output='0x';p.trace[0].result.gasUsed='0x5f0b';p.stateDiff[target].storage['0x'+'00'.repeat(32)]['+']='0x'+'00'.repeat(31)+'2b';const r=compareObserved(p,local,request,target);assert.equal(r.returnData,'different');assert.equal(r.observedStateChanges,'different');assert.equal(r.gas.messageGas,'different');assert.equal(r.equivalentExecutionContext,false);});
+test('unknown accounts or missing existing slot facts cannot acquire invented zero baselines',()=>{const changed=structuredClone(parity.stateDiff);changed['0x'+'77'.repeat(20)]=changed[target];assert.throws(()=>parityChanges(changed,local.inputs));const sender=structuredClone(parity.stateDiff);sender[request.from].storage['0x'+'00'.repeat(32)]={'*':{from:'0x'+'00'.repeat(32),to:'0x'+'00'.repeat(31)+'01'}};assert.throws(()=>parityChanges(sender,local.inputs));});

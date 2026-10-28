@@ -1,0 +1,183 @@
+{
+  "schemaVersion": "1.0",
+  "status": "sealed",
+  "statusMeaning": "capture_completion_not_RPC_support_or_accuracy",
+  "planSha256": "8ff678c2a4a72e58e6aaa1114bab24da66bd9699bce1efb7a54990e0dd6f2450",
+  "sourceManifestSha256": "df32a4c2dcc9afa48bf04488a9ad565ad39c43fc16c67a1c1e5f76d7e2d02c76",
+  "sourceUnchanged": true,
+  "runtimeUnchanged": true,
+  "ledger": [
+    {
+      "id": 1,
+      "provider": "drpc",
+      "label": "chain",
+      "status": "returned",
+      "wirePath": "wire/001.json",
+      "shape": {
+        "recognized": true,
+        "kind": "chain"
+      }
+    },
+    {
+      "id": 2,
+      "provider": "drpc",
+      "label": "header-before",
+      "status": "returned",
+      "wirePath": "wire/002.json",
+      "shape": {
+        "recognized": true,
+        "kind": "header-before"
+      }
+    },
+    {
+      "id": 3,
+      "provider": "drpc",
+      "label": "parity-null-trace-stateDiff",
+      "status": "returned",
+      "wirePath": "wire/003.json",
+      "shape": {
+        "recognized": true,
+        "kind": "parity",
+        "outputPresent": true,
+        "tracePresent": true,
+        "stateDiffPresent": true,
+        "committedLogsVerified": false
+      }
+    },
+    {
+      "id": 4,
+      "provider": "drpc",
+      "label": "header-after",
+      "status": "returned",
+      "wirePath": "wire/004.json",
+      "shape": {
+        "recognized": true,
+        "kind": "header-after"
+      }
+    },
+    {
+      "id": 5,
+      "provider": "publicnode",
+      "label": "chain",
+      "status": "returned",
+      "wirePath": "wire/005.json",
+      "shape": {
+        "recognized": true,
+        "kind": "chain"
+      }
+    },
+    {
+      "id": 6,
+      "provider": "publicnode",
+      "label": "header-before",
+      "status": "returned",
+      "wirePath": "wire/006.json",
+      "shape": {
+        "recognized": true,
+        "kind": "header-before"
+      }
+    },
+    {
+      "id": 7,
+      "provider": "publicnode",
+      "label": "debug-null-callTracer",
+      "status": "failed",
+      "wirePath": "wire/007.json",
+      "error": "rpc_error"
+    },
+    {
+      "id": 8,
+      "provider": "publicnode",
+      "label": "debug-null-prestateTracer",
+      "status": "failed",
+      "wirePath": "wire/008.json",
+      "error": "rpc_error"
+    },
+    {
+      "id": 9,
+      "provider": "publicnode",
+      "label": "debug-omitted-callTracer",
+      "status": "failed",
+      "wirePath": "wire/009.json",
+      "error": "rpc_error"
+    },
+    {
+      "id": 10,
+      "provider": "publicnode",
+      "label": "debug-omitted-prestateTracer",
+      "status": "failed",
+      "wirePath": "wire/010.json",
+      "error": "rpc_error"
+    },
+    {
+      "id": 11,
+      "provider": "publicnode",
+      "label": "parity-null-trace-stateDiff",
+      "status": "failed",
+      "wirePath": "wire/011.json",
+      "error": "http_error"
+    },
+    {
+      "id": 12,
+      "provider": "publicnode",
+      "label": "header-after",
+      "status": "returned",
+      "wirePath": "wire/012.json",
+      "shape": {
+        "recognized": true,
+        "kind": "header-after"
+      }
+    }
+  ],
+  "binding": {
+    "drpc": {
+      "chain": "matched",
+      "beforeHeader": "matched",
+      "afterHeader": "matched",
+      "completeHeaderEquality": true,
+      "numericSelectorAtomicHashBinding": false,
+      "consensusVerified": false
+    },
+    "publicnode": {
+      "chain": "matched",
+      "beforeHeader": "matched",
+      "afterHeader": "matched",
+      "completeHeaderEquality": true,
+      "numericSelectorAtomicHashBinding": false,
+      "consensusVerified": false
+    }
+  },
+  "usage": {
+    "planned": 12,
+    "calls": 12,
+    "dispatches": 12,
+    "observedBytes": 53671,
+    "saveFailure": false,
+    "durationMs": 2379.7587080000003,
+    "limits": {
+      "calls": 12,
+      "requestMs": 25000,
+      "responseBytes": 8388608,
+      "totalBytes": 33554432,
+      "wallMs": 330000,
+      "terminalDrainMs": 25000,
+      "liveAndDrainCeilingMs": 360000,
+      "retries": 0,
+      "replacements": 0
+    }
+  },
+  "scope": {
+    "purpose": "fixed_root_CREATE_RPC_capability_discovery_only",
+    "localReference": "previously_sealed_successful_proof_backed_execution_before_all_new_provider_calls",
+    "providerOutputsUsedAsLocalInputs": false,
+    "accuracyEvaluated": false,
+    "fiveChannelAgreement": false,
+    "committedLogsVerified": false,
+    "consensusVerified": false,
+    "debugSelector": "exact_blockHash_requireCanonical",
+    "paritySelector": "numeric_block_with_before_after_complete_header_comparison_not_atomic_hash_binding",
+    "parityFeeContext": "gasPrice_zero_without_block_override_not_claimed_identical_to_local_unpriced_environment",
+    "failurePolicy": "attempt_each_predeclared_row_independently_until_shared_budget_or_persistence_failure_no_retry",
+    "timing": "330s_dispatch_plus_at_most25s_terminal_drain_offline_hashing_and_sealing_excluded"
+  }
+}
