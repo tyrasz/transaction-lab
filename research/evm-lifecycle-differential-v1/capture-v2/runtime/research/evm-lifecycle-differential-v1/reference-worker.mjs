@@ -1,0 +1,2 @@
+import fs from'node:fs';import {createHash}from'node:crypto';import {executeReference}from'./runtime.mjs';
+try{const[file,expected]=process.argv.slice(2),raw=fs.readFileSync(file);if(raw.length>1024*1024||createHash('sha256').update(raw).digest('hex')!==expected)throw Error('Frozen declaration mismatch');const result=await executeReference(JSON.parse(raw));process.stdout.write(JSON.stringify(result)+'\n');}catch(error){process.stdout.write(JSON.stringify({status:'unavailable',error:{name:error.name,message:error.message}})+'\n');process.exitCode=1;}
