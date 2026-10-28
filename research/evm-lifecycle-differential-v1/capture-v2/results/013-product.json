@@ -1,0 +1,643 @@
+{
+  "attempt": {
+    "status": "completed",
+    "error": null,
+    "output": {
+      "execution": {
+        "status": "reverted",
+        "executionGasUsed": "22115",
+        "gasRefundCounter": "0",
+        "returnData": "0x00",
+        "error": "revert"
+      },
+      "trace": {
+        "type": "CREATE",
+        "from": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+        "to": "0x081f85bbb63f960f83724898686620b3e01a5542",
+        "executionAddress": "0x081f85bbb63f960f83724898686620b3e01a5542",
+        "caller": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+        "value": "0x0",
+        "input": "0x600160005560016000fd600b600155",
+        "gas": "0x4b7b5e",
+        "gasUsed": "0x5663",
+        "output": "0x00",
+        "error": "revert",
+        "depth": 0,
+        "calls": []
+      },
+      "logs": [],
+      "environment": {
+        "chainId": 1,
+        "hardfork": "osaka",
+        "number": "22000000",
+        "timestamp": "1764798551",
+        "gasLimit": "120000000",
+        "baseFeePerGas": "0",
+        "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "miner": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba",
+        "sourceBlockHash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5",
+        "sourceParentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "sourceBlockIdentityVerified": false
+      },
+      "semantics": {
+        "kind": "unsigned_message",
+        "signatureVerification": false,
+        "transactionNonceValidation": false,
+        "callerNonce": "runCall_increments_once_including_EVM_revert",
+        "gasBudget": "message_execution_only_intrinsic_transaction_gas_not_subtracted",
+        "gasUsed": "execution_gas_before_transaction_refund_and_intrinsic_gas",
+        "gasPrice": "0",
+        "feeSettlement": false,
+        "warmAddresses": "sender_coinbase_and_fork_active_precompiles_creation_target_warmed_by_EVM_no_access_list",
+        "logs": "committed_root_result_only_no_duplicated_descendant_log_arrays",
+        "callTree": "entered_messages_only",
+        "chainScope": "Ethereum_mainnet_pinned_timestamp_selected_fork",
+        "lifecycle": "top_level_CREATE_and_internal_CREATE_CREATE2_with_proven_deployable_targets_Shanghai_SELFDESTRUCT_and_full_EIP161_cleanup_unsupported",
+        "deadline": "cooperative_until_final_atomic_commit_no_forceful_IO_cancellation"
+      },
+      "limits": {
+        "gas": 5000000,
+        "steps": 1000000,
+        "frames": 1000,
+        "depth": 32,
+        "logs": 2000,
+        "memoryBytes": 1048576,
+        "returnBytes": 1048576,
+        "calldataBytes": 32768,
+        "traceBytes": 8388608,
+        "wallMs": 9998
+      },
+      "usage": {
+        "steps": 6,
+        "frames": 1,
+        "maxDepth": 0,
+        "logOpcodes": 0,
+        "retainedTraceBytes": 404
+      },
+      "stateDisposition": "message_result_retained_in_supplied_manager",
+      "profile": {
+        "name": "ethereum_unsigned_unpriced_call",
+        "chainId": 1,
+        "hardfork": "osaka",
+        "forkSchedule": "pinned_ethereumjs_common_10.1.3_mainnet",
+        "sourceBlockHash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5",
+        "sourceStateRoot": "0xf2c6670166ba433ca20ad7c359ccb69510bd1d2a4b979d8e4da913cb283f2cd5",
+        "sourceBlockIdentityVerified": false,
+        "sourceStateProofVerified": false,
+        "actualBlockBaseFee": "0",
+        "executionBaseFee": "0",
+        "gasPrice": "0",
+        "declaredGasLimit": "5000000",
+        "intrinsicGas": "53218",
+        "calldataFloor": "21540",
+        "messageGasLimit": "4946782",
+        "calldataZeroBytes": "2",
+        "calldataNonzeroBytes": "13",
+        "outerSignatureVerified": false,
+        "feesSettled": false,
+        "originalTransactionPosition": false,
+        "expectedOutputsUsed": false,
+        "operation": "create",
+        "initcodeBytes": "15",
+        "creationIntrinsicGas": "32000",
+        "initcodeWordGas": "2"
+      },
+      "gasAccounting": {
+        "beforeRefund": "75333",
+        "appliedRefund": "0",
+        "floorAdjustment": "0",
+        "gasUsed": "75333"
+      },
+      "gasAccountingScope": "Unsigned call gas including intrinsic, one-fifth refund cap and active calldata floor; no fee settlement or signed-transaction validity claim."
+    },
+    "inputs": {
+      "status": "available",
+      "context": {
+        "chainId": 1,
+        "blockHash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5",
+        "stateRoot": "0xf2c6670166ba433ca20ad7c359ccb69510bd1d2a4b979d8e4da913cb283f2cd5",
+        "header": {
+          "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+          "miner": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba",
+          "stateRoot": "0xf2c6670166ba433ca20ad7c359ccb69510bd1d2a4b979d8e4da913cb283f2cd5",
+          "transactionsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "receiptsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "difficulty": "0x0",
+          "number": "0x14fb180",
+          "gasLimit": "0x7270e00",
+          "gasUsed": "0x0",
+          "timestamp": "0x6930b057",
+          "extraData": "0x",
+          "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "nonce": "0x0000000000000000",
+          "baseFeePerGas": "0x0",
+          "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "blobGasUsed": "0x0",
+          "excessBlobGas": "0x0",
+          "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "requestsHash": "0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "hash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5"
+        },
+        "selector": {
+          "blockHash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5",
+          "requireCanonical": true
+        },
+        "stateRootTrust": "caller_supplied_header",
+        "provenance": "verified_eip1186_proofs_and_code_hash",
+        "expectedOutputsUsed": false
+      },
+      "accounts": {
+        "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+          "exists": true,
+          "nonce": "0",
+          "balance": "1000000000000000000000000000",
+          "code": "0x",
+          "storage": {}
+        },
+        "0x081f85bbb63f960f83724898686620b3e01a5542": {
+          "exists": false
+        }
+      },
+      "provenance": [
+        {
+          "account": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+          "accountProof": {
+            "exists": true,
+            "nonceRaw": "0",
+            "balanceRaw": "1000000000000000000000000000",
+            "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+            "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+          },
+          "proofEvidenceId": 1,
+          "codeEvidenceId": 2,
+          "storage": []
+        },
+        {
+          "account": "0x081f85bbb63f960f83724898686620b3e01a5542",
+          "accountProof": {
+            "exists": false,
+            "nonceRaw": "0",
+            "balanceRaw": "0",
+            "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+            "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+          },
+          "proofEvidenceId": 3,
+          "codeEvidenceId": 4,
+          "storage": [
+            {
+              "key": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "exists": false,
+              "evidenceId": 3
+            }
+          ]
+        }
+      ],
+      "coverage": "Only demanded, proof-verified initial accounts and storage keys; unrequested storage is unknown."
+    },
+    "inputEvidence": [
+      {
+        "id": 1,
+        "request": {
+          "method": "eth_getProof",
+          "params": [
+            "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+            [],
+            {
+              "blockHash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getProof\",\"params\":[\"0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff\",[],{\"blockHash\":\"0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5\",\"requireCanonical\":true}]}",
+        "requestSha256": "f3b10b10b42e69d79227c79bbda25bdc87ca539b90b20a2ff03907eee8b06269",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 551,
+        "resultSha256": "894a774039f394fb73e557f7fcebdd9e2d8798a37c5d3c882ba8f10abed782ef",
+        "result": {
+          "address": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+          "balance": "0x33b2e3c9fd0803ce8000000",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "nonce": "0x0",
+          "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "accountProof": [
+            "0xf876a120b1182ca0865c06f8303682e7654d42265e1c4e86b94937d0facf17558db79cc9b852f850808c033b2e3c9fd0803ce8000000a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a0c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+          ],
+          "storageProof": []
+        },
+        "durationMs": 0.9355000000000047,
+        "verification": "verified"
+      },
+      {
+        "id": 2,
+        "request": {
+          "method": "eth_getCode",
+          "params": [
+            "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+            {
+              "blockHash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getCode\",\"params\":[\"0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff\",{\"blockHash\":\"0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5\",\"requireCanonical\":true}]}",
+        "requestSha256": "e37dae7b6f6391ff11efd3685d35a05475dc22cb0168f6f89bfb4c0a311d3c62",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 4,
+        "resultSha256": "1c9409806518d1a5f52d79299ea0289ea2ff527e05895cd8f7a36d4cca28a13e",
+        "result": "0x",
+        "durationMs": 0.205916000000002,
+        "verification": "verified"
+      },
+      {
+        "id": 3,
+        "request": {
+          "method": "eth_getProof",
+          "params": [
+            "0x081f85bbb63f960f83724898686620b3e01a5542",
+            [],
+            {
+              "blockHash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getProof\",\"params\":[\"0x081f85bbb63f960f83724898686620b3e01a5542\",[],{\"blockHash\":\"0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5\",\"requireCanonical\":true}]}",
+        "requestSha256": "a635aa5e084faafb5bd96282af2058ed1f10f78e4b616e9e153afba601741e75",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 529,
+        "resultSha256": "b755d43d4cf7a6b63de23a2fca062a13c2f9652ad7c537ccb7abaef5d510708f",
+        "result": {
+          "address": "0x081f85bbb63f960f83724898686620b3e01a5542",
+          "balance": "0x0",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "nonce": "0x0",
+          "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "accountProof": [
+            "0xf876a120b1182ca0865c06f8303682e7654d42265e1c4e86b94937d0facf17558db79cc9b852f850808c033b2e3c9fd0803ce8000000a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a0c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+          ],
+          "storageProof": []
+        },
+        "durationMs": 0.227958000000001,
+        "verification": "verified"
+      },
+      {
+        "id": 4,
+        "request": {
+          "method": "eth_getCode",
+          "params": [
+            "0x081f85bbb63f960f83724898686620b3e01a5542",
+            {
+              "blockHash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getCode\",\"params\":[\"0x081f85bbb63f960f83724898686620b3e01a5542\",{\"blockHash\":\"0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5\",\"requireCanonical\":true}]}",
+        "requestSha256": "5e4bc0df5be4e50331e23b33cb49cbb04e88a26dc791c538047140732792db9b",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 4,
+        "resultSha256": "1c9409806518d1a5f52d79299ea0289ea2ff527e05895cd8f7a36d4cca28a13e",
+        "result": "0x",
+        "durationMs": 0.125,
+        "verification": "verified"
+      }
+    ],
+    "inputUsage": {
+      "status": "available",
+      "calls": 4,
+      "observedResultBytes": 1088,
+      "retainedResultBytes": 1088,
+      "accounts": 2,
+      "slots": 1,
+      "reads": 5,
+      "distinctReads": 5,
+      "limits": {
+        "accounts": 128,
+        "slots": 1024,
+        "calls": 256,
+        "responseBytes": 8388608,
+        "totalBytes": 33554432,
+        "codeBytes": 131072,
+        "reads": 200000,
+        "requestMs": 25000,
+        "wallMs": 9998
+      }
+    },
+    "inputReads": {
+      "total": 5,
+      "distinct": 5,
+      "reads": [
+        {
+          "kind": "account",
+          "account": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff"
+        },
+        {
+          "kind": "code",
+          "account": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff"
+        },
+        {
+          "kind": "account",
+          "account": "0x081f85bbb63f960f83724898686620b3e01a5542"
+        },
+        {
+          "kind": "code",
+          "account": "0x081f85bbb63f960f83724898686620b3e01a5542"
+        },
+        {
+          "kind": "storage",
+          "account": "0x081f85bbb63f960f83724898686620b3e01a5542",
+          "slot": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    "stateReads": {
+      "total": 12,
+      "distinct": 4,
+      "reads": [
+        {
+          "kind": "account",
+          "address": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff"
+        },
+        {
+          "kind": "code",
+          "address": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff"
+        },
+        {
+          "kind": "account",
+          "address": "0x081f85bbb63f960f83724898686620b3e01a5542"
+        },
+        {
+          "kind": "storage",
+          "address": "0x081f85bbb63f960f83724898686620b3e01a5542",
+          "slot": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    "changes": {
+      "scope": "Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.",
+      "accounts": [
+        {
+          "address": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+          "nonce": {
+            "before": "0x0",
+            "after": "0x1"
+          }
+        }
+      ]
+    },
+    "headerVerification": {
+      "status": "verified",
+      "blockHash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5",
+      "stateRoot": "0xf2c6670166ba433ca20ad7c359ccb69510bd1d2a4b979d8e4da913cb283f2cd5",
+      "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "number": "22000000",
+      "timestamp": "1764798551",
+      "hardfork": "osaka",
+      "encodedBytes": 610,
+      "headerFields": 21,
+      "consensusVerified": false,
+      "finalityVerified": false,
+      "bodyVerified": false
+    },
+    "isolation": {
+      "worker": "engines/local-evm/isolated-worker.js",
+      "processSeparated": true,
+      "childPid": 46564,
+      "node": "v22.23.2",
+      "v8": "12.4.254.21-node.56",
+      "v8OldSpaceMiB": 256,
+      "hardTotalRssCap": false,
+      "osNetworkSandbox": false,
+      "osFilesystemSandbox": false,
+      "sourceImplementationBound": false,
+      "wallMs": 9998,
+      "drainMs": 25000,
+      "durationMs": 109.2160829999998,
+      "terminateRequested": false,
+      "processClosed": true,
+      "exitCode": 0,
+      "exitSignal": null,
+      "stdioBytes": 0,
+      "limits": {
+        "wallMs": 9998,
+        "requestMs": 25000,
+        "drainMs": 25000,
+        "killWaitMs": 1000,
+        "heapMiB": 256,
+        "calls": 256,
+        "responseBytes": 8388608,
+        "totalResponseBytes": 33554432,
+        "outputBytes": 16777216,
+        "stdioBytes": 65536,
+        "inputs": {
+          "accounts": 128,
+          "slots": 1024,
+          "codeBytes": 131072,
+          "reads": 200000,
+          "wallMs": 9998
+        },
+        "execution": {
+          "gas": 5000000,
+          "steps": 1000000,
+          "frames": 1000,
+          "depth": 32,
+          "logs": 2000,
+          "memoryBytes": 1048576,
+          "returnBytes": 1048576,
+          "calldataBytes": 32768,
+          "traceBytes": 8388608,
+          "wallMs": 9998
+        }
+      }
+    },
+    "broker": {
+      "calls": 4,
+      "dispatches": 4,
+      "accountedParsedResultBytes": 1088,
+      "records": [
+        {
+          "id": 1,
+          "request": {
+            "method": "eth_getProof",
+            "params": [
+              "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+              [],
+              {
+                "blockHash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 551,
+          "resultSha256": "894a774039f394fb73e557f7fcebdd9e2d8798a37c5d3c882ba8f10abed782ef",
+          "durationMs": 0.2068330000001879
+        },
+        {
+          "id": 2,
+          "request": {
+            "method": "eth_getCode",
+            "params": [
+              "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+              {
+                "blockHash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 4,
+          "resultSha256": "1c9409806518d1a5f52d79299ea0289ea2ff527e05895cd8f7a36d4cca28a13e",
+          "durationMs": 0.08433400000012625
+        },
+        {
+          "id": 3,
+          "request": {
+            "method": "eth_getProof",
+            "params": [
+              "0x081f85bbb63f960f83724898686620b3e01a5542",
+              [],
+              {
+                "blockHash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 529,
+          "resultSha256": "b755d43d4cf7a6b63de23a2fca062a13c2f9652ad7c537ccb7abaef5d510708f",
+          "durationMs": 0.11483399999997346
+        },
+        {
+          "id": 4,
+          "request": {
+            "method": "eth_getCode",
+            "params": [
+              "0x081f85bbb63f960f83724898686620b3e01a5542",
+              {
+                "blockHash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 4,
+          "resultSha256": "1c9409806518d1a5f52d79299ea0289ea2ff527e05895cd8f7a36d4cca28a13e",
+          "durationMs": 0.04475000000002183
+        }
+      ],
+      "pendingAtReturn": 0,
+      "rawWireCaptured": false,
+      "inRangeBlockhash": "authenticated_parent_hash_chain_with_shared_input_limits"
+    }
+  },
+  "proofRecords": [
+    {
+      "id": 1,
+      "request": {
+        "method": "eth_getProof",
+        "params": [
+          "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+          [],
+          {
+            "blockHash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "representation": "parsed_in_memory_proof_result_no_network_wire",
+      "status": "received",
+      "result": {
+        "address": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+        "balance": "0x33b2e3c9fd0803ce8000000",
+        "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+        "nonce": "0x0",
+        "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "accountProof": [
+          "0xf876a120b1182ca0865c06f8303682e7654d42265e1c4e86b94937d0facf17558db79cc9b852f850808c033b2e3c9fd0803ce8000000a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a0c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+        ],
+        "storageProof": []
+      },
+      "bytes": 551
+    },
+    {
+      "id": 2,
+      "request": {
+        "method": "eth_getCode",
+        "params": [
+          "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+          {
+            "blockHash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "representation": "parsed_in_memory_proof_result_no_network_wire",
+      "status": "received",
+      "result": "0x",
+      "bytes": 4
+    },
+    {
+      "id": 3,
+      "request": {
+        "method": "eth_getProof",
+        "params": [
+          "0x081f85bbb63f960f83724898686620b3e01a5542",
+          [],
+          {
+            "blockHash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "representation": "parsed_in_memory_proof_result_no_network_wire",
+      "status": "received",
+      "result": {
+        "address": "0x081f85bbb63f960f83724898686620b3e01a5542",
+        "balance": "0x0",
+        "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+        "nonce": "0x0",
+        "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "accountProof": [
+          "0xf876a120b1182ca0865c06f8303682e7654d42265e1c4e86b94937d0facf17558db79cc9b852f850808c033b2e3c9fd0803ce8000000a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a0c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+        ],
+        "storageProof": []
+      },
+      "bytes": 529
+    },
+    {
+      "id": 4,
+      "request": {
+        "method": "eth_getCode",
+        "params": [
+          "0x081f85bbb63f960f83724898686620b3e01a5542",
+          {
+            "blockHash": "0x22b666387f5aad60ecd31fb0f600e75d17b0922558d8519a3f5a64e1975b26d5",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "representation": "parsed_in_memory_proof_result_no_network_wire",
+      "status": "received",
+      "result": "0x",
+      "bytes": 4
+    }
+  ],
+  "proofSource": "Immutable declared fixture preallocation only; no reference output or original official poststate.",
+  "publicRequests": 0
+}

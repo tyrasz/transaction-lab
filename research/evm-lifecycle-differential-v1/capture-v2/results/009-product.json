@@ -1,0 +1,1503 @@
+{
+  "attempt": {
+    "status": "completed",
+    "error": null,
+    "output": {
+      "execution": {
+        "status": "success",
+        "executionGasUsed": "115839",
+        "gasRefundCounter": "0",
+        "returnData": "0x",
+        "error": null
+      },
+      "trace": {
+        "type": "CALL",
+        "from": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+        "to": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+        "executionAddress": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+        "caller": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+        "value": "0x3",
+        "input": "0x",
+        "gas": "0x4bf938",
+        "gasUsed": "0x1c47f",
+        "output": "0x",
+        "error": null,
+        "depth": 0,
+        "calls": [
+          {
+            "type": "CREATE",
+            "from": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+            "to": "0x0facfbcabd0646f9d44393694b5e355040def982",
+            "executionAddress": "0x0facfbcabd0646f9d44393694b5e355040def982",
+            "caller": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+            "value": "0x3",
+            "input": "0x610023600081600b8239f36000600060006000600073ebe5f51f766e9e9ba4e623905eb26cbacfe069e35af25000",
+            "gas": "0x4a4e14",
+            "gasUsed": "0x1b76",
+            "output": "0x6000600060006000600073ebe5f51f766e9e9ba4e623905eb26cbacfe069e35af25000",
+            "error": null,
+            "depth": 1,
+            "calls": []
+          },
+          {
+            "type": "CALL",
+            "from": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+            "to": "0x0facfbcabd0646f9d44393694b5e355040def982",
+            "executionAddress": "0x0facfbcabd0646f9d44393694b5e355040def982",
+            "caller": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+            "value": "0x0",
+            "input": "0x",
+            "gas": "0x49dd36",
+            "gasUsed": "0x7e4b",
+            "output": "0x",
+            "error": null,
+            "depth": 1,
+            "calls": [
+              {
+                "type": "CALLCODE",
+                "from": "0x0facfbcabd0646f9d44393694b5e355040def982",
+                "to": "0xebe5f51f766e9e9ba4e623905eb26cbacfe069e3",
+                "executionAddress": "0x0facfbcabd0646f9d44393694b5e355040def982",
+                "caller": "0x0facfbcabd0646f9d44393694b5e355040def982",
+                "value": "0x0",
+                "input": "0x",
+                "gas": "0x48abaf",
+                "gasUsed": "0x740d",
+                "output": "0x",
+                "error": null,
+                "depth": 2,
+                "calls": [],
+                "selfdestruct": {
+                  "beneficiary": "0xf36afef4dcb45e52f80cb039335952f77cec8960"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "logs": [],
+      "environment": {
+        "chainId": 1,
+        "hardfork": "osaka",
+        "number": "22000000",
+        "timestamp": "1764798551",
+        "gasLimit": "120000000",
+        "baseFeePerGas": "0",
+        "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "miner": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba",
+        "sourceBlockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+        "sourceParentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "sourceBlockIdentityVerified": false
+      },
+      "semantics": {
+        "kind": "unsigned_message",
+        "signatureVerification": false,
+        "transactionNonceValidation": false,
+        "callerNonce": "runCall_increments_once_including_EVM_revert",
+        "gasBudget": "message_execution_only_intrinsic_transaction_gas_not_subtracted",
+        "gasUsed": "execution_gas_before_transaction_refund_and_intrinsic_gas",
+        "gasPrice": "0",
+        "feeSettlement": false,
+        "warmAddresses": "sender_destination_coinbase_and_fork_active_precompiles_no_access_list",
+        "logs": "committed_root_result_only_no_duplicated_descendant_log_arrays",
+        "callTree": "entered_messages_only",
+        "chainScope": "Ethereum_mainnet_pinned_timestamp_selected_fork",
+        "lifecycle": "Cancun_created_account_SELFDESTRUCT_with_root_commit_gated_deletion_Shanghai_SELFDESTRUCT_and_full_EIP161_cleanup_unsupported",
+        "deadline": "cooperative_until_final_atomic_commit_no_forceful_IO_cancellation"
+      },
+      "limits": {
+        "gas": 5000000,
+        "steps": 1000000,
+        "frames": 1000,
+        "depth": 32,
+        "logs": 2000,
+        "memoryBytes": 1048576,
+        "returnBytes": 1048576,
+        "calldataBytes": 32768,
+        "traceBytes": 8388608,
+        "wallMs": 9997
+      },
+      "usage": {
+        "steps": 51,
+        "frames": 4,
+        "maxDepth": 2,
+        "logOpcodes": 0,
+        "retainedTraceBytes": 1886
+      },
+      "lifecycle": {
+        "finalizedDeletions": [
+          {
+            "address": "0x0facfbcabd0646f9d44393694b5e355040def982",
+            "scope": "entire_account_including_code_and_storage",
+            "initialStorageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+          }
+        ]
+      },
+      "stateDisposition": "message_result_retained_in_supplied_manager",
+      "profile": {
+        "name": "ethereum_unsigned_unpriced_call",
+        "chainId": 1,
+        "hardfork": "osaka",
+        "forkSchedule": "pinned_ethereumjs_common_10.1.3_mainnet",
+        "sourceBlockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+        "sourceStateRoot": "0x2e9ed0c6ca528983eb9fe296e202e78e8f135c3ee1d419e29e2b7dae9b0eed94",
+        "sourceBlockIdentityVerified": false,
+        "sourceStateProofVerified": false,
+        "actualBlockBaseFee": "0",
+        "executionBaseFee": "0",
+        "gasPrice": "0",
+        "declaredGasLimit": "5000000",
+        "intrinsicGas": "21000",
+        "calldataFloor": "21000",
+        "messageGasLimit": "4979000",
+        "calldataZeroBytes": "0",
+        "calldataNonzeroBytes": "0",
+        "outerSignatureVerified": false,
+        "feesSettled": false,
+        "originalTransactionPosition": false,
+        "expectedOutputsUsed": false
+      },
+      "gasAccounting": {
+        "beforeRefund": "136839",
+        "appliedRefund": "0",
+        "floorAdjustment": "0",
+        "gasUsed": "136839"
+      },
+      "gasAccountingScope": "Unsigned call gas including intrinsic, one-fifth refund cap and active calldata floor; no fee settlement or signed-transaction validity claim."
+    },
+    "inputs": {
+      "status": "available",
+      "context": {
+        "chainId": 1,
+        "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+        "stateRoot": "0x2e9ed0c6ca528983eb9fe296e202e78e8f135c3ee1d419e29e2b7dae9b0eed94",
+        "header": {
+          "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+          "miner": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba",
+          "stateRoot": "0x2e9ed0c6ca528983eb9fe296e202e78e8f135c3ee1d419e29e2b7dae9b0eed94",
+          "transactionsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "receiptsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "difficulty": "0x0",
+          "number": "0x14fb180",
+          "gasLimit": "0x7270e00",
+          "gasUsed": "0x0",
+          "timestamp": "0x6930b057",
+          "extraData": "0x",
+          "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "nonce": "0x0000000000000000",
+          "baseFeePerGas": "0x0",
+          "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "blobGasUsed": "0x0",
+          "excessBlobGas": "0x0",
+          "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "requestsHash": "0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "hash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea"
+        },
+        "selector": {
+          "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+          "requireCanonical": true
+        },
+        "stateRootTrust": "caller_supplied_header",
+        "provenance": "verified_eip1186_proofs_and_code_hash",
+        "expectedOutputsUsed": false
+      },
+      "accounts": {
+        "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+          "exists": true,
+          "nonce": "0",
+          "balance": "1000000000000000000000000000",
+          "code": "0x",
+          "storage": {}
+        },
+        "0x4fdb869be35218e189e2b3409752e3ff20c339ee": {
+          "exists": true,
+          "nonce": "1",
+          "balance": "0",
+          "code": "0x7f610023600081600b8239f36000600060006000600073ebe5f51f766e9e9ba4e660005260205171ffffffffffffffffffffffffffffffffffff167f23905eb26cbacfe069e35af2500000000000000000000000000000000000000017602052602e60006003f0600055600060006000600060006000545af160015500",
+          "storage": {
+            "0x0000000000000000000000000000000000000000000000000000000000000000": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "0x0000000000000000000000000000000000000000000000000000000000000001": "0x0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        },
+        "0x0facfbcabd0646f9d44393694b5e355040def982": {
+          "exists": false
+        },
+        "0xebe5f51f766e9e9ba4e623905eb26cbacfe069e3": {
+          "exists": true,
+          "nonce": "1",
+          "balance": "7",
+          "code": "0x600160005573f36afef4dcb45e52f80cb039335952f77cec8960ff",
+          "storage": {}
+        },
+        "0xf36afef4dcb45e52f80cb039335952f77cec8960": {
+          "exists": true,
+          "nonce": "0",
+          "balance": "1",
+          "code": "0x",
+          "storage": {}
+        }
+      },
+      "provenance": [
+        {
+          "account": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+          "accountProof": {
+            "exists": true,
+            "nonceRaw": "0",
+            "balanceRaw": "1000000000000000000000000000",
+            "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+            "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+          },
+          "proofEvidenceId": 1,
+          "codeEvidenceId": 2,
+          "storage": []
+        },
+        {
+          "account": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+          "accountProof": {
+            "exists": true,
+            "nonceRaw": "1",
+            "balanceRaw": "0",
+            "codeHash": "0x3d5cdec66b0e78336d5de046d9228b0ef81a372253d191705e81cba34271c9b4",
+            "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+          },
+          "proofEvidenceId": 3,
+          "codeEvidenceId": 4,
+          "storage": [
+            {
+              "key": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "exists": false,
+              "evidenceId": 7
+            },
+            {
+              "key": "0x0000000000000000000000000000000000000000000000000000000000000001",
+              "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "exists": false,
+              "evidenceId": 12
+            }
+          ]
+        },
+        {
+          "account": "0x0facfbcabd0646f9d44393694b5e355040def982",
+          "accountProof": {
+            "exists": false,
+            "nonceRaw": "0",
+            "balanceRaw": "0",
+            "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+            "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+          },
+          "proofEvidenceId": 5,
+          "codeEvidenceId": 6,
+          "storage": [
+            {
+              "key": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "value": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "exists": false,
+              "evidenceId": 5
+            }
+          ]
+        },
+        {
+          "account": "0xebe5f51f766e9e9ba4e623905eb26cbacfe069e3",
+          "accountProof": {
+            "exists": true,
+            "nonceRaw": "1",
+            "balanceRaw": "7",
+            "codeHash": "0xa2eab5d2d55db421313fdcdef02b854a7bbaa8a6dbb2c1621d557fe03f99ef1f",
+            "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+          },
+          "proofEvidenceId": 8,
+          "codeEvidenceId": 9,
+          "storage": []
+        },
+        {
+          "account": "0xf36afef4dcb45e52f80cb039335952f77cec8960",
+          "accountProof": {
+            "exists": true,
+            "nonceRaw": "0",
+            "balanceRaw": "1",
+            "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+            "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+          },
+          "proofEvidenceId": 10,
+          "codeEvidenceId": 11,
+          "storage": []
+        }
+      ],
+      "coverage": "Only demanded, proof-verified initial accounts and storage keys; unrequested storage is unknown."
+    },
+    "inputEvidence": [
+      {
+        "id": 1,
+        "request": {
+          "method": "eth_getProof",
+          "params": [
+            "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+            [],
+            {
+              "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getProof\",\"params\":[\"0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff\",[],{\"blockHash\":\"0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea\",\"requireCanonical\":true}]}",
+        "requestSha256": "c7107663673002ffb04cc0a85db242861dae3657f222538c1e39076bbd4c4f85",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 784,
+        "resultSha256": "c8d33ee37663bb4f47cbba8506a2c5934c7c7a00b6685f65d4ac7638ba08abd3",
+        "result": {
+          "address": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+          "balance": "0x33b2e3c9fd0803ce8000000",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "nonce": "0x0",
+          "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "accountProof": [
+            "0xf8718080a0b479769098dcc1748892d2d3f565ee91f82b0ca474a519807b26b278fb99366680a0203a89599bb7dd82f963c6c7c41a15f4d6c0a48ad310b96931fa6c35a38322b4808080808080a03322071acd1dceefd29ef7c44c88610cca307a9c994d2940c0d18a9b19a1aeb88080808080",
+            "0xf875a031182ca0865c06f8303682e7654d42265e1c4e86b94937d0facf17558db79cc9b852f850808c033b2e3c9fd0803ce8000000a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a0c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+          ],
+          "storageProof": []
+        },
+        "durationMs": 1.0672079999999937,
+        "verification": "verified"
+      },
+      {
+        "id": 2,
+        "request": {
+          "method": "eth_getCode",
+          "params": [
+            "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+            {
+              "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getCode\",\"params\":[\"0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff\",{\"blockHash\":\"0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea\",\"requireCanonical\":true}]}",
+        "requestSha256": "2b4eea6b20ab465f495d8d7c61dbdf2a74bcebd4c1e244b53b79e1a281e42d70",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 4,
+        "resultSha256": "1c9409806518d1a5f52d79299ea0289ea2ff527e05895cd8f7a36d4cca28a13e",
+        "result": "0x",
+        "durationMs": 0.18754199999999344,
+        "verification": "verified"
+      },
+      {
+        "id": 3,
+        "request": {
+          "method": "eth_getProof",
+          "params": [
+            "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+            [],
+            {
+              "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getProof\",\"params\":[\"0x4fdb869be35218e189e2b3409752e3ff20c339ee\",[],{\"blockHash\":\"0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea\",\"requireCanonical\":true}]}",
+        "requestSha256": "8963fa4dd11c3f2f02e738cf49d14e04f7871950ef467f7b2a5fa4f35eef3781",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 909,
+        "resultSha256": "65c9f9bd3975cacee74abf09794ac7af35eb8453dc70f7958f43b70482c07513",
+        "result": {
+          "address": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+          "balance": "0x0",
+          "codeHash": "0x3d5cdec66b0e78336d5de046d9228b0ef81a372253d191705e81cba34271c9b4",
+          "nonce": "0x1",
+          "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "accountProof": [
+            "0xf8718080a0b479769098dcc1748892d2d3f565ee91f82b0ca474a519807b26b278fb99366680a0203a89599bb7dd82f963c6c7c41a15f4d6c0a48ad310b96931fa6c35a38322b4808080808080a03322071acd1dceefd29ef7c44c88610cca307a9c994d2940c0d18a9b19a1aeb88080808080",
+            "0xf851a0e8958d651ed3a458592676462ee3aff2f759ec6cd2f27ca3ca428b13a3d031278080808080808080808080808080a001fceb8bd8bfc1c7d8c880fee845197d87855852698fd0e47de80d3c41c5bd7080",
+            "0xf869a0200b7f119e84e02b3e90c586d0e5e0aaa48990f19c8555a45cb1d33678f678f7b846f8440180a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a03d5cdec66b0e78336d5de046d9228b0ef81a372253d191705e81cba34271c9b4"
+          ],
+          "storageProof": []
+        },
+        "durationMs": 0.24245799999999917,
+        "verification": "verified"
+      },
+      {
+        "id": 4,
+        "request": {
+          "method": "eth_getCode",
+          "params": [
+            "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+            {
+              "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getCode\",\"params\":[\"0x4fdb869be35218e189e2b3409752e3ff20c339ee\",{\"blockHash\":\"0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea\",\"requireCanonical\":true}]}",
+        "requestSha256": "35a451a1234e67025bd41f4993ef7a5a491df4c6f7552feb554201a0241077e1",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 254,
+        "resultSha256": "6b64975e5f57c18cf18f2abc165efd251566f55c4531e9166e74ea58227621b8",
+        "result": "0x7f610023600081600b8239f36000600060006000600073ebe5f51f766e9e9ba4e660005260205171ffffffffffffffffffffffffffffffffffff167f23905eb26cbacfe069e35af2500000000000000000000000000000000000000017602052602e60006003f0600055600060006000600060006000545af160015500",
+        "durationMs": 0.14116700000001003,
+        "verification": "verified"
+      },
+      {
+        "id": 5,
+        "request": {
+          "method": "eth_getProof",
+          "params": [
+            "0x0facfbcabd0646f9d44393694b5e355040def982",
+            [],
+            {
+              "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getProof\",\"params\":[\"0x0facfbcabd0646f9d44393694b5e355040def982\",[],{\"blockHash\":\"0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea\",\"requireCanonical\":true}]}",
+        "requestSha256": "3bae0da89f31e35ff276353c2cf9dd1a04574fe48bc3876e049dacd736a2a948",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 519,
+        "resultSha256": "253e417aa5b3098a6c2e263ab84539e953282fd38345fafbf02364c7dfb782f6",
+        "result": {
+          "address": "0x0facfbcabd0646f9d44393694b5e355040def982",
+          "balance": "0x0",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "nonce": "0x0",
+          "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "accountProof": [
+            "0xf8718080a0b479769098dcc1748892d2d3f565ee91f82b0ca474a519807b26b278fb99366680a0203a89599bb7dd82f963c6c7c41a15f4d6c0a48ad310b96931fa6c35a38322b4808080808080a03322071acd1dceefd29ef7c44c88610cca307a9c994d2940c0d18a9b19a1aeb88080808080"
+          ],
+          "storageProof": []
+        },
+        "durationMs": 0.15791699999999764,
+        "verification": "verified"
+      },
+      {
+        "id": 6,
+        "request": {
+          "method": "eth_getCode",
+          "params": [
+            "0x0facfbcabd0646f9d44393694b5e355040def982",
+            {
+              "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getCode\",\"params\":[\"0x0facfbcabd0646f9d44393694b5e355040def982\",{\"blockHash\":\"0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea\",\"requireCanonical\":true}]}",
+        "requestSha256": "8cb90492cb20c8e7e84a02dfc783f23061b3dbdb4cec0de6c4e173a980bdd165",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 4,
+        "resultSha256": "1c9409806518d1a5f52d79299ea0289ea2ff527e05895cd8f7a36d4cca28a13e",
+        "result": "0x",
+        "durationMs": 0.12724999999998943,
+        "verification": "verified"
+      },
+      {
+        "id": 7,
+        "request": {
+          "method": "eth_getProof",
+          "params": [
+            "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+            [
+              "0x0000000000000000000000000000000000000000000000000000000000000000"
+            ],
+            {
+              "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getProof\",\"params\":[\"0x4fdb869be35218e189e2b3409752e3ff20c339ee\",[\"0x0000000000000000000000000000000000000000000000000000000000000000\"],{\"blockHash\":\"0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea\",\"requireCanonical\":true}]}",
+        "requestSha256": "1c902239f5d7d9480c18599712cd6f673a5bef25293346f438cdd55ca07a176f",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 1010,
+        "resultSha256": "76fab6a79bce49809fa7d66f835b6b436b52b1bb2273b65ea1b40e132f74ac45",
+        "result": {
+          "address": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+          "balance": "0x0",
+          "codeHash": "0x3d5cdec66b0e78336d5de046d9228b0ef81a372253d191705e81cba34271c9b4",
+          "nonce": "0x1",
+          "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "accountProof": [
+            "0xf8718080a0b479769098dcc1748892d2d3f565ee91f82b0ca474a519807b26b278fb99366680a0203a89599bb7dd82f963c6c7c41a15f4d6c0a48ad310b96931fa6c35a38322b4808080808080a03322071acd1dceefd29ef7c44c88610cca307a9c994d2940c0d18a9b19a1aeb88080808080",
+            "0xf851a0e8958d651ed3a458592676462ee3aff2f759ec6cd2f27ca3ca428b13a3d031278080808080808080808080808080a001fceb8bd8bfc1c7d8c880fee845197d87855852698fd0e47de80d3c41c5bd7080",
+            "0xf869a0200b7f119e84e02b3e90c586d0e5e0aaa48990f19c8555a45cb1d33678f678f7b846f8440180a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a03d5cdec66b0e78336d5de046d9228b0ef81a372253d191705e81cba34271c9b4"
+          ],
+          "storageProof": [
+            {
+              "key": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "value": "0x0",
+              "proof": []
+            }
+          ]
+        },
+        "durationMs": 0.23341700000000287,
+        "verification": "verified"
+      },
+      {
+        "id": 8,
+        "request": {
+          "method": "eth_getProof",
+          "params": [
+            "0xebe5f51f766e9e9ba4e623905eb26cbacfe069e3",
+            [],
+            {
+              "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getProof\",\"params\":[\"0xebe5f51f766e9e9ba4e623905eb26cbacfe069e3\",[],{\"blockHash\":\"0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea\",\"requireCanonical\":true}]}",
+        "requestSha256": "a564d6cba138e799cd999ff679dabdb75bf3796c770c54d8c213eee5a842b5b0",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 738,
+        "resultSha256": "fbc8ae683f58940576348d3f7fccce9396b4e453093c4284698097a017fec47d",
+        "result": {
+          "address": "0xebe5f51f766e9e9ba4e623905eb26cbacfe069e3",
+          "balance": "0x7",
+          "codeHash": "0xa2eab5d2d55db421313fdcdef02b854a7bbaa8a6dbb2c1621d557fe03f99ef1f",
+          "nonce": "0x1",
+          "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "accountProof": [
+            "0xf8718080a0b479769098dcc1748892d2d3f565ee91f82b0ca474a519807b26b278fb99366680a0203a89599bb7dd82f963c6c7c41a15f4d6c0a48ad310b96931fa6c35a38322b4808080808080a03322071acd1dceefd29ef7c44c88610cca307a9c994d2940c0d18a9b19a1aeb88080808080",
+            "0xf869a033452666ad22b459e51c6cb1d713ecd8469efab1d752a560efae92e0acf77745b846f8440107a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a0a2eab5d2d55db421313fdcdef02b854a7bbaa8a6dbb2c1621d557fe03f99ef1f"
+          ],
+          "storageProof": []
+        },
+        "durationMs": 0.3385410000000064,
+        "verification": "verified"
+      },
+      {
+        "id": 9,
+        "request": {
+          "method": "eth_getCode",
+          "params": [
+            "0xebe5f51f766e9e9ba4e623905eb26cbacfe069e3",
+            {
+              "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getCode\",\"params\":[\"0xebe5f51f766e9e9ba4e623905eb26cbacfe069e3\",{\"blockHash\":\"0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea\",\"requireCanonical\":true}]}",
+        "requestSha256": "72c40ea256d01054d87692bb82f0dfe2c68199f7c0cf50bf9a958f843da05e0e",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 58,
+        "resultSha256": "fa67e7eee693e58ec09083a73b41fb26eb725ee37e25c1583b81226541651c4f",
+        "result": "0x600160005573f36afef4dcb45e52f80cb039335952f77cec8960ff",
+        "durationMs": 0.3363340000000079,
+        "verification": "verified"
+      },
+      {
+        "id": 10,
+        "request": {
+          "method": "eth_getProof",
+          "params": [
+            "0xf36afef4dcb45e52f80cb039335952f77cec8960",
+            [],
+            {
+              "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getProof\",\"params\":[\"0xf36afef4dcb45e52f80cb039335952f77cec8960\",[],{\"blockHash\":\"0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea\",\"requireCanonical\":true}]}",
+        "requestSha256": "b5c3cba9dec009ae63aef49f904fc189fceb15aa9b68b7d9e756902bd230bebd",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 909,
+        "resultSha256": "8e46b9fa02fda21ef1e059b0549749f1c8f312afca5d5fa9646c191f26c50e96",
+        "result": {
+          "address": "0xf36afef4dcb45e52f80cb039335952f77cec8960",
+          "balance": "0x1",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "nonce": "0x0",
+          "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "accountProof": [
+            "0xf8718080a0b479769098dcc1748892d2d3f565ee91f82b0ca474a519807b26b278fb99366680a0203a89599bb7dd82f963c6c7c41a15f4d6c0a48ad310b96931fa6c35a38322b4808080808080a03322071acd1dceefd29ef7c44c88610cca307a9c994d2940c0d18a9b19a1aeb88080808080",
+            "0xf851a0e8958d651ed3a458592676462ee3aff2f759ec6cd2f27ca3ca428b13a3d031278080808080808080808080808080a001fceb8bd8bfc1c7d8c880fee845197d87855852698fd0e47de80d3c41c5bd7080",
+            "0xf869a0205b6c0f8ba3a27bef840137d5a456692251023f514c350122dc7333da81e640b846f8448001a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a0c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+          ],
+          "storageProof": []
+        },
+        "durationMs": 0.21999999999999886,
+        "verification": "verified"
+      },
+      {
+        "id": 11,
+        "request": {
+          "method": "eth_getCode",
+          "params": [
+            "0xf36afef4dcb45e52f80cb039335952f77cec8960",
+            {
+              "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getCode\",\"params\":[\"0xf36afef4dcb45e52f80cb039335952f77cec8960\",{\"blockHash\":\"0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea\",\"requireCanonical\":true}]}",
+        "requestSha256": "cc91c03806cf991b8c5727311ab6484aec4bb4c6861d3cf3b8f22267a6a84bc4",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 4,
+        "resultSha256": "1c9409806518d1a5f52d79299ea0289ea2ff527e05895cd8f7a36d4cca28a13e",
+        "result": "0x",
+        "durationMs": 0.13208399999999187,
+        "verification": "verified"
+      },
+      {
+        "id": 12,
+        "request": {
+          "method": "eth_getProof",
+          "params": [
+            "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+            [
+              "0x0000000000000000000000000000000000000000000000000000000000000001"
+            ],
+            {
+              "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getProof\",\"params\":[\"0x4fdb869be35218e189e2b3409752e3ff20c339ee\",[\"0x0000000000000000000000000000000000000000000000000000000000000001\"],{\"blockHash\":\"0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea\",\"requireCanonical\":true}]}",
+        "requestSha256": "9222e495ddea212d58321630260bb2a762fa06da2cb6d9ec787e325d7daad63a",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 1010,
+        "resultSha256": "f507c7423b8f39b4bea426bd1e63ce9bbc84b7c175893f21040e96f1a962b8a9",
+        "result": {
+          "address": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+          "balance": "0x0",
+          "codeHash": "0x3d5cdec66b0e78336d5de046d9228b0ef81a372253d191705e81cba34271c9b4",
+          "nonce": "0x1",
+          "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "accountProof": [
+            "0xf8718080a0b479769098dcc1748892d2d3f565ee91f82b0ca474a519807b26b278fb99366680a0203a89599bb7dd82f963c6c7c41a15f4d6c0a48ad310b96931fa6c35a38322b4808080808080a03322071acd1dceefd29ef7c44c88610cca307a9c994d2940c0d18a9b19a1aeb88080808080",
+            "0xf851a0e8958d651ed3a458592676462ee3aff2f759ec6cd2f27ca3ca428b13a3d031278080808080808080808080808080a001fceb8bd8bfc1c7d8c880fee845197d87855852698fd0e47de80d3c41c5bd7080",
+            "0xf869a0200b7f119e84e02b3e90c586d0e5e0aaa48990f19c8555a45cb1d33678f678f7b846f8440180a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a03d5cdec66b0e78336d5de046d9228b0ef81a372253d191705e81cba34271c9b4"
+          ],
+          "storageProof": [
+            {
+              "key": "0x0000000000000000000000000000000000000000000000000000000000000001",
+              "value": "0x0",
+              "proof": []
+            }
+          ]
+        },
+        "durationMs": 0.20695899999999767,
+        "verification": "verified"
+      }
+    ],
+    "inputUsage": {
+      "status": "available",
+      "calls": 12,
+      "observedResultBytes": 6203,
+      "retainedResultBytes": 6203,
+      "accounts": 5,
+      "slots": 3,
+      "reads": 13,
+      "distinctReads": 13,
+      "limits": {
+        "accounts": 128,
+        "slots": 1024,
+        "calls": 256,
+        "responseBytes": 8388608,
+        "totalBytes": 33554432,
+        "codeBytes": 131072,
+        "reads": 200000,
+        "requestMs": 25000,
+        "wallMs": 9997
+      }
+    },
+    "inputReads": {
+      "total": 13,
+      "distinct": 13,
+      "reads": [
+        {
+          "kind": "account",
+          "account": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff"
+        },
+        {
+          "kind": "code",
+          "account": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff"
+        },
+        {
+          "kind": "account",
+          "account": "0x4fdb869be35218e189e2b3409752e3ff20c339ee"
+        },
+        {
+          "kind": "code",
+          "account": "0x4fdb869be35218e189e2b3409752e3ff20c339ee"
+        },
+        {
+          "kind": "account",
+          "account": "0x0facfbcabd0646f9d44393694b5e355040def982"
+        },
+        {
+          "kind": "code",
+          "account": "0x0facfbcabd0646f9d44393694b5e355040def982"
+        },
+        {
+          "kind": "storage",
+          "account": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+          "slot": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "kind": "account",
+          "account": "0xebe5f51f766e9e9ba4e623905eb26cbacfe069e3"
+        },
+        {
+          "kind": "code",
+          "account": "0xebe5f51f766e9e9ba4e623905eb26cbacfe069e3"
+        },
+        {
+          "kind": "storage",
+          "account": "0x0facfbcabd0646f9d44393694b5e355040def982",
+          "slot": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "kind": "account",
+          "account": "0xf36afef4dcb45e52f80cb039335952f77cec8960"
+        },
+        {
+          "kind": "code",
+          "account": "0xf36afef4dcb45e52f80cb039335952f77cec8960"
+        },
+        {
+          "kind": "storage",
+          "account": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+          "slot": "0x0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      ]
+    },
+    "stateReads": {
+      "total": 39,
+      "distinct": 11,
+      "reads": [
+        {
+          "kind": "account",
+          "address": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff"
+        },
+        {
+          "kind": "code",
+          "address": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff"
+        },
+        {
+          "kind": "account",
+          "address": "0x4fdb869be35218e189e2b3409752e3ff20c339ee"
+        },
+        {
+          "kind": "code",
+          "address": "0x4fdb869be35218e189e2b3409752e3ff20c339ee"
+        },
+        {
+          "kind": "account",
+          "address": "0x0facfbcabd0646f9d44393694b5e355040def982"
+        },
+        {
+          "kind": "storage",
+          "address": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+          "slot": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "kind": "code",
+          "address": "0x0facfbcabd0646f9d44393694b5e355040def982"
+        },
+        {
+          "kind": "code",
+          "address": "0xebe5f51f766e9e9ba4e623905eb26cbacfe069e3"
+        },
+        {
+          "kind": "storage",
+          "address": "0x0facfbcabd0646f9d44393694b5e355040def982",
+          "slot": "0x0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "kind": "account",
+          "address": "0xf36afef4dcb45e52f80cb039335952f77cec8960"
+        },
+        {
+          "kind": "storage",
+          "address": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+          "slot": "0x0000000000000000000000000000000000000000000000000000000000000001"
+        }
+      ]
+    },
+    "changes": {
+      "scope": "Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.",
+      "accounts": [
+        {
+          "address": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+          "nonce": {
+            "before": "0x0",
+            "after": "0x1"
+          },
+          "balance": {
+            "before": "0x33b2e3c9fd0803ce8000000",
+            "after": "0x33b2e3c9fd0803ce7fffffd"
+          }
+        },
+        {
+          "address": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+          "nonce": {
+            "before": "0x1",
+            "after": "0x2"
+          },
+          "storage": [
+            {
+              "slot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "after": "0x0000000000000000000000000facfbcabd0646f9d44393694b5e355040def982"
+            },
+            {
+              "slot": "0x0000000000000000000000000000000000000000000000000000000000000001",
+              "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "after": "0x0000000000000000000000000000000000000000000000000000000000000001"
+            }
+          ]
+        },
+        {
+          "address": "0xf36afef4dcb45e52f80cb039335952f77cec8960",
+          "balance": {
+            "before": "0x1",
+            "after": "0x4"
+          }
+        }
+      ]
+    },
+    "headerVerification": {
+      "status": "verified",
+      "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+      "stateRoot": "0x2e9ed0c6ca528983eb9fe296e202e78e8f135c3ee1d419e29e2b7dae9b0eed94",
+      "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "number": "22000000",
+      "timestamp": "1764798551",
+      "hardfork": "osaka",
+      "encodedBytes": 610,
+      "headerFields": 21,
+      "consensusVerified": false,
+      "finalityVerified": false,
+      "bodyVerified": false
+    },
+    "isolation": {
+      "worker": "engines/local-evm/isolated-worker.js",
+      "processSeparated": true,
+      "childPid": 46556,
+      "node": "v22.23.2",
+      "v8": "12.4.254.21-node.56",
+      "v8OldSpaceMiB": 256,
+      "hardTotalRssCap": false,
+      "osNetworkSandbox": false,
+      "osFilesystemSandbox": false,
+      "sourceImplementationBound": false,
+      "wallMs": 9997,
+      "drainMs": 25000,
+      "durationMs": 116.07104200000003,
+      "terminateRequested": false,
+      "processClosed": true,
+      "exitCode": 0,
+      "exitSignal": null,
+      "stdioBytes": 0,
+      "limits": {
+        "wallMs": 9997,
+        "requestMs": 25000,
+        "drainMs": 25000,
+        "killWaitMs": 1000,
+        "heapMiB": 256,
+        "calls": 256,
+        "responseBytes": 8388608,
+        "totalResponseBytes": 33554432,
+        "outputBytes": 16777216,
+        "stdioBytes": 65536,
+        "inputs": {
+          "accounts": 128,
+          "slots": 1024,
+          "codeBytes": 131072,
+          "reads": 200000,
+          "wallMs": 9997
+        },
+        "execution": {
+          "gas": 5000000,
+          "steps": 1000000,
+          "frames": 1000,
+          "depth": 32,
+          "logs": 2000,
+          "memoryBytes": 1048576,
+          "returnBytes": 1048576,
+          "calldataBytes": 32768,
+          "traceBytes": 8388608,
+          "wallMs": 9997
+        }
+      }
+    },
+    "broker": {
+      "calls": 12,
+      "dispatches": 12,
+      "accountedParsedResultBytes": 6203,
+      "records": [
+        {
+          "id": 1,
+          "request": {
+            "method": "eth_getProof",
+            "params": [
+              "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+              [],
+              {
+                "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 784,
+          "resultSha256": "c8d33ee37663bb4f47cbba8506a2c5934c7c7a00b6685f65d4ac7638ba08abd3",
+          "durationMs": 0.30333299999983865
+        },
+        {
+          "id": 2,
+          "request": {
+            "method": "eth_getCode",
+            "params": [
+              "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+              {
+                "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 4,
+          "resultSha256": "1c9409806518d1a5f52d79299ea0289ea2ff527e05895cd8f7a36d4cca28a13e",
+          "durationMs": 0.07862500000010186
+        },
+        {
+          "id": 3,
+          "request": {
+            "method": "eth_getProof",
+            "params": [
+              "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+              [],
+              {
+                "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 909,
+          "resultSha256": "65c9f9bd3975cacee74abf09794ac7af35eb8453dc70f7958f43b70482c07513",
+          "durationMs": 0.1394999999997708
+        },
+        {
+          "id": 4,
+          "request": {
+            "method": "eth_getCode",
+            "params": [
+              "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+              {
+                "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 254,
+          "resultSha256": "6b64975e5f57c18cf18f2abc165efd251566f55c4531e9166e74ea58227621b8",
+          "durationMs": 0.05349999999998545
+        },
+        {
+          "id": 5,
+          "request": {
+            "method": "eth_getProof",
+            "params": [
+              "0x0facfbcabd0646f9d44393694b5e355040def982",
+              [],
+              {
+                "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 519,
+          "resultSha256": "253e417aa5b3098a6c2e263ab84539e953282fd38345fafbf02364c7dfb782f6",
+          "durationMs": 0.06491700000015044
+        },
+        {
+          "id": 6,
+          "request": {
+            "method": "eth_getCode",
+            "params": [
+              "0x0facfbcabd0646f9d44393694b5e355040def982",
+              {
+                "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 4,
+          "resultSha256": "1c9409806518d1a5f52d79299ea0289ea2ff527e05895cd8f7a36d4cca28a13e",
+          "durationMs": 0.030291999999917607
+        },
+        {
+          "id": 7,
+          "request": {
+            "method": "eth_getProof",
+            "params": [
+              "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+              [
+                "0x0000000000000000000000000000000000000000000000000000000000000000"
+              ],
+              {
+                "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 1010,
+          "resultSha256": "76fab6a79bce49809fa7d66f835b6b436b52b1bb2273b65ea1b40e132f74ac45",
+          "durationMs": 0.1411670000002232
+        },
+        {
+          "id": 8,
+          "request": {
+            "method": "eth_getProof",
+            "params": [
+              "0xebe5f51f766e9e9ba4e623905eb26cbacfe069e3",
+              [],
+              {
+                "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 738,
+          "resultSha256": "fbc8ae683f58940576348d3f7fccce9396b4e453093c4284698097a017fec47d",
+          "durationMs": 0.14779200000020865
+        },
+        {
+          "id": 9,
+          "request": {
+            "method": "eth_getCode",
+            "params": [
+              "0xebe5f51f766e9e9ba4e623905eb26cbacfe069e3",
+              {
+                "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 58,
+          "resultSha256": "fa67e7eee693e58ec09083a73b41fb26eb725ee37e25c1583b81226541651c4f",
+          "durationMs": 0.0435419999998885
+        },
+        {
+          "id": 10,
+          "request": {
+            "method": "eth_getProof",
+            "params": [
+              "0xf36afef4dcb45e52f80cb039335952f77cec8960",
+              [],
+              {
+                "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 909,
+          "resultSha256": "8e46b9fa02fda21ef1e059b0549749f1c8f312afca5d5fa9646c191f26c50e96",
+          "durationMs": 0.10779199999979028
+        },
+        {
+          "id": 11,
+          "request": {
+            "method": "eth_getCode",
+            "params": [
+              "0xf36afef4dcb45e52f80cb039335952f77cec8960",
+              {
+                "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 4,
+          "resultSha256": "1c9409806518d1a5f52d79299ea0289ea2ff527e05895cd8f7a36d4cca28a13e",
+          "durationMs": 0.03866600000037579
+        },
+        {
+          "id": 12,
+          "request": {
+            "method": "eth_getProof",
+            "params": [
+              "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+              [
+                "0x0000000000000000000000000000000000000000000000000000000000000001"
+              ],
+              {
+                "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 1010,
+          "resultSha256": "f507c7423b8f39b4bea426bd1e63ce9bbc84b7c175893f21040e96f1a962b8a9",
+          "durationMs": 0.13158299999986411
+        }
+      ],
+      "pendingAtReturn": 0,
+      "rawWireCaptured": false,
+      "inRangeBlockhash": "authenticated_parent_hash_chain_with_shared_input_limits"
+    }
+  },
+  "proofRecords": [
+    {
+      "id": 1,
+      "request": {
+        "method": "eth_getProof",
+        "params": [
+          "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+          [],
+          {
+            "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "representation": "parsed_in_memory_proof_result_no_network_wire",
+      "status": "received",
+      "result": {
+        "address": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+        "balance": "0x33b2e3c9fd0803ce8000000",
+        "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+        "nonce": "0x0",
+        "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "accountProof": [
+          "0xf8718080a0b479769098dcc1748892d2d3f565ee91f82b0ca474a519807b26b278fb99366680a0203a89599bb7dd82f963c6c7c41a15f4d6c0a48ad310b96931fa6c35a38322b4808080808080a03322071acd1dceefd29ef7c44c88610cca307a9c994d2940c0d18a9b19a1aeb88080808080",
+          "0xf875a031182ca0865c06f8303682e7654d42265e1c4e86b94937d0facf17558db79cc9b852f850808c033b2e3c9fd0803ce8000000a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a0c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+        ],
+        "storageProof": []
+      },
+      "bytes": 784
+    },
+    {
+      "id": 2,
+      "request": {
+        "method": "eth_getCode",
+        "params": [
+          "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+          {
+            "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "representation": "parsed_in_memory_proof_result_no_network_wire",
+      "status": "received",
+      "result": "0x",
+      "bytes": 4
+    },
+    {
+      "id": 3,
+      "request": {
+        "method": "eth_getProof",
+        "params": [
+          "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+          [],
+          {
+            "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "representation": "parsed_in_memory_proof_result_no_network_wire",
+      "status": "received",
+      "result": {
+        "address": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+        "balance": "0x0",
+        "codeHash": "0x3d5cdec66b0e78336d5de046d9228b0ef81a372253d191705e81cba34271c9b4",
+        "nonce": "0x1",
+        "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "accountProof": [
+          "0xf8718080a0b479769098dcc1748892d2d3f565ee91f82b0ca474a519807b26b278fb99366680a0203a89599bb7dd82f963c6c7c41a15f4d6c0a48ad310b96931fa6c35a38322b4808080808080a03322071acd1dceefd29ef7c44c88610cca307a9c994d2940c0d18a9b19a1aeb88080808080",
+          "0xf851a0e8958d651ed3a458592676462ee3aff2f759ec6cd2f27ca3ca428b13a3d031278080808080808080808080808080a001fceb8bd8bfc1c7d8c880fee845197d87855852698fd0e47de80d3c41c5bd7080",
+          "0xf869a0200b7f119e84e02b3e90c586d0e5e0aaa48990f19c8555a45cb1d33678f678f7b846f8440180a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a03d5cdec66b0e78336d5de046d9228b0ef81a372253d191705e81cba34271c9b4"
+        ],
+        "storageProof": []
+      },
+      "bytes": 909
+    },
+    {
+      "id": 4,
+      "request": {
+        "method": "eth_getCode",
+        "params": [
+          "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+          {
+            "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "representation": "parsed_in_memory_proof_result_no_network_wire",
+      "status": "received",
+      "result": "0x7f610023600081600b8239f36000600060006000600073ebe5f51f766e9e9ba4e660005260205171ffffffffffffffffffffffffffffffffffff167f23905eb26cbacfe069e35af2500000000000000000000000000000000000000017602052602e60006003f0600055600060006000600060006000545af160015500",
+      "bytes": 254
+    },
+    {
+      "id": 5,
+      "request": {
+        "method": "eth_getProof",
+        "params": [
+          "0x0facfbcabd0646f9d44393694b5e355040def982",
+          [],
+          {
+            "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "representation": "parsed_in_memory_proof_result_no_network_wire",
+      "status": "received",
+      "result": {
+        "address": "0x0facfbcabd0646f9d44393694b5e355040def982",
+        "balance": "0x0",
+        "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+        "nonce": "0x0",
+        "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "accountProof": [
+          "0xf8718080a0b479769098dcc1748892d2d3f565ee91f82b0ca474a519807b26b278fb99366680a0203a89599bb7dd82f963c6c7c41a15f4d6c0a48ad310b96931fa6c35a38322b4808080808080a03322071acd1dceefd29ef7c44c88610cca307a9c994d2940c0d18a9b19a1aeb88080808080"
+        ],
+        "storageProof": []
+      },
+      "bytes": 519
+    },
+    {
+      "id": 6,
+      "request": {
+        "method": "eth_getCode",
+        "params": [
+          "0x0facfbcabd0646f9d44393694b5e355040def982",
+          {
+            "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "representation": "parsed_in_memory_proof_result_no_network_wire",
+      "status": "received",
+      "result": "0x",
+      "bytes": 4
+    },
+    {
+      "id": 7,
+      "request": {
+        "method": "eth_getProof",
+        "params": [
+          "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+          [
+            "0x0000000000000000000000000000000000000000000000000000000000000000"
+          ],
+          {
+            "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "representation": "parsed_in_memory_proof_result_no_network_wire",
+      "status": "received",
+      "result": {
+        "address": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+        "balance": "0x0",
+        "codeHash": "0x3d5cdec66b0e78336d5de046d9228b0ef81a372253d191705e81cba34271c9b4",
+        "nonce": "0x1",
+        "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "accountProof": [
+          "0xf8718080a0b479769098dcc1748892d2d3f565ee91f82b0ca474a519807b26b278fb99366680a0203a89599bb7dd82f963c6c7c41a15f4d6c0a48ad310b96931fa6c35a38322b4808080808080a03322071acd1dceefd29ef7c44c88610cca307a9c994d2940c0d18a9b19a1aeb88080808080",
+          "0xf851a0e8958d651ed3a458592676462ee3aff2f759ec6cd2f27ca3ca428b13a3d031278080808080808080808080808080a001fceb8bd8bfc1c7d8c880fee845197d87855852698fd0e47de80d3c41c5bd7080",
+          "0xf869a0200b7f119e84e02b3e90c586d0e5e0aaa48990f19c8555a45cb1d33678f678f7b846f8440180a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a03d5cdec66b0e78336d5de046d9228b0ef81a372253d191705e81cba34271c9b4"
+        ],
+        "storageProof": [
+          {
+            "key": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "value": "0x0",
+            "proof": []
+          }
+        ]
+      },
+      "bytes": 1010
+    },
+    {
+      "id": 8,
+      "request": {
+        "method": "eth_getProof",
+        "params": [
+          "0xebe5f51f766e9e9ba4e623905eb26cbacfe069e3",
+          [],
+          {
+            "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "representation": "parsed_in_memory_proof_result_no_network_wire",
+      "status": "received",
+      "result": {
+        "address": "0xebe5f51f766e9e9ba4e623905eb26cbacfe069e3",
+        "balance": "0x7",
+        "codeHash": "0xa2eab5d2d55db421313fdcdef02b854a7bbaa8a6dbb2c1621d557fe03f99ef1f",
+        "nonce": "0x1",
+        "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "accountProof": [
+          "0xf8718080a0b479769098dcc1748892d2d3f565ee91f82b0ca474a519807b26b278fb99366680a0203a89599bb7dd82f963c6c7c41a15f4d6c0a48ad310b96931fa6c35a38322b4808080808080a03322071acd1dceefd29ef7c44c88610cca307a9c994d2940c0d18a9b19a1aeb88080808080",
+          "0xf869a033452666ad22b459e51c6cb1d713ecd8469efab1d752a560efae92e0acf77745b846f8440107a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a0a2eab5d2d55db421313fdcdef02b854a7bbaa8a6dbb2c1621d557fe03f99ef1f"
+        ],
+        "storageProof": []
+      },
+      "bytes": 738
+    },
+    {
+      "id": 9,
+      "request": {
+        "method": "eth_getCode",
+        "params": [
+          "0xebe5f51f766e9e9ba4e623905eb26cbacfe069e3",
+          {
+            "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "representation": "parsed_in_memory_proof_result_no_network_wire",
+      "status": "received",
+      "result": "0x600160005573f36afef4dcb45e52f80cb039335952f77cec8960ff",
+      "bytes": 58
+    },
+    {
+      "id": 10,
+      "request": {
+        "method": "eth_getProof",
+        "params": [
+          "0xf36afef4dcb45e52f80cb039335952f77cec8960",
+          [],
+          {
+            "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "representation": "parsed_in_memory_proof_result_no_network_wire",
+      "status": "received",
+      "result": {
+        "address": "0xf36afef4dcb45e52f80cb039335952f77cec8960",
+        "balance": "0x1",
+        "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+        "nonce": "0x0",
+        "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "accountProof": [
+          "0xf8718080a0b479769098dcc1748892d2d3f565ee91f82b0ca474a519807b26b278fb99366680a0203a89599bb7dd82f963c6c7c41a15f4d6c0a48ad310b96931fa6c35a38322b4808080808080a03322071acd1dceefd29ef7c44c88610cca307a9c994d2940c0d18a9b19a1aeb88080808080",
+          "0xf851a0e8958d651ed3a458592676462ee3aff2f759ec6cd2f27ca3ca428b13a3d031278080808080808080808080808080a001fceb8bd8bfc1c7d8c880fee845197d87855852698fd0e47de80d3c41c5bd7080",
+          "0xf869a0205b6c0f8ba3a27bef840137d5a456692251023f514c350122dc7333da81e640b846f8448001a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a0c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+        ],
+        "storageProof": []
+      },
+      "bytes": 909
+    },
+    {
+      "id": 11,
+      "request": {
+        "method": "eth_getCode",
+        "params": [
+          "0xf36afef4dcb45e52f80cb039335952f77cec8960",
+          {
+            "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "representation": "parsed_in_memory_proof_result_no_network_wire",
+      "status": "received",
+      "result": "0x",
+      "bytes": 4
+    },
+    {
+      "id": 12,
+      "request": {
+        "method": "eth_getProof",
+        "params": [
+          "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+          [
+            "0x0000000000000000000000000000000000000000000000000000000000000001"
+          ],
+          {
+            "blockHash": "0x10e2d7d6045360293494f2f1a289305b63d7b148858cc0077dc016fa35a9daea",
+            "requireCanonical": true
+          }
+        ]
+      },
+      "representation": "parsed_in_memory_proof_result_no_network_wire",
+      "status": "received",
+      "result": {
+        "address": "0x4fdb869be35218e189e2b3409752e3ff20c339ee",
+        "balance": "0x0",
+        "codeHash": "0x3d5cdec66b0e78336d5de046d9228b0ef81a372253d191705e81cba34271c9b4",
+        "nonce": "0x1",
+        "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "accountProof": [
+          "0xf8718080a0b479769098dcc1748892d2d3f565ee91f82b0ca474a519807b26b278fb99366680a0203a89599bb7dd82f963c6c7c41a15f4d6c0a48ad310b96931fa6c35a38322b4808080808080a03322071acd1dceefd29ef7c44c88610cca307a9c994d2940c0d18a9b19a1aeb88080808080",
+          "0xf851a0e8958d651ed3a458592676462ee3aff2f759ec6cd2f27ca3ca428b13a3d031278080808080808080808080808080a001fceb8bd8bfc1c7d8c880fee845197d87855852698fd0e47de80d3c41c5bd7080",
+          "0xf869a0200b7f119e84e02b3e90c586d0e5e0aaa48990f19c8555a45cb1d33678f678f7b846f8440180a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a03d5cdec66b0e78336d5de046d9228b0ef81a372253d191705e81cba34271c9b4"
+        ],
+        "storageProof": [
+          {
+            "key": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "value": "0x0",
+            "proof": []
+          }
+        ]
+      },
+      "bytes": 1010
+    }
+  ],
+  "proofSource": "Immutable declared fixture preallocation only; no reference output or original official poststate.",
+  "publicRequests": 0
+}

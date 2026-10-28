@@ -1,0 +1,141 @@
+{
+  "status": "matched",
+  "checks": {
+    "execution": true,
+    "returnData": true,
+    "logs": true,
+    "gas": true,
+    "stateRoot": true
+  },
+  "applied": {
+    "stateRoot": "0x694feb83b7040de977a6f492612dfeff84d35e5ed0db3aa79ffa1d83392fad71",
+    "accounts": [
+      {
+        "address": "0x081f85bbb63f960f83724898686620b3e01a5542",
+        "existsBefore": true,
+        "existsAfter": false,
+        "nonceBefore": "0",
+        "nonceAfter": "0",
+        "balanceBefore": "100000",
+        "balanceAfter": "0",
+        "codeBefore": "0x",
+        "codeAfter": "0x",
+        "storageRootBefore": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "storageRootAfter": null,
+        "storage": []
+      },
+      {
+        "address": "0x22d339df985a054d335af73613545d6008566b37",
+        "existsBefore": true,
+        "existsAfter": true,
+        "nonceBefore": "1",
+        "nonceAfter": "1",
+        "balanceBefore": "0",
+        "balanceAfter": "200000",
+        "codeBefore": "0x6000600055",
+        "codeAfter": "0x6000600055",
+        "storageRootBefore": "0x821e2556a290c86405f8160a2d662042a431ba456b9db265c79bb837c04be5f0",
+        "storageRootAfter": "0x821e2556a290c86405f8160a2d662042a431ba456b9db265c79bb837c04be5f0",
+        "storage": []
+      },
+      {
+        "address": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+        "existsBefore": true,
+        "existsAfter": true,
+        "nonceBefore": "0",
+        "nonceAfter": "1",
+        "balanceBefore": "1000000000000000000000000000",
+        "balanceAfter": "999999999999999999999900000",
+        "codeBefore": "0x",
+        "codeAfter": "0x",
+        "storageRootBefore": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "storageRootAfter": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "storage": []
+      }
+    ],
+    "changes": {
+      "scope": "Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.",
+      "accounts": [
+        {
+          "address": "0x081f85bbb63f960f83724898686620b3e01a5542",
+          "existence": {
+            "before": true,
+            "after": false,
+            "basis": "same_invocation_created_contract_deletion"
+          },
+          "balance": {
+            "before": "0x186a0",
+            "after": "0x0"
+          }
+        },
+        {
+          "address": "0x22d339df985a054d335af73613545d6008566b37",
+          "balance": {
+            "before": "0x0",
+            "after": "0x30d40"
+          }
+        },
+        {
+          "address": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+          "nonce": {
+            "before": "0x0",
+            "after": "0x1"
+          },
+          "balance": {
+            "before": "0x33b2e3c9fd0803ce8000000",
+            "after": "0x33b2e3c9fd0803ce7fe7960"
+          }
+        }
+      ]
+    },
+    "observedState": [
+      {
+        "address": "0x081f85bbb63f960f83724898686620b3e01a5542",
+        "exists": false,
+        "nonce": "0",
+        "balance": "0",
+        "code": "0x",
+        "storageRoot": null,
+        "storage": [
+          {
+            "slot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "value": "0x0000000000000000000000000000000000000000000000000000000000000000"
+          }
+        ]
+      },
+      {
+        "address": "0x22d339df985a054d335af73613545d6008566b37",
+        "exists": true,
+        "nonce": "1",
+        "balance": "200000",
+        "code": "0x6000600055",
+        "storageRoot": "0x821e2556a290c86405f8160a2d662042a431ba456b9db265c79bb837c04be5f0",
+        "storage": [
+          {
+            "slot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "value": "0x0000000000000000000000000000000000000000000000000000000000000001"
+          }
+        ]
+      },
+      {
+        "address": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba",
+        "exists": false,
+        "nonce": "0",
+        "balance": "0",
+        "code": "0x",
+        "storageRoot": null,
+        "storage": []
+      },
+      {
+        "address": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff",
+        "exists": true,
+        "nonce": "1",
+        "balance": "999999999999999999999900000",
+        "code": "0x",
+        "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "storage": []
+      }
+    ]
+  },
+  "scope": "Synthetic zero-fee differential with shared opcode library, independent sparse versus full-MPT finalization paths."
+}
