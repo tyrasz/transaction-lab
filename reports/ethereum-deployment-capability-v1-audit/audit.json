@@ -1,0 +1,257 @@
+{
+  "schemaVersion": "1.0",
+  "role": "postseal_wire_and_field_audit_by_capability_runner_author_not_independent_source_author_review",
+  "packetIdentities": {
+    "manifest": "d6f402d95e53a62a1991e1ec74855f8e375034512d53d555c8c75a5a293c641e",
+    "plan": "8ff678c2a4a72e58e6aaa1114bab24da66bd9699bce1efb7a54990e0dd6f2450",
+    "source": "df32a4c2dcc9afa48bf04488a9ad565ad39c43fc16c67a1c1e5f76d7e2d02c76",
+    "referenceManifest": "3aab8f526c5dee2d5ce765f66ea6108119faca53bc80105d2b093921a01a3841"
+  },
+  "evidence": {
+    "files": 35,
+    "bytes": 2182074
+  },
+  "archive": {
+    "files": 1789,
+    "bytes": 11799763
+  },
+  "wireRecords": 19,
+  "capabilityCalls": 12,
+  "capabilityBytes": 53671,
+  "captureDurationMs": 2379.7587080000003,
+  "sourceAndEvidenceHashesVerified": true,
+  "nodeIdentityBoundToPlan": true,
+  "nodeExecutableRerunOrReverification": false,
+  "originalVMReexecuted": false,
+  "initialProofsReverified": [
+    {
+      "address": "0xbb6e024b9cffacb947a71991e386681b1cd1477d",
+      "exists": true,
+      "nonceRaw": "1",
+      "balanceRaw": "12714900000000000",
+      "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+      "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+    },
+    {
+      "address": "0x3be7f950380997a5fbbd6ace42b422c7ef437f1b",
+      "exists": false,
+      "nonceRaw": "0",
+      "balanceRaw": "0",
+      "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+      "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+    }
+  ],
+  "headerHashRecomputed": true,
+  "headerBinding": {
+    "drpc": {
+      "chain": "matched",
+      "beforeHeader": "matched",
+      "afterHeader": "matched",
+      "completeHeaderEquality": true,
+      "numericSelectorAtomicHashBinding": false,
+      "consensusVerified": false
+    },
+    "publicnode": {
+      "chain": "matched",
+      "beforeHeader": "matched",
+      "afterHeader": "matched",
+      "completeHeaderEquality": true,
+      "numericSelectorAtomicHashBinding": false,
+      "consensusVerified": false
+    }
+  },
+  "outcomes": [
+    {
+      "id": 1,
+      "provider": "drpc",
+      "method": "eth_chainId",
+      "label": "chain",
+      "httpStatus": 200,
+      "status": "completed",
+      "responseBytes": 39
+    },
+    {
+      "id": 2,
+      "provider": "drpc",
+      "method": "eth_getBlockByHash",
+      "label": "header-before",
+      "httpStatus": 200,
+      "status": "completed",
+      "responseBytes": 13018
+    },
+    {
+      "id": 3,
+      "provider": "drpc",
+      "method": "trace_call",
+      "label": "parity-null-trace-stateDiff",
+      "httpStatus": 200,
+      "status": "completed",
+      "responseBytes": 883
+    },
+    {
+      "id": 4,
+      "provider": "drpc",
+      "method": "eth_getBlockByNumber",
+      "label": "header-after",
+      "httpStatus": 200,
+      "status": "completed",
+      "responseBytes": 13018
+    },
+    {
+      "id": 5,
+      "provider": "publicnode",
+      "method": "eth_chainId",
+      "label": "chain",
+      "httpStatus": 200,
+      "status": "completed",
+      "responseBytes": 40
+    },
+    {
+      "id": 6,
+      "provider": "publicnode",
+      "method": "eth_getBlockByHash",
+      "label": "header-before",
+      "httpStatus": 200,
+      "status": "completed",
+      "responseBytes": 13019
+    },
+    {
+      "id": 7,
+      "provider": "publicnode",
+      "method": "debug_traceCall",
+      "label": "debug-null-callTracer",
+      "httpStatus": 200,
+      "status": "failed",
+      "responseBytes": 120,
+      "rpcError": {
+        "code": -32601,
+        "message": "the method debug_traceCall does not exist/is not available"
+      }
+    },
+    {
+      "id": 8,
+      "provider": "publicnode",
+      "method": "debug_traceCall",
+      "label": "debug-null-prestateTracer",
+      "httpStatus": 200,
+      "status": "failed",
+      "responseBytes": 120,
+      "rpcError": {
+        "code": -32601,
+        "message": "the method debug_traceCall does not exist/is not available"
+      }
+    },
+    {
+      "id": 9,
+      "provider": "publicnode",
+      "method": "debug_traceCall",
+      "label": "debug-omitted-callTracer",
+      "httpStatus": 200,
+      "status": "failed",
+      "responseBytes": 120,
+      "rpcError": {
+        "code": -32601,
+        "message": "the method debug_traceCall does not exist/is not available"
+      }
+    },
+    {
+      "id": 10,
+      "provider": "publicnode",
+      "method": "debug_traceCall",
+      "label": "debug-omitted-prestateTracer",
+      "httpStatus": 200,
+      "status": "failed",
+      "responseBytes": 121,
+      "rpcError": {
+        "code": -32601,
+        "message": "the method debug_traceCall does not exist/is not available"
+      }
+    },
+    {
+      "id": 11,
+      "provider": "publicnode",
+      "method": "trace_call",
+      "label": "parity-null-trace-stateDiff",
+      "httpStatus": 403,
+      "status": "failed",
+      "responseBytes": 153,
+      "rpcError": {
+        "code": -32602,
+        "message": "Archive requests require a personal token. Get one at: https://www.allnodes.com/publicnode"
+      }
+    },
+    {
+      "id": 12,
+      "provider": "publicnode",
+      "method": "eth_getBlockByNumber",
+      "label": "header-after",
+      "httpStatus": 200,
+      "status": "completed",
+      "responseBytes": 13020
+    }
+  ],
+  "exploratoryObservedComparison": {
+    "label": "exploratory_observed_fields_only",
+    "status": "equal",
+    "returnData": "equal",
+    "runtimeCode": "equal",
+    "derivedAddress": "0x3be7f950380997a5fbbd6ace42b422c7ef437f1b",
+    "observedStateChanges": "equal",
+    "providerNormalizedChanges": [
+      {
+        "address": "0x3be7f950380997a5fbbd6ace42b422c7ef437f1b",
+        "existence": {
+          "before": false,
+          "after": true,
+          "basis": "top_level_contract_creation"
+        },
+        "nonce": {
+          "before": "0x0",
+          "after": "0x1"
+        },
+        "code": {
+          "before": "0x",
+          "after": "0x60005460005260206000f3"
+        },
+        "storage": [
+          {
+            "slot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "after": "0x000000000000000000000000000000000000000000000000000000000000002a"
+          }
+        ]
+      },
+      {
+        "address": "0xbb6e024b9cffacb947a71991e386681b1cd1477d",
+        "nonce": {
+          "before": "0x1",
+          "after": "0x2"
+        }
+      }
+    ],
+    "gas": {
+      "providerMessageGas": "24330",
+      "localMessageGas": "24330",
+      "messageGas": "equal",
+      "independentlyDerivedIntrinsic": "53390",
+      "calldataFloor": "21970",
+      "providerMessagePlusIntrinsic": "77720",
+      "localUnsignedGas": "77720",
+      "localRefundCounter": "0",
+      "totalGasInterpretation": "Arithmetic only; Parity refund/fee context is not independently authenticated."
+    },
+    "equivalentExecutionContext": false,
+    "providerCommittedLogsVerified": false,
+    "postStateRootVerified": false,
+    "fiveChannelAgreement": false,
+    "accuracyRate": null
+  },
+  "limitations": [
+    "Same historical workload, not a new independent accuracy case.",
+    "Numeric trace_call selection plus unchanged headers is not atomic hash binding.",
+    "Parity zero-gas-price execution and refund/fee semantics are not independently equivalent to the local unpriced profile.",
+    "Parity trace/stateDiff has no authenticated committed-log channel here.",
+    "No full post-state-root, consensus, finality, signed admission, fee settlement or population accuracy claim.",
+    "Original dRPC debug_traceCall HTTP400 remains a failed comparison; it is not rewritten by this later capability discovery."
+  ]
+}
