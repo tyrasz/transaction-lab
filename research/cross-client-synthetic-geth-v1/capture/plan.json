@@ -1,0 +1,886 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-28T06:57:54.277Z",
+  "limits": {
+    "cases": 16,
+    "perCaseMs": 5000,
+    "closeGraceMs": 1000,
+    "totalMs": 360000,
+    "outputBytes": 1048576
+  },
+  "scope": {
+    "synthetic": true,
+    "officialExpectedPostUsed": false,
+    "independentOpcodeImplementation": true,
+    "expectedRootSource": "sealed_full_VM_reference",
+    "expectedLogsSource": "sealed_full_VM_reference_RLP_Keccak",
+    "comparedChannels": [
+      "full_poststate_root",
+      "Geth_internal_log_hash_assertion"
+    ],
+    "oldProductVersion": "0.18.0",
+    "currentProductAccuracy": false,
+    "populationCoverage": false,
+    "fiveChannelAgreement": false,
+    "gasReturnReceiptChecked": false,
+    "blockSystemCalls": false,
+    "injectedSystemCode": false,
+    "targetExecutionsDuringPreparation": 0,
+    "publicRequests": 0,
+    "retries": 0,
+    "replacements": 0,
+    "portableToolchainArchive": false,
+    "archivedRuntimeSelfContainedExceptExactBinaryAndNode": true,
+    "processMemory": "GOMEMLIMIT256MiB_soft_not_hard_RSS",
+    "expectedPostAssertionsOnly": true
+  },
+  "sourceManifestSha256": "42330c8e7f59f0ddf6c219c6995c30a858d4006c8afc0aafff130938bac58367",
+  "node": {
+    "node": "v22.23.2",
+    "v8": "12.4.254.21-node.56",
+    "platform": "darwin",
+    "arch": "arm64",
+    "executableBytes": 67024,
+    "executableSha256": "1f72236fcbfc84855d7c884fbcba0f6a7c635d600d7e493b823e77c467f2ae95"
+  },
+  "toolchainManifestSha256": "791a91bca058b516b21a66097787f96959477958219eaee9dd20e73367b21333",
+  "binary": {
+    "path": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/bin/evm",
+    "sha256": "10385eddbfd76c3d05b9853f30f4372f2468f6a8c1ac64c445a7490694fc3521",
+    "bytes": 54847666
+  },
+  "sourceCommit": "1df30b18d9ed35ee9d28ffd4648442c2204554ad",
+  "releasedDispatcherSha256": "eafecc8f260a0136cbc005bd1d713ac3cabb29886c26e0d2b443eaf273788236",
+  "semantics": [
+    {
+      "path": "geth-semantics/cmd/evm/staterunner.go",
+      "bytes": 4718,
+      "sha256": "8a474f9396502e813719198fb9ae6f082717c2562ecc8a46378fe9d1036bb388"
+    },
+    {
+      "path": "geth-semantics/cmd/evm/reporter.go",
+      "bytes": 2451,
+      "sha256": "65ec783c6f27e951249a786e41ce9a70f9015046fa99be660eccfe719b426725"
+    },
+    {
+      "path": "geth-semantics/tests/state_test_util.go",
+      "bytes": 21943,
+      "sha256": "61f5097513e5874ed800a412bfd3e1f9ab4373fbfb994a59d57ba589fbc44401"
+    },
+    {
+      "path": "geth-semantics/tests/init.go",
+      "bytes": 30950,
+      "sha256": "c651b2e940b6653432d62e64a9e21264a60c4789f135df57dadea0f3b7168462"
+    }
+  ],
+  "originalCorpus": {
+    "directory": "research/evm-lifecycle-differential-v1/capture-v2",
+    "count": 16,
+    "manifestSha256": "299980c26fde8c589f74922f2b00b93be6290b9acae3f69973f434f3e1f4bcf3",
+    "planSha256": "82edf8c8f06d33180ac109f61ed9247da6b596a5c618b9c2fa7ea16937fd1f86",
+    "productVersion": "0.18.0",
+    "productBaseCommit": "dcc0554"
+  },
+  "cases": [
+    {
+      "index": 1,
+      "id": "tests/cancun/eip6780_selfdestruct/test_selfdestruct.py::test_self_destructing_initcode_create_tx[fork_Osaka-state_test-selfdestruct_contract_initial_balance_0-tx_value_0]",
+      "category": "root_create_zero",
+      "path": "cases/001.json",
+      "expected": {
+        "stateRoot": "0xad8cc2de672564a6ac77c24f64db42d1cd71f56f6d79ac449d09f1bac8a11bc1",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+      },
+      "compatibility": {
+        "examinedCodeItems": 4,
+        "instructionBoundaryContextOpcodeHits": [],
+        "staticScanOnly": true,
+        "reachabilityOrOpcodeCoverageEstablished": false,
+        "coinbaseAbsentBeforeAndInSealedReference": true,
+        "legacyTransactionOnly": true,
+        "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+        "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+        "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+      },
+      "originalArtifacts": [
+        {
+          "path": "declarations/001.json",
+          "bytes": 6122,
+          "sha256": "7dc67780b79fe2e7d6fa1568b5c8c834b0b6e53e8ff8af062a6bd2733b251c90"
+        },
+        {
+          "path": "results/001-reference.json",
+          "bytes": 4373,
+          "sha256": "e955c629798712088ce11803cfd5edba05a36cde8bd26e98fd187132656d6b82"
+        },
+        {
+          "path": "results/001-product.json",
+          "bytes": 32240,
+          "sha256": "1a4025742cd0cab240fd877fee98405e37917220e57b3695ccc7071a482f2d30"
+        },
+        {
+          "path": "results/001-comparison.json",
+          "bytes": 2877,
+          "sha256": "85917886f09114c54a533c7db81c699d3d2f9397c6afb32686c270aee4eec53b"
+        },
+        {
+          "path": "results/001-PRODUCT_SEALED.json",
+          "bytes": 440,
+          "sha256": "b80b0b27c7ed616fd63130f57e94204b230996a8e7623ec5417523bfe8a5b16b"
+        }
+      ],
+      "bytes": 2030,
+      "sha256": "c98407700463466114b1a4685cb6c13809b13b7b9b5697861a2f03662955467a"
+    },
+    {
+      "index": 2,
+      "id": "tests/cancun/eip6780_selfdestruct/test_selfdestruct.py::test_self_destructing_initcode_create_tx[fork_Osaka-state_test-selfdestruct_contract_initial_balance_100000-tx_value_100000]",
+      "category": "root_create_prefunded",
+      "path": "cases/002.json",
+      "expected": {
+        "stateRoot": "0x694feb83b7040de977a6f492612dfeff84d35e5ed0db3aa79ffa1d83392fad71",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+      },
+      "compatibility": {
+        "examinedCodeItems": 5,
+        "instructionBoundaryContextOpcodeHits": [],
+        "staticScanOnly": true,
+        "reachabilityOrOpcodeCoverageEstablished": false,
+        "coinbaseAbsentBeforeAndInSealedReference": true,
+        "legacyTransactionOnly": true,
+        "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+        "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+        "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+      },
+      "originalArtifacts": [
+        {
+          "path": "declarations/002.json",
+          "bytes": 6304,
+          "sha256": "bcc26f83b02fd25ef643392e6356a387f3194734c6bdccb003aadd71a4809c64"
+        },
+        {
+          "path": "results/002-reference.json",
+          "bytes": 4393,
+          "sha256": "c27fdda05a381a02f8a9b5b3f3b6f1ad3a17816f35b8270e2eb40c546e81c4c2"
+        },
+        {
+          "path": "results/002-product.json",
+          "bytes": 38673,
+          "sha256": "e5d11a12e5f7d906c0cc4c93482ed34fd5d4916015fdb690cb16fb938b23f1ca"
+        },
+        {
+          "path": "results/002-comparison.json",
+          "bytes": 4566,
+          "sha256": "9852c266806fd128d6d39cd33cc1b05ff2bc5b42cd0d59e1acf4c618bc893751"
+        },
+        {
+          "path": "results/002-PRODUCT_SEALED.json",
+          "bytes": 450,
+          "sha256": "9788d7c7969134a2f70b68fa6624d93e344cbda042cce4c1717ad4d192b52b4c"
+        }
+      ],
+      "bytes": 2213,
+      "sha256": "87ad21d98f3a4aa8bc53ce4cd0847d6b82828c3e7ed2bfc4e16a9a527f3d1ae8"
+    },
+    {
+      "index": 3,
+      "id": "tests/cancun/eip6780_selfdestruct/test_selfdestruct.py::test_create_selfdestruct_same_tx[fork_Osaka-state_test-selfdestruct_contract_initial_balance_0-single_call-create_opcode_CREATE]",
+      "category": "create_then_delete",
+      "path": "cases/003.json",
+      "expected": {
+        "stateRoot": "0xbf20804e4af08a52edebcc890d3de7e2bfb03652d12fb0f48747431b31d07c93",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+      },
+      "compatibility": {
+        "examinedCodeItems": 7,
+        "instructionBoundaryContextOpcodeHits": [],
+        "staticScanOnly": true,
+        "reachabilityOrOpcodeCoverageEstablished": false,
+        "coinbaseAbsentBeforeAndInSealedReference": true,
+        "legacyTransactionOnly": true,
+        "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+        "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+        "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+      },
+      "originalArtifacts": [
+        {
+          "path": "declarations/003.json",
+          "bytes": 7531,
+          "sha256": "dc1cf8317fbcefbb373361010f6ce3448c137d7ad224f7411c880ac76fab4fce"
+        },
+        {
+          "path": "results/003-reference.json",
+          "bytes": 8968,
+          "sha256": "85c239c9408afab5c260a41ac9568260facf8e0e0cbe94f3a5f52046a6158d53"
+        },
+        {
+          "path": "results/003-product.json",
+          "bytes": 55448,
+          "sha256": "5d9b30f3e63ce61e6838d86a7dc69d34291233ffe26175d8a7f9cab274b80616"
+        },
+        {
+          "path": "results/003-comparison.json",
+          "bytes": 9542,
+          "sha256": "f300dc3e6613d346fa6cf011927f4ddf766a9afe6222793814405c13eb58acba"
+        },
+        {
+          "path": "results/003-PRODUCT_SEALED.json",
+          "bytes": 454,
+          "sha256": "611dfc8fb00af9429d0b48c5f2d49897b9fa0c79e5cba48e1a91aedb9dfa41d3"
+        }
+      ],
+      "bytes": 3067,
+      "sha256": "ecbd4f3c9969aa55358240b1b03bafaff3e59cdd1e0c86664050d26fd8d7ee4e"
+    },
+    {
+      "index": 4,
+      "id": "tests/cancun/eip6780_selfdestruct/test_selfdestruct.py::test_create_selfdestruct_same_tx[fork_Osaka-state_test-selfdestruct_contract_initial_balance_100000-single_call_self-create_opcode_CREATE2]",
+      "category": "create2_self_burn",
+      "path": "cases/004.json",
+      "expected": {
+        "stateRoot": "0x10f5b82d6ca83070b12d0bf285d98c26844df194065e09de3134ad27eabbe856",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+      },
+      "compatibility": {
+        "examinedCodeItems": 7,
+        "instructionBoundaryContextOpcodeHits": [],
+        "staticScanOnly": true,
+        "reachabilityOrOpcodeCoverageEstablished": false,
+        "coinbaseAbsentBeforeAndInSealedReference": true,
+        "legacyTransactionOnly": true,
+        "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+        "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+        "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+      },
+      "originalArtifacts": [
+        {
+          "path": "declarations/004.json",
+          "bytes": 7477,
+          "sha256": "e1915f54b4418e2dd8f2247f16063ad8d84a44c3cd81aaf0e54aa697a7ecb42a"
+        },
+        {
+          "path": "results/004-reference.json",
+          "bytes": 7983,
+          "sha256": "ebe91e7601eba2ad5577b50bd422120d7a4ae06275895805cdba851b5523b197"
+        },
+        {
+          "path": "results/004-product.json",
+          "bytes": 53875,
+          "sha256": "9f43039096176d13fed49a6bf8917b98942ee238c5977e5600670548995e8004"
+        },
+        {
+          "path": "results/004-comparison.json",
+          "bytes": 9803,
+          "sha256": "d037f744e034bb0d0c20beef6e48abad6dec3bfceec066946a9bcdc1d22b794c"
+        },
+        {
+          "path": "results/004-PRODUCT_SEALED.json",
+          "bytes": 465,
+          "sha256": "72c6a3c81e1e42f14cfbdfdbfeed032ee2dc64f320f8dc510e17143649c4c07f"
+        }
+      ],
+      "bytes": 3006,
+      "sha256": "d2cf889ba5c7ccb08b9fd7f18df00723596ddbdb880248290d081c3a23d9cd64"
+    },
+    {
+      "index": 5,
+      "id": "tests/cancun/eip6780_selfdestruct/test_selfdestruct_finalization.py::test_selfdestruct_clears_nonce_and_storage[fork_Osaka-state_test-nonce_and_storage-funded-other]",
+      "category": "clear_nonce_storage_other",
+      "path": "cases/005.json",
+      "expected": {
+        "stateRoot": "0x8a8059f9a654cda089e1c0f545d32709f7e06d56e38e0d7bffaaab740e41e0e3",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+      },
+      "compatibility": {
+        "examinedCodeItems": 9,
+        "instructionBoundaryContextOpcodeHits": [],
+        "staticScanOnly": true,
+        "reachabilityOrOpcodeCoverageEstablished": false,
+        "coinbaseAbsentBeforeAndInSealedReference": true,
+        "legacyTransactionOnly": true,
+        "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+        "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+        "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+      },
+      "originalArtifacts": [
+        {
+          "path": "declarations/005.json",
+          "bytes": 6355,
+          "sha256": "9c64fbf420343e6367d45f83438c0de37a42af5ad921119dcd661b39ba19826e"
+        },
+        {
+          "path": "results/005-reference.json",
+          "bytes": 7025,
+          "sha256": "9fec80fa54e426851eaf453aaaa78578947cbb019c24ff2335c876d802ab389f"
+        },
+        {
+          "path": "results/005-product.json",
+          "bytes": 69819,
+          "sha256": "8f4c5a7e9a2de3d3da9308f92e991b40d8706a1eab586aeb64706bedcc7cf9c5"
+        },
+        {
+          "path": "results/005-comparison.json",
+          "bytes": 9189,
+          "sha256": "478b89278c74b1e1e0e8600870d03b430238b36d5413193397c5f5c2b5407a7d"
+        },
+        {
+          "path": "results/005-PRODUCT_SEALED.json",
+          "bytes": 435,
+          "sha256": "c12b8b7d75f820f717c85b5311052c4e36e3048343b436348452b8f8521a10f2"
+        }
+      ],
+      "bytes": 2298,
+      "sha256": "a0bcb808abbefa96ffde526d67fb8d8b8fba4982d441084d3cb673d8685b3ab8"
+    },
+    {
+      "index": 6,
+      "id": "tests/cancun/eip6780_selfdestruct/test_selfdestruct_finalization.py::test_selfdestruct_clears_nonce_and_storage[fork_Osaka-state_test-nonce_and_storage-funded-self]",
+      "category": "clear_nonce_storage_self",
+      "path": "cases/006.json",
+      "expected": {
+        "stateRoot": "0xfaa7d131f45bfc030065907121e007f831db8e145d0d0f3bc67edd3b057c5f97",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+      },
+      "compatibility": {
+        "examinedCodeItems": 9,
+        "instructionBoundaryContextOpcodeHits": [],
+        "staticScanOnly": true,
+        "reachabilityOrOpcodeCoverageEstablished": false,
+        "coinbaseAbsentBeforeAndInSealedReference": true,
+        "legacyTransactionOnly": true,
+        "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+        "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+        "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+      },
+      "originalArtifacts": [
+        {
+          "path": "declarations/006.json",
+          "bytes": 6393,
+          "sha256": "3bd9ff57cd2d93e1dd4a082a77a027771a868f7eb279cfc9c8a3fe43a0f61b3c"
+        },
+        {
+          "path": "results/006-reference.json",
+          "bytes": 7105,
+          "sha256": "300ddf9727805cd8f2141ac51aa73bb9267f87e6541529844760ac718251b378"
+        },
+        {
+          "path": "results/006-product.json",
+          "bytes": 62340,
+          "sha256": "838db7c8d8519db7462726204925e9fdc1fb2698a3a89e04c7d8d575ae3dc993"
+        },
+        {
+          "path": "results/006-comparison.json",
+          "bytes": 8601,
+          "sha256": "f1b2a73fae26068c55668e308b800cce1a7cd8e69c543df401a5bb056b56a3b8"
+        },
+        {
+          "path": "results/006-PRODUCT_SEALED.json",
+          "bytes": 434,
+          "sha256": "4979c794699cfb8062d4511d9242330e17f059b9058aa46668cb052f08332d16"
+        }
+      ],
+      "bytes": 2337,
+      "sha256": "2a46afb1297dd2d2c2b9aae9b261f9eb9e29a8d8370c9311973b98505be06c3e"
+    },
+    {
+      "index": 7,
+      "id": "tests/cancun/eip6780_selfdestruct/test_selfdestruct_revert.py::test_selfdestruct_created_in_same_tx_with_revert[fork_Osaka-state_test-no_outer_selfdestruct-same_tx]",
+      "category": "reverted_inner",
+      "path": "cases/007.json",
+      "expected": {
+        "stateRoot": "0x1474e208189288d4fb74af744b8aa2b0c7505cfd9c7b5236713546e9a4da94e8",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+      },
+      "compatibility": {
+        "examinedCodeItems": 7,
+        "instructionBoundaryContextOpcodeHits": [],
+        "staticScanOnly": true,
+        "reachabilityOrOpcodeCoverageEstablished": false,
+        "coinbaseAbsentBeforeAndInSealedReference": true,
+        "legacyTransactionOnly": true,
+        "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+        "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+        "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+      },
+      "originalArtifacts": [
+        {
+          "path": "declarations/007.json",
+          "bytes": 6753,
+          "sha256": "f39e6b28dfbee21051147529c987b3bb9460846d5ebe0cc202dd58469dde713a"
+        },
+        {
+          "path": "results/007-reference.json",
+          "bytes": 7678,
+          "sha256": "83b197eb970b16e2c8c909c381e9a8b8bffdd2cbdf4ab2fa839aab5620383687"
+        },
+        {
+          "path": "results/007-product.json",
+          "bytes": 66633,
+          "sha256": "6f01cfe9b1fb03067267d663c6434d76f6118aa9f1a54a2b0a9ce1f211a5fb63"
+        },
+        {
+          "path": "results/007-comparison.json",
+          "bytes": 9605,
+          "sha256": "5a8b2824c770c958191a689efca025f5f84ad29bf1583e3cf9d4b1bd2d586899"
+        },
+        {
+          "path": "results/007-PRODUCT_SEALED.json",
+          "bytes": 434,
+          "sha256": "bc1e4b465748bc5a80c16d1191c897b221c46f5125686a356d29a6e6ad20cb19"
+        }
+      ],
+      "bytes": 2603,
+      "sha256": "e7735b4e0b455e9c97daab824f4e2c2a3c2b567212dad6e6b51ca3d6680082e8"
+    },
+    {
+      "index": 8,
+      "id": "tests/cancun/eip6780_selfdestruct/test_selfdestruct_revert.py::test_selfdestruct_created_in_same_tx_with_revert[fork_Osaka-state_test-outer_selfdestruct_after_inner_call-same_tx]",
+      "category": "reverted_inner_then_outer",
+      "path": "cases/008.json",
+      "expected": {
+        "stateRoot": "0x1f5e23731acb65ac1f4bbc56bf3e5e069f7a3252044587b12a2e4c5e0c6fb202",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+      },
+      "compatibility": {
+        "examinedCodeItems": 7,
+        "instructionBoundaryContextOpcodeHits": [],
+        "staticScanOnly": true,
+        "reachabilityOrOpcodeCoverageEstablished": false,
+        "coinbaseAbsentBeforeAndInSealedReference": true,
+        "legacyTransactionOnly": true,
+        "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+        "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+        "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+      },
+      "originalArtifacts": [
+        {
+          "path": "declarations/008.json",
+          "bytes": 6796,
+          "sha256": "8f6b85471aa168410943562cb057bd3c8a6871868ed4f54c644a44f347c8e576"
+        },
+        {
+          "path": "results/008-reference.json",
+          "bytes": 7482,
+          "sha256": "169c9617347525157ba0e64228246222ef109171ff931269215498b1c285864e"
+        },
+        {
+          "path": "results/008-product.json",
+          "bytes": 66756,
+          "sha256": "5a445a48b54a5e43c592d87fbf3963ccf96e851a007a223c5d515793a10fd1c7"
+        },
+        {
+          "path": "results/008-comparison.json",
+          "bytes": 8508,
+          "sha256": "2a061d7f6410fe01f041c5a91afcfd02a453b845af8d73d68cf95010b69535ea"
+        },
+        {
+          "path": "results/008-PRODUCT_SEALED.json",
+          "bytes": 448,
+          "sha256": "cb15a7f8a40958cb7c17c4b2efa4ff05c2f84d2ed4825d534e48c3cc21dd2617"
+        }
+      ],
+      "bytes": 2635,
+      "sha256": "63dca0501fec2b93a5f8ef5e6de4da394805db8430fdd28ffe3741f51ccb8578"
+    },
+    {
+      "index": 9,
+      "id": "tests/cancun/eip6780_selfdestruct/test_selfdestruct_finalization.py::test_selfdestruct_in_delegate_context[fork_Osaka-state_test-funded-other-call_opcode_CALLCODE]",
+      "category": "callcode_context",
+      "path": "cases/009.json",
+      "expected": {
+        "stateRoot": "0xfb742e2cac7f5f5eda5bd3b194e74c18d2487a905a70b6c25376aef5e904bda3",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+      },
+      "compatibility": {
+        "examinedCodeItems": 6,
+        "instructionBoundaryContextOpcodeHits": [],
+        "staticScanOnly": true,
+        "reachabilityOrOpcodeCoverageEstablished": false,
+        "coinbaseAbsentBeforeAndInSealedReference": true,
+        "legacyTransactionOnly": true,
+        "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+        "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+        "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+      },
+      "originalArtifacts": [
+        {
+          "path": "declarations/009.json",
+          "bytes": 6571,
+          "sha256": "c35cd517aea8738c5043f86738239d1e73c5e708a7cf02bb8accdfe73aa880ba"
+        },
+        {
+          "path": "results/009-reference.json",
+          "bytes": 6299,
+          "sha256": "2815cfeea979a6672b941327ed0e5d345be3e636277d2fb1a871b23a51605cf9"
+        },
+        {
+          "path": "results/009-product.json",
+          "bytes": 63139,
+          "sha256": "ca6bbece849c0fde1353a49db58d6febb95401e343c0a0324a6e7a368ec45368"
+        },
+        {
+          "path": "results/009-comparison.json",
+          "bytes": 7253,
+          "sha256": "aba4c630bafdfd415745111f24b045721f36d35d7ca6f678ee72ec9537e1058a"
+        },
+        {
+          "path": "results/009-PRODUCT_SEALED.json",
+          "bytes": 433,
+          "sha256": "60b4a230a281a99cb68d1a793ab7252a64e719c990f44093e9dbec53b2c86e21"
+        }
+      ],
+      "bytes": 2535,
+      "sha256": "8d7cb007ace9c0cc2aa0072e7ed1e80d16777a7494f3696e0de30be3346ba0b7"
+    },
+    {
+      "index": 10,
+      "id": "tests/cancun/eip6780_selfdestruct/test_selfdestruct_finalization.py::test_selfdestruct_in_delegate_context[fork_Osaka-state_test-funded-other-call_opcode_DELEGATECALL]",
+      "category": "delegate_context",
+      "path": "cases/010.json",
+      "expected": {
+        "stateRoot": "0xaed58e00432e1d5b1330b8462906a14fbdda4d5c684b708aeecba1e15f7bade1",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+      },
+      "compatibility": {
+        "examinedCodeItems": 6,
+        "instructionBoundaryContextOpcodeHits": [],
+        "staticScanOnly": true,
+        "reachabilityOrOpcodeCoverageEstablished": false,
+        "coinbaseAbsentBeforeAndInSealedReference": true,
+        "legacyTransactionOnly": true,
+        "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+        "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+        "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+      },
+      "originalArtifacts": [
+        {
+          "path": "declarations/010.json",
+          "bytes": 6580,
+          "sha256": "6509e9a8b0a84f94a0f8c72ee350999a0d767be41f0989fef61502632df64782"
+        },
+        {
+          "path": "results/010-reference.json",
+          "bytes": 6307,
+          "sha256": "7fafab5d7ff7d14e11deb68feb0e0f3bedc05b8921c50243341cd61fb98b5576"
+        },
+        {
+          "path": "results/010-product.json",
+          "bytes": 62572,
+          "sha256": "1fcfcd56952751de6067e22f67235c57f09d07b1662dfacdf7f9fc2e60747704"
+        },
+        {
+          "path": "results/010-comparison.json",
+          "bytes": 7265,
+          "sha256": "eb2a623527163687e722518797744bcf69460bf976ba1f03f5acf014cb793fc2"
+        },
+        {
+          "path": "results/010-PRODUCT_SEALED.json",
+          "bytes": 438,
+          "sha256": "17f14a31385114a8724d68b059cca3cd74b4b94df9c2ba78ab924763f3a8a309"
+        }
+      ],
+      "bytes": 2543,
+      "sha256": "0ea88de6aa131ce3eaca73493ddbcf14acdc611e97465e5aa71614b6a9129149"
+    },
+    {
+      "index": 11,
+      "id": "tests/cancun/eip6780_selfdestruct/test_collision_selfdestruct.py::test_selfdestruct_after_create2_collision[fork_Osaka-state_test]",
+      "category": "create2_collision",
+      "path": "cases/011.json",
+      "expected": {
+        "stateRoot": "0x6c9b21d6d834cdecbdaa3c05954e8e7d230f99350ac679d23a58b52a37cd00ac",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+      },
+      "compatibility": {
+        "examinedCodeItems": 6,
+        "instructionBoundaryContextOpcodeHits": [],
+        "staticScanOnly": true,
+        "reachabilityOrOpcodeCoverageEstablished": false,
+        "coinbaseAbsentBeforeAndInSealedReference": true,
+        "legacyTransactionOnly": true,
+        "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+        "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+        "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+      },
+      "originalArtifacts": [
+        {
+          "path": "declarations/011.json",
+          "bytes": 6586,
+          "sha256": "67da51365d795054f2fafb17c7f664e51fdbe5ec9d4549492ad42288b7ab5c8e"
+        },
+        {
+          "path": "results/011-reference.json",
+          "bytes": 6367,
+          "sha256": "ce6604a7287b1cf189293e6b8069451c9996b367816348709270cb02bb816ccd"
+        },
+        {
+          "path": "results/011-product.json",
+          "bytes": 67877,
+          "sha256": "d9afe9a754ce59cb999307a063101f4fba25caee49fe55e2c58642ce8a731f85"
+        },
+        {
+          "path": "results/011-comparison.json",
+          "bytes": 9189,
+          "sha256": "aa830b7830878acbca3a110c7b9abee7fe52ffd698bcd792639316fa22fbe3b0"
+        },
+        {
+          "path": "results/011-PRODUCT_SEALED.json",
+          "bytes": 401,
+          "sha256": "6d02e8c15acfbd43bd071f251f1e65310b4bf9e0ab95e4d27d0c244318db499f"
+        }
+      ],
+      "bytes": 2528,
+      "sha256": "76cfd62216aa6bdf03512d65e202c86bb6d42151c7e64ddc6100763293b77304"
+    },
+    {
+      "index": 12,
+      "id": "tests/cancun/eip6780_selfdestruct/test_selfdestruct_finalization.py::test_reinvoked_selfdestruct_create_nonce[fork_Osaka-state_test]",
+      "category": "reinvoked_nonce",
+      "path": "cases/012.json",
+      "expected": {
+        "stateRoot": "0xd9724a3bef3b2800adaffa24daf8c0993cdb2b025e7251680d269d45ef616c5a",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+      },
+      "compatibility": {
+        "examinedCodeItems": 10,
+        "instructionBoundaryContextOpcodeHits": [],
+        "staticScanOnly": true,
+        "reachabilityOrOpcodeCoverageEstablished": false,
+        "coinbaseAbsentBeforeAndInSealedReference": true,
+        "legacyTransactionOnly": true,
+        "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+        "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+        "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+      },
+      "originalArtifacts": [
+        {
+          "path": "declarations/012.json",
+          "bytes": 6270,
+          "sha256": "53aa2ecd6a2d8b290ef23f1a817131e7e431462b2f4d38cfb1732ccb724a5781"
+        },
+        {
+          "path": "results/012-reference.json",
+          "bytes": 5606,
+          "sha256": "d19937eaaf427ba5efc8dafa5acc36d7454476db0e86250f3a2080087fb73add"
+        },
+        {
+          "path": "results/012-product.json",
+          "bytes": 56370,
+          "sha256": "f121f3349bf8ed304e9281bffa78d667a30894bc250193a4e0fafa2b836a5f37"
+        },
+        {
+          "path": "results/012-comparison.json",
+          "bytes": 7419,
+          "sha256": "321fc73b056d845352fdb5a6faac87fc7dcac235956eaabc8fae5b5e2192eef6"
+        },
+        {
+          "path": "results/012-PRODUCT_SEALED.json",
+          "bytes": 403,
+          "sha256": "fc28ab51639621364ecf78b36d2300df491bd214d15aecfa8fbb7fb38bbbfae2"
+        }
+      ],
+      "bytes": 2210,
+      "sha256": "be151e5a708e6098b848b49f927237a3ebfd80a3cde4ffc80197e32c0995bf28"
+    },
+    {
+      "index": 13,
+      "id": "tests/ported_static/stRevertTest/test_revert_opcode_in_init.py::test_revert_opcode_in_init[fork_Osaka-state_test-tx_value_0]",
+      "category": "root_create_revert_zero",
+      "path": "cases/013.json",
+      "expected": {
+        "stateRoot": "0x6542b7d637a71dc92b45bd29e53ab327cc62267bcda5d728683fe2793819b3c1",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+      },
+      "compatibility": {
+        "examinedCodeItems": 3,
+        "instructionBoundaryContextOpcodeHits": [],
+        "staticScanOnly": true,
+        "reachabilityOrOpcodeCoverageEstablished": false,
+        "coinbaseAbsentBeforeAndInSealedReference": true,
+        "legacyTransactionOnly": true,
+        "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+        "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+        "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+      },
+      "originalArtifacts": [
+        {
+          "path": "declarations/013.json",
+          "bytes": 5765,
+          "sha256": "9d3a36d8213014fae930a3d330d62fa856bb9378802ab102b51693328c48302d"
+        },
+        {
+          "path": "results/013-reference.json",
+          "bytes": 3378,
+          "sha256": "bb1e3df0585c253ed7038366b1a3a3cca9e8c95e26c3b8f7d9a4d1b90d63e235"
+        },
+        {
+          "path": "results/013-product.json",
+          "bytes": 24576,
+          "sha256": "5909eeebf03d2fe5577e55b9ad7975b4992ffd7e41a3e8b703879d7d35cb77c0"
+        },
+        {
+          "path": "results/013-comparison.json",
+          "bytes": 2365,
+          "sha256": "a29e75b6af6c06e980b106a2b8d85a704ff3cc4cf60d42a040ff0f68a8db29bc"
+        },
+        {
+          "path": "results/013-PRODUCT_SEALED.json",
+          "bytes": 395,
+          "sha256": "e8dc8c6565668107a00f99bdb454c906aee272a2c74340dae0eb1764f4b53b97"
+        }
+      ],
+      "bytes": 1693,
+      "sha256": "ed1d8c2c2e43134fcf3bf197c4395f5fc8ff1b4cf9781cee89942782cc34f377"
+    },
+    {
+      "index": 14,
+      "id": "tests/ported_static/stRevertTest/test_revert_opcode_in_init.py::test_revert_opcode_in_init[fork_Osaka-state_test-tx_value_1]",
+      "category": "root_create_revert_value",
+      "path": "cases/014.json",
+      "expected": {
+        "stateRoot": "0x6542b7d637a71dc92b45bd29e53ab327cc62267bcda5d728683fe2793819b3c1",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347"
+      },
+      "compatibility": {
+        "examinedCodeItems": 3,
+        "instructionBoundaryContextOpcodeHits": [],
+        "staticScanOnly": true,
+        "reachabilityOrOpcodeCoverageEstablished": false,
+        "coinbaseAbsentBeforeAndInSealedReference": true,
+        "legacyTransactionOnly": true,
+        "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+        "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+        "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+      },
+      "originalArtifacts": [
+        {
+          "path": "declarations/014.json",
+          "bytes": 5766,
+          "sha256": "c47d4854c8332eb377a12fe64483dd9a447fd6c9bd5129a1e61a72819d172546"
+        },
+        {
+          "path": "results/014-reference.json",
+          "bytes": 3378,
+          "sha256": "149e0dcb2e8ae8e0fade060ad9cb1ce242986f18b1ccc87ff0165ba94a90a3ab"
+        },
+        {
+          "path": "results/014-product.json",
+          "bytes": 24594,
+          "sha256": "9e13a9b8167b46558e6c4b31ae7036113dfff26f8f3e5649b21753fac8456c98"
+        },
+        {
+          "path": "results/014-comparison.json",
+          "bytes": 2365,
+          "sha256": "a29e75b6af6c06e980b106a2b8d85a704ff3cc4cf60d42a040ff0f68a8db29bc"
+        },
+        {
+          "path": "results/014-PRODUCT_SEALED.json",
+          "bytes": 395,
+          "sha256": "b6ba50b8e8c4047bb2d688c605cb64dd7a4f9af914dfb7ddbdbedbf97e495880"
+        }
+      ],
+      "bytes": 1693,
+      "sha256": "8c2cba2dc12245e6478c304523f7f4d261bb2a8db6c635a2ffed6d7ff794224c"
+    },
+    {
+      "index": 15,
+      "id": "tests/ported_static/stLogTests/test_log0_non_empty_mem.py::test_log0_non_empty_mem[fork_Osaka-state_test]",
+      "category": "log0_nonempty",
+      "path": "cases/015.json",
+      "expected": {
+        "stateRoot": "0x14c576de25304fa63d569ea3130ccee6f2d838a264d7f0c87f08d22c920f2382",
+        "logsHash": "0x6320e7da900ee9d976cd16278c9f0edb79c0d39bbd3bdc268566b8a0d86c023a"
+      },
+      "compatibility": {
+        "examinedCodeItems": 3,
+        "instructionBoundaryContextOpcodeHits": [],
+        "staticScanOnly": true,
+        "reachabilityOrOpcodeCoverageEstablished": false,
+        "coinbaseAbsentBeforeAndInSealedReference": true,
+        "legacyTransactionOnly": true,
+        "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+        "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+        "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+      },
+      "originalArtifacts": [
+        {
+          "path": "declarations/015.json",
+          "bytes": 6253,
+          "sha256": "0262128757b7c7f2f93290b7f82517b03993f54c50aa6bfbe37fde6261ff0400"
+        },
+        {
+          "path": "results/015-reference.json",
+          "bytes": 4785,
+          "sha256": "a78b4d57ce04ce5b2d61710c499ab78b4cace01e64aa6681d3a1c5bca98684df"
+        },
+        {
+          "path": "results/015-product.json",
+          "bytes": 39736,
+          "sha256": "86f68230dcbc3677ea8ccfb9500d3841ece9810cb4ae4da5aa013dc90d633c24"
+        },
+        {
+          "path": "results/015-comparison.json",
+          "bytes": 5521,
+          "sha256": "aee3a877ff0ad960db92ab1b58f815c901a0a9cd8c45972b4735190bfc6396a4"
+        },
+        {
+          "path": "results/015-PRODUCT_SEALED.json",
+          "bytes": 376,
+          "sha256": "5d87b214b86154a8abb550213f7c872094f7de873fab3ed5cccf068029a1f103"
+        }
+      ],
+      "bytes": 2205,
+      "sha256": "fb4fca42b456eec8faf3562a6bee60203987f3d885b6c00fcb3d3f11741563f1"
+    },
+    {
+      "index": 16,
+      "id": "tests/ported_static/stLogTests/test_log4_non_empty_mem.py::test_log4_non_empty_mem[fork_Osaka-state_test]",
+      "category": "log4_nonempty",
+      "path": "cases/016.json",
+      "expected": {
+        "stateRoot": "0x050dbacc3961a8f3cccf5b885cf4e24ef8ae297006b628dfdc632fdeab3d1c61",
+        "logsHash": "0xb0c6aa87ffb12ccc3dc80e53662223b809d37ad3364d59bcd566437491b92d72"
+      },
+      "compatibility": {
+        "examinedCodeItems": 3,
+        "instructionBoundaryContextOpcodeHits": [],
+        "staticScanOnly": true,
+        "reachabilityOrOpcodeCoverageEstablished": false,
+        "coinbaseAbsentBeforeAndInSealedReference": true,
+        "legacyTransactionOnly": true,
+        "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+        "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+        "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+      },
+      "originalArtifacts": [
+        {
+          "path": "declarations/016.json",
+          "bytes": 6269,
+          "sha256": "77f3f994b325b718f62e1dec99bfeaff1a5641b11a70fdbbf2e9942312a40806"
+        },
+        {
+          "path": "results/016-reference.json",
+          "bytes": 5438,
+          "sha256": "8222a8553b03b32d36dfb115c4c744bc863837b29948b57e1fb780b4e2f294bc"
+        },
+        {
+          "path": "results/016-product.json",
+          "bytes": 40345,
+          "sha256": "31212dadf00cc7f51cd2a6618207ef4cfccee8c1f4c96670e7562e4c991934cb"
+        },
+        {
+          "path": "results/016-comparison.json",
+          "bytes": 5569,
+          "sha256": "7dd735846daae8289335eaf6289c20e7558f4a9cdf978dae1ffab5d1b3a0140b"
+        },
+        {
+          "path": "results/016-PRODUCT_SEALED.json",
+          "bytes": 376,
+          "sha256": "41e9cd3f7cf86641d03bd518ef8ef0942aaff1e16d71c8279b641b6181060170"
+        }
+      ],
+      "bytes": 2221,
+      "sha256": "6cdc8023f4e1deffca0825c7bb936dd797bcae7680511617c549b5bffcfeaf68"
+    }
+  ]
+}

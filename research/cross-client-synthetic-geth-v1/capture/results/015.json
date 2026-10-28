@@ -1,0 +1,93 @@
+{
+  "case": {
+    "index": 15,
+    "id": "tests/ported_static/stLogTests/test_log0_non_empty_mem.py::test_log0_non_empty_mem[fork_Osaka-state_test]",
+    "category": "log0_nonempty",
+    "path": "cases/015.json",
+    "expected": {
+      "stateRoot": "0x14c576de25304fa63d569ea3130ccee6f2d838a264d7f0c87f08d22c920f2382",
+      "logsHash": "0x6320e7da900ee9d976cd16278c9f0edb79c0d39bbd3bdc268566b8a0d86c023a"
+    },
+    "compatibility": {
+      "examinedCodeItems": 3,
+      "instructionBoundaryContextOpcodeHits": [],
+      "staticScanOnly": true,
+      "reachabilityOrOpcodeCoverageEstablished": false,
+      "coinbaseAbsentBeforeAndInSealedReference": true,
+      "legacyTransactionOnly": true,
+      "blockhash": "Geth vmTestBlockHash invents Keccak(decimal number); scanned corpus code has no BLOCKHASH",
+      "blobBaseFee": "Geth derives fee from excessBlobGas; no blob transaction or scanned blob opcode in this corpus",
+      "signature": "Adapter independently binds signature bytes to message fields; Geth statetest itself only separately recovers txbytes"
+    },
+    "originalArtifacts": [
+      {
+        "path": "declarations/015.json",
+        "bytes": 6253,
+        "sha256": "0262128757b7c7f2f93290b7f82517b03993f54c50aa6bfbe37fde6261ff0400"
+      },
+      {
+        "path": "results/015-reference.json",
+        "bytes": 4785,
+        "sha256": "a78b4d57ce04ce5b2d61710c499ab78b4cace01e64aa6681d3a1c5bca98684df"
+      },
+      {
+        "path": "results/015-product.json",
+        "bytes": 39736,
+        "sha256": "86f68230dcbc3677ea8ccfb9500d3841ece9810cb4ae4da5aa013dc90d633c24"
+      },
+      {
+        "path": "results/015-comparison.json",
+        "bytes": 5521,
+        "sha256": "aee3a877ff0ad960db92ab1b58f815c901a0a9cd8c45972b4735190bfc6396a4"
+      },
+      {
+        "path": "results/015-PRODUCT_SEALED.json",
+        "bytes": 376,
+        "sha256": "5d87b214b86154a8abb550213f7c872094f7de873fab3ed5cccf068029a1f103"
+      }
+    ],
+    "bytes": 2205,
+    "sha256": "fb4fca42b456eec8faf3562a6bee60203987f3d885b6c00fcb3d3f11741563f1"
+  },
+  "raw": {
+    "args": [
+      "statetest",
+      "--statetest.fork=Osaka",
+      "--run=^tests/ported_static/stLogTests/test_log0_non_empty_mem\\.py::test_log0_non_empty_mem\\[fork_Osaka-state_test\\]$",
+      "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v020/research/cross-client-synthetic-geth-v1/capture/cases/015.json"
+    ],
+    "reason": null,
+    "exitCode": 0,
+    "signal": null,
+    "processClosed": true,
+    "stdoutRaw": {
+      "base64": "WwogIHsKICAgICJuYW1lIjogInRlc3RzL3BvcnRlZF9zdGF0aWMvc3RMb2dUZXN0cy90ZXN0X2xvZzBfbm9uX2VtcHR5X21lbS5weTo6dGVzdF9sb2cwX25vbl9lbXB0eV9tZW1bZm9ya19Pc2FrYS1zdGF0ZV90ZXN0XSIsCiAgICAicGFzcyI6IHRydWUsCiAgICAic3RhdGVSb290IjogIjB4MTRjNTc2ZGUyNTMwNGZhNjNkNTY5ZWEzMTMwY2NlZTZmMmQ4MzhhMjY0ZDdmMGM4N2YwOGQyMmM5MjBmMjM4MiIsCiAgICAiZm9yayI6ICJPc2FrYSIKICB9Cl0K",
+      "bytes": 258,
+      "sha256": "5e6872f44dd730d5cfba8e96b9e93c2af88155b80f1b5c9e467f43909052fd74"
+    },
+    "stdout": "[\n  {\n    \"name\": \"tests/ported_static/stLogTests/test_log0_non_empty_mem.py::test_log0_non_empty_mem[fork_Osaka-state_test]\",\n    \"pass\": true,\n    \"stateRoot\": \"0x14c576de25304fa63d569ea3130ccee6f2d838a264d7f0c87f08d22c920f2382\",\n    \"fork\": \"Osaka\"\n  }\n]\n",
+    "stderrRaw": {
+      "base64": "eyJzdGF0ZVJvb3QiOiAiMHgxNGM1NzZkZTI1MzA0ZmE2M2Q1NjllYTMxMzBjY2VlNmYyZDgzOGEyNjRkN2YwYzg3ZjA4ZDIyYzkyMGYyMzgyIn0K",
+      "bytes": 84,
+      "sha256": "7f59e02add02edb4e4c3138b3869fe1bbbf2184ae5ee98ffac4421e52f26bb74"
+    },
+    "stderr": "{\"stateRoot\": \"0x14c576de25304fa63d569ea3130ccee6f2d838a264d7f0c87f08d22c920f2382\"}\n",
+    "observedBytes": 342,
+    "durationMs": 16.51558399999999
+  },
+  "observed": {
+    "status": "matched",
+    "result": {
+      "name": "tests/ported_static/stLogTests/test_log0_non_empty_mem.py::test_log0_non_empty_mem[fork_Osaka-state_test]",
+      "pass": true,
+      "stateRoot": "0x14c576de25304fa63d569ea3130ccee6f2d838a264d7f0c87f08d22c920f2382",
+      "fork": "Osaka"
+    },
+    "checks": {
+      "reportedPass": true,
+      "stateRoot": true,
+      "logHashCheckedByGeth": true
+    },
+    "scope": "Synthetic sealed-reference full state root plus Geth internal log-hash assertion; gas/return/receipt and current-product coverage not checked."
+  }
+}

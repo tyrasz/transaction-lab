@@ -1,0 +1,140 @@
+{
+  "outcome": {
+    "transactionHash": "0x94e92176f522c00433570c6cd4fe61b0b40e6cdf9ad6764b1c9abdf23e639fe4",
+    "execution": "success",
+    "comparison": "match"
+  },
+  "channels": {
+    "executionStatus": {
+      "status": "match",
+      "product": {
+        "status": "success",
+        "exception": null
+      },
+      "oracle": {
+        "status": "success",
+        "exception": null
+      }
+    },
+    "returnData": {
+      "status": "match",
+      "product": "0x0000000000000000000000000000000000000000000000000000000000000001",
+      "oracle": "0x0000000000000000000000000000000000000000000000000000000000000001"
+    },
+    "committedLogs": {
+      "status": "match",
+      "product": [
+        {
+          "address": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000b3e8c75912438c2282e0afa51b41bff8e835bc88",
+            "0x00000000000000000000000028c6c06298d514db089934071355e5743bf21d60"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000b73ed727f470308400"
+        }
+      ],
+      "oracle": [
+        {
+          "address": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000b3e8c75912438c2282e0afa51b41bff8e835bc88",
+            "0x00000000000000000000000028c6c06298d514db089934071355e5743bf21d60"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000b73ed727f470308400"
+        }
+      ]
+    },
+    "gasAccounting": {
+      "status": "match",
+      "product": "35318",
+      "oracle": "35318"
+    },
+    "fullObservedStateChanges": {
+      "status": "match",
+      "product": [
+        {
+          "address": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+          "storage": [
+            {
+              "slot": "0x44a6c51a1742636c5f52a567e08612f0b1f580be1e93cc4318bbc864b75b21fe",
+              "before": "0x000000000000000000000000000000000000000000048673c8c7271d3a83a3d7",
+              "after": "0x00000000000000000000000000000000000000000004872b079e4f11aab427d7"
+            },
+            {
+              "slot": "0xca441455ef7e1b09be1f19207639dfe601c07a301a6a4d2040a3d932395aae71",
+              "before": "0x0000000000000000000000000000000000000000000000b73ed727f470308400",
+              "after": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          ]
+        },
+        {
+          "address": "0xb3e8c75912438c2282e0afa51b41bff8e835bc88",
+          "nonce": {
+            "before": "0xeda8",
+            "after": "0xeda9"
+          }
+        }
+      ],
+      "oracle": [
+        {
+          "address": "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+          "storage": [
+            {
+              "slot": "0x44a6c51a1742636c5f52a567e08612f0b1f580be1e93cc4318bbc864b75b21fe",
+              "before": "0x000000000000000000000000000000000000000000048673c8c7271d3a83a3d7",
+              "after": "0x00000000000000000000000000000000000000000004872b079e4f11aab427d7"
+            },
+            {
+              "slot": "0xca441455ef7e1b09be1f19207639dfe601c07a301a6a4d2040a3d932395aae71",
+              "before": "0x0000000000000000000000000000000000000000000000b73ed727f470308400",
+              "after": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            }
+          ]
+        },
+        {
+          "address": "0xb3e8c75912438c2282e0afa51b41bff8e835bc88",
+          "nonce": {
+            "before": "0xeda8",
+            "after": "0xeda9"
+          }
+        }
+      ]
+    }
+  },
+  "reasons": [],
+  "allChannelsComplete": true,
+  "evidence": {
+    "local": {
+      "sourceSha256": "1175a9427f0c3549dc5895cd7223a53497340f6e9bbe1c09e3db0e5b11be6211",
+      "blockHash": "0x49b97e395a7e594a00de1f8fc289717527962d2f3a0e6666966fa0d1398b2ce4",
+      "stateRoot": "0xf67ebff446c1ef9ef541dc3db46baa3f4d6516a42d351a4f0d4f3d2049f0f15b",
+      "inputEvidenceCount": 8,
+      "rawExecutionError": null
+    },
+    "oracle": {
+      "wireIds": [
+        43,
+        44,
+        45,
+        46
+      ],
+      "rawExecutionError": null
+    }
+  },
+  "limitations": {
+    "evaluatedProduct": "current_isolated_local_kernel",
+    "oracle": "remote_native_trace_and_sparse_diff",
+    "artifactHashesBound": false,
+    "sourceIdentityAuthenticityVerified": false,
+    "providerContextExecutionAttested": false,
+    "headerConsensusOrFinalityVerified": false,
+    "fullPoststateRootCompared": false,
+    "fullCallTreeEquality": false,
+    "originalTransactionReplay": false,
+    "feeSettlement": false,
+    "completeEconomicInventory": false,
+    "securityScore": false
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "tests/cancun/eip6780_selfdestruct/test_collision_selfdestruct.py::test_selfdestruct_after_create2_collision[fork_Osaka-state_test]": {
+    "env": {
+      "currentCoinbase": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba",
+      "currentDifficulty": "0x0",
+      "currentRandom": "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "currentGasLimit": "0x7270e00",
+      "currentNumber": "0x14fb180",
+      "currentTimestamp": "0x6930b057",
+      "currentBaseFee": "0x0",
+      "currentExcessBlobGas": "0x0"
+    },
+    "pre": {
+      "0x1da394b1266aa3edf12d385f12df0bd00d6fe958": {
+        "nonce": "0x01",
+        "balance": "0x00",
+        "code": "0x36600060003760003660006000f5600055",
+        "storage": {
+          "0x00": "0xba5e"
+        }
+      },
+      "0xab62ad2053d4b25c9ec365469788cbb7ec7fdf0e": {
+        "nonce": "0x01",
+        "balance": "0x01",
+        "code": "0x73c0f6dc9e5836f54caadbf59cc69346c508e1992bff",
+        "storage": {}
+      },
+      "0xc05e53421f24def8d3d0c763bf494dd40489f149": {
+        "nonce": "0x01",
+        "balance": "0x00",
+        "code": "0x366000600037600060003660006000731da394b1266aa3edf12d385f12df0bd00d6fe958620c8320f16000556000600060006000600073ab62ad2053d4b25c9ec365469788cbb7ec7fdf0e6207a120f160015500",
+        "storage": {}
+      },
+      "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff": {
+        "nonce": "0x00",
+        "balance": "0x033b2e3c9fd0803ce8000000",
+        "code": "0x",
+        "storage": {}
+      }
+    },
+    "transaction": {
+      "gasPrice": "0x0",
+      "nonce": "0x0",
+      "to": "0xc05e53421f24def8d3d0c763bf494dd40489f149",
+      "data": [
+        "0x610001600081600b8239f300"
+      ],
+      "gasLimit": [
+        "0x4c4b40"
+      ],
+      "value": [
+        "0x0"
+      ],
+      "secretKey": "0x1ad604b3d94e06ec50b27732ec677f3d857c4d588f082f0016317697dd3a2d92",
+      "sender": "0xf6c3a9edc1afa0ad5b720e4d42e1437c43d3b3ff"
+    },
+    "post": {
+      "Osaka": [
+        {
+          "hash": "0x6c9b21d6d834cdecbdaa3c05954e8e7d230f99350ac679d23a58b52a37cd00ac",
+          "logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+          "txbytes": "0xf86c8080834c4b4094c05e53421f24def8d3d0c763bf494dd40489f149808c610001600081600b8239f30025a001030fb43d5f8cee80ddd9ac0ff57180580099698d399c24b7a36ec18cf49310a062463357a99483cfec961fb2e74b2d0ca2d1c03c20227da6febaf57b26fddfb2",
+          "indexes": {
+            "data": 0,
+            "gas": 0,
+            "value": 0
+          }
+        }
+      ]
+    }
+  }
+}
