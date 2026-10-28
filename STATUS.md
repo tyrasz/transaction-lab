@@ -1,8 +1,16 @@
-# Transaction Lab checkpoint — 0.24.0
+# Transaction Lab checkpoint — 0.25.0
 
 Updated October 28, 2026. The user's long-term objective remains to improve measured correctness and coverage; no background goal-runner status is implied. **No representative 90% or 100% accuracy rate or superiority to Blockaid has been established.** This is a working prototype with narrow measured coverage, not a general EVM simulation or security product.
 
 The app uses http://127.0.0.1:5174/ without a wallet connection or Dynamic authentication. Version 0.14 adds `POST /api/evm/local-preview`: an experimental Ethereum call executed in an isolated local worker from verified starting-state proofs/code, with explicit before/after token and Aave/Morpho position queries. The existing provider-backed Ethereum path retains automatic token/native measurements, typed positions and complete state continuation across ordered sequences. HyperEVM endpoints retain their semantics. The new local endpoint has its own availability, source/runtime identity, transport bounds and failure handling; it does not establish full signed-transaction support or complete economic-effect coverage. Security remains `not_assessed`. No signing or broadcasting occurs.
+
+## Explicit blob pricing — 0.25.0
+
+The development engine, API and browser now accept a separate unsigned EIP-4844 profile with exact header-derived blob pricing and three explicit fee caps. It checks selected-fork blob limits and maximum affordability, prepays actual execution and blob costs, and keeps blob burn separate from refundable execution gas and beneficiary tips. Blob burn survives completed message failure. The parent independently derives fees and validates native balances, including sender/beneficiary aliases, before exposing totals. Both priced profiles now provide real BLOBBASEFEE on Cancun or later; the unpriced default and fresh measurement-query contexts remain unchanged. Sidecars, KZG, parent excess transitions, block-body admission and outer signatures remain outside support.
+
+The local engine passed **502/502** controls before the shared fixture-only extraction; **29/29** affected controls passed afterward. The new slice includes twelve signed full-VM/third-MPT counterparts (nine type 3 and three type 2), with shared EthereumJS opcodes explicitly acknowledged. Independent review passed 52 focused and legacy controls plus four additional child/full-VM cases for beneficiary aliases, contract deletion and the calldata floor. The parent/API review and 53 combined UI/API controls pass, including an actual offline API/child response and final-header failure. Independent UI review repeated all 29 local UI controls. All **657/657 application controls pass** after the version update (11.367 seconds); no expectations or deadlines were relaxed.
+
+A fixed twelve-case Geth comparison harness has passed independent review and twelve preparation controls. No target execution or freeze has occurred yet; the product release pin remains pending. The running app remains the verified **0.24.0** release until this extension completes validation. These are development controls, not a representative accuracy estimate.
 
 ## Explicit EIP-1559 fees — 0.24.0
 
