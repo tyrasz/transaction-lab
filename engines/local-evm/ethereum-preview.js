@@ -1,3 +1,4 @@
+import { normalizeEvmContext } from '../evm-context.js';
 // Owned execution and explicit queries over verified initial state. No provider
 // execution trace, override, expected result or poststate enters this module.
 import { performance } from 'node:perf_hooks';
@@ -7,7 +8,7 @@ import { createRpcStateInputs } from './rpc-state-inputs.js';
 import { createProofStateManager } from './proof-state.js';
 import { executeEthereumCall } from './ethereum-call.js';
 import { verifyEthereumHeader } from './ethereum-header.js';
-import { ethereumCallGas, ethereumCommon, ethereumQuantity } from './ethereum-profile.js';
+import { ethereumCallGas, ethereumCommon, ethereumContextProfile, ethereumQuantity } from './ethereum-profile.js';
 import { encode, decode, fields, need } from './isolated-protocol.js';
 import { compilePreviewQueries, decodePreviewValues } from './preview-queries.js';
 import { validateQueryMutation } from './preview-mutations.js';
@@ -43,13 +44,15 @@ export async function executeEthereumPreview(options) {
     now = options.now ?? (() => performance.now()); need(typeof now === 'function');
     queries = compilePreviewQueries(options.queries);
     request = decode(encode(options.request, 128 * 1024), 128 * 1024);
-    fields(request, ['from', 'to', 'data', 'value', 'gas']);
+    fields(request, ['from', 'to', 'data', 'value', 'gas', 'accessList', 'blobVersionedHashes'], ['from', 'to', 'data', 'value', 'gas']);
+    Object.assign(request, normalizeEvmContext(request));
     need(['from', 'to'].every(key => typeof request[key] === 'string' && /^0x[0-9a-f]{40}$/i.test(request[key])));
     request.from = request.from.toLowerCase(); request.to = request.to.toLowerCase();
     ethereumQuantity(request.value); const gas = ethereumQuantity(request.gas);
     header = decode(encode(options.header, 128 * 1024), 128 * 1024);
     headerVerification = verifyEthereumHeader({ header, expectedHash: header.hash });
-    need(gas <= 5000000n && gas >= ethereumCallGas(request.data, ethereumCommon(header)).minimum);
+    ethereumContextProfile(request, header);
+    need(gas <= 5000000n && gas >= ethereumCallGas(request.data, ethereumCommon(header), request).minimum);
     header.hash = header.hash.toLowerCase();
     const supplied = options.limits ?? {}; fields(supplied, Object.keys(ETHEREUM_PREVIEW_LIMITS), []);
     limits = { ...ETHEREUM_PREVIEW_LIMITS };

@@ -1,0 +1,134 @@
+{
+  "createdAt": "2026-10-28T00:23:27.876Z",
+  "provider": "https://eth.drpc.org/",
+  "purpose": "explicit_zero_blob_base_fee_provider_capability_only",
+  "sourceSha256": "e9292f3eae4a987a8597095be27cb12852cb84a32b08b518185bc7538f98cc18",
+  "inputSha256": "b9aa87356ec3d020cf51e8286aa8973c8106e0ef8232c7e3d2556f25626f2136",
+  "requests": [
+    [
+      {
+        "from": "0xb5bd290ef8ef3840cb866c7a8b7cc9e45fde3ab9",
+        "to": "0x8c12f051c161c2cda736f3b3fa1c4bdd35b7922c",
+        "data": "0x",
+        "gas": "0x4c4b40",
+        "value": "0x0",
+        "blobVersionedHashes": [
+          "0x01165d645bdfeccf6fe37350f653b8b03ecd0690db91d1e956b2a01f050e643e"
+        ],
+        "maxFeePerBlobGas": "0x0"
+      },
+      {
+        "blockHash": "0x8b50e706eaab7c421953671324e453c13a1247a973af40f56f6eda63a8435763",
+        "requireCanonical": true
+      },
+      {
+        "tracer": "callTracer",
+        "timeout": "15s",
+        "tracerConfig": {
+          "withLog": true
+        },
+        "blockOverrides": {
+          "blobBaseFee": "0x0"
+        }
+      }
+    ],
+    [
+      {
+        "from": "0xb5bd290ef8ef3840cb866c7a8b7cc9e45fde3ab9",
+        "to": "0x8c12f051c161c2cda736f3b3fa1c4bdd35b7922c",
+        "data": "0x",
+        "gas": "0x4c4b40",
+        "value": "0x0",
+        "blobVersionedHashes": [
+          "0x01165d645bdfeccf6fe37350f653b8b03ecd0690db91d1e956b2a01f050e643e"
+        ],
+        "maxFeePerBlobGas": "0x0"
+      },
+      {
+        "blockHash": "0x8b50e706eaab7c421953671324e453c13a1247a973af40f56f6eda63a8435763",
+        "requireCanonical": true
+      },
+      {
+        "tracer": "prestateTracer",
+        "timeout": "15s",
+        "tracerConfig": {
+          "diffMode": true
+        },
+        "blockOverrides": {
+          "blobBaseFee": "0x0"
+        }
+      }
+    ],
+    [
+      {
+        "from": "0xb5bd290ef8ef3840cb866c7a8b7cc9e45fde3ab9",
+        "to": "0x000000000000000000000000000000000000ba1a",
+        "data": "0x",
+        "gas": "0x493e0",
+        "value": "0x0",
+        "blobVersionedHashes": [
+          "0x01165d645bdfeccf6fe37350f653b8b03ecd0690db91d1e956b2a01f050e643e"
+        ],
+        "maxFeePerBlobGas": "0x0"
+      },
+      {
+        "blockHash": "0x8b50e706eaab7c421953671324e453c13a1247a973af40f56f6eda63a8435763",
+        "requireCanonical": true
+      },
+      {
+        "tracer": "callTracer",
+        "timeout": "15s",
+        "tracerConfig": {
+          "withLog": true
+        },
+        "blockOverrides": {
+          "blobBaseFee": "0x0"
+        },
+        "stateOverrides": {
+          "0x000000000000000000000000000000000000ba1a": {
+            "code": "0x6000496000526001496020524a60405260606000f3"
+          }
+        }
+      }
+    ],
+    [
+      {
+        "from": "0xb5bd290ef8ef3840cb866c7a8b7cc9e45fde3ab9",
+        "to": "0x000000000000000000000000000000000000ba1a",
+        "data": "0x",
+        "gas": "0x493e0",
+        "value": "0x0",
+        "blobVersionedHashes": [
+          "0x01165d645bdfeccf6fe37350f653b8b03ecd0690db91d1e956b2a01f050e643e"
+        ],
+        "maxFeePerBlobGas": "0x0"
+      },
+      {
+        "blockHash": "0x8b50e706eaab7c421953671324e453c13a1247a973af40f56f6eda63a8435763",
+        "requireCanonical": true
+      },
+      {
+        "tracer": "prestateTracer",
+        "timeout": "15s",
+        "tracerConfig": {
+          "diffMode": true
+        },
+        "blockOverrides": {
+          "blobBaseFee": "0x0"
+        },
+        "stateOverrides": {
+          "0x000000000000000000000000000000000000ba1a": {
+            "code": "0x6000496000526001496020524a60405260606000f3"
+          }
+        }
+      }
+    ]
+  ],
+  "retries": 0,
+  "replacements": 0,
+  "limitations": [
+    "No original-transaction replay or proof-backed independent comparison",
+    "Explicit synthetic zero blob base fee; no fee settlement or KZG validation"
+  ],
+  "expectedWitnessOutput": "0x01165d645bdfeccf6fe37350f653b8b03ecd0690db91d1e956b2a01f050e643e00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+}

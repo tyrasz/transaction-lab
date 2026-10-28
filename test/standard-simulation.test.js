@@ -172,6 +172,26 @@ test('nonzero decimal wei reaches the unsigned engine as exact hexadecimal witho
   assert.equal(report.execution.status, 'unavailable');
 });
 
+test('optional access and blob context reaches the original engine request in manual and automatic modes', async () => {
+  const address = '0x' + 'AB'.repeat(20), slot = '0x' + 'CD'.repeat(32), blob = '0x01' + 'EF'.repeat(31);
+  for (const automatic of [false, true]) {
+    const candidate = { ...input(), accessList: [{ address, storageKeys: [slot, slot] }, { address, storageKeys: [] }], blobVersionedHashes: [blob] };
+    if (automatic) delete candidate.queries;
+    const report = await simulateStandard(candidate, { async call() { return '0x2'; } });
+    const expected = [{ address: address.toLowerCase(), storageKeys: [slot.toLowerCase(), slot.toLowerCase()] }, { address: address.toLowerCase(), storageKeys: [] }];
+    assert.deepEqual(report.apiRequest.accessList, expected);
+    assert.deepEqual(report.request.transaction.accessList, expected);
+    assert.deepEqual(report.request.transaction.blobVersionedHashes, [blob.toLowerCase()]);
+    assert.equal(report.request.transaction.maxFeePerBlobGas, '0x0');
+    assert.equal(Object.hasOwn(report.apiRequest, 'maxFeePerBlobGas'), false);
+    candidate.accessList[0].storageKeys.length = 0;
+    assert.equal(report.request.transaction.accessList[0].storageKeys.length, 2);
+  }
+  for (const change of [{ accessList: null }, { blobVersionedHashes: [] }, { blobVersionedHashes: ['0x02' + '00'.repeat(31)] }, { maxFeePerBlobGas: '0x0' }]) {
+    assert.throws(() => validateStandardSimulation({ ...input(), ...change }), InputError);
+  }
+});
+
 test('URLs, override/metadata/fee/signing fields and accessor/symbol/prototype records are rejected', () => {
   for (const key of ['rpcUrl', 'url', 'metadata', 'stateOverrides', 'gas', 'gasPrice', 'maxFeePerGas', 'nonce', 'accessList', 'authorizationList', 'signature']) assert.throws(() => validateStandardSimulation({ ...input(), [key]: 'ignored?' }), InputError);
   for (const value of [null, [], 'text', Object.create({ chainId: 1 })]) assert.throws(() => validateStandardSimulation(value), InputError);

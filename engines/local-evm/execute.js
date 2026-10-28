@@ -4,7 +4,8 @@ import { performance } from 'node:perf_hooks';
 import { createCustomCommon, Hardfork, Mainnet } from '@ethereumjs/common';
 import { createEVM, EVMError } from '@ethereumjs/evm';
 import { bytesToHex, createAddressFromString, hexToBytes } from '@ethereumjs/util';
-import { ethereumCommon } from './ethereum-profile.js';
+import { ethereumCommon, ethereumContextProfile } from './ethereum-profile.js';
+import { normalizeEvmContext } from '../evm-context.js';
 
 export const EXECUTION_LIMITS = Object.freeze({ gas: 5000000, steps: 1000000, frames: 1000, depth: 32, logs: 2000, memoryBytes: 1048576, returnBytes: 1048576, calldataBytes: 32768, traceBytes: 8388608, wallMs: 10000 });
 export const ETHEREUM_EXECUTION_LIMITS = Object.freeze({ ...EXECUTION_LIMITS, wallMs: 120000 });
@@ -72,14 +73,17 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     }
     if (!stateManager || typeof stateManager !== 'object' || ['getAccount', 'putAccount', 'getCode', 'getStorage', 'checkpoint', 'commit', 'revert'].some(method => typeof stateManager[method] !== 'function')) reject('LOCAL_INVALID_INPUT', 'A compatible explicit state manager is required.');
     if (activeManagers.has(stateManager)) reject('LOCAL_STATE_BUSY', 'Concurrent execution on the same state manager is not supported.');
+    let context; try { context = normalizeEvmContext(request); } catch { reject('LOCAL_INVALID_INPUT', 'Optional EVM context is malformed.'); }
+    if (chainId !== 1 && Object.keys(context).length) reject('LOCAL_INVALID_INPUT', 'Optional execution context requires the Ethereum profile.');
     const from = address(request?.from), to = address(request?.to), value = quantity(request?.value), gasLimit = quantity(request?.gasLimit);
-    if (!from || !to || value === null || gasLimit === null || (chainId === 999 && gasLimit === 0n) || gasLimit > BigInt(limits.gas) || typeof request?.data !== 'string' || !BYTES.test(request.data) || request.data.length > 2 + limits.calldataBytes * 2 || Object.keys(request).some(key => !['from', 'to', 'data', 'value', 'gasLimit'].includes(key))) reject('LOCAL_INVALID_INPUT', 'A bounded unsigned call with explicit from, to, data, value and message gasLimit is required.');
+    if (!from || !to || value === null || gasLimit === null || (chainId === 999 && gasLimit === 0n) || gasLimit > BigInt(limits.gas) || typeof request?.data !== 'string' || !BYTES.test(request.data) || request.data.length > 2 + limits.calldataBytes * 2 || Object.keys(request).some(key => !['from', 'to', 'data', 'value', 'gasLimit', 'accessList', 'blobVersionedHashes'].includes(key))) reject('LOCAL_INVALID_INPUT', 'A bounded unsigned call with explicit from, to, data, value and message gasLimit is required.');
     reserved(from); reserved(to);
     if (!block || ['number', 'timestamp', 'gasLimit', 'baseFeePerGas'].some(field => quantity(block[field]) === null) || quantity(block.gasLimit) === 0n || typeof block.mixHash !== 'string' || !WORD.test(block.mixHash) || !address(block.miner) || ['hash', 'parentHash'].some(field => block[field] !== undefined && (typeof block[field] !== 'string' || !WORD.test(block[field])))) reject('LOCAL_INVALID_INPUT', 'Explicit block number, timestamp, gas limit, base fee, prevRandao and coinbase are required.');
     const common = chainId === 1 ? ethereumCommon(block) : createCustomCommon({ chainId: 999, name: 'experimental-hyperevm-message' }, Mainnet, { hardfork: Hardfork.Cancun });
     if (chainId === 1) {
+      try { ethereumContextProfile(context, block, common); } catch { reject('LOCAL_INVALID_INPUT', 'Optional execution context does not match the selected fork/header.'); }
       semantics.chainScope = 'Ethereum_mainnet_pinned_timestamp_selected_fork';
-      semantics.warmAddresses = 'sender_destination_coinbase_and_fork_active_precompiles_no_access_list';
+      semantics.warmAddresses = context.accessList ? 'sender_destination_coinbase_fork_active_precompiles_and_declared_access_list' : 'sender_destination_coinbase_and_fork_active_precompiles_no_access_list';
     }
     environment = { chainId, hardfork: common.hardfork(), number: quantity(block.number).toString(), timestamp: quantity(block.timestamp).toString(), gasLimit: quantity(block.gasLimit).toString(), baseFeePerGas: quantity(block.baseFeePerGas).toString(), mixHash: block.mixHash.toLowerCase(), miner: address(block.miner), ...(block.hash ? { sourceBlockHash: block.hash.toLowerCase() } : {}), ...(block.parentHash ? { sourceParentHash: block.parentHash.toLowerCase() } : {}), sourceBlockIdentityVerified: false };
     activeManagers.add(stateManager); ownsManager = true;
@@ -117,6 +121,10 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     // SSTORE refund accounting, even when the caller retains the same manager.
     stateManager.originalStorageCache?.clear();
     for (const warm of [from, to, address(block.miner), ...evm.precompiles.keys()]) evm.journal.addAlwaysWarmAddress(warm);
+    for (const entry of context.accessList ?? []) {
+      evm.journal.addAlwaysWarmAddress(entry.address);
+      for (const slot of entry.storageKeys) evm.journal.addAlwaysWarmSlot(entry.address, slot);
+    }
     evm.events.on('beforeMessage', message => {
       clockCheck();
       if (!message.to) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'Contract creation or destruction is outside this sparse-state engine.', 'unsupported');
@@ -131,7 +139,10 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     evm.events.on('step', step => {
       clockCheck(); bound('steps', ++usage.steps); bound('memoryBytes', step.memory.length);
       if ([0xf0, 0xf5, 0xff].includes(step.opcode.code)) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'Contract creation or destruction is outside this sparse-state engine.', 'unsupported');
-      if ([0x49, 0x4a].includes(step.opcode.code)) reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is outside this local engine profile.', 'unsupported');
+      // On Ethereum, absent blob hashes are the empty transaction list: BLOBHASH
+      // returns zero through the fork-selected EVM opcode. BLOBBASEFEE still
+      // requires our explicit synthetic fee context; keep the legacy999 scope.
+      if ((step.opcode.code === 0x4a || (step.opcode.code === 0x49 && chainId !== 1)) && !context.blobVersionedHashes) reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is outside this local engine profile.', 'unsupported');
       if (step.opcode.code >= 0xa0 && step.opcode.code <= 0xa4) bound('logs', ++usage.logOpcodes);
       const active = stack.at(-1);
       if (active) active.pendingCall = callOpcodes.get(step.opcode.code) ?? null;
@@ -158,7 +169,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       if ((account?.nonce ?? 0n) >= (1n << 64n) - 1n) reject('LOCAL_CALL_NONCE_OVERFLOW', 'The sender nonce cannot be incremented within uint64.', 'invalid');
     }
     await guarded.checkpoint();
-    const result = await evm.runCall({ caller: createAddressFromString(from), origin: createAddressFromString(from), to: createAddressFromString(to), data: hexToBytes(request.data), value, gasLimit, gasPrice: 0n, block: { header: { number: quantity(block.number), timestamp: quantity(block.timestamp), gasLimit: quantity(block.gasLimit), baseFeePerGas: quantity(block.baseFeePerGas), difficulty: 0n, prevRandao: hexToBytes(block.mixHash), coinbase: createAddressFromString(address(block.miner)), getBlobGasPrice() { reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is unsupported.', 'unsupported'); } } } });
+    const result = await evm.runCall({ caller: createAddressFromString(from), origin: createAddressFromString(from), to: createAddressFromString(to), data: hexToBytes(request.data), value, gasLimit, gasPrice: 0n, ...(context.blobVersionedHashes ? { blobVersionedHashes: [...context.blobVersionedHashes] } : {}), block: { header: { number: quantity(block.number), timestamp: quantity(block.timestamp), gasLimit: quantity(block.gasLimit), baseFeePerGas: quantity(block.baseFeePerGas), difficulty: 0n, prevRandao: hexToBytes(block.mixHash), coinbase: createAddressFromString(address(block.miner)), getBlobGasPrice() { if (context.blobVersionedHashes) return 0n; reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is unsupported.', 'unsupported'); } } } });
     clockCheck();
     if (stack.length || checkpointDepth !== 1) reject('LOCAL_TRACE_INVALID', 'Local call-tree or checkpoint completion is inconsistent.');
     const logs = (result.execResult.logs ?? []).map(([emitter, topics, data]) => ({ address: bytesToHex(emitter), topics: topics.map(bytesToHex), data: bytesToHex(data) }));

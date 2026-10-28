@@ -1,6 +1,6 @@
 const $ = (id) => document.getElementById(id);
 const state = { config: null, example: null, result: null, busy: false, benchmarkLoaded: false, sequenceDrafts: [], sequenceControls: [], nextCallKey: 1 };
-const requestFieldIds = ['chain', 'ethereum-engine', 'ethereum-call-mode', 'from', 'to', 'data', 'value', 'block', 'standard-manual-queries', 'standard-queries'];
+const requestFieldIds = ['chain', 'ethereum-engine', 'ethereum-call-mode', 'from', 'to', 'data', 'value', 'block', 'standard-manual-queries', 'standard-queries', 'transaction-context'];
 const ethereumMode = () => $('chain').value === '1';
 const localMode = () => ethereumMode() && $('ethereum-engine').value === 'local';
 const localAvailable = () => state.config?.localEvm?.available === true;
@@ -69,7 +69,7 @@ function clearResult({ inputsChanged = false } = {}) {
 }
 
 function requestFingerprint() {
-  return JSON.stringify({ fields: requestFieldIds.map(id => $(id).type === 'checkbox' ? $(id).checked : $(id).value), calls: sequenceMode() ? state.sequenceControls.map(row => ({ key: row.key, to: row.to.value, data: row.data.value, value: row.value.value, manual: row.manual.checked, queries: row.queries.value })) : null, exampleId: state.example?.id, transactionHash: state.example?.transactionHash });
+  return JSON.stringify({ fields: requestFieldIds.map(id => $(id).type === 'checkbox' ? $(id).checked : $(id).value), calls: sequenceMode() ? state.sequenceControls.map(row => ({ key: row.key, to: row.to.value, data: row.data.value, value: row.value.value, manual: row.manual.checked, queries: row.queries.value, context: row.context.value })) : null, exampleId: state.example?.id, transactionHash: state.example?.transactionHash });
 }
 
 function currentExamples() {
@@ -87,7 +87,7 @@ function populateExampleOptions() {
 }
 
 function newSequenceDraft(call = {}) {
-  return { key: state.nextCallKey++, to: call.to || '', data: call.data || '0x', value: call.value ?? '0', manual: false, queriesText: JSON.stringify(call.queries || [], null, 2) };
+  return { key: state.nextCallKey++, to: call.to || '', data: call.data || '0x', value: call.value ?? '0', manual: false, queriesText: JSON.stringify(call.queries || [], null, 2), contextText: transactionContextText(call) };
 }
 
 function renderSequenceEditor() {
@@ -119,6 +119,11 @@ function renderSequenceEditor() {
     Object.assign(controls, { manual, manualFields, queries, advanced });
     manual.addEventListener('change', () => { draft.manual = manual.checked; queries.setCustomValidity(''); updateSequenceControls(); clearResult({ inputsChanged: true }); });
     queries.addEventListener('input', () => { draft.queriesText = queries.value; queries.setCustomValidity(''); clearResult({ inputsChanged: true }); });
+    const contextSettings = node('details', 'query-settings transaction-context-settings'), contextLabel = node('label', '', 'Optional context · JSON'), context = node('textarea', 'mono');
+    context.id = `sequence-${draft.key}-context`; context.rows = 4; context.spellcheck = false; context.value = draft.contextText;
+    contextLabel.htmlFor = context.id; contextSettings.append(node('summary', '', 'Advanced: transaction context'), transactionContextHelp(), contextLabel, context);
+    context.addEventListener('input', () => { draft.contextText = context.value; context.setCustomValidity(''); clearResult({ inputsChanged: true }); });
+    Object.assign(controls, { context, contextSettings }); card.append(contextSettings);
     const actions = node('div', 'sequence-call-actions');
     for (const [action, label] of [['up', 'Move up'], ['down', 'Move down'], ['remove', 'Remove']]) {
       const button = node('button', 'text-button', label); button.type = 'button'; button.setAttribute('aria-label', `${label} step ${index + 1}`);
@@ -143,7 +148,7 @@ function renderSequenceEditor() {
 function updateSequenceControls() {
   const active = sequenceMode(), locked = state.busy || !active;
   for (const [index, row] of state.sequenceControls.entries()) {
-    for (const key of ['to', 'data', 'value', 'manual']) row[key].disabled = locked;
+    for (const key of ['to', 'data', 'value', 'manual', 'context']) row[key].disabled = locked;
     for (const key of ['to', 'data', 'value']) row[key].required = active;
     row.queries.disabled = locked || !row.manual.checked; row.queries.required = active && row.manual.checked;
     row.manualFields.hidden = !row.manual.checked;
@@ -156,6 +161,7 @@ function updateSequenceControls() {
 }
 
 function selectExample({ initial = false } = {}) {
+  clearTransactionContexts();
   state.example = currentExamples().find((example) => example.id === $('example').value) || null;
   const example = state.example;
   if (example) {
@@ -163,7 +169,10 @@ function selectExample({ initial = false } = {}) {
     for (const field of sequenceMode() ? ['from'] : ['from', 'to', 'data', 'value']) $(field).value = transaction[field] ?? (field === 'data' ? '0x' : field === 'value' ? '0' : '');
     $('block').value = ethereumMode() ? transaction.block || 'latest' : 'latest';
     if (sequenceMode()) { state.sequenceDrafts = (transaction.calls || []).map(newSequenceDraft); renderSequenceEditor(); }
-    else if (ethereumMode()) $('standard-queries').value = JSON.stringify(transaction.queries || [], null, 2);
+    else if (ethereumMode()) {
+      $('standard-queries').value = JSON.stringify(transaction.queries || [], null, 2);
+      $('transaction-context').value = transactionContextText(transaction);
+    }
   }
   $('example-description').textContent = example?.description || (example ? 'Original public transaction inputs. Simulating uses the requested state block.' : 'Enter public transaction inputs to inspect an unsigned call.');
   $('replay-button').hidden = ethereumMode() || !example?.transactionHash;
@@ -201,6 +210,9 @@ function updateQueryMode() {
   $('simulate-label').textContent = local ? 'Run local preview' : sequence ? 'Simulate sequence' : 'Simulate';
   for (const id of ['to', 'data', 'value']) { $(id).disabled = state.busy || sequence; $(id).required = !sequence; if (sequence) $(id).setCustomValidity(''); }
   $('standard-query-settings').hidden = !standard || sequence;
+  $('transaction-context-settings').hidden = !standard || sequence;
+  $('transaction-context').disabled = state.busy || !standard || sequence;
+  if (!standard || sequence) $('transaction-context').setCustomValidity('');
   $('standard-manual-fields').hidden = !manual;
   $('standard-queries').required = manual;
   $('standard-queries').disabled = state.busy || !manual;
@@ -283,6 +295,49 @@ function readStandardQueries(text = $('standard-queries').value) {
   return queries;
 }
 
+function transactionContextText(call) {
+  const context = Object.fromEntries(['accessList', 'blobVersionedHashes'].filter(key => Object.hasOwn(call, key)).map(key => [key, call[key]]));
+  return Object.keys(context).length ? JSON.stringify(context, null, 2) : '';
+}
+
+function transactionContextHelp() {
+  const help = node('div', 'transaction-context-help');
+  help.append(node('p', 'field-help', 'Leave blank for ordinary calls. Add accessList, blobVersionedHashes, or both. Order and duplicates are preserved; this applies only to this call, not its balance or position checks.'));
+  help.append(node('pre', '', '{"accessList":[{"address":"<0x + 40 hex digits>","storageKeys":["<0x + 64 hex digits>"]}],"blobVersionedHashes":["<0x01 + 62 hex digits>"]}'));
+  help.append(node('p', 'field-help', 'Unsigned blob simulation uses zero blob fee. Blob data and sidecar validity are not checked.'));
+  return help;
+}
+
+// Early form feedback only; the backend independently enforces its own schema,
+// fork and resource limits. JSON list order and duplicate entries stay intact.
+function readTransactionContext(text) {
+  if (!text.trim()) return {};
+  let context;
+  try { context = JSON.parse(text); } catch { throw new Error('Enter a valid JSON object in Advanced: transaction context, or leave it blank.'); }
+  const record = value => value !== null && typeof value === 'object' && !Array.isArray(value);
+  const hex = (value, digits) => typeof value === 'string' && new RegExp(`^0x[0-9a-f]{${digits}}$`, 'i').test(value);
+  if (!record(context) || Object.keys(context).some(key => !['accessList', 'blobVersionedHashes'].includes(key))) throw new Error('Context accepts only accessList and blobVersionedHashes. Fee, signature and sidecar fields are not accepted.');
+  if (Object.hasOwn(context, 'accessList')) {
+    if (!Array.isArray(context.accessList) || context.accessList.length > 128) throw new Error('Use an accessList array with at most 128 entries.');
+    let keys = 0;
+    for (const entry of context.accessList) {
+      if (!record(entry) || Object.keys(entry).sort().join() !== 'address,storageKeys' || !hex(entry.address, 40) || !Array.isArray(entry.storageKeys)
+        || entry.storageKeys.some(key => !hex(key, 64))) throw new Error('Each access-list entry needs only a full address and a storageKeys array of full 32-byte hex keys.');
+      keys += entry.storageKeys.length;
+      if (keys > 1024) throw new Error('Use at most 1024 storage keys across the access list, counting duplicates.');
+    }
+  }
+  if (Object.hasOwn(context, 'blobVersionedHashes') && (!Array.isArray(context.blobVersionedHashes) || context.blobVersionedHashes.length < 1 || context.blobVersionedHashes.length > 32
+    || context.blobVersionedHashes.some(hash => !hex(hash, 64) || hash.slice(2, 4) !== '01'))) throw new Error('Use one to 32 full 32-byte blob versioned hashes, each beginning 0x01.');
+  return context;
+}
+
+function clearTransactionContexts() {
+  $('transaction-context').value = ''; $('transaction-context').setCustomValidity(''); $('transaction-context-settings').open = false;
+  for (const draft of state.sequenceDrafts) draft.contextText = '';
+  for (const row of state.sequenceControls) { row.context.value = ''; row.context.setCustomValidity(''); row.contextSettings.open = false; }
+}
+
 function validateWeiField(field) {
   const value = field.value;
   field.setCustomValidity(/^(?:0|[1-9][0-9]{0,77})$/.test(value) && BigInt(value) < (1n << 256n)
@@ -297,6 +352,9 @@ function readSequenceCalls() {
   for (const row of state.sequenceControls) {
     validateWeiField(row.value);
     const call = { to: row.to.value.trim(), data: row.data.value.trim(), value: row.value.value };
+    row.context.setCustomValidity('');
+    try { Object.assign(call, readTransactionContext(row.context.value)); }
+    catch (error) { row.contextSettings.open = true; row.context.setCustomValidity(error.message); row.context.reportValidity(); return null; }
     row.queries.setCustomValidity('');
     if (row.manual.checked) {
       try { call.queries = readStandardQueries(row.queries.value); }
@@ -1419,7 +1477,12 @@ async function run(mode) {
   if (standard && !sequence) validateWeiField($('value'));
   const calls = sequence ? readSequenceCalls() : undefined;
   if (sequence && !calls) return;
-  let queries;
+  let queries, context;
+  if (standard && !sequence) {
+    $('transaction-context').setCustomValidity('');
+    try { context = readTransactionContext($('transaction-context').value); }
+    catch (error) { $('transaction-context-settings').open = true; $('transaction-context').setCustomValidity(error.message); $('transaction-context').reportValidity(); return; }
+  }
   if (standard && manualQueries()) {
     $('standard-queries').setCustomValidity('');
     try { queries = readStandardQueries(); }
@@ -1438,6 +1501,7 @@ async function run(mode) {
     const body = sequence ? { chainId: 1, from: $('from').value.trim(), block: $('block').value.trim(), calls }
       : mode === 'historical_trace' ? { chainId: Number(state.example.request.chainId), transactionHash: state.example.transactionHash } : { chainId: Number($('chain').value), from: $('from').value.trim(), to: $('to').value.trim(), data: $('data').value.trim(), value: $('value').value.trim(), block: $('block').value.trim() };
     if (standard && queries !== undefined) body.queries = queries;
+    if (context !== undefined) Object.assign(body, context);
     const result = await request(localMode() ? '/api/evm/local-preview' : sequence ? '/api/evm/simulate-sequence' : standard ? '/api/evm/simulate' : mode === 'historical_trace' ? '/api/replay' : '/api/simulate', body);
     if (fingerprint !== requestFingerprint()) {
       setBusy(false);
@@ -1561,6 +1625,7 @@ function setView(view) {
 }
 
 $('simulation-form').addEventListener('submit', (event) => { event.preventDefault(); run('simulation'); });
+$('simulation-form').addEventListener('reset', () => { clearTransactionContexts(); clearResult({ inputsChanged: true }); });
 $('replay-button').addEventListener('click', () => run('historical_trace'));
 $('example').addEventListener('change', selectExample);
 $('chain').addEventListener('change', selectNetwork);
@@ -1586,6 +1651,7 @@ for (const id of requestFieldIds) {
   if (id === 'chain' || id === 'ethereum-call-mode' || id === 'ethereum-engine') continue;
   const changed = () => {
     if (id === 'standard-queries') $('standard-queries').setCustomValidity('');
+    if (id === 'transaction-context') $('transaction-context').setCustomValidity('');
     if (id === 'value') $('value').setCustomValidity('');
     if (id === 'standard-manual-queries') updateQueryMode();
     if (ethereumMode() && state.example) $('historical-help').textContent = sequenceMode() ? 'The selected example is a starting point. The sequence uses the calls currently shown, in their displayed order, from one selected block-end state.' : manualQueries() ? 'The selected example is a starting point. Simulation uses the fields and manual query list currently shown, at the end of the selected block.' : 'The selected example is a starting point. Simulation uses the fields currently shown and automatically selects checks from the call, at the end of the selected block.';
@@ -1630,5 +1696,6 @@ async function initialize() {
 }
 
 $('standard-query-formats').replaceChildren(positionQueryHelp());
+$('transaction-context-help').replaceChildren(transactionContextHelp());
 clearResult();
 initialize();

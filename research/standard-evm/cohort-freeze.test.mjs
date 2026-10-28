@@ -16,6 +16,7 @@ async function fixture(t, { drift = false } = {}) {
   t.after(() => rm(temp, { recursive: true, force: true })); await mkdir(root);
   await write(root, 'package.json', JSON.stringify({ type: 'module', version: 'test-only' }));
   await write(root, 'src/product.js', 'export const syntheticFixture = true;\n');
+  await write(root, 'engines/evm-context.js', '// Shared transaction-context fixture.');
   // Tiny declared product closure, never the production source tree. The fake
   // loader calculates actual bytes; no asserted hash bypass is supplied to freeze.
   const loader = `import {readFile,writeFile} from 'node:fs/promises';import{createHash}from'node:crypto';
@@ -55,7 +56,8 @@ test('conservative read-only inventory includes full dependency bytes, nested lo
   assert(!result.files.some(item => item.path === 'engines/local-evm/test/ignored.test.js'));
   assert(!result.files.some(item => item.path.endsWith('cohort-runner.test.mjs')));
   assert.deepEqual(result.files.map(item => item.path), [...result.files.map(item => item.path)].sort());
-  assert(result.localImplementation.sourceFiles.every(path => path.startsWith('engines/local-evm/')));
+  assert(result.localImplementation.sourceFiles.includes('engines/evm-context.js'));
+  assert(result.localImplementation.sourceFiles.every(path => path.startsWith('engines/local-evm/') || path === 'engines/evm-context.js'));
   assert.equal(result.limitations.planFrozen, false); assert.equal(result.limitations.publicDispatchAuthorized, false);
   assert.deepEqual(await readdir(f.temp), ['repo']);
 });
@@ -129,6 +131,6 @@ test('Node executable identity is concrete, separately verified, and included in
   assert.deepEqual(await verifyNodeRuntime(actual), actual);
   await assert.rejects(verifyNodeRuntime({ ...actual, executableSha256: '0'.repeat(64) }), /differs/);
   const f = await fixture(t), info = await inspectCohortSources({ repoRoot: f.root });
-  const files = info.files.filter(item => item.path.startsWith('engines/local-evm/'));
+  const files = info.files.filter(item => item.path.startsWith('engines/local-evm/') || item.path === 'engines/evm-context.js');
   assert.equal(info.localImplementation.sourceSha256, sha(JSON.stringify({ files, runtime: info.runtime })));
 });

@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { isDeepStrictEqual } from 'node:util';
 import { verifyEthereumHeader } from '../../engines/local-evm/ethereum-header.js';
 import { createCohortSelection, MAX_CENSUS } from './cohort-accounting.mjs';
+import { normalizeEvmContext } from '../../engines/evm-context.js';
 
 export const CENSUS_LIMITS = Object.freeze({ providers: 2, headersPerProvider: 256, censusTransactions: MAX_CENSUS, sampleSize: 16, inputBytes: 64 * 1024 * 1024, fieldBytes: 1024 * 1024, dataNodes: 2_000_000, depth: 16, simulationGas: 5_000_000, simulationCalldataBytes: 32 * 1024, finalityWaitMs: 20 * 60 * 1000 });
 export class CohortCensusError extends Error {
@@ -147,8 +148,11 @@ function headerHelpers(header, target) {
 function projection(envelope, parentHeader) {
   const reasons = [];
   if (envelope.to === null) reasons.push('contract_creation');
-  if (envelope.type === '1' || envelope.accessList?.length) reasons.push('access_list_context_unsupported');
-  if (envelope.type === '3') reasons.push('blob_context_unsupported');
+  let context = {};
+  try { context = normalizeEvmContext({
+    ...(envelope.type === '1' || envelope.accessList?.length ? { accessList: envelope.accessList } : {}),
+    ...(envelope.type === '3' ? { blobVersionedHashes: envelope.blobVersionedHashes } : {}),
+  }); } catch { reasons.push('transaction_context_exceeds_profile'); }
   if (envelope.type === '4') reasons.push('authorization_context_unsupported');
   if (!['0', '1', '2', '3', '4'].includes(envelope.type)) reasons.push('unknown_transaction_type');
   if (Object.keys(envelope.extensions).length) reasons.push('unrecognized_envelope_fields');
@@ -157,9 +161,9 @@ function projection(envelope, parentHeader) {
   if ([envelope.from, envelope.to].includes('0x000000000000000000000000000000000000ba1a')) reasons.push('reserved_profile_witness_address');
   return {
     status: reasons.length ? 'unsupported' : 'projectable', reasons,
-    ...(reasons.length ? {} : { request: { chainId: 1, from: envelope.from, to: envelope.to, data: envelope.input, value: envelope.value, block: parentHeader.hash.toLowerCase() } }),
+    ...(reasons.length ? {} : { request: { chainId: 1, from: envelope.from, to: envelope.to, data: envelope.input, value: envelope.value, block: parentHeader.hash.toLowerCase(), ...context } }),
     profile: 'unsigned_unpriced_parent_block_end', simulationGas: String(CENSUS_LIMITS.simulationGas), originalGasLimit: envelope.gas,
-    omittedOuterFields: ['nonce', 'gas', 'gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas', 'signature', 'transaction_type', 'access_list', 'blob_context', 'authorizations'],
+    omittedOuterFields: ['nonce', 'gas', 'gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas', 'signature', 'transaction_type', ...(!Object.hasOwn(context,'accessList') ? ['access_list'] : []), ...(!Object.hasOwn(context,'blobVersionedHashes') ? ['blob_context'] : ['blob_fee_cap', 'blob_sidecar']), 'authorizations'],
     prerequisites: { senderCode: 'not_checked', executionSupport: 'not_established' },
     originalPositionReplay: false, outerTransactionValidation: false, transactionFeesIncluded: false, syntheticBaseFeePerGas: '0',
   };

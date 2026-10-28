@@ -1,6 +1,7 @@
 // Offline evidence audit. No fetch, sockets, subprocess execution or VM replay.
 // Expected manifest identity must come from the separately sealed handoff.
 import { createHash } from 'node:crypto';
+import { normalizeEvmContext } from '../../engines/evm-context.js';
 import { createReadStream } from 'node:fs';
 import { readFile, readdir, lstat, realpath } from 'node:fs/promises';
 import { join, resolve, posix, isAbsolute } from 'node:path';
@@ -355,7 +356,7 @@ export async function verifyCohortEvidence({ outputDirectory, expectedManifestSh
         const productBinding = verifyProductBindings(product, productWires, row.projection.request);
         phaseDeclaredOnlyWireRecords += productBinding.phaseDeclaredOnlyWireRecords;
         const api = row.projection.request;
-        adjudication = modules.adjudicateCohortOutcome({ transactionHash: row.transactionHash, request: { from: api.from, to: api.to, data: api.data, value: api.value, gas: '5000000' }, header: row.parentHeader, expectedProductImplementation: sources.manifest.productImplementation, expectedLocalImplementation: sources.manifest.localImplementation, local, product });
+        adjudication = modules.adjudicateCohortOutcome({ transactionHash: row.transactionHash, request: { from: api.from, to: api.to, data: api.data, value: api.value, gas: '5000000', ...normalizeEvmContext(api) }, header: row.parentHeader, expectedProductImplementation: sources.manifest.productImplementation, expectedLocalImplementation: sources.manifest.localImplementation, local, product });
         if (productBinding.phaseDeclaredOnlyWireRecords) need(adjudication.outcome.execution === 'provider_unavailable' && adjudication.outcome.comparison === 'not_comparable' && adjudication.allChannelsComplete === false, 'Missing internal wire evidence was promoted into a comparison.');
       }
       need(equal(adjudication, await p.read(`cases/${id}/outcome.json`)) && equal(modules.compactAdjudication(adjudication), entry.adjudication), 'Recomputed case adjudication differs.'); outcomes.push(adjudication.outcome);

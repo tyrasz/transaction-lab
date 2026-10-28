@@ -51,7 +51,7 @@ function harness({mutate,failDeposit=false}={}){
         if(diff){result.pre[TOKEN]={storage:{[ALLOW]:word(st.allowance)}};result.post[TOKEN]={storage:{[ALLOW]:word(amount)}};}
       }else if(call.to===POOL){
         stage=diff?'deposit_diff':'deposit_trace';
-        if(st.allowance<50n||st.balance<50n||failDeposit)result={...frame,error:'execution reverted',revertReason:'insufficient allowance or balance'};
+        if(st.allowance<50n||st.balance<50n||failDeposit)result=diff?senderDiff():{...frame,error:'execution reverted',revertReason:'insufficient allowance or balance'};
         else if(diff){
           result=senderDiff();result.pre[TOKEN]={storage:{[ALLOW]:word(st.allowance),[BAL]:word(st.balance)}};
           result.post[TOKEN]={storage:{[BAL]:word(st.balance-50n)}};
@@ -134,7 +134,29 @@ test('revert stops later calls without rolling back the earlier approval',async(
   assert.equal(result.canonicalStatus,'verified');assert.equal(result.sequence.status,'stopped');assert.equal(result.sequence.completedSteps,1);assert.equal(result.sequence.attemptedSteps,2);
   assert.deepEqual(result.steps.map(s=>s.status),['completed','reverted_or_failed','skipped']);assert.equal(result.steps[2].result,undefined);
   assert.deepEqual(values(result.steps[0].result)[1],['0','50','50']);
+  const failure=result.steps[1].result;assert.equal(failure.revertStateValidation.status,'verified');
+  assert.equal(failure.revertStateValidation.beforeNonceRaw,'8');assert.equal(failure.revertStateValidation.afterNonceRaw,'9');
+  assert.equal(failure.stateDiff.pre[S].nonce,'8');assert.equal(failure.stateDiff.post[S].nonce,'9');
+  assert.ok(failure.measurements.every(row=>row.status==='not_applicable'&&row.beforeRaw===undefined));
+  const attempted=h.records.filter(r=>r.method==='debug_traceCall'&&r.params[0].to===POOL);
+  assert.equal(attempted.length,2);assert.deepEqual(attempted[0].params.slice(0,2),attempted[1].params.slice(0,2));
+  for(const record of attempted)assert.deepEqual(record.params[2].stateOverrides,failure.startingState.overrides);
   assert.equal(h.records.filter(r=>r.method==='debug_traceCall'&&r.params[0].data.startsWith('0x095ea7b3')&&r.params[2].tracer==='callTracer').length,1);
+});
+
+test('unverified reverted state invalidates the sequence prefix and cannot create a continuation',async()=>{
+  for(const mutate of [
+    x=>{if(x.stage==='deposit_diff')delete x.result.post[S].nonce;},
+    x=>{if(x.stage==='deposit_diff')x.result.pre[S].nonce=7;},
+    x=>{if(x.stage==='deposit_diff')x.result.post[TOKEN]={storage:{[ALLOW]:word(0)}};},
+  ]){
+    const h=harness({failDeposit:true,mutate});h.calls.push(approve(0));const result=await run(h);
+    assert.equal(result.canonicalStatus,'unverified');assert.equal(result.sequence.status,'unavailable');assert.equal(result.sequence.completedSteps,0);
+    assert.equal(result.steps[2].status,'skipped');assert.equal(result.steps[2].result,undefined);
+    assert.ok(result.steps[0].result.measurements.every(row=>row.status==='unavailable'&&row.beforeRaw===undefined));
+    assert.equal(result.steps[1].result.execution.status,'reverted_or_failed');
+    assert.notEqual(result.steps[1].result.revertStateValidation?.status,'verified');
+  }
 });
 
 test('final shared header change invalidates all earlier amounts',async()=>{

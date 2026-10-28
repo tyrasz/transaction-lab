@@ -1,0 +1,355 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-28T00:24:08.858Z",
+  "finishedAt": "2026-10-28T00:24:15.242Z",
+  "status": "failed",
+  "origin": "http://127.0.0.1:5174",
+  "browser": {
+    "executablePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "temporaryProfile": true,
+    "userProfileUsed": false,
+    "headless": true,
+    "version": "156.0.8078.48"
+  },
+  "productVersion": "0.15.0",
+  "source": [
+    {
+      "path": "public/app.js",
+      "bytes": 131336,
+      "sha256": "4a56ff51b07f980705996ac550328cebc899ddf76bfccbed3151af01e07e052b"
+    },
+    {
+      "path": "public/index.html",
+      "bytes": 19724,
+      "sha256": "30461925b8c1311794e21bd7c33e2475eed39b397b229db0657a76d4142a60ac"
+    },
+    {
+      "path": "public/style.css",
+      "bytes": 31005,
+      "sha256": "2b8528368635141288915c09183e95eec5ad618a1535607216da6f2128d1a841"
+    },
+    {
+      "path": "package.json",
+      "bytes": 748,
+      "sha256": "06250fe13bd180c8b87231b6189a7e2d20c09ed4e8bfbf12fef0b868a38c7c81"
+    }
+  ],
+  "scope": {
+    "realBrowser": true,
+    "syntheticResponses": true,
+    "providerRpcCalls": 0,
+    "localEngineExecutions": 0,
+    "productionSourceModified": false,
+    "authOrUserProfileUsed": false,
+    "limitations": [
+      "Submission responses are intercepted synthetic UI controls, not blockchain observations or engine results.",
+      "Layout checks and screenshots cover the declared desktop and mobile viewport only."
+    ]
+  },
+  "checks": [
+    {
+      "name": "HyperEVM hides optional Ethereum context",
+      "passed": true
+    },
+    {
+      "name": "Ethereum context is visible as collapsed Advanced with a blank default",
+      "passed": true
+    },
+    {
+      "name": "Desktop blank context layout has no horizontal overflow or clipped context controls",
+      "passed": true,
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "documentWidth": 1440,
+      "contextFields": [
+        {
+          "id": "transaction-context",
+          "left": 68,
+          "right": 396,
+          "width": 328,
+          "fontSize": "10px",
+          "lineHeight": "17px",
+          "scrollWidth": 326,
+          "clientWidth": 326
+        }
+      ]
+    },
+    {
+      "name": "Malformed context blocks submission with native field feedback",
+      "passed": true
+    },
+    {
+      "name": "/api/evm/simulate forwards exact context and locks request controls",
+      "passed": true,
+      "submission": 1
+    },
+    {
+      "name": "/api/evm/local-preview forwards exact context and locks request controls",
+      "passed": true,
+      "submission": 2
+    }
+  ],
+  "submissions": [
+    {
+      "index": 1,
+      "path": "/api/evm/simulate",
+      "method": "POST",
+      "intercepted": true,
+      "reachedProductionHandler": false,
+      "bodyText": "{\"chainId\":1,\"from\":\"0x1111111111111111111111111111111111111111\",\"to\":\"0xabababababababababababababababababababab\",\"data\":\"0x\",\"value\":\"0\",\"block\":\"0x3333333333333333333333333333333333333333333333333333333333333333\",\"accessList\":[{\"address\":\"0xabababababababababababababababababababab\",\"storageKeys\":[\"0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd\",\"0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd\"]},{\"address\":\"0xabababababababababababababababababababab\",\"storageKeys\":[\"0x3333333333333333333333333333333333333333333333333333333333333333\"]}],\"blobVersionedHashes\":[\"0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef\",\"0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef\"]}",
+      "bodySha256": "1eb5e69aa175a2392ec43fff5f74a1ec31e8902f03ba45f720d01ad8602c7a90",
+      "body": {
+        "chainId": 1,
+        "from": "0x1111111111111111111111111111111111111111",
+        "to": "0xabababababababababababababababababababab",
+        "data": "0x",
+        "value": "0",
+        "block": "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "accessList": [
+          {
+            "address": "0xabababababababababababababababababababab",
+            "storageKeys": [
+              "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+              "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+            ]
+          },
+          {
+            "address": "0xabababababababababababababababababababab",
+            "storageKeys": [
+              "0x3333333333333333333333333333333333333333333333333333333333333333"
+            ]
+          }
+        ],
+        "blobVersionedHashes": [
+          "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef",
+          "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef"
+        ]
+      },
+      "response": {
+        "id": "SYNTHETIC_UI_ONLY_1",
+        "apiRequest": {
+          "chainId": 1,
+          "from": "0x1111111111111111111111111111111111111111",
+          "to": "0xabababababababababababababababababababab",
+          "data": "0x",
+          "value": "0",
+          "block": "0x3333333333333333333333333333333333333333333333333333333333333333",
+          "accessList": [
+            {
+              "address": "0xabababababababababababababababababababab",
+              "storageKeys": [
+                "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+                "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+              ]
+            },
+            {
+              "address": "0xabababababababababababababababababababab",
+              "storageKeys": [
+                "0x3333333333333333333333333333333333333333333333333333333333333333"
+              ]
+            }
+          ],
+          "blobVersionedHashes": [
+            "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef",
+            "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef"
+          ]
+        },
+        "canonicalStatus": "unverified",
+        "execution": {
+          "status": "unavailable"
+        },
+        "measurementFailure": "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC.",
+        "source": {
+          "blockSelection": {
+            "requested": "0x3333333333333333333333333333333333333333333333333333333333333333"
+          },
+          "canonicalStatus": "unverified",
+          "profile": "synthetic_ui_only"
+        },
+        "preview": {
+          "queries": [],
+          "nativeBalances": [],
+          "positions": []
+        },
+        "limitations": [
+          "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC."
+        ],
+        "timing": {
+          "totalMs": 0
+        }
+      }
+    },
+    {
+      "index": 2,
+      "path": "/api/evm/local-preview",
+      "method": "POST",
+      "intercepted": true,
+      "reachedProductionHandler": false,
+      "bodyText": "{\"chainId\":1,\"from\":\"0x1111111111111111111111111111111111111111\",\"to\":\"0xabababababababababababababababababababab\",\"data\":\"0x\",\"value\":\"0\",\"block\":\"0x3333333333333333333333333333333333333333333333333333333333333333\",\"queries\":[{\"to\":\"0xabababababababababababababababababababab\",\"data\":\"0x70a082310000000000000000000000001111111111111111111111111111111111111111\"}],\"accessList\":[{\"address\":\"0xabababababababababababababababababababab\",\"storageKeys\":[\"0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd\",\"0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd\"]},{\"address\":\"0xabababababababababababababababababababab\",\"storageKeys\":[\"0x3333333333333333333333333333333333333333333333333333333333333333\"]}],\"blobVersionedHashes\":[\"0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef\",\"0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef\"]}",
+      "bodySha256": "2d02edde71d837fca59238d7dd1acedebca2ad49e0f55b1a559a12c4d9791258",
+      "body": {
+        "chainId": 1,
+        "from": "0x1111111111111111111111111111111111111111",
+        "to": "0xabababababababababababababababababababab",
+        "data": "0x",
+        "value": "0",
+        "block": "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "queries": [
+          {
+            "to": "0xabababababababababababababababababababab",
+            "data": "0x70a082310000000000000000000000001111111111111111111111111111111111111111"
+          }
+        ],
+        "accessList": [
+          {
+            "address": "0xabababababababababababababababababababab",
+            "storageKeys": [
+              "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+              "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+            ]
+          },
+          {
+            "address": "0xabababababababababababababababababababab",
+            "storageKeys": [
+              "0x3333333333333333333333333333333333333333333333333333333333333333"
+            ]
+          }
+        ],
+        "blobVersionedHashes": [
+          "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef",
+          "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef"
+        ]
+      },
+      "response": {
+        "id": "SYNTHETIC_UI_ONLY_2",
+        "apiRequest": {
+          "chainId": 1,
+          "from": "0x1111111111111111111111111111111111111111",
+          "to": "0xabababababababababababababababababababab",
+          "data": "0x",
+          "value": "0",
+          "block": "0x3333333333333333333333333333333333333333333333333333333333333333",
+          "queries": [
+            {
+              "to": "0xabababababababababababababababababababab",
+              "data": "0x70a082310000000000000000000000001111111111111111111111111111111111111111"
+            }
+          ],
+          "accessList": [
+            {
+              "address": "0xabababababababababababababababababababab",
+              "storageKeys": [
+                "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+                "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+              ]
+            },
+            {
+              "address": "0xabababababababababababababababababababab",
+              "storageKeys": [
+                "0x3333333333333333333333333333333333333333333333333333333333333333"
+              ]
+            }
+          ],
+          "blobVersionedHashes": [
+            "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef",
+            "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef"
+          ]
+        },
+        "canonicalStatus": "unverified",
+        "execution": {
+          "status": "unavailable"
+        },
+        "measurementFailure": "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC.",
+        "source": {
+          "blockSelection": {
+            "requested": "0x3333333333333333333333333333333333333333333333333333333333333333"
+          },
+          "canonicalStatus": "unverified",
+          "profile": "synthetic_ui_only"
+        },
+        "preview": {
+          "queries": [],
+          "nativeBalances": [],
+          "positions": []
+        },
+        "limitations": [
+          "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC."
+        ],
+        "timing": {
+          "totalMs": 0
+        },
+        "kind": "local_proof_preview",
+        "status": "unavailable",
+        "error": {
+          "code": "SYNTHETIC_UI_ONLY",
+          "message": "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC."
+        },
+        "measurements": [
+          {
+            "descriptor": {
+              "to": "0xabababababababababababababababababababab",
+              "data": "0x70a082310000000000000000000000001111111111111111111111111111111111111111"
+            },
+            "status": "unavailable",
+            "reason": "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC.",
+            "values": null
+          }
+        ]
+      }
+    }
+  ],
+  "allowedGets": [
+    {
+      "method": "GET",
+      "path": "/"
+    },
+    {
+      "method": "GET",
+      "path": "/style.css"
+    },
+    {
+      "method": "GET",
+      "path": "/app.js"
+    },
+    {
+      "method": "GET",
+      "path": "/api/config"
+    }
+  ],
+  "blockedRequests": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "screenshots": [
+    {
+      "path": "attempts/2026-10-28T00-24-08.858Z/01-desktop-context-blank.png",
+      "bytes": 214881,
+      "sha256": "7401538f93b97dd014e6b3d0d3dd86ef0b67d512b1209bc8126e686a9fc61d1a"
+    },
+    {
+      "path": "attempts/2026-10-28T00-24-08.858Z/02-provider-request-locked.png",
+      "bytes": 204455,
+      "sha256": "d1c4050e603f40deb9f11213d3b61e44b5eef8da3f00b14aa9452aca881cba09"
+    },
+    {
+      "path": "attempts/2026-10-28T00-24-08.858Z/03-provider-synthetic-response.png",
+      "bytes": 312569,
+      "sha256": "120b0f2a90d5e121719ebbdfe0e73d53cbc58c601da1d3cc75cbbb21df403e14"
+    },
+    {
+      "path": "attempts/2026-10-28T00-24-08.858Z/failure.png",
+      "bytes": 345832,
+      "sha256": "2d44e8068f0fbcf894b7d53ba41fc6f08b849c938f393b09d681ceb9a867c9df"
+    }
+  ],
+  "config": {
+    "bytes": 23833,
+    "sha256": "e900a2ce40ebcf312cbddd473fdd917c2b68db54ba8ce753a40cc561102cb604"
+  },
+  "error": {
+    "name": "AssertionError",
+    "message": "The input did not match the regular expression /SYNTHETIC UI TEST ONLY/. Input:\n\n'Independent local previewPreview: UnavailableExperimental execution over verified state proofs and code from the selected block. Only your requested queries are measured. Raw values are not prices, token decimals or a complete asset summary.Query 1 · BalanceOfUnavailableToken0xababababababababababababababababababababAccount0x1111111111111111111111111111111111111111Each query refers to the named account. Contract identity and token units are not verified.The query result or verified state context is unavailable. Values are withheld.'\n",
+    "stack": "AssertionError [ERR_ASSERTION]: The input did not match the regular expression /SYNTHETIC UI TEST ONLY/. Input:\n\n'Independent local previewPreview: UnavailableExperimental execution over verified state proofs and code from the selected block. Only your requested queries are measured. Raw values are not prices, token decimals or a complete asset summary.Query 1 · BalanceOfUnavailableToken0xababababababababababababababababababababAccount0x1111111111111111111111111111111111111111Each query refers to the named account. Contract identity and token units are not verified.The query result or verified state context is unavailable. Values are withheld.'\n\n    at file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab/reports/evm-context-ui-v1/run.mjs:96:10"
+  }
+}

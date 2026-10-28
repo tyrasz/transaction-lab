@@ -46,7 +46,7 @@ function fixture({ revertSecond = false, changeFinal = false } = {}) {
     }
     if (call.to === USDC) return diff ? mutation : { ...frame, output: word(7) };
     assert.equal(call.to, R);
-    if (revertSecond && nonce > 7n) return { ...frame, error: 'execution reverted' };
+    if (revertSecond && nonce > 7n) return diff ? mutation : { ...frame, error: 'execution reverted' };
     if (!diff) return frame;
     mutation.post[S].balance = hex(sender - BigInt(call.value));
     mutation.pre[R] = { balance: hex(receiver) }; mutation.post[R] = { balance: hex(receiver + BigInt(call.value)) };

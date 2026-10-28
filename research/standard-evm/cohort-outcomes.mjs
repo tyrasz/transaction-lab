@@ -3,12 +3,16 @@
 // No product normalizers, execution, network or state repair are imported.
 import { isDeepStrictEqual as equal } from 'node:util';
 import { createHash } from 'node:crypto';
+import { normalizeEvmContext, rpcEvmContext } from '../../engines/evm-context.js';
 
 const sha = value => createHash('sha256').update(value).digest('hex');
 const own = (o, k) => Object.hasOwn(o, k);
 const record = x => x !== null && typeof x === 'object' && !Array.isArray(x);
 const ADDRESS = /^0x[0-9a-f]{40}$/, WORD = /^0x[0-9a-f]{64}$/, DATA = /^0x(?:[0-9a-f]{2})*$/;
 const MAX = (1n << 256n) - 1n, ZERO = '0x' + '0'.repeat(64);
+const EMPTY_CODE_HASH = '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470';
+const EMPTY_STORAGE_ROOT = '0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421';
+const NATIVE_FUNDING = { before: false, after: true, basis: 'positive_native_funding_of_proof_absent_account' };
 const LIMITS = { frames: 1000, depth: 32, logs: 2000, accounts: 128, slots: 8192, bytes: 8 * 1024 * 1024, wireBytes: 64 * 1024 * 1024, records: 65, index: 0xffffffffn };
 class Incomplete extends Error {}
 const need = (condition, message) => { if (!condition) throw new Incomplete(message); };
@@ -44,7 +48,8 @@ const sortChanges = rows => rows.sort((a, b) => a.address.localeCompare(b.addres
 // Sparse Geth diff interpretation, independently anchored to proven inputs.
 // Omitted post basic fields are unchanged; a pre-only slot is cleared. A
 // post-only slot requires an explicit, independently proven zero input value.
-export function providerChanges(raw, inputs) {
+export function providerChanges(raw, inputs) { return normalizedProviderChanges(raw, inputs, null); }
+function normalizedProviderChanges(raw, inputs, fundedRecipient) {
   bounded(raw); need(record(raw) && equal(Object.keys(raw).sort(), ['post', 'pre']), 'Raw diff requires exactly pre/post');
   need(record(raw.pre) && record(raw.post), 'Diff maps missing');
   const addresses = Object.keys(raw.pre).sort();
@@ -53,8 +58,12 @@ export function providerChanges(raw, inputs) {
   let slots = 0; const out = [];
   for (const address of addresses) {
     need(textMatches(address, ADDRESS), 'Malformed/case-ambiguous address');
-    const before = inputs.accounts[address], proofs = inputs.provenance.filter(p => p.account === address);
-    need(before?.exists === true && proofs.length === 1 && record(proofs[0].accountProof), 'Unknown or unsupported account lifecycle');
+    let before = inputs.accounts[address]; const proofs = inputs.provenance.filter(p => p.account === address);
+    const funded = address === fundedRecipient && before?.exists === false;
+    need((before?.exists === true || funded) && proofs.length === 1 && record(proofs[0].accountProof), 'Unknown or unsupported account lifecycle');
+    // Only the direct-native-transfer admission below can supply this recipient.
+    // These zero basics come from its retained exclusion proof, not the diff.
+    if (funded) before = { exists: false, nonce: '0', balance: '0', code: '0x', storage: {} };
     const proof = proofs[0].accountProof, pre = raw.pre[address], post = raw.post[address];
     need(record(pre) && record(post) && record(before.storage), 'Malformed account');
     need(textMatches(before.code, DATA) && textMatches(proof.codeHash, WORD), 'Malformed proven account');
@@ -64,7 +73,10 @@ export function providerChanges(raw, inputs) {
     if (own(pre, 'codeHash')) need(textMatches(pre.codeHash, WORD) && pre.codeHash === proof.codeHash, 'Raw prior code hash differs from proof');
     if (own(post, 'code')) need(textMatches(post.code, DATA) && post.code === before.code, 'Runtime code mutation unsupported');
     if (own(post, 'codeHash')) need(textMatches(post.codeHash, WORD) && post.codeHash === proof.codeHash, 'Runtime code hash mutation unsupported');
-    const changes = { address };
+    const changes = { address, ...(funded ? { existence: { ...NATIVE_FUNDING } } : {}) };
+    if (funded) need(own(post, 'balance') && quantity(post.balance) > 0n &&
+      (!own(post, 'nonce') || quantity(post.nonce) === 0n) &&
+      [pre, post].every(p => !own(p, 'storage') || (record(p.storage) && Object.keys(p.storage).length === 0)), 'Funded absent account must remain code-free with zero nonce and no storage');
     for (const key of ['balance', 'nonce']) if (own(post, key)) {
       const old = quantity(before[key]), next = quantity(post[key]);
       // Nonzero old basic state cannot disappear from a changed field's preimage.
@@ -178,13 +190,14 @@ function exceptionClass(error, local = false) {
   throw new Incomplete('Unrecognized execution error is not evidence of a completed EVM fault');
 }
 function requestProfile(request) {
-  need(exactKeys(request, ['from', 'to', 'data', 'value', 'gas']), 'Projected request requires exactly from/to/data/value/gas');
+  need(exactKeys(request, ['from', 'to', 'data', 'value', 'gas'], ['accessList', 'blobVersionedHashes']), 'Projected request has unsupported envelope fields');
   need(textMatches(request.from, ADDRESS) && (request.to === null || textMatches(request.to, ADDRESS)) && textMatches(request.data, DATA), 'Projected request identity or calldata is malformed');
   const value = quantity(request.value), gas = quantity(request.gas);
   if (request.to === null) return { supported: false, reason: 'Contract creation is outside the ordinary call profile' };
   if (request.data.length > 65538 || gas !== 5000000n) return { supported: false, reason: 'Projected input exceeds the fixed calldata or gas profile' };
   if (['from', 'to'].some(k => request[k] === '0x000000000000000000000000000000000000ba1a')) return { supported: false, reason: 'Input overlaps the reserved execution witness' };
-  return { supported: true, call: { from: request.from, to: request.to, data: request.data, value: hex(value.toString()), gas: hex(gas.toString()) } };
+  let context; try { context = rpcEvmContext(request); } catch { throw new Incomplete('Projected optional EVM context is malformed or excessive'); }
+  return { supported: true, call: { from: request.from, to: request.to, data: request.data, value: hex(value.toString()), gas: hex(gas.toString()), ...context } };
 }
 function successful(row) {
   need(typeof row.responseText === 'string', 'Successful wire response missing');
@@ -221,8 +234,10 @@ function originalEvidence(product, call, header) {
     const [envelope, selector, options] = row.request.params;
     if (!record(envelope) || envelope.from !== call.from || envelope.to !== call.to || envelope.data !== call.data || !equal(selector, pinned) || own(options ?? {}, 'stateOverrides')) continue;
     if (quantity(envelope.gas) !== quantity(call.gas) || quantity(envelope.value) !== quantity(call.value)) continue;
-    need(row.request.params.length === 3 && exactKeys(envelope, ['from', 'to', 'data', 'gas', 'value'], ['nonce']), 'Original call envelope has unrecognized fields');
-    need(exactKeys(options, ['tracer', 'tracerConfig', 'timeout']), 'Original execution options differ');
+    need(row.request.params.length === 3 && exactKeys(envelope, ['from', 'to', 'data', 'gas', 'value'], ['nonce', ...Object.keys(rpcEvmContext(call))]), 'Original call envelope has unrecognized fields');
+    for (const key of ['accessList', 'blobVersionedHashes', 'maxFeePerBlobGas']) need(own(envelope, key) === own(call, key) && (!own(call, key) || equal(envelope[key], call[key])), 'Original call optional context differs from the projected request');
+    need(exactKeys(options, ['tracer', 'tracerConfig', 'timeout', ...(call.blobVersionedHashes ? ['blockOverrides'] : [])]), 'Original execution options differ');
+    if (call.blobVersionedHashes) need(equal(options.blockOverrides, { baseFeePerGas: '0x0', blobBaseFee: '0x0' }), 'Original blob-base-fee override differs');
     need(options.timeout === '15s', 'Original tracer timeout differs');
     const key = options.tracer === 'callTracer' ? 'trace' : options.tracer === 'prestateTracer' ? 'diff' : null;
     if (!key) continue;
@@ -287,6 +302,34 @@ function unsupportedProduct(product, call, header, expected) {
   }
   return null;
 }
+// Independent arithmetic for the pinned mainnet Shanghai..BPO2 schedule. These
+// are the timestamp activations in the frozen EthereumJS10.1.3 Mainnet source;
+// no product/local gas calculator or caller-supplied claimed cost is trusted.
+function declaredGasCosts(call, header) {
+  const timestamp = quantity(header.timestamp), schedule = [
+    [1681338455n, 'shanghai'], [1710338135n, 'cancun'], [1746612311n, 'prague'],
+    [1764798551n, 'osaka'], [1765290071n, 'bpo1'], [1767747671n, 'bpo2'],
+  ];
+  const hardfork = schedule.filter(([at]) => timestamp >= at).at(-1)?.[1];
+  need(hardfork, 'Local gas schedule is outside the supported mainnet forks');
+  const context = normalizeEvmContext(call); let zero = 0n, nonzero = 0n;
+  for (let i = 2; i < call.data.length; i += 2) call.data.slice(i, i + 2) === '00' ? zero++ : nonzero++;
+  const addresses = BigInt(context.accessList?.length ?? 0), slots = BigInt(context.accessList?.reduce((n, row) => n + row.storageKeys.length, 0) ?? 0);
+  const accessGas = addresses * 2400n + slots * 1900n, tokens = zero + nonzero * 4n;
+  const intrinsic = 21000n + tokens * 4n + accessGas, floor = timestamp >= 1746612311n ? 21000n + tokens * 10n : 0n;
+  need(intrinsic <= quantity(call.gas) && floor <= quantity(call.gas), 'Declared call gas does not cover intrinsic costs and calldata floor');
+  if (own(context, 'blobVersionedHashes')) need(timestamp >= 1710338135n && quantity(header.excessBlobGas, (1n << 64n) - 1n) >= 0n, 'Blob context requires an active fork and bounded source excess blob gas');
+  return { context, hardfork, zero, nonzero, addresses, slots, accessGas, intrinsic, floor };
+}
+function bindLocalContext(output, call, header) {
+  const { context, hardfork, addresses, slots, accessGas } = declaredGasCosts(call, header), p = output.profile;
+  need(p.hardfork === hardfork && output.environment.hardfork === hardfork, 'Local fork differs from the declared header schedule');
+  const fields = { ...(own(context, 'accessList') ? { accessList: context.accessList, accessListAddressCount: addresses.toString(), accessListStorageKeyCount: slots.toString(), accessListIntrinsicGas: accessGas.toString() } : {}),
+    ...(own(context, 'blobVersionedHashes') ? { blobVersionedHashes: context.blobVersionedHashes, executionBlobBaseFee: '0', sourceExcessBlobGas: quantity(header.excessBlobGas).toString() } : {}) };
+  for (const key of ['accessList', 'accessListAddressCount', 'accessListStorageKeyCount', 'accessListIntrinsicGas', 'blobVersionedHashes', 'executionBlobBaseFee', 'sourceExcessBlobGas'])
+    need(own(p, key) === own(fields, key) && (!own(fields, key) || equal(p[key], fields[key])), 'Local optional execution context differs from the declared call');
+  if (own(context, 'accessList')) need(output.semantics?.warmAddresses === 'sender_destination_coinbase_fork_active_precompiles_and_declared_access_list', 'Local access-list warming profile is missing');
+}
 function localBinding(local, call, header, expected) {
   boundImplementation(local.implementation, expected);
   const attempt = local.attempt; need(record(attempt), 'Local attempt is missing');
@@ -300,6 +343,7 @@ function localBinding(local, call, header, expected) {
   for (const f of ['number', 'timestamp', 'gasLimit']) need(quantity(env[f]) === quantity(header[f]), 'Local header field differs');
   need(profile?.name === 'ethereum_unsigned_unpriced_call' && profile.chainId === 1 && profile.sourceBlockHash === header.hash && profile.sourceStateRoot === header.stateRoot && profile.expectedOutputsUsed === false && profile.feesSettled === false && profile.originalTransactionPosition === false && quantity(profile.executionBaseFee) === 0n && quantity(profile.gasPrice) === 0n && quantity(profile.actualBlockBaseFee) === quantity(header.baseFeePerGas) && quantity(profile.declaredGasLimit) === quantity(call.gas), 'Local unsigned execution profile differs');
   need(output.stateDisposition === 'message_result_retained_in_supplied_manager' && output.semantics?.feeSettlement === false, 'Local state is not a retained execution result');
+  bindLocalContext(output, call, header);
   const trace = output.trace;
   need(trace?.type === 'CALL' && trace.from === call.from && trace.to === call.to && trace.input === call.data && quantity(trace.value) === quantity(call.value) && quantity(trace.gas) === quantity(profile.messageGasLimit), 'Local root differs from the projected request');
   const classified = exceptionClass(output.execution.error, true);
@@ -308,12 +352,83 @@ function localBinding(local, call, header, expected) {
   need(sender?.exists === true && sender.code === '0x', 'Local sender account is not a proven code-free account');
   return { attempt, output, classified, nonce: quantity(sender.nonce) };
 }
-function canonicalLocalChanges(attempt) {
+// This exception covers ordinary funding of a proven absent wallet, not CREATE,
+// SELFDESTRUCT, internal calls or arbitrary account lifecycle normalization.
+// Proof/code bytes are bound here to the already verified collector facts. The
+// outer evidence verifier still independently checks the MPT proofs; this
+// synchronous output comparator does not claim cryptographic re-verification.
+function directNativeFunding(attempt, raw, call, productTrace) {
+  const rows = attempt.changes?.accounts;
+  const absentTouched = record(raw?.pre) && Object.keys(raw.pre).some(a => attempt.inputs.accounts[a]?.exists === false);
+  if (!absentTouched && !(Array.isArray(rows) && rows.some(r => record(r) && own(r, 'existence')))) return null;
+  const sender = call.from, recipient = call.to, value = quantity(call.value), inputs = attempt.inputs, output = attempt.output;
+  need(sender !== recipient && value > 0n && call.data === '0x' && output.execution.status === 'success' && !failure(productTrace), 'Absent-account comparison requires a successful direct native transfer');
+  need(quantity(output.execution.executionGasUsed) === 0n && quantity(output.trace.gasUsed) === 0n && quantity(output.execution.gasRefundCounter) === 0n,
+    'Native funding excludes precompile or other message execution');
+  for (const trace of [productTrace, output.trace]) {
+    need(trace.type === 'CALL' && trace.from === sender && trace.to === recipient && trace.input === '0x' && quantity(trace.value) === value &&
+      providerOutput(trace) === '0x' && (!own(trace, 'calls') || (Array.isArray(trace.calls) && trace.calls.length === 0)) &&
+      (!own(trace, 'logs') || (Array.isArray(trace.logs) && trace.logs.length === 0)), 'Native funding contains code execution, child calls or logs');
+  }
+  need(Array.isArray(output.logs) && output.logs.length === 0 && committedLogs(productTrace).length === 0, 'Native funding contains committed logs');
+  const addresses = [sender, recipient].sort();
+  need(record(raw.pre) && record(raw.post) && equal(Object.keys(raw.pre).sort(), addresses) && equal(Object.keys(raw.post).sort(), addresses) &&
+    Array.isArray(rows) && rows.length === 2 && equal(rows.map(r => r.address).sort(), addresses), 'Native funding must retain exactly the sender and recipient changes');
+  need(equal(inputs.accounts[recipient], { exists: false }), 'Native recipient exclusion fact missing');
+  const evidence = attempt.inputEvidence;
+  need(Array.isArray(evidence) && evidence.length <= 256, 'Native funding proof/code evidence missing or excessive');
+  const ids = new Set();
+  for (const row of evidence) { need(Number.isSafeInteger(row?.id) && row.id > 0 && !ids.has(row.id), 'Native funding evidence IDs are malformed or duplicated'); ids.add(row.id); }
+  const pinned = { blockHash: inputs.context.blockHash, requireCanonical: true };
+  function retained(id, method, params) {
+    need(Number.isSafeInteger(id) && id > 0, 'Native funding evidence reference missing');
+    const e = evidence.find(row => row.id === id), request = { method, params };
+    need(e?.status === 'received' && e.verification === 'verified' && e.representation === 'parsed_rpc_result_not_wire_bytes' &&
+      equal(e.request, request) && e.requestText === JSON.stringify(request) && e.requestSha256 === sha(e.requestText) && own(e, 'result'), 'Native funding proof/code evidence is not bound to its pinned request');
+    bounded(e.result); const serialized = JSON.stringify(e.result);
+    need(e.resultBytes === Buffer.byteLength(serialized) && e.resultSha256 === sha(serialized), 'Native funding proof/code result hash differs');
+    return e.result;
+  }
+  for (const account of addresses) {
+    const proven = inputs.provenance.filter(p => p.account === account);
+    need(proven.length === 1, 'Native funding account proof is missing or ambiguous');
+    const p = proven[0], fact = p.accountProof, absent = account === recipient;
+    need(exactKeys(fact, ['exists', 'nonceRaw', 'balanceRaw', 'codeHash', 'storageRoot']) && fact.exists === !absent &&
+      fact.codeHash === EMPTY_CODE_HASH && fact.storageRoot === EMPTY_STORAGE_ROOT && equal(p.storage, []), 'Native funding requires a proven code-free account with empty storage');
+    const nonce = quantity(fact.nonceRaw), balance = quantity(fact.balanceRaw);
+    if (absent) need(nonce === 0n && balance === 0n, 'Excluded native recipient has nonzero basic state');
+    else need(inputs.accounts[account]?.exists === true && inputs.accounts[account].code === '0x' &&
+      quantity(inputs.accounts[account].nonce) === nonce && quantity(inputs.accounts[account].balance) === balance &&
+      equal(inputs.accounts[account].storage, {}), 'Native sender facts differ from its proof');
+    const proof = retained(p.proofEvidenceId, 'eth_getProof', [account, [], pinned]);
+    const code = retained(p.codeEvidenceId, 'eth_getCode', [account, pinned]);
+    need(code === '0x' && exactKeys(proof, ['address', 'accountProof', 'balance', 'nonce', 'codeHash', 'storageHash', 'storageProof']) && proof.address === account &&
+      quantity(proof.nonce) === nonce && quantity(proof.balance) === balance && equal(proof.storageProof, []) &&
+      Array.isArray(proof.accountProof) && proof.accountProof.length > 0 && proof.accountProof.length <= 128 &&
+      proof.accountProof.every(n => textMatches(n, DATA) && n !== '0x'), 'Native funding retained proof or code contradicts the account facts');
+    // Geth reports two zero hashes for excluded accounts; the proof verifier
+    // normalizes those reported metadata fields to canonical empty roots.
+    need((proof.codeHash === EMPTY_CODE_HASH && proof.storageHash === EMPTY_STORAGE_ROOT) ||
+      (absent && proof.codeHash === ZERO && proof.storageHash === ZERO), 'Native funding proof hash claims contradict empty code/storage');
+  }
+  const recipientChange = rows.find(r => r.address === recipient), senderChange = rows.find(r => r.address === sender);
+  need(exactKeys(recipientChange, ['address', 'existence', 'balance']) && equal(recipientChange.existence, NATIVE_FUNDING) &&
+    exactKeys(recipientChange.balance, ['before', 'after']) && quantity(recipientChange.balance.before) === 0n && quantity(recipientChange.balance.after) === value,
+  'Local native recipient is not exactly positive funding of the proven absent account');
+  const senderBalance = quantity(inputs.accounts[sender].balance), senderNonce = quantity(inputs.accounts[sender].nonce);
+  need(exactKeys(senderChange, ['address', 'nonce', 'balance']) && exactKeys(senderChange.balance, ['before', 'after']) && exactKeys(senderChange.nonce, ['before', 'after']) &&
+    senderBalance >= value && quantity(senderChange.balance.before) === senderBalance && quantity(senderChange.balance.after) === senderBalance - value &&
+    quantity(senderChange.nonce.before) === senderNonce && quantity(senderChange.nonce.after) === senderNonce + 1n, 'Local direct native debit/nonce differs from the proven call');
+  return recipient;
+}
+function canonicalLocalChanges(attempt, fundedRecipient = null) {
   bounded(attempt.changes?.accounts); need(Array.isArray(attempt.changes?.accounts) && attempt.changes.accounts.length <= LIMITS.accounts, 'Local full observed changes missing');
   const addresses = new Set(); let slots = 0;
   const changes = attempt.changes.accounts.map(row => {
-    need(exactKeys(row, ['address'], ['nonce', 'balance', 'storage']) && textMatches(row.address, ADDRESS) && !addresses.has(row.address), 'Malformed or duplicate local changed account'); addresses.add(row.address);
-    const prior = attempt.inputs.accounts[row.address]; need(prior?.exists === true, 'Unsupported local account lifecycle'); const result = { address: row.address };
+    const funded = row.address === fundedRecipient;
+    need(exactKeys(row, ['address'], ['nonce', 'balance', 'storage', ...(funded ? ['existence'] : [])]) && textMatches(row.address, ADDRESS) && !addresses.has(row.address), 'Malformed or duplicate local changed account'); addresses.add(row.address);
+    const prior = funded ? { exists: false, nonce: '0', balance: '0', storage: {} } : attempt.inputs.accounts[row.address];
+    need(prior?.exists === true || funded, 'Unsupported local account lifecycle'); const result = { address: row.address, ...(funded ? { existence: { ...NATIVE_FUNDING } } : {}) };
     for (const f of ['nonce', 'balance']) if (own(row, f)) { need(exactKeys(row[f], ['before', 'after']) && quantity(row[f].before) === quantity(prior[f]), 'Local prior basic state differs from proven input'); result[f] = { before: hex(row[f].before), after: hex(row[f].after) }; need(result[f].before !== result[f].after, 'Unchanged local basic field is not a change'); }
     if (own(row, 'storage')) {
       need(Array.isArray(row.storage) && row.storage.length > 0, 'Local storage changes missing'); const seen = new Set();
@@ -323,10 +438,14 @@ function canonicalLocalChanges(attempt) {
   });
   return sortChanges(changes);
 }
-function localGas(output) {
+function localGas(output, call, header) {
   const p = output.profile, g = output.gasAccounting;
-  const intrinsic = quantity(p.intrinsicGas), message = quantity(output.execution.executionGasUsed), refund = quantity(output.execution.gasRefundCounter), floor = quantity(p.calldataFloor);
+  const { intrinsic, floor, zero, nonzero } = declaredGasCosts(call, header);
+  need(quantity(p.intrinsicGas) === intrinsic && quantity(p.calldataFloor) === floor && quantity(p.calldataZeroBytes) === zero && quantity(p.calldataNonzeroBytes) === nonzero,
+    'Local intrinsic/calldata costs differ from independently derived request costs');
+  const message = quantity(output.execution.executionGasUsed), refund = quantity(output.execution.gasRefundCounter);
   need(quantity(output.trace.gasUsed) === message && intrinsic + quantity(p.messageGasLimit) === quantity(p.declaredGasLimit), 'Local message gas does not bind to its declared profile');
+  need(message <= quantity(p.messageGasLimit), 'Local execution gas exceeds its independently derived message budget');
   const beforeRefund = intrinsic + message, applied = refund < beforeRefund / 5n ? refund : beforeRefund / 5n, after = beforeRefund - applied, adjustment = floor > after ? floor - after : 0n;
   for (const [k, n] of Object.entries({ beforeRefund, appliedRefund: applied, floorAdjustment: adjustment, gasUsed: after + adjustment })) need(quantity(g?.[k], 5000000n) === n, 'Local unsigned gas accounting is incomplete or inconsistent');
   return (after + adjustment).toString();
@@ -384,9 +503,10 @@ export function adjudicateCohortOutcome(input) {
     const raw = p.raw.diff.result, sender = profile.call.from;
     const priorNonce = raw.pre?.[sender]?.nonce === undefined && l.nonce === 0n ? 0n : quantity(raw.pre?.[sender]?.nonce);
     need(priorNonce === l.nonce && quantity(raw.post?.[sender]?.nonce) === l.nonce + 1n, 'Original provider nonce diff does not bind the proven local nonce transition');
-    return [providerChanges(raw, l.attempt.inputs), canonicalLocalChanges(l.attempt)];
+    const fundedRecipient = directNativeFunding(l.attempt, raw, profile.call, p.raw.trace.result);
+    return [normalizedProviderChanges(raw, l.attempt.inputs, fundedRecipient), canonicalLocalChanges(l.attempt, fundedRecipient)];
   });
-  channel('gasAccounting', () => [p.gas, localGas(l.output)]);
+  channel('gasAccounting', () => [p.gas, localGas(l.output, profile.call, input.header)]);
   const statuses = Object.values(result.channels).map(x => x.status);
   result.outcome.comparison = statuses.includes('mismatch') ? 'mismatch' : statuses.every(x => x === 'match') ? 'match' : 'not_comparable';
   result.allChannelsComplete = statuses.every(x => x !== 'unavailable');

@@ -99,8 +99,12 @@ test('explicit post zero is preserved, omitted pre zero is anchored and a nonzer
 });
 
 test('original failure stays not applicable with no native amounts',async()=>{
-  const r=await simulateUnsignedCall(fixture({mutate:x=>{if(x.stage==='original_trace')x.result.error='execution reverted';}}));
+  const r=await simulateUnsignedCall(fixture({mutate:x=>{
+    if(x.stage==='original_trace')x.result.error='execution reverted';
+    if(x.stage==='original_diff')return {pre:{[S]:{nonce:7,balance:h(1000)}},post:{[S]:{nonce:8}}};
+  }}));
   assert.equal(r.canonicalStatus,'verified');assert.equal(r.nativeEffects.status,'not_applicable');assert.deepEqual(r.nativeEffects.measurements,[]);
+  assert.equal(r.revertStateValidation.status,'verified');assert.equal(r.revertStateValidation.balanceRaw,'1000');
 });
 
 test('automatic payable calls retain both native and discovered token measurements',async()=>{

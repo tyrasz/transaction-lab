@@ -1,0 +1,90 @@
+{
+  "outcome": {
+    "transactionHash": "0x5401a3f3aa071b77a3e4cee72712c5e616ff42b1ef1eafdb4cf243fcc1df8368",
+    "execution": "reverted",
+    "comparison": "match"
+  },
+  "channels": {
+    "executionStatus": {
+      "status": "match",
+      "product": {
+        "status": "reverted",
+        "exception": "revert"
+      },
+      "local": {
+        "status": "reverted",
+        "exception": "revert"
+      }
+    },
+    "returnData": {
+      "status": "match",
+      "product": "0x",
+      "local": "0x"
+    },
+    "committedLogs": {
+      "status": "match",
+      "product": [],
+      "local": []
+    },
+    "fullObservedStateChanges": {
+      "status": "match",
+      "product": [
+        {
+          "address": "0xdadb0d80178819f2319190d340ce9a924f783711",
+          "nonce": {
+            "before": "0x2c8bfc",
+            "after": "0x2c8bfd"
+          }
+        }
+      ],
+      "local": [
+        {
+          "address": "0xdadb0d80178819f2319190d340ce9a924f783711",
+          "nonce": {
+            "before": "0x2c8bfc",
+            "after": "0x2c8bfd"
+          }
+        }
+      ]
+    },
+    "gasAccounting": {
+      "status": "match",
+      "product": "21960",
+      "local": "21960"
+    }
+  },
+  "reasons": [],
+  "evidence": {
+    "product": {
+      "trace": 8,
+      "diff": 9,
+      "nonce": 3,
+      "headers": [
+        2,
+        12
+      ],
+      "chain": 1,
+      "senderCode": 5,
+      "rawExecutionError": "execution reverted"
+    },
+    "local": {
+      "sourceSha256": "82446fead938be3885447d14b066f1315c449bc0a7e0782da5ca2202dcf13d35",
+      "stateBlockHash": "0x8b50e706eaab7c421953671324e453c13a1247a973af40f56f6eda63a8435763",
+      "stateRoot": "0x25ebfa84c05cea98397a4b3effcd1bc215fa7620e6b327123343dc7882e70673",
+      "rawExecutionError": "revert"
+    }
+  },
+  "allChannelsComplete": true,
+  "limitations": {
+    "artifactHashesBound": false,
+    "sourceIdentityAuthenticityVerified": false,
+    "independentProofsReverified": false,
+    "headerConsensusOrFinalityVerified": false,
+    "originalTransactionPosition": false,
+    "feeSettlement": false,
+    "fullCallTreeEquality": false,
+    "completeEconomicInventory": false,
+    "tokenOrEventInventoryAccuracy": false,
+    "securityScore": false
+  }
+}

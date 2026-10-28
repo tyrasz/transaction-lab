@@ -101,7 +101,7 @@ test('code-bearing sender and lifecycle operations remain explicit unsupported o
 });
 
 test('unsupported transaction extras and malformed inputs are rejected before state reads', async () => {
-  for (const change of [f => { f.request.accessList = []; }, f => { f.request.authorizationList = []; }, f => { f.request.blobVersionedHashes = []; }, f => { f.request.value = '-1'; }, f => { f.request.gas = '0x00'; }, f => { delete f.header.stateRoot; }, f => { f.request.to = null; }]) {
+  for (const change of [f => { f.request.accessList = [{ address: TO, storageKeys: ['0x1'] }]; }, f => { f.request.authorizationList = []; }, f => { f.request.blobVersionedHashes = []; }, f => { f.request.value = '-1'; }, f => { f.request.gas = '0x00'; }, f => { delete f.header.stateRoot; }, f => { f.request.to = null; }]) {
     const f = await fixture(); change(f); const r = await executeEthereumCall(f); assert.equal(r.execution.status, 'invalid'); assert.equal(f.stateManager.snapshotReads().total, 0); assert.deepEqual(f.stateManager.snapshotChanges().accounts, []);
   }
 });
@@ -109,4 +109,108 @@ test('unsupported transaction extras and malformed inputs are rejected before st
 test('gas rules preserve byte classes and refund/floor boundary exactly without floating point', () => {
   const costs = ethereumCallGas('0x00010200', ethereumCommon(HEADER)); assert.deepEqual(costs, { zeroBytes: 2n, nonzeroBytes: 2n, intrinsic: 21040n, floor: 21100n, minimum: 21100n });
   assert.deepEqual(ethereumUsedGas({ messageGasUsed: 100n, refundCounter: 100000n, intrinsic: 21040n, floor: 21100n }), { beforeRefund: 21140n, appliedRefund: 4228n, floorAdjustment: 4188n, gasUsed: 21100n });
+});
+
+test('access-list occurrences charge intrinsic gas while warming deduplicates and never prefetches unused facts', async () => {
+  const cold=await fixture('0x60005400'),warm=await fixture('0x60005400');
+  warm.request.accessList=[{address:TO,storageKeys:[word(0),word(0)]},{address:TO,storageKeys:[word(0)]},{address:addr(0x7777),storageKeys:[]}];
+  const a=await executeEthereumCall(cold),b=await executeEthereumCall(warm);
+  assert.equal(a.execution.executionGasUsed,'2103');assert.equal(b.execution.executionGasUsed,'103');
+  assert.equal(b.profile.accessListAddressCount,'3');assert.equal(b.profile.accessListStorageKeyCount,'3');assert.equal(b.profile.accessListIntrinsicGas,'12900');assert.equal(b.profile.intrinsicGas,'33900');
+  assert.deepEqual(b.profile.accessList,warm.request.accessList);assert.equal(b.gasAccounting.gasUsed,'34003');
+  assert.equal(warm.stateManager.snapshotReads().reads.some(x=>x.address===addr(0x7777)),false);
+  delete warm.request.accessList;const again=await executeEthereumCall(warm);assert.equal(again.execution.executionGasUsed,'2103');assert.equal(Object.hasOwn(again.profile,'accessList'),false);
+});
+
+test('declared warming survives nested REVERT and is scoped to each new execution', async()=>{
+ const target=addr(0x3333),invoke='6000600060006000600073'+target.slice(2)+'61fffff150';
+ const results=[];for(const warm of [false,true]){
+  const f=await fixture('0x'+invoke+invoke+'00',{[target]:account('0x6000545060006000fd')});
+  if(warm)f.request.accessList=[{address:target,storageKeys:[word(0)]}];
+  const r=await executeEthereumCall(f);assert.equal(r.execution.status,'success');assert.equal(r.trace.calls.length,2);
+  assert(r.trace.calls.every(x=>x.error==='revert'));results.push(r.trace.calls.map(x=>BigInt(x.gasUsed)));
+ }
+ assert.equal(results[0][0],results[0][1]);assert.equal(results[1][0],results[1][1]);assert.equal(results[0][0]-results[1][0],2000n);
+});
+
+test('declared blob context exposes ordered hashes, bounded index zero and synthetic blob base fee',async()=>{
+ const hashes=Array.from({length:32},(_,i)=>'0x01'+BigInt(i+1).toString(16).padStart(62,'0'));
+ const f=await fixture('0x600049600052601f49602052602049604052607f496060524a60805260a06000f3');
+ f.header.excessBlobGas='173922672';f.request.blobVersionedHashes=hashes;
+ const r=await executeEthereumCall(f);assert.equal(r.execution.status,'success');
+ assert.equal(r.execution.returnData,'0x'+[hashes[0],hashes[31],word(0),word(0),word(0)].map(x=>x.slice(2)).join(''));
+ assert.deepEqual(r.profile.blobVersionedHashes,hashes);assert.equal(r.profile.executionBlobBaseFee,'0');assert.equal(r.profile.sourceExcessBlobGas,'173922672');assert.equal(r.profile.intrinsicGas,'21000');
+ assert.equal(r.profile.feesSettled,false);assert.equal(Object.hasOwn(r.profile,'accessList'),false);
+});
+
+test('blob transaction context propagates through nested calls without enabling KZG or implicit BLOBBASEFEE',async()=>{
+ const target=addr(0x3333),hash='0x01'+'ab'.repeat(31),invoke='6020600060006000600073'+target.slice(2)+'61fffff15060206000f3';
+ const f=await fixture('0x'+invoke,{[target]:account('0x60004960005260206000f3')});f.header.excessBlobGas='0';f.request.blobVersionedHashes=[hash];
+ const r=await executeEthereumCall(f);assert.equal(r.execution.status,'success');assert.equal(r.execution.returnData,hash);assert.equal(r.trace.calls[0].output,hash);
+ const missing=await fixture('0x4a00');const noFee=await executeEthereumCall(missing);assert.equal(noFee.execution.status,'unsupported');assert.equal(noFee.execution.error.code,'LOCAL_BLOB_UNSUPPORTED');assert.deepEqual(missing.stateManager.snapshotChanges().accounts,[]);
+ const kzg=await fixture('0x00');kzg.request.to=addr(10);kzg.request.blobVersionedHashes=[hash];kzg.header.excessBlobGas='0';const bad=await executeEthereumCall(kzg);assert.equal(bad.execution.status,'unsupported');assert.deepEqual(kzg.stateManager.snapshotChanges().accounts,[]);
+});
+
+test('access intrinsic and blob fork/header validity reject before state reads',async()=>{
+ for(const change of [f=>{f.request.accessList=[{address:TO,storageKeys:[word(0)]}];f.request.gas='25299';},f=>{f.request.blobVersionedHashes=['0x01'+'00'.repeat(31)];},f=>{f.request.blobVersionedHashes=['0x01'+'00'.repeat(31)];f.header.excessBlobGas='0';f.header.timestamp='1681338455';},f=>{f.request.blobVersionedHashes=['0x01'+'00'.repeat(31)];f.header.excessBlobGas=(1n<<64n).toString();}]){
+  const f=await fixture();change(f);const r=await executeEthereumCall(f);assert.equal(r.execution.status,'invalid');assert.equal(f.stateManager.snapshotReads().total,0);assert.deepEqual(f.stateManager.snapshotChanges().accounts,[]);
+ }
+});
+
+
+test('Ethereum BLOBHASH without declared blobs returns zero for all tested uint256 indexes at three opcode gas', async () => {
+  for (const index of ['6000', '6001', '7f' + 'ff'.repeat(32)]) {
+    const f = await fixture('0x' + index + '4960005260206000f3');
+    const r = await executeEthereumCall(f);
+    assert.equal(r.execution.status, 'success'); assert.equal(r.execution.returnData, word(0));
+    // PUSH index + BLOBHASH + PUSH offset + MSTORE + memory expansion + two PUSHes.
+    assert.equal(r.execution.executionGasUsed, '21'); assert.equal(r.gasAccounting.gasUsed, '21021');
+    assert.equal(Object.hasOwn(r.profile, 'blobVersionedHashes'), false);
+    assert.equal(Object.hasOwn(r.profile, 'executionBlobBaseFee'), false);
+    assert.deepEqual(f.stateManager.snapshotChanges().accounts, [{ address: FROM, nonce: { before: '0x7', after: '0x8' } }]);
+  }
+});
+
+test('non-blob BLOBHASH obeys Cancun activation rather than enabling a pre-fork opcode', async () => {
+  for (const [timestamp, status] of [['1710338134', 'failed'], ['1710338135', 'success']]) {
+    const f = await fixture('0x60004960005260206000f3'); f.header.timestamp = timestamp;
+    const r = await executeEthereumCall(f); assert.equal(r.execution.status, status);
+    if (status === 'success') assert.equal(r.execution.returnData, word(0));
+    else { assert.equal(r.execution.error, 'invalid opcode'); assert.equal(r.gasAccounting.gasUsed, f.request.gas); }
+    assert.deepEqual(f.stateManager.snapshotChanges().accounts, [{ address: FROM, nonce: { before: '0x7', after: '0x8' } }]);
+  }
+});
+
+test('CALL, DELEGATECALL and STATICCALL inherit an empty blob-hash list without extra input state', async () => {
+  const target = addr(0x3333), code = '0x60004960005260206000f3';
+  for (const [opcode, type] of [['f1', 'CALL'], ['f4', 'DELEGATECALL'], ['fa', 'STATICCALL']]) {
+    const invoke = '6020600060006000' + (opcode === 'f1' ? '6000' : '') + '73' + target.slice(2) + '61ffff' + opcode;
+    const f = await fixture('0x' + invoke + '5060206000f3', { [target]: account(code) });
+    const r = await executeEthereumCall(f);
+    assert.equal(r.execution.status, 'success'); assert.equal(r.execution.returnData, word(0));
+    assert.equal(r.trace.calls.length, 1); assert.equal(r.trace.calls[0].type, type);
+    assert.equal(r.trace.calls[0].output, word(0)); assert.equal(r.trace.calls[0].gasUsed, '0x15');
+    assert.equal(r.trace.calls[0].error, null);
+    assert.deepEqual(f.stateManager.snapshotChanges().accounts, [{ address: FROM, nonce: { before: '0x7', after: '0x8' } }]);
+  }
+});
+
+test('non-blob BLOBHASH preserves ordinary REVERT and stack-fault rollback including transferred value', async () => {
+  for (const [code, status, error] of [['0x60004960005560006000fd', 'reverted', 'revert'], ['0x602a60005549', 'failed', 'stack underflow']]) {
+    const f = await fixture(code); f.request.value = '100';
+    const r = await executeEthereumCall(f);
+    assert.equal(r.execution.status, status); assert.equal(r.execution.error, error);
+    assert.equal((await current(f)).balance, 1000n); assert.equal((await current(f, TO)).balance, 0n);
+    assert.deepEqual(f.stateManager.snapshotChanges().accounts, [{ address: FROM, nonce: { before: '0x7', after: '0x8' } }]);
+    if (status === 'failed') assert.equal(r.gasAccounting.gasUsed, f.request.gas);
+  }
+});
+
+test('unsupported non-blob BLOBBASEFEE after successful BLOBHASH rolls back storage, value and nonce', async () => {
+  const f = await fixture('0x6000496000554a00'); f.request.value = '100';
+  const r = await executeEthereumCall(f);
+  assert.equal(r.execution.status, 'unsupported'); assert.equal(r.execution.error.code, 'LOCAL_BLOB_UNSUPPORTED');
+  assert.equal(r.stateDisposition, 'rolled_back'); assert.equal(r.execution.returnData, null);
+  assert.deepEqual(f.stateManager.snapshotChanges().accounts, []);
+  assert.equal((await current(f)).balance, 1000n); assert.equal((await current(f)).nonce, 7n);
 });

@@ -78,6 +78,26 @@ test('actual isolated execution measures synthetic writes and binds latest and f
   assert.deepEqual(f.records.at(-1), { method: 'eth_getBlockByNumber', params: [f.header.number, false] });
 });
 
+test('public local API preserves access-list occurrences and explicit blob context through the real child', async () => {
+  const f = await fixture(), blob = '0x01' + 'ab'.repeat(31);
+  const accessList = [{ address: A, storageKeys: ['0x' + '00'.repeat(32), '0x' + '00'.repeat(32)] }, { address: A, storageKeys: [] }];
+  const result = await simulateLocal({ ...input, accessList, blobVersionedHashes: [blob] }, f.rpc);
+  assert.equal(result.status, 'complete');
+  assert.deepEqual(result.apiRequest.accessList, accessList);
+  assert.deepEqual(result.apiRequest.blobVersionedHashes, [blob]);
+  assert.equal(result.measurements[0].values[0].afterRaw, '42');
+  const profile = result.attempt.preview.original.output.profile;
+  assert.deepEqual(profile.accessList, accessList);
+  assert.equal(profile.accessListAddressCount, '2');
+  assert.equal(profile.accessListStorageKeyCount, '2');
+  assert.equal(profile.accessListIntrinsicGas, '8600');
+  assert.deepEqual(profile.blobVersionedHashes, [blob]);
+  assert.equal(profile.executionBlobBaseFee, '0');
+  for (const change of [{ accessList: null }, { blobVersionedHashes: [] }, { maxFeePerBlobGas: '0x0' }]) {
+    assert.throws(() => validateLocalSimulation({ ...input, ...change }), InputError);
+  }
+});
+
 test('hash selector does not add a number-resolution call, and wrong numeric header fails before proof dispatch', async () => {
   const f = await fixture();
   const result = await simulateLocal({ ...input, block: f.header.hash }, f.rpc);

@@ -196,3 +196,35 @@ test('diagnostic output is discarded, bounded, and never copied into a result', 
   const result = await run(await fixture(), { limits: { stdioBytes: 10 } });
   assert.equal(result.error.code, 'LOCAL_ISOLATED_STDIO'); assert.equal(JSON.stringify(result).includes('PRIVATE_DIAGNOSTIC'), false);
 });
+
+test('actual child preserves access-list occurrence gas and declared blob context without new input kinds',async()=>{
+ const hash='0x01'+'ab'.repeat(31), f=await fixture('0x6000546000526000496020524a60405260606000f3');
+ f.request.accessList=[{address:A,storageKeys:[word(0),word(0)]}];f.request.blobVersionedHashes=[hash];
+ const r=await run(f);assert.equal(r.status,'completed');assert.equal(r.output.execution.status,'success');
+ assert.equal(r.output.execution.returnData,'0x'+[word(7),hash,word(0)].map(x=>x.slice(2)).join(''));
+ assert.equal(r.output.profile.accessListIntrinsicGas,'6200');assert.equal(r.output.profile.intrinsicGas,'27200');assert.equal(r.output.profile.executionBlobBaseFee,'0');assert.deepEqual(r.output.profile.blobVersionedHashes,[hash]);
+ assert(f.calls.every(x=>['eth_getProof','eth_getCode'].includes(x.method)));assert.equal(r.broker.pendingAtReturn,0);
+});
+
+test('parent rejects actual-child substitutions of optional context, intrinsic gas and gas accounting',async t=>{
+ const fork=childProcess.fork,hash='0x01'+'ab'.repeat(31);
+ for(const mutate of [r=>{r.output.profile.accessList[0].storageKeys=[];},r=>{r.output.profile.blobVersionedHashes[0]='0x01'+'cd'.repeat(31);},r=>{r.output.profile.intrinsicGas='21000';},r=>{r.output.gasAccounting.gasUsed='1';},r=>{r.output.profile.executionBlobBaseFee='1';},r=>{r.output.trace.gasUsed='0x1';}]){
+  let altered=false;const mock=t.mock.method(childProcess,'fork',(...args)=>{const child=fork(...args),emit=child.emit;child.emit=function(event,...values){if(event==='message'&&typeof values[0]==='string'){const msg=JSON.parse(values[0]);if(msg.type==='result'){mutate(msg.result);altered=true;values[0]=JSON.stringify(msg);}}return emit.call(this,event,...values);};return child;});
+  const f=await fixture('0x60005460005260206000f3');f.request.accessList=[{address:A,storageKeys:[word(0)]}];f.request.blobVersionedHashes=[hash];
+  const r=await run(f);mock.mock.restore();assert.equal(altered,true);assert.equal(r.status,'unavailable');assert.equal(r.error.code,'LOCAL_ISOLATED_PROTOCOL');assert.equal(r.output,null);
+ }
+});
+
+
+test('actual child executes non-blob BLOBHASH from proof-only inputs with no blob metadata or extra RPC kinds', async () => {
+  const f = await fixture('0x60004960005260206000f3'); f.request.value = '0';
+  const r = await run(f);
+  assert.equal(r.status, 'completed'); assert.equal(r.error, null); assert.equal(r.output.execution.status, 'success');
+  assert.equal(r.output.execution.returnData, word(0)); assert.equal(r.output.execution.executionGasUsed, '21');
+  assert.equal(r.output.gasAccounting.gasUsed, '21021'); assert.equal(Object.hasOwn(r.output.profile, 'blobVersionedHashes'), false);
+  assert.equal(Object.hasOwn(r.output.profile, 'executionBlobBaseFee'), false);
+  assert.deepEqual(r.changes.accounts, [{ address: B, nonce: { before: '0x1', after: '0x2' } }]);
+  assert.equal(r.broker.calls, 4); assert.equal(r.broker.pendingAtReturn, 0);
+  assert.deepEqual(f.calls.map(x => x.method), ['eth_getProof', 'eth_getCode', 'eth_getProof', 'eth_getCode']);
+  assert.equal(r.isolation.processSeparated, true); assert.notEqual(r.isolation.childPid, process.pid); assert.equal(r.isolation.processClosed, true);
+});

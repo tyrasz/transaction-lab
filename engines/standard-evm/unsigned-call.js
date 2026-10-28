@@ -11,6 +11,7 @@ import { discoverTokenQueries } from './discovery.js';
 import { collectNativeEffects } from './native-effects.js';
 import { composeSequenceOverrides } from './sequence-state.js';
 import { encodePositionQuery, decodePositionResult, comparePositionResults, PositionQueryError } from './position-queries.js';
+import { rpcEvmContext, EvmContextError } from '../evm-context.js';
 
 const ADDRESS=/^0x[0-9a-f]{40}$/i, WORD=/^0x[0-9a-f]{64}$/i, BYTES=/^0x(?:[0-9a-f]{2})*$/i;
 const BALANCE=/^0x70a082310{24}[0-9a-f]{40}$/i, ALLOWANCE=/^0xdd62ed3e0{24}[0-9a-f]{40}0{24}[0-9a-f]{40}$/i;
@@ -27,13 +28,14 @@ const continuations = new WeakMap();
 export const SEQUENCE_LIMITS=Object.freeze({minCalls:2,maxCalls:4,rpc:257,responseBytes:8*1024*1024,evidenceBytes:128*1024*1024,wallMs:240000});
 class ValidationError extends Error {}
 const need=(condition,message)=>{if(!condition)throw new ValidationError(message);};
-const publicError=e=>e instanceof ValidationError||e instanceof StateValidationError?e.message:e instanceof PositionQueryError?'The declared position query or its returned ABI words are invalid.':'The provider did not complete a valid bounded read-only request.';
+const publicError=e=>e instanceof ValidationError||e instanceof StateValidationError?e.message:e instanceof PositionQueryError?'The declared position query or its returned ABI words are invalid.':e instanceof EvmContextError?'The optional EVM context is malformed or exceeds its fixed bounds.':'The provider did not complete a valid bounded read-only request.';
 const tracer=diff=>({tracer:diff?'prestateTracer':'callTracer',timeout:'15s',tracerConfig:diff?{diffMode:true}:{withLog:true}});
 const failed=frame=>Boolean(frame.error||frame.revertReason);
 const visit=(frame,fn)=>{fn(frame);for(const child of frame.calls)visit(child,fn);};
 // Geth can omit zero basic prefields. Accept that representation only when
 // the caller independently read that exact original value at the pinned hash.
 const observedPre=(record,field,independent)=>record[field]===undefined&&independent===0n?0n:quantity(record[field]);
+const envelopeKeys=request=>['data','from','gas','to','value'].every(key=>Object.hasOwn(request,key))&&Object.keys(request).every(key=>['data','from','gas','to','value','accessList','blobVersionedHashes'].includes(key));
 function header(raw){
   need(record(raw)&&isWord(raw.hash)&&isWord(raw.parentHash)&&isWord(raw.mixHash)&&isAddress(raw.miner),'An explicit complete post-Merge block header is required.');
   need(['number','timestamp','gasLimit','baseFeePerGas'].every(k=>quantity(raw[k])!==null)&&uint(raw.number)>0n&&uint(raw.gasLimit)>0n,'Malformed block header quantities.');
@@ -110,13 +112,23 @@ export function validatePositionTrace(raw,call,position){
   need(isDeepStrictEqual(decoded.query,{to:call.to,data:call.data})&&isDeepStrictEqual({identity:decoded.identity,signature:decoded.signature,returnBytes:decoded.returnBytes},position),'Position query identity differs from the compiled call.');
   return root.output;
 }
-export function validateQueryDiff(raw,{sender,nonce,balance}){
+function validateNonceOnlyDiff(diff,{sender,nonce,balance},label){
   need(isAddress(sender)&&typeof nonce==='bigint'&&nonce>=0n&&nonce<MAX_NONCE&&typeof balance==='bigint'&&balance>=0n&&balance<=MAX,'Explicit independently read sender state is required.');
-  const {diff}=normalizeProviderStateDiff(raw),before=diff.pre[sender],after=diff.post[sender];
-  need(Object.keys(diff.pre).length===1&&Object.keys(diff.post).length===1&&before&&after,'Query must change only the sender nonce.');
-  need([before,after].every(value=>Object.keys(value).every(k=>['nonce','balance'].includes(k))),'Query changed code or storage.');
-  need(observedPre(before,'nonce',nonce)===nonce&&quantity(after.nonce)===nonce+1n,'Query sender nonce transition is inconsistent.');
-  need(observedPre(before,'balance',balance)===balance&&(after.balance===undefined||quantity(after.balance)===balance),'Query debited native funds or its starting balance is not independently established.');
+  const before=diff.pre[sender],after=diff.post[sender];
+  need(Object.keys(diff.pre).length===1&&Object.keys(diff.post).length===1&&before&&after,`${label} must change only the sender nonce.`);
+  need([before,after].every(value=>Object.keys(value).every(k=>['nonce','balance'].includes(k))),`${label} changed code or storage.`);
+  need(observedPre(before,'nonce',nonce)===nonce&&quantity(after.nonce)===nonce+1n,`${label} sender nonce transition is inconsistent.`);
+  need(observedPre(before,'balance',balance)===balance&&(after.balance===undefined||quantity(after.balance)===balance),`${label} debited native funds or its starting balance is not independently established.`);
+}
+export function validateQueryDiff(raw,anchors){
+  validateNonceOnlyDiff(normalizeProviderStateDiff(raw).diff,anchors,'Query');
+}
+/** A reverted trace alone never proves unchanged state. This unpriced profile
+ * requires an explicit complete diff showing only the sender nonce increment;
+ * omitted zero prefields need independent starting-state anchors as above. */
+export function validateRevertedStateDiff(raw,anchors){
+  const normalized=normalizeProviderStateDiff(raw);
+  validateNonceOnlyDiff(normalized.diff,anchors,'Reverted execution');return normalized;
 }
 
 /** Executes the exact supplied unsigned call at block-end state. Query calls
@@ -143,8 +155,11 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
       retained+=bytes;item.result=JSON.parse(text);return structuredClone(item.result);
     }catch(error){item.error=publicError(error);throw error;}
   }
-  let pinned,identity,rawHeader,nonce,balance,postBalance,overrides,originalCall,predecessor,initialOverrides;
+  let pinned,identity,rawHeader,nonce,balance,postBalance,overrides,originalCall,predecessor,initialOverrides,originalContext={};
   const initialOptions=()=>initialOverrides?{stateOverrides:structuredClone(initialOverrides)}:{};
+  // Explicitly bind the synthetic blob fee for both tracers. Some providers
+  // accept a zero fee cap in callTracer but otherwise reject prestateTracer.
+  const blobOptions=()=>originalContext.blobVersionedHashes?{blockOverrides:{baseFeePerGas:'0x0',blobBaseFee:'0x0'}}:{};
   function startingBasic(account,field,pinnedValue,evidenceId){
     const carried=initialOverrides?.[account]?.[field];
     const value=carried===undefined?pinnedValue:quantity(carried,field==='nonce'?MAX_NONCE:MAX);
@@ -155,18 +170,33 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
   const nativeAnchors=new Map(),nativeExpected=new Map(),targetCodes=new Map();
   async function witness(after){
     const rows=result.nativeEffects.measurements;
+    const blobs=originalContext.blobVersionedHashes??[],blobWords=blobs.length?blobs.length+2:0;
     let code='0x43600052426020524560405248606052446080524160a0524660c0527f'+(BigInt(identity.number)-1n).toString(16).padStart(64,'0')+'4060e052';
     for(const [i,row] of rows.entries())code+='73'+row.account.slice(2)+'3161'+(256+32*i).toString(16).padStart(4,'0')+'52';
-    code+='61'+(256+32*rows.length).toString(16).padStart(4,'0')+'6000f3';
-    const input={from:originalCall.from,to:PROBE,data:'0x',value:'0x0',gas:'0x493e0'};
+    if(blobs.length){
+      // Include every declared index and the first out-of-range index. The
+      // final word independently observes the synthetic zero blob base fee.
+      for(let i=0;i<=blobs.length;i++)code+='60'+i.toString(16).padStart(2,'0')+'4961'+(256+32*(rows.length+i)).toString(16).padStart(4,'0')+'52';
+      code+='4a61'+(256+32*(rows.length+blobs.length+1)).toString(16).padStart(4,'0')+'52';
+    }
+    code+='61'+(256+32*(rows.length+blobWords)).toString(16).padStart(4,'0')+'6000f3';
+    // The witness retains the original access list, so each occurrence also
+    // consumes transaction intrinsic gas. Preserve the legacy message budget.
+    const accessGas=(originalContext.accessList??[]).reduce((sum,row)=>sum+2400n+1900n*BigInt(row.storageKeys.length),0n);
+    const input={from:originalCall.from,to:PROBE,data:'0x',value:'0x0',gas:'0x'+(300000n+accessGas).toString(16),...originalContext};
     const stateOverrides={...(after?overrides:initialOverrides??{}),[PROBE]:{code}},traceEvidenceId=evidence.length+1;
-    const output=bindTrace(await call('debug_traceCall',[input,pinned,{...tracer(false),stateOverrides}]),input);
-    need(!failed(output)&&output.calls.length===0&&output.logs.length===0&&output.output.length===514+64*rows.length,'Header and native-balance witness is incomplete.');
+    const output=bindTrace(await call('debug_traceCall',[input,pinned,{...tracer(false),...blobOptions(),stateOverrides}]),input);
+    need(!failed(output)&&output.calls.length===0&&output.logs.length===0&&output.output.length===514+64*(rows.length+blobWords),'Header and native-balance witness is incomplete.');
     const expected=[identity.number,identity.timestamp,identity.gasLimit,0,identity.mixHash,identity.miner,chainId,identity.parentHash].map(BigInt);
     need(expected.every((n,i)=>BigInt('0x'+output.output.slice(2+i*64,66+i*64))===n),'Execution header does not match the pinned synthetic BASEFEE-zero profile.');
+    if(blobs.length){
+      const expectedBlobs=[...blobs,0,0].map(BigInt),offset=514+64*rows.length;
+      need(expectedBlobs.every((n,i)=>BigInt('0x'+output.output.slice(offset+i*64,offset+(i+1)*64))===n),'Execution blob hashes or synthetic BLOBBASEFEE-zero context do not match the declared call.');
+      result.blobContextValidation.witnesses.push({state:after?'after':'before',traceEvidenceId,hashWordStart:8+rows.length,hashCount:blobs.length,outOfRangeIndex:blobs.length,blobBaseFeeRaw:'0'});
+    }
     if(rows.length){
       const mutationEvidenceId=evidence.length+1;
-      validateQueryDiff(await call('debug_traceCall',[input,pinned,{...tracer(true),stateOverrides}]),{sender:originalCall.from,nonce:nonce+(after?1n:0n),balance:after?postBalance:balance});
+      validateQueryDiff(await call('debug_traceCall',[input,pinned,{...tracer(true),...blobOptions(),stateOverrides}]),{sender:originalCall.from,nonce:nonce+(after?1n:0n),balance:after?postBalance:balance});
       for(const [i,row] of rows.entries()){
         const observed=BigInt('0x'+output.output.slice(514+64*i,578+64*i));
         need(observed===(after?nativeExpected.get(row.account):nativeAnchors.get(row.account).value),'Native-balance witness disagrees with pinned balances or complete original state changes.');
@@ -178,7 +208,8 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
 
   try{
     need(quantity(chainId,BigInt(Number.MAX_SAFE_INTEGER))!==null&&BigInt(chainId)>0n&&isWord(blockHash),'A positive chain ID and explicit block hash are required.');
-    need(record(request)&&Object.keys(request).sort().join()==='data,from,gas,to,value'&&isAddress(request.from)&&isAddress(request.to)&&typeof request.data==='string'&&request.data.length<=65538&&isBytes(request.data)&&quantity(request.value)!==null&&quantity(request.gas)!==null&&BigInt(request.gas)>21000n&&BigInt(request.gas)<=5000000n,'Unsupported unsigned call envelope.');
+    originalContext=rpcEvmContext(request);
+    need(record(request)&&envelopeKeys(request)&&isAddress(request.from)&&isAddress(request.to)&&typeof request.data==='string'&&request.data.length<=65538&&isBytes(request.data)&&quantity(request.value)!==null&&quantity(request.gas)!==null&&BigInt(request.gas)>21000n&&BigInt(request.gas)<=5000000n,'Unsupported unsigned call envelope.');
     need(automatic||(Array.isArray(queries)&&queries.length>0&&queries.length<=LIMITS.queries),'Between one and eight explicit queries are required.');
     let compiled=automatic?[]:queries.map(query=>compileMeasurementQuery(query,chainId)),normalized=compiled.map(item=>item.descriptor);
     need(new Set(compiled.map(item=>item.query.to+item.query.data)).size===compiled.length,'Duplicate queries must be removed before execution.');
@@ -187,7 +218,7 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
       result.schemaVersion='0.4';result.scope.queries='observed_ERC20_queries_and_declared_position_ABI_fields';
       result.scope.positionContracts='caller_declared_not_authenticated';
     }
-    originalCall={from:lower(request.from),to:lower(request.to),data:lower(request.data),gas:hex(request.gas),value:hex(request.value)};
+    originalCall={from:lower(request.from),to:lower(request.to),data:lower(request.data),gas:hex(request.gas),value:hex(request.value),...originalContext};
     need(originalCall.from!==PROBE&&originalCall.to!==PROBE&&compiled.every(item=>item.query.to!==PROBE),'Input overlaps the reserved header witness.');
     pinned={blockHash:lower(blockHash),requireCanonical:true};
     if(previous!==undefined){
@@ -202,6 +233,10 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
     if(automatic)result.request.querySelection='bounded_observed_trace_candidates';
     need(quantity(await call('eth_chainId',[]))===BigInt(chainId),'Provider chain identity differs from the request.');
     rawHeader=await call('eth_getBlockByHash',[pinned.blockHash,false]);identity=header(rawHeader);need(identity.hash===pinned.blockHash,'Provider returned the wrong source block.');result.block=identity;
+    if(originalContext.blobVersionedHashes){
+      need(BigInt(chainId)===1n&&BigInt(identity.timestamp)>=1710338135n&&quantity(rawHeader.excessBlobGas,MAX_NONCE)!==null&&quantity(rawHeader.blobGasUsed,MAX_NONCE)!==null,'Blob context requires an explicit Cancun-or-later Ethereum header.');
+      result.blobContextValidation={status:'unavailable',basis:'same_context_BLOBHASH_and_BLOBBASEFEE_witnesses',sourceExcessBlobGas:quantity(rawHeader.excessBlobGas).toString(),executionBlobBaseFee:'0',hashCount:originalContext.blobVersionedHashes.length,witnesses:[],sidecarsVerified:false,feeSettlement:false};
+    }
     if(predecessor)need(isDeepStrictEqual(rawHeader,predecessor.rawHeader),'Continuation header or block contents differ from the predecessor.');
     nonce=quantity(await call('eth_getTransactionCount',[originalCall.from,pinned]),MAX_NONCE-2n);
     need(nonce!==null,'Sender basic state is incomplete.');nonce=startingBasic(originalCall.from,'nonce',nonce,evidence.length);
@@ -214,12 +249,29 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
       const code=await call('eth_getCode',[target,pinned]);need(typeof code==='string'&&BYTES.test(code)&&(code!=='0x'||(target===originalCall.to&&!compiled.some(item=>item.query.to===target))),'A declared target has no valid runtime code.');targetCodes.set(target,code);
     }
     need(await call('eth_getCode',[PROBE,pinned])==='0x','Reserved header witness address is not code-free.');
-    const rawTrace=await call('debug_traceCall',[originalCall,pinned,{...tracer(false),...initialOptions()}]),trace=bindTrace(rawTrace,originalCall);
+    const originalTraceEvidenceId=evidence.length+1;
+    const rawTrace=await call('debug_traceCall',[originalCall,pinned,{...tracer(false),...initialOptions(),...blobOptions()}]),trace=bindTrace(rawTrace,originalCall);
     result.execution={status:failed(trace)?'reverted_or_failed':'success',gasUsed:trace.gasUsed,returnData:trace.output,error:trace.error,revertReason:trace.revertReason,trace:rawTrace};
     if(failed(trace)){
       result.nativeEffects={...result.nativeEffects,status:'not_applicable',reason:'Original execution did not succeed.'};
       if(automatic)result.discovery={status:'not_applicable',reason:'Original execution did not succeed.',queries:[],candidates:[]};
       for(const entry of measurements)Object.assign(entry,{status:'not_applicable',reason:'Original execution did not succeed.'});
+      const diffEvidenceId=evidence.length+1;
+      const rawDiff=await call('debug_traceCall',[originalCall,pinned,{...tracer(true),...initialOptions(),...blobOptions()}]);
+      const normalizedDiff=validateRevertedStateDiff(rawDiff,{sender:originalCall.from,nonce,balance});
+      result.stateDiff=normalizedDiff.diff;
+      result.providerCodeHashChecks={basis:'Keccak256_of_explicit_provider_runtime_code_only',independentStateAttestation:false,claims:normalizedDiff.codeHashChecks};
+      if(predecessor){
+        const composed=composeSequenceOverrides(initialOverrides,result.stateDiff);overrides=composed.overrides;result.startingState.overlapChecks=composed.overlapChecks;
+      }else overrides=buildStateOverrides(result.stateDiff);
+      postBalance=balance;
+      const beforeWitnessEvidenceId=evidence.length+1;await witness(false);
+      const afterWitnessEvidenceId=evidence.length+1;await witness(true);
+      result.revertStateValidation={status:'unavailable',basis:'explicit_original_nonce_only_diff_and_same_context_header_witnesses',
+        originalTraceEvidenceId,diffEvidenceId,beforeWitnessEvidenceId,afterWitnessEvidenceId,
+        sender:originalCall.from,beforeNonceRaw:nonce.toString(),afterNonceRaw:(nonce+1n).toString(),balanceRaw:balance.toString(),
+        changesBeyondSenderNonce:'none_observed',feeSettlement:false};
+      result.executionIdentity={chainId:BigInt(chainId).toString(),stateBlockHash:pinned.blockHash,blockNumber:identity.number,timestamp:identity.timestamp,originalEnvelopeSha256:sha(originalCall),completeOverridesSha256:sha(overrides),actualBlockBaseFee:identity.baseFeePerGas,executionBaseFee:'0',omittedZeroPrefields:predecessor?'accepted_only_with_validated_starting_basic_state':'accepted_only_with_independent_pinned_basic_state_reads'};
     }else{
       visit(trace,frame=>need(!['CREATE','CREATE2','SELFDESTRUCT'].includes(frame.type)&&frame.from!==PROBE&&frame.to!==PROBE,'Original execution contains unsupported lifecycle or witness-address behavior.'));
       if(automatic){
@@ -236,7 +288,7 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
           const code=targetCodes.has(target)?targetCodes.get(target):await call('eth_getCode',[target,pinned]);need(typeof code==='string'&&BYTES.test(code)&&code!=='0x','A selected target has no valid runtime code.');
         }
       }
-      const normalizedDiff=normalizeProviderStateDiff(await call('debug_traceCall',[originalCall,pinned,{...tracer(true),...initialOptions()}])),diff=normalizedDiff.diff;result.stateDiff=diff;
+      const normalizedDiff=normalizeProviderStateDiff(await call('debug_traceCall',[originalCall,pinned,{...tracer(true),...initialOptions(),...blobOptions()}])),diff=normalizedDiff.diff;result.stateDiff=diff;
       result.providerCodeHashChecks={basis:'Keccak256_of_explicit_provider_runtime_code_only',independentStateAttestation:false,claims:normalizedDiff.codeHashChecks};
       need(!Object.hasOwn(diff.pre,PROBE)&&!Object.hasOwn(diff.post,PROBE),'Original state changes overlap the header witness.');
       const collection=collectNativeEffects(trace,diff);
@@ -331,6 +383,8 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
     const confirmedRaw=await call('eth_getBlockByNumber',[hex(identity.number),false]),confirmed=header(confirmedRaw);
     need(JSON.stringify(confirmed)===JSON.stringify(identity)&&isDeepStrictEqual(confirmedRaw,rawHeader),'Canonical header or block contents changed during simulation.');
     result.canonicalStatus='verified';
+    if(result.revertStateValidation)result.revertStateValidation.status='verified';
+    if(result.blobContextValidation)result.blobContextValidation.status='verified';
   }catch(error){latched=publicError(error);}
   if(latched){result.measurementFailure=latched;result.canonicalStatus='unverified';result.nativeEffects.status='unavailable';result.nativeEffects.reason=latched;if(result.nativeEffects.counts)result.nativeEffects.counts.measured=0;for(const entry of [...measurements,...result.nativeEffects.measurements]){clearMeasurementAmounts(entry);Object.assign(entry,{status:'unavailable',reason:latched});}}
   result.accounting={rpcCalls:evidence.length,retainedResultBytes:retained,limits:LIMITS};
@@ -343,6 +397,8 @@ export async function simulateUnsignedCall({rpc,chainId,blockHash,request,querie
 function invalidateSequenceAmounts(result,reason){
   continuations.delete(result);
   result.canonicalStatus='unverified';result.measurementFailure??=reason;result.sequenceValidationFailure=reason;
+  if(result.revertStateValidation)result.revertStateValidation.status='unavailable';
+  if(result.blobContextValidation)result.blobContextValidation.status='unavailable';
   result.nativeEffects.status='unavailable';result.nativeEffects.reason=reason;
   if(result.nativeEffects.counts)result.nativeEffects.counts.measured=0;
   for(const entry of [...result.measurements,...result.nativeEffects.measurements]){
@@ -363,7 +419,8 @@ export async function simulateUnsignedSequence({rpc,chainId,blockHash,calls,now=
   const inputs=calls.map(input=>{
     need(record(input)&&Object.keys(input).every(key=>['request','queries'].includes(key)),'Unsupported sequence input fields.');
     const request=input.request;
-    need(record(request)&&Object.keys(request).sort().join()==='data,from,gas,to,value'&&isAddress(request.from)&&isAddress(request.to)&&typeof request.data==='string'&&request.data.length<=65538&&isBytes(request.data)&&quantity(request.value)!==null&&quantity(request.gas)!==null&&BigInt(request.gas)>21000n&&BigInt(request.gas)<=5000000n,'Unsupported unsigned sequence envelope.');
+    rpcEvmContext(request);
+    need(record(request)&&envelopeKeys(request)&&isAddress(request.from)&&isAddress(request.to)&&typeof request.data==='string'&&request.data.length<=65538&&isBytes(request.data)&&quantity(request.value)!==null&&quantity(request.gas)!==null&&BigInt(request.gas)>21000n&&BigInt(request.gas)<=5000000n,'Unsupported unsigned sequence envelope.');
     sender??=lower(request.from);need(lower(request.from)===sender,'Every sequence call must use the same sender.');
     need(lower(request.from)!==PROBE&&lower(request.to)!==PROBE,'Input overlaps the reserved header witness.');
     if(input.queries!==undefined){

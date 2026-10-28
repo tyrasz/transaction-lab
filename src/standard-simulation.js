@@ -5,6 +5,7 @@ import { simulateUnsignedCall, simulateUnsignedSequence, compileMeasurementQuery
 import { comparePositionResults } from '../engines/standard-evm/position-queries.js';
 import { InputError } from './validate.js';
 import { RpcError, assertNoProviderErrorResult } from './rpc.js';
+import { normalizeEvmContext, EVM_CONTEXT_LIMITS } from '../engines/evm-context.js';
 
 const ADDRESS = /^0x[0-9a-f]{40}$/i;
 const HASH = /^0x[0-9a-f]{64}$/i;
@@ -215,6 +216,7 @@ export const STANDARD_CAPABILITIES = freeze({
   positionSelection: 'explicit_only',
   limits: { queries: 8, nativeAccounts: 8, calldataBytes: 32768, gas: 5000000, engineRpcCalls: 64, blockSelectionRpcCalls: 1, totalRpcCalls: 65 },
   profile: 'unsigned_unpriced_block_end',
+  transactionContext: { optionalFields: ['accessList', 'blobVersionedHashes'], limits: EVM_CONTEXT_LIMITS, blobFeeScope: 'synthetic_zero_no_blob_fee_settlement_or_sidecar_validation' },
   limitations: [
     'Explicit queried accounts only; other assets and economic effects may be omitted.',
     'Synthetic BASEFEE-zero execution with no outer transaction signature or fee-settlement validation. Contract permit checks still execute.',
@@ -288,7 +290,7 @@ function address(value, name) {
 /** Only declarative call inputs are accepted. Provider URLs, state overrides,
  * metadata, gas/fees and transaction-signing fields cannot enter this API. */
 export function validateStandardSimulation(input) {
-  fields(input, ['chainId', 'from', 'to', 'data', 'value', 'block', 'queries'], 'request');
+  fields(input, ['chainId', 'from', 'to', 'data', 'value', 'block', 'queries', 'accessList', 'blobVersionedHashes'], 'request');
   if (input.chainId !== 1 && input.chainId !== '1') throw new InputError('Only Ethereum chain 1 is supported by this endpoint.', 'UNSUPPORTED_CHAIN');
   const from = address(input.from, 'from'), to = address(input.to, 'to');
   if (typeof input.data !== 'string' || !DATA.test(input.data) || input.data.length > 65538) throw new InputError('data must be even-length hexadecimal calldata of at most 32 KiB.');
@@ -296,7 +298,9 @@ export function validateStandardSimulation(input) {
   if (typeof value !== 'string' || !DECIMAL.test(value) || BigInt(value) > UINT256_MAX) throw new InputError('value must be a canonical decimal uint256 wei string.');
   const block = input.block === undefined ? 'latest' : input.block;
   if (typeof block !== 'string' || !(block === 'latest' || NUMBER.test(block) || HASH.test(block))) throw new InputError('block must be latest, a canonical hexadecimal block number, or a 32-byte block hash.');
-  if (!Object.hasOwn(input, 'queries')) return { chainId: 1, from, to, data: input.data.toLowerCase(), value, block: block.toLowerCase() };
+  let context;
+  try { context = normalizeEvmContext(input); } catch { throw new InputError('The access list or versioned blob hashes are malformed or exceed the declared bounds.'); }
+  if (!Object.hasOwn(input, 'queries')) return { chainId: 1, from, to, data: input.data.toLowerCase(), value, block: block.toLowerCase(), ...context };
   if (!Array.isArray(input.queries) || input.queries.length < 1 || input.queries.length > 8) throw new InputError('Omit queries for automatic token selection, or supply between one and eight explicit token or position queries.');
   const seen = new Set(), queries = [];
   for (const query of input.queries) {
@@ -309,7 +313,7 @@ export function validateStandardSimulation(input) {
     if (compiled.query.to === RESERVED_WITNESS) throw new InputError('Query target overlaps the reserved execution witness.');
     seen.add(key); queries.push(compiled.descriptor);
   }
-  return { chainId: 1, from, to, data: input.data.toLowerCase(), value, block: block.toLowerCase(), queries };
+  return { chainId: 1, from, to, data: input.data.toLowerCase(), value, block: block.toLowerCase(), queries, ...context };
 }
 
 export function validateStandardSequence(input) {
@@ -317,7 +321,7 @@ export function validateStandardSequence(input) {
   if (!Array.isArray(input.calls) || input.calls.length < 2 || input.calls.length > 4) throw new InputError('A sequence requires between two and four calls.');
   let shared;
   const calls = Array.from(input.calls, call => {
-    fields(call, ['to', 'data', 'value', 'queries'], 'sequence call');
+    fields(call, ['to', 'data', 'value', 'queries', 'accessList', 'blobVersionedHashes'], 'sequence call');
     const normalized = validateStandardSimulation({ ...call, chainId: input.chainId, from: input.from, ...(Object.hasOwn(input, 'block') ? { block: input.block } : {}) });
     if (normalized.from === RESERVED_WITNESS || normalized.to === RESERVED_WITNESS || normalized.queries?.some(query => compileMeasurementQuery(query, normalized.chainId).query.to === RESERVED_WITNESS)) throw new InputError('Sequence inputs overlap the reserved execution witness.');
     const { chainId, from, block, ...step } = normalized;
@@ -446,7 +450,7 @@ function assertSelectedBlock(result, blockHash, blockSelection) {
   }
 }
 function engineRequest(input) {
-  return { from: input.from, to: input.to, data: input.data, value: '0x' + BigInt(input.value).toString(16), gas: '0x4c4b40' };
+  return { from: input.from, to: input.to, data: input.data, value: '0x' + BigInt(input.value).toString(16), gas: '0x4c4b40', ...normalizeEvmContext(input) };
 }
 function duration(start, rpcStart, rpc) {
   const timing = { totalMs: performance.now() - start };

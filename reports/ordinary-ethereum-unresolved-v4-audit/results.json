@@ -1,0 +1,160 @@
+{
+  "status": "verified_with_retained_limitations",
+  "packetManifestSha256": "dce9038a13613eea736defdf135b6bfc2cf5abed9fddec0a2714ec33df6fd024",
+  "planSha256": "26d661c345a7c76df6db7d6b95eb110d95bbbad80d58d8139e25ae701c6f2a96",
+  "sourceManifestSha256": "39789b5a98d4ba89356f4d1c35566863d30d51fa665b1f430e3c19f572b93696",
+  "evidenceFiles": 85,
+  "sourceEntries": 1785,
+  "wireRecords": 52,
+  "wireBytes": 196954,
+  "independentlyJoinedProductRecords": 48,
+  "independentlyJoinedLocalRecords": 4,
+  "unjoinedRecords": 0,
+  "proofAudit": {
+    "freshVerifiedProofs": 0,
+    "freshFailedProofReads": 4,
+    "savedAccountProofsVerified": 4,
+    "savedCodeValuesVerified": 4,
+    "proofs": [
+      {
+        "caseId": "005",
+        "address": "0x8683f4ea30e2452c4ac7b33f5aaf5ef18c202013",
+        "exists": true,
+        "stateRoot": "0x2d5a1ffa1d55e5f5d60725424fddb5b67a06f7dd2ca6862a7473e705727ec606",
+        "codeVerified": true,
+        "storageKeys": 0
+      },
+      {
+        "caseId": "005",
+        "address": "0xf7579fe55ed59cc0ddbd9a11e2e8e0e82a80fcfe",
+        "exists": false,
+        "stateRoot": "0x2d5a1ffa1d55e5f5d60725424fddb5b67a06f7dd2ca6862a7473e705727ec606",
+        "codeVerified": true,
+        "storageKeys": 0
+      },
+      {
+        "caseId": "016",
+        "address": "0xdadb0d80178819f2319190d340ce9a924f783711",
+        "exists": true,
+        "stateRoot": "0x25ebfa84c05cea98397a4b3effcd1bc215fa7620e6b327123343dc7882e70673",
+        "codeVerified": true,
+        "storageKeys": 0
+      },
+      {
+        "caseId": "016",
+        "address": "0xfeeeeee44046c3f61a8cc081e0918ef0de0a7ffc",
+        "exists": true,
+        "stateRoot": "0x25ebfa84c05cea98397a4b3effcd1bc215fa7620e6b327123343dc7882e70673",
+        "codeVerified": true,
+        "storageKeys": 0
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "002",
+      "liveLocal": "unavailable_historical_state",
+      "providerExecution": "reverted_or_failed",
+      "canonicalStatus": "verified",
+      "outcome": {
+        "transactionHash": "0x2e3906379c97fc20f4453813a9ed0b602ed5c126286bff0bd371adfecc5a6912",
+        "execution": "reverted",
+        "comparison": "oracle_unavailable"
+      },
+      "supplement": null
+    },
+    {
+      "id": "005",
+      "liveLocal": "unavailable_historical_state",
+      "providerExecution": "success",
+      "canonicalStatus": "verified",
+      "outcome": {
+        "transactionHash": "0xbfae47d1b359a1e9e080779d9fdf4dfbf30653acbdaa1cf7000b0fc8d8db4d06",
+        "execution": "success",
+        "comparison": "oracle_unavailable"
+      },
+      "supplement": {
+        "comparison": "match",
+        "execution": "success",
+        "channels": [
+          "executionStatus",
+          "returnData",
+          "committedLogs",
+          "fullObservedStateChanges",
+          "gasAccounting"
+        ],
+        "gas": "21000",
+        "proofSource": "retained_v2_same_parent_state_not_fresh_provider_reads"
+      }
+    },
+    {
+      "id": "007",
+      "liveLocal": "unavailable_historical_state",
+      "providerExecution": "success",
+      "canonicalStatus": "unverified",
+      "outcome": {
+        "transactionHash": "0x76cda4947526f97179b0bb325183c5e70c8ae7ec066c61294623e521722d2f04",
+        "execution": "provider_unavailable",
+        "comparison": "not_comparable"
+      },
+      "supplement": null
+    },
+    {
+      "id": "016",
+      "liveLocal": "unavailable_historical_state",
+      "providerExecution": "reverted_or_failed",
+      "canonicalStatus": "verified",
+      "outcome": {
+        "transactionHash": "0x5401a3f3aa071b77a3e4cee72712c5e616ff42b1ef1eafdb4cf243fcc1df8368",
+        "execution": "reverted",
+        "comparison": "oracle_unavailable"
+      },
+      "supplement": {
+        "comparison": "match",
+        "execution": "reverted",
+        "channels": [
+          "executionStatus",
+          "returnData",
+          "committedLogs",
+          "fullObservedStateChanges",
+          "gasAccounting"
+        ],
+        "gas": "21960",
+        "proofSource": "retained_v2_same_parent_state_not_fresh_provider_reads"
+      }
+    }
+  ],
+  "priorTiming": {
+    "manifestSha256": "107f69a3659b9ba1f1b1bb9beac928ab10a1ecf3051e927d6e86e4e5b9fb16a9",
+    "declaredExecutionMs": 1200000,
+    "declaredDrainMs": 25000,
+    "observedExecutionMs": 1336998.307167,
+    "overrunMs": 136998.3071669999,
+    "maxObservedRequestMs": 392128.5236670001,
+    "lateRequests": [
+      {
+        "globalId": 26,
+        "caseId": "005",
+        "error": "deadline",
+        "durationMs": 392128.5236670001
+      }
+    ],
+    "unattemptedCases": [
+      "007",
+      "016"
+    ],
+    "cause": "Raw timestamps prove delayed scheduling/deadline overrun; host suspension is operator context, not independently proven by RPC records."
+  },
+  "limitations": {
+    "newVmExecution": false,
+    "outcomesRecomputedWithFrozenAdjudicator": true,
+    "proofsReverifiedAgainstRehashedHeader": true,
+    "independentExecutionEngineRun": false,
+    "independentProvider": false,
+    "headerConsensusOrFinalityVerified": false,
+    "originalTransactionPosition": false,
+    "signedFeesOrBlobSidecarsValidated": false,
+    "prospectiveHoldout": false,
+    "populationAccuracyClaim": false
+  }
+}

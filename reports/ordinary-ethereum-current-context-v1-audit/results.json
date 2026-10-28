@@ -1,0 +1,82 @@
+{
+  "status": "verified_and_reexecuted",
+  "evidenceManifestSha256": "69774b826eced318cf6a15a8fd9b854ae3f763334cae771f2ab24c98ec1a69c7",
+  "sourceManifestSha256": "5869cbd6bf7c0a9635bc0ef755ee694ee347771aed5792ffd1ac9c5fe6ea2aff",
+  "planSha256": "f64c96306fe145021c192771244ab66f20c05a879a074edf30d962cc9ad65b2e",
+  "evidenceFiles": 59,
+  "sourceEntries": 1785,
+  "wireRecords": 36,
+  "responseEntityBytes": 214788,
+  "unjoinedRecords": 0,
+  "verifiedAccountProofs": 4,
+  "verifiedCodeValues": 4,
+  "localWorkerExecutions": 2,
+  "cases": [
+    {
+      "id": "002",
+      "blockHash": "0x49bede17a7e691b1408a7e570131f62f8be2006b4c440a5884ba64288b495eca",
+      "blockNumber": "26287639",
+      "originalParentHash": "0xd372140d4251f5715741aa0fd4eb6256dad8f5e9e04ca9e6175ff08fd3e8e599",
+      "execution": "reverted",
+      "gas": "317368",
+      "messageGas": "516",
+      "intrinsicGas": "316852",
+      "accessListEntries": "25",
+      "accessListStorageKeys": "116",
+      "blobHashes": 0,
+      "exactProofCodeReads": 4,
+      "exactExecutionAndStateReplay": true,
+      "comparison": "match",
+      "matchedChannels": [
+        "executionStatus",
+        "returnData",
+        "committedLogs",
+        "fullObservedStateChanges",
+        "gasAccounting"
+      ]
+    },
+    {
+      "id": "007",
+      "blockHash": "0x97a5de83af87394e2c93d54487e293cccf887aed7ed825d611ee836f95717837",
+      "blockNumber": "26287640",
+      "originalParentHash": "0x8b50e706eaab7c421953671324e453c13a1247a973af40f56f6eda63a8435763",
+      "execution": "success",
+      "gas": "21000",
+      "messageGas": "0",
+      "intrinsicGas": "21000",
+      "accessListEntries": "0",
+      "accessListStorageKeys": "0",
+      "blobHashes": 1,
+      "exactProofCodeReads": 4,
+      "exactExecutionAndStateReplay": true,
+      "comparison": "match",
+      "matchedChannels": [
+        "executionStatus",
+        "returnData",
+        "committedLogs",
+        "fullObservedStateChanges",
+        "gasAccounting"
+      ]
+    }
+  ],
+  "comparisonNormalizations": [
+    "inputEvidence[].durationMs",
+    "broker.records[].durationMs",
+    "isolation.durationMs",
+    "isolation.childPid (fresh process identity checked separately)"
+  ],
+  "limitations": {
+    "newStatesNotOriginalParentReplay": true,
+    "selectedDevelopmentCasesNotProspectiveSample": true,
+    "sameProviderForProofsAndTraces": true,
+    "independentLocalExecutionAlgorithm": true,
+    "consensusOrFinalityVerified": false,
+    "completeEconomicInventory": false,
+    "signedFeesOrBlobSidecarsVerified": false,
+    "populationAccuracyClaim": false
+  },
+  "auditDependency": {
+    "path": "reports/ordinary-ethereum-unresolved-v4-audit/verify.mjs",
+    "sha256": "74afb2b53eade67fe55af894e4928131b92bf1550be6cc9fd9dc21383f2b0ea9"
+  }
+}

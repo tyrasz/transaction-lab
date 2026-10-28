@@ -76,14 +76,27 @@ test('declared optional provider normalizations preserve originals and reject co
   b.headers[2].transactions[0].gasPrice = '0x4'; expectBad(input, /effective gasPrice/);
 });
 
-test('creation, access-list, blob, authorization, high-gas, large-input and unknown types stay in census and sample', () => {
+test('bounded access-list/blob contexts are preserved while unsupported profiles stay in census and sample', () => {
   const one = tx(2, { type: '0x1', gasPrice: '0x3' }); delete one.maxFeePerGas; delete one.maxPriorityFeePerGas;
-  const cases = [tx(1, { to: null }), one, tx(3, { type: '0x3', maxFeePerBlobGas: '0x4', blobVersionedHashes: [word(100)] }), tx(4, { type: '0x4', authorizationList: [{ chainId: '0x0', address: addr(4), nonce: '0x0', yParity: '0x1', r: '0x1', s: '0x2' }] }), tx(5, { gas: q(5_000_001) }), tx(6, { input: '0x' + '01'.repeat(32 * 1024 + 1) }), tx(7, { type: '0x7e', futureContext: { id: 'unchanged' } }), tx(8, { accessList: [{ address: addr(9), storageKeys: [word(1)] }] })];
+  const hashes = ['0x01' + '00'.repeat(31)];
+  const cases = [tx(1, { to: null }), one, tx(3, { type: '0x3', maxFeePerBlobGas: '0x4', blobVersionedHashes: hashes }), tx(4, { type: '0x4', authorizationList: [{ chainId: '0x0', address: addr(4), nonce: '0x0', yParity: '0x1', r: '0x1', s: '0x2' }] }), tx(5, { gas: q(5_000_001) }), tx(6, { input: '0x' + '01'.repeat(32 * 1024 + 1) }), tx(7, { type: '0x7e', futureContext: { id: 'unchanged' } }), tx(8, { accessList: [{ address: addr(9), storageKeys: [word(1)] }] })];
   const out = validateCohortCensus(bodyFixture([cases, []]));
-  assert.equal(out.census.length, 8); assert.equal(out.selected.length, 8); assert.equal(out.selected.filter(r => r.projection.status === 'unsupported').length, 8);
-  assert.deepEqual(out.selected.map(r => r.projection.reasons[0]), ['contract_creation', 'access_list_context_unsupported', 'blob_context_unsupported', 'authorization_context_unsupported', 'original_gas_limit_exceeds_profile', 'calldata_exceeds_profile', 'unknown_transaction_type', 'access_list_context_unsupported']);
-  assert.ok(out.selected.every(r => !Object.hasOwn(r.projection, 'request')));
+  assert.equal(out.census.length, 8); assert.equal(out.selected.length, 8); assert.equal(out.selected.filter(r => r.projection.status === 'unsupported').length, 5);
+  assert.deepEqual(out.selected.map(r => r.projection.reasons[0]), ['contract_creation', undefined, undefined, 'authorization_context_unsupported', 'original_gas_limit_exceeds_profile', 'calldata_exceeds_profile', 'unknown_transaction_type', undefined]);
+  assert.deepEqual(out.selected[1].projection.request.accessList, []);
+  assert.deepEqual(out.selected[2].projection.request.blobVersionedHashes, hashes);
+  assert.deepEqual(out.selected[7].projection.request.accessList, cases[7].accessList);
+  assert.ok(out.selected.filter(r => r.projection.status === 'unsupported').every(r => !Object.hasOwn(r.projection, 'request')));
   assert.equal(out.envelopes[6].providerEnvelopes[0].envelope.futureContext.id, 'unchanged');
+});
+
+test('context bounds retain unsupported rows and duplicate access entries remain exact', () => {
+  const entry = { address: addr(9), storageKeys: [word(1), word(1)] };
+  const rows = [tx(1, { accessList: [entry, entry] }), tx(2, { accessList: Array(129).fill(entry) }), tx(3, { accessList: [{address: addr(9), storageKeys: Array(1025).fill(word(1))}] }), tx(4, {type:'0x3',maxFeePerBlobGas:'0x1',blobVersionedHashes:['0x02'+'00'.repeat(31)]})];
+  const out = validateCohortCensus(bodyFixture([rows, []]));
+  assert.deepEqual(out.selected[0].projection.request.accessList, [entry, entry]);
+  assert.deepEqual(out.selected.slice(1).map(r => r.projection.reasons), Array(3).fill(['transaction_context_exceeds_profile']));
+  assert.equal(out.selected.length, 4); assert.equal(out.census.length, 4);
 });
 
 test('optional mined blockTimestamp is header-bound, retained raw and normalized across provider omission', () => {

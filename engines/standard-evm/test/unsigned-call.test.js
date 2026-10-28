@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { simulateUnsignedCall, normalizeQuery, validateQueryTrace, validateQueryDiff } from '../unsigned-call.js';
+import { simulateUnsignedCall, normalizeQuery, validateQueryTrace, validateQueryDiff, validateRevertedStateDiff } from '../unsigned-call.js';
 
 const address = n => '0x' + BigInt(n).toString(16).padStart(40, '0');
 const word = n => '0x' + BigInt(n).toString(16).padStart(64, '0');
@@ -52,7 +52,7 @@ function harness({ mutate, chainId = 1, originalFailed = false } = {}) {
         result = frame({ ...call, input: call.data, gasUsed: '0x6000', output: '0x' + [9000001,1700000000,30000000,0,MIX,MINER,chainId,PARENT].map(n => word(n).slice(2)).join('') }); delete result.data;
       } else if (call.to === TARGET && call.data === CALL.data) {
         stage = diff ? 'original_diff' : 'original_trace';
-        result = diff ? structuredClone(ORIGINAL_DIFF) : frame({ ...(originalFailed ? { error: 'execution reverted', output: '0xdeadbeef' } : {}) });
+        result = diff ? originalFailed ? queryDiff(false) : structuredClone(ORIGINAL_DIFF) : frame({ ...(originalFailed ? { error: 'execution reverted', output: '0xdeadbeef' } : {}) });
       } else {
         assert.notEqual(q, -1, 'No undeclared query or fallback'); stage = `query_${q}_${after ? 'after' : 'before'}_${diff ? 'diff' : 'trace'}`;
         result = diff ? queryDiff(after) : queryTrace(QUERIES[q], VALUES[q][after ? 1 : 0]);
@@ -196,9 +196,64 @@ test('full synthetic before/after flow uses complete original overrides, clears 
 
 test('a synthetic original EVM failure is retained distinctly from unavailable transport and never gets poststate measurements', async () => {
   const reverted = harness({originalFailed:true}), result = await run(reverted); assert.equal(result.execution.status,'reverted_or_failed'); assert.equal(result.execution.returnData,'0xdeadbeef'); assert.equal(result.canonicalStatus,'verified'); assert.ok(result.measurements.every(m=>m.status==='not_applicable')); noAmounts(result);
-  assert.equal(reverted.records.some(r=>r.method==='debug_traceCall'&&r.params[2].tracer==='prestateTracer'),false);
+  assert.equal(reverted.records.filter(r=>r.method==='debug_traceCall'&&r.params[2].tracer==='prestateTracer').length,1);
+  assert.equal(result.revertStateValidation.status,'verified');
+  assert.deepEqual(result.stateDiff,{pre:{[S]:{balance:NATIVE.toString(),nonce:'7'}},post:{[S]:{nonce:'8'}}});
+  const trace=result.evidence[result.revertStateValidation.originalTraceEvidenceId-1],diff=result.evidence[result.revertStateValidation.diffEvidenceId-1];
+  assert.deepEqual(trace.params.slice(0,2),diff.params.slice(0,2));
+  assert.equal(diff.params[2].tracer,'prestateTracer');assert.deepEqual(diff.params[2].tracerConfig,{diffMode:true});
+  assert.equal(reverted.records.filter(r=>r.method==='debug_traceCall'&&r.params[0].to===PROBE).length,2);
+  assert.equal(reverted.records.some(r=>r.method==='debug_traceCall'&&QUERIES.some(q=>q.to===r.params[0].to&&q.data===r.params[0].data)),false);
   const marker='SECRET_PROVIDER_CREDENTIAL'; const failed = await run(harness({mutate:({stage})=>{if(stage==='original_trace')throw new Error(marker);}}));
   assert.equal(failed.execution.status,'unavailable'); assert.ok(failed.measurements.every(m=>m.status==='unavailable')); noAmounts(failed); assert.equal(JSON.stringify(failed).includes(marker),false);
+});
+
+test('reverted original state requires exact independently anchored nonce-only changes', () => {
+  const anchors={sender:S,nonce:7n,balance:NATIVE},raw=queryDiff(false);
+  assert.doesNotThrow(()=>validateRevertedStateDiff(raw,anchors));
+  for(const mutate of [
+    d=>{d.pre={};d.post={};},d=>{delete d.post[S].nonce;},d=>{d.post[S].nonce=7;},d=>{d.post[S].nonce=9;},
+    d=>{delete d.pre[S].nonce;},d=>{delete d.pre[S].balance;},d=>{d.pre[S].balance=hex(NATIVE-1n);},
+    d=>{d.post[S].balance=hex(NATIVE-1n);},d=>{d.post[S].balance=hex(NATIVE+1n);},
+    d=>{d.pre[S].storage={};},d=>{d.post[S].code='0x';},
+    d=>{d.pre[USDC]={storage:{[word(1)]:word(1)}};d.post[USDC]={storage:{[word(1)]:word(2)}};},
+    d=>{d.pre[USDC]={balance:'0x1'};d.post[USDC]={balance:'0x1'};},
+  ]){const bad=structuredClone(raw);mutate(bad);assert.throws(()=>validateRevertedStateDiff(bad,anchors));}
+  const zero={pre:{[S]:{}},post:{[S]:{nonce:1}}};
+  assert.doesNotThrow(()=>validateRevertedStateDiff(zero,{sender:S,nonce:0n,balance:0n}));
+  for(const bad of [{sender:S,nonce:1n,balance:0n},{sender:S,nonce:0n,balance:1n}])assert.throws(()=>validateRevertedStateDiff(zero,bad));
+});
+
+test('revert diff, header-witness and final canonical failures cannot claim verified rollback or query amounts', async () => {
+  for(const mutate of [
+    x=>{if(x.stage==='original_diff')throw Error('unavailable');},
+    x=>x.stage==='original_diff'?{pre:{},post:{}}:undefined,
+    x=>{if(x.stage==='original_diff')x.result.post[S].balance=hex(NATIVE-1n);},
+    x=>{if(x.stage==='header_before')x.result.output='0x'+'0'.repeat(512);},
+    x=>{if(x.stage==='header_after')x.result.error='execution reverted';},
+    x=>{if(x.method==='eth_getBlockByNumber')x.result.hash=word(999);},
+  ]){
+    const h=harness({originalFailed:true,mutate}),result=await run(h);
+    assert.equal(result.execution.status,'reverted_or_failed');assert.equal(result.canonicalStatus,'unverified');
+    assert.notEqual(result.revertStateValidation?.status,'verified');noAmounts(result);
+    assert.ok(result.measurements.every(m=>m.status==='unavailable'));
+  }
+});
+
+test('saved v2 case016 retains its actual revert but cannot invent the absent original state diff', async () => {
+  const bytes=await readFile(new URL('../../../reports/ordinary-ethereum-cohort-v2/cases/016/product.json',import.meta.url));
+  assert.equal(createHash('sha256').update(bytes).digest('hex'),'944408881885987fdffe7df7db661fdc89e1a2c3fc7c7f50cfd1076af3d268e1');
+  const saved=JSON.parse(bytes).report,records=saved.evidence,attempts=[];let read=0;
+  const rpc={async call(method,params){
+    attempts.push({method,params:structuredClone(params)});
+    if(read===8){assert.equal(method,'debug_traceCall');assert.equal(params[2].tracer,'prestateTracer');assert.deepEqual(params.slice(0,2),records[7].params.slice(0,2));throw Error('The frozen packet contains no response for this new required read.');}
+    const observed=records[read++];assert.equal(method,observed.method);assert.deepEqual(params,observed.params);return structuredClone(observed.result);
+  }};
+  const result=await simulateUnsignedCall({rpc,chainId:1,blockHash:saved.request.block.blockHash,request:saved.request.transaction});
+  assert.equal(read,8);assert.equal(attempts.length,9);assert.equal(result.execution.status,'reverted_or_failed');
+  assert.equal(result.execution.gasUsed,'21960');assert.equal(result.execution.returnData,'0x');
+  assert.equal(result.canonicalStatus,'unverified');assert.equal(result.stateDiff,undefined);assert.equal(result.revertStateValidation,undefined);
+  assert.equal(result.measurements.length,0);assert.equal(saved.evidence.some(e=>e.params[2]?.tracer==='prestateTracer'),false);
 });
 
 test('source-chain/header/basic-state/original trace mismatches fail closed before useful query amounts', async () => {

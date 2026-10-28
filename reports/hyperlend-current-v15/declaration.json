@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "declaredAt": "2026-10-28T02:36:04.396Z",
+  "purpose": "One selected current-state Hyperlend USDC supply development check through the actual local app.",
+  "source": {
+    "path": "reports/current-validated-decimal/plan.json",
+    "sha256": "4a2e2432a9c817823b322ecda5b90d1b06058aaa2874c35edcd6ea14aa6d202b",
+    "caseId": "current-supply",
+    "priorBlock": "0x2f3df80"
+  },
+  "transformation": "Only request.block changed to latest; all other fields preserved exactly.",
+  "request": {
+    "method": "POST",
+    "url": "http://127.0.0.1:5174/api/simulate",
+    "headers": {
+      "content-type": "application/json"
+    },
+    "bodySha256": "c6c22b824b4f29fbdc4451069ea8e8e66f08a676e0ab26e9cf0b5c26626aa522",
+    "bytes": 422
+  },
+  "expectedImplementation": {
+    "name": "Transaction Lab",
+    "version": "0.15.0",
+    "sourceSha256": "00ed9f3a69bd317de3c5758f2ceed6ce68e5c8e51a037c0c563be4f7f6282f35",
+    "sourceFiles": [
+      "account-effects.js",
+      "affected-balances.js",
+      "allowances.js",
+      "analyze.js",
+      "balances.js",
+      "config.js",
+      "current-state.js",
+      "historical-state.js",
+      "lending.js",
+      "lending-balances.js",
+      "local-loader.js",
+      "local-simulation.js",
+      "permissions.js",
+      "proof-rpc.js",
+      "query-validation.js",
+      "revert.js",
+      "rpc.js",
+      "server.js",
+      "standard-loader.js",
+      "standard-rpc.js",
+      "state-diff.js",
+      "state.js",
+      "validate.js"
+    ]
+  },
+  "scriptSha256": "8031e90a19fec74ea64360154679f00cbf21b1806e5a83c1b33d6c5d9177ee63",
+  "sourceIdentitySha256": "6d58f12d18143cb2e2375e4564ce7836ac7fefbcd66dc1f94c9b9cc06e0044ec",
+  "limits": {
+    "httpAttempts": 1,
+    "httpWallMs": 150000,
+    "responseBytes": 8388608,
+    "redirects": 0,
+    "retries": 0
+  },
+  "scope": {
+    "readOnlySimulation": true,
+    "signing": false,
+    "broadcasts": false,
+    "independentExecutionComparison": false,
+    "historicalTransactionReplay": false,
+    "reliabilityRate": false,
+    "clientDeadlineDoesNotProveServerCancellation": true
+  }
+}

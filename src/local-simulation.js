@@ -5,6 +5,7 @@ import { InputError } from './validate.js';
 import { executeIsolatedEthereumPreview } from '../engines/local-evm/isolated-call.js';
 import { compilePreviewQueries } from '../engines/local-evm/preview-queries.js';
 import { verifyEthereumHeader } from '../engines/local-evm/ethereum-header.js';
+import { normalizeEvmContext, EVM_CONTEXT_LIMITS } from '../engines/evm-context.js';
 
 const ADDRESS = /^0x[0-9a-f]{40}$/i, HASH = /^0x[0-9a-f]{64}$/i;
 const NUMBER = /^0x(?:0|[1-9a-f][0-9a-f]{0,15})$/i, DATA = /^0x(?:[0-9a-f]{2})*$/i;
@@ -25,6 +26,7 @@ const freeze = value => { if (value && typeof value === 'object') { for (const c
 export const LOCAL_CAPABILITIES = freeze({
   available: true, chainId: 1, status: 'experimental', operation: 'isolated_proof_backed_unsigned_call',
   profile: 'unsigned_unpriced_block_end', blockSelection: ['latest', 'canonical_hex_number', 'block_hash'],
+  transactionContext: { optionalFields: ['accessList', 'blobVersionedHashes'], limits: EVM_CONTEXT_LIMITS, blobFeeScope: 'synthetic_zero_no_blob_fee_settlement_or_sidecar_validation' },
   querySelection: 'explicit_only', queryTypes: ['balanceOf', 'allowance', 'aave_v3_user_account_data', 'morpho_blue_position'],
   limits: { queries: 8, calldataBytes: 32768, gas: 5000000, proofRpcCalls: 256, totalRpcCalls: 260,
     responseBytes: 8 * 1024 * 1024, wireBytes: 32 * 1024 * 1024, wallMs: WALL, drainMs: DRAIN, apiOutputBytes: RESPONSE },
@@ -32,7 +34,7 @@ export const LOCAL_CAPABILITIES = freeze({
     'Only explicit query pairs are measured; automatic token discovery, native-effect summaries and sequences are not provided by this endpoint.',
     'Proofs and runtime code are checked against the selected header, whose hash is recomputed. Consensus, finality and contract identity are not independently established.',
     'Unsigned execution uses zero gas price and BASEFEE, without outer signature validation or fee settlement. Contract signature checks still execute.',
-    'Contract lifecycle changes, blob context, coded senders and in-range BLOCKHASH without supplied ancestry remain unsupported.',
+    'Contract lifecycle changes, coded senders, KZG point evaluation and in-range BLOCKHASH without supplied ancestry remain unsupported. Explicit blob context uses zero blob base fee without sidecar or inclusion validation.',
     'The pinned EthereumJS Shanghai-through-BPO2 schedule and fixed execution/state budgets bound supported execution.',
     'Process separation and a V8 heap limit are not an OS network/filesystem sandbox or a hard total-RSS limit.',
     'No security verdict, complete economic-effect coverage or accuracy percentage is established.',
@@ -47,7 +49,7 @@ function record(value, allowed) {
   }
 }
 export function validateLocalSimulation(input) {
-  record(input, ['chainId', 'from', 'to', 'data', 'value', 'block', 'queries']);
+  record(input, ['chainId', 'from', 'to', 'data', 'value', 'block', 'queries', 'accessList', 'blobVersionedHashes']);
   if (input.chainId !== 1 && input.chainId !== '1') throw new InputError('Only Ethereum chain 1 is supported.', 'UNSUPPORTED_CHAIN');
   for (const field of ['from', 'to']) if (typeof input[field] !== 'string' || !ADDRESS.test(input[field])) throw new InputError(`${field} must be a 20-byte hex address.`);
   if (typeof input.data !== 'string' || input.data.length > 65538 || !DATA.test(input.data)) throw new InputError('data must be even-length hexadecimal calldata of at most 32 KiB.');
@@ -55,10 +57,11 @@ export function validateLocalSimulation(input) {
   if (typeof value !== 'string' || !DECIMAL.test(value) || BigInt(value) > MAX) throw new InputError('value must be a canonical decimal uint256 wei string.');
   const block = input.block === undefined ? 'latest' : input.block;
   if (typeof block !== 'string' || !(block === 'latest' || NUMBER.test(block) || HASH.test(block))) throw new InputError('block must be latest, a canonical hexadecimal number, or a 32-byte block hash.');
-  let queries;
+  let queries, context;
+  try { context = normalizeEvmContext(input); } catch { throw new InputError('The access list or versioned blob hashes are malformed or exceed the declared bounds.'); }
   try { queries = compilePreviewQueries(input.queries).map(row => structuredClone(row.descriptor)); }
   catch { throw new InputError('Supply one to eight distinct canonical token or typed position queries.'); }
-  return { chainId: 1, from: input.from.toLowerCase(), to: input.to.toLowerCase(), data: input.data.toLowerCase(), value, block: block.toLowerCase(), queries };
+  return { chainId: 1, from: input.from.toLowerCase(), to: input.to.toLowerCase(), data: input.data.toLowerCase(), value, block: block.toLowerCase(), queries, ...context };
 }
 
 function projection(core) {
@@ -116,7 +119,7 @@ export async function simulateLocal(input, rpc, { signal } = {}) {
     const usage = rpc.usage(), wallMs = Math.floor(remaining() - FINAL_RESERVE);
     const calls = Math.min(256, usage.limits.calls - usage.calls - 1), totalResponseBytes = Math.min(32 * 1024 * 1024, usage.limits.totalBytes - usage.observedBytes);
     if (wallMs <= 0 || calls <= 0 || totalResponseBytes <= 0) stop('LOCAL_PREVIEW_BUDGET');
-    report.attempt = await executeIsolatedEthereumPreview({ request: { from: apiRequest.from, to: apiRequest.to, data: apiRequest.data, value: apiRequest.value, gas: '5000000' },
+    report.attempt = await executeIsolatedEthereumPreview({ request: { from: apiRequest.from, to: apiRequest.to, data: apiRequest.data, value: apiRequest.value, gas: '5000000', ...normalizeEvmContext(apiRequest) },
       header, queries: apiRequest.queries, rpc, signal: controller.signal,
       limits: { wallMs, calls, totalResponseBytes } });
     if (controller.signal.aborted || signal?.aborted) stop(signal?.aborted ? 'LOCAL_PREVIEW_CANCELLED' : 'LOCAL_PREVIEW_BUDGET');

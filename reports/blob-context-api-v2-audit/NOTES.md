@@ -1,0 +1,11 @@
+# Independent audit of the blob-context API v2 response
+
+The live response and all 12 retained successful RPC requests/responses pass the offline audit. Its product fingerprint is `b035863ce536cf70ac92cdf72eb381bc9cfe0f4a2ef59d135e9678f640b177ba`. All 38 matching source files were copied into this separate audit directory after independently recomputing that fingerprint from the current files. No original capture was modified.
+
+Both original execution tracers used the exact same call, pinned historical block hash, declared blob hash, zero blob fee cap, and exact block overrides `{baseFeePerGas: "0x0", blobBaseFee: "0x0"}`. The successful call used 21,000 gas. The independently anchored raw state diff shows only sender nonce 54,083 → 54,084, with no balance, code, or storage change. Its normalized report and complete after-state override agree with the raw diff.
+
+Both before/after witnesses return the expected eleven words: eight header/context words, the declared BLOBHASH, zero for the first out-of-range BLOBHASH index, and zero BLOBBASEFEE. BASEFEE is also explicitly zero. The audit checks the exact witness bytecode, call options, entire state override, return words, evidence references, and the identical initial/final raw block headers; it also recomputes the selected execution-header hash.
+
+Read-only source review found no remaining blocker in this fix. The exact block overrides apply only to original calls and witnesses, including their state-diff traces. Getters retain fresh independent query context. The comparator rejects missing, additional, or nonzero override fields. Independently, 43 focused controls passed: seven provider-context controls, 32 outcome-comparator controls, and four controls for the separate current-state runner.
+
+Reproduce with `node reports/blob-context-api-v2-audit/verify.mjs --verify`. This performs no network request or VM execution. The successful RPC response text is retained by the actual API transport; outer HTTP headers were not retained by this small capture. This is provider evidence for one historical block-end unsigned call, not original-position replay, a fresh local-engine comparison, consensus/finality verification, blob sidecar/KZG validation, signed fee validation, or a population accuracy claim. The preceding failed API attempt and limited diagnostic remain separate evidence.

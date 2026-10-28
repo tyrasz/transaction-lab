@@ -1,0 +1,696 @@
+{
+  "schemaVersion": 1,
+  "startedAt": "2026-10-28T00:24:32.318Z",
+  "finishedAt": "2026-10-28T00:24:34.209Z",
+  "status": "passed",
+  "origin": "http://127.0.0.1:5174",
+  "browser": {
+    "executablePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "temporaryProfile": true,
+    "userProfileUsed": false,
+    "headless": true,
+    "version": "156.0.8078.48"
+  },
+  "productVersion": "0.15.0",
+  "source": [
+    {
+      "path": "public/app.js",
+      "bytes": 131336,
+      "sha256": "4a56ff51b07f980705996ac550328cebc899ddf76bfccbed3151af01e07e052b"
+    },
+    {
+      "path": "public/index.html",
+      "bytes": 19724,
+      "sha256": "30461925b8c1311794e21bd7c33e2475eed39b397b229db0657a76d4142a60ac"
+    },
+    {
+      "path": "public/style.css",
+      "bytes": 31005,
+      "sha256": "2b8528368635141288915c09183e95eec5ad618a1535607216da6f2128d1a841"
+    },
+    {
+      "path": "package.json",
+      "bytes": 748,
+      "sha256": "06250fe13bd180c8b87231b6189a7e2d20c09ed4e8bfbf12fef0b868a38c7c81"
+    }
+  ],
+  "scope": {
+    "realBrowser": true,
+    "syntheticResponses": true,
+    "providerRpcCalls": 0,
+    "localEngineExecutions": 0,
+    "productionSourceModified": false,
+    "authOrUserProfileUsed": false,
+    "limitations": [
+      "Submission responses are intercepted synthetic UI controls, not blockchain observations or engine results.",
+      "Layout checks and screenshots cover the declared desktop and mobile viewport only."
+    ]
+  },
+  "checks": [
+    {
+      "name": "HyperEVM hides optional Ethereum context",
+      "passed": true
+    },
+    {
+      "name": "Ethereum context is visible as collapsed Advanced with a blank default",
+      "passed": true
+    },
+    {
+      "name": "Desktop blank context layout has no horizontal overflow or clipped context controls",
+      "passed": true,
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "documentWidth": 1440,
+      "contextFields": [
+        {
+          "id": "transaction-context",
+          "left": 68,
+          "right": 396,
+          "width": 328,
+          "fontSize": "10px",
+          "lineHeight": "17px",
+          "scrollWidth": 326,
+          "clientWidth": 326
+        }
+      ]
+    },
+    {
+      "name": "Malformed context blocks submission with native field feedback",
+      "passed": true
+    },
+    {
+      "name": "/api/evm/simulate forwards exact context and locks request controls",
+      "passed": true,
+      "submission": 1
+    },
+    {
+      "name": "/api/evm/local-preview forwards exact context and locks request controls",
+      "passed": true,
+      "submission": 2
+    },
+    {
+      "name": "/api/evm/simulate-sequence forwards exact context and locks request controls",
+      "passed": true,
+      "submission": 3
+    },
+    {
+      "name": "Desktop sequence context layout has no horizontal overflow or clipped context controls",
+      "passed": true,
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "documentWidth": 1440,
+      "contextFields": [
+        {
+          "id": "sequence-6-context",
+          "left": 80,
+          "right": 384,
+          "width": 304,
+          "fontSize": "10px",
+          "lineHeight": "17px",
+          "scrollWidth": 302,
+          "clientWidth": 302
+        },
+        {
+          "id": "sequence-5-context",
+          "left": 80,
+          "right": 384,
+          "width": 304,
+          "fontSize": "10px",
+          "lineHeight": "17px",
+          "scrollWidth": 302,
+          "clientWidth": 302
+        }
+      ]
+    },
+    {
+      "name": "Native form reset clears global and every per-step context",
+      "passed": true
+    },
+    {
+      "name": "Choosing a custom example clears prior context",
+      "passed": true
+    },
+    {
+      "name": "Loading a recorded example clears unrelated context",
+      "passed": true
+    },
+    {
+      "name": "Network round-trip clears and hides stale context",
+      "passed": true
+    },
+    {
+      "name": "/api/evm/simulate forwards exact context and locks request controls",
+      "passed": true,
+      "submission": 4
+    },
+    {
+      "name": "Blank context forwards neither optional field",
+      "passed": true
+    },
+    {
+      "name": "Mobile populated context layout has no horizontal overflow or clipped context controls",
+      "passed": true,
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "contextFields": [
+        {
+          "id": "transaction-context",
+          "left": 45,
+          "right": 345,
+          "width": 300,
+          "fontSize": "10px",
+          "lineHeight": "17px",
+          "scrollWidth": 298,
+          "clientWidth": 298
+        }
+      ]
+    },
+    {
+      "name": "All four POSTs intercepted; no simulation handler or public RPC reached; no page errors",
+      "passed": true
+    },
+    {
+      "name": "UI/package source unchanged throughout browser check",
+      "passed": true
+    }
+  ],
+  "submissions": [
+    {
+      "index": 1,
+      "path": "/api/evm/simulate",
+      "method": "POST",
+      "intercepted": true,
+      "reachedProductionHandler": false,
+      "bodyText": "{\"chainId\":1,\"from\":\"0x1111111111111111111111111111111111111111\",\"to\":\"0xabababababababababababababababababababab\",\"data\":\"0x\",\"value\":\"0\",\"block\":\"0x3333333333333333333333333333333333333333333333333333333333333333\",\"accessList\":[{\"address\":\"0xabababababababababababababababababababab\",\"storageKeys\":[\"0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd\",\"0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd\"]},{\"address\":\"0xabababababababababababababababababababab\",\"storageKeys\":[\"0x3333333333333333333333333333333333333333333333333333333333333333\"]}],\"blobVersionedHashes\":[\"0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef\",\"0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef\"]}",
+      "bodySha256": "1eb5e69aa175a2392ec43fff5f74a1ec31e8902f03ba45f720d01ad8602c7a90",
+      "body": {
+        "chainId": 1,
+        "from": "0x1111111111111111111111111111111111111111",
+        "to": "0xabababababababababababababababababababab",
+        "data": "0x",
+        "value": "0",
+        "block": "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "accessList": [
+          {
+            "address": "0xabababababababababababababababababababab",
+            "storageKeys": [
+              "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+              "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+            ]
+          },
+          {
+            "address": "0xabababababababababababababababababababab",
+            "storageKeys": [
+              "0x3333333333333333333333333333333333333333333333333333333333333333"
+            ]
+          }
+        ],
+        "blobVersionedHashes": [
+          "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef",
+          "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef"
+        ]
+      },
+      "response": {
+        "id": "SYNTHETIC_UI_ONLY_1",
+        "apiRequest": {
+          "chainId": 1,
+          "from": "0x1111111111111111111111111111111111111111",
+          "to": "0xabababababababababababababababababababab",
+          "data": "0x",
+          "value": "0",
+          "block": "0x3333333333333333333333333333333333333333333333333333333333333333",
+          "accessList": [
+            {
+              "address": "0xabababababababababababababababababababab",
+              "storageKeys": [
+                "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+                "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+              ]
+            },
+            {
+              "address": "0xabababababababababababababababababababab",
+              "storageKeys": [
+                "0x3333333333333333333333333333333333333333333333333333333333333333"
+              ]
+            }
+          ],
+          "blobVersionedHashes": [
+            "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef",
+            "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef"
+          ]
+        },
+        "canonicalStatus": "unverified",
+        "execution": {
+          "status": "unavailable"
+        },
+        "measurementFailure": "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC.",
+        "source": {
+          "blockSelection": {
+            "requested": "0x3333333333333333333333333333333333333333333333333333333333333333"
+          },
+          "canonicalStatus": "unverified",
+          "profile": "synthetic_ui_only"
+        },
+        "preview": {
+          "queries": [],
+          "nativeBalances": [],
+          "positions": []
+        },
+        "limitations": [
+          "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC."
+        ],
+        "timing": {
+          "totalMs": 0
+        }
+      }
+    },
+    {
+      "index": 2,
+      "path": "/api/evm/local-preview",
+      "method": "POST",
+      "intercepted": true,
+      "reachedProductionHandler": false,
+      "bodyText": "{\"chainId\":1,\"from\":\"0x1111111111111111111111111111111111111111\",\"to\":\"0xabababababababababababababababababababab\",\"data\":\"0x\",\"value\":\"0\",\"block\":\"0x3333333333333333333333333333333333333333333333333333333333333333\",\"queries\":[{\"to\":\"0xabababababababababababababababababababab\",\"data\":\"0x70a082310000000000000000000000001111111111111111111111111111111111111111\"}],\"accessList\":[{\"address\":\"0xabababababababababababababababababababab\",\"storageKeys\":[\"0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd\",\"0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd\"]},{\"address\":\"0xabababababababababababababababababababab\",\"storageKeys\":[\"0x3333333333333333333333333333333333333333333333333333333333333333\"]}],\"blobVersionedHashes\":[\"0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef\",\"0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef\"]}",
+      "bodySha256": "2d02edde71d837fca59238d7dd1acedebca2ad49e0f55b1a559a12c4d9791258",
+      "body": {
+        "chainId": 1,
+        "from": "0x1111111111111111111111111111111111111111",
+        "to": "0xabababababababababababababababababababab",
+        "data": "0x",
+        "value": "0",
+        "block": "0x3333333333333333333333333333333333333333333333333333333333333333",
+        "queries": [
+          {
+            "to": "0xabababababababababababababababababababab",
+            "data": "0x70a082310000000000000000000000001111111111111111111111111111111111111111"
+          }
+        ],
+        "accessList": [
+          {
+            "address": "0xabababababababababababababababababababab",
+            "storageKeys": [
+              "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+              "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+            ]
+          },
+          {
+            "address": "0xabababababababababababababababababababab",
+            "storageKeys": [
+              "0x3333333333333333333333333333333333333333333333333333333333333333"
+            ]
+          }
+        ],
+        "blobVersionedHashes": [
+          "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef",
+          "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef"
+        ]
+      },
+      "response": {
+        "id": "SYNTHETIC_UI_ONLY_2",
+        "apiRequest": {
+          "chainId": 1,
+          "from": "0x1111111111111111111111111111111111111111",
+          "to": "0xabababababababababababababababababababab",
+          "data": "0x",
+          "value": "0",
+          "block": "0x3333333333333333333333333333333333333333333333333333333333333333",
+          "queries": [
+            {
+              "to": "0xabababababababababababababababababababab",
+              "data": "0x70a082310000000000000000000000001111111111111111111111111111111111111111"
+            }
+          ],
+          "accessList": [
+            {
+              "address": "0xabababababababababababababababababababab",
+              "storageKeys": [
+                "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+                "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+              ]
+            },
+            {
+              "address": "0xabababababababababababababababababababab",
+              "storageKeys": [
+                "0x3333333333333333333333333333333333333333333333333333333333333333"
+              ]
+            }
+          ],
+          "blobVersionedHashes": [
+            "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef",
+            "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef"
+          ]
+        },
+        "canonicalStatus": "unverified",
+        "execution": {
+          "status": "unavailable"
+        },
+        "measurementFailure": "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC.",
+        "source": {
+          "blockSelection": {
+            "requested": "0x3333333333333333333333333333333333333333333333333333333333333333"
+          },
+          "canonicalStatus": "unverified",
+          "profile": "synthetic_ui_only"
+        },
+        "preview": {
+          "queries": [],
+          "nativeBalances": [],
+          "positions": []
+        },
+        "limitations": [
+          "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC."
+        ],
+        "timing": {
+          "totalMs": 0
+        },
+        "kind": "local_proof_preview",
+        "status": "unavailable",
+        "error": {
+          "code": "SYNTHETIC_UI_ONLY",
+          "message": "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC."
+        },
+        "measurements": [
+          {
+            "descriptor": {
+              "to": "0xabababababababababababababababababababab",
+              "data": "0x70a082310000000000000000000000001111111111111111111111111111111111111111"
+            },
+            "status": "unavailable",
+            "reason": "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC.",
+            "values": null
+          }
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "path": "/api/evm/simulate-sequence",
+      "method": "POST",
+      "intercepted": true,
+      "reachedProductionHandler": false,
+      "bodyText": "{\"chainId\":1,\"from\":\"0x48c16c5652add27eddb0f896748a35fc60b8d1b4\",\"block\":\"0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7\",\"calls\":[{\"to\":\"0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2\",\"data\":\"0x617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000ec351bbd00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b40000000000000000000000000000000000000000000000000000000000000000\",\"value\":\"0\",\"blobVersionedHashes\":[\"0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef\",\"0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef\"]},{\"to\":\"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48\",\"data\":\"0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000ec351bbd\",\"value\":\"0\",\"accessList\":[{\"address\":\"0xabababababababababababababababababababab\",\"storageKeys\":[\"0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd\",\"0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd\"]},{\"address\":\"0xabababababababababababababababababababab\",\"storageKeys\":[\"0x3333333333333333333333333333333333333333333333333333333333333333\"]}]}]}",
+      "bodySha256": "460a6b556a1880bbbcf8ea4acdf459e4b36a704329ba8da1eef27b81acf416bb",
+      "body": {
+        "chainId": 1,
+        "from": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+        "block": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+        "calls": [
+          {
+            "to": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+            "data": "0x617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000ec351bbd00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b40000000000000000000000000000000000000000000000000000000000000000",
+            "value": "0",
+            "blobVersionedHashes": [
+              "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef",
+              "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef"
+            ]
+          },
+          {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000ec351bbd",
+            "value": "0",
+            "accessList": [
+              {
+                "address": "0xabababababababababababababababababababab",
+                "storageKeys": [
+                  "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+                  "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+                ]
+              },
+              {
+                "address": "0xabababababababababababababababababababab",
+                "storageKeys": [
+                  "0x3333333333333333333333333333333333333333333333333333333333333333"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "response": {
+        "id": "SYNTHETIC_UI_ONLY_3",
+        "apiRequest": {
+          "chainId": 1,
+          "from": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+          "block": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+          "calls": [
+            {
+              "to": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+              "data": "0x617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000ec351bbd00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b40000000000000000000000000000000000000000000000000000000000000000",
+              "value": "0",
+              "blobVersionedHashes": [
+                "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef",
+                "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef"
+              ]
+            },
+            {
+              "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "data": "0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000ec351bbd",
+              "value": "0",
+              "accessList": [
+                {
+                  "address": "0xabababababababababababababababababababab",
+                  "storageKeys": [
+                    "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+                    "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+                  ]
+                },
+                {
+                  "address": "0xabababababababababababababababababababab",
+                  "storageKeys": [
+                    "0x3333333333333333333333333333333333333333333333333333333333333333"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "canonicalStatus": "unverified",
+        "execution": {
+          "status": "unavailable"
+        },
+        "measurementFailure": "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC.",
+        "source": {
+          "blockSelection": {
+            "requested": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7"
+          },
+          "canonicalStatus": "unverified",
+          "profile": "synthetic_ui_only"
+        },
+        "preview": {
+          "queries": [],
+          "nativeBalances": [],
+          "positions": []
+        },
+        "limitations": [
+          "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC."
+        ],
+        "timing": {
+          "totalMs": 0
+        },
+        "sequence": {
+          "status": "unavailable",
+          "completedSteps": 0,
+          "attemptedSteps": 0,
+          "stoppedAtIndex": null,
+          "reason": "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC."
+        },
+        "steps": [
+          {
+            "index": 0,
+            "input": {
+              "to": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+              "data": "0x617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000ec351bbd00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b40000000000000000000000000000000000000000000000000000000000000000",
+              "value": "0",
+              "blobVersionedHashes": [
+                "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef",
+                "0x01efefefefefefefefefefefefefefefefefefefefefefefefefefefefefefef"
+              ]
+            },
+            "status": "skipped",
+            "reason": "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC.",
+            "result": null
+          },
+          {
+            "index": 1,
+            "input": {
+              "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+              "data": "0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e200000000000000000000000000000000000000000000000000000000ec351bbd",
+              "value": "0",
+              "accessList": [
+                {
+                  "address": "0xabababababababababababababababababababab",
+                  "storageKeys": [
+                    "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd",
+                    "0xcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcdcd"
+                  ]
+                },
+                {
+                  "address": "0xabababababababababababababababababababab",
+                  "storageKeys": [
+                    "0x3333333333333333333333333333333333333333333333333333333333333333"
+                  ]
+                }
+              ]
+            },
+            "status": "skipped",
+            "reason": "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC.",
+            "result": null
+          }
+        ]
+      }
+    },
+    {
+      "index": 4,
+      "path": "/api/evm/simulate",
+      "method": "POST",
+      "intercepted": true,
+      "reachedProductionHandler": false,
+      "bodyText": "{\"chainId\":1,\"from\":\"0x48c16c5652add27eddb0f896748a35fc60b8d1b4\",\"to\":\"0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2\",\"data\":\"0x02c205f0000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000ec351bbd00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b40000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006ade28e5000000000000000000000000000000000000000000000000000000000000001c1fc8457fd931323b0d6826fc26886f225497d878c64a89a6910d343460e195607fbaa6d6119003fd9817e7ca4267763e7ce8663807399d427761dd38b3af48f5\",\"value\":\"0\",\"block\":\"0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7\"}",
+      "bodySha256": "f856676e0d306e920b865753eee4d0a074a65d432e5a7ac3e299480819de2a88",
+      "body": {
+        "chainId": 1,
+        "from": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+        "to": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+        "data": "0x02c205f0000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000ec351bbd00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b40000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006ade28e5000000000000000000000000000000000000000000000000000000000000001c1fc8457fd931323b0d6826fc26886f225497d878c64a89a6910d343460e195607fbaa6d6119003fd9817e7ca4267763e7ce8663807399d427761dd38b3af48f5",
+        "value": "0",
+        "block": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7"
+      },
+      "response": {
+        "id": "SYNTHETIC_UI_ONLY_4",
+        "apiRequest": {
+          "chainId": 1,
+          "from": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+          "to": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+          "data": "0x02c205f0000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb4800000000000000000000000000000000000000000000000000000000ec351bbd00000000000000000000000048c16c5652add27eddb0f896748a35fc60b8d1b40000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006ade28e5000000000000000000000000000000000000000000000000000000000000001c1fc8457fd931323b0d6826fc26886f225497d878c64a89a6910d343460e195607fbaa6d6119003fd9817e7ca4267763e7ce8663807399d427761dd38b3af48f5",
+          "value": "0",
+          "block": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7"
+        },
+        "canonicalStatus": "unverified",
+        "execution": {
+          "status": "unavailable"
+        },
+        "measurementFailure": "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC.",
+        "source": {
+          "blockSelection": {
+            "requested": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7"
+          },
+          "canonicalStatus": "unverified",
+          "profile": "synthetic_ui_only"
+        },
+        "preview": {
+          "queries": [],
+          "nativeBalances": [],
+          "positions": []
+        },
+        "limitations": [
+          "SYNTHETIC UI TEST ONLY: intercepted response; no engine execution or public RPC."
+        ],
+        "timing": {
+          "totalMs": 0
+        }
+      }
+    }
+  ],
+  "allowedGets": [
+    {
+      "method": "GET",
+      "path": "/"
+    },
+    {
+      "method": "GET",
+      "path": "/style.css"
+    },
+    {
+      "method": "GET",
+      "path": "/app.js"
+    },
+    {
+      "method": "GET",
+      "path": "/api/config"
+    }
+  ],
+  "blockedRequests": [],
+  "pageErrors": [],
+  "consoleErrors": [],
+  "screenshots": [
+    {
+      "path": "attempts/2026-10-28T00-24-32.318Z/01-desktop-context-blank.png",
+      "bytes": 214881,
+      "sha256": "7401538f93b97dd014e6b3d0d3dd86ef0b67d512b1209bc8126e686a9fc61d1a"
+    },
+    {
+      "path": "attempts/2026-10-28T00-24-32.318Z/02-provider-request-locked.png",
+      "bytes": 204233,
+      "sha256": "256d0f59d386f726a6e7f48aff9250ef7056d13dabaee000d20d84b0ea7b0e1e"
+    },
+    {
+      "path": "attempts/2026-10-28T00-24-32.318Z/03-provider-synthetic-response.png",
+      "bytes": 312569,
+      "sha256": "120b0f2a90d5e121719ebbdfe0e73d53cbc58c601da1d3cc75cbbb21df403e14"
+    },
+    {
+      "path": "attempts/2026-10-28T00-24-32.318Z/04-local-synthetic-response.png",
+      "bytes": 345832,
+      "sha256": "2d44e8068f0fbcf894b7d53ba41fc6f08b849c938f393b09d681ceb9a867c9df"
+    },
+    {
+      "path": "attempts/2026-10-28T00-24-32.318Z/05-sequence-synthetic-response.png",
+      "bytes": 441014,
+      "sha256": "177d3a0323cffc64d1f0959b32feb899f271f24bc891727e7908199b2e33dc7f"
+    },
+    {
+      "path": "attempts/2026-10-28T00-24-32.318Z/06-mobile-context.png",
+      "bytes": 178344,
+      "sha256": "03d13369b0f3a4d0a089f1800e63d4b5e65f14664b1bed4fc044c13c5ec6dca7"
+    }
+  ],
+  "config": {
+    "bytes": 23833,
+    "sha256": "e900a2ce40ebcf312cbddd473fdd917c2b68db54ba8ce753a40cc561102cb604"
+  },
+  "attemptDirectory": "attempts/2026-10-28T00-24-32.318Z",
+  "attemptHistory": [
+    {
+      "path": "attempts/2026-10-28T00-24-08.858Z/browser-checks.json",
+      "sha256": "e5577fc5a780ed0ca5694e340e836255b4ec3120dfd0494eb5629fca4e2862b5",
+      "status": "failed",
+      "checks": 6,
+      "syntheticSubmissions": 2,
+      "error": "The input did not match the regular expression /SYNTHETIC UI TEST ONLY/. Input:\n\n'Independent local previewPreview: UnavailableExperimental execution over verified state proofs and code from the selected block. Only your requested queries are measured. Raw values are not prices, token decimals or a complete asset summary.Query 1 · BalanceOfUnavailableToken0xababababababababababababababababababababAccount0x1111111111111111111111111111111111111111Each query refers to the named account. Contract identity and token units are not verified.The query result or verified state context is unavailable. Values are withheld.'\n"
+    },
+    {
+      "path": "attempts/2026-10-28T00-24-32.318Z/browser-checks.json",
+      "sha256": "122e1a3e2f8b2d49bedc17689a762a9c4329143cf9054c217ffa96c86bf6aff8",
+      "status": "passed",
+      "checks": 17,
+      "syntheticSubmissions": 4,
+      "error": null
+    }
+  ],
+  "totalSyntheticSubmissionsAcrossAttempts": 6,
+  "visualReview": {
+    "status": "passed",
+    "reviewedAt": "2026-10-28T00:25:51.969Z",
+    "screenshots": [
+      "01-desktop-context-blank.png",
+      "06-mobile-context.png"
+    ],
+    "notes": [
+      "Desktop and mobile screenshots were visually inspected after the browser checks.",
+      "Context help and JSON controls wrap within the request panel; no overlapping production controls were observed.",
+      "The brown synthetic-test label is a temporary test-only DOM overlay; it is not part of production UI.",
+      "Context textarea text is 10px/17px line-height, recorded rather than asserted as accessibility compliance."
+    ]
+  },
+  "runner": {
+    "path": "run.mjs",
+    "sha256": "83e692dea67f1af2da54c8fc8f38add925f1cca4047e900998ec9cf2f11cb317"
+  }
+}

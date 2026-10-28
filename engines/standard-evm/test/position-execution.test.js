@@ -60,7 +60,7 @@ function harness({ mutate, originalFailed = false } = {}) {
         stage = 'witness'; result = { ...frame, output: tuple([9000001, 1700000000, 30000000, 0, HEADER.mixHash, HEADER.miner, 1, HEADER.parentHash]) };
       } else if (call.to === TARGET && call.data === REQUEST.data) {
         stage = diff ? 'original_diff' : 'original_trace';
-        if (originalFailed) result = { ...frame, error: 'execution reverted', output: '0xdead' };
+        if (originalFailed) result = diff ? nonceDiff() : { ...frame, error: 'execution reverted', output: '0xdead' };
         else if (!diff) result = frame;
         else {
           result = nonceDiff();
@@ -172,7 +172,9 @@ test('original revert leaves every typed query not applicable and makes no tuple
   assert.equal(result.execution.status, 'reverted_or_failed'); assert.equal(result.canonicalStatus, 'verified');
   assert.deepEqual(result.measurements.map(r => r.status), ['not_applicable', 'not_applicable', 'not_applicable']);
   for (const row of result.measurements) assertNoAmounts(row);
-  assert.equal(h.records.filter(r => r.method === 'debug_traceCall').length, 1);
+  assert.equal(h.records.filter(r => r.method === 'debug_traceCall').length, 4);
+  assert.equal(result.revertStateValidation.status, 'verified');
+  assert.equal(h.records.some(r => r.method === 'debug_traceCall' && [TOKEN,AAVE,MORPHO].includes(r.params[0].to)), false);
 });
 test('eight mixed/typed descriptors share the unchanged query budget, while duplicates or a ninth reject before RPC', async () => {
   const h = harness(); h.queries = Array.from({ length: 8 }, (_, i) => ({ ...QUERIES[1], user: address(100 + i) }));

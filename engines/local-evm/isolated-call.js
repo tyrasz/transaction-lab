@@ -1,10 +1,11 @@
+import { normalizeEvmContext } from '../evm-context.js';
 import childProcess from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
 import { verifyEthereumHeader } from './ethereum-header.js';
-import { ethereumQuantity, ethereumCallGas, ethereumCommon } from './ethereum-profile.js';
+import { ethereumQuantity, ethereumCallGas, ethereumCommon, ethereumContextProfile, ethereumUsedGas } from './ethereum-profile.js';
 import { compilePreviewQueries, decodePreviewValues } from './preview-queries.js';
 import { validateQueryMutation } from './preview-mutations.js';
 import { ISOLATED_LIMITS, IsolationError, decode, encode, envelope, fields, need, normalizeLimits, validateRpcRequest } from './isolated-protocol.js';
@@ -40,12 +41,14 @@ async function executeIsolated(options, previewMode) {
     need(signal === undefined || (typeof signal.aborted === 'boolean' && typeof signal.addEventListener === 'function' && typeof signal.removeEventListener === 'function'));
     limits = normalizeLimits(options.limits);
     if (previewMode) compiledQueries = compilePreviewQueries(options.queries);
-    request = decode(encode(options.request, 128 * 1024), 128 * 1024); fields(request, ['from', 'to', 'data', 'value', 'gas']);
+    request = decode(encode(options.request, 128 * 1024), 128 * 1024); fields(request, ['from', 'to', 'data', 'value', 'gas', 'accessList', 'blobVersionedHashes'], ['from', 'to', 'data', 'value', 'gas']);
+    Object.assign(request, normalizeEvmContext(request));
     need(['from', 'to'].every(k => typeof request[k] === 'string' && /^0x[0-9a-f]{40}$/i.test(request[k])));
     ethereumQuantity(request.value); const gas = ethereumQuantity(request.gas);
     header = decode(encode(options.header, 128 * 1024), 128 * 1024);
     headerVerification = verifyEthereumHeader({ header, expectedHash: header.hash });
-    need(gas <= 5000000n && gas >= ethereumCallGas(request.data, ethereumCommon(header)).minimum);
+    ethereumContextProfile(request, header);
+    need(gas <= 5000000n && gas >= ethereumCallGas(request.data, ethereumCommon(header), request).minimum);
     header.hash = header.hash.toLowerCase();
     if (previewMode) previewLimits = {
       wallMs: Math.min(limits.wallMs, limits.inputs.wallMs, limits.execution.wallMs), requestMs: limits.requestMs,
@@ -128,10 +131,46 @@ async function executeIsolated(options, previewMode) {
     fields(reads, ['total', 'distinct', 'reads']);
     need(Number.isSafeInteger(reads.total) && reads.total >= 0 && Number.isSafeInteger(reads.distinct) && reads.distinct >= 0 && reads.distinct <= reads.total && Array.isArray(reads.reads) && reads.reads.length === reads.distinct);
   }
+  function executionContext(output, call, complete) {
+    if (output === null) { need(!complete); return; }
+    const costs = ethereumCallGas(call.data, ethereumCommon(header), call), gas = ethereumQuantity(call.gas);
+    const environment = { chainId: 1, hardfork: ethereumCommon(header).hardfork(),
+      number: ethereumQuantity(header.number).toString(), timestamp: ethereumQuantity(header.timestamp).toString(),
+      gasLimit: ethereumQuantity(header.gasLimit).toString(), baseFeePerGas: '0', mixHash: header.mixHash.toLowerCase(), miner: header.miner.toLowerCase(),
+      sourceBlockHash: header.hash, sourceParentHash: header.parentHash.toLowerCase(), sourceBlockIdentityVerified: false };
+    if (complete || output.environment !== null) need(isDeepStrictEqual(output.environment, environment));
+    if (complete || output.profile !== null) {
+      const profile = {
+        name: 'ethereum_unsigned_unpriced_call', chainId: 1, hardfork: environment.hardfork,
+        forkSchedule: 'pinned_ethereumjs_common_10.1.3_mainnet', sourceBlockHash: header.hash, sourceStateRoot: header.stateRoot.toLowerCase(),
+        sourceBlockIdentityVerified: false, sourceStateProofVerified: false,
+        actualBlockBaseFee: ethereumQuantity(header.baseFeePerGas).toString(), executionBaseFee: '0', gasPrice: '0',
+        declaredGasLimit: gas.toString(), intrinsicGas: costs.intrinsic.toString(), calldataFloor: costs.floor.toString(), messageGasLimit: (gas - costs.intrinsic).toString(),
+        calldataZeroBytes: costs.zeroBytes.toString(), calldataNonzeroBytes: costs.nonzeroBytes.toString(),
+        outerSignatureVerified: false, feesSettled: false, originalTransactionPosition: false, expectedOutputsUsed: false,
+        ...ethereumContextProfile(call, header),
+      };
+      need(isDeepStrictEqual(output.profile, profile));
+    }
+    if (complete) {
+      need(output.stateDisposition === 'message_result_retained_in_supplied_manager');
+      const messageGasUsed = ethereumQuantity(output.execution.executionGasUsed), refundCounter = ethereumQuantity(output.execution.gasRefundCounter);
+      need(messageGasUsed <= gas - costs.intrinsic);
+      const accounting = ethereumUsedGas({ messageGasUsed, refundCounter, intrinsic: costs.intrinsic, floor: costs.floor });
+      need(isDeepStrictEqual(output.gasAccounting, Object.fromEntries(Object.entries(accounting).map(([key, value]) => [key, value.toString()]))));
+    }
+    if (complete || output.trace !== null) {
+      const trace = output.trace;
+      need(trace?.type === 'CALL' && trace.from === call.from.toLowerCase() && trace.to === call.to.toLowerCase() && trace.executionAddress === call.to.toLowerCase() && trace.caller === call.from.toLowerCase() && trace.input === call.data.toLowerCase() && trace.value === '0x' + ethereumQuantity(call.value).toString(16) && trace.gas === '0x' + (gas - costs.intrinsic).toString(16));
+      if (complete) need(trace.output === output.execution.returnData && trace.error === output.execution.error && ethereumQuantity(trace.gasUsed) === ethereumQuantity(output.execution.executionGasUsed));
+    }
+  }
+
   function validateCallResult(result, count = records.length, allowNullOutput = false) {
     fields(result, Object.keys(EMPTY));
     need((allowNullOutput && result.output === null) || (result.output && ['success', 'reverted', 'failed', 'unsupported', 'unavailable', 'invalid'].includes(result.output.execution?.status)));
     validateInputs(result, count);
+    executionContext(result.output, request, ['success', 'reverted', 'failed'].includes(result.output?.execution?.status));
     need(Array.isArray(result.changes?.accounts));
     for (const reads of [result.stateReads, result.inputReads]) validateReads(reads);
     return result;
@@ -149,34 +188,6 @@ async function executeIsolated(options, previewMode) {
     need(value.usage && isDeepStrictEqual(value.usage.limits, previewLimits));
     need(Array.isArray(value.measurements) && value.measurements.length === compiledQueries.length);
     const originalComplete = ['success', 'reverted', 'failed'].includes(value.original.output?.execution?.status);
-    function executionContext(output, call, complete) {
-      if (output === null) { need(!complete); return; }
-      const costs = ethereumCallGas(call.data, ethereumCommon(header)), gas = ethereumQuantity(call.gas);
-      const environment = { chainId: 1, hardfork: ethereumCommon(header).hardfork(),
-        number: ethereumQuantity(header.number).toString(), timestamp: ethereumQuantity(header.timestamp).toString(),
-        gasLimit: ethereumQuantity(header.gasLimit).toString(), baseFeePerGas: '0', mixHash: header.mixHash.toLowerCase(), miner: header.miner.toLowerCase(),
-        sourceBlockHash: header.hash, sourceParentHash: header.parentHash.toLowerCase(), sourceBlockIdentityVerified: false };
-      if (complete || output.environment !== null) need(isDeepStrictEqual(output.environment, environment));
-      if (complete || output.profile !== null) {
-        const profile = {
-          name: 'ethereum_unsigned_unpriced_call', chainId: 1, hardfork: environment.hardfork,
-          forkSchedule: 'pinned_ethereumjs_common_10.1.3_mainnet', sourceBlockHash: header.hash, sourceStateRoot: header.stateRoot.toLowerCase(),
-          sourceBlockIdentityVerified: false, sourceStateProofVerified: false,
-          actualBlockBaseFee: ethereumQuantity(header.baseFeePerGas).toString(), executionBaseFee: '0', gasPrice: '0',
-          declaredGasLimit: gas.toString(), intrinsicGas: costs.intrinsic.toString(), calldataFloor: costs.floor.toString(), messageGasLimit: (gas - costs.intrinsic).toString(),
-          calldataZeroBytes: costs.zeroBytes.toString(), calldataNonzeroBytes: costs.nonzeroBytes.toString(),
-          outerSignatureVerified: false, feesSettled: false, originalTransactionPosition: false, expectedOutputsUsed: false,
-        };
-        need(isDeepStrictEqual(output.profile, profile));
-      }
-      if (complete) need(output.stateDisposition === 'message_result_retained_in_supplied_manager');
-      if (complete || output.trace !== null) {
-        const trace = output.trace;
-        need(trace?.type === 'CALL' && trace.from === call.from.toLowerCase() && trace.to === call.to.toLowerCase() && trace.executionAddress === call.to.toLowerCase() && trace.caller === call.from.toLowerCase() && trace.input === call.data.toLowerCase() && trace.value === '0x' + ethereumQuantity(call.value).toString(16) && trace.gas === '0x' + (gas - costs.intrinsic).toString(16));
-        if (complete) need(trace.output === output.execution.returnData && trace.error === output.execution.error);
-      }
-    }
-    executionContext(value.original.output, request, originalComplete);
     function sideQuery(side, compiled, phase) {
       need(side && ['measured', 'unavailable'].includes(side.status));
       fields(side, ['status', 'reason', 'output', 'values', 'changesBefore', 'changesAfter', 'mutationValidation', 'inputEvidenceIds', 'stateReads'], ['status', 'reason', 'output', 'values']);

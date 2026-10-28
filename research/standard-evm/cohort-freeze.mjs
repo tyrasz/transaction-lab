@@ -9,6 +9,7 @@ import { isDeepStrictEqual } from 'node:util';
 const MAX_FILES = 20000, MAX_FILE = 32 * 1024 * 1024, MAX_TOTAL = 512 * 1024 * 1024, MAX_MANIFEST = 8 * 1024 * 1024;
 const DEPS = ['engines/local-evm/node_modules', 'engines/standard-evm/node_modules'];
 const LOCAL_ROOT = 'engines/local-evm';
+const SHARED_CONTEXT = 'engines/evm-context.js';
 const REQUIRED_LOCAL = ['isolated-call.js', 'isolated-worker.js', 'isolated-protocol.js', 'ethereum-call.js', 'ethereum-profile.js', 'ethereum-header.js', 'execute.js', 'rpc-state-inputs.js', 'proof-state.js', 'verified-state-proof.js', 'package.json', 'package-lock.json'].map(p => `${LOCAL_ROOT}/${p}`);
 const WIRE = 'reports/ethereum-lending-local-reference/wire.mjs';
 const POLICY = 'Product declared source closure plus entire installed standard dependencies; all local runtime JavaScript/package scopes and complete installed local dependencies; cohort runtime modules and explicit extra research files. No dependency exclusions, source maps/tests/licenses within node_modules retained.';
@@ -80,7 +81,7 @@ function implementation(value) {
   need(isDeepStrictEqual(value.sourceFiles, ordered(new Set(value.sourceFiles))), 'Implementation source paths must be unique and sorted.');
 }
 const localIdentity = (files, runtime, version) => {
-  const local = files.filter(item => item.path.startsWith(LOCAL_ROOT + '/'));
+  const local = files.filter(item => item.path.startsWith(LOCAL_ROOT + '/') || item.path === SHARED_CONTEXT);
   return { name: 'Transaction Lab isolated Ethereum reference', version, sourceSha256: sha(JSON.stringify({ files: local, runtime })), sourceFiles: local.map(item => item.path) };
 };
 
@@ -113,7 +114,7 @@ export async function inspectCohortSources({ repoRoot, extraFiles = [] }) {
   const research = await walk(root, 'research/standard-evm');
   const cohort = research.filter(path => posix.dirname(path) === 'research/standard-evm' && /^cohort-.*\.mjs$/.test(posix.basename(path)) && !path.endsWith('.test.mjs'));
   const dependencyPaths = (await Promise.all(DEPS.map(path => walk(root, path)))).flat();
-  const paths = ordered(new Set([...productImplementation.sourceFiles, ...localSources, ...REQUIRED_LOCAL, ...dependencyPaths, ...cohort, WIRE, ...extraFiles]));
+  const paths = ordered(new Set([...productImplementation.sourceFiles, ...localSources, ...REQUIRED_LOCAL, SHARED_CONTEXT, ...dependencyPaths, ...cohort, WIRE, ...extraFiles]));
   const files = await inventory(root, paths), runtime = await inspectNodeRuntime();
   need(await fingerprint(root, productImplementation.sourceFiles) === productImplementation.sourceSha256, 'Loaded product identity disagrees with current source bytes.');
   const localPackage = JSON.parse(await readFile(join(root, LOCAL_ROOT, 'package.json'), 'utf8'));
@@ -178,6 +179,8 @@ export async function verifyFrozenSources({ outputDirectory, expectedManifestSha
   need(isDeepStrictEqual(actual, manifest.files), 'Archived source bytes, modes or links changed.');
   need(manifest.filesCount === actual.length && manifest.regularFileBytes === actual.reduce((sum, item) => sum + (item.bytes ?? 0), 0), 'Manifest source totals differ.');
   const byPath = new Set(paths);
+  // Shared helpers belong to the frozen product/local inventory. Older sealed
+  // runtimes predate them and must remain verifiable under their own inventory.
   for (const path of [...manifest.productImplementation.sourceFiles, ...REQUIRED_LOCAL, WIRE]) need(byPath.has(path), 'Required implementation source is absent.');
   need(await fingerprint(join(out, 'runtime'), manifest.productImplementation.sourceFiles) === manifest.productImplementation.sourceSha256, 'Archived product fingerprint differs.');
   const pkg = JSON.parse(await readFile(join(out, 'runtime', LOCAL_ROOT, 'package.json'), 'utf8'));

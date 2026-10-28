@@ -117,7 +117,7 @@ test('actual current product handler preserves all recorded Aave request/respons
   assert.deepEqual(output.report.preview, saved.preview);
   // Preserve the original capture identity. Independently bind current source
   // additions instead of relabeling the recorded observation as a new capture.
-  const currentFiles = [...saved.implementation.sourceFiles, 'src/local-loader.js', 'src/local-simulation.js', 'src/proof-rpc.js'].sort();
+  const currentFiles = [...saved.implementation.sourceFiles, 'src/local-loader.js', 'src/local-simulation.js', 'src/proof-rpc.js', 'engines/evm-context.js'].sort();
   const currentHash = createHash('sha256');
   for (const path of currentFiles) currentHash.update(path + '\0').update(readFileSync(new URL('../../' + path, import.meta.url))).update('\0');
   assert.deepEqual(output.report.implementation, { name: saved.implementation.name, version: VERSION, sourceSha256: currentHash.digest('hex'), sourceFiles: currentFiles });

@@ -147,3 +147,41 @@ test('unbound headers, injected poststate and invalid queries reject before any 
   }
   assert.equal(f.calls.length, 0);
 });
+
+test('actual child preview uses original context only and fresh context-free getters over the retained overlay',async()=>{
+ const {executeIsolatedEthereumPreview}=await import('../isolated-call.js');
+ const f=await fixture({original:'60004960005500'}), hash='0x01'+'ab'.repeat(31);
+ f.request.accessList=[{address:A,storageKeys:[word(0),word(0)]}];f.request.blobVersionedHashes=[hash];
+ const {calls,...options}=f,r=await executeIsolatedEthereumPreview(options);
+ assert.equal(r.status,'completed');assert.equal(r.preview.status,'complete');assert.equal(r.preview.original.output.execution.status,'success');
+ assert.deepEqual(r.preview.original.output.profile.accessList,f.request.accessList);assert.deepEqual(r.preview.original.output.profile.blobVersionedHashes,[hash]);
+ const measurement=r.preview.measurements[0];assert.equal(measurement.values[0].beforeRaw,'7');assert.equal(measurement.values[0].afterRaw,BigInt(hash).toString());
+ for(const phase of [measurement.before,measurement.after]){
+  for(const key of ['accessList','accessListAddressCount','accessListStorageKeyCount','accessListIntrinsicGas','blobVersionedHashes','executionBlobBaseFee','sourceExcessBlobGas'])assert.equal(Object.hasOwn(phase.output.profile,key),false);
+  assert.equal(phase.output.semantics.warmAddresses,'sender_destination_coinbase_and_fork_active_precompiles_no_access_list');assert.equal(phase.mutationValidation.status,'verified');
+ }
+ assert(calls.every(x=>['eth_getProof','eth_getCode'].includes(x.method)));assert.equal(r.broker.pendingAtReturn,0);
+});
+
+
+test('actual child preview BLOBHASH getters see the fresh empty context before and after a blob original', async () => {
+  const { executeIsolatedEthereumPreview } = await import('../isolated-call.js');
+  // Original stores its declared hash. Getter returns storage + BLOBHASH(0):
+  // leaking the original context would incorrectly add the hash a second time.
+  const f = await fixture({ original: '60004960005500', query: '6000546000490160005260206000f3' });
+  const hash = '0x01' + 'ab'.repeat(31); f.request.blobVersionedHashes = [hash];
+  const { calls, ...options } = f, r = await executeIsolatedEthereumPreview(options);
+  assert.equal(r.status, 'completed'); assert.equal(r.preview.status, 'complete');
+  assert.equal(r.preview.original.output.execution.status, 'success');
+  assert.deepEqual(r.preview.original.output.profile.blobVersionedHashes, [hash]);
+  assert.deepEqual(r.preview.original.changes.accounts.find(a => a.address === A).storage, [{ slot: word(0), before: word(7), after: hash }]);
+  const row = r.preview.measurements[0]; assert.equal(row.status, 'measured');
+  assert.deepEqual(row.values.map(({ beforeRaw, afterRaw, deltaRaw }) => ({ beforeRaw, afterRaw, deltaRaw })),
+    [{ beforeRaw: '7', afterRaw: BigInt(hash).toString(), deltaRaw: (BigInt(hash) - 7n).toString() }]);
+  for (const phase of [row.before, row.after]) {
+    assert.equal(phase.output.execution.status, 'success'); assert.equal(phase.mutationValidation.status, 'verified');
+    assert.equal(Object.hasOwn(phase.output.profile, 'blobVersionedHashes'), false);
+    assert.equal(Object.hasOwn(phase.output.profile, 'executionBlobBaseFee'), false);
+  }
+  assert(calls.every(x => ['eth_getProof', 'eth_getCode'].includes(x.method))); assert.equal(r.broker.pendingAtReturn, 0);
+});

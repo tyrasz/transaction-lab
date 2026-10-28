@@ -4,6 +4,7 @@ import { performance } from 'node:perf_hooks';
 import { isDeepStrictEqual as equal } from 'node:util';
 import { accountCohortOutcomes } from './cohort-accounting.mjs';
 import { adjudicateCohortOutcome } from './cohort-outcomes.mjs';
+import { normalizeEvmContext } from '../../engines/evm-context.js';
 
 const sha = value => createHash('sha256').update(value).digest('hex');
 const need = (ok, message) => { if (!ok) throw new Error(message); };
@@ -61,7 +62,7 @@ export async function executeCohortCases({ census, expectedProductImplementation
       } else {
         const apiRequest = row.projection.request;
         need(apiRequest?.chainId === 1 && apiRequest.block === row.parentBlockHash && row.parentHeader?.hash === row.parentBlockHash, 'Projected parent context is inconsistent');
-        const request = { from: apiRequest.from, to: apiRequest.to, data: apiRequest.data, value: apiRequest.value, gas: '5000000' };
+        const request = { from: apiRequest.from, to: apiRequest.to, data: apiRequest.data, value: apiRequest.value, gas: '5000000', ...normalizeEvmContext(apiRequest) };
         if (!canAttempt({ phase: 'local', row })) entry.local = unattempted('Frozen run budget or cancellation prevented the independent attempt');
         else {
           try { entry.local = await executeLocal({ id, row, request, header: row.parentHeader }); }
