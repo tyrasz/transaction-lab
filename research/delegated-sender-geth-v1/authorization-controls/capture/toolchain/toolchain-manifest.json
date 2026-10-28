@@ -1,0 +1,555 @@
+{
+  "schemaVersion": "1.0",
+  "status": "verified",
+  "createdAt": "2026-10-28T06:30:49.821196+00:00",
+  "binary": {
+    "path": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/bin/evm",
+    "sha256": "10385eddbfd76c3d05b9853f30f4372f2468f6a8c1ac64c445a7490694fc3521",
+    "bytes": 54847666
+  },
+  "source": {
+    "repository": "https://github.com/ethereum/go-ethereum.git",
+    "tag": "v1.17.10",
+    "commit": "1df30b18d9ed35ee9d28ffd4648442c2204554ad",
+    "tree": "cc329acc8f69375efe7e3cbba00e1acb1e2d373f",
+    "inventory": {
+      "path": "source-inventory.json",
+      "bytes": 621083,
+      "sha256": "36e245fda711de52fe5e0b8c917d4bbbffd840ed7edfc0696f29cbb1f8b24dff"
+    },
+    "signatureVerification": "GitHub attestation verified=true/valid retained; local independent OpenPGP verification not performed.",
+    "testOnlyGitlinks": "Exact gitlinks retained in inventory; tests/testdata and tests/evm-benchmarks not fetched.",
+    "interpretationSources": [
+      {
+        "path": "source/cmd/evm/staterunner.go",
+        "bytes": 4718,
+        "sha256": "8a474f9396502e813719198fb9ae6f082717c2562ecc8a46378fe9d1036bb388"
+      },
+      {
+        "path": "source/cmd/evm/reporter.go",
+        "bytes": 2451,
+        "sha256": "65ec783c6f27e951249a786e41ce9a70f9015046fa99be660eccfe719b426725"
+      },
+      {
+        "path": "source/cmd/evm/internal/t8ntool/transition.go",
+        "bytes": 22260,
+        "sha256": "1ce0fc6eda0b6712488d929009463f578dfcc920fe01c309eeff3f70fe4eccec"
+      },
+      {
+        "path": "source/cmd/evm/internal/t8ntool/execution.go",
+        "bytes": 21703,
+        "sha256": "4c502228294949f8e6b9ef794c0b4ecf0b32621693541bf78f18d1fe9c965de7"
+      },
+      {
+        "path": "source/cmd/evm/internal/t8ntool/flags.go",
+        "bytes": 6060,
+        "sha256": "3da31e5c66cf20e698c0c6bc43a97edf43f1409356236a87a6fe068cbc1972fd"
+      },
+      {
+        "path": "source/tests/state_test_util.go",
+        "bytes": 21943,
+        "sha256": "61f5097513e5874ed800a412bfd3e1f9ab4373fbfb994a59d57ba589fbc44401"
+      },
+      {
+        "path": "source/tests/init.go",
+        "bytes": 30950,
+        "sha256": "c651b2e940b6653432d62e64a9e21264a60c4789f135df57dadea0f3b7168462"
+      },
+      {
+        "path": "source/go.mod",
+        "bytes": 8684,
+        "sha256": "df92841ea528f644350b890d9d67fd78e1f68ff2424e90f3e495cfcf8e30f21d"
+      },
+      {
+        "path": "source/go.sum",
+        "bytes": 55307,
+        "sha256": "ddafb18490c93ae43659876330add971403706b3403bf0d0ac7760a6daabdf65"
+      }
+    ]
+  },
+  "go": {
+    "version": "go1.27.3",
+    "archiveUrl": "https://go.dev/dl/go1.27.3.darwin-arm64.tar.gz",
+    "archiveSha256": "dd3908cf20959d798c1e06ebe5b72213f0505ce01373b40ce3110975a6cd99c2",
+    "archiveBytes": 68196737,
+    "binarySha256": "aa355b078a81158d418079a3f8c776719eb99cc6f527e39ffa3250c66566aafb",
+    "officialMetadata": {
+      "path": "go-download-metadata.json",
+      "bytes": 22898,
+      "sha256": "e0324e8717deaa8ba77ec05b672086e755e57d816c052d3b25d36d5533c3160e"
+    }
+  },
+  "build": {
+    "command": [
+      "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/go/bin/go",
+      "build",
+      "-mod=readonly",
+      "-trimpath",
+      "-p=2",
+      "-buildvcs=true",
+      "-o",
+      "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/bin/evm",
+      "./cmd/evm"
+    ],
+    "settings": {
+      "GOARCH": "arm64",
+      "GOOS": "darwin",
+      "GOVERSION": "go1.27.3",
+      "GOROOT": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/go",
+      "GOTOOLCHAIN": "local",
+      "CGO_ENABLED": "0",
+      "GOFLAGS": "-mod=readonly",
+      "GOMODCACHE": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/cache/go-mod",
+      "GOCACHE": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/cache/go-build",
+      "GOPATH": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/cache/go-path",
+      "GOPROXY": "https://proxy.golang.org",
+      "GOSUMDB": "sum.golang.org",
+      "GOTELEMETRY": "off",
+      "GOTELEMETRYDIR": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/cache/telemetry-off",
+      "GOMAXPROCS": "2",
+      "GOMEMLIMIT": "1073741824",
+      "TEST_TELEMETRY_DIR": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/cache/telemetry-off",
+      "GOENV": "off"
+    },
+    "moduleVerification": {
+      "status": "verified",
+      "output": "all modules verified",
+      "log": {
+        "path": "logs/telemetry-off-module-verify.stdout",
+        "bytes": 21,
+        "sha256": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd"
+      }
+    },
+    "goModSha256": "df92841ea528f644350b890d9d67fd78e1f68ff2424e90f3e495cfcf8e30f21d",
+    "goSumSha256": "ddafb18490c93ae43659876330add971403706b3403bf0d0ac7760a6daabdf65",
+    "moduleInventory": {
+      "path": "dependency-inventory.json",
+      "bytes": 196445,
+      "sha256": "364ceb9f506861fb3326452f45a1406370f7f7aec485d43002b8823247c049db"
+    },
+    "rawManifest": {
+      "path": "build-manifest.json",
+      "bytes": 11778,
+      "sha256": "7bd8af1cbe8f4f685f1c4b6aeac6db8495f146ca4031c951dc65edfcdf4bae3b"
+    },
+    "initialBuildDurationMs": 200758,
+    "telemetryRevision": {
+      "path": "telemetry-verification.json",
+      "bytes": 1977,
+      "sha256": "be6078d8d36996bc4e38f79f8797f93cdbc4e34a285c6c1f5e11d28b2223cfa9"
+    },
+    "telemetryLimitation": "Initial build ran Go default local-only counters (no upload). Final cached rebuild uses workspace telemetry off and produces the identical binary. No global telemetry-mode setting was changed.",
+    "deadlineSeconds": 900,
+    "compilerMemoryLimitIsSoft": true
+  },
+  "runtime": {
+    "platform": "Darwin",
+    "architecture": "arm64",
+    "versionOutput": "evm version 1.17.10-stable-1df30b18",
+    "globalInstallation": false,
+    "publicRpcCalls": 0,
+    "targetFixturesExecuted": 0
+  },
+  "smoke": {
+    "statetestPositive": "passed",
+    "statetestWrongRoot": "pass:false correctly reported with process exit0",
+    "t8n": "unavailable: Osaka block post-execution requires absent withdrawal/consolidation system contracts; inputs were not repaired or retried.",
+    "declaration": {
+      "path": "smoke/declaration.json",
+      "bytes": 1171,
+      "sha256": "052e1b988a46cb0941cb3c614c8c4d0f028826e96577badbc5636672ff75591f"
+    },
+    "commands": {
+      "path": "smoke/commands.json",
+      "bytes": 1762,
+      "sha256": "c0d9832a96447b375ee26cb530351d6ecbc5564b1cff1c248acb8c586d51d9b8"
+    }
+  },
+  "artifacts": [
+    {
+      "path": "FAILED.json",
+      "bytes": 3316,
+      "sha256": "de8db2cd0740ba1791528c8a6ef9cde4978f09c7284448aab5a45282f71b4b46"
+    },
+    {
+      "path": "RESUMED.json",
+      "bytes": 555,
+      "sha256": "9ae83ab3a9dd83bbde73417ac79e856495cebd8f7d430cb0f354207d393a1662"
+    },
+    {
+      "path": "STARTED.json",
+      "bytes": 489,
+      "sha256": "57cc88e5b56846ad54c98b2edbcbdfc5d67f935c875ddb39d7cfb3c06f110e93"
+    },
+    {
+      "path": "acquire-build.py",
+      "bytes": 10444,
+      "sha256": "bf001b160d095c7514a274a1d2c2e822e7091bd2eabc07acdc2f22c916fd8cd5"
+    },
+    {
+      "path": "build-manifest.json",
+      "bytes": 11778,
+      "sha256": "7bd8af1cbe8f4f685f1c4b6aeac6db8495f146ca4031c951dc65edfcdf4bae3b"
+    },
+    {
+      "path": "dependency-inventory.json",
+      "bytes": 196445,
+      "sha256": "364ceb9f506861fb3326452f45a1406370f7f7aec485d43002b8823247c049db"
+    },
+    {
+      "path": "geth-commit.json",
+      "bytes": 2199,
+      "sha256": "56d4337521455d1d070ae274f29425e3a08daf367b3660f42bf8818a18c5c02e"
+    },
+    {
+      "path": "geth-commit.json.metadata.json",
+      "bytes": 1923,
+      "sha256": "cde035392c58cd4446757fdffa620017f8dc963e2c6fd0ad5b07a0991a4470e4"
+    },
+    {
+      "path": "geth-tag.json",
+      "bytes": 353,
+      "sha256": "37f04551a98c3b5043fbb8be450ddf90b2f444a96b647fff3f7d5ff38417c0fc"
+    },
+    {
+      "path": "geth-tag.json.metadata.json",
+      "bytes": 1889,
+      "sha256": "6160ddf6dfc3aef1d3ced7ef71a7944064b40731875d58ebf101224554836824"
+    },
+    {
+      "path": "go-download-metadata.json",
+      "bytes": 22898,
+      "sha256": "e0324e8717deaa8ba77ec05b672086e755e57d816c052d3b25d36d5533c3160e"
+    },
+    {
+      "path": "go-download-metadata.json.metadata.json",
+      "bytes": 1657,
+      "sha256": "06f4e180851eb27ddcb13e25a0d1e3dcc620b544766a8b5cdceab263dbec128e"
+    },
+    {
+      "path": "go1.27.3.darwin-arm64.tar.gz",
+      "bytes": 68196737,
+      "sha256": "dd3908cf20959d798c1e06ebe5b72213f0505ce01373b40ce3110975a6cd99c2"
+    },
+    {
+      "path": "go1.27.3.darwin-arm64.tar.gz.metadata.json",
+      "bytes": 939,
+      "sha256": "9224d99544671458b215378a370cc9e2df947264de545343c3250f08ffba26d6"
+    },
+    {
+      "path": "logs/01-git-init.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/01-git-init.stdout",
+      "bytes": 129,
+      "sha256": "d66fdd563307a6b2650bedee02f69442c61413569663bfb525ff37b674cad986"
+    },
+    {
+      "path": "logs/02-git-fetch.stderr",
+      "bytes": 91,
+      "sha256": "cf0a2ea9d4f83539b425fd22c038c9b6b0605bee7216c55ae6fe2add46418af5"
+    },
+    {
+      "path": "logs/02-git-fetch.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/03-git-resolve.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/03-git-resolve.stdout",
+      "bytes": 41,
+      "sha256": "0433059a173044451d04999f9d2a13f0ea42a49f6f8cbfad0587563ce1738ad0"
+    },
+    {
+      "path": "logs/04-git-checkout.stderr",
+      "bytes": 57,
+      "sha256": "eaefe5f287cbc07fac8f945117186810e07ba779b5e461a0222ffaed69cb709a"
+    },
+    {
+      "path": "logs/04-git-checkout.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/05-git-tree.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/05-git-tree.stdout",
+      "bytes": 41,
+      "sha256": "b395e845585c25c2c89be2effac470926eeba038141e9907e6a38fb4cc61c6af"
+    },
+    {
+      "path": "logs/06-git-fsck.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/06-git-fsck.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/07-git-resolve-current.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/07-git-resolve-current.stdout",
+      "bytes": 41,
+      "sha256": "0433059a173044451d04999f9d2a13f0ea42a49f6f8cbfad0587563ce1738ad0"
+    },
+    {
+      "path": "logs/08-git-tree-current.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/08-git-tree-current.stdout",
+      "bytes": 41,
+      "sha256": "b395e845585c25c2c89be2effac470926eeba038141e9907e6a38fb4cc61c6af"
+    },
+    {
+      "path": "logs/09-git-fsck.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/09-git-fsck.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/10-go-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/10-go-version.stdout",
+      "bytes": 33,
+      "sha256": "70f94d37a097ca424ec1a1c0d5a81288ec60b4ceeae67edc3a75aeb6ce378600"
+    },
+    {
+      "path": "logs/11-go-environment.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/11-go-environment.stdout",
+      "bytes": 2022,
+      "sha256": "0732ee113c09ada5758bc4970c061a252fb56d45fb0ed681ff3306e65d8a7def"
+    },
+    {
+      "path": "logs/12-build-evm.stderr",
+      "bytes": 5886,
+      "sha256": "230dc4e314df5bdca29614b54bf8f9830e326d7c575c2c590d0514d4510817c2"
+    },
+    {
+      "path": "logs/12-build-evm.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/13-module-verify.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/13-module-verify.stdout",
+      "bytes": 21,
+      "sha256": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd"
+    },
+    {
+      "path": "logs/14-binary-build-info.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/14-binary-build-info.stdout",
+      "bytes": 10310,
+      "sha256": "16035f6360f61b488d85c4527f4234f3d5b0446b93e27de90aa17eb45f00413c"
+    },
+    {
+      "path": "logs/15-dependency-modules.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/15-dependency-modules.stdout",
+      "bytes": 125991,
+      "sha256": "8b372982e09d72189ee1a1c1fb6c10f050eecb5854ac61bead0557d743b6debc"
+    },
+    {
+      "path": "logs/16-git-status.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/16-git-status.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/17-evm-version.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/17-evm-version.stdout",
+      "bytes": 36,
+      "sha256": "d82e25ce411d4552921461643ecc51e27f1414339ca954eebd705b294e437f6e"
+    },
+    {
+      "path": "logs/18-statetest-help.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/18-statetest-help.stdout",
+      "bytes": 1691,
+      "sha256": "5d19296cfcc415f70f481d902f7f70b6d661632d94bb4a87270ff00465dd45ab"
+    },
+    {
+      "path": "logs/19-t8n-help.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/19-t8n-help.stdout",
+      "bytes": 6509,
+      "sha256": "40b264038055a72c8a0bcce8c7694d37a337806a466b5640c85a96cc338148d6"
+    },
+    {
+      "path": "logs/telemetry-off-environment.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/telemetry-off-environment.stdout",
+      "bytes": 2067,
+      "sha256": "c02b1624bf05310971a55f0f89eb39499891a319710f301684bd77096b8fc813"
+    },
+    {
+      "path": "logs/telemetry-off-module-verify.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/telemetry-off-module-verify.stdout",
+      "bytes": 21,
+      "sha256": "b4537ed75f533f993f371954de47e42a793b8e5b0587577de7e27fb3e50696bd"
+    },
+    {
+      "path": "logs/telemetry-off-rebuild.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "logs/telemetry-off-rebuild.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "prepare-smoke.mjs",
+      "bytes": 3443,
+      "sha256": "e2dbbc8a41a3b2281c217624248dd4864da7f2c65146da53d95fe6d2eb449847"
+    },
+    {
+      "path": "resume-build.py",
+      "bytes": 10268,
+      "sha256": "50b2be99591f5eb9e7730820731b5e8fd1208078bfea8505747897b0a1d3c188"
+    },
+    {
+      "path": "smoke/alloc.json",
+      "bytes": 136,
+      "sha256": "638177efd5f32c1adec3e0e431271469e9cda34600f8302857a5182129d886b3"
+    },
+    {
+      "path": "smoke/commands.json",
+      "bytes": 1762,
+      "sha256": "c0d9832a96447b375ee26cb530351d6ecbc5564b1cff1c248acb8c586d51d9b8"
+    },
+    {
+      "path": "smoke/declaration.json",
+      "bytes": 1171,
+      "sha256": "052e1b988a46cb0941cb3c614c8c4d0f028826e96577badbc5636672ff75591f"
+    },
+    {
+      "path": "smoke/env.json",
+      "bytes": 468,
+      "sha256": "df08552315b1aa8dd85c820a8587dd41141450a26b2cdfdcc69bfc2b1b953795"
+    },
+    {
+      "path": "smoke/fixture-wrong-root.json",
+      "bytes": 1593,
+      "sha256": "217be9ba9c776d1d509c413a1260d865eaae52aaa5e5cd3a6f26432169c18d73"
+    },
+    {
+      "path": "smoke/fixture.json",
+      "bytes": 1593,
+      "sha256": "986bc172f3456b4db0b4cba56c84ffed24444fcbd7dbed6ebbe8d2e8d9bd6d41"
+    },
+    {
+      "path": "smoke/statetest-pass.stderr",
+      "bytes": 84,
+      "sha256": "9b917753dee9d1dd4e3f321b89722c0794b4e6c08255a234360ab8eaeb6a9a16"
+    },
+    {
+      "path": "smoke/statetest-pass.stdout",
+      "bytes": 184,
+      "sha256": "29eda466af712ac8b76a861a0f1581c6ce3c7937c24255051c544f3b91f9ac3a"
+    },
+    {
+      "path": "smoke/statetest-reject.stderr",
+      "bytes": 84,
+      "sha256": "9b917753dee9d1dd4e3f321b89722c0794b4e6c08255a234360ab8eaeb6a9a16"
+    },
+    {
+      "path": "smoke/statetest-reject.stdout",
+      "bytes": 367,
+      "sha256": "0166df87a366cd4f0b6bf5c8e3625a3a7a1dba6e1d709cb2288d7cfe74a258e3"
+    },
+    {
+      "path": "smoke/t8n/trace-0-0xbd2460c8f652b08f10d3ac4c1dc1659eb61509fff7e1d04c26b4c2a02bd1e413.json",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "smoke/t8n.stderr",
+      "bytes": 508,
+      "sha256": "92c3de7cfc64eebfeb1d3170ccd583992dde30428028040124e4af5170c240d4"
+    },
+    {
+      "path": "smoke/t8n.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "smoke/txs.rlp",
+      "bytes": 203,
+      "sha256": "4b185b8bba6386e667bdbeada16e343be3837cf9e8a6906b502123d8605ca5af"
+    },
+    {
+      "path": "smoke-preparation-revision.json",
+      "bytes": 354,
+      "sha256": "4683dbc71959b7eab6f80f8ee4cc12a1794c6439e156a044465da5f3cdc5f829"
+    },
+    {
+      "path": "source-inventory.json",
+      "bytes": 621083,
+      "sha256": "36e245fda711de52fe5e0b8c917d4bbbffd840ed7edfc0696f29cbb1f8b24dff"
+    },
+    {
+      "path": "telemetry-verification.json",
+      "bytes": 1977,
+      "sha256": "be6078d8d36996bc4e38f79f8797f93cdbc4e34a285c6c1f5e11d28b2223cfa9"
+    }
+  ]
+}
