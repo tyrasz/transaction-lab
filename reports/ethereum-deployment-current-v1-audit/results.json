@@ -1,0 +1,141 @@
+{
+  "status": "verified_and_reexecuted_local_provider_unavailable",
+  "identities": {
+    "evidence": "3aab8f526c5dee2d5ce765f66ea6108119faca53bc80105d2b093921a01a3841",
+    "plan": "84d716f5e6c416cbf071ff8e9a7047213b083b50895e8d0daea0da75586001f7",
+    "source": "87c7695fa5a93532596309b57f087959b759538279c4c9c3007db405f588b1f5",
+    "runner": "bf8b272b5aec53c1eb8ceb2eb877c1ebad0f1fbbf886409bd6d81ce354eea450"
+  },
+  "evidenceFiles": 17,
+  "sourceEntries": 1788,
+  "localImplementationSha256": "077c4114abe838c4705642d22ebe2cf4e125ea541a68a54b13e691e50c3909ec",
+  "productImplementationSha256": "aed73e7eddf6540ae640b90e6da26f0c9159eab25c733be7bb3ba06f9b009d55",
+  "block": {
+    "hash": "0x9d73e3dcf2701d54ca3ef88d36597307ef5847940ad31767be1379bf5768d3ea",
+    "number": "26288940",
+    "stateRoot": "0xbc3d6df63b333e9a4c33a8634c2175502bd178bc3f322a74182582776f24055c",
+    "hardfork": "bpo2",
+    "finalCanonicalRecheckObtained": false
+  },
+  "declaredCase": {
+    "runtimeBytes": 11,
+    "initcodeBytes": 31,
+    "target": "0x3be7f950380997a5fbbd6ace42b422c7ef437f1b",
+    "senderNonceRaw": "1"
+  },
+  "wireRecords": 7,
+  "responseEntityBytes": 29156,
+  "unjoinedWireRecords": 0,
+  "proofAudit": {
+    "proofs": [
+      {
+        "address": "0xbb6e024b9cffacb947a71991e386681b1cd1477d",
+        "exists": true,
+        "nonceRaw": "1",
+        "balanceRaw": "12714900000000000",
+        "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+        "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "codeBytes": 0
+      },
+      {
+        "address": "0x3be7f950380997a5fbbd6ace42b422c7ef437f1b",
+        "exists": false,
+        "nonceRaw": "0",
+        "balanceRaw": "0",
+        "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+        "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "codeBytes": 0
+      }
+    ],
+    "codeResponses": 2,
+    "slotZeroBasis": "cryptographically_proven_target_account_absence"
+  },
+  "replay": {
+    "workerExecutions": 1,
+    "proofCodeReads": 4,
+    "exactExecutionAndState": true,
+    "execution": "success",
+    "steps": 10,
+    "frames": 1,
+    "gas": {
+      "intrinsic": "53390",
+      "creationIntrinsic": "32000",
+      "initcodeWordGas": "2",
+      "message": "24330",
+      "refundCounter": "0",
+      "total": "77720"
+    },
+    "changedAccounts": [
+      {
+        "address": "0xbb6e024b9cffacb947a71991e386681b1cd1477d",
+        "nonce": {
+          "before": "0x1",
+          "after": "0x2"
+        }
+      },
+      {
+        "address": "0x3be7f950380997a5fbbd6ace42b422c7ef437f1b",
+        "existence": {
+          "before": false,
+          "after": true,
+          "basis": "top_level_contract_creation"
+        },
+        "nonce": {
+          "before": "0x0",
+          "after": "0x1"
+        },
+        "storage": [
+          {
+            "slot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "after": "0x000000000000000000000000000000000000000000000000000000000000002a"
+          }
+        ],
+        "code": {
+          "before": "0x",
+          "after": "0x60005460005260206000f3"
+        }
+      }
+    ]
+  },
+  "provider": {
+    "attemptedRequests": 1,
+    "plannedRequests": 3,
+    "httpStatus": 400,
+    "error": {
+      "message": "Error: -32602, Required \"to\" is empty",
+      "code": 5
+    },
+    "traceObtained": false,
+    "stateDiffObtained": false,
+    "finalCanonicalHeaderObtained": false
+  },
+  "comparison": {
+    "status": "unavailable",
+    "channels": {},
+    "allChannelsComplete": false,
+    "reason": "provider_sequence_incomplete",
+    "independentProviderAgreement": false
+  },
+  "comparisonNormalizations": [
+    "inputEvidence[].durationMs",
+    "broker.records[].durationMs",
+    "isolation.durationMs",
+    "isolation.childPid (fresh child process checked separately)"
+  ],
+  "limitations": {
+    "singleFixedDevelopmentCase": true,
+    "rawProviderComparisonNotProductApi": true,
+    "proofsFromOneProvider": true,
+    "unsignedUnpricedBlockEnd": true,
+    "feesOrSignaturesVerified": false,
+    "consensusOrFinalityVerified": false,
+    "postStateRootRecomputed": false,
+    "completeEconomicInventory": false,
+    "fullCallTreeComparison": false,
+    "lifecycleScopeExpandedByAudit": false,
+    "osSandboxEstablished": false,
+    "populationAccuracyClaim": false,
+    "publicCallsDuringAudit": 0
+  }
+}
