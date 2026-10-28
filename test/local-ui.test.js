@@ -35,6 +35,7 @@ function setup(fetchImpl) {
   state.config = { standardEvm: { available: true, examples: [], sequenceCapabilities: { available: true } }, localEvm: { available: true } };
   for (const [id, value] of Object.entries({ chain: '1', 'ethereum-engine': 'provider', 'ethereum-call-mode': 'single', from: A, to: T, data: '0x', value: '0', block: H, 'standard-queries': JSON.stringify([query]) })) elements.get(id).value = value;
   elements.get('standard-manual-queries').type = 'checkbox';
+  elements.get('local-fees-enabled').type = 'checkbox';
   return { context, state, elements, requests };
 }
 function sample() {
@@ -259,4 +260,114 @@ test('local result shows its retained gas limit rather than the current form val
   assert.deepEqual(JSON.parse(ui.elements.get('raw-json').textContent), result);
   delete result.apiRequest.gas; ui.context.renderLocalResult(result); assert.match(ui.elements.get('gas-used').textContent, /5,000,000/);
   result.apiRequest.gas = '0x123'; ui.context.renderLocalResult(result); assert.match(ui.elements.get('gas-used').textContent, /Not available/);
+});
+
+const feeProfile = 'unsigned_eip1559_block_end';
+function enableFees(ui, max = '100', priority = '2') {
+  ui.elements.get('local-fees-enabled').checked = true; ui.elements.get('local-fees-enabled').dispatch('change');
+  ui.elements.get('local-max-fee').value = max; ui.elements.get('local-priority-fee').value = priority;
+}
+function feeSample() {
+  const result = sample(); result.apiRequest.gas = '50000'; result.apiRequest.executionProfile = feeProfile;
+  result.apiRequest.fees = { maxFeePerGas: '100', maxPriorityFeePerGas: '2' };
+  result.source.profile = feeProfile; result.source.blockSelection.header = { baseFeePerGas: '0xa', miner: T };
+  result.attempt = { status: 'completed', preview: { original: { output: {
+    execution: { status: 'success' }, profile: { executionProfile: feeProfile, fees: { ...result.apiRequest.fees },
+      declaredGasLimit: '50000', executionBaseFee: '10', gasPrice: '12', feesSettled: true }, gasAccounting: { gasUsed: '21000' },
+    feeAccounting: { kind: 'eip1559', gasLimit: '50000', effectiveGasPrice: '12', baseFeePerGas: '10', priorityFeePerGas: '2',
+      maximumRequiredBalance: '5000000', upfrontGasDebit: '600000', chargedGas: '21000', gasCharge: '252000', senderRefund: '348000',
+      baseFeeBurn: '210000', coinbaseTip: '42000', coinbase: T },
+  } } } };
+  return result;
+}
+
+test('fees opt in only for local mode and leave default and provider payloads unchanged', async () => {
+  assert.match(html, /id="local-fees-enabled" type="checkbox"[^>]*disabled/);
+  assert.doesNotMatch(html.match(/<input id="local-fees-enabled"[^>]*>/)[0], /\bchecked\b/);
+  const local = setup(); chooseLocal(local);
+  assert.equal(local.elements.get('local-fee-settings').hidden, false); assert.equal(local.elements.get('local-fees-enabled').checked, false);
+  assert.equal(local.elements.get('local-max-fee').disabled, true); await local.context.run('simulation');
+  assert.equal(Object.hasOwn(JSON.parse(local.requests[0].options.body), 'fees'), false);
+  const priced = setup(); chooseLocal(priced); enableFees(priced, '9007199254740993', '0');
+  assert.equal(priced.elements.get('local-max-fee').required, true); assert.equal(priced.elements.get('local-priority-fee').required, true);
+  await priced.context.run('simulation'); const request = JSON.parse(priced.requests[0].options.body);
+  assert.equal(request.executionProfile, feeProfile); assert.deepEqual(request.fees, { maxFeePerGas: '9007199254740993', maxPriorityFeePerGas: '0' });
+  assert.deepEqual(request.queries, [query]);
+  for (const mode of ['provider', 'sequence', 'hyper', 'historical']) {
+    const ui = setup(); enableFees(ui, 'invalid hidden field', '');
+    if (mode === 'sequence') { ui.elements.get('ethereum-call-mode').value = 'sequence'; ui.state.sequenceDrafts = [ui.context.newSequenceDraft({ to: T }), ui.context.newSequenceDraft({ to: A })]; ui.context.renderSequenceEditor(); }
+    if (mode === 'hyper' || mode === 'historical') ui.elements.get('chain').value = '999';
+    if (mode === 'historical') ui.state.example = { transactionHash: H, request: { chainId: 999 } };
+    ui.context.updateQueryMode(); assert.equal(ui.elements.get('local-fee-settings').hidden, true);
+    await ui.context.run(mode === 'historical' ? 'historical_trace' : 'simulation');
+    const body = JSON.parse(ui.requests[0].options.body);
+    for (const row of [body, ...(body.calls || [])]) { assert.equal(Object.hasOwn(row, 'fees'), false); assert.equal(Object.hasOwn(row, 'executionProfile'), false); }
+  }
+});
+
+test('both canonical fee inputs and their relationship are checked before dispatch, including blob exclusion', async () => {
+  for (const pair of [['', ''], ['100', ''], ['', '0'], ['01', '0'], ['100', '101'], ['0x10', '0'], ['1e9', '0'], ['1,000', '0'], [(1n << 256n).toString(), '0'], ['100', '-1']]) {
+    const ui = setup(); chooseLocal(ui); enableFees(ui, ...pair); await ui.context.run('simulation');
+    assert.equal(ui.requests.length, 0); assert.equal(ui.elements.get('local-fee-settings').open, true); assert.notEqual(ui.elements.get('local-max-fee').validationMessage, '');
+    ui.elements.get('local-max-fee').dispatch('input'); assert.equal(ui.elements.get('local-max-fee').validationMessage, '');
+  }
+  const ui = setup(); chooseLocal(ui); enableFees(ui);
+  ui.elements.get('transaction-context').value = JSON.stringify({ blobVersionedHashes: ['0x01' + '11'.repeat(31)] });
+  await ui.context.run('simulation'); assert.equal(ui.requests.length, 0); assert.match(ui.elements.get('transaction-context').validationMessage, /cannot be combined with blob/);
+  ui.elements.get('local-fees-enabled').checked = false; ui.elements.get('local-fees-enabled').dispatch('change');
+  assert.equal(ui.elements.get('transaction-context').validationMessage, ''); await ui.context.run('simulation'); assert.equal(ui.requests.length, 1);
+});
+
+test('fee toggles and amounts clear stale results, lock while busy and fingerprint pending responses', async () => {
+  const edited = setup(); chooseLocal(edited); edited.context.renderLocalResult(feeSample()); enableFees(edited);
+  assert.equal(edited.state.result, null); assert.equal(edited.elements.get('download-json').disabled, true);
+  edited.context.renderLocalResult(feeSample()); edited.elements.get('local-priority-fee').dispatch('input'); assert.equal(edited.state.result, null);
+  let finish; const ui = setup(() => new Promise(resolve => { finish = resolve; })); chooseLocal(ui); enableFees(ui);
+  const pending = ui.context.run('simulation'); for (const id of ['local-fees-enabled', 'local-max-fee', 'local-priority-fee']) assert.equal(ui.elements.get(id).disabled, true);
+  ui.elements.get('local-fees-enabled').checked = false; finish({ ok: true, json: async () => feeSample() }); await pending;
+  assert.equal(ui.state.result, null); assert.equal(ui.elements.get('local-fees-enabled').disabled, false); assert.equal(ui.elements.get('local-max-fee').disabled, true);
+});
+
+test('fee example and reset paths restore the explicit mode without leaking into other networks', () => {
+  const ui = setup(); chooseLocal(ui);
+  ui.state.config.standardEvm.examples = [{ id: 'priced', input: feeSample().apiRequest }, { id: 'plain', input: sample().apiRequest }];
+  ui.elements.get('example').value = 'priced'; ui.context.selectExample(); assert.equal(ui.elements.get('local-fees-enabled').checked, true); assert.equal(ui.elements.get('local-max-fee').value, '100');
+  ui.context.renderLocalResult(feeSample()); ui.elements.get('example').value = 'plain'; ui.context.selectExample();
+  assert.equal(ui.elements.get('local-fees-enabled').checked, false); assert.equal(ui.elements.get('local-max-fee').value, ''); assert.equal(ui.state.result, null);
+  enableFees(ui); ui.elements.get('local-max-fee').setCustomValidity('old'); ui.elements.get('local-fee-settings').open = true;
+  ui.elements.get('simulation-form').dispatch('reset'); assert.equal(ui.elements.get('local-fees-enabled').checked, false);
+  assert.equal(ui.elements.get('local-max-fee').validationMessage, ''); assert.equal(ui.elements.get('local-max-fee').required, false); assert.equal(ui.elements.get('local-fee-settings').open, false);
+  enableFees(ui); ui.elements.get('chain').value = '999'; ui.context.selectNetwork(); assert.equal(ui.elements.get('local-fees-enabled').checked, false); assert.equal(ui.elements.get('local-fee-settings').hidden, true);
+});
+
+test('fee labels use only complete validated retained accounting, including genuine failed execution', () => {
+  const ui = setup(); chooseLocal(ui); enableFees(ui, '999', '999');
+  for (const status of ['success', 'reverted', 'failed']) {
+    const result = feeSample(); result.execution.status = status; result.attempt.preview.original.output.execution.status = status;
+    ui.context.renderLocalResult(result);
+    assert.equal(ui.elements.get('gas-used').textContent, 'Gas limit: 50,000 · simulated fee: 252,000 wei');
+    assert.match(ui.elements.get('source-details').textContent, /Fee charged in simulation · wei252000/);
+    assert.deepEqual(JSON.parse(ui.elements.get('raw-json').textContent), result);
+  }
+  for (const mutate of [r => { r.status = 'unavailable'; }, r => { r.source.canonicalStatus = 'unverified'; }, r => { r.attempt.status = 'unavailable'; },
+    r => { r.attempt.preview.original.output.profile.feesSettled = false; }, r => { r.execution.status = 'unavailable'; },
+    r => { r.apiRequest.fees.maxFeePerGas = '99'; }, r => { r.source.blockSelection.header.baseFeePerGas = '0xb'; },
+    r => { r.attempt.preview.original.output.feeAccounting.gasCharge = '252001'; }, r => { r.attempt.preview.original.output.feeAccounting.gasCharge = 252000; },
+    r => { r.attempt.preview.original.output.feeAccounting.senderRefund = '-1'; }, r => { r.attempt.preview.original.output.feeAccounting.coinbase = A; },
+    r => { r.attempt.preview.original.output.feeAccounting.coinbase = { toString: null }; },
+    r => { r.attempt.preview.original.output.gasAccounting.gasUsed = '21001'; }, r => { r.attempt.preview.original.output.profile.gasPrice = '0'; }]) {
+    const result = feeSample(); mutate(result); ui.context.renderLocalResult(result);
+    assert.match(ui.elements.get('gas-used').textContent, /fee result unavailable/); assert.doesNotMatch(ui.elements.get('source-details').textContent, /Fee charged in simulation/);
+    assert.deepEqual(JSON.parse(ui.elements.get('raw-json').textContent), result);
+  }
+  ui.context.renderLocalResult(sample()); assert.match(ui.elements.get('gas-used').textContent, /network fees excluded/);
+});
+
+test('priced cleanup is labeled only with its matching completed fee context', () => {
+  const ui = setup(), result = feeSample();
+  result.attempt.preview.original.output.lifecycle = { emptyAccountCleanup: { basis: 'eip161_transaction_end', scope: 'unsigned_eip1559_transaction_touches',
+    deletions: [{ address: T, scope: 'entire_account_including_code_and_storage', initialStorageRoot: H }] } };
+  ui.context.renderLocalResult(result); assert.match(ui.elements.get('source-details').textContent, /Empty accounts removed/);
+  result.attempt.preview.original.output.feeAccounting.gasCharge = '0'; ui.context.renderLocalResult(result);
+  assert.doesNotMatch(ui.elements.get('source-details').textContent, /Empty accounts removed/);
 });

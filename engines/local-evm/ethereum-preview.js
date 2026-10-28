@@ -1,4 +1,5 @@
 import { normalizeEvmContext } from '../evm-context.js';
+import { normalizeEthereumFees, ethereumFeePlan } from './ethereum-fees.js';
 import { normalizeAuthorizationList } from './authorization-list.js';
 // Owned execution and explicit queries over verified initial state. No provider
 // execution trace, override, expected result or poststate enters this module.
@@ -45,8 +46,8 @@ export async function executeEthereumPreview(options) {
     now = options.now ?? (() => performance.now()); need(typeof now === 'function');
     queries = compilePreviewQueries(options.queries);
     request = decode(encode(options.request, 128 * 1024), 128 * 1024);
-    fields(request, ['from', 'to', 'data', 'value', 'gas', 'accessList', 'blobVersionedHashes', 'authorizationList'], ['from', 'to', 'data', 'value', 'gas']);
-    Object.assign(request, normalizeEvmContext(request));
+    fields(request, ['from', 'to', 'data', 'value', 'gas', 'accessList', 'blobVersionedHashes', 'authorizationList', 'executionProfile', 'fees'], ['from', 'to', 'data', 'value', 'gas']);
+    Object.assign(request, normalizeEvmContext(request), normalizeEthereumFees(request));
     const authorizationList = normalizeAuthorizationList(request);
     if (authorizationList) request.authorizationList = authorizationList;
     need(typeof request.from === 'string' && /^0x[0-9a-f]{40}$/i.test(request.from));
@@ -55,7 +56,7 @@ export async function executeEthereumPreview(options) {
     ethereumQuantity(request.value); const gas = ethereumQuantity(request.gas);
     header = decode(encode(options.header, 128 * 1024), 128 * 1024);
     headerVerification = verifyEthereumHeader({ header, expectedHash: header.hash });
-    ethereumContextProfile(request, header);
+    ethereumContextProfile(request, header); ethereumFeePlan(request, header);
     need(gas <= 5000000n && gas >= ethereumCallGas(request.data, ethereumCommon(header), request).minimum);
     header.hash = header.hash.toLowerCase();
     const supplied = options.limits ?? {}; fields(supplied, Object.keys(ETHEREUM_PREVIEW_LIMITS), []);
@@ -157,7 +158,8 @@ export async function executeEthereumPreview(options) {
   const result = { status: sharedFailure || !completeOriginal ? 'unavailable' : measurements.every(row => row.status === 'measured') ? 'complete' : 'partial',
     error: sharedFailure, headerVerification, original, measurements,
     inputs: inputs?.snapshotInputs() ?? null, inputEvidence: inputs?.snapshotEvidence() ?? [], inputUsage: inputs?.snapshotUsage() ?? null,
-    inputReads: inputs?.snapshotReads() ?? null, usage: { ...counters, wallMs: elapsed(), limits }, scope: SCOPE };
+    inputReads: inputs?.snapshotReads() ?? null, usage: { ...counters, wallMs: elapsed(), limits },
+    scope: request.executionProfile ? { ...SCOPE, execution: request.executionProfile, feesSettled: Boolean(completeOriginal) } : SCOPE };
   // The isolated host applies the same bound to IPC. The internal core also
   // refuses a result too large to retain, without presenting a partial success.
   try { encode(result, 64 * 1024 * 1024); return result; }

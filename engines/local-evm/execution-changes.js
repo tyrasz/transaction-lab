@@ -4,6 +4,7 @@ import { isDeepStrictEqual, types } from 'node:util';
 import { createAddressFromString, createContractAddress } from '@ethereumjs/util';
 import { existingDelegationTarget } from './sender-delegation.js';
 import { deriveAuthorizationPreparation } from './authorization-validation.js';
+import { deriveVerifiedFees, revertedFeeRows } from './fee-validation.js';
 
 const ADDRESS = /^0x[0-9a-f]{40}$/, WORD = /^0x[0-9a-f]{64}$/, DATA = /^0x(?:[0-9a-f]{2})*$/;
 const ZERO = '0x' + '00'.repeat(32);
@@ -50,7 +51,7 @@ function emptyFact(inputs, address) {
 /** Check invocation-local lifecycle evidence without assuming a query starts
  * from the immutable base. Net query effects are validated separately. This is
  * trace/result consistency, not an independent replay or post-state-root proof. */
-export function validateExecutionLifecycle({ output, inputs, destination, changes, startingChanges, selfdestructOnlyCreated = true }) {
+export function validateExecutionLifecycle({ output, inputs, destination, changes, startingChanges, selfdestructOnlyCreated = true, fees = null }) {
   need(typeof selfdestructOnlyCreated === 'boolean');
   const created = new Map(), creationAttempts = new Map(), destructed = new Set(), eligibleTouches = new Set(), justifiedTouches = new Set(); let frames = 0;
   const lifecycle = output === null ? undefined : ownData(output, 'lifecycle');
@@ -145,7 +146,19 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
       else if (!selfdestructOnlyCreated || created.has(frame.executionAddress)) balances.set(frame.executionAddress, 0n);
     }
   }
+  if (fees) {
+    const before = balance(fees.sender), debit = fees.plan.upfrontGasDebit;
+    need(before >= debit); balances.set(fees.sender, before - debit);
+  }
   walk(output.trace, true, 0);
+  if (fees) {
+    // Refund and tip are sequential account updates before lifecycle deletion.
+    // A pending-deletion coinbase receives its credit and then burns it.
+    for (const [address, amount] of [[fees.sender, BigInt(fees.accounting.senderRefund)], [fees.plan.coinbase, BigInt(fees.accounting.coinbaseTip)]]) {
+      const next = balance(address) + amount; need(next < (1n << 256n)); balances.set(address, next);
+      justifiedTouches.add(address); eligibleTouches.add(address);
+    }
+  }
   const deleted = new Set([...destructed].filter(address => !selfdestructOnlyCreated || created.has(address)).sort());
   const deletionBasis = selfdestructOnlyCreated ? DELETION_BASIS : SHANGHAI_DELETION_BASIS;
   if (lifecycle !== undefined) { fields(lifecycle, [], ['finalizedDeletions', 'emptyAccountCleanup']); need(Object.keys(lifecycle).length > 0); }
@@ -196,7 +209,7 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
   const emptyDeleted = new Set(), cleanup = lifecycle?.emptyAccountCleanup;
   if (cleanup !== undefined) {
     fields(cleanup, ['basis', 'scope', 'touchedAccounts', 'deletions']);
-    need(cleanup.basis === 'eip161_transaction_end' && cleanup.scope === 'unsigned_message_touches_no_fee_settlement');
+    need(cleanup.basis === 'eip161_transaction_end' && cleanup.scope === (fees ? 'unsigned_eip1559_transaction_touches' : 'unsigned_message_touches_no_fee_settlement'));
     boundedArray(cleanup.touchedAccounts, 128); boundedArray(cleanup.deletions, 128); need(cleanup.deletions.length > 0);
     let previous = '';
     for (const address of cleanup.touchedAccounts) {
@@ -213,18 +226,30 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     }
   }
   need(isDeepStrictEqual([...emptyDeleted].sort(), [...requiredCleanup].sort()));
+  if (fees) {
+    // Bind every declared balance delta, and every account reached by the value
+    // ledger, so a worker cannot omit or invent either side of fee settlement.
+    for (const address of new Set([...balances.keys(), ...[...rows.values()].filter(row => row.balance).map(row => row.address)])) {
+      const fact = inputs.accounts[address]; need(fact && typeof fact.exists === 'boolean');
+      const before = fact.exists ? BigInt(fact.balance) : 0n;
+      const after = deleted.has(address) || emptyDeleted.has(address) ? 0n : balance(address);
+      need(isDeepStrictEqual(rows.get(address)?.balance, before === after ? undefined : { before: hex(before), after: hex(after) }));
+    }
+  }
   return { created, creationAttempts, deleted, emptyDeleted };
 }
 
 /** Bind the bounded overlay schema to the worker's immutable input facts and
  * committed creation frames. This is result-consistency validation, not an
  * independent EVM execution or a recomputed post-state-root proof. */
-export function validateExecutionChanges({ changes, inputs, output, sender, destination, selfdestructOnlyCreated = true, common, request }) {
+export function validateExecutionChanges({ changes, inputs, output, sender, destination, selfdestructOnlyCreated = true, common, request, header }) {
   const snapshot = canonicalStateChanges(changes), complete = ['success', 'reverted', 'failed'].includes(output?.execution?.status);
   const topCreation = destination === null, senderAddress = sender.toLowerCase(), senderInitial = inputs?.accounts?.[senderAddress];
   const preparation = complete && request ? deriveAuthorizationPreparation({ request, inputs, common }) : null;
   if (preparation) need(isDeepStrictEqual(output.authorizationProcessing, preparation.processing));
   else need(output?.authorizationProcessing === undefined);
+  const fees = request && header ? deriveVerifiedFees({ request, header, inputs, output }) : null;
+  if (!fees) need(output?.feeAccounting === undefined);
   // Derive the root CREATE address from independently reverified initial facts,
   // never from the worker's trace or its claimed after-nonce. An unfinished
   // frame may not have resolved a destination yet.
@@ -238,7 +263,7 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
       need(root.to === createContractAddress(createAddressFromString(senderAddress), nonce).toString());
     }
   }
-  const { created, creationAttempts, deleted, emptyDeleted } = validateExecutionLifecycle({ output, inputs, destination, changes: snapshot, startingChanges: preparation?.snapshot, selfdestructOnlyCreated });
+  const { created, creationAttempts, deleted, emptyDeleted } = validateExecutionLifecycle({ output, inputs, destination, changes: snapshot, startingChanges: preparation?.snapshot, selfdestructOnlyCreated, fees });
   if (!complete) { need(snapshot.accounts.length === 0); return; }
   need(senderInitial && typeof senderInitial.exists === 'boolean');
   need(output.trace.from === senderAddress && output.trace.caller === senderAddress);
@@ -258,8 +283,9 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
     need(initial && typeof initial.exists === 'boolean');
     const nonce = initial.exists ? BigInt(initial.nonce) : 0n;
     const row = { address, ...(!initial.exists ? { existence: { before: false, after: true, basis: 'unsigned_sender_nonce_materialization' } } : {}), nonce: { before: hex(nonce), after: hex(nonce + 1n) } };
-    need([...emptyDeleted].every(account => account === RIPEMD160));
-    need(isDeepStrictEqual(snapshot.accounts, [...emptyDeleted].map(cleanupRow).concat(preparation?.snapshot.accounts ?? [row]).sort((a, b) => a.address.localeCompare(b.address))));
+    need([...emptyDeleted].every(account => account === RIPEMD160 || account === fees?.plan.coinbase));
+    const preparedRows = revertedFeeRows({ baseRows: preparation?.snapshot.accounts ?? [row], fees, inputs });
+    need(isDeepStrictEqual(snapshot.accounts, [...emptyDeleted].map(cleanupRow).concat(preparedRows.filter(item => !emptyDeleted.has(item.address))).sort((a, b) => a.address.localeCompare(b.address))));
   }
   const rows = new Map(snapshot.accounts.map(row => [row.address, row]));
   // EVM execution changes nonces only for the outer sender, successfully

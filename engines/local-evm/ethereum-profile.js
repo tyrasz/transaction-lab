@@ -1,6 +1,7 @@
 import { Common, Mainnet } from '@ethereumjs/common';
 import { normalizeEvmContext } from '../evm-context.js';
 import { normalizeAuthorizationList } from './authorization-list.js';
+import { normalizeEthereumFees } from './ethereum-fees.js';
 
 const SUPPORTED = new Set(['shanghai', 'cancun', 'prague', 'osaka', 'bpo1', 'bpo2']);
 const BYTES = /^0x(?:[0-9a-f]{2})*$/i;
@@ -53,7 +54,7 @@ export function ethereumUsedGas({ messageGasUsed, refundCounter, intrinsic, floo
 /** Optional context metadata is conditional so legacy response identity stays
  * unchanged. Actual blob fee settlement and KZG validation remain excluded. */
 export function ethereumContextProfile(request, header, common = ethereumCommon(header)) {
-  const context = normalizeEvmContext(request), authorizationList = normalizeAuthorizationList(request), profile = { ...context };
+  const context = normalizeEvmContext(request), authorizationList = normalizeAuthorizationList(request), profile = { ...context, ...normalizeEthereumFees(request) };
   if (authorizationList) {
     const costs = ethereumCallGas(request.data, common, request);
     Object.assign(profile, { authorizationList, authorizationCount: costs.authorizationCount.toString(), authorizationIntrinsicGas: costs.authorizationIntrinsic.toString() });

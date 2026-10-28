@@ -1,8 +1,18 @@
-# Transaction Lab checkpoint — 0.23.0
+# Transaction Lab checkpoint — 0.24.0 candidate
 
 Updated October 28, 2026. The user's long-term objective remains to improve measured correctness and coverage; no background goal-runner status is implied. **No representative 90% or 100% accuracy rate or superiority to Blockaid has been established.** This is a working prototype with narrow measured coverage, not a general EVM simulation or security product.
 
 The app uses http://127.0.0.1:5174/ without a wallet connection or Dynamic authentication. Version 0.14 adds `POST /api/evm/local-preview`: an experimental Ethereum call executed in an isolated local worker from verified starting-state proofs/code, with explicit before/after token and Aave/Morpho position queries. The existing provider-backed Ethereum path retains automatic token/native measurements, typed positions and complete state continuation across ordered sequences. HyperEVM endpoints retain their semantics. The new local endpoint has its own availability, source/runtime identity, transport bounds and failure handling; it does not establish full signed-transaction support or complete economic-effect coverage. Security remains `not_assessed`. No signing or broadcasting occurs.
+
+## Explicit EIP-1559 fees — 0.24.0 candidate
+
+The local engine, API and browser now support an explicit unsigned EIP-1559 block-end profile. It uses the verified block base fee and beneficiary, checks maximum affordability, prepays effective gas cost, applies refunds and the calldata floor, credits the beneficiary, then finalizes deletion and empty-account cleanup. Fees and authorization preparation survive completed message REVERT/out-of-gas; infrastructure, proof and deadline failures roll back the entire attempt. Before/after queries remain unpriced and do not repeat preparation. The default unpriced profile is unchanged. Blob fee settlement, outer signatures, explicit transaction nonce and original historical position remain outside this profile.
+
+The unchanged implementation passes **647/647 application** and **482/482 local-engine tests**, in 11.016 and 15.430 seconds respectively. Earlier runs retained 640/647 and 474/482, followed by a controlled application run at 645/647; the system power log records repeated sleep intervals coinciding with those deadline failures, including a 276-second pause. No product deadline or test expectation was relaxed. A subsequent narrow UI malformed-beneficiary type guard and its regression pass all 23 local UI controls. The original test logs remain under `/tmp/evm-v024-*` on this workstation; these are local validation records, not sealed benchmark evidence.
+
+Thirteen differential groups cover 25 successful product/full-VM comparisons, including five real isolated-worker cases, with complete independently applied MPT roots. These share the EthereumJS opcode library. Four parent test groups reject altered fee/context/balance evidence and verify query isolation. Independent review additionally rejected five coordinated mutations and accepted two alias/zero-price edge cases. API/UI review found and fixed one malformed-response display exception; it found no false fee-amount admission. The parent validates consistency of the fixed worker's evidence; it does not independently execute each opcode.
+
+A fixed sixteen-case Geth comparison is being prepared. It has not yet been frozen or executed and contributes no result. The running app remains **0.23.0** at http://127.0.0.1:5174/ until this candidate completes release verification. No new representative accuracy estimate is available.
 
 ## Caller-selected gas — 0.23.0
 

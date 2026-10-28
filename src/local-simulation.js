@@ -7,6 +7,7 @@ import { compilePreviewQueries } from '../engines/local-evm/preview-queries.js';
 import { verifyEthereumHeader } from '../engines/local-evm/ethereum-header.js';
 import { normalizeEvmContext, EVM_CONTEXT_LIMITS } from '../engines/evm-context.js';
 import { normalizeAuthorizationList, MAX_AUTHORIZATIONS } from '../engines/local-evm/authorization-list.js';
+import { normalizeEthereumFees } from '../engines/local-evm/ethereum-fees.js';
 
 const ADDRESS = /^0x[0-9a-f]{40}$/i, HASH = /^0x[0-9a-f]{64}$/i;
 const NUMBER = /^0x(?:0|[1-9a-f][0-9a-f]{0,15})$/i, DATA = /^0x(?:[0-9a-f]{2})*$/i;
@@ -30,7 +31,7 @@ export const LOCAL_CAPABILITIES = freeze({
   profile: 'unsigned_unpriced_block_end', blockSelection: ['latest', 'canonical_hex_number', 'block_hash'],
   transactionContext: { optionalFields: ['accessList', 'blobVersionedHashes', 'authorizationList'], limits: { ...EVM_CONTEXT_LIMITS, authorizations: MAX_AUTHORIZATIONS }, blobFeeScope: 'synthetic_zero_no_blob_fee_settlement_or_sidecar_validation' },
   senderCode: 'empty_or_exact_existing_EIP7702_delegation_on_Prague_or_later',
-  authorizations: 'ordered_EIP7702_signed_tuples_on_Prague_or_later_before_unsigned_message_no_outer_signature_or_fee_settlement',
+  authorizations: 'ordered_EIP7702_signed_tuples_on_Prague_or_later_before_unsigned_message_no_outer_signature_validation',
   internalCreation: 'CREATE_CREATE2_with_proven_empty_deployable_targets',
   topLevelCreation: 'explicit_null_destination_CREATE_with_proven_empty_deployable_target',
   selfdestruct: 'fork_selected_Shanghai_whole_account_deletion_and_Cancun_created_only_deletion',
@@ -39,15 +40,19 @@ export const LOCAL_CAPABILITIES = freeze({
   querySelection: 'explicit_only', queryTypes: ['balanceOf', 'allowance', 'aave_v3_user_account_data', 'morpho_blue_position'],
   gasSelection: { field: 'gas', encoding: 'canonical_decimal_string', default: DEFAULT_GAS, minimum: MIN_GAS.toString(), maximum: MAX_GAS.toString(),
     scope: 'total_transaction_gas_including_intrinsic', selectedForkMinimumRequired: true, queryGas: '1000000' },
+  feeSelection: { executionProfile: 'unsigned_eip1559_block_end', requiredFields: ['maxFeePerGas', 'maxPriorityFeePerGas'],
+    encoding: 'canonical_decimal_uint256_wei_strings', default: 'unsigned_unpriced_block_end', blobContext: false,
+    scope: 'original_execution_only', queryProfile: 'unsigned_unpriced_block_end', settlementRequiresCompleteValidatedOutput: true },
   limits: { queries: 8, calldataBytes: 32768, gas: 5000000, proofRpcCalls: 256, totalRpcCalls: 260,
     responseBytes: 8 * 1024 * 1024, wireBytes: 32 * 1024 * 1024, wallMs: WALL, drainMs: DRAIN, apiOutputBytes: RESPONSE },
   limitations: [
     'Only explicit query pairs are measured; automatic token discovery, native-effect summaries and sequences are not provided by this endpoint.',
     'Proofs and runtime code are checked against the selected header, whose hash is recomputed. Consensus, finality and contract identity are not independently established.',
-    'Unsigned execution uses zero gas price and BASEFEE, without outer signature validation or fee settlement. Contract signature checks still execute.',
+    'The default unsigned profile uses zero gas price and BASEFEE without fee settlement. The optional EIP-1559 profile uses the selected block base fee and caller fee caps; settlement is reported only for a complete validated execution. Neither profile validates an outer transaction signature. Contract signature checks still execute.',
     'Optional gas selects the original transaction gas limit within 21,000–5,000,000; the selected fork also requires sufficient intrinsic gas and calldata floor. Each measurement query retains a separate 1,000,000 gas limit.',
     'Explicit to:null deploys initcode with CREATE; internal CREATE and CREATE2 require a proven deployable target with empty initial code/storage and zero nonce. Shanghai SELFDESTRUCT removes every committed execution account at transaction end. Cancun-or-later transfers preexisting balances while deleting only contracts created in that invocation.',
-    'Transaction-end EIP-161 cleanup removes touched empty accounts and their entire storage, including the retained RIPEMD160 touch exception. It adds no fee-related coinbase touch. Rematerializing a deleted account with original code, nonzero nonce or nonempty storage remains unsupported.',
+    'Transaction-end EIP-161 cleanup removes touched empty accounts and their entire storage, including the retained RIPEMD160 touch exception. The default profile adds no fee-related coinbase touch. Rematerializing a deleted account with original code, nonzero nonce or nonempty storage remains unsupported.',
+    'Optional fees require both maxFeePerGas and maxPriorityFeePerGas as raw wei strings and cannot accompany blob context. Measurement queries stay unpriced and do not repeat fee settlement.',
     'Sender code must initially be empty or an exact existing EIP-7702 delegation on Prague or later. Up to sixteen signed authorization tuples may install, replace or clear delegations before a call; their changes survive message failure. Authorization lists cannot accompany deployment or blob context. Other coded senders and KZG point evaluation remain unsupported. Blob calls use zero blob base fee without sidecar or inclusion validation.',
     'In-range BLOCKHASH follows authenticated parent headers within the shared read and time budgets; missing ancestry is unavailable.',
     'The pinned EthereumJS Shanghai-through-BPO2 schedule and fixed execution/state budgets bound supported execution.',
@@ -64,7 +69,7 @@ function record(value, allowed) {
   }
 }
 export function validateLocalSimulation(input) {
-  record(input, ['chainId', 'from', 'to', 'data', 'value', 'gas', 'block', 'queries', 'accessList', 'blobVersionedHashes', 'authorizationList']);
+  record(input, ['chainId', 'from', 'to', 'data', 'value', 'gas', 'block', 'queries', 'accessList', 'blobVersionedHashes', 'authorizationList', 'executionProfile', 'fees']);
   if (input.chainId !== 1 && input.chainId !== '1') throw new InputError('Only Ethereum chain 1 is supported.', 'UNSUPPORTED_CHAIN');
   if (typeof input.from !== 'string' || !ADDRESS.test(input.from)) throw new InputError('from must be a 20-byte hex address.');
   if (input.to !== null && (typeof input.to !== 'string' || !ADDRESS.test(input.to))) throw new InputError('to must be a 20-byte hex address, or explicit null for contract deployment.');
@@ -75,14 +80,15 @@ export function validateLocalSimulation(input) {
   if (typeof gas !== 'string' || !/^[1-9][0-9]{4,6}$/.test(gas) || BigInt(gas) < MIN_GAS || BigInt(gas) > MAX_GAS) throw new InputError('gas must be a canonical decimal string from 21000 to 5000000.');
   const block = input.block === undefined ? 'latest' : input.block;
   if (typeof block !== 'string' || !(block === 'latest' || NUMBER.test(block) || HASH.test(block))) throw new InputError('block must be latest, a canonical hexadecimal number, or a 32-byte block hash.');
-  let queries, context, authorizationList;
+  let queries, context, authorizationList, fees;
   try { context = normalizeEvmContext(input); } catch { throw new InputError('The access list or versioned blob hashes are malformed or exceed the declared bounds.'); }
   try { authorizationList = normalizeAuthorizationList(input); } catch { throw new InputError('The authorization list must contain one to sixteen canonical bounded authorization tuples.'); }
   if (authorizationList && (input.to === null || context.blobVersionedHashes)) throw new InputError('Authorization lists require a call destination without blob context.');
   if (input.to === null && context.blobVersionedHashes) throw new InputError('Blob context requires a call destination; contract deployment cannot carry blob hashes.');
+  try { fees = normalizeEthereumFees(input); } catch { throw new InputError('Optional transaction fees require the unsigned_eip1559_block_end profile and canonical decimal uint256 maxFeePerGas and maxPriorityFeePerGas, with priority no higher than the cap and no blob context.'); }
   try { queries = compilePreviewQueries(input.queries).map(row => structuredClone(row.descriptor)); }
   catch { throw new InputError('Supply one to eight distinct canonical token or typed position queries.'); }
-  return { chainId: 1, from: input.from.toLowerCase(), to: input.to === null ? null : input.to.toLowerCase(), data: input.data.toLowerCase(), value, gas, block: block.toLowerCase(), queries, ...context, ...(authorizationList ? { authorizationList } : {}) };
+  return { chainId: 1, from: input.from.toLowerCase(), to: input.to === null ? null : input.to.toLowerCase(), data: input.data.toLowerCase(), value, gas, block: block.toLowerCase(), queries, ...context, ...(authorizationList ? { authorizationList } : {}), ...fees };
 }
 
 function projection(core) {
@@ -107,7 +113,7 @@ export async function simulateLocal(input, rpc, { signal } = {}) {
   const apiRequest = validateLocalSimulation(input), started = performance.now();
   const report = { kind: 'local_proof_preview', schemaVersion: '1.0', id: randomUUID(), createdAt: new Date().toISOString(),
     apiRequest, status: 'unavailable', error: null, execution: { status: 'unavailable' }, measurements: [], attempt: null,
-    source: { kind: 'proof_backed_owned_execution', profile: 'unsigned_unpriced_block_end', canonicalStatus: 'unverified',
+    source: { kind: 'proof_backed_owned_execution', profile: apiRequest.executionProfile ?? 'unsigned_unpriced_block_end', canonicalStatus: 'unverified',
       consensusVerified: false, originalTransactionReplay: false, blockSelection: { requested: apiRequest.block } },
     transportEvidence: [], usage: null, timing: null };
   const controller = new AbortController();
@@ -140,7 +146,7 @@ export async function simulateLocal(input, rpc, { signal } = {}) {
     const usage = rpc.usage(), wallMs = Math.floor(remaining() - FINAL_RESERVE);
     const calls = Math.min(256, usage.limits.calls - usage.calls - 1), totalResponseBytes = Math.min(32 * 1024 * 1024, usage.limits.totalBytes - usage.observedBytes);
     if (wallMs <= 0 || calls <= 0 || totalResponseBytes <= 0) stop('LOCAL_PREVIEW_BUDGET');
-    report.attempt = await executeIsolatedEthereumPreview({ request: { from: apiRequest.from, to: apiRequest.to, data: apiRequest.data, value: apiRequest.value, gas: apiRequest.gas, ...normalizeEvmContext(apiRequest), ...(apiRequest.authorizationList ? { authorizationList: apiRequest.authorizationList } : {}) },
+    report.attempt = await executeIsolatedEthereumPreview({ request: { from: apiRequest.from, to: apiRequest.to, data: apiRequest.data, value: apiRequest.value, gas: apiRequest.gas, ...normalizeEvmContext(apiRequest), ...(apiRequest.authorizationList ? { authorizationList: apiRequest.authorizationList } : {}), ...normalizeEthereumFees(apiRequest) },
       header, queries: apiRequest.queries, rpc, signal: controller.signal,
       limits: { wallMs, calls, totalResponseBytes } });
     if (controller.signal.aborted || signal?.aborted) stop(signal?.aborted ? 'LOCAL_PREVIEW_CANCELLED' : 'LOCAL_PREVIEW_BUDGET');

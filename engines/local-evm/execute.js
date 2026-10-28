@@ -1,15 +1,17 @@
 // Experimental message execution. No provider trace, expected output, outer
-// transaction signature, broadcast or fee settlement enters this module.
+// transaction signature or broadcast enters this module. Fee settlement is an
+// explicit opt-in; the legacy unsigned/unpriced profile stays unchanged.
 // Explicit bounded EIP-7702 authorization signatures are processed separately.
 import { performance } from 'node:perf_hooks';
 import { createCustomCommon, Hardfork, Mainnet } from '@ethereumjs/common';
 import { createEVM, EVMError } from '@ethereumjs/evm';
 import { Account, bytesToHex, createAddressFromString, hexToBytes } from '@ethereumjs/util';
-import { ethereumCommon, ethereumContextProfile } from './ethereum-profile.js';
+import { ethereumCommon, ethereumContextProfile, ethereumCallGas, ethereumUsedGas } from './ethereum-profile.js';
 import { normalizeEvmContext } from '../evm-context.js';
 import { EMPTY_STORAGE_ROOT } from './verified-state-proof.js';
 import { existingDelegationTarget } from './sender-delegation.js';
 import { normalizeAuthorizationList, recoverAuthorization, authorizationStateDecision } from './authorization-list.js';
+import { normalizeEthereumFees, ethereumFeePlan, settleEthereumFees } from './ethereum-fees.js';
 
 export const EXECUTION_LIMITS = Object.freeze({ gas: 5000000, steps: 1000000, frames: 1000, depth: 32, logs: 2000, memoryBytes: 1048576, returnBytes: 1048576, calldataBytes: 32768, traceBytes: 8388608, wallMs: 10000 });
 export const ETHEREUM_EXECUTION_LIMITS = Object.freeze({ ...EXECUTION_LIMITS, wallMs: 120000 });
@@ -65,6 +67,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
   let managerFailed = false, managerError;
   let delegatedSenderNonce = null, retainedSenderCreations = 0;
   let authorizationProcessing = null, authorizationSenderIncrements = 0, authorizationBaseline = null;
+  let feePlan = null, feeCosts = null, feeAccounting = null;
   const stack = [];
   const reserved = value => supportedAddress(value, chainId);
   function bound(name, value) { if (value > limits[name]) reject('LOCAL_RESOURCE_LIMIT', `Local execution exceeded its ${name} limit.`); }
@@ -87,11 +90,11 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     }
     if (!stateManager || typeof stateManager !== 'object' || ['getAccount', 'putAccount', 'getCode', 'getStorage', 'checkpoint', 'commit', 'revert'].some(method => typeof stateManager[method] !== 'function')) reject('LOCAL_INVALID_INPUT', 'A compatible explicit state manager is required.');
     if (activeManagers.has(stateManager)) reject('LOCAL_STATE_BUSY', 'Concurrent execution on the same state manager is not supported.');
-    let context, authorizationList; try { context = normalizeEvmContext(request); authorizationList = normalizeAuthorizationList(request); } catch { reject('LOCAL_INVALID_INPUT', 'Optional EVM context is malformed.'); }
-    if (chainId !== 1 && (Object.keys(context).length || authorizationList !== undefined)) reject('LOCAL_INVALID_INPUT', 'Optional execution context requires the Ethereum profile.');
+    let context, authorizationList, feeContext; try { context = normalizeEvmContext(request); authorizationList = normalizeAuthorizationList(request); feeContext = normalizeEthereumFees(request); } catch { reject('LOCAL_INVALID_INPUT', 'Optional EVM context is malformed.'); }
+    if (chainId !== 1 && (Object.keys(context).length || authorizationList !== undefined || feeContext.executionProfile)) reject('LOCAL_INVALID_INPUT', 'Optional execution context requires the Ethereum profile.');
     const topLevelCreation = chainId === 1 && request?.to === null;
     const from = address(request?.from), to = address(request?.to), value = quantity(request?.value), gasLimit = quantity(request?.gasLimit);
-    if (!from || (!to && !topLevelCreation) || (topLevelCreation && context.blobVersionedHashes !== undefined) || value === null || gasLimit === null || (chainId === 999 && gasLimit === 0n) || gasLimit > BigInt(limits.gas) || typeof request?.data !== 'string' || !BYTES.test(request.data) || request.data.length > 2 + limits.calldataBytes * 2 || Object.keys(request).some(key => !['from', 'to', 'data', 'value', 'gasLimit', 'accessList', 'blobVersionedHashes', 'authorizationList'].includes(key))) reject('LOCAL_INVALID_INPUT', 'A bounded unsigned message with explicit from, destination (or Ethereum creation null), data, value and message gasLimit is required.');
+    if (!from || (!to && !topLevelCreation) || (topLevelCreation && context.blobVersionedHashes !== undefined) || value === null || gasLimit === null || (chainId === 999 && gasLimit === 0n) || gasLimit > BigInt(limits.gas) || typeof request?.data !== 'string' || !BYTES.test(request.data) || request.data.length > 2 + limits.calldataBytes * 2 || Object.keys(request).some(key => !['from', 'to', 'data', 'value', 'gasLimit', 'accessList', 'blobVersionedHashes', 'authorizationList', 'executionProfile', 'fees'].includes(key))) reject('LOCAL_INVALID_INPUT', 'A bounded unsigned message with explicit from, destination (or Ethereum creation null), data, value and message gasLimit is required.');
     reserved(from); reserved(to);
     if (!block || ['number', 'timestamp', 'gasLimit', 'baseFeePerGas'].some(field => quantity(block[field]) === null) || quantity(block.gasLimit) === 0n || typeof block.mixHash !== 'string' || !WORD.test(block.mixHash) || !address(block.miner) || ['hash', 'parentHash'].some(field => block[field] !== undefined && (typeof block[field] !== 'string' || !WORD.test(block[field])))) reject('LOCAL_INVALID_INPUT', 'Explicit block number, timestamp, gas limit, base fee, prevRandao and coinbase are required.');
     const common = chainId === 1 ? ethereumCommon(block) : createCustomCommon({ chainId: 999, name: 'experimental-hyperevm-message' }, Mainnet, { hardfork: Hardfork.Cancun });
@@ -101,6 +104,16 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     const canFinalizeDeletion = chainId === 1 && typeof stateManager.finalizeCreatedContractDeletion === 'function';
     const canFinalizeShanghai = chainId === 1 && typeof stateManager.finalizeShanghaiContractDeletion === 'function';
     const canCleanupEmpty = chainId === 1 && typeof stateManager.beginEmptyAccountCleanup === 'function' && typeof stateManager.endEmptyAccountCleanup === 'function';
+    if (feeContext.executionProfile) {
+      if (!canCleanupEmpty) reject('LOCAL_STATE_UNSUPPORTED', 'Fee settlement requires transaction-end empty-account cleanup.', 'unsupported');
+      try {
+        feeCosts = ethereumCallGas(request.data, common, request);
+        const totalGas = gasLimit + feeCosts.intrinsic;
+        if (totalGas < feeCosts.minimum) reject('LOCAL_INVALID_INPUT', 'The priced envelope cannot cover the selected fork gas minimum.', 'invalid');
+        feePlan = ethereumFeePlan({ ...request, value: value.toString(), gas: totalGas.toString() }, block);
+      } catch { reject('LOCAL_INVALID_INPUT', 'The explicit fee profile does not match the selected header or gas envelope.', 'invalid'); }
+      semantics.gasPrice = feePlan.effectiveGasPrice.toString();
+    }
     let observedCreation = false, observedSelfdestruct = false, observedCreatedSelfdestruct = false;
     function describeLifecycle() {
       const unsupported = canFinalizeDeletion ? (canCleanupEmpty ? (canFinalizeShanghai ? 'fork_selected_SELFDESTRUCT_finalization' : 'Shanghai_SELFDESTRUCT_unsupported') : 'Shanghai_SELFDESTRUCT_and_full_EIP161_cleanup_unsupported') : 'same_invocation_creation_and_Shanghai_SELFDESTRUCT_unsupported';
@@ -253,12 +266,16 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
         semantics.senderDelegation = { address: delegation, authorizationListProcessed: false };
         semantics.callerNonce = 'runCall_increment_and_committed_sender_creation_attempts';
       }
-      if ((account?.balance ?? 0n) < value) reject('LOCAL_CALL_INSUFFICIENT_BALANCE', 'The sender cannot cover the declared native value.', 'invalid');
+      if ((account?.balance ?? 0n) < (feePlan?.maximumRequiredBalance ?? value)) reject('LOCAL_CALL_INSUFFICIENT_BALANCE', feePlan ? 'The sender cannot cover the native value and maximum declared gas fee.' : 'The sender cannot cover the declared native value.', 'invalid');
       if ((account?.nonce ?? 0n) >= (1n << 64n) - 1n) reject('LOCAL_CALL_NONCE_OVERFLOW', 'The sender nonce cannot be incremented within uint64.', 'invalid');
       if (authorizationList !== undefined) delegatedSenderNonce = account?.nonce ?? 0n;
     }
     if (authorizationList !== undefined) authorizationBaseline = { callerNonce: semantics.callerNonce, warmAddresses: semantics.warmAddresses, senderDelegation: semantics.senderDelegation };
     await guarded.checkpoint();
+    if (feePlan) {
+      const sender = createAddressFromString(from), account = await guarded.getAccount(sender) ?? new Account();
+      account.balance -= feePlan.upfrontGasDebit; await evm.journal.putAccount(sender, account);
+    }
     if (authorizationList !== undefined) {
       const sender = createAddressFromString(from), account = await guarded.getAccount(sender) ?? new Account();
       account.nonce++; await evm.journal.putAccount(sender, account);
@@ -288,9 +305,23 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       semantics.callerNonce = 'outer_increment_authorizations_and_committed_sender_creation_attempts';
       semantics.warmAddresses += '_and_recovered_authorities';
     }
-    const result = await evm.runCall({ caller: createAddressFromString(from), origin: createAddressFromString(from), ...(to ? { to: createAddressFromString(to) } : {}), data: hexToBytes(request.data), value, gasLimit, gasPrice: 0n, ...(authorizationList !== undefined ? { skipNonceIncrement: true } : {}), ...(context.blobVersionedHashes ? { blobVersionedHashes: [...context.blobVersionedHashes] } : {}), block: { header: { number: quantity(block.number), timestamp: quantity(block.timestamp), gasLimit: quantity(block.gasLimit), baseFeePerGas: quantity(block.baseFeePerGas), difficulty: 0n, prevRandao: hexToBytes(block.mixHash), coinbase: createAddressFromString(address(block.miner)), getBlobGasPrice() { if (context.blobVersionedHashes) return 0n; reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is unsupported.', 'unsupported'); } } } });
+    const result = await evm.runCall({ caller: createAddressFromString(from), origin: createAddressFromString(from), ...(to ? { to: createAddressFromString(to) } : {}), data: hexToBytes(request.data), value, gasLimit, gasPrice: feePlan?.effectiveGasPrice ?? 0n, ...(authorizationList !== undefined ? { skipNonceIncrement: true } : {}), ...(context.blobVersionedHashes ? { blobVersionedHashes: [...context.blobVersionedHashes] } : {}), block: { header: { number: quantity(block.number), timestamp: quantity(block.timestamp), gasLimit: quantity(block.gasLimit), baseFeePerGas: quantity(block.baseFeePerGas), difficulty: 0n, prevRandao: hexToBytes(block.mixHash), coinbase: createAddressFromString(address(block.miner)), getBlobGasPrice() { if (context.blobVersionedHashes) return 0n; reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is unsupported.', 'unsupported'); } } } });
     clockCheck();
     if (stack.length || checkpointDepth !== 1) reject('LOCAL_TRACE_INVALID', 'Local call-tree or checkpoint completion is inconsistent.');
+    if (feePlan) {
+      const used = ethereumUsedGas({ messageGasUsed: result.execResult.executionGasUsed, refundCounter: (result.execResult.gasRefund ?? 0n) + BigInt(authorizationProcessing?.gasRefundCounter ?? '0'), intrinsic: feeCosts.intrinsic, floor: feeCosts.floor });
+      feeAccounting = settleEthereumFees(feePlan, { gasUsed: used.gasUsed });
+      // Read current state separately for each credit: sender and coinbase can
+      // coincide. Credit even a zero tip so EIP-161 sees the coinbase touch.
+      for (const [target, amount] of [[from, BigInt(feeAccounting.senderRefund)], [feePlan.coinbase, BigInt(feeAccounting.coinbaseTip)]]) {
+        const accountAddress = createAddressFromString(target), account = await guarded.getAccount(accountAddress) ?? new Account();
+        if (account.balance + amount > UINT256_MAX) reject('LOCAL_STATE_INVALID', 'Fee settlement exceeds the account balance range.');
+        account.balance += amount; await evm.journal.putAccount(accountAddress, account);
+      }
+      // Settlement precedes deletion. A scheduled deletion can burn its tip;
+      // refunding or crediting it after finalization would resurrect state.
+      semantics.feeSettlement = true;
+    }
     const finalizedDeletions = [];
     if (!result.execResult.exceptionError && result.execResult.selfdestruct?.size) {
       const cancun = common.isActivatedEIP(6780);
@@ -315,7 +346,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       finally { deletions = stateManager.endEmptyAccountCleanup(); }
       clockCheck();
       if (deletions.length) {
-        emptyAccountCleanup = { basis: 'eip161_transaction_end', scope: 'unsigned_message_touches_no_fee_settlement', touchedAccounts, deletions };
+        emptyAccountCleanup = { basis: 'eip161_transaction_end', scope: feePlan ? 'unsigned_eip1559_transaction_touches' : 'unsigned_message_touches_no_fee_settlement', touchedAccounts, deletions };
         semantics.lifecycle = (semantics.lifecycle === 'no_lifecycle_operation_encountered' ? '' : semantics.lifecycle + '_and_') + 'EIP161_empty_account_cleanup';
       }
     }
@@ -325,9 +356,9 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     } : null;
     const logs = (result.execResult.logs ?? []).map(([emitter, topics, data]) => ({ address: bytesToHex(emitter), topics: topics.map(bytesToHex), data: bytesToHex(data) }));
     bound('logs', logs.length); bound('returnBytes', result.execResult.returnValue.length);
-    usage.retainedTraceBytes = Buffer.byteLength(JSON.stringify({ trace: root, logs, ...(lifecycle ? { lifecycle } : {}), ...(authorizationProcessing ? { authorizationProcessing } : {}) }), 'utf8'); bound('traceBytes', usage.retainedTraceBytes);
+    usage.retainedTraceBytes = Buffer.byteLength(JSON.stringify({ trace: root, logs, ...(lifecycle ? { lifecycle } : {}), ...(authorizationProcessing ? { authorizationProcessing } : {}), ...(feeAccounting ? { feeAccounting } : {}) }), 'utf8'); bound('traceBytes', usage.retainedTraceBytes);
     const error = root.error, status = !error ? 'success' : error === 'revert' ? 'reverted' : 'failed';
-    const report = { execution: { status, executionGasUsed: result.execResult.executionGasUsed.toString(), gasRefundCounter: (result.execResult.gasRefund ?? 0n).toString(), returnData: bytesToHex(result.execResult.returnValue), error }, trace: root, logs, environment, semantics, limits, usage, ...(lifecycle ? { lifecycle } : {}), ...(authorizationProcessing ? { authorizationProcessing } : {}), stateDisposition: 'message_result_retained_in_supplied_manager' };
+    const report = { execution: { status, executionGasUsed: result.execResult.executionGasUsed.toString(), gasRefundCounter: (result.execResult.gasRefund ?? 0n).toString(), returnData: bytesToHex(result.execResult.returnValue), error }, trace: root, logs, environment, semantics, limits, usage, ...(lifecycle ? { lifecycle } : {}), ...(authorizationProcessing ? { authorizationProcessing } : {}), ...(feeAccounting ? { feeAccounting } : {}), stateDisposition: 'message_result_retained_in_supplied_manager' };
     // Transient writes in reverted subtrees are gone now. Any remaining whole
     // namespace reset must be representable before the invocation is retained,
     // including when a caller supplied an already-checkpointed manager.
@@ -342,6 +373,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     await stateManager.commit(); checkpointDepth--;
     return report;
   } catch (error) {
+    semantics.feeSettlement = false;
     // No completed preparation record is exposed for a rolled-back attempt.
     // Keep incomplete metadata bound to the independently known sender input.
     if (authorizationBaseline) {

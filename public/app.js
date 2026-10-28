@@ -1,7 +1,8 @@
 const $ = (id) => document.getElementById(id);
 const state = { config: null, example: null, result: null, busy: false, benchmarkLoaded: false, sequenceDrafts: [], sequenceControls: [], nextCallKey: 1 };
-const requestFieldIds = ['chain', 'ethereum-engine', 'ethereum-call-mode', 'local-operation', 'local-gas', 'from', 'to', 'data', 'value', 'block', 'standard-manual-queries', 'standard-queries', 'transaction-context'];
+const requestFieldIds = ['chain', 'ethereum-engine', 'ethereum-call-mode', 'local-operation', 'local-gas', 'local-fees-enabled', 'local-max-fee', 'local-priority-fee', 'from', 'to', 'data', 'value', 'block', 'standard-manual-queries', 'standard-queries', 'transaction-context'];
 const DEFAULT_LOCAL_GAS = '5000000';
+const LOCAL_FEE_PROFILE = 'unsigned_eip1559_block_end';
 const ethereumMode = () => $('chain').value === '1';
 const localMode = () => ethereumMode() && $('ethereum-engine').value === 'local';
 const creationMode = () => localMode() && $('local-operation').value === 'create';
@@ -91,6 +92,22 @@ function updateLocalGasSelection() {
 function resetLocalGas(value = '') {
   $('local-gas').value = value; $('local-gas').setCustomValidity('');
   $('local-gas-settings').open = false; updateLocalGasSelection();
+}
+
+function decimalWei(value) { return typeof value === 'string' && /^(?:0|[1-9][0-9]{0,77})$/.test(value) && BigInt(value) < (1n << 256n); }
+function readLocalFees() {
+  if (!$('local-fees-enabled').checked) return undefined;
+  const maxFeePerGas = $('local-max-fee').value.trim(), maxPriorityFeePerGas = $('local-priority-fee').value.trim();
+  if (!decimalWei(maxFeePerGas) || !decimalWei(maxPriorityFeePerGas)) throw new Error('Enter both fee amounts as whole wei, without commas or leading zeros.');
+  if (BigInt(maxPriorityFeePerGas) > BigInt(maxFeePerGas)) throw new Error('Priority fee cannot exceed the maximum fee per gas.');
+  return { executionProfile: LOCAL_FEE_PROFILE, fees: { maxFeePerGas, maxPriorityFeePerGas } };
+}
+function resetLocalFees(request = {}) {
+  $('local-fees-enabled').checked = request.executionProfile === LOCAL_FEE_PROFILE;
+  $('local-max-fee').value = typeof request.fees?.maxFeePerGas === 'string' ? request.fees.maxFeePerGas : '';
+  $('local-priority-fee').value = typeof request.fees?.maxPriorityFeePerGas === 'string' ? request.fees.maxPriorityFeePerGas : '';
+  for (const id of ['local-max-fee', 'local-priority-fee']) $(id).setCustomValidity('');
+  $('local-fee-settings').open = false;
 }
 
 function currentExamples() {
@@ -184,11 +201,13 @@ function updateSequenceControls() {
 function selectExample({ initial = false } = {}) {
   clearTransactionContexts();
   resetLocalGas();
+  resetLocalFees();
   state.example = currentExamples().find((example) => example.id === $('example').value) || null;
   const example = state.example;
   if (example) {
     const transaction = (ethereumMode() ? example.input : example.request) || {};
     if (localMode() && typeof transaction.gas === 'string') resetLocalGas(transaction.gas);
+    if (localMode()) resetLocalFees(transaction);
     $('local-operation').value = localMode() && transaction.to === null ? 'create' : 'call';
     for (const field of sequenceMode() ? ['from'] : ['from', 'to', 'data', 'value']) $(field).value = transaction[field] ?? (field === 'data' ? '0x' : field === 'value' ? '0' : '');
     $('block').value = ethereumMode() ? transaction.block || 'latest' : 'latest';
@@ -239,8 +258,16 @@ function updateQueryMode() {
   $('local-gas').disabled = state.busy || !local;
   if (!local) $('local-gas').setCustomValidity('');
   updateLocalGasSelection();
+  const feesEnabled = local && $('local-fees-enabled').checked;
+  $('local-fee-settings').hidden = !local;
+  $('local-fees-enabled').disabled = state.busy || !local;
+  $('local-fee-fields').hidden = !feesEnabled;
+  for (const id of ['local-max-fee', 'local-priority-fee']) {
+    $(id).disabled = state.busy || !feesEnabled; $(id).required = feesEnabled;
+    if (!feesEnabled) $(id).setCustomValidity('');
+  }
   if (standard) $('block-help').textContent = local
-    ? 'Use latest, a hexadecimal block number, or a block hash. Execution starts at the end of that block with your selected gas limit and no transaction fee settlement.'
+    ? `Use latest, a hexadecimal block number, or a block hash. Execution starts at the end of that block with your selected gas limit${feesEnabled ? ' and the selected block’s base fee.' : ' and no transaction fee settlement.'}`
     : 'Use latest, a hexadecimal block number, or a block hash. Execution starts at the end of that block with a fixed gas limit and no transaction fee settlement.';
   $('local-operation-help').hidden = !creationMode();
   $('recipient-field').hidden = creationMode();
@@ -261,7 +288,8 @@ function updateQueryMode() {
     ? 'Your manual list controls token and position checks, up to eight combined. Up to eight observed ETH accounts are still selected automatically; network fees are excluded.'
     : 'Automatically check up to eight observed ETH accounts and eight token balance or allowance queries. Other changes may be missed; network fees are excluded.';
   if (!manual) $('standard-queries').setCustomValidity('');
-  if (local) $('standard-checks-help').textContent = 'Checks only the listed accounts and contracts, in raw units. Network fees, contract identity and complete economic effects are not established.';
+  if (local) $('standard-checks-help').textContent = `Checks only the listed accounts and contracts, in raw units. ${feesEnabled ? 'Measurement queries do not repeat transaction fees. ' : 'Network fees are excluded. '}Contract identity and complete economic effects are not established.`;
+  if (standard) $('value-help').textContent = `ETH sent with the call, in whole wei. 1 ETH = 1000000000000000000 wei. Use 0 for none; ${feesEnabled ? 'transaction fees are separate from this value.' : 'network fees are excluded.'}`;
   updateSequenceControls();
 }
 
@@ -1232,6 +1260,31 @@ function localMeasurementRows(result) {
   });
 }
 
+function localFeeAccounting(result) {
+  const output = result.attempt?.preview?.original?.output, profile = output?.profile, fee = output?.feeAccounting, api = result.apiRequest;
+  if (!['complete', 'partial'].includes(result.status) || result.source?.canonicalStatus !== 'verified' || result.attempt?.status !== 'completed'
+    || !['success', 'reverted', 'failed'].includes(result.execution?.status) || output?.execution?.status !== result.execution.status
+    || result.source.profile !== LOCAL_FEE_PROFILE || api?.executionProfile !== LOCAL_FEE_PROFILE || profile?.executionProfile !== LOCAL_FEE_PROFILE
+    || profile.feesSettled !== true || fee?.kind !== 'eip1559' || typeof fee.coinbase !== 'string' || !/^0x[0-9a-f]{40}$/.test(fee.coinbase)) return null;
+  try {
+    if (!['maxFeePerGas', 'maxPriorityFeePerGas'].every(key => decimalWei(api.fees?.[key]) && profile.fees?.[key] === api.fees[key])) return null;
+    if (!['gasLimit', 'effectiveGasPrice', 'baseFeePerGas', 'priorityFeePerGas', 'maximumRequiredBalance', 'upfrontGasDebit', 'chargedGas', 'gasCharge', 'senderRefund', 'baseFeeBurn', 'coinbaseTip'].every(key => decimalWei(fee[key]))) return null;
+    const gas = readLocalGas(api.gas), header = result.source.blockSelection?.header;
+    if (!gas || fee.gasLimit !== gas || profile.declaredGasLimit !== gas || fee.chargedGas !== output.gasAccounting?.gasUsed
+      || profile.executionBaseFee !== fee.baseFeePerGas || profile.gasPrice !== fee.effectiveGasPrice
+      || typeof header?.baseFeePerGas !== 'string' || !/^0x(?:0|[1-9a-f][0-9a-f]*)$/.test(header.baseFeePerGas)
+      || BigInt(header.baseFeePerGas) !== BigInt(fee.baseFeePerGas) || header.miner?.toLowerCase() !== fee.coinbase || !decimalWei(api.value)) return null;
+    const cap = BigInt(api.fees.maxFeePerGas), maxTip = BigInt(api.fees.maxPriorityFeePerGas), base = BigInt(fee.baseFeePerGas);
+    if (maxTip > cap || cap < base) return null;
+    const tip = cap - base < maxTip ? cap - base : maxTip, price = base + tip, limit = BigInt(gas), charged = BigInt(fee.chargedGas);
+    if (charged > limit || BigInt(fee.priorityFeePerGas) !== tip || BigInt(fee.effectiveGasPrice) !== price
+      || BigInt(fee.maximumRequiredBalance) !== limit * cap + BigInt(api.value) || BigInt(fee.upfrontGasDebit) !== limit * price
+      || BigInt(fee.gasCharge) !== charged * price || BigInt(fee.senderRefund) !== (limit - charged) * price
+      || BigInt(fee.baseFeeBurn) !== charged * base || BigInt(fee.coinbaseTip) !== charged * tip) return null;
+    return fee;
+  } catch { return null; }
+}
+
 function renderLocalResult(result) {
   beginResult(result, true);
   $('standard-result').hidden = true; $('hyper-result').hidden = true; $('sequence-result').hidden = true; $('local-result').hidden = false;
@@ -1243,7 +1296,8 @@ function renderLocalResult(result) {
   const reportedGas = result.apiRequest?.gas ?? result.attempt?.preview?.original?.output?.profile?.declaredGasLimit ?? DEFAULT_LOCAL_GAS;
   let gasLabel = 'Not available';
   try { gasLabel = numberLabel(readLocalGas(reportedGas)); } catch { /* Keep malformed result context explicit. */ }
-  $('gas-used').textContent = `Gas limit: ${gasLabel} · network fees excluded`;
+  const fee = localFeeAccounting(result), feeRequested = result.apiRequest?.executionProfile !== undefined || result.apiRequest?.fees !== undefined || result.source?.profile === LOCAL_FEE_PROFILE;
+  $('gas-used').textContent = `Gas limit: ${gasLabel} · ${fee ? `simulated fee: ${numberLabel(fee.gasCharge)} wei` : feeRequested ? 'fee result unavailable' : 'network fees excluded'}`;
   $('coverage-label').textContent = 'Requested checks'; $('coverage-status').textContent = `${measured} / ${rows.length} measured`;
   $('coverage-status').className = rows.length > 0 && measured === rows.length ? 'success' : 'partial';
   $('coverage-detail').textContent = 'Explicit query list only · raw units';
@@ -1273,10 +1327,15 @@ function renderLocalResult(result) {
     'Only the explicit query list is checked. There is no automatic asset discovery, ETH balance summary or total portfolio value.',
     'Before and after refer to this unsigned call from the selected block-end state, not the original historical transaction position.',
     'State proofs and code are checked against the selected header. Consensus, finality, contract identity and complete economic effects are not established.',
-    'Network fees and outer transaction signatures are not validated. Execution is not a security verdict.',
+    feeRequested ? 'Fee amounts are shown only for a complete validated simulation. Measurement queries do not repeat fees. Outer transaction signatures are not validated.' : 'Network fees and outer transaction signatures are not validated. Execution is not a security verdict.',
   ].map(text => node('li', '', text)));
   const details = $('source-details'), selection = result.source?.blockSelection || {}; details.replaceChildren();
   for (const [label, value] of [['Engine', 'Independent local execution · experimental'], ['Profile', result.source?.profile], ['Requested state', selection.requested || result.apiRequest?.block], ['Resolved block', selection.blockNumber], ['Block hash', selection.blockHash], ['Block binding', result.source?.canonicalStatus], ['Sender', result.apiRequest?.from], ['Recipient', result.apiRequest?.to === null ? 'Contract deployment' : result.apiRequest?.to], ['Native value · wei', result.apiRequest?.value], ['Run ID', result.id]]) addDefinition(details, label, value);
+  if (fee) {
+    for (const [label, key] of [['Gas charged', 'chargedGas'], ['Effective gas price · wei', 'effectiveGasPrice'], ['Fee charged in simulation · wei', 'gasCharge'], ['Unused upfront gas debit returned · wei', 'senderRefund'], ['Base fee burned · wei', 'baseFeeBurn'], ['Block beneficiary tip · wei', 'coinbaseTip']]) addDefinition(details, label, fee[key]);
+    addDefinition(details, 'Block beneficiary', fee.coinbase);
+    $('warnings-list').append(node('li', '', 'The simulated beneficiary tip is a fee allocation, not a claim about its surviving balance after account deletion.'));
+  } else if (feeRequested) addDefinition(details, 'Transaction fees', 'Unavailable; no validated fee amounts are shown.');
   const original = result.attempt?.preview?.original?.output;
   const deletions = original?.lifecycle?.finalizedDeletions;
   if (['complete', 'partial'].includes(result.status) && result.execution?.status === 'success' && result.source?.canonicalStatus === 'verified' && result.attempt?.status === 'completed' && original?.execution?.status === 'success' && Array.isArray(deletions) && deletions.length > 0 && deletions.length <= 128 && deletions.every(row => typeof row.address === 'string' && /^0x[0-9a-f]{40}$/.test(row.address) && row.scope === 'entire_account_including_code_and_storage')) {
@@ -1284,7 +1343,7 @@ function renderLocalResult(result) {
     $('warnings-list').append(node('li', '', 'The listed contracts are removed at the end of this call. They do not remain deployed after it.'));
   }
   const cleanup = original?.lifecycle?.emptyAccountCleanup;
-  if (['complete', 'partial'].includes(result.status) && ['success', 'reverted', 'failed'].includes(result.execution?.status) && original?.execution?.status === result.execution.status && result.source?.canonicalStatus === 'verified' && result.attempt?.status === 'completed' && cleanup?.basis === 'eip161_transaction_end' && cleanup.scope === 'unsigned_message_touches_no_fee_settlement' && Array.isArray(cleanup.deletions) && cleanup.deletions.length > 0 && cleanup.deletions.length <= 128 && cleanup.deletions.every(row => typeof row.address === 'string' && /^0x[0-9a-f]{40}$/.test(row.address) && row.scope === 'entire_account_including_code_and_storage' && /^0x[0-9a-f]{64}$/.test(row.initialStorageRoot))) {
+  if (['complete', 'partial'].includes(result.status) && ['success', 'reverted', 'failed'].includes(result.execution?.status) && original?.execution?.status === result.execution.status && result.source?.canonicalStatus === 'verified' && result.attempt?.status === 'completed' && cleanup?.basis === 'eip161_transaction_end' && cleanup.scope === (fee ? 'unsigned_eip1559_transaction_touches' : 'unsigned_message_touches_no_fee_settlement') && Array.isArray(cleanup.deletions) && cleanup.deletions.length > 0 && cleanup.deletions.length <= 128 && cleanup.deletions.every(row => typeof row.address === 'string' && /^0x[0-9a-f]{40}$/.test(row.address) && row.scope === 'entire_account_including_code_and_storage' && /^0x[0-9a-f]{64}$/.test(row.initialStorageRoot))) {
     addDefinition(details, 'Empty accounts removed', cleanup.deletions.map(row => row.address).join(', '));
   }
   $('timing').textContent = Number.isFinite(result.timing?.totalMs) ? `${(result.timing.totalMs / 1000).toFixed(2)}s total` : '';
@@ -1528,17 +1587,21 @@ async function run(mode) {
   if (standard && !sequence) validateWeiField($('value'));
   const calls = sequence ? readSequenceCalls() : undefined;
   if (sequence && !calls) return;
-  let queries, context, gas;
+  let queries, context, gas, feeContext;
   if (localMode()) {
     $('local-gas').setCustomValidity('');
     try { gas = readLocalGas(); }
     catch (error) { $('local-gas-settings').open = true; $('local-gas').setCustomValidity(error.message); $('local-gas').reportValidity(); return; }
+    for (const id of ['local-max-fee', 'local-priority-fee']) $(id).setCustomValidity('');
+    try { feeContext = readLocalFees(); }
+    catch (error) { $('local-fee-settings').open = true; $('local-max-fee').setCustomValidity(error.message); $('local-max-fee').reportValidity(); return; }
   }
   if (standard && !sequence) {
     $('transaction-context').setCustomValidity('');
     try {
       context = readTransactionContext($('transaction-context').value);
       if (creationMode() && context?.blobVersionedHashes) throw new Error('Contract deployment cannot carry blob hashes. Remove blobVersionedHashes from the optional context.');
+      if (feeContext && context?.blobVersionedHashes) throw new Error('Transaction fees cannot be combined with blob context. Remove blobVersionedHashes or turn off transaction fees.');
     }
     catch (error) { $('transaction-context-settings').open = true; $('transaction-context').setCustomValidity(error.message); $('transaction-context').reportValidity(); return; }
   }
@@ -1561,6 +1624,7 @@ async function run(mode) {
       : mode === 'historical_trace' ? { chainId: Number(state.example.request.chainId), transactionHash: state.example.transactionHash } : { chainId: Number($('chain').value), from: $('from').value.trim(), to: creationMode() ? null : $('to').value.trim(), data: $('data').value.trim(), value: $('value').value.trim(), block: $('block').value.trim() };
     if (standard && queries !== undefined) body.queries = queries;
     if (localMode() && gas !== undefined) body.gas = gas;
+    if (localMode() && feeContext) Object.assign(body, feeContext);
     if (context !== undefined) Object.assign(body, context);
     const result = await request(localMode() ? '/api/evm/local-preview' : sequence ? '/api/evm/simulate-sequence' : standard ? '/api/evm/simulate' : mode === 'historical_trace' ? '/api/replay' : '/api/simulate', body);
     if (fingerprint !== requestFingerprint()) {
@@ -1685,7 +1749,7 @@ function setView(view) {
 }
 
 $('simulation-form').addEventListener('submit', (event) => { event.preventDefault(); run('simulation'); });
-$('simulation-form').addEventListener('reset', () => { clearTransactionContexts(); resetLocalGas(); clearResult({ inputsChanged: true }); });
+$('simulation-form').addEventListener('reset', () => { clearTransactionContexts(); resetLocalGas(); resetLocalFees(); updateQueryMode(); clearResult({ inputsChanged: true }); });
 $('replay-button').addEventListener('click', () => run('historical_trace'));
 $('example').addEventListener('change', selectExample);
 $('chain').addEventListener('change', selectNetwork);
@@ -1718,6 +1782,10 @@ for (const id of requestFieldIds) {
     if (id === 'transaction-context') $('transaction-context').setCustomValidity('');
     if (id === 'value') $('value').setCustomValidity('');
     if (id === 'local-gas') { $('local-gas').setCustomValidity(''); updateLocalGasSelection(); }
+    if (['local-fees-enabled', 'local-max-fee', 'local-priority-fee'].includes(id)) {
+      $('local-max-fee').setCustomValidity(''); $('local-priority-fee').setCustomValidity('');
+      if (id === 'local-fees-enabled') { $('transaction-context').setCustomValidity(''); updateQueryMode(); }
+    }
     if (id === 'standard-manual-queries') updateQueryMode();
     if (ethereumMode() && state.example) $('historical-help').textContent = sequenceMode() ? 'The selected example is a starting point. The sequence uses the calls currently shown, in their displayed order, from one selected block-end state.' : manualQueries() ? 'The selected example is a starting point. Simulation uses the fields and manual query list currently shown, at the end of the selected block.' : 'The selected example is a starting point. Simulation uses the fields currently shown and automatically selects checks from the call, at the end of the selected block.';
     clearResult({ inputsChanged: true });
