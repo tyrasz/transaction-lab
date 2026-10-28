@@ -1,0 +1,150 @@
+{
+  "status": "verified_and_reexecuted",
+  "identities": {
+    "evidence": "eba759a9e0bec7fd50a9160a42b0a76d79966a8f9f7f4d1c9d4cfc0bbce93dab",
+    "plan": "ff9a66e5006a96a76d353c3aa5aa6f77ac9089c367a939d1ec19f32a033c57cc",
+    "source": "49c5fd113a4fec2a2687b501d22e9b38deed767d55e656ee2ebc0ca6ce99bcf1",
+    "runner": "a11bd25335c75f7b98b1fb9b00b45e36ee2154ed1b37c363812736d02ca3cf62"
+  },
+  "evidenceFiles": 20,
+  "sourceEntries": 1788,
+  "localImplementationSha256": "422516798eda7eb0aa5278cc3c3354f179743ea99fb9fd9cb1041dd80f3c7774",
+  "productImplementationSha256": "70a3aa9b43c9ea564417d5f94d8b374b4b1a5f43f094ce2d0669618046b167df",
+  "block": {
+    "hash": "0x48dd57e5393bc6cf3b703bbb8a529b2fe33997ab975472ecff64f0016f970c78",
+    "number": "26288720",
+    "stateRoot": "0x7286441d5b070220dc02d5d75070f79e19429c8e8a5c181cee3073d438444e58",
+    "hardfork": "bpo2"
+  },
+  "declaredCase": {
+    "target": "0xd7de4766a65d3dc6d02766ecadc6ae9a3f5e0039",
+    "runtimeBytes": 11,
+    "initcodeBytes": 31,
+    "initcodeHash": "0xe5521d4dacb167c3251696ac128bef52963b98883b4766baa13436befa9b53d1",
+    "selector": "0x4af63f02"
+  },
+  "wireRecords": 11,
+  "responseEntityBytes": 57217,
+  "unjoinedWireRecords": 0,
+  "proofAudit": {
+    "proofs": [
+      {
+        "address": "0xbb6e024b9cffacb947a71991e386681b1cd1477d",
+        "exists": true,
+        "nonceRaw": "1",
+        "balanceRaw": "12714900000000000",
+        "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+        "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "codeBytes": 0
+      },
+      {
+        "address": "0xce0042b868300000d44a59004da54a005ffdcf9f",
+        "exists": true,
+        "nonceRaw": "19757",
+        "balanceRaw": "0",
+        "codeHash": "0xc4d5542b53a8b779595a20a8ddd60e58a6c49d3c3decc2df83ced1c69c8ca807",
+        "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "codeBytes": 308
+      },
+      {
+        "address": "0xd7de4766a65d3dc6d02766ecadc6ae9a3f5e0039",
+        "exists": false,
+        "nonceRaw": "0",
+        "balanceRaw": "0",
+        "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+        "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "codeBytes": 0
+      }
+    ],
+    "codeResponses": 3,
+    "slotZeroBasis": "cryptographically_proven_target_account_absence"
+  },
+  "replay": {
+    "workerExecutions": 1,
+    "proofCodeReads": 6,
+    "exactExecutionAndState": true,
+    "execution": "success",
+    "steps": 190,
+    "frames": 2,
+    "gas": {
+      "intrinsic": "22248",
+      "message": "56932",
+      "refundCounter": "0",
+      "cappedRefund": "0",
+      "calldataFloor": "24120",
+      "localTotal": "79180",
+      "providerTotal": "79180"
+    },
+    "changedAccounts": [
+      {
+        "address": "0xbb6e024b9cffacb947a71991e386681b1cd1477d",
+        "nonce": {
+          "before": "0x1",
+          "after": "0x2"
+        }
+      },
+      {
+        "address": "0xce0042b868300000d44a59004da54a005ffdcf9f",
+        "nonce": {
+          "before": "0x4d2d",
+          "after": "0x4d2e"
+        }
+      },
+      {
+        "address": "0xd7de4766a65d3dc6d02766ecadc6ae9a3f5e0039",
+        "existence": {
+          "before": false,
+          "after": true,
+          "basis": "internal_contract_creation"
+        },
+        "nonce": {
+          "before": "0x0",
+          "after": "0x1"
+        },
+        "storage": [
+          {
+            "slot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "before": "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "after": "0x000000000000000000000000000000000000000000000000000000000000002a"
+          }
+        ],
+        "code": {
+          "before": "0x",
+          "after": "0x60005460005260206000f3"
+        }
+      }
+    ]
+  },
+  "comparison": {
+    "status": "match",
+    "channels": {
+      "execution": true,
+      "returnData": true,
+      "gas": true,
+      "logs": true,
+      "state": true
+    },
+    "allChannelsComplete": true
+  },
+  "comparisonNormalizations": [
+    "inputEvidence[].durationMs",
+    "broker.records[].durationMs",
+    "isolation.durationMs",
+    "isolation.childPid (fresh child process checked separately)"
+  ],
+  "limitations": {
+    "singleFixedDevelopmentCase": true,
+    "rawProviderComparisonNotProductApi": true,
+    "sameProviderForProofsAndTraces": true,
+    "unsignedUnpricedBlockEnd": true,
+    "feesOrSignaturesVerified": false,
+    "consensusOrFinalityVerified": false,
+    "postStateRootRecomputed": false,
+    "completeEconomicInventory": false,
+    "fullCallTreeComparison": false,
+    "selfdestructSupported": false,
+    "osSandboxEstablished": false,
+    "populationAccuracyClaim": false,
+    "publicCallsDuringAudit": 0
+  }
+}

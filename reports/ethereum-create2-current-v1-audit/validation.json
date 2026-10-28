@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "1.0",
+  "publicCalls": 0,
+  "checks": [
+    {
+      "command": "node reports/ethereum-create2-current-v1-audit/verify.mjs --write",
+      "status": "passed"
+    },
+    {
+      "command": "node reports/ethereum-create2-current-v1-audit/verify.mjs --verify",
+      "status": "passed"
+    },
+    {
+      "command": "node --test reports/ethereum-create2-current-v1-audit/verify.test.mjs",
+      "status": "passed",
+      "tests": 5
+    },
+    {
+      "command": "node --test research/standard-evm/lifecycle-current.test.mjs",
+      "status": "passed",
+      "tests": 9,
+      "runnerSha256": "a11bd25335c75f7b98b1fb9b00b45e36ee2154ed1b37c363812736d02ca3cf62"
+    }
+  ]
+}
