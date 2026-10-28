@@ -1,8 +1,16 @@
-# Transaction Lab checkpoint — 0.20.0
+# Transaction Lab checkpoint — 0.20.1
 
 Updated October 28, 2026. The user's long-term objective remains to improve measured correctness and coverage; no background goal-runner status is implied. **No representative 90% or 100% accuracy rate or superiority to Blockaid has been established.** This is a working prototype with narrow measured coverage, not a general EVM simulation or security product.
 
 The app uses http://127.0.0.1:5174/ without a wallet connection or Dynamic authentication. Version 0.14 adds `POST /api/evm/local-preview`: an experimental Ethereum call executed in an isolated local worker from verified starting-state proofs/code, with explicit before/after token and Aave/Morpho position queries. The existing provider-backed Ethereum path retains automatic token/native measurements, typed positions and complete state continuation across ordered sequences. HyperEVM endpoints retain their semantics. The new local endpoint has its own availability, source/runtime identity, transport bounds and failure handling; it does not establish full signed-transaction support or complete economic-effect coverage. Security remains `not_assessed`. No signing or broadcasting occurs.
+
+## Reverted funding in after-state queries — 0.20.1
+
+A synthetic Shanghai deletion exposed an after-query failure: a getter temporarily funded the deleted account inside a helper call, the helper reverted, and the getter caught that revert and returned 42. The immediate write restriction previously aborted the entire after-query. Temporary native funding now follows ordinary nested rollback; old code and all original storage remain masked. A guard before the final invocation commit, at the manager's outermost commit and in snapshots rejects any surviving account reset that the current net-change schema cannot represent. Such rejection rolls back the entire attempt, including the sender nonce, while retaining a caller-owned checkpoint. Creation restrictions and output schemas are unchanged.
+
+The real isolated worker and parent query/proof validation now return **42 before, 42 after, delta 0**, with the original deletion preserved. All **eight** new controls pass, including nested commits followed by ancestor/root reverts, surviving-funding rejection, checkpoint preservation, unknown-slot masking and exact proof-broker evidence joins. Four query outcomes and three originals have full-MPT signed zero-fee counterparts; these share the opcode dependency and remain synthetic regression evidence. Independent review repeated the new controls and additional ephemeral rollback/storage checks without finding a production blocker.
+
+Release checks pass **619/619 application**, **399/399 local engine**, and **179/179 research** controls. The first application run could not bind local HTTP test servers inside the sandbox; the retained rerun with loopback access passed. The app remains on 0.20.0 until the verified release is started. The prospective live pilot continues to evaluate its already frozen 0.20.0 engine; this fix does not alter its cases or archived source. No population accuracy gain or new deposit validation is claimed.
 
 ## Independent opcode implementation check
 

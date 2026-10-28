@@ -82,7 +82,10 @@ class ProofStateManager extends SimpleStateManager {
     const reset = this.resetStack.at(-1).has(key);
     if ((!base.exists || reset) && account.nonce === 0n && account.balance === 0n && emptyRoots) { this.topAccountStack().set(key, undefined); return; }
     if (current === undefined) {
-      if (reset && (base.storageRoot !== EMPTY_STORAGE_ROOT || base.code !== '0x' || base.nonceRaw !== '0')) fail('LOCAL_STATE_UNSUPPORTED', 'Rematerializing a deleted account with original code, nonce or storage requires explicit account-reset provenance.');
+      // A later disposable invocation may fund a deleted address inside a
+      // subtree which subsequently reverts. Keep that transient EVM behavior;
+      // only a surviving reset needs a richer net-change representation.
+      if (reset && this.accountStack.length < 2 && (base.storageRoot !== EMPTY_STORAGE_ROOT || base.code !== '0x' || base.nonceRaw !== '0')) fail('LOCAL_STATE_UNSUPPORTED', 'Rematerializing a deleted account requires an active rollback checkpoint.');
       if ((base.exists && !reset) || account.nonce > 1n || !emptyRoots) {
         fail('LOCAL_STATE_UNSUPPORTED', 'Only native funding or the unsigned sender nonce may materialize a proof-absent account.');
       }
@@ -180,7 +183,20 @@ class ProofStateManager extends SimpleStateManager {
     this.creationStack.push(new Map(this.creationStack.at(-1)));
     this.resetStack.push(new Map(this.resetStack.at(-1)));
   }
-  async commit() { if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'No state checkpoint exists to commit.'); await super.commit(); this.creationStack.splice(-2, 1); this.resetStack.splice(-2, 1); }
+  assertRepresentableAccountResets() {
+    for (const address of this.resetStack.at(-1).keys()) {
+      const base = this.base.get(address);
+      if (this.topAccountStack().get(address) !== undefined && (base.storageRoot !== EMPTY_STORAGE_ROOT || base.code !== '0x' || base.nonceRaw !== '0')) {
+        fail('LOCAL_STATE_UNSUPPORTED', 'Retaining a rematerialized account with original code, nonce or storage requires explicit account-reset provenance.');
+      }
+    }
+  }
+  async commit() {
+    if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'No state checkpoint exists to commit.');
+    // Nested message commits may still be reverted by an enclosing message.
+    if (this.accountStack.length === 2) this.assertRepresentableAccountResets();
+    await super.commit(); this.creationStack.splice(-2, 1); this.resetStack.splice(-2, 1);
+  }
   async revert() { if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'No state checkpoint exists to revert.'); await super.revert(); this.creationStack.pop(); this.resetStack.pop(); }
   shallowCopy() {
     if (this.emptyCleanup !== null || this.accountStack.length !== 1 || [...this.loading.keys()].some(key => !this.base.has(key)) || [...this.slotLoading.keys()].some(id => !this.topStorageStack().has(id))) fail('LOCAL_STATE_UNSUPPORTED', 'Copy only a settled state manager outside active checkpoints.');
@@ -198,6 +214,7 @@ class ProofStateManager extends SimpleStateManager {
   snapshotInputEvidence() { return this.inputs.snapshotEvidence(); }
   snapshotInputUsage() { return this.inputs.snapshotUsage(); }
   snapshotChanges() {
+    this.assertRepresentableAccountResets();
     const accounts = [];
     for (const [address, base] of this.base) {
       const current = this.topAccountStack().get(address), changes = {};

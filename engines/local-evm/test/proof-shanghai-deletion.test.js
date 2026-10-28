@@ -45,12 +45,16 @@ test('Shanghai deletion rolls back code, account and lazily read storage through
   assert.deepEqual(s.snapshotChanges().accounts, []);
 });
 
-test('deleted original code cannot be rematerialized as a balance-only row even with empty original storage', async () => {
+test('transient funding of deleted code cannot escape as a balance-only row or outer commit', async () => {
   const f = await fixture({}), s = f.stateManager;
   await s.checkpoint(); await s.finalizeShanghaiContractDeletion(address); await s.commit();
   const before = s.snapshotChanges();
-  await s.checkpoint();
   await assert.rejects(s.putAccount(address, new Account(0n, 1n)), { code: 'LOCAL_STATE_UNSUPPORTED' });
+  await s.checkpoint();
+  await s.putAccount(address, new Account(0n, 1n));
+  assert.equal((await s.getAccount(address)).balance, 1n);
+  assert.throws(() => s.snapshotChanges(), { code: 'LOCAL_STATE_UNSUPPORTED' });
+  await assert.rejects(s.commit(), { code: 'LOCAL_STATE_UNSUPPORTED' });
   await s.revert();
   assert.deepEqual(s.snapshotChanges(), before);
   await s.checkpoint(); await s.putAccount(address, new Account()); await s.commit();

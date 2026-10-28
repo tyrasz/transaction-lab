@@ -273,6 +273,10 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     usage.retainedTraceBytes = Buffer.byteLength(JSON.stringify({ trace: root, logs, ...(lifecycle ? { lifecycle } : {}) }), 'utf8'); bound('traceBytes', usage.retainedTraceBytes);
     const error = root.error, status = !error ? 'success' : error === 'revert' ? 'reverted' : 'failed';
     const report = { execution: { status, executionGasUsed: result.execResult.executionGasUsed.toString(), gasRefundCounter: (result.execResult.gasRefund ?? 0n).toString(), returnData: bytesToHex(result.execResult.returnValue), error }, trace: root, logs, environment, semantics, limits, usage, ...(lifecycle ? { lifecycle } : {}), stateDisposition: 'message_result_retained_in_supplied_manager' };
+    // Transient writes in reverted subtrees are gone now. Any remaining whole
+    // namespace reset must be representable before the invocation is retained,
+    // including when a caller supplied an already-checkpointed manager.
+    if (typeof stateManager.assertRepresentableAccountResets === 'function') await guarded.assertRepresentableAccountResets();
     clockCheck();
     // Final atomic commit is the irreversible terminal step: no subsequent
     // deadline/output validation may mislabel retained state as rolled back.
