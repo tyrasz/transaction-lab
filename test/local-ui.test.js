@@ -180,3 +180,83 @@ test('verified empty-account cleanup is visible after a reverted call and hidden
   result.source.canonicalStatus='unverified';ui.context.renderLocalResult(result);
   assert.doesNotMatch(ui.elements.get('source-details').textContent,/Empty accounts removed/);
 });
+
+test('advanced local gas defaults to omission and forwards exact bounded decimal selections', async () => {
+  assert.match(html, /<details id="local-gas-settings"[^>]* hidden>/);
+  assert.doesNotMatch(html.match(/<details id="local-gas-settings"[^>]*>/)[0], /\bopen\b/);
+  const defaults = setup(); defaults.context.updateQueryMode();
+  assert.equal(defaults.elements.get('local-gas-settings').hidden, true); assert.equal(defaults.elements.get('local-gas').disabled, true);
+  chooseLocal(defaults);
+  assert.equal(defaults.elements.get('local-gas-settings').hidden, false); assert.equal(defaults.elements.get('local-gas').disabled, false);
+  assert.match(defaults.elements.get('local-gas-selection').textContent, /default limit: 5,000,000/);
+  assert.match(defaults.elements.get('block-help').textContent, /selected gas limit/); assert.doesNotMatch(defaults.elements.get('block-help').textContent, /fixed gas/);
+  await defaults.context.run('simulation'); assert.equal(Object.hasOwn(JSON.parse(defaults.requests[0].options.body), 'gas'), false);
+  for (const gas of ['21000', '120000', '5000000']) {
+    const ui = setup(); chooseLocal(ui); ui.elements.get('local-gas').value = gas; ui.elements.get('local-gas').dispatch('input');
+    assert.equal(ui.elements.get('local-gas-selection').textContent, `Selected limit: ${BigInt(gas).toLocaleString('en-US')} gas.`);
+    await ui.context.run('simulation'); assert.equal(ui.requests[0].url, '/api/evm/local-preview');
+    const body = JSON.parse(ui.requests[0].options.body); assert.equal(body.gas, gas); assert.deepEqual(body.queries, [query]);
+  }
+  assert.match(html, /Each measurement query keeps a separate 1,000,000 gas limit/);
+});
+
+test('malformed or out-of-range local gas blocks dispatch and opens the field', async () => {
+  for (const gas of ['0', '20999', '5000001', '021000', '21000.0', '2.1e4', '0x5208', '-21000', '21,000', '9'.repeat(100)]) {
+    const ui = setup(); chooseLocal(ui); ui.elements.get('local-gas').value = gas;
+    await ui.context.run('simulation'); assert.equal(ui.requests.length, 0, gas);
+    assert.equal(ui.elements.get('local-gas-settings').open, true); assert.match(ui.elements.get('local-gas').validationMessage, /21000 to 5000000/);
+    ui.elements.get('local-gas').value = ''; ui.elements.get('local-gas').dispatch('input');
+    assert.equal(ui.elements.get('local-gas').validationMessage, ''); assert.match(ui.elements.get('local-gas-selection').textContent, /default/);
+  }
+});
+
+test('gas edits clear stale output, lock during dispatch, and suppress mismatched pending results', async () => {
+  const edited = setup(); chooseLocal(edited); edited.context.renderLocalResult(sample());
+  edited.elements.get('local-gas').value = '75000'; edited.elements.get('local-gas').dispatch('input');
+  assert.equal(edited.state.result, null); assert.equal(edited.elements.get('download-json').disabled, true); assert.equal(edited.elements.get('raw-json').textContent, '');
+  let finish; const ui = setup(() => new Promise(resolve => { finish = resolve; })); chooseLocal(ui);
+  ui.elements.get('local-gas').value = '75000'; const running = ui.context.run('simulation');
+  assert.equal(ui.elements.get('local-gas').disabled, true); assert.equal(JSON.parse(ui.requests[0].options.body).gas, '75000');
+  ui.elements.get('local-gas').value = '76000'; finish({ ok: true, json: async () => sample() }); await running;
+  assert.equal(ui.state.result, null); assert.equal(ui.elements.get('download-json').disabled, true); assert.equal(ui.elements.get('local-gas').disabled, false);
+});
+
+test('gas is hidden and absent from provider, sequence, HyperEVM and historical requests', async () => {
+  for (const mode of ['provider', 'sequence', 'hyper', 'historical']) {
+    const ui = setup(); ui.elements.get('local-gas').value = 'invalid hidden field';
+    if (mode === 'sequence') {
+      ui.elements.get('ethereum-call-mode').value = 'sequence';
+      ui.state.sequenceDrafts = [ui.context.newSequenceDraft({ to: T }), ui.context.newSequenceDraft({ to: A })]; ui.context.renderSequenceEditor();
+    }
+    if (mode === 'hyper' || mode === 'historical') ui.elements.get('chain').value = '999';
+    if (mode === 'historical') ui.state.example = { transactionHash: H, request: { chainId: 999 } };
+    ui.context.updateQueryMode();
+    assert.equal(ui.elements.get('local-gas-settings').hidden, true); assert.equal(ui.elements.get('local-gas').disabled, true);
+    await ui.context.run(mode === 'historical' ? 'historical_trace' : 'simulation');
+    assert.equal(ui.requests.length, 1, mode); const body = JSON.parse(ui.requests[0].options.body);
+    assert.equal(Object.hasOwn(body, 'gas'), false); for (const call of body.calls || []) assert.equal(Object.hasOwn(call, 'gas'), false);
+  }
+});
+
+test('example, reset and network changes restore default gas and clear prior results', () => {
+  const ui = setup(); chooseLocal(ui);
+  ui.state.config.standardEvm.examples = [{ id: 'bounded', input: { ...sample().apiRequest, gas: '120000' } }, { id: 'default', input: sample().apiRequest }];
+  ui.elements.get('example').value = 'bounded'; ui.context.selectExample(); assert.equal(ui.elements.get('local-gas').value, '120000');
+  ui.context.renderLocalResult(sample()); ui.elements.get('example').value = 'default'; ui.context.selectExample();
+  assert.equal(ui.elements.get('local-gas').value, ''); assert.equal(ui.state.result, null); assert.equal(ui.elements.get('download-json').disabled, true);
+  ui.elements.get('local-gas').value = '100000'; ui.elements.get('local-gas').setCustomValidity('old'); ui.elements.get('local-gas-settings').open = true;
+  ui.elements.get('simulation-form').dispatch('reset'); assert.equal(ui.elements.get('local-gas').value, ''); assert.equal(ui.elements.get('local-gas').validationMessage, '');
+  assert.equal(ui.elements.get('local-gas-settings').open, false); assert.match(ui.elements.get('local-gas-selection').textContent, /default/);
+  ui.elements.get('local-gas').value = '100000'; ui.elements.get('example').value = ''; ui.context.selectExample(); assert.equal(ui.elements.get('local-gas').value, '');
+  ui.elements.get('local-gas').value = '100000'; ui.elements.get('chain').value = '999'; ui.context.selectNetwork(); assert.equal(ui.elements.get('local-gas').value, '');
+  assert.equal(ui.elements.get('local-gas-settings').hidden, true); assert.equal(ui.elements.get('local-gas').disabled, true);
+});
+
+test('local result shows its retained gas limit rather than the current form value', () => {
+  const ui = setup(); chooseLocal(ui); ui.elements.get('local-gas').value = '90000';
+  const result = sample(); result.apiRequest.gas = '120000'; ui.context.renderLocalResult(result);
+  assert.equal(ui.elements.get('gas-used').textContent, 'Gas limit: 120,000 · network fees excluded');
+  assert.deepEqual(JSON.parse(ui.elements.get('raw-json').textContent), result);
+  delete result.apiRequest.gas; ui.context.renderLocalResult(result); assert.match(ui.elements.get('gas-used').textContent, /5,000,000/);
+  result.apiRequest.gas = '0x123'; ui.context.renderLocalResult(result); assert.match(ui.elements.get('gas-used').textContent, /Not available/);
+});

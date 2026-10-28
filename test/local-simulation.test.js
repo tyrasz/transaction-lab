@@ -56,9 +56,9 @@ async function fixture({ original = '602a60005500', queryCode = '600054600052602
   return { rpc, header, records };
 }
 
-test('local input is normalized independently, with explicit bounded queries and no execution settings', async () => {
+test('local input is normalized independently, with explicit bounded queries and no arbitrary execution settings', async () => {
   const normalized = validateLocalSimulation(input);
-  assert.equal(normalized.block, 'latest'); assert.deepEqual(normalized.queries, [query]);
+  assert.equal(normalized.block, 'latest'); assert.equal(normalized.gas, '5000000'); assert.deepEqual(normalized.queries, [query]);
   assert.equal(LOCAL_CAPABILITIES.querySelection, 'explicit_only');
   for (const change of [{ chainId: 8453 }, { queries: undefined }, { queries: [] }, { queries: [query, query] }, { gas: '1' }, { stateOverrides: {} }, { value: '0x0' }, { block: 'pending' }, { to: undefined }, { data: '0xa' }]) {
     await assert.rejects(simulateLocal({ ...input, ...change }, { call() { assert.fail('Invalid input reached RPC'); } }), InputError);

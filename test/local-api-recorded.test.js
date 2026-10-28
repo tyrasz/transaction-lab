@@ -135,7 +135,7 @@ async function invoke(t, input, rpc) {
   finally { req.destroy(); server.close(); }
   assert.equal(factories, 1); assert.equal(status, 200); assert.equal(typeof responseBody, 'string');
   const report = JSON.parse(responseBody);
-  assert.deepEqual(report.apiRequest, input, 'The returned request must preserve the exact submitted canonical inputs');
+  assert.deepEqual(report.apiRequest, { ...input, gas: input.gas ?? '5000000' }, 'The returned request preserves canonical inputs and records the effective gas default');
   assert.deepEqual(report.implementation, api.implementation);
   assert.deepEqual(JSON.parse(await readFile(path.join(reportDir, 'simulations', report.id + '.json'), 'utf8')), report,
     'Saved JSON retains complete raw API output, not just projected amounts');

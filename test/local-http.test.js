@@ -38,7 +38,7 @@ test('owned capability is independent of the standard engine and configuration c
 test('local route rejects malformed requests, unsupported fields and origins before provider construction', async t => {
   let constructed = 0, simulated = 0;
   const base = await start(t, { localLoader: async () => api(async () => { simulated++; assert.fail('Invalid request reached simulation.'); }), proofRpcFactory() { constructed++; assert.fail('No provider allowed.'); } });
-  for (const change of [{ chainId: 999 }, { gas: '21000' }, { gasPrice: '1' }, { stateOverrides: {} }, { rpcUrl: 'https://external.invalid' }, { value: '0x0' }, { to: undefined }, { data: '0x1' }, { block: 'pending' }, { queries: [] }, { queries: null }, { queries: Array(9).fill(input().queries[0]) }]) {
+  for (const change of [{ chainId: 999 }, { gas: '20999' }, { gas: '5000001' }, { gas: 21000 }, { gasPrice: '1' }, { stateOverrides: {} }, { rpcUrl: 'https://external.invalid' }, { value: '0x0' }, { to: undefined }, { data: '0x1' }, { block: 'pending' }, { queries: [] }, { queries: null }, { queries: Array(9).fill(input().queries[0]) }]) {
     const response = await post(base, { ...input(), ...change }); assert.equal(response.status, 400); assert.ok((await response.json()).error.code);
   }
   const missing = input(); delete missing.queries; assert.equal((await post(base, missing)).status, 400);

@@ -11,6 +11,7 @@ import { normalizeAuthorizationList, MAX_AUTHORIZATIONS } from '../engines/local
 const ADDRESS = /^0x[0-9a-f]{40}$/i, HASH = /^0x[0-9a-f]{64}$/i;
 const NUMBER = /^0x(?:0|[1-9a-f][0-9a-f]{0,15})$/i, DATA = /^0x(?:[0-9a-f]{2})*$/i;
 const DECIMAL = /^(?:0|[1-9][0-9]{0,77})$/, MAX = (1n << 256n) - 1n;
+const DEFAULT_GAS = '5000000', MIN_GAS = 21000n, MAX_GAS = 5000000n;
 const WALL = 145000, DRAIN = 25000, FINAL_RESERVE = 25000, RESPONSE = 96 * 1024 * 1024;
 const failure = code => ({ code, message: ({
   LOCAL_PREVIEW_SOURCE_CHANGED: 'Execution sources changed; all measurements were withheld. Restart the service.',
@@ -36,12 +37,15 @@ export const LOCAL_CAPABILITIES = freeze({
   emptyAccountCleanup: 'EIP161_retained_unsigned_message_touches_including_RIPEMD160_exception',
   historicalBlockHashes: 'authenticated_parent_hash_chain_with_shared_input_limits',
   querySelection: 'explicit_only', queryTypes: ['balanceOf', 'allowance', 'aave_v3_user_account_data', 'morpho_blue_position'],
+  gasSelection: { field: 'gas', encoding: 'canonical_decimal_string', default: DEFAULT_GAS, minimum: MIN_GAS.toString(), maximum: MAX_GAS.toString(),
+    scope: 'total_transaction_gas_including_intrinsic', selectedForkMinimumRequired: true, queryGas: '1000000' },
   limits: { queries: 8, calldataBytes: 32768, gas: 5000000, proofRpcCalls: 256, totalRpcCalls: 260,
     responseBytes: 8 * 1024 * 1024, wireBytes: 32 * 1024 * 1024, wallMs: WALL, drainMs: DRAIN, apiOutputBytes: RESPONSE },
   limitations: [
     'Only explicit query pairs are measured; automatic token discovery, native-effect summaries and sequences are not provided by this endpoint.',
     'Proofs and runtime code are checked against the selected header, whose hash is recomputed. Consensus, finality and contract identity are not independently established.',
     'Unsigned execution uses zero gas price and BASEFEE, without outer signature validation or fee settlement. Contract signature checks still execute.',
+    'Optional gas selects the original transaction gas limit within 21,000–5,000,000; the selected fork also requires sufficient intrinsic gas and calldata floor. Each measurement query retains a separate 1,000,000 gas limit.',
     'Explicit to:null deploys initcode with CREATE; internal CREATE and CREATE2 require a proven deployable target with empty initial code/storage and zero nonce. Shanghai SELFDESTRUCT removes every committed execution account at transaction end. Cancun-or-later transfers preexisting balances while deleting only contracts created in that invocation.',
     'Transaction-end EIP-161 cleanup removes touched empty accounts and their entire storage, including the retained RIPEMD160 touch exception. It adds no fee-related coinbase touch. Rematerializing a deleted account with original code, nonzero nonce or nonempty storage remains unsupported.',
     'Sender code must initially be empty or an exact existing EIP-7702 delegation on Prague or later. Up to sixteen signed authorization tuples may install, replace or clear delegations before a call; their changes survive message failure. Authorization lists cannot accompany deployment or blob context. Other coded senders and KZG point evaluation remain unsupported. Blob calls use zero blob base fee without sidecar or inclusion validation.',
@@ -60,13 +64,15 @@ function record(value, allowed) {
   }
 }
 export function validateLocalSimulation(input) {
-  record(input, ['chainId', 'from', 'to', 'data', 'value', 'block', 'queries', 'accessList', 'blobVersionedHashes', 'authorizationList']);
+  record(input, ['chainId', 'from', 'to', 'data', 'value', 'gas', 'block', 'queries', 'accessList', 'blobVersionedHashes', 'authorizationList']);
   if (input.chainId !== 1 && input.chainId !== '1') throw new InputError('Only Ethereum chain 1 is supported.', 'UNSUPPORTED_CHAIN');
   if (typeof input.from !== 'string' || !ADDRESS.test(input.from)) throw new InputError('from must be a 20-byte hex address.');
   if (input.to !== null && (typeof input.to !== 'string' || !ADDRESS.test(input.to))) throw new InputError('to must be a 20-byte hex address, or explicit null for contract deployment.');
   if (typeof input.data !== 'string' || input.data.length > 65538 || !DATA.test(input.data)) throw new InputError('data must be even-length hexadecimal calldata of at most 32 KiB.');
   const value = input.value === undefined ? '0' : input.value;
   if (typeof value !== 'string' || !DECIMAL.test(value) || BigInt(value) > MAX) throw new InputError('value must be a canonical decimal uint256 wei string.');
+  const gas = Object.hasOwn(input, 'gas') ? input.gas : DEFAULT_GAS;
+  if (typeof gas !== 'string' || !/^[1-9][0-9]{4,6}$/.test(gas) || BigInt(gas) < MIN_GAS || BigInt(gas) > MAX_GAS) throw new InputError('gas must be a canonical decimal string from 21000 to 5000000.');
   const block = input.block === undefined ? 'latest' : input.block;
   if (typeof block !== 'string' || !(block === 'latest' || NUMBER.test(block) || HASH.test(block))) throw new InputError('block must be latest, a canonical hexadecimal number, or a 32-byte block hash.');
   let queries, context, authorizationList;
@@ -76,7 +82,7 @@ export function validateLocalSimulation(input) {
   if (input.to === null && context.blobVersionedHashes) throw new InputError('Blob context requires a call destination; contract deployment cannot carry blob hashes.');
   try { queries = compilePreviewQueries(input.queries).map(row => structuredClone(row.descriptor)); }
   catch { throw new InputError('Supply one to eight distinct canonical token or typed position queries.'); }
-  return { chainId: 1, from: input.from.toLowerCase(), to: input.to === null ? null : input.to.toLowerCase(), data: input.data.toLowerCase(), value, block: block.toLowerCase(), queries, ...context, ...(authorizationList ? { authorizationList } : {}) };
+  return { chainId: 1, from: input.from.toLowerCase(), to: input.to === null ? null : input.to.toLowerCase(), data: input.data.toLowerCase(), value, gas, block: block.toLowerCase(), queries, ...context, ...(authorizationList ? { authorizationList } : {}) };
 }
 
 function projection(core) {
@@ -134,7 +140,7 @@ export async function simulateLocal(input, rpc, { signal } = {}) {
     const usage = rpc.usage(), wallMs = Math.floor(remaining() - FINAL_RESERVE);
     const calls = Math.min(256, usage.limits.calls - usage.calls - 1), totalResponseBytes = Math.min(32 * 1024 * 1024, usage.limits.totalBytes - usage.observedBytes);
     if (wallMs <= 0 || calls <= 0 || totalResponseBytes <= 0) stop('LOCAL_PREVIEW_BUDGET');
-    report.attempt = await executeIsolatedEthereumPreview({ request: { from: apiRequest.from, to: apiRequest.to, data: apiRequest.data, value: apiRequest.value, gas: '5000000', ...normalizeEvmContext(apiRequest), ...(apiRequest.authorizationList ? { authorizationList: apiRequest.authorizationList } : {}) },
+    report.attempt = await executeIsolatedEthereumPreview({ request: { from: apiRequest.from, to: apiRequest.to, data: apiRequest.data, value: apiRequest.value, gas: apiRequest.gas, ...normalizeEvmContext(apiRequest), ...(apiRequest.authorizationList ? { authorizationList: apiRequest.authorizationList } : {}) },
       header, queries: apiRequest.queries, rpc, signal: controller.signal,
       limits: { wallMs, calls, totalResponseBytes } });
     if (controller.signal.aborted || signal?.aborted) stop(signal?.aborted ? 'LOCAL_PREVIEW_CANCELLED' : 'LOCAL_PREVIEW_BUDGET');

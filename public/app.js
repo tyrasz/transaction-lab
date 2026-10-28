@@ -1,6 +1,7 @@
 const $ = (id) => document.getElementById(id);
 const state = { config: null, example: null, result: null, busy: false, benchmarkLoaded: false, sequenceDrafts: [], sequenceControls: [], nextCallKey: 1 };
-const requestFieldIds = ['chain', 'ethereum-engine', 'ethereum-call-mode', 'local-operation', 'from', 'to', 'data', 'value', 'block', 'standard-manual-queries', 'standard-queries', 'transaction-context'];
+const requestFieldIds = ['chain', 'ethereum-engine', 'ethereum-call-mode', 'local-operation', 'local-gas', 'from', 'to', 'data', 'value', 'block', 'standard-manual-queries', 'standard-queries', 'transaction-context'];
+const DEFAULT_LOCAL_GAS = '5000000';
 const ethereumMode = () => $('chain').value === '1';
 const localMode = () => ethereumMode() && $('ethereum-engine').value === 'local';
 const creationMode = () => localMode() && $('local-operation').value === 'create';
@@ -71,6 +72,25 @@ function clearResult({ inputsChanged = false } = {}) {
 
 function requestFingerprint() {
   return JSON.stringify({ fields: requestFieldIds.map(id => $(id).type === 'checkbox' ? $(id).checked : $(id).value), calls: sequenceMode() ? state.sequenceControls.map(row => ({ key: row.key, to: row.to.value, data: row.data.value, value: row.value.value, manual: row.manual.checked, queries: row.queries.value, context: row.context.value })) : null, exampleId: state.example?.id, transactionHash: state.example?.transactionHash });
+}
+
+function readLocalGas(text = $('local-gas').value) {
+  const value = text.trim();
+  if (!value) return undefined;
+  if (!/^[1-9][0-9]{4,6}$/.test(value) || BigInt(value) < 21000n || BigInt(value) > 5000000n) throw new Error('Enter a whole gas limit from 21000 to 5000000, without commas or leading zeros, or leave it blank for the default.');
+  return value;
+}
+
+function updateLocalGasSelection() {
+  try {
+    const selected = readLocalGas();
+    $('local-gas-selection').textContent = selected === undefined ? `Using the default limit: ${numberLabel(DEFAULT_LOCAL_GAS)} gas.` : `Selected limit: ${numberLabel(selected)} gas.`;
+  } catch { $('local-gas-selection').textContent = 'Enter a valid limit, or leave blank to use 5,000,000 gas.'; }
+}
+
+function resetLocalGas(value = '') {
+  $('local-gas').value = value; $('local-gas').setCustomValidity('');
+  $('local-gas-settings').open = false; updateLocalGasSelection();
 }
 
 function currentExamples() {
@@ -163,10 +183,12 @@ function updateSequenceControls() {
 
 function selectExample({ initial = false } = {}) {
   clearTransactionContexts();
+  resetLocalGas();
   state.example = currentExamples().find((example) => example.id === $('example').value) || null;
   const example = state.example;
   if (example) {
     const transaction = (ethereumMode() ? example.input : example.request) || {};
+    if (localMode() && typeof transaction.gas === 'string') resetLocalGas(transaction.gas);
     $('local-operation').value = localMode() && transaction.to === null ? 'create' : 'call';
     for (const field of sequenceMode() ? ['from'] : ['from', 'to', 'data', 'value']) $(field).value = transaction[field] ?? (field === 'data' ? '0x' : field === 'value' ? '0' : '');
     $('block').value = ethereumMode() ? transaction.block || 'latest' : 'latest';
@@ -213,6 +235,13 @@ function updateQueryMode() {
   for (const id of ['to', 'data', 'value']) { $(id).disabled = state.busy || sequence; $(id).required = !sequence; if (sequence) $(id).setCustomValidity(''); }
   $('local-operation-field').hidden = !local;
   $('local-operation').disabled = state.busy || !local;
+  $('local-gas-settings').hidden = !local;
+  $('local-gas').disabled = state.busy || !local;
+  if (!local) $('local-gas').setCustomValidity('');
+  updateLocalGasSelection();
+  if (standard) $('block-help').textContent = local
+    ? 'Use latest, a hexadecimal block number, or a block hash. Execution starts at the end of that block with your selected gas limit and no transaction fee settlement.'
+    : 'Use latest, a hexadecimal block number, or a block hash. Execution starts at the end of that block with a fixed gas limit and no transaction fee settlement.';
   $('local-operation-help').hidden = !creationMode();
   $('recipient-field').hidden = creationMode();
   $('data-label').textContent = creationMode() ? 'Deployment bytecode' : 'Calldata';
@@ -1211,7 +1240,10 @@ function renderLocalResult(result) {
   $('local-report-status').textContent = `Preview: ${titleCase(result.status)}`;
   $('execution-status').textContent = titleCase(result.execution?.status || 'unavailable');
   $('execution-status').className = result.execution?.status === 'success' ? 'success' : ['reverted', 'failed'].includes(result.execution?.status) ? 'failed' : 'partial';
-  $('gas-used').textContent = 'Unsigned execution · network fees excluded';
+  const reportedGas = result.apiRequest?.gas ?? result.attempt?.preview?.original?.output?.profile?.declaredGasLimit ?? DEFAULT_LOCAL_GAS;
+  let gasLabel = 'Not available';
+  try { gasLabel = numberLabel(readLocalGas(reportedGas)); } catch { /* Keep malformed result context explicit. */ }
+  $('gas-used').textContent = `Gas limit: ${gasLabel} · network fees excluded`;
   $('coverage-label').textContent = 'Requested checks'; $('coverage-status').textContent = `${measured} / ${rows.length} measured`;
   $('coverage-status').className = rows.length > 0 && measured === rows.length ? 'success' : 'partial';
   $('coverage-detail').textContent = 'Explicit query list only · raw units';
@@ -1496,7 +1528,12 @@ async function run(mode) {
   if (standard && !sequence) validateWeiField($('value'));
   const calls = sequence ? readSequenceCalls() : undefined;
   if (sequence && !calls) return;
-  let queries, context;
+  let queries, context, gas;
+  if (localMode()) {
+    $('local-gas').setCustomValidity('');
+    try { gas = readLocalGas(); }
+    catch (error) { $('local-gas-settings').open = true; $('local-gas').setCustomValidity(error.message); $('local-gas').reportValidity(); return; }
+  }
   if (standard && !sequence) {
     $('transaction-context').setCustomValidity('');
     try {
@@ -1523,6 +1560,7 @@ async function run(mode) {
     const body = sequence ? { chainId: 1, from: $('from').value.trim(), block: $('block').value.trim(), calls }
       : mode === 'historical_trace' ? { chainId: Number(state.example.request.chainId), transactionHash: state.example.transactionHash } : { chainId: Number($('chain').value), from: $('from').value.trim(), to: creationMode() ? null : $('to').value.trim(), data: $('data').value.trim(), value: $('value').value.trim(), block: $('block').value.trim() };
     if (standard && queries !== undefined) body.queries = queries;
+    if (localMode() && gas !== undefined) body.gas = gas;
     if (context !== undefined) Object.assign(body, context);
     const result = await request(localMode() ? '/api/evm/local-preview' : sequence ? '/api/evm/simulate-sequence' : standard ? '/api/evm/simulate' : mode === 'historical_trace' ? '/api/replay' : '/api/simulate', body);
     if (fingerprint !== requestFingerprint()) {
@@ -1647,7 +1685,7 @@ function setView(view) {
 }
 
 $('simulation-form').addEventListener('submit', (event) => { event.preventDefault(); run('simulation'); });
-$('simulation-form').addEventListener('reset', () => { clearTransactionContexts(); clearResult({ inputsChanged: true }); });
+$('simulation-form').addEventListener('reset', () => { clearTransactionContexts(); resetLocalGas(); clearResult({ inputsChanged: true }); });
 $('replay-button').addEventListener('click', () => run('historical_trace'));
 $('example').addEventListener('change', selectExample);
 $('chain').addEventListener('change', selectNetwork);
@@ -1679,6 +1717,7 @@ for (const id of requestFieldIds) {
     if (id === 'standard-queries') $('standard-queries').setCustomValidity('');
     if (id === 'transaction-context') $('transaction-context').setCustomValidity('');
     if (id === 'value') $('value').setCustomValidity('');
+    if (id === 'local-gas') { $('local-gas').setCustomValidity(''); updateLocalGasSelection(); }
     if (id === 'standard-manual-queries') updateQueryMode();
     if (ethereumMode() && state.example) $('historical-help').textContent = sequenceMode() ? 'The selected example is a starting point. The sequence uses the calls currently shown, in their displayed order, from one selected block-end state.' : manualQueries() ? 'The selected example is a starting point. Simulation uses the fields and manual query list currently shown, at the end of the selected block.' : 'The selected example is a starting point. Simulation uses the fields currently shown and automatically selects checks from the call, at the end of the selected block.';
     clearResult({ inputsChanged: true });

@@ -4,7 +4,13 @@ Updated October 28, 2026. The user's long-term objective remains to improve meas
 
 The app uses http://127.0.0.1:5174/ without a wallet connection or Dynamic authentication. Version 0.14 adds `POST /api/evm/local-preview`: an experimental Ethereum call executed in an isolated local worker from verified starting-state proofs/code, with explicit before/after token and Aave/Morpho position queries. The existing provider-backed Ethereum path retains automatic token/native measurements, typed positions and complete state continuation across ordered sequences. HyperEVM endpoints retain their semantics. The new local endpoint has its own availability, source/runtime identity, transport bounds and failure handling; it does not establish full signed-transaction support or complete economic-effect coverage. Security remains `not_assessed`. No signing or broadcasting occurs.
 
-## Authorization-list release candidate — 0.22.0
+## Caller-selected gas release candidate — 0.23.0
+
+The local API and browser now accept a total transaction gas limit from 21,000 to 5,000,000, defaulting to 5,000,000. Intrinsic gas and the verified fork's calldata floor remain admission requirements. GAS and out-of-gas behavior use the selected amount; message writes roll back on EVM failure while permitted outer preparation survives. Before/after queries keep their independent one-million-gas budget. The API records the effective limit, and browser edits invalidate prior results. Provider-backed routes retain their existing behavior.
+
+All **636 application tests pass** after the version update. Seven new API controls cover real isolated-child execution, malformed inputs before I/O, exact GAS results, default equivalence, write rollback, persistent authorization preparation, independent full-VM/full-MPT state agreement, intrinsic boundaries and final-header invalidation. Six new UI controls cover local-only submission, defaults, reset/busy/stale-result handling and retained-response display. Independent UI review and 26 focused controls pass. The execution kernel is unchanged from the 457-test 0.22 suite. The app remains 0.21.0 until integration; this release also includes the tested 0.22 authorization feature and its separately retained Geth evidence below.
+
+## Ordered authorizations — 0.22.0
 
 The development engine and local API now process up to sixteen ordered EIP-7702 signed authorization tuples on Prague or later. Installation, replacement, clearing, self-authorization, duplicate/skipped tuples, warming, intrinsic gas and refunds are supported. Preparation survives message REVERT/out-of-gas, while host/proof failures roll back the entire attempt. Before/after probes use the correct original/final code and carry no authorization list. Outer transaction signature validation and nonzero fee settlement remain excluded.
 
