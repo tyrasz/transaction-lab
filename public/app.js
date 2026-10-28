@@ -381,7 +381,7 @@ function transactionContextHelp() {
   const help = node('div', 'transaction-context-help');
   help.append(node('p', 'field-help', 'Leave blank for ordinary calls. Add accessList, blobVersionedHashes, or both. Order and duplicates are preserved; this applies only to this call, not its balance or position checks.'));
   help.append(node('pre', '', '{"accessList":[{"address":"<0x + 40 hex digits>","storageKeys":["<0x + 64 hex digits>"]}],"blobVersionedHashes":["<0x01 + 62 hex digits>"]}'));
-  help.append(node('p', 'field-help', 'Unsigned blob simulation uses zero blob fee. Blob data and sidecar validity are not checked.'));
+  help.append(node('p', 'field-help', 'The default blob profile uses zero blob fees. The independent local engine can include fees when transaction fees are enabled and a blob fee cap is provided. Blob data and sidecar validity are not checked.'));
   return help;
 }
 
