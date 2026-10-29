@@ -230,7 +230,7 @@ export async function replay(input, rpc) {
   };
 }
 
-export function createAppServer({rpcFactory=()=>new RpcClient(),standardRpcFactory=options=>new StandardRpcClient(options),standardLoader=loadStandardApi,proofRpcFactory=()=>new ProofRpcClient(),localLoader=loadLocalApi,arbitrumLoader=loadArbitrumApi,arbitrumOptions=()=>({}),reportDir=path.join(ROOT,'reports'),persist=true}={}) {
+export function createAppServer({rpcFactory=()=>new RpcClient(),standardRpcFactory=options=>new StandardRpcClient(options),standardLoader=loadStandardApi,proofRpcFactory=options=>new ProofRpcClient(options),localLoader=loadLocalApi,arbitrumLoader=loadArbitrumApi,arbitrumOptions=()=>({}),reportDir=path.join(ROOT,'reports'),persist=true}={}) {
   let inFlight=0;
   return http.createServer(async(req,res)=>{
     try {
@@ -246,9 +246,9 @@ export function createAppServer({rpcFactory=()=>new RpcClient(),standardRpcFacto
       if(req.method==='GET' && url.pathname==='/api/health') return json(res,200,{status:'ok',version:VERSION,readOnly:true});
       if(req.method==='GET' && url.pathname==='/api/config') {
         const [standard, local, arbitrum] = await Promise.all([standardLoader(), localLoader(), arbitrumLoader()]);
-        return json(res,200,{chains:[{chainId:999,name:'HyperEVM'},{chainId:1,name:'Ethereum',experimental:true},{chainId:42161,name:'Arbitrum',experimental:true}],examples:EXAMPLES,capabilities:CAPABILITIES,
+        return json(res,200,{chains:[{chainId:999,name:'HyperEVM'},{chainId:1,name:'Ethereum',experimental:true},{chainId:11155111,name:'Sepolia',experimental:true,localOnly:true},{chainId:42161,name:'Arbitrum',experimental:true}],examples:EXAMPLES,capabilities:CAPABILITIES,
           standardEvm:standard?{available:true,examples:standard.STANDARD_EXAMPLES,capabilities:standard.STANDARD_CAPABILITIES,sequenceExamples:standard.STANDARD_SEQUENCE_EXAMPLES,sequenceCapabilities:standard.STANDARD_SEQUENCE_CAPABILITIES}:{available:false,examples:[],capabilities:null,sequenceExamples:[],sequenceCapabilities:{available:false},reason:'Install the standard EVM experiment dependencies and restart the service to enable Ethereum previews.'},
-          localEvm:local?{available:true,capabilities:local.LOCAL_CAPABILITIES}:{available:false,capabilities:null,reason:'Install the local EVM experiment dependencies and restart the service to enable independent previews.'},
+          localEvm:local?{available:true,capabilities:local.LOCAL_CAPABILITIES,examples:local.LOCAL_EXAMPLES??[]}:{available:false,capabilities:null,examples:[],reason:'Install the local EVM experiment dependencies and restart the service to enable independent previews.'},
           arbitrumEvm:arbitrum?{available:true,examples:arbitrum.ARBITRUM_EXAMPLES,capabilities:arbitrum.ARBITRUM_CAPABILITIES}:{available:false,examples:[],capabilities:null,reason:'Install the Arbitrum engine dependencies and restart the service to enable this preview.'},
           projectStatus:'Research preview · correctness and coverage under active development'});
       }
@@ -271,7 +271,8 @@ export function createAppServer({rpcFactory=()=>new RpcClient(),standardRpcFacto
         if(isStandard && !standard) return json(res,503,{error:{code:'STANDARD_EVM_UNAVAILABLE',message:'Install the standard EVM experiment dependencies and restart the service to enable Ethereum previews.'}});
         if(isLocal && !local) return json(res,503,{error:{code:'LOCAL_EVM_UNAVAILABLE',message:'Install the local EVM experiment dependencies and restart the service to enable independent previews.'}});
         if(isArbitrum && !arbitrum) return json(res,503,{error:{code:'ARBITRUM_EVM_UNAVAILABLE',message:'Install the Arbitrum engine dependencies and restart the service to enable this preview.'}});
-        if(arbitrum)arbitrum.validateArbitrumSimulation(input);else if(local)local.validateLocalSimulation(input);else if(standard)(isSequence?standard.validateStandardSequence:standard.validateStandardSimulation)(input);else if(url.pathname==='/api/simulate')validateSimulation(input);else validateReplay(input);
+        let localInput;
+        if(arbitrum)arbitrum.validateArbitrumSimulation(input);else if(local)localInput=local.validateLocalSimulation(input);else if(standard)(isSequence?standard.validateStandardSequence:standard.validateStandardSimulation)(input);else if(url.pathname==='/api/simulate')validateSimulation(input);else validateReplay(input);
         // Loading the optional engine yields; reserve the shared slot only
         // after another check so concurrent imports cannot bypass the limit.
         if(inFlight>=2)return json(res,429,{error:{code:'BUSY',message:'Two simulations are already running. Try again shortly.'}});
@@ -291,7 +292,7 @@ export function createAppServer({rpcFactory=()=>new RpcClient(),standardRpcFacto
             }
             if(res.destroyed)return;
           } else if(local) {
-            const rpc=proofRpcFactory(), controller=new AbortController();
+            const rpc=proofRpcFactory({chainId:localInput.chainId}), controller=new AbortController();
             const disconnected=()=>{ if(!res.writableEnded){controller.abort();rpc.cancel();} };
             req.once('aborted',disconnected);res.once('close',disconnected);
             if(req.aborted||res.destroyed)disconnected();

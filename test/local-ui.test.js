@@ -481,12 +481,15 @@ test('priced cleanup is labeled only with its matching completed fee context', (
 const blobProfile = 'unsigned_eip4844_block_end', blobHash = '0x01' + '44'.repeat(31);
 const blobForks = { cancun: [1710338135n, 6, 6, 3338477n], prague: [1746612311n, 9, 9, 5007716n],
   osaka: [1764798551n, 9, 6, 5007716n], bpo1: [1765290071n, 15, 6, 8346193n], bpo2: [1767747671n, 21, 6, 11684671n] };
+const sepoliaBlobForks = { cancun: [1706655072n, 6, 6, 3338477n], prague: [1741159776n, 9, 9, 5007716n],
+  osaka: [1760427360n, 9, 6, 5007716n], bpo1: [1761017184n, 15, 6, 8346193n], bpo2: [1761607008n, 21, 6, 11684671n], amsterdam: [1791294816n, 21, 6, 11684671n] };
 // Synthetic retained response, not a recorded public-chain or browser result.
-function blobSample({ fork = 'osaka', excess = 0n, count = 1, used = 0n } = {}) {
-  const result = feeSample(), output = result.attempt.preview.original.output, rule = blobForks[fork];
+function blobSample({ fork = 'osaka', excess = 0n, count = 1, used = 0n, chainId = 1 } = {}) {
+  const result = feeSample(), output = result.attempt.preview.original.output, rule = (chainId === 11155111 ? sepoliaBlobForks : blobForks)[fork];
+  result.apiRequest.chainId = chainId;
   const header = { hash: H, stateRoot: '0x' + '55'.repeat(32), number: '0x191c9e0', timestamp: '0x' + rule[0].toString(16),
     miner: T, gasLimit: '0x1c9c380', baseFeePerGas: '0xa', excessBlobGas: '0x' + excess.toString(16), blobGasUsed: '0x' + used.toString(16) };
-  const blob = ethereumBlobContext(header), blobGas = BigInt(count) * 131072n, burn = blobGas * blob.blobBaseFeePerGas;
+  const blob = ethereumBlobContext(header, chainId), blobGas = BigInt(count) * 131072n, burn = blobGas * blob.blobBaseFeePerGas;
   result.apiRequest.executionProfile = result.source.profile = output.profile.executionProfile = blobProfile;
   result.apiRequest.fees.maxFeePerBlobGas = '100'; output.profile.fees = { ...result.apiRequest.fees };
   result.apiRequest.blobVersionedHashes = Array.from({ length: count }, (_, i) => '0x01' + (44 + i).toString(16).repeat(31));
@@ -499,6 +502,7 @@ function blobSample({ fork = 'osaka', excess = 0n, count = 1, used = 0n } = {}) 
   Object.assign(output.feeAccounting, { kind: 'eip4844', maximumRequiredBalance: (5000000n + blobGas * 100n).toString(),
     blobCount: String(count), blobGasUsed: blobGas.toString(), maxFeePerBlobGas: '100', blobBaseFeePerGas: blob.blobBaseFeePerGas.toString(), blobFeeBurn: burn.toString(),
     totalUpfrontDebit: (600000n + burn).toString(), totalFeeCharge: (252000n + burn).toString(), totalFeeBurn: (210000n + burn).toString() });
+  if (chainId === 11155111) sepoliaResult(result, fork);
   return result;
 }
 function enterBlobFees(ui, cap = '100', hashes = [blobHash]) {
@@ -622,5 +626,137 @@ test('actual offline blob API response renders validated totals; canonical reche
     ui.context.renderLocalResult(report);
     if (failFinal) { assert.equal(report.source.canonicalStatus, 'unverified'); assert.match(ui.elements.get('gas-used').textContent, /fee result unavailable/); assert.equal(ui.elements.get('coverage-status').textContent, '0 / 1 measured'); }
     else { assert.equal(report.source.canonicalStatus, 'verified'); assert.deepEqual(plain(ui.context.localFeeAccounting(report)), report.attempt.preview.original.output.feeAccounting); assert.match(ui.elements.get('gas-used').textContent, /blob burn: 524,288 wei/); }
+  }
+});
+
+const sepoliaSchedule = 'pinned_ethereumjs_common_10.1.3_sepolia_amsterdam_1791294816';
+function sepoliaResult(result = nativeSample(), fork = 'amsterdam') {
+  result.apiRequest.chainId = result.source.chainId = 11155111;
+  result.source.blockSelection.headerVerification = { ...result.source.blockSelection.headerVerification,
+    status: 'verified', chainId: 11155111, forkSchedule: sepoliaSchedule, hardfork: fork };
+  result.attempt ??= { status: 'completed', preview: { original: { output: { execution: result.execution, profile: {} } } } };
+  Object.assign(result.attempt.preview.original.output.profile, { chainId: 11155111, hardfork: fork, forkSchedule: sepoliaSchedule });
+  for (const row of result.measurements) if (row.identity?.kind === 'native_balance') row.identity.chainId = '11155111';
+  return result;
+}
+function chooseSepolia(ui) {
+  ui.state.config.localEvm.capabilities = { chainIds: [1, 11155111] };
+  ui.elements.get('chain').value = '11155111'; ui.context.selectNetwork();
+  for (const [id, value] of Object.entries({ from: A, to: T, data: '0x', value: '0', block: H, 'standard-queries': JSON.stringify([nativeQuery]) })) ui.elements.get(id).value = value;
+}
+
+test('Sepolia selects local-only execution and forwards its chain without loading mainnet examples', async () => {
+  const { LOCAL_EXAMPLES } = await import('../src/local-simulation.js');
+  const ui = setup(() => Promise.resolve({ ok: true, json: async () => sepoliaResult() }));
+  ui.state.config.standardEvm.examples = [{ id: 'mainnet', input: sample().apiRequest }];
+  ui.state.config.localEvm.examples = LOCAL_EXAMPLES;
+  chooseSepolia(ui);
+  assert.equal(ui.elements.get('ethereum-engine').value, 'local'); assert.equal(ui.elements.get('ethereum-engine').disabled, true);
+  assert.equal(ui.context.currentExamples()[0].id, LOCAL_EXAMPLES[0].id); assert.equal(ui.context.currentExamples().length, 1);
+  ui.context.selectExample();
+  for (const field of ['from', 'to', 'data', 'value', 'block']) assert.equal(ui.elements.get(field).value, LOCAL_EXAMPLES[0].request[field]);
+  assert.equal(ui.elements.get('local-gas').value, '21000');
+  assert.deepEqual(JSON.parse(ui.elements.get('standard-queries').value), LOCAL_EXAMPLES[0].request.queries);
+  assert.match(ui.elements.get('network-heading').textContent, /SEPOLIA TESTNET/); assert.match(ui.elements.get('value-help').textContent, /Test ETH/);
+  ui.elements.get('ethereum-engine').value = 'provider'; ui.elements.get('ethereum-call-mode').value = 'sequence';
+  await ui.context.run('simulation'); assert.equal(ui.requests.length, 1);
+  assert.equal(ui.requests[0].url, '/api/evm/local-preview'); assert.equal(JSON.parse(ui.requests[0].options.body).chainId, 11155111);
+  assert.equal(Object.hasOwn(JSON.parse(ui.requests[0].options.body), 'calls'), false);
+  ui.elements.get('chain').value = '1'; ui.context.selectNetwork();
+  assert.equal(ui.elements.get('ethereum-engine').value, 'provider'); assert.equal(ui.elements.get('ethereum-engine').disabled, false);
+  assert.equal(ui.state.result, null); assert.equal(ui.context.currentExamples()[0].id, 'mainnet');
+});
+
+test('Sepolia test ETH display binds API, source, profile, header and native identity chain', () => {
+  const ui = setup(), result = sepoliaResult(); ui.context.renderLocalResult(result);
+  assert.equal(ui.elements.get('coverage-status').textContent, '1 / 1 measured');
+  assert.match(ui.elements.get('local-measurements').textContent, /0\.009007199254740993 test ETH/);
+  assert.match(ui.elements.get('source-details').textContent, /Sepolia testnet · chain 11155111/);
+  for (const mutate of [r => r.source.chainId = 1, r => r.apiRequest.chainId = 1,
+    r => r.attempt.preview.original.output.profile.chainId = 1, r => r.source.blockSelection.headerVerification.chainId = 1,
+    r => r.source.blockSelection.headerVerification.forkSchedule = 'mainnet', r => r.source.blockSelection.headerVerification.hardfork = 'bpo2',
+    r => r.measurements[0].identity.chainId = '1', r => delete r.source.chainId]) {
+    const bad = structuredClone(result); mutate(bad); ui.context.renderLocalResult(bad);
+    assert.equal(ui.elements.get('coverage-status').textContent, '0 / 1 measured');
+    assert.equal(nodes(ui.elements.get('local-measurements')).filter(n => n.tagName === 'TABLE').length, 0);
+  }
+});
+
+test('all Sepolia blob fork boundaries including Amsterdam retain exact fee calculations and network binding', () => {
+  const ui = setup();
+  for (const [fork, rule] of Object.entries(sepoliaBlobForks)) for (const multiple of [0n, 1n, 2n]) {
+    const result = blobSample({ chainId: 11155111, fork, excess: rule[3] * multiple, count: rule[2], used: BigInt(rule[1]) * 131072n });
+    assert.deepEqual(plain(ui.context.localFeeAccounting(result)), result.attempt.preview.original.output.feeAccounting, fork);
+    const wrong = structuredClone(result); wrong.attempt.preview.original.output.profile.forkSchedule = 'pinned_ethereumjs_common_10.1.3_mainnet';
+    assert.equal(ui.context.localFeeAccounting(wrong), null);
+    const before = structuredClone(result); const header = before.source.blockSelection.header; header.timestamp = '0x' + (rule[0] - 1n).toString(16);
+    before.source.blockSelection.headerVerification.timestamp = (rule[0] - 1n).toString();
+    assert.equal(ui.context.localFeeAccounting(before), null, fork + ' before activation');
+  }
+});
+
+test('Sepolia availability and pending-result invalidation follow the selected network', async () => {
+  const unavailable = setup(); unavailable.elements.get('chain').value = '11155111'; unavailable.context.selectNetwork();
+  assert.equal(unavailable.elements.get('simulate-button').disabled, true);
+  let finish; const ui = setup(() => new Promise(resolve => { finish = resolve; })); chooseSepolia(ui);
+  const pending = ui.context.run('simulation'); assert.equal(ui.elements.get('chain').disabled, true);
+  ui.elements.get('chain').value = '1'; finish({ ok: true, json: async () => sepoliaResult() }); await pending;
+  assert.equal(ui.state.result, null); assert.match(ui.elements.get('run-status').textContent, /Inputs changed/);
+});
+
+test('Sepolia contract query identities reject a different chain, contract or account before displaying values', async () => {
+  const { compilePreviewQueries } = await import('../engines/local-evm/preview-queries.js');
+  const descriptors = [query, { to: T, data: '0xdd62ed3e' + A.slice(2).padStart(64, '0') + T.slice(2).padStart(64, '0') },
+    { kind: 'aave_v3_user_account_data', contract: T, user: A }, { kind: 'morpho_blue_position', contract: T, user: A, marketId: H }];
+  const ui = setup();
+  for (const entry of compilePreviewQueries(descriptors, { chainId: 11155111 })) {
+    const result = sepoliaResult(); result.apiRequest.queries = [entry.descriptor];
+    result.measurements = [{ index: 0, ...entry, status: 'measured', values: entry.fields.map(field => ({ name: field.name, beforeRaw: '0', afterRaw: '1', deltaRaw: '1', unit: field.unit })) }];
+    assert.equal(ui.context.localMeasurementRows(result)[0].measured, true);
+    for (const key of Object.keys(entry.identity)) {
+      const wrong = structuredClone(result); wrong.measurements[0].identity[key] = key === 'chainId' ? '1' : 'wrong';
+      ui.context.renderLocalResult(wrong); assert.equal(ui.elements.get('coverage-status').textContent, '0 / 1 measured', entry.identity.kind + ':' + key);
+    }
+    const missing = structuredClone(result); delete missing.measurements[0].identity; assert(!ui.context.localMeasurementRows(missing)[0].measured);
+  }
+  const [{ simulateLocal }, { sepoliaApiFixture, sepoliaApiTransport, sepoliaApiInput, TX_SENDER, TARGET }] = await Promise.all([
+    import('../src/local-simulation.js'), import('./local-sepolia-fixture.js'),
+  ]);
+  const f = await sepoliaApiFixture({ gas: '5000000', target: { nonce: 1n, code: '0x4660005260206000f3' } }), p = sepoliaApiTransport(f);
+  const report = await simulateLocal(sepoliaApiInput(f, { queries: [{ to: TARGET, data: '0x70a08231' + TX_SENDER.slice(2).padStart(64, '0') }] }), p.rpc); p.check(report);
+  assert.equal(report.status, 'complete'); ui.context.renderLocalResult(report); assert.equal(ui.elements.get('coverage-status').textContent, '1 / 1 measured');
+  assert.equal(report.measurements[0].values[0].beforeRaw, '11155111');
+  report.measurements[0].identity.chainId = '1'; ui.context.renderLocalResult(report); assert.equal(ui.elements.get('coverage-status').textContent, '0 / 1 measured');
+});
+
+test('real Sepolia API responses render exact native amounts and fee totals; failed rechecks withhold them', async () => {
+  const [{ simulateLocal }, { sepoliaApiFixture, sepoliaApiTransport, sepoliaApiInput, TX_SENDER, TARGET }] = await Promise.all([
+    import('../src/local-simulation.js'), import('./local-sepolia-fixture.js'),
+  ]);
+  for (const mode of ['unpriced', 'priced', 'blob', 'changed-header']) {
+    const f = await sepoliaApiFixture({ priced: mode !== 'unpriced', ...(mode === 'blob' ? { sender: { balance: 10n ** 22n } } : {}) }), ui = setup();
+    const p = sepoliaApiTransport(f, mode === 'changed-header' ? { finalHeader: h => ({ ...h, slotNumber: '0x1' }) } : {});
+    const input = sepoliaApiInput(f, mode === 'blob' ? {
+      executionProfile: blobProfile, fees: { ...f.request.fees, maxFeePerBlobGas: String(ethereumBlobContext(f.header, 11155111).blobBaseFeePerGas) }, blobVersionedHashes: ['0x01' + '44'.repeat(31)],
+    } : {});
+    const result = await simulateLocal(input, p.rpc); p.check(result); ui.context.renderLocalResult(result);
+    assert.deepEqual(JSON.parse(ui.elements.get('raw-json').textContent), result);
+    if (mode === 'changed-header') {
+      assert.equal(result.source.canonicalStatus, 'unverified'); assert.equal(ui.elements.get('coverage-status').textContent, '0 / 2 measured');
+      assert.equal(nodes(ui.elements.get('local-measurements')).filter(n => n.tagName === 'TABLE').length, 0);
+      assert.match(ui.elements.get('gas-used').textContent, /fee result unavailable/); continue;
+    }
+    assert.equal(result.status, 'complete', mode + ': ' + JSON.stringify(result.error)); assert.equal(result.execution.status, 'success');
+    assert.equal(ui.elements.get('coverage-status').textContent, '2 / 2 measured');
+    const amounts = ui.elements.get('local-measurements').textContent;
+    assert(amounts.includes(TX_SENDER)); assert(amounts.includes(TARGET));
+    assert.match(amounts, /0\.000000000000000026 test ETH/); assert.match(amounts, /17 wei/);
+    const fees = result.attempt.preview.original.output.feeAccounting;
+    if (mode === 'unpriced') { assert.equal(fees, undefined); assert.equal(ui.context.localFeeAccounting(result), null); }
+    else {
+      assert.deepEqual(plain(ui.context.localFeeAccounting(result)), fees);
+      assert.match(ui.elements.get('gas-used').textContent, /fee/);
+      if (mode === 'blob') assert(ui.elements.get('gas-used').textContent.includes('blob burn: ' + BigInt(fees.blobFeeBurn).toLocaleString('en-US') + ' wei'));
+    }
   }
 });

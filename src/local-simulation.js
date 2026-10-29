@@ -26,25 +26,40 @@ const failure = code => ({ code, message: ({
 const stop = code => { throw Object.assign(new Error(code), { localCode: code }); };
 const freeze = value => { if (value && typeof value === 'object') { for (const child of Object.values(value)) freeze(child); Object.freeze(value); } return value; };
 
+export const LOCAL_EXAMPLES = freeze([{ id: 'sepolia-public-native-transfer', title: 'Sepolia: preview 0.001 test ETH',
+  description: 'Unsigned preview from a public address to the burn address. No funds are owned or sent; current balances and provider availability determine the result.',
+  request: { chainId: 11155111, from: '0x6efb29cee3b414272eb7a8f3ebabf873d36bc033',
+    to: '0x000000000000000000000000000000000000dead', data: '0x', value: '1000000000000000', gas: '21000', block: 'latest',
+    queries: [{ kind: 'native_balance', account: '0x6efb29cee3b414272eb7a8f3ebabf873d36bc033' },
+      { kind: 'native_balance', account: '0x000000000000000000000000000000000000dead' }] } }]);
+
 export const LOCAL_CAPABILITIES = freeze({
   available: true, chainId: 1, status: 'experimental', operation: 'isolated_proof_backed_unsigned_call',
+  chainIds: [1, 11155111],
+  networks: {
+    1: { name: 'Ethereum', nativeAsset: 'ETH', supportedForks: ['shanghai', 'cancun', 'prague', 'osaka', 'bpo1', 'bpo2'] },
+    11155111: { name: 'Sepolia', nativeAsset: 'test ETH', supportedForks: ['shanghai', 'cancun', 'prague', 'osaka', 'bpo1', 'bpo2', 'amsterdam'] },
+  },
+  amsterdam: { chainId: 11155111, authorizationList: false, delegatedSenders: true, storageOnlyCreationCollision: false,
+    creationAttempts: 'authenticated_nonce_and_code_collision_state_with_chronological_nonce_write_validation',
+    selfdestruct: 'created_account_code_nonce_storage_clearing_preserving_residual_balance' },
   profile: 'unsigned_unpriced_block_end', blockSelection: ['latest', 'canonical_hex_number', 'block_hash'],
   transactionContext: { optionalFields: ['accessList', 'blobVersionedHashes', 'authorizationList'], limits: { ...EVM_CONTEXT_LIMITS, authorizations: MAX_AUTHORIZATIONS }, blobFeeScope: 'default_synthetic_zero_or_explicit_fork_priced_blob_fees_without_sidecar_validation' },
-  senderCode: 'empty_or_exact_existing_EIP7702_delegation_on_Prague_or_later',
-  authorizations: 'ordered_EIP7702_signed_tuples_on_Prague_or_later_before_unsigned_message_no_outer_signature_validation',
+  senderCode: 'empty_or_exact_existing_EIP7702_delegation_on_supported_Prague_or_later_forks',
+  authorizations: 'ordered_EIP7702_signed_tuples_on_Prague_through_BPO2_before_unsigned_message_no_outer_signature_validation',
   internalCreation: 'CREATE_CREATE2_with_proven_empty_deployable_targets',
   topLevelCreation: 'explicit_null_destination_CREATE_with_proven_empty_deployable_target',
-  selfdestruct: 'fork_selected_Shanghai_whole_account_deletion_and_Cancun_created_only_deletion',
+  selfdestruct: 'fork_selected_Shanghai_whole_account_deletion_Cancun_created_only_deletion_Amsterdam_balance_preserving_clearing',
   emptyAccountCleanup: 'EIP161_retained_unsigned_message_touches_including_RIPEMD160_exception',
   historicalBlockHashes: 'authenticated_parent_hash_chain_with_shared_input_limits',
   pointEvaluation: { address: '0x000000000000000000000000000000000000000a', activationFork: 'cancun',
-    supportedForks: ['cancun', 'prague', 'osaka', 'bpo1', 'bpo2'], scope: 'executed_EIP4844_single_point_KZG_proofs',
+    supportedForks: ['cancun', 'prague', 'osaka', 'bpo1', 'bpo2', 'amsterdam'], scope: 'executed_EIP4844_single_point_KZG_proofs',
     blobSidecarsVerified: false, wholeBlobValidityVerified: false, inclusionVerified: false },
   cryptographicPrecompiles: {
     bls12_381: { addresses: ['0x0b', '0x0c', '0x0d', '0x0e', '0x0f', '0x10', '0x11'], activationFork: 'prague',
-      supportedForks: ['prague', 'osaka', 'bpo1', 'bpo2'], scope: 'EIP2537_curve_operations' },
+      supportedForks: ['prague', 'osaka', 'bpo1', 'bpo2', 'amsterdam'], scope: 'EIP2537_curve_operations' },
     p256: { address: '0x0000000000000000000000000000000000000100', activationFork: 'osaka',
-      supportedForks: ['osaka', 'bpo1', 'bpo2'], gas: '6900', scope: 'EIP7951_signature_verification' },
+      supportedForks: ['osaka', 'bpo1', 'bpo2', 'amsterdam'], gas: '6900', scope: 'EIP7951_signature_verification' },
     hostFailure: 'unavailable_with_whole_attempt_rollback',
   },
   querySelection: 'explicit_only', queryTypes: ['balanceOf', 'allowance', 'aave_v3_user_account_data', 'morpho_blue_position', 'native_balance'],
@@ -64,14 +79,14 @@ export const LOCAL_CAPABILITIES = freeze({
     'Proofs and runtime code are checked against the selected header, whose hash is recomputed. Consensus, finality and contract identity are not independently established.',
     'The default unsigned profile uses zero gas price and BASEFEE without fee settlement. Explicit EIP-1559 and EIP-4844 profiles use the selected block fee context and caller caps; settlement is reported only for a complete validated execution. No profile validates an outer transaction signature. Contract signature checks still execute.',
     'Optional gas selects the original transaction gas limit within 21,000–5,000,000; the selected fork also requires sufficient intrinsic gas and calldata floor. Each token or position CALL query retains a separate 1,000,000 gas limit; native balance reads execute no code and consume no query gas.',
-    'Explicit to:null deploys initcode with CREATE; internal CREATE and CREATE2 require a proven deployable target with empty initial code/storage and zero nonce. Shanghai SELFDESTRUCT removes every committed execution account at transaction end. Cancun-or-later transfers preexisting balances while deleting only contracts created in that invocation.',
+    'Explicit to:null deploys initcode with CREATE; successful internal CREATE and CREATE2 require a proven deployable target. Shanghai SELFDESTRUCT removes every committed execution account at transaction end. Cancun through BPO2 deletes only contracts created in that invocation. Amsterdam clears a newly created contract’s code, nonce and storage while preserving its residual balance; preexisting contracts keep their account state. Amsterdam creation collisions require authenticated nonce or code evidence; storage-only collisions remain unsupported.',
     'Transaction-end EIP-161 cleanup removes touched empty accounts and their entire storage, including the retained RIPEMD160 touch exception. The default profile adds no fee-related coinbase touch. Rematerializing a deleted account with original code, nonzero nonce or nonempty storage remains unsupported.',
     'Optional fees require maxFeePerGas and maxPriorityFeePerGas as raw wei strings. The explicit EIP-4844 profile also requires maxFeePerBlobGas and nonempty versioned hashes; its actual blob charge is burned without refund or beneficiary tip. Measurement queries stay unpriced, receive no blob hashes, do not repeat fees and still do not support BLOBBASEFEE.',
-    'Sender code must initially be empty or an exact existing EIP-7702 delegation on Prague or later. Up to sixteen signed authorization tuples may install, replace or clear delegations before a call; their changes survive message failure. Authorization lists cannot accompany deployment or blob context. Other coded senders remain unsupported. Default blob calls use zero blob base fee. Explicit priced calls derive BLOBBASEFEE from the verified current header and pinned fork parameters; parent excess evolution, sidecars and inclusion remain unverified.',
-    'On Cancun through BPO2, executed calls to the 0x0a point-evaluation precompile check EIP-4844 single-point KZG proofs. This does not validate blob sidecars, whole-blob validity or inclusion, and supplying blob hashes alone performs no point-evaluation check.',
+    'Sender code must initially be empty or an exact existing EIP-7702 delegation on the supported Prague-or-later forks, including Sepolia Amsterdam. On Prague through BPO2, up to sixteen signed authorization tuples may install, replace or clear delegations before a call; their changes survive message failure. Amsterdam authorization lists remain unsupported. Authorization lists cannot accompany deployment or blob context. Other coded senders remain unsupported. Default blob calls use zero blob base fee. Explicit priced calls derive BLOBBASEFEE from the verified current header and pinned fork parameters; parent excess evolution, sidecars and inclusion remain unverified.',
+    'On supported Cancun-or-later forks, executed calls to the 0x0a point-evaluation precompile check EIP-4844 single-point KZG proofs. This does not validate blob sidecars, whole-blob validity or inclusion, and supplying blob hashes alone performs no point-evaluation check.',
     'BLS12-381 operations use the Prague-or-later rules and P-256 signature verification uses Osaka-or-later rules. Unexpected cryptographic runtime failures withhold execution rather than becoming an invalid signature or catchable EVM failure. Before activation, these addresses keep ordinary account behavior.',
     'In-range BLOCKHASH follows authenticated parent headers within the shared read and time budgets; missing ancestry is unavailable.',
-    'The pinned EthereumJS Shanghai-through-BPO2 schedule and fixed execution/state budgets bound supported execution.',
+    'Supported networks are Ethereum mainnet and Sepolia. The selected endpoint must report the requested chain ID; header hashes and state proofs do not independently prove network membership. Pinned schedules support Shanghai through BPO2 on mainnet and Shanghai through Amsterdam on Sepolia, within fixed execution and state budgets. Sepolia ETH is test currency.',
     'Process separation and a V8 heap limit are not an OS network/filesystem sandbox or a hard total-RSS limit.',
     'No security verdict, complete economic-effect coverage or accuracy percentage is established.',
   ],
@@ -86,7 +101,8 @@ function record(value, allowed) {
 }
 export function validateLocalSimulation(input) {
   record(input, ['chainId', 'from', 'to', 'data', 'value', 'gas', 'block', 'queries', 'accessList', 'blobVersionedHashes', 'authorizationList', 'executionProfile', 'fees']);
-  if (input.chainId !== 1 && input.chainId !== '1') throw new InputError('Only Ethereum chain 1 is supported.', 'UNSUPPORTED_CHAIN');
+  if (![1, '1', 11155111, '11155111'].includes(input.chainId)) throw new InputError('Only Ethereum chain 1 and Sepolia chain 11155111 are supported by the local preview.', 'UNSUPPORTED_CHAIN');
+  const chainId = Number(input.chainId);
   if (typeof input.from !== 'string' || !ADDRESS.test(input.from)) throw new InputError('from must be a 20-byte hex address.');
   if (input.to !== null && (typeof input.to !== 'string' || !ADDRESS.test(input.to))) throw new InputError('to must be a 20-byte hex address, or explicit null for contract deployment.');
   if (typeof input.data !== 'string' || input.data.length > 65538 || !DATA.test(input.data)) throw new InputError('data must be even-length hexadecimal calldata of at most 32 KiB.');
@@ -102,9 +118,9 @@ export function validateLocalSimulation(input) {
   if (authorizationList && (input.to === null || context.blobVersionedHashes)) throw new InputError('Authorization lists require a call destination without blob context.');
   if (input.to === null && context.blobVersionedHashes) throw new InputError('Blob context requires a call destination; contract deployment cannot carry blob hashes.');
   try { fees = normalizeEthereumFees(input); } catch { throw new InputError('Transaction fees require an explicit supported profile and canonical decimal uint256 wei caps. EIP-1559 requires maxFeePerGas and maxPriorityFeePerGas without blobs; EIP-4844 additionally requires maxFeePerBlobGas and nonempty versioned hashes, without authorizations or deployment. Priority cannot exceed the execution fee cap.'); }
-  try { queries = compilePreviewQueries(input.queries).map(row => structuredClone(row.descriptor)); }
+  try { queries = compilePreviewQueries(input.queries, { chainId }).map(row => structuredClone(row.descriptor)); }
   catch { throw new InputError('Supply one to eight distinct canonical token, typed position or native balance queries.'); }
-  return { chainId: 1, from: input.from.toLowerCase(), to: input.to === null ? null : input.to.toLowerCase(), data: input.data.toLowerCase(), value, gas, block: block.toLowerCase(), queries, ...context, ...(authorizationList ? { authorizationList } : {}), ...fees };
+  return { chainId, from: input.from.toLowerCase(), to: input.to === null ? null : input.to.toLowerCase(), data: input.data.toLowerCase(), value, gas, block: block.toLowerCase(), queries, ...context, ...(authorizationList ? { authorizationList } : {}), ...fees };
 }
 
 function projection(core) {
@@ -130,6 +146,7 @@ export async function simulateLocal(input, rpc, { signal } = {}) {
   const report = { kind: 'local_proof_preview', schemaVersion: '1.0', id: randomUUID(), createdAt: new Date().toISOString(),
     apiRequest, status: 'unavailable', error: null, execution: { status: 'unavailable' }, measurements: [], attempt: null,
     source: { kind: 'proof_backed_owned_execution', profile: apiRequest.executionProfile ?? 'unsigned_unpriced_block_end', canonicalStatus: 'unverified',
+      ...(apiRequest.chainId === 1 ? {} : { chainId: apiRequest.chainId }),
       consensusVerified: false, originalTransactionReplay: false, blockSelection: { requested: apiRequest.block } },
     transportEvidence: [], usage: null, timing: null };
   const controller = new AbortController();
@@ -149,11 +166,11 @@ export async function simulateLocal(input, rpc, { signal } = {}) {
       if (controller.signal.aborted || remaining() <= 0) stop(signal?.aborted ? 'LOCAL_PREVIEW_CANCELLED' : 'LOCAL_PREVIEW_BUDGET');
       return result;
     };
-    if (await call('eth_chainId', []) !== '0x1') stop('LOCAL_PREVIEW_PREPARATION');
+    if (await call('eth_chainId', []) !== '0x' + apiRequest.chainId.toString(16)) stop('LOCAL_PREVIEW_PREPARATION');
     const byHash = HASH.test(apiRequest.block), method = byHash ? 'eth_getBlockByHash' : 'eth_getBlockByNumber';
     const header = await call(method, [apiRequest.block, false]);
     const expectedHash = byHash ? apiRequest.block : header?.hash;
-    const verified = verifyEthereumHeader({ header, expectedHash });
+    const verified = verifyEthereumHeader({ header, expectedHash, chainId: apiRequest.chainId });
     if (!byHash && apiRequest.block !== 'latest' && BigInt(header.number) !== BigInt(apiRequest.block)) stop('LOCAL_PREVIEW_PREPARATION');
     const blockHash = header.hash.toLowerCase();
     report.source.blockSelection = { requested: apiRequest.block, kind: byHash ? 'pinned_hash' : apiRequest.block === 'latest' ? 'resolved_latest' : 'resolved_number',
@@ -163,7 +180,7 @@ export async function simulateLocal(input, rpc, { signal } = {}) {
     const calls = Math.min(256, usage.limits.calls - usage.calls - 1), totalResponseBytes = Math.min(32 * 1024 * 1024, usage.limits.totalBytes - usage.observedBytes);
     if (wallMs <= 0 || calls <= 0 || totalResponseBytes <= 0) stop('LOCAL_PREVIEW_BUDGET');
     report.attempt = await executeIsolatedEthereumPreview({ request: { from: apiRequest.from, to: apiRequest.to, data: apiRequest.data, value: apiRequest.value, gas: apiRequest.gas, ...normalizeEvmContext(apiRequest), ...(apiRequest.authorizationList ? { authorizationList: apiRequest.authorizationList } : {}), ...normalizeEthereumFees(apiRequest) },
-      header, queries: apiRequest.queries, rpc, signal: controller.signal,
+      header, chainId: apiRequest.chainId, queries: apiRequest.queries, rpc, signal: controller.signal,
       limits: { wallMs, calls, totalResponseBytes } });
     if (controller.signal.aborted || signal?.aborted) stop(signal?.aborted ? 'LOCAL_PREVIEW_CANCELLED' : 'LOCAL_PREVIEW_BUDGET');
     if (report.attempt.status !== 'completed') {
@@ -171,7 +188,7 @@ export async function simulateLocal(input, rpc, { signal } = {}) {
     } else {
       const confirmed = await call('eth_getBlockByNumber', ['0x' + BigInt(header.number).toString(16), false]);
       try {
-        verifyEthereumHeader({ header: confirmed, expectedHash: blockHash });
+        verifyEthereumHeader({ header: confirmed, expectedHash: blockHash, chainId: apiRequest.chainId });
         if (!isDeepStrictEqual(confirmed, header)) stop('LOCAL_PREVIEW_CANONICAL');
       } catch { stop('LOCAL_PREVIEW_CANONICAL'); }
       report.source.canonicalStatus = 'verified';

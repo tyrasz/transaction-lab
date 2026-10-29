@@ -165,7 +165,7 @@ async function executeIsolated(options, previewMode) {
     } else need(output.authorizationProcessing === undefined);
     const delegation = existingDelegationTarget(code, common), advertised = output.semantics?.senderDelegation;
     if (complete) need(code === '0x' || delegation !== null);
-    if (complete && common.isActivatedEIP(8037)) need(delegation === null && preparation === null);
+    if (complete && common.isActivatedEIP(8037)) need(preparation === null);
     if (preparation) {
       need(output.semantics?.callerNonce === 'outer_increment_authorizations_and_committed_sender_creation_attempts');
       need(isDeepStrictEqual(advertised, delegation === null ? undefined : { address: delegation, authorizationListProcessed: true }));

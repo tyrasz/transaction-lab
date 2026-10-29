@@ -23,7 +23,7 @@ test('actual local API exposes constructor deletion and carries it through stabl
   assert.deepEqual(original.changes.accounts.find(row=>row.address===target),{address:target,existence:{before:true,after:false,basis:'same_invocation_created_contract_deletion'},balance:{before:'0x11',after:'0x0'}});
   assert.equal(result.measurements[0].status,'measured');assert.equal(result.measurements[0].values[0].deltaRaw,'0');
   assert.deepEqual(result.attempt.preview.measurements[0].after.changesBefore,original.changes);
-  assert.equal(LOCAL_CAPABILITIES.selfdestruct,'fork_selected_Shanghai_whole_account_deletion_and_Cancun_created_only_deletion');
+  assert.equal(LOCAL_CAPABILITIES.selfdestruct,'fork_selected_Shanghai_whole_account_deletion_Cancun_created_only_deletion_Amsterdam_balance_preserving_clearing');
   assert(LOCAL_CAPABILITIES.limitations.some(value=>value.includes('Shanghai SELFDESTRUCT removes every committed execution account')));
 });
 

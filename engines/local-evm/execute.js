@@ -239,9 +239,9 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       // CREATE increments the creator before the child's checkpoint. A failed
       // constructor or collision keeps that increment if its parent commits.
       // Historical delegated-sender profiles count entered attempts here.
-      // Amsterdam uses the write observer above; its delegated-sender gate
-      // remains closed until authorization/nonce restoration is integrated.
-      if (delegatedSenderNonce !== null && creation && parent && frame.from === from) parent.senderCreations++;
+      // Amsterdam counts actual nonce writes at successful frame exit, also
+      // covering collisions that never enter a child message.
+      if (!creationObserver && delegatedSenderNonce !== null && creation && parent && frame.from === from) parent.senderCreations++;
       // This is the EVM's invocation-local creation set. The state manager's
       // creation marker deliberately survives copied after-state query forks.
       stack.push({ frame, pendingCall: null, createdAddresses: message.createdAddresses, senderCreations: 0 });
@@ -300,6 +300,9 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       active.frame.error = error === undefined ? null : evmErrors.has(error) ? error : 'unrecognized EVM exception';
       creationObserver?.exitFrame(active.frame, result);
       if (error === undefined) {
+        // Attempts belong to the creator frame. Constructor failure retains
+        // its caller's increment; a reverted ancestor discards the subtree.
+        if (creationObserver && delegatedSenderNonce !== null && active.frame.executionAddress === from) active.senderCreations += active.frame.creationAttempts.length;
         const parent = stack.at(-1);
         if (parent) parent.senderCreations += active.senderCreations;
         else retainedSenderCreations = active.senderCreations;
@@ -314,7 +317,6 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       if (code.length) {
         const delegation = existingDelegationTarget(bytesToHex(code), common);
         if (delegation === null) reject('LOCAL_SENDER_CODE_UNSUPPORTED', 'The unsigned reference requires an empty-code sender or an exact existing EIP-7702 delegation on Prague or later.', 'unsupported');
-        if (amsterdam) reject('LOCAL_SENDER_CODE_UNSUPPORTED', 'Amsterdam delegated-sender creation and parent nonce validation are not yet integrated.', 'unsupported');
         delegatedSenderNonce = account?.nonce ?? 0n;
         semantics.senderDelegation = { address: delegation, authorizationListProcessed: false };
         semantics.callerNonce = 'runCall_increment_and_committed_sender_creation_attempts';

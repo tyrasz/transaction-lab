@@ -100,8 +100,12 @@ export class ProofRpcClient {
   #pin = null; #ancestry = null; #ancestorPending = false; #closed = null; #evidence = []; #pending = new Set(); #adapters = new Set(); #stops = new Set();
   #observed = 0; #retained = 0; #successful = 0; #dispatched = 0; #rpcMs = 0; #clockValid = true;
   constructor(options = {}) {
-    fields(options, ['url', 'fetchImpl', 'now', 'limits'], []);
-    const { url = process.env.ETHEREUM_RPC_URL || 'https://eth.drpc.org', fetchImpl = fetch, now = () => performance.now(), limits = {} } = options;
+    fields(options, ['url', 'fetchImpl', 'now', 'limits', 'chainId'], []);
+    const { chainId = 1 } = options;
+    need(chainId === 1 || chainId === 11155111);
+    const defaultUrl = chainId === 1 ? process.env.ETHEREUM_RPC_URL || 'https://eth.drpc.org'
+      : process.env.SEPOLIA_RPC_URL || 'https://rpc.sepolia.ethpandaops.io';
+    const { url = defaultUrl, fetchImpl = fetch, now = () => performance.now(), limits = {} } = options;
     need(typeof url === 'string', 'INVALID_RPC_URL'); let endpoint;
     try { endpoint = new URL(url); } catch { fail('INVALID_RPC_URL'); }
     need(['http:', 'https:'].includes(endpoint.protocol), 'INVALID_RPC_URL');

@@ -1,0 +1,269 @@
+TAP version 13
+# Subtest: explicit native queries submit only to the local endpoint and count toward the combined eight-query cap
+ok 1 - explicit native queries submit only to the local endpoint and count toward the combined eight-query cap
+  ---
+  duration_ms: 16.769708
+  type: 'test'
+  ...
+# Subtest: native query validation rejects malformed addresses, extra fields and duplicate normalized accounts before dispatch
+ok 2 - native query validation rejects malformed addresses, extra fields and duplicate normalized accounts before dispatch
+  ---
+  duration_ms: 3.796959
+  type: 'test'
+  ...
+# Subtest: native balances retain exact large ETH and wei values, including uint256 maximum and negative one wei
+ok 3 - native balances retain exact large ETH and wei values, including uint256 maximum and negative one wei
+  ---
+  duration_ms: 0.795584
+  type: 'test'
+  ...
+# Subtest: native amount display rejects mismatched identity, unit, encoding, bounds and unverified context
+ok 4 - native amount display rejects mismatched identity, unit, encoding, bounds and unverified context
+  ---
+  duration_ms: 9.557917
+  type: 'test'
+  ...
+# Subtest: native fee wording follows retained validated results rather than the current fee checkbox
+ok 5 - native fee wording follows retained validated results rather than the current fee checkbox
+  ---
+  duration_ms: 0.806667
+  type: 'test'
+  ...
+# Subtest: editing native accounts or switching engines clears retained and pending results
+ok 6 - editing native accounts or switching engines clears retained and pending results
+  ---
+  duration_ms: 1.002333
+  type: 'test'
+  ...
+# Subtest: provider stays default; config gates local independently and local requires a manual single call
+ok 7 - provider stays default; config gates local independently and local requires a manual single call
+  ---
+  duration_ms: 0.746417
+  type: 'test'
+  ...
+# Subtest: engine switch preserves single-call inputs but clears stale result and download state
+ok 8 - engine switch preserves single-call inputs but clears stale result and download state
+  ---
+  duration_ms: 0.690541
+  type: 'test'
+  ...
+# Subtest: local submission uses only the dedicated endpoint, sends explicit queries and locks all request controls
+ok 9 - local submission uses only the dedicated endpoint, sends explicit queries and locks all request controls
+  ---
+  duration_ms: 0.81075
+  type: 'test'
+  ...
+# Subtest: empty manual queries block local dispatch and a changed fingerprint suppresses a pending result
+ok 10 - empty manual queries block local dispatch and a changed fingerprint suppresses a pending result
+  ---
+  duration_ms: 1.101291
+  type: 'test'
+  ...
+# Subtest: deployment selection sends explicit null only to local execution and restores the call recipient on engine change
+ok 11 - deployment selection sends explicit null only to local execution and restores the call recipient on engine change
+  ---
+  duration_ms: 1.05275
+  type: 'test'
+  ...
+# Subtest: deployment rejects blob context before dispatch and changes invalidate pending results
+ok 12 - deployment rejects blob context before dispatch and changes invalidate pending results
+  ---
+  duration_ms: 0.864125
+  type: 'test'
+  ...
+# Subtest: local exact values remain raw, identities explicit, full JSON intact, provider summaries hidden
+ok 13 - local exact values remain raw, identities explicit, full JSON intact, provider summaries hidden
+  ---
+  duration_ms: 0.44375
+  type: 'test'
+  ...
+# Subtest: unavailable, partial, malformed and unverified rows never turn missing values into zero
+ok 14 - unavailable, partial, malformed and unverified rows never turn missing values into zero
+  ---
+  duration_ms: 3.247875
+  type: 'test'
+  ...
+# Subtest: typed identity is separate, unsafe text stays text, and a later provider result hides local rows
+ok 15 - typed identity is separate, unsafe text stays text, and a later provider result hides local rows
+  ---
+  duration_ms: 0.4135
+  type: 'test'
+  ...
+# Subtest: verified same-call deletion is visible without claiming the contract remains deployed
+ok 16 - verified same-call deletion is visible without claiming the contract remains deployed
+  ---
+  duration_ms: 0.429833
+  type: 'test'
+  ...
+# Subtest: verified empty-account cleanup is visible after a reverted call and hidden when unverified
+ok 17 - verified empty-account cleanup is visible after a reverted call and hidden when unverified
+  ---
+  duration_ms: 0.415458
+  type: 'test'
+  ...
+# Subtest: advanced local gas defaults to omission and forwards exact bounded decimal selections
+ok 18 - advanced local gas defaults to omission and forwards exact bounded decimal selections
+  ---
+  duration_ms: 1.906959
+  type: 'test'
+  ...
+# Subtest: malformed or out-of-range local gas blocks dispatch and opens the field
+ok 19 - malformed or out-of-range local gas blocks dispatch and opens the field
+  ---
+  duration_ms: 4.413584
+  type: 'test'
+  ...
+# Subtest: gas edits clear stale output, lock during dispatch, and suppress mismatched pending results
+ok 20 - gas edits clear stale output, lock during dispatch, and suppress mismatched pending results
+  ---
+  duration_ms: 0.775333
+  type: 'test'
+  ...
+# Subtest: gas is hidden and absent from provider, sequence, HyperEVM and historical requests
+ok 21 - gas is hidden and absent from provider, sequence, HyperEVM and historical requests
+  ---
+  duration_ms: 2.41
+  type: 'test'
+  ...
+# Subtest: example, reset and network changes restore default gas and clear prior results
+ok 22 - example, reset and network changes restore default gas and clear prior results
+  ---
+  duration_ms: 0.905792
+  type: 'test'
+  ...
+# Subtest: local result shows its retained gas limit rather than the current form value
+ok 23 - local result shows its retained gas limit rather than the current form value
+  ---
+  duration_ms: 0.579208
+  type: 'test'
+  ...
+# Subtest: fees opt in only for local mode and leave default and provider payloads unchanged
+ok 24 - fees opt in only for local mode and leave default and provider payloads unchanged
+  ---
+  duration_ms: 2.732958
+  type: 'test'
+  ...
+# Subtest: both canonical fee inputs and their relationship are checked before dispatch, including the required blob cap
+ok 25 - both canonical fee inputs and their relationship are checked before dispatch, including the required blob cap
+  ---
+  duration_ms: 3.618041
+  type: 'test'
+  ...
+# Subtest: fee toggles and amounts clear stale results, lock while busy and fingerprint pending responses
+ok 26 - fee toggles and amounts clear stale results, lock while busy and fingerprint pending responses
+  ---
+  duration_ms: 0.947042
+  type: 'test'
+  ...
+# Subtest: fee example and reset paths restore the explicit mode without leaking into other networks
+ok 27 - fee example and reset paths restore the explicit mode without leaking into other networks
+  ---
+  duration_ms: 0.661375
+  type: 'test'
+  ...
+# Subtest: fee labels use only complete validated retained accounting, including genuine failed execution
+ok 28 - fee labels use only complete validated retained accounting, including genuine failed execution
+  ---
+  duration_ms: 2.009125
+  type: 'test'
+  ...
+# Subtest: priced cleanup is labeled only with its matching completed fee context
+ok 29 - priced cleanup is labeled only with its matching completed fee context
+  ---
+  duration_ms: 0.447375
+  type: 'test'
+  ...
+# Subtest: blob pricing selects only the local profile; missing, malformed, stray and excessive blob caps or counts do not dispatch
+ok 30 - blob pricing selects only the local profile; missing, malformed, stray and excessive blob caps or counts do not dispatch
+  ---
+  duration_ms: 4.401958
+  type: 'test'
+  ...
+# Subtest: blob fee field participates in reset, examples, busy locks, stale invalidation and pending fingerprints
+ok 31 - blob fee field participates in reset, examples, busy locks, stale invalidation and pending fingerprints
+  ---
+  duration_ms: 2.5855
+  type: 'test'
+  ...
+# Subtest: all pinned blob forks use exact integer pricing and retained execution, blob burn and total amounts
+ok 32 - all pinned blob forks use exact integer pricing and retained execution, blob burn and total amounts
+  ---
+  duration_ms: 5.684209
+  type: 'test'
+  ...
+# Subtest: blob fee displays reject malformed arithmetic, identities, fork limits, unbounded price and lost final-header binding
+ok 33 - blob fee displays reject malformed arithmetic, identities, fork limits, unbounded price and lost final-header binding
+  ---
+  duration_ms: 6.824625
+  type: 'test'
+  ...
+# Subtest: blob cleanup requires validated blob fee scope and loses its label when fee evidence fails
+ok 34 - blob cleanup requires validated blob fee scope and loses its label when fee evidence fails
+  ---
+  duration_ms: 0.706084
+  type: 'test'
+  ...
+# Subtest: actual offline blob API response renders validated totals; canonical recheck failure withholds them
+ok 35 - actual offline blob API response renders validated totals; canonical recheck failure withholds them
+  ---
+  duration_ms: 367.751375
+  type: 'test'
+  ...
+# Subtest: Sepolia selects local-only execution and forwards its chain without loading mainnet examples
+ok 36 - Sepolia selects local-only execution and forwards its chain without loading mainnet examples
+  ---
+  duration_ms: 1.111167
+  type: 'test'
+  ...
+# Subtest: Sepolia test ETH display binds API, source, profile, header and native identity chain
+ok 37 - Sepolia test ETH display binds API, source, profile, header and native identity chain
+  ---
+  duration_ms: 0.739542
+  type: 'test'
+  ...
+# Subtest: all Sepolia blob fork boundaries including Amsterdam retain exact fee calculations and network binding
+ok 38 - all Sepolia blob fork boundaries including Amsterdam retain exact fee calculations and network binding
+  ---
+  duration_ms: 2.401833
+  type: 'test'
+  ...
+# Subtest: Sepolia availability and pending-result invalidation follow the selected network
+ok 39 - Sepolia availability and pending-result invalidation follow the selected network
+  ---
+  duration_ms: 0.902291
+  type: 'test'
+  ...
+# Subtest: real Sepolia API responses render exact native amounts and fee totals; failed rechecks withhold them
+not ok 40 - real Sepolia API responses render exact native amounts and fee totals; failed rechecks withhold them
+  ---
+  duration_ms: 249.395833
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/local-ui.test.js:707:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    {"code":"LOCAL_ISOLATED_INPUT","message":"The local preview could not complete a valid result."}
+    + actual - expected
+    
+    + 'unavailable'
+    - 'complete'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'complete'
+  actual: 'unavailable'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/local-ui.test.js:724:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..40
+# tests 40
+# suites 0
+# pass 39
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 789.884875

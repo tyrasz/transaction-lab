@@ -6,12 +6,13 @@ const LOCAL_FEE_PROFILE = 'unsigned_eip1559_block_end';
 const LOCAL_BLOB_FEE_PROFILE = 'unsigned_eip4844_block_end';
 const arbitrumMode = () => $('chain').value === '42161';
 const arbitrumAvailable = () => state.config?.arbitrumEvm?.available === true;
-const ethereumMode = () => $('chain').value === '1';
-const localMode = () => ethereumMode() && $('ethereum-engine').value === 'local';
+const sepoliaMode = () => $('chain').value === '11155111';
+const ethereumMode = () => ['1', '11155111'].includes($('chain').value);
+const localMode = () => ethereumMode() && (sepoliaMode() || $('ethereum-engine').value === 'local');
 const creationMode = () => localMode() && $('local-operation').value === 'create';
-const localAvailable = () => state.config?.localEvm?.available === true;
+const localAvailable = () => state.config?.localEvm?.available === true && (!sepoliaMode() || state.config.localEvm.capabilities?.chainIds?.includes(11155111));
 const sequenceMode = () => ethereumMode() && !localMode() && $('ethereum-call-mode').value === 'sequence';
-const standardAvailable = () => state.config?.standardEvm?.available === true;
+const standardAvailable = () => !sepoliaMode() && state.config?.standardEvm?.available === true;
 const sequenceAvailable = () => !localMode() && standardAvailable() && state.config?.standardEvm?.sequenceCapabilities?.available === true;
 const manualQueries = () => ethereumMode() && !sequenceMode() && (localMode() || $('standard-manual-queries').checked);
 
@@ -137,6 +138,7 @@ function resetLocalFees(request = {}) {
 }
 
 function currentExamples() {
+  if (sepoliaMode()) return (state.config?.localEvm?.examples || []).filter(example => Number(example.request?.chainId) === 11155111);
   return arbitrumMode() ? state.config?.arbitrumEvm?.examples || [] : sequenceMode() ? state.config?.standardEvm?.sequenceExamples || [] : ethereumMode() ? state.config?.standardEvm?.examples || []
     : (state.config?.examples || []).filter(example => String(example.request?.chainId) === $('chain').value);
 }
@@ -232,7 +234,7 @@ function selectExample({ initial = false } = {}) {
   state.example = currentExamples().find((example) => example.id === $('example').value) || null;
   const example = state.example;
   if (example) {
-    const transaction = (ethereumMode() ? example.input : arbitrumMode() ? example.request || example.input : example.request) || {};
+    const transaction = (sepoliaMode() ? example.request : ethereumMode() ? example.input : arbitrumMode() ? example.request || example.input : example.request) || {};
     if (arbitrumMode() && typeof transaction.gas === 'string') resetArbitrumGas(transaction.gas);
     if (localMode() && typeof transaction.gas === 'string') resetLocalGas(transaction.gas);
     if (localMode()) resetLocalFees(transaction);
@@ -248,7 +250,7 @@ function selectExample({ initial = false } = {}) {
   $('example-description').textContent = example?.description || (example ? 'Original public transaction inputs. Simulating uses the requested state block.' : 'Enter public transaction inputs to inspect an unsigned call.');
   $('replay-button').hidden = arbitrumMode() || ethereumMode() || !example?.transactionHash;
   $('historical-help').hidden = arbitrumMode() ? !example : ethereumMode() ? !example : !example?.transactionHash;
-  $('historical-help').textContent = arbitrumMode() ? 'The example uses these public inputs at the selected block. Previous outcomes are not reused; a fresh preview may succeed, revert or be unavailable.' : ethereumMode() && example
+  $('historical-help').textContent = sepoliaMode() && example ? 'This uses a public address and the selected testnet state. No wallet connection, signature or transfer is made; current balances determine whether the preview can complete.' : arbitrumMode() ? 'The example uses these public inputs at the selected block. Previous outcomes are not reused; a fresh preview may succeed, revert or be unavailable.' : ethereumMode() && example
     ? sequenceMode() ? 'This example uses the selected block-end state, then applies each successful simulated call before evaluating the next. It is not a historical transaction-position replay.' : 'This example starts at the end of the block before the original deposit. It runs the same calldata against that state; it does not replay the original transaction at its exact position.'
     : example?.transactionHash ? `Historical inspection uses the original transaction ${example.transactionHash.slice(0, 12)}… and its original block, independent of the fields above.` : '';
   $('standard-queries').setCustomValidity('');
@@ -258,6 +260,7 @@ function selectExample({ initial = false } = {}) {
 }
 
 function updateQueryMode() {
+  if (sepoliaMode()) $('ethereum-engine').value = 'local';
   const standard = ethereumMode(), arbitrum = arbitrumMode(), local = localMode(), sequence = sequenceMode(), manual = manualQueries();
   $('arbitrum-help').hidden = !arbitrum;
   $('arbitrum-gas-settings').hidden = !arbitrum; $('arbitrum-gas').disabled = state.busy || !arbitrum;
@@ -268,7 +271,7 @@ function updateQueryMode() {
     $('network-help').classList.toggle('unavailable-note', !arbitrumAvailable());
   }
   $('ethereum-engine-field').hidden = !standard;
-  $('ethereum-engine').disabled = state.busy || !standard;
+  $('ethereum-engine').disabled = state.busy || !standard || sepoliaMode();
   $('local-engine-option').disabled = !localAvailable();
   $('local-engine-help').textContent = local ? 'Experimental local execution. Single call, manual queries only; no automatic asset or ETH summaries.' : localAvailable() ? 'Provider preview is the default. The independent local engine is available for explicit query checks.' : state.config?.localEvm?.reason || 'Independent local previews are unavailable in this workspace.';
   if (standard) {
@@ -329,12 +332,16 @@ function updateQueryMode() {
   if (!manual) $('standard-queries').setCustomValidity('');
   if (local) $('standard-checks-help').textContent = `Checks only the explicitly listed accounts and contracts. ETH balances use exact ETH and wei; token and position values stay raw. ${feesEnabled ? 'ETH changes include simulated transaction fees; measurement queries do not repeat fees. ' : 'ETH changes exclude transaction fees. '}There is no automatic account selection or complete effect coverage.`;
   if (standard) $('value-help').textContent = `ETH sent with the call, in whole wei. 1 ETH = 1000000000000000000 wei. Use 0 for none; ${feesEnabled ? 'transaction fees are separate from this value.' : 'network fees are excluded.'}`;
+  if (sepoliaMode()) {
+    $('network-help').textContent = localAvailable() ? 'Sepolia testnet. Preview with test ETH; no connected wallet or signature needed.' : 'Sepolia local previews are unavailable in this workspace.';
+    $('value-help').textContent = `Test ETH sent with the call, in whole wei. 1 test ETH = 1000000000000000000 wei. ${feesEnabled ? 'Simulated fees are separate.' : 'Simulated fees are excluded.'}`;
+  }
   updateSequenceControls();
 }
 
 function selectNetwork({ initial = false } = {}) {
   const standard = ethereumMode(), arbitrum = arbitrumMode();
-  $('ethereum-engine').value = 'provider';
+  $('ethereum-engine').value = sepoliaMode() ? 'local' : 'provider';
   $('ethereum-call-mode').value = 'single';
   $('local-operation').value = 'call';
   state.sequenceDrafts = [newSequenceDraft(), newSequenceDraft()]; renderSequenceEditor();
@@ -355,7 +362,7 @@ function selectNetwork({ initial = false } = {}) {
     ? 'Use latest, a hexadecimal block number, or a block hash. Execution starts at the end of that block with a fixed gas limit and no transaction fee settlement.'
     : 'Use latest or a hexadecimal block number. The result records the state used.';
   if (arbitrum) { $('value-help').textContent = 'ETH sent with the call, in whole wei. Network fees are excluded.'; $('block-help').textContent = 'Use latest or a hexadecimal block number. The provider simulates successor blocks; the selected header is checked again afterward.'; }
-  $('network-heading').textContent = arbitrum ? 'ARBITRUM ONE · CHAIN 42161 · PROVIDER' : standard ? 'ETHEREUM · CHAIN 1 · EXPERIMENTAL' : 'HYPEREVM · CHAIN 999';
+  $('network-heading').textContent = sepoliaMode() ? 'SEPOLIA TESTNET · CHAIN 11155111 · EXPERIMENTAL' : arbitrum ? 'ARBITRUM ONE · CHAIN 42161 · PROVIDER' : standard ? 'ETHEREUM · CHAIN 1 · EXPERIMENTAL' : 'HYPEREVM · CHAIN 999';
   $('page-description').textContent = arbitrum ? 'Preview a single call through the provider and review the limits of its asset observations.' : standard ? 'Preview an unsigned call and check the selected accounts’ balances and allowances.' : 'Simulate an unsigned call or inspect a historical execution. See the evidence behind each result.';
   $('empty-description').textContent = arbitrum ? 'Use the original public CCTP example or enter a call. Execution and incomplete asset observations are reported separately; destination credit is not verified.' : standard ? 'Choose an example or enter your own inputs. The preview shows which ETH balances, token balances and allowances could be measured for the selected accounts.' : 'Choose an example or enter a transaction. The preview separates execution, token events, and coverage limits.';
   $('network-help').hidden = !standard;
@@ -1293,6 +1300,17 @@ function localQueryIdentity(descriptor = {}) {
     ...(data.startsWith('0xdd62ed3e') ? { owner: account, spender: '0x' + data.slice(98, 138) } : { account }) };
 }
 
+function localResultChainValid(result) {
+  const chainId = result.apiRequest?.chainId, source = result.source, profile = result.attempt?.preview?.original?.output?.profile;
+  if (![1, 11155111].includes(chainId) || (source?.chainId !== undefined && source.chainId !== chainId)
+    || (profile?.chainId !== undefined && profile.chainId !== chainId)) return false;
+  if (chainId === 1) return true; // Preserve the original mainnet response shape.
+  const verified = source?.blockSelection?.headerVerification;
+  return source?.chainId === chainId && profile?.chainId === chainId && verified?.chainId === chainId
+    && verified.status === 'verified' && profile.forkSchedule === 'pinned_ethereumjs_common_10.1.3_sepolia_amsterdam_1791294816'
+    && verified.forkSchedule === profile.forkSchedule && verified.hardfork === profile.hardfork;
+}
+
 function localMeasurementRows(result) {
   const queries = Array.isArray(result.apiRequest?.queries) ? result.apiRequest.queries : [];
   return queries.map((descriptor, index) => {
@@ -1303,13 +1321,17 @@ function localMeasurementRows(result) {
         : identity.kind === 'morpho_blue_position' ? [['supplyShares', 256], ['borrowShares', 128], ['collateral', 128]] : [];
     const matching = descriptor && typeof descriptor === 'object' && !Array.isArray(descriptor) && row?.descriptor
       && Object.keys(descriptor).length === Object.keys(row.descriptor).length && Object.entries(descriptor).every(([key, value]) => row.descriptor[key] === value);
-    const contextValid = ['complete', 'partial'].includes(result.status) && result.source?.canonicalStatus === 'verified' && ['success', 'reverted', 'failed'].includes(result.execution?.status);
+    const contextValid = localResultChainValid(result) && ['complete', 'partial'].includes(result.status) && result.source?.canonicalStatus === 'verified' && ['success', 'reverted', 'failed'].includes(result.execution?.status);
+    const expectedIdentity = { ...identity, chainId: String(result.apiRequest?.chainId), ...(!native ? { contractIdentityVerified: false } : {}) };
+    const queryIdentityValid = result.apiRequest?.chainId !== 11155111 || (row?.identity && typeof row.identity === 'object'
+      && Object.keys(row.identity).length === Object.keys(expectedIdentity).length
+      && Object.entries(expectedIdentity).every(([key, value]) => row.identity[key] === value));
     const nativeIdentityValid = !native || (Object.keys(descriptor).sort().join() === 'account,kind'
       && typeof descriptor.account === 'string' && /^0x[0-9a-f]{40}$/i.test(descriptor.account)
       && row?.identity && Object.keys(row.identity).sort().join() === 'account,chainId,kind'
-      && row.identity.kind === 'native_balance' && row.identity.chainId === '1' && row.identity.account === descriptor.account.toLowerCase()
-      && row.query === null && row.returnBytes === 0 && result.apiRequest.chainId === 1);
-    const measured = contextValid && matching && nativeIdentityValid && row.status === 'measured' && fields.length > 0 && Array.isArray(row.values) && row.values.length === fields.length && fields.every(([name, bits], i) => {
+      && row.identity.kind === 'native_balance' && row.identity.chainId === String(result.apiRequest.chainId) && row.identity.account === descriptor.account.toLowerCase()
+      && row.query === null && row.returnBytes === 0);
+    const measured = contextValid && matching && queryIdentityValid && nativeIdentityValid && row.status === 'measured' && fields.length > 0 && Array.isArray(row.values) && row.values.length === fields.length && fields.every(([name, bits], i) => {
       const value = row.values[i], raw = n => typeof n === 'string' && /^(?:0|[1-9][0-9]{0,77})$/.test(n) && BigInt(n) < (1n << BigInt(bits));
       return value?.name === name && raw(value.beforeRaw) && raw(value.afterRaw) && typeof value.deltaRaw === 'string'
         && /^(?:0|-?[1-9][0-9]{0,77})$/.test(value.deltaRaw) && BigInt(value.deltaRaw) === BigInt(value.afterRaw) - BigInt(value.beforeRaw)
@@ -1319,20 +1341,25 @@ function localMeasurementRows(result) {
   });
 }
 
-function localEthAmount(raw) {
+function localEthAmount(raw, chainId = 1) {
   const value = BigInt(raw), negative = value < 0n, absolute = negative ? -value : value;
   const fraction = (absolute % 1000000000000000000n).toString().padStart(18, '0').replace(/0+$/, '');
-  return `${negative ? '-' : ''}${absolute / 1000000000000000000n}${fraction ? '.' + fraction : ''} ETH`;
+  return `${negative ? '-' : ''}${absolute / 1000000000000000000n}${fraction ? '.' + fraction : ''} ${chainId === 11155111 ? 'test ETH' : 'ETH'}`;
 }
 
 // Keep the finite schedule and bounded integer series aligned with
 // local-evm/ethereum-blob-fees.js and pinned Common 10.1.3. No floating point.
 function localBlobContext(api, profile, selection) {
-  const schedule = [
+  const schedule = api.chainId === 11155111 ? [
+    ['cancun', 1706655072n, 6n, 6n, 3338477n], ['prague', 1741159776n, 9n, 9n, 5007716n],
+    ['osaka', 1760427360n, 9n, 6n, 5007716n], ['bpo1', 1761017184n, 15n, 6n, 8346193n],
+    ['bpo2', 1761607008n, 21n, 6n, 11684671n], ['amsterdam', 1791294816n, 21n, 6n, 11684671n],
+  ] : api.chainId === 1 ? [
     ['cancun', 1710338135n, 6n, 6n, 3338477n], ['prague', 1746612311n, 9n, 9n, 5007716n],
     ['osaka', 1764798551n, 9n, 6n, 5007716n], ['bpo1', 1765290071n, 15n, 6n, 8346193n],
     ['bpo2', 1767747671n, 21n, 6n, 11684671n],
-  ];
+  ] : [];
+  const scheduleId = api.chainId === 11155111 ? 'pinned_ethereumjs_common_10.1.3_sepolia_amsterdam_1791294816' : 'pinned_ethereumjs_common_10.1.3_mainnet';
   const header = selection?.header, verified = selection?.headerVerification;
   const quantity = value => {
     if (typeof value !== 'string' || value.length > 18 || !/^0x(?:0|[1-9a-f][0-9a-f]*)$/i.test(value)) throw Error('Malformed blob header quantity');
@@ -1342,7 +1369,8 @@ function localBlobContext(api, profile, selection) {
   const rule = schedule.filter(([, start]) => timestamp >= start).at(-1);
   const word = value => typeof value === 'string' && /^0x[0-9a-f]{64}$/.test(value);
   if (!rule || verified?.status !== 'verified' || verified.hardfork !== rule[0] || profile.hardfork !== rule[0]
-    || profile.forkSchedule !== 'pinned_ethereumjs_common_10.1.3_mainnet' || profile.chainId !== 1 || api.chainId !== 1
+    || profile.forkSchedule !== scheduleId || profile.chainId !== api.chainId
+    || (api.chainId === 11155111 && (verified.chainId !== api.chainId || verified.forkSchedule !== scheduleId))
     || profile.name !== 'ethereum_unsigned_eip4844_call' || !word(header.hash) || !word(header.stateRoot)
     || selection.blockHash !== header.hash || verified.blockHash !== header.hash || profile.sourceBlockHash !== header.hash
     || selection.blockNumber !== number.toString() || verified.number !== number.toString() || verified.timestamp !== timestamp.toString()
@@ -1371,7 +1399,7 @@ function localBlobContext(api, profile, selection) {
 function localFeeAccounting(result) {
   const output = result.attempt?.preview?.original?.output, profile = output?.profile, fee = output?.feeAccounting, api = result.apiRequest;
   const blob = api?.executionProfile === LOCAL_BLOB_FEE_PROFILE, expectedProfile = blob ? LOCAL_BLOB_FEE_PROFILE : LOCAL_FEE_PROFILE;
-  if (!['complete', 'partial'].includes(result.status) || result.source?.canonicalStatus !== 'verified' || result.attempt?.status !== 'completed'
+  if (!localResultChainValid(result) || !['complete', 'partial'].includes(result.status) || result.source?.canonicalStatus !== 'verified' || result.attempt?.status !== 'completed'
     || !['success', 'reverted', 'failed'].includes(result.execution?.status) || output?.execution?.status !== result.execution.status
     || result.source.profile !== expectedProfile || api?.executionProfile !== expectedProfile || profile?.executionProfile !== expectedProfile
     || profile.feesSettled !== true || fee?.kind !== (blob ? 'eip4844' : 'eip1559') || typeof fee.coinbase !== 'string' || !/^0x[0-9a-f]{40}$/.test(fee.coinbase)) return null;
@@ -1500,7 +1528,8 @@ function renderLocalResult(result) {
   beginResult(result, true);
   $('standard-result').hidden = true; $('hyper-result').hidden = true; $('sequence-result').hidden = true; $('local-result').hidden = false;
   const rows = localMeasurementRows(result), measured = rows.filter(row => row.measured).length;
-  $('result-label').textContent = 'Independent local preview · experimental';
+  const nativeSymbol = result.apiRequest?.chainId === 11155111 ? 'test ETH' : 'ETH';
+  $('result-label').textContent = result.apiRequest?.chainId === 11155111 ? 'Sepolia local preview · experimental' : 'Independent local preview · experimental';
   $('local-report-status').textContent = `Preview: ${titleCase(result.status)}`;
   $('execution-status').textContent = titleCase(result.execution?.status || 'unavailable');
   $('execution-status').className = result.execution?.status === 'success' ? 'success' : ['reverted', 'failed'].includes(result.execution?.status) ? 'failed' : 'partial';
@@ -1528,8 +1557,8 @@ function renderLocalResult(result) {
       const table = node('table', 'measurement-table position-measurement-table'), head = node('thead'), header = node('tr'), body = node('tbody');
       for (const label of ['Field / units', 'Before', 'After', 'Change']) { const cell = node('th', '', label); cell.scope = 'col'; header.append(cell); } head.append(header);
       for (const value of row.values) {
-        const tr = node('tr'), name = node('th'); name.scope = 'row'; name.append(node('span', 'position-field-name', value.name), node('span', 'position-unit', native ? 'ETH · 1 ETH = 1000000000000000000 wei' : positionUnitLabel(value.unit))); tr.append(name);
-        for (const key of ['beforeRaw', 'afterRaw', 'deltaRaw']) { const cell = node('td'); cell.append(node('strong', '', native ? localEthAmount(value[key]) : value[key])); if (native) cell.append(node('span', 'raw-amount', `${value[key]} wei`)); tr.append(cell); } body.append(tr);
+        const tr = node('tr'), name = node('th'); name.scope = 'row'; name.append(node('span', 'position-field-name', value.name), node('span', 'position-unit', native ? `${nativeSymbol} · 1 ${nativeSymbol} = 1000000000000000000 wei` : positionUnitLabel(value.unit))); tr.append(name);
+        for (const key of ['beforeRaw', 'afterRaw', 'deltaRaw']) { const cell = node('td'); cell.append(node('strong', '', native ? localEthAmount(value[key], result.apiRequest?.chainId) : value[key])); if (native) cell.append(node('span', 'raw-amount', `${value[key]} wei`)); tr.append(cell); } body.append(tr);
       }
       table.append(head, body); card.append(table);
     } else card.append(node('p', 'query-note', row.reason));
@@ -1545,6 +1574,7 @@ function renderLocalResult(result) {
     feeRequested ? 'Fee amounts are shown only for a complete validated simulation. Measurement queries do not repeat fees. Outer transaction signatures are not validated.' : 'Network fees and outer transaction signatures are not validated. Execution is not a security verdict.',
   ].map(text => node('li', '', text)));
   const details = $('source-details'), selection = result.source?.blockSelection || {}; details.replaceChildren();
+  addDefinition(details, 'Network', result.apiRequest?.chainId === 11155111 ? 'Sepolia testnet · chain 11155111' : result.apiRequest?.chainId === 1 ? 'Ethereum · chain 1' : 'Unverified network');
   for (const [label, value] of [['Engine', 'Independent local execution · experimental'], ['Profile', result.source?.profile], ['Requested state', selection.requested || result.apiRequest?.block], ['Resolved block', selection.blockNumber], ['Block hash', selection.blockHash], ['Block binding', result.source?.canonicalStatus], ['Sender', result.apiRequest?.from], ['Recipient', result.apiRequest?.to === null ? 'Contract deployment' : result.apiRequest?.to], ['Native value · wei', result.apiRequest?.value], ['Run ID', result.id]]) addDefinition(details, label, value);
   if (fee) {
     for (const [label, key] of [['Gas charged', 'chargedGas'], ['Effective gas price · wei', 'effectiveGasPrice'], [fee.kind === 'eip4844' ? 'Execution fee charged · wei' : 'Fee charged in simulation · wei', 'gasCharge'], ['Unused upfront gas debit returned · wei', 'senderRefund'], ['Execution base fee burned · wei', 'baseFeeBurn'], ['Block beneficiary tip · wei', 'coinbaseTip']]) addDefinition(details, label, fee[key]);
@@ -2049,6 +2079,7 @@ async function initialize() {
     const chains = state.config.chains || [];
     const choices = chains.length ? [...chains] : [{ name: 'HyperEVM', chainId: 999 }];
     if ((state.config.standardEvm || state.config.localEvm) && !choices.some(chain => Number(chain.chainId) === 1)) choices.push({ name: 'Ethereum · experimental', chainId: 1 });
+    if (state.config.localEvm?.capabilities?.chainIds?.includes(11155111) && !choices.some(chain => Number(chain.chainId) === 11155111)) choices.push({ name: 'Sepolia testnet · local preview', chainId: 11155111 });
     if (state.config.arbitrumEvm && !choices.some(chain => Number(chain.chainId) === 42161)) choices.push({ name: 'Arbitrum One · provider', chainId: 42161 });
     $('chain').replaceChildren(...choices.map((chain) => { const option = node('option', '', `${chain.name} · ${chain.chainId}`); option.value = chain.chainId; return option; }));
     selectNetwork({ initial: true });

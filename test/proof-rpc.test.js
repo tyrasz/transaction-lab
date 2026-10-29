@@ -32,6 +32,25 @@ test('fixed defaults, server URL and request transport options have no credentia
   } finally { if (before === undefined) delete process.env.ETHEREUM_RPC_URL; else process.env.ETHEREUM_RPC_URL = before; }
 });
 
+test('trusted numeric network selects its own endpoint and cannot fall back to the other network', () => {
+  const ethereum = process.env.ETHEREUM_RPC_URL, sepolia = process.env.SEPOLIA_RPC_URL;
+  try {
+    delete process.env.ETHEREUM_RPC_URL; delete process.env.SEPOLIA_RPC_URL;
+    assert.equal(make({ chainId: 1 }).url.href, 'https://eth.drpc.org/');
+    assert.equal(make({ chainId: 11155111 }).url.href, 'https://rpc.sepolia.ethpandaops.io/');
+    process.env.ETHEREUM_RPC_URL = 'https://mainnet.invalid/main';
+    assert.equal(make({ chainId: 11155111 }).url.href, 'https://rpc.sepolia.ethpandaops.io/');
+    process.env.SEPOLIA_RPC_URL = 'https://sepolia.invalid/test';
+    assert.equal(make({ chainId: 1 }).url.href, 'https://mainnet.invalid/main');
+    assert.equal(make({ chainId: 11155111 }).url.href, 'https://sepolia.invalid/test');
+    assert.equal(make({ chainId: 11155111, url: 'http://127.0.0.1:1234' }).url.href, 'http://127.0.0.1:1234/');
+    for (const chainId of ['1', '11155111', 0, 999, 42161, null, {}, NaN]) assert.throws(() => make({ chainId }), ProofRpcError);
+  } finally {
+    if (ethereum === undefined) delete process.env.ETHEREUM_RPC_URL; else process.env.ETHEREUM_RPC_URL = ethereum;
+    if (sepolia === undefined) delete process.env.SEPOLIA_RPC_URL; else process.env.SEPOLIA_RPC_URL = sepolia;
+  }
+});
+
 test('exact method/parameter allowlist and one-time canonical hash pin reject before dispatch', async () => {
   const methods = [], rpc = make({ fetchImpl: async (_url, options) => { methods.push(JSON.parse(options.body)); return new Response(body(options)); } });
   await rpc.call('eth_chainId', []);

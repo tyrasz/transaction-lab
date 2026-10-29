@@ -335,10 +335,9 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
   const senderCode = senderInitial.exists ? senderInitial.code : '0x';
   const delegated = common && existingDelegationTarget(senderCode, common) !== null;
   need(senderCode === '0x' || delegated);
-  // Historical mainnet and Sepolia delegations use the entered-frame nonce
-  // ledger. EIP-7928 can increment a creator on collision without entering a
-  // child, so delegated senders remain closed there pending that evidence.
-  if (delegated) need([1n, 11155111n].includes(common.chainId()) && !common.isActivatedEIP(7928));
+  // Amsterdam's independently checked nonce-write ledger includes collisions
+  // without a child message; older forks retain entered-frame accounting.
+  if (delegated) need([1n, 11155111n].includes(common.chainId()));
   const senderNonce = senderInitial.exists ? BigInt(senderInitial.nonce) : 0n;
   const nonceAfter = (preparation?.accounts.get(senderAddress).current.nonce ?? senderNonce + 1n) + (delegated || preparation ? BigInt(creationAttempts.get(senderAddress) ?? 0) : 0n);
   need(senderNonce < (1n << 64n) - 1n && nonceAfter < (1n << 64n));

@@ -1,0 +1,82 @@
+TAP version 13
+# Subtest: existing delegation permits priced/unpriced transfer to existing and absent recipients without executing its implementation
+ok 1 - existing delegation permits priced/unpriced transfer to existing and absent recipients without executing its implementation
+  ---
+  duration_ms: 520.807208
+  type: 'test'
+  ...
+# Subtest: self-call retains sender ADDRESS/caller/origin, value and storage context with exact fee/gas settlement
+ok 2 - self-call retains sender ADDRESS/caller/origin, value and storage context with exact fee/gas settlement
+  ---
+  duration_ms: 250.332959
+  type: 'test'
+  ...
+# Subtest: top-level delegation access charges cold/warm gas and preserves preparation-OOG nonce and fees
+ok 3 - top-level delegation access charges cold/warm gas and preserves preparation-OOG nonce and fees
+  ---
+  duration_ms: 369.094708
+  type: 'test'
+  ...
+# Subtest: a nonself recipient does not implicitly warm the sender implementation
+ok 4 - a nonself recipient does not implicitly warm the sender implementation
+  ---
+  duration_ms: 247.982708
+  type: 'test'
+  ...
+# Subtest: nested callbacks resolve sender delegation and roll back reverted sender storage only
+ok 5 - nested callbacks resolve sender delegation and roll back reverted sender storage only
+  ---
+  duration_ms: 256.183625
+  type: 'test'
+  ...
+# Subtest: CREATE uses post-outer sender nonce two and initial collision still increments it without an entered constructor
+ok 6 - CREATE uses post-outer sender nonce two and initial collision still increments it without an entered constructor
+  ---
+  duration_ms: 248.271375
+  type: 'test'
+  ...
+# Subtest: repeated CREATE2 by the outer sender counts success plus collision and transfers endowment once
+ok 7 - repeated CREATE2 by the outer sender counts success plus collision and transfers endowment once
+  ---
+  duration_ms: 250.145167
+  type: 'test'
+  ...
+# Subtest: constructor REVERT and INVALID retain sender creation nonce but roll back target funding/storage/code
+ok 8 - constructor REVERT and INVALID retain sender creation nonce but roll back target funding/storage/code
+  ---
+  duration_ms: 247.765416
+  type: 'test'
+  ...
+# Subtest: root and caught ancestor rollback remove observed sender creation increments while preserving outer nonce and fees
+ok 9 - root and caught ancestor rollback remove observed sender creation increments while preserving outer nonce and fees
+  ---
+  duration_ms: 252.844458
+  type: 'test'
+  ...
+# Subtest: reentrant sender creates at chronological nonces two, three and four without double-counting its outer increment
+ok 10 - reentrant sender creates at chronological nonces two, three and four without double-counting its outer increment
+  ---
+  duration_ms: 133.170041
+  type: 'test'
+  ...
+# Subtest: top-level CREATE from an existing delegated sender derives pre-outer nonce address without running delegation code
+ok 11 - top-level CREATE from an existing delegated sender derives pre-outer nonce address without running delegation code
+  ---
+  duration_ms: 121.478792
+  type: 'test'
+  ...
+# Subtest: real preview normalizes only fresh query nonce, permits reverted helper creation and rejects surviving mutations
+ok 12 - real preview normalizes only fresh query nonce, permits reverted helper creation and rejects surviving mutations
+  ---
+  duration_ms: 435.069834
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3507.78075

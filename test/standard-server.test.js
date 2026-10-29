@@ -60,7 +60,7 @@ test('configuration exposes experimental Ethereum separately and binds its compl
   assert.deepEqual(config.standardEvm.sequenceCapabilities, api.STANDARD_SEQUENCE_CAPABILITIES);
   assert.deepEqual(config.standardEvm.sequenceExamples, api.STANDARD_SEQUENCE_EXAMPLES);
   assert.deepEqual(config.examples, EXAMPLES);
-  assert.deepEqual(config.chains, [{ chainId: 999, name: 'HyperEVM' }, { chainId: 1, name: 'Ethereum', experimental: true }, { chainId: 42161, name: 'Arbitrum', experimental: true }]);
+  assert.deepEqual(config.chains, [{ chainId: 999, name: 'HyperEVM' }, { chainId: 1, name: 'Ethereum', experimental: true }, { chainId: 11155111, name: 'Sepolia', experimental: true, localOnly: true }, { chainId: 42161, name: 'Arbitrum', experimental: true }]);
   assert.deepEqual(api.implementation, await expectedImplementation());
   assert.equal(await loadStandardApi(), api, 'The loaded implementation identity is stable for this process.');
   assert.ok(api.implementation.sourceFiles.includes('src/standard-rpc.js'));

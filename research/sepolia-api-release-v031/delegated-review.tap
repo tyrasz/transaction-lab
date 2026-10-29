@@ -1,0 +1,148 @@
+TAP version 13
+# Subtest: failed creator writes before and after mutation roll back nonce, upfront fees and value
+ok 1 - failed creator writes before and after mutation roll back nonce, upfront fees and value
+  ---
+  duration_ms: 25.184958
+  type: 'test'
+  ...
+# Subtest: failed post-increment collision-state read cannot retain a creator write
+ok 2 - failed post-increment collision-state read cannot retain a creator write
+  ---
+  duration_ms: 7.102916
+  type: 'test'
+  ...
+# Subtest: no-child attempts consume the existing frame evidence budget and roll back on exhaustion
+ok 3 - no-child attempts consume the existing frame evidence budget and roll back on exhaustion
+  ---
+  duration_ms: 4.258125
+  type: 'test'
+  ...
+# Subtest: parent derives delegated sender eligibility and rejects missing, altered or extra declaration fields
+ok 4 - parent derives delegated sender eligibility and rejects missing, altered or extra declaration fields
+  ---
+  duration_ms: 742.293834
+  type: 'test'
+  ...
+# Subtest: parent rejects undercounted and overcounted sender creation attempts
+ok 5 - parent rejects undercounted and overcounted sender creation attempts
+  ---
+  duration_ms: 241.7505
+  type: 'test'
+  ...
+# Subtest: entered reverted constructors and collisions retain their creator nonce increment
+ok 6 - entered reverted constructors and collisions retain their creator nonce increment
+  ---
+  duration_ms: 460.331125
+  type: 'test'
+  ...
+# Subtest: reverted parent ancestry cannot justify an extra sender nonce even when its CREATE succeeded
+ok 7 - reverted parent ancestry cannot justify an extra sender nonce even when its CREATE succeeded
+  ---
+  duration_ms: 461.184833
+  type: 'test'
+  ...
+# Subtest: parent rejects laundering a callback execution account to hide sender creation attempts
+ok 8 - parent rejects laundering a callback execution account to hide sender creation attempts
+  ---
+  duration_ms: 231.057209
+  type: 'test'
+  ...
+# Subtest: an empty-code sender cannot acquire delegation authority through metadata or forged input facts
+ok 9 - an empty-code sender cannot acquire delegation authority through metadata or forged input facts
+  ---
+  duration_ms: 233.12025
+  type: 'test'
+  ...
+# Subtest: trusted pre-Prague fork and exact indicator length remain required at the parent boundary
+ok 10 - trusted pre-Prague fork and exact indicator length remain required at the parent boundary
+  ---
+  duration_ms: 787.293458
+  type: 'test'
+  ...
+# Subtest: measured probes use the same authenticated delegation but still normalize only one sender nonce
+ok 11 - measured probes use the same authenticated delegation but still normalize only one sender nonce
+  ---
+  duration_ms: 383.976959
+  type: 'test'
+  ...
+# Subtest: delegated sender can transfer to another address without executing or warming its implementation
+ok 12 - delegated sender can transfer to another address without executing or warming its implementation
+  ---
+  duration_ms: 58.803125
+  type: 'test'
+  ...
+# Subtest: self-call executes in sender storage/address context and warms the resolved implementation
+ok 13 - self-call executes in sender storage/address context and warms the resolved implementation
+  ---
+  duration_ms: 17.879875
+  type: 'test'
+  ...
+# Subtest: entered successful and reverted CREATE both retain the delegated sender creation nonce
+ok 14 - entered successful and reverted CREATE both retain the delegated sender creation nonce
+  ---
+  duration_ms: 19.569292
+  type: 'test'
+  ...
+# Subtest: CREATE2 success followed by collision counts both entered attempts and preserves only the first deployment
+ok 15 - CREATE2 success followed by collision counts both entered attempts and preserves only the first deployment
+  ---
+  duration_ms: 8.3075
+  type: 'test'
+  ...
+# Subtest: callback creation counts only when its parent ancestry commits, even if a successful constructor is later reverted
+ok 16 - callback creation counts only when its parent ancestry commits, even if a successful constructor is later reverted
+  ---
+  duration_ms: 19.624125
+  type: 'test'
+  ...
+# Subtest: root REVERT undoes all entered creation effects but preserves the outer transaction nonce
+ok 17 - root REVERT undoes all entered creation effects but preserves the outer transaction nonce
+  ---
+  duration_ms: 6.239666
+  type: 'test'
+  ...
+# Subtest: pre-entry CREATE balance and uint64 nonce refusals do not invent a creation nonce or frame
+ok 18 - pre-entry CREATE balance and uint64 nonce refusals do not invent a creation nonce or frame
+  ---
+  duration_ms: 11.254583
+  type: 'test'
+  ...
+# Subtest: top-level CREATE uses original sender nonce without executing its designation
+ok 19 - top-level CREATE uses original sender nonce without executing its designation
+  ---
+  duration_ms: 5.828416
+  type: 'test'
+  ...
+# Subtest: exact designations work at Prague while pre-Prague and malformed sender code stay unsupported
+ok 20 - exact designations work at Prague while pre-Prague and malformed sender code stay unsupported
+  ---
+  duration_ms: 12.817709
+  type: 'test'
+  ...
+# Subtest: overflow and unsupported nested bytecode restore the entire attempt even inside a caller checkpoint
+ok 21 - overflow and unsupported nested bytecode restore the entire attempt even inside a caller checkpoint
+  ---
+  duration_ms: 7.00025
+  type: 'test'
+  ...
+# Subtest: real child and parent validation accept committed, reverted-constructor, collision and rolled-back callback nonce accounting
+ok 22 - real child and parent validation accept committed, reverted-constructor, collision and rolled-back callback nonce accounting
+  ---
+  duration_ms: 510.567375
+  type: 'test'
+  ...
+# Subtest: real preview permits neutral queries from a delegated sender and rejects extra creation nonce effects
+ok 23 - real preview permits neutral queries from a delegated sender and rejects extra creation nonce effects
+  ---
+  duration_ms: 253.738084
+  type: 'test'
+  ...
+1..23
+# tests 23
+# suites 0
+# pass 23
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3642.025875
