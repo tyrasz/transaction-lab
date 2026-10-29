@@ -1,0 +1,88 @@
+TAP version 13
+# Subtest: Amsterdam budget split has exact regular/total boundaries and does not enable older forks
+ok 1 - Amsterdam budget split has exact regular/total boundaries and does not enable older forks
+  ---
+  duration_ms: 1.2695
+  type: 'test'
+  ...
+# Subtest: signed state/refill counters retain negative values; ordinary refunds and floor remain separate
+ok 2 - signed state/refill counters retain negative values; ordinary refunds and floor remain separate
+  ---
+  duration_ms: 0.232125
+  type: 'test'
+  ...
+# Subtest: arithmetic rejects impossible budget/counter combinations and hostile records without invoking accessors
+ok 3 - arithmetic rejects impossible budget/counter combinations and hostile records without invoking accessors
+  ---
+  duration_ms: 0.880209
+  type: 'test'
+  ...
+# Subtest: signed native transfers distinguish existing, absent and self recipients at transaction-level setup
+ok 4 - signed native transfers distinguish existing, absent and self recipients at transaction-level setup
+  ---
+  duration_ms: 39.245
+  type: 'test'
+  ...
+# Subtest: signed root creation pays account/code state gas only when committed and preserves prefunding distinction
+ok 5 - signed root creation pays account/code state gas only when committed and preserves prefunding distinction
+  ---
+  duration_ms: 11.51675
+  type: 'test'
+  ...
+# Subtest: signed SSTORE allocation/clear and original-slot refund separate state refills from the refund cap
+ok 6 - signed SSTORE allocation/clear and original-slot refund separate state refills from the refund cap
+  ---
+  duration_ms: 11.551583
+  type: 'test'
+  ...
+# Subtest: signed frame revert and exceptional halt roll state gas back but preserve their distinct regular charges
+ok 7 - signed frame revert and exceptional halt roll state gas back but preserve their distinct regular charges
+  ---
+  duration_ms: 7.242333
+  type: 'test'
+  ...
+# Subtest: signed transactions use a nonzero reservoir for state while returning unused reservoir on revert
+ok 8 - signed transactions use a nonzero reservoir for state while returning unused reservoir on revert
+  ---
+  duration_ms: 7.009
+  type: 'test'
+  ...
+# Subtest: signed nested calls preserve successful state and discard reverted allocation/refill across frames
+ok 9 - signed nested calls preserve successful state and discard reverted allocation/refill across frames
+  ---
+  duration_ms: 9.429917
+  type: 'test'
+  ...
+# Subtest: signed type-4 preparation debits are counted once and survive only ordinary message rollback
+ok 10 - signed type-4 preparation debits are counted once and survive only ordinary message rollback
+  ---
+  duration_ms: 9.934792
+  type: 'test'
+  ...
+# Subtest: signed preparation OOG rolls authorization state back while retaining sender nonce and spent regular gas
+ok 11 - signed preparation OOG rolls authorization state back while retaining sender nonce and spent regular gas
+  ---
+  duration_ms: 7.566042
+  type: 'test'
+  ...
+# Subtest: signed calldata floor changes sender gas and refund reporting without erasing raw message refund
+ok 12 - signed calldata floor changes sender gas and refund reporting without erasing raw message refund
+  ---
+  duration_ms: 3.773083
+  type: 'test'
+  ...
+# Subtest: observed pinned post-target CALL OOG drains reservoir; its above-cap regular dimension is explicitly exceptional
+ok 13 - observed pinned post-target CALL OOG drains reservoir; its above-cap regular dimension is explicitly exceptional
+  ---
+  duration_ms: 3.25825
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 293.810667

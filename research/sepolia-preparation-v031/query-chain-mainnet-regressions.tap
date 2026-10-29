@@ -1,0 +1,184 @@
+TAP version 13
+# Subtest: real EVM queries measure original writes with independent before/post overlays and no extra nonce carry
+ok 1 - real EVM queries measure original writes with independent before/post overlays and no extra nonce carry
+  ---
+  duration_ms: 25.281625
+  type: 'test'
+  ...
+# Subtest: genuine original REVERT and EVM fault preserve zero token delta and their actual status
+ok 2 - genuine original REVERT and EVM fault preserve zero token delta and their actual status
+  ---
+  duration_ms: 13.748042
+  type: 'test'
+  ...
+# Subtest: query mutations, logs, malformed return and query revert are unavailable without altering original
+ok 3 - query mutations, logs, malformed return and query revert are unavailable without altering original
+  ---
+  duration_ms: 17.412458
+  type: 'test'
+  ...
+# Subtest: proven absent sender is materialized once by original; query-only nonce materialization never carries
+ok 4 - proven absent sender is materialized once by original; query-only nonce materialization never carries
+  ---
+  duration_ms: 4.202666
+  type: 'test'
+  ...
+# Subtest: unsupported original has no after-state measurements or speculative getter reads
+ok 5 - unsupported original has no after-state measurements or speculative getter reads
+  ---
+  duration_ms: 2.574
+  type: 'test'
+  ...
+# Subtest: original plus all probes share execution and root-return budgets
+ok 6 - original plus all probes share execution and root-return budgets
+  ---
+  duration_ms: 13.248708
+  type: 'test'
+  ...
+# Subtest: tightened proof-state and execution limits reach the actual collectors and EVM
+ok 7 - tightened proof-state and execution limits reach the actual collectors and EVM
+  ---
+  duration_ms: 2.337
+  type: 'test'
+  ...
+# Subtest: injected overlay-isolation failure withholds nested values as well as the final pair
+ok 8 - injected overlay-isolation failure withholds nested values as well as the final pair
+  ---
+  duration_ms: 4.298708
+  type: 'test'
+  ...
+# Subtest: unbound headers, injected poststate and invalid queries reject before any state transport
+ok 9 - unbound headers, injected poststate and invalid queries reject before any state transport
+  ---
+  duration_ms: 0.817708
+  type: 'test'
+  ...
+# Subtest: actual child preview uses original context only and fresh context-free getters over the retained overlay
+ok 10 - actual child preview uses original context only and fresh context-free getters over the retained overlay
+  ---
+  duration_ms: 131.811083
+  type: 'test'
+  ...
+# Subtest: actual child preview BLOBHASH getters see the fresh empty context before and after a blob original
+ok 11 - actual child preview BLOBHASH getters see the fresh empty context before and after a blob original
+  ---
+  duration_ms: 139.528583
+  type: 'test'
+  ...
+# Subtest: actual isolated child executes original Aave once then returns three proof-backed before/after pairs
+ok 12 - actual isolated child executes original Aave once then returns three proof-backed before/after pairs
+  ---
+  duration_ms: 324.857708
+  type: 'test'
+  ...
+# Subtest: actual child handles eight Morpho queries with all 230 proof/code calls and exact account identities
+ok 13 - actual child handles eight Morpho queries with all 230 proof/code calls and exact account identities
+  ---
+  duration_ms: 1393.702041
+  type: 'test'
+  ...
+# Subtest: actual child preserves a partial preview when an explicitly missing proof poisons later queries
+ok 14 - actual child preserves a partial preview when an explicitly missing proof poisons later queries
+  ---
+  duration_ms: 487.816458
+  type: 'test'
+  ...
+# Subtest: parent rejects bad queries and unbound inputs before fork or any provider dispatch
+ok 15 - parent rejects bad queries and unbound inputs before fork or any provider dispatch
+  ---
+  duration_ms: 2.803833
+  type: 'test'
+  ...
+# Subtest: hard deadline kills an actual stopped child and withholds the entire preview
+ok 16 - hard deadline kills an actual stopped child and withholds the entire preview
+  ---
+  duration_ms: 103.864458
+  type: 'test'
+  ...
+# Subtest: cancellation aborts and drains the actual child proof read before returning no preview
+ok 17 - cancellation aborts and drains the actual child proof read before returning no preview
+  ---
+  duration_ms: 226.764125
+  type: 'test'
+  ...
+# Subtest: late uncooperative read cannot revive measurements or mutate sealed unavailable preview evidence
+ok 18 - late uncooperative read cannot revive measurements or mutate sealed unavailable preview evidence
+  ---
+  duration_ms: 251.853708
+  type: 'test'
+  ...
+# Subtest: actual child IPC mutations cannot substitute query identities, amounts, return words or original evidence
+ok 19 - actual child IPC mutations cannot substitute query identities, amounts, return words or original evidence
+  ---
+  duration_ms: 2356.570708
+  type: 'test'
+  ...
+# Subtest: synthetic fake child cannot invent a complete preview without parent proof evidence
+ok 20 - synthetic fake child cannot invent a complete preview without parent proof evidence
+  ---
+  duration_ms: 0.935291
+  type: 'test'
+  ...
+# Subtest: real child native fee-transfer balances match signed fullVM and independent third-MPT deltas
+ok 21 - real child native fee-transfer balances match signed fullVM and independent third-MPT deltas
+  ---
+  duration_ms: 172.955875
+  type: 'test'
+  ...
+# Subtest: sender equal to coinbase reports net base-fee debit once, without double-counting the tip
+ok 22 - sender equal to coinbase reports net base-fee debit once, without double-counting the tip
+  ---
+  duration_ms: 137.848916
+  type: 'test'
+  ...
+# Subtest: native measurements remain available after completed REVERT and OOG and include only retained fees
+ok 23 - native measurements remain available after completed REVERT and OOG and include only retained fees
+  ---
+  duration_ms: 301.978
+  type: 'test'
+  ...
+# Subtest: priced blob calls retain blob burn in native deltas on both success and REVERT
+ok 24 - priced blob calls retain blob burn in native deltas on both success and REVERT
+  ---
+  duration_ms: 335.21375
+  type: 'test'
+  ...
+# Subtest: native poststate reads follow Shanghai deletion and Cancun retention after miner settlement
+ok 25 - native poststate reads follow Shanghai deletion and Cancun retention after miner settlement
+  ---
+  duration_ms: 390.92525
+  type: 'test'
+  ...
+# Subtest: native reads distinguish surviving creation funding from same-invocation creation/deletion
+ok 26 - native reads distinguish surviving creation funding from same-invocation creation/deletion
+  ---
+  duration_ms: 432.376625
+  type: 'test'
+  ...
+# Subtest: missing newly requested native proof preserves earlier measured pairs and withholds later queries
+ok 27 - missing newly requested native proof preserves earlier measured pairs and withholds later queries
+  ---
+  duration_ms: 227.810458
+  type: 'test'
+  ...
+# Subtest: native reads remain available when the completed original exhausts the shared VM-step allowance
+ok 28 - native reads remain available when the completed original exhausts the shared VM-step allowance
+  ---
+  duration_ms: 248.225041
+  type: 'test'
+  ...
+# Subtest: cancellation during an extra native proof withholds the entire child preview and drains the read
+ok 29 - cancellation during an extra native proof withholds the entire child preview and drains the read
+  ---
+  duration_ms: 227.499166
+  type: 'test'
+  ...
+1..29
+# tests 29
+# suites 0
+# pass 29
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5264.744125

@@ -1,0 +1,90 @@
+TAP version 13
+# Subtest: Amsterdam budget split has exact regular/total boundaries and does not enable older forks
+ok 1 - Amsterdam budget split has exact regular/total boundaries and does not enable older forks
+  ---
+  duration_ms: 1.348833
+  type: 'test'
+  ...
+# Subtest: signed state/refill counters retain negative values; ordinary refunds and floor remain separate
+ok 2 - signed state/refill counters retain negative values; ordinary refunds and floor remain separate
+  ---
+  duration_ms: 0.242084
+  type: 'test'
+  ...
+# Subtest: arithmetic rejects impossible budget/counter combinations and hostile records without invoking accessors
+ok 3 - arithmetic rejects impossible budget/counter combinations and hostile records without invoking accessors
+  ---
+  duration_ms: 0.833084
+  type: 'test'
+  ...
+# Subtest: signed native transfers distinguish existing, absent and self recipients at transaction-level setup
+ok 4 - signed native transfers distinguish existing, absent and self recipients at transaction-level setup
+  ---
+  duration_ms: 42.799833
+  type: 'test'
+  ...
+# Subtest: signed root creation pays account/code state gas only when committed and preserves prefunding distinction
+ok 5 - signed root creation pays account/code state gas only when committed and preserves prefunding distinction
+  ---
+  duration_ms: 11.198666
+  type: 'test'
+  ...
+# Subtest: signed SSTORE allocation/clear and original-slot refund separate state refills from the refund cap
+not ok 6 - signed SSTORE allocation/clear and original-slot refund separate state refills from the refund cap
+  ---
+  duration_ms: 7.56575
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/ethereum-state-gas.test.js:85:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /^0x[0-9a-fA-F]+$/. Input:
+    
+    '0'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: '0'
+  operator: 'match'
+  stack: |-
+    qty (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/fixture-evm/state-test.js:15:54)
+    word (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/fixture-evm/state-test.js:16:43)
+    loadState (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/fixture-evm/state-test.js:23:95)
+    async signedStateGasCase (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/state-gas-fixture.js:40:17)
+    async TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/ethereum-state-gas.test.js:93:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: signed frame revert and exceptional halt roll state gas back but preserve their distinct regular charges
+ok 7 - signed frame revert and exceptional halt roll state gas back but preserve their distinct regular charges
+  ---
+  duration_ms: 5.568166
+  type: 'test'
+  ...
+# Subtest: signed transactions use a nonzero reservoir for state while returning unused reservoir on revert
+ok 8 - signed transactions use a nonzero reservoir for state while returning unused reservoir on revert
+  ---
+  duration_ms: 7.5655
+  type: 'test'
+  ...
+# Subtest: signed nested calls preserve successful state and discard reverted allocation/refill across frames
+ok 9 - signed nested calls preserve successful state and discard reverted allocation/refill across frames
+  ---
+  duration_ms: 9.761375
+  type: 'test'
+  ...
+# Subtest: signed type-4 preparation debits are counted once and survive only ordinary message rollback
+ok 10 - signed type-4 preparation debits are counted once and survive only ordinary message rollback
+  ---
+  duration_ms: 10.67575
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 9
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 261.591125

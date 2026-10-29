@@ -1,0 +1,4683 @@
+
+> transaction-lab@0.30.0 test:local
+> npm --prefix engines/local-evm test
+
+
+> transaction-lab-local-evm@0.1.0 test
+> node --test test/*.test.js
+
+TAP version 13
+# Subtest: Amsterdam EIP-2780 reference shapes have the independently specified intrinsic and floor costs
+ok 1 - Amsterdam EIP-2780 reference shapes have the independently specified intrinsic and floor costs
+  ---
+  duration_ms: 1.408542
+  type: 'test'
+  ...
+# Subtest: Amsterdam access-list duplicates pay both access and data charges; floor includes every declared byte
+ok 2 - Amsterdam access-list duplicates pay both access and data charges; floor includes every declared byte
+  ---
+  duration_ms: 0.392917
+  type: 'test'
+  ...
+# Subtest: Amsterdam uniform calldata floor is independent of zero bytes; intrinsic data cost still distinguishes them
+ok 3 - Amsterdam uniform calldata floor is independent of zero bytes; intrinsic data cost still distinguishes them
+  ---
+  duration_ms: 2.445417
+  type: 'test'
+  ...
+# Subtest: every Amsterdam authorization occurrence pays 7816 even if signature or chain would later skip
+ok 4 - every Amsterdam authorization occurrence pays 7816 even if signature or chain would later skip
+  ---
+  duration_ms: 0.684125
+  type: 'test'
+  ...
+# Subtest: owned intrinsic/floor arithmetic matches separately signed transaction calculations across declared shapes
+ok 5 - owned intrinsic/floor arithmetic matches separately signed transaction calculations across declared shapes
+  ---
+  duration_ms: 144.531792
+  type: 'test'
+  ...
+# Subtest: Amsterdam gas calculation requires complete explicit envelope and retains input bounds
+ok 6 - Amsterdam gas calculation requires complete explicit envelope and retains input bounds
+  ---
+  duration_ms: 0.528417
+  type: 'test'
+  ...
+# Subtest: older gas results remain unchanged and public mainnet execution still does not enable Amsterdam
+ok 7 - older gas results remain unchanged and public mainnet execution still does not enable Amsterdam
+  ---
+  duration_ms: 1.198625
+  type: 'test'
+  ...
+# Subtest: CREATE profile metadata reflects the selected intrinsic and initcode word charges
+ok 8 - CREATE profile metadata reflects the selected intrinsic and initcode word charges
+  ---
+  duration_ms: 1.297041
+  type: 'test'
+  ...
+# Subtest: signed type-4 intrinsic/floor calculations agree for self transfers, repeated auth and access lists
+ok 9 - signed type-4 intrinsic/floor calculations agree for self transfers, repeated auth and access lists
+  ---
+  duration_ms: 95.510292
+  type: 'test'
+  ...
+# Subtest: Amsterdam envelope validation does not invoke hostile getters or proxy traps
+ok 10 - Amsterdam envelope validation does not invoke hostile getters or proxy traps
+  ---
+  duration_ms: 0.207667
+  type: 'test'
+  ...
+# Subtest: source commitment supplies N-1; N-256 follows exactly255 authenticated hash links and caches
+ok 11 - source commitment supplies N-1; N-256 follows exactly255 authenticated hash links and caches
+  ---
+  duration_ms: 403.827375
+  type: 'test'
+  ...
+# Subtest: current/future/older-than256 return zero without adapter dispatch or retained ancestry lookups
+ok 12 - current/future/older-than256 return zero without adapter dispatch or retained ancestry lookups
+  ---
+  duration_ms: 6.204334
+  type: 'test'
+  ...
+# Subtest: hash substitution, changed fields, number gaps and nondecreasing timestamp cannot extend ancestry
+ok 13 - hash substitution, changed fields, number gaps and nondecreasing timestamp cannot extend ancestry
+  ---
+  duration_ms: 6.084459
+  type: 'test'
+  ...
+# Subtest: snapshots cannot add unsupported lookups, omit received header proof or invent provenance
+ok 14 - snapshots cannot add unsupported lookups, omit received header proof or invent provenance
+  ---
+  duration_ms: 10.522
+  type: 'test'
+  ...
+# Subtest: ancestor reads share call/byte/time budgets and poison subsequent reads on failure
+ok 15 - ancestor reads share call/byte/time budgets and poison subsequent reads on failure
+  ---
+  duration_ms: 26.310417
+  type: 'test'
+  ...
+# Subtest: invalid ancestors retain rejected evidence and do not become valid cached facts
+ok 16 - invalid ancestors retain rejected evidence and do not become valid cached facts
+  ---
+  duration_ms: 2.095166
+  type: 'test'
+  ...
+# Subtest: install, replace and clear retain exact authority storage and full signed type-4 postroots
+ok 17 - install, replace and clear retain exact authority storage and full signed type-4 postroots
+  ---
+  duration_ms: 223.549875
+  type: 'test'
+  ...
+# Subtest: proof-absent and existing empty authorities differ by the existence refund
+ok 18 - proof-absent and existing empty authorities differ by the existence refund
+  ---
+  duration_ms: 41.320709
+  type: 'test'
+  ...
+# Subtest: ordered duplicate authorizations consume sequential nonces and keep skipped tuples in place
+ok 19 - ordered duplicate authorizations consume sequential nonces and keep skipped tuples in place
+  ---
+  duration_ms: 51.945292
+  type: 'test'
+  ...
+# Subtest: self-authorization reads the sender nonce after its outer increment and executes the new code
+ok 20 - self-authorization reads the sender nonce after its outer increment and executes the new code
+  ---
+  duration_ms: 35.281458
+  type: 'test'
+  ...
+# Subtest: wrong chain, max nonce, invalid parity, high-s and zero-r are protocol skips, not dropped inputs
+ok 21 - wrong chain, max nonce, invalid parity, high-s and zero-r are protocol skips, not dropped inputs
+  ---
+  duration_ms: 52.3275
+  type: 'test'
+  ...
+# Subtest: code and nonce guards skip recoverable authorities without mutating them
+ok 22 - code and nonce guards skip recoverable authorities without mutating them
+  ---
+  duration_ms: 37.387292
+  type: 'test'
+  ...
+# Subtest: recoverable skipped authorities are warm even though their authorization was not applied
+ok 23 - recoverable skipped authorities are warm even though their authorization was not applied
+  ---
+  duration_ms: 45.27275
+  type: 'test'
+  ...
+# Subtest: REVERT and out of gas roll back message writes but retain preceding authorization state and refunds
+ok 24 - REVERT and out of gas roll back message writes but retain preceding authorization state and refunds
+  ---
+  duration_ms: 62.812917
+  type: 'test'
+  ...
+# Subtest: successful delegated message storage writes use authority context and preserve old unknown slots
+ok 25 - successful delegated message storage writes use authority context and preserve old unknown slots
+  ---
+  duration_ms: 13.189041
+  type: 'test'
+  ...
+# Subtest: a newly materialized authority may write storage without being marked as a constructor creation
+ok 26 - a newly materialized authority may write storage without being marked as a constructor creation
+  ---
+  duration_ms: 9.444958
+  type: 'test'
+  ...
+# Subtest: authorization materialization is not EIP-6780 creation and SELFDESTRUCT keeps its designation
+ok 27 - authorization materialization is not EIP-6780 creation and SELFDESTRUCT keeps its designation
+  ---
+  duration_ms: 17.912125
+  type: 'test'
+  ...
+# Subtest: message storage-clear refund is separate from the authorization existence refund
+ok 28 - message storage-clear refund is separate from the authorization existence refund
+  ---
+  duration_ms: 19.692042
+  type: 'test'
+  ...
+# Subtest: authorization nonce precedes CREATE and only committed message ancestry retains creator increments
+ok 29 - authorization nonce precedes CREATE and only committed message ancestry retains creator increments
+  ---
+  duration_ms: 57.365459
+  type: 'test'
+  ...
+# Subtest: self-authorization and committed sender creation attempts each consume their distinct nonce
+ok 30 - self-authorization and committed sender creation attempts each consume their distinct nonce
+  ---
+  duration_ms: 53.244584
+  type: 'test'
+  ...
+# Subtest: Prague activates authorization processing and uses the same signed transaction behavior
+ok 31 - Prague activates authorization processing and uses the same signed transaction behavior
+  ---
+  duration_ms: 10.287667
+  type: 'test'
+  ...
+# Subtest: a proof failure after authorization and a post-authorization deadline restore the complete attempt
+ok 32 - a proof failure after authorization and a post-authorization deadline restore the complete attempt
+  ---
+  duration_ms: 24.538959
+  type: 'test'
+  ...
+# Subtest: failure inside a caller checkpoint restores that checkpoint without retaining authorization provenance
+ok 33 - failure inside a caller checkpoint restores that checkpoint without retaining authorization provenance
+  ---
+  duration_ms: 8.305459
+  type: 'test'
+  ...
+# Subtest: real isolated child retains signature decisions, complete changes and five full-VM channels
+ok 34 - real isolated child retains signature decisions, complete changes and five full-VM channels
+  ---
+  duration_ms: 281.548209
+  type: 'test'
+  ...
+# Subtest: real isolated before/after queries see old/new code without replaying original authorizations
+ok 35 - real isolated before/after queries see old/new code without replaying original authorizations
+  ---
+  duration_ms: 287.575417
+  type: 'test'
+  ...
+# Subtest: authorization normalization preserves ordered duplicates, detaches, and freezes canonical values
+ok 36 - authorization normalization preserves ordered duplicates, detaches, and freezes canonical values
+  ---
+  duration_ms: 1.768875
+  type: 'test'
+  ...
+# Subtest: structural bounds reject ambiguous encodings, extra fields, sparse/getter/proxy values without evaluating them
+ok 37 - structural bounds reject ambiguous encodings, extra fields, sparse/getter/proxy values without evaluating them
+  ---
+  duration_ms: 1.0935
+  type: 'test'
+  ...
+# Subtest: recover known offline signer and chain-zero domain; malformed signatures are skipped not admitted as recovered authorities
+ok 38 - recover known offline signer and chain-zero domain; malformed signatures are skipped not admitted as recovered authorities
+  ---
+  duration_ms: 41.231042
+  type: 'test'
+  ...
+# Subtest: state decisions distinguish existence from emptiness and enforce exact delegation code before nonce matching
+ok 39 - state decisions distinguish existence from emptiness and enforce exact delegation code before nonce matching
+  ---
+  duration_ms: 0.171834
+  type: 'test'
+  ...
+# Subtest: parent independently derives every ordered authority decision and refund
+ok 40 - parent independently derives every ordered authority decision and refund
+  ---
+  duration_ms: 2065.901625
+  type: 'test'
+  ...
+# Subtest: parent requires exact retained code, nonce and materialization for authenticated absent authorities
+ok 41 - parent requires exact retained code, nonce and materialization for authenticated absent authorities
+  ---
+  duration_ms: 2076.394458
+  type: 'test'
+  ...
+# Subtest: message REVERT cannot discard preceding authorization state or retain message writes
+ok 42 - message REVERT cannot discard preceding authorization state or retain message writes
+  ---
+  duration_ms: 2565.579458
+  type: 'test'
+  ...
+# Subtest: parent checks repeated self-authorization before committed sender creation attempts
+ok 43 - parent checks repeated self-authorization before committed sender creation attempts
+  ---
+  duration_ms: 4094.051875
+  type: 'test'
+  ...
+# Subtest: skipped signatures cannot authorize extra code or nonce changes
+ok 44 - skipped signatures cannot authorize extra code or nonce changes
+  ---
+  duration_ms: 2661.514
+  type: 'test'
+  ...
+# Subtest: before/after query sender semantics use original and prepared code separately
+ok 45 - before/after query sender semantics use original and prepared code separately
+  ---
+  duration_ms: 4022.057792
+  type: 'test'
+  ...
+# Subtest: absent authorization context preserves legacy cost and profile shape
+ok 46 - absent authorization context preserves legacy cost and profile shape
+  ---
+  duration_ms: 3.676208
+  type: 'test'
+  ...
+# Subtest: every declared tuple occurrence pays 25000 intrinsic even when protocol-skippable
+ok 47 - every declared tuple occurrence pays 25000 intrinsic even when protocol-skippable
+  ---
+  duration_ms: 1.262292
+  type: 'test'
+  ...
+# Subtest: authorization admission starts at Prague and excludes creation and blob context
+ok 48 - authorization admission starts at Prague and excludes creation and blob context
+  ---
+  duration_ms: 6.630708
+  type: 'test'
+  ...
+# Subtest: authorization intrinsic participates in admission, refund cap and unchanged calldata floor
+ok 49 - authorization intrinsic participates in admission, refund cap and unchanged calldata floor
+  ---
+  duration_ms: 0.456709
+  type: 'test'
+  ...
+# Subtest: malformed authorization structures fail before any state or query input read
+ok 50 - malformed authorization structures fail before any state or query input read
+  ---
+  duration_ms: 11.975459
+  type: 'test'
+  ...
+# Subtest: authorization installation/replacement/clear preserve authenticated balance and nonempty storage
+ok 51 - authorization installation/replacement/clear preserve authenticated balance and nonempty storage
+  ---
+  duration_ms: 21.948583
+  type: 'test'
+  ...
+# Subtest: absent authorized account and demanded storage carry through settled copies without altering immutable proofs
+ok 52 - absent authorized account and demanded storage carry through settled copies without altering immutable proofs
+  ---
+  duration_ms: 4.298875
+  type: 'test'
+  ...
+# Subtest: outer rollback removes authorization materialization, code, nonce, slots and provenance
+ok 53 - outer rollback removes authorization materialization, code, nonce, slots and provenance
+  ---
+  duration_ms: 2.995625
+  type: 'test'
+  ...
+# Subtest: authorization setter refuses no checkpoint, nonce mismatch, malformed designation and generic runtime replacement
+ok 54 - authorization setter refuses no checkpoint, nonce mismatch, malformed designation and generic runtime replacement
+  ---
+  duration_ms: 7.264
+  type: 'test'
+  ...
+# Subtest: priced blob opcodes and sender BALANCE observe exact hashes, current price and both upfront charges
+ok 55 - priced blob opcodes and sender BALANCE observe exact hashes, current price and both upfront charges
+  ---
+  duration_ms: 111.94325
+  type: 'test'
+  ...
+# Subtest: each fork admits its exact blob count even when the selected block already used its full capacity
+ok 56 - each fork admits its exact blob count even when the selected block already used its full capacity
+  ---
+  duration_ms: 71.205375
+  type: 'test'
+  ...
+# Subtest: EVM revert and out-of-gas retain blob burn plus settled execution charges while reverting storage/value
+ok 57 - EVM revert and out-of-gas retain blob burn plus settled execution charges while reverting storage/value
+  ---
+  duration_ms: 54.387584
+  type: 'test'
+  ...
+# Subtest: priced nonblob calls expose real BLOBBASEFEE while Shanghai preserves its ordinary invalid opcode
+ok 58 - priced nonblob calls expose real BLOBBASEFEE while Shanghai preserves its ordinary invalid opcode
+  ---
+  duration_ms: 113.074791
+  type: 'test'
+  ...
+# Subtest: fork, cap, count and bounded-price failures precede proof reads and cannot emit accounting
+ok 59 - fork, cap, count and bounded-price failures precede proof reads and cannot emit accounting
+  ---
+  duration_ms: 9.554583
+  type: 'test'
+  ...
+# Subtest: host and deadline failures after blob debit or final credits roll back everything including caller checkpoints
+ok 60 - host and deadline failures after blob debit or final credits roll back everything including caller checkpoints
+  ---
+  duration_ms: 42.205917
+  type: 'test'
+  ...
+# Subtest: unpriced probes omit original blob hashes and fees; BLOBBASEFEE remains explicitly unavailable
+ok 61 - unpriced probes omit original blob hashes and fees; BLOBBASEFEE remains explicitly unavailable
+  ---
+  duration_ms: 29.808084
+  type: 'test'
+  ...
+# Subtest: malformed KZG retains blob fees and zero-tip cleanup uses the blob-specific transaction scope
+ok 62 - malformed KZG retains blob fees and zero-tip cleanup uses the blob-specific transaction scope
+  ---
+  duration_ms: 27.861292
+  type: 'test'
+  ...
+# Subtest: blob parent binds complete fee accounting, authenticated price and declared hashes
+ok 63 - blob parent binds complete fee accounting, authenticated price and declared hashes
+  ---
+  duration_ms: 3863.367667
+  type: 'test'
+  ...
+# Subtest: blob parent rejects omitted burn and invented beneficiary blob credits, including sender alias
+ok 64 - blob parent rejects omitted burn and invented beneficiary blob credits, including sender alias
+  ---
+  duration_ms: 3657.683875
+  type: 'test'
+  ...
+# Subtest: blob parent validates burn and rollback on REVERT and out of gas
+ok 65 - blob parent validates burn and rollback on REVERT and out of gas
+  ---
+  duration_ms: 4321.82325
+  type: 'test'
+  ...
+# Subtest: blob before/after measurements receive no hashes or charges and retain explicit opcode limitations
+ok 66 - blob before/after measurements receive no hashes or charges and retain explicit opcode limitations
+  ---
+  duration_ms: 1352.071167
+  type: 'test'
+  ...
+# Subtest: blob count and cap admission happen before proof I/O
+ok 67 - blob count and cap admission happen before proof I/O
+  ---
+  duration_ms: 4.336792
+  type: 'test'
+  ...
+# Subtest: all seven BLS precompiles execute at their actual addresses after activation
+ok 68 - all seven BLS precompiles execute at their actual addresses after activation
+  ---
+  duration_ms: 725.917125
+  type: 'test'
+  ...
+# Subtest: BLS message gas boundary and transaction calldata floor are distinct
+ok 69 - BLS message gas boundary and transaction calldata floor are distinct
+  ---
+  duration_ms: 3.968291
+  type: 'test'
+  ...
+# Subtest: malformed BLS input preserves EVM failure semantics and rolls back transferred value
+ok 70 - malformed BLS input preserves EVM failure semantics and rolls back transferred value
+  ---
+  duration_ms: 9.130209
+  type: 'test'
+  ...
+# Subtest: nested BLS calls retain correct value, execution context and enclosing rollback
+ok 71 - nested BLS calls retain correct value, execution context and enclosing rollback
+  ---
+  duration_ms: 207.792791
+  type: 'test'
+  ...
+# Subtest: caught invalid BLS input retains valid parent work rather than becoming host failure
+ok 72 - caught invalid BLS input retains valid parent work rather than becoming host failure
+  ---
+  duration_ms: 14.09275
+  type: 'test'
+  ...
+# Subtest: BLS addresses retain ordinary account behavior before Prague
+ok 73 - BLS addresses retain ordinary account behavior before Prague
+  ---
+  duration_ms: 128.380208
+  type: 'test'
+  ...
+# Subtest: BLS host and deadline failures cannot be caught by CALL or retain fees, nonce, value or storage
+ok 74 - BLS host and deadline failures cannot be caught by CALL or retain fees, nonce, value or storage
+  ---
+  duration_ms: 124.784208
+  type: 'test'
+  ...
+# Subtest: BLS invalid public data stays an EVM error and still checks both budget boundaries
+ok 75 - BLS invalid public data stays an EVM error and still checks both budget boundaries
+  ---
+  duration_ms: 1.487541
+  type: 'test'
+  ...
+# Subtest: BLS subgroup rule applies to MSM with zero scalar but not addition
+ok 76 - BLS subgroup rule applies to MSM with zero scalar but not addition
+  ---
+  duration_ms: 1.451959
+  type: 'test'
+  ...
+# Subtest: BLS zero operands preserve infinity and the neutral pairing result
+ok 77 - BLS zero operands preserve infinity and the neutral pairing result
+  ---
+  duration_ms: 38.702542
+  type: 'test'
+  ...
+# Subtest: BLS never treats unexpected thrown values or malformed results as EVM rejection
+ok 78 - BLS never treats unexpected thrown values or malformed results as EVM rejection
+  ---
+  duration_ms: 1.420166
+  type: 'test'
+  ...
+# Subtest: BLS deadline failures latch before/after success and after malformed input
+ok 79 - BLS deadline failures latch before/after success and after malformed input
+  ---
+  duration_ms: 0.417709
+  type: 'test'
+  ...
+# Subtest: actual parent retains preexisting SELFDESTRUCT transfer without deletion or invented zero-value accounts
+ok 80 - actual parent retains preexisting SELFDESTRUCT transfer without deletion or invented zero-value accounts
+  ---
+  duration_ms: 714.03525
+  type: 'test'
+  ...
+# Subtest: parent rejects fabricated code/account deletion and forged beneficiary origin
+ok 81 - parent rejects fabricated code/account deletion and forged beneficiary origin
+  ---
+  duration_ms: 851.962375
+  type: 'test'
+  ...
+# Subtest: parent binds delegated SELFDESTRUCT to the proxy balance and preserves implementation state
+ok 82 - parent binds delegated SELFDESTRUCT to the proxy balance and preserves implementation state
+  ---
+  duration_ms: 284.257792
+  type: 'test'
+  ...
+# Subtest: a root revert after successful SELFDESTRUCT cannot retain beneficiary funding
+ok 83 - a root revert after successful SELFDESTRUCT cannot retain beneficiary funding
+  ---
+  duration_ms: 510.645
+  type: 'test'
+  ...
+# Subtest: fresh getter self-beneficiary preserves original-created code while real transfers remain unmeasured
+ok 84 - fresh getter self-beneficiary preserves original-created code while real transfers remain unmeasured
+  ---
+  duration_ms: 1191.315125
+  type: 'test'
+  ...
+# Subtest: Cancun SELFDESTRUCT transfers value to a proven absent beneficiary and preserves code/storage/nonce
+ok 85 - Cancun SELFDESTRUCT transfers value to a proven absent beneficiary and preserves code/storage/nonce
+  ---
+  duration_ms: 32.115875
+  type: 'test'
+  ...
+# Subtest: self-beneficiary keeps the entire balance and zero-value absent recipient stays absent
+ok 86 - self-beneficiary keeps the entire balance and zero-value absent recipient stays absent
+  ---
+  duration_ms: 13.813792
+  type: 'test'
+  ...
+# Subtest: retained code can SELFDESTRUCT again after refunding within the same invocation
+ok 87 - retained code can SELFDESTRUCT again after refunding within the same invocation
+  ---
+  duration_ms: 17.789667
+  type: 'test'
+  ...
+# Subtest: DELEGATECALL destroys neither implementation nor proxy and transfers only execution-context balance
+ok 88 - DELEGATECALL destroys neither implementation nor proxy and transfers only execution-context balance
+  ---
+  duration_ms: 19.91775
+  type: 'test'
+  ...
+# Subtest: STATICCALL and insufficient opcode gas remain caught EVM failures without transfer
+ok 89 - STATICCALL and insufficient opcode gas remain caught EVM failures without transfer
+  ---
+  duration_ms: 19.354583
+  type: 'test'
+  ...
+# Subtest: root revert and caught ancestor revert undo successful SELFDESTRUCT transfers
+ok 90 - root revert and caught ancestor revert undo successful SELFDESTRUCT transfers
+  ---
+  duration_ms: 7.633041
+  type: 'test'
+  ...
+# Subtest: Shanghai without its authenticated finalizer and legacy999 SELFDESTRUCT stay unsupported with complete rollback
+ok 91 - Shanghai without its authenticated finalizer and legacy999 SELFDESTRUCT stay unsupported with complete rollback
+  ---
+  duration_ms: 5.356459
+  type: 'test'
+  ...
+# Subtest: constructor and fresh-runtime SELFDESTRUCT require the authenticated deletion finalizer
+ok 92 - constructor and fresh-runtime SELFDESTRUCT require the authenticated deletion finalizer
+  ---
+  duration_ms: 39.595083
+  type: 'test'
+  ...
+# Subtest: an original-created contract is preexisting in a fresh after-query; self destruction preserves the original overlay
+ok 93 - an original-created contract is preexisting in a fresh after-query; self destruction preserves the original overlay
+  ---
+  duration_ms: 32.834042
+  type: 'test'
+  ...
+# Subtest: fresh query SELFDESTRUCT transfer is rejected by net-mutation checks without changing original state
+ok 94 - fresh query SELFDESTRUCT transfer is rejected by net-mutation checks without changing original state
+  ---
+  duration_ms: 27.137709
+  type: 'test'
+  ...
+# Subtest: SELFDESTRUCT funds a proven existing empty beneficiary while arbitrary direct deletion remains refused
+ok 95 - SELFDESTRUCT funds a proven existing empty beneficiary while arbitrary direct deletion remains refused
+  ---
+  duration_ms: 2.068291
+  type: 'test'
+  ...
+# Subtest: failed CREATE2 collision does not mark a preexisting SELFDESTRUCT target as newly created
+ok 96 - failed CREATE2 collision does not mark a preexisting SELFDESTRUCT target as newly created
+  ---
+  duration_ms: 2.25875
+  type: 'test'
+  ...
+# Subtest: old execution account may delegate to fresh code; created code address does not authorize deletion
+ok 97 - old execution account may delegate to fresh code; created code address does not authorize deletion
+  ---
+  duration_ms: 8.548
+  type: 'test'
+  ...
+# Subtest: real sparse drpc inputs execute before exact call/log/state comparison
+ok 98 - real sparse drpc inputs execute before exact call/log/state comparison
+  ---
+  duration_ms: 50.381542
+  type: 'test'
+  ...
+# Subtest: real sparse hyperlend-archive inputs execute before exact call/log/state comparison
+ok 99 - real sparse hyperlend-archive inputs execute before exact call/log/state comparison
+  ---
+  duration_ms: 35.610166
+  type: 'test'
+  ...
+# Subtest: missing required storage is unavailable and rolls back the sender nonce and all effects
+ok 100 - missing required storage is unavailable and rolls back the sender nonce and all effects
+  ---
+  duration_ms: 2.999041
+  type: 'test'
+  ...
+# Subtest: missing implementation account is unavailable with complete rollback, not an empty-code success
+ok 101 - missing implementation account is unavailable with complete rollback, not an empty-code success
+  ---
+  duration_ms: 1.36925
+  type: 'test'
+  ...
+# Subtest: missing basic-code completion rejects at input conversion before any manager is created
+ok 102 - missing basic-code completion rejects at input conversion before any manager is created
+  ---
+  duration_ms: 0.385208
+  type: 'test'
+  ...
+# Subtest: explicit empty implementation code is changed supplied state and causes observable divergence
+ok 103 - explicit empty implementation code is changed supplied state and causes observable divergence
+  ---
+  duration_ms: 1.807208
+  type: 'test'
+  ...
+# Subtest: explicit changed storage remains changed rather than repaired from expected state
+ok 104 - explicit changed storage remains changed rather than repaired from expected state
+  ---
+  duration_ms: 5.917208
+  type: 'test'
+  ...
+# Subtest: descendant gas and return-data differences cannot pass a root-only comparison
+ok 105 - descendant gas and return-data differences cannot pass a root-only comparison
+  ---
+  duration_ms: 11.853542
+  type: 'test'
+  ...
+# Subtest: missing entered calls are not discarded and duplicate log indices are unavailable
+ok 106 - missing entered calls are not discarded and duplicate log indices are unavailable
+  ---
+  duration_ms: 14.915042
+  type: 'test'
+  ...
+# Subtest: committed log ordering uses provider indices rather than incidental array order
+ok 107 - committed log ordering uses provider indices rather than incidental array order
+  ---
+  duration_ms: 26.401791
+  type: 'test'
+  ...
+# Subtest: missing changed-basic pre-value, account lifecycle and runtime code changes remain unavailable
+ok 108 - missing changed-basic pre-value, account lifecycle and runtime code changes remain unavailable
+  ---
+  duration_ms: 11.495708
+  type: 'test'
+  ...
+# Subtest: provider prefields and the entire local changed-state snapshot are compared
+ok 109 - provider prefields and the entire local changed-state snapshot are compared
+  ---
+  duration_ms: 4.412209
+  type: 'test'
+  ...
+# Subtest: nonzero refund and changed context cannot masquerade as exact gas/envelope agreement
+ok 110 - nonzero refund and changed context cannot masquerade as exact gas/envelope agreement
+  ---
+  duration_ms: 4.14275
+  type: 'test'
+  ...
+# Subtest: contradictory revert reasons and explicit empty error fields cannot match success
+ok 111 - contradictory revert reasons and explicit empty error fields cannot match success
+  ---
+  duration_ms: 10.583209
+  type: 'test'
+  ...
+# Subtest: parent/block identity and retained state disposition bind every comparison channel
+ok 112 - parent/block identity and retained state disposition bind every comparison channel
+  ---
+  duration_ms: 5.855375
+  type: 'test'
+  ...
+# Subtest: native tracer omission rules never supply missing call input or nonstatic value
+ok 113 - native tracer omission rules never supply missing call input or nonstatic value
+  ---
+  duration_ms: 11.763208
+  type: 'test'
+  ...
+# Subtest: provider log index gaps are permitted, but impossible supplied positions are unavailable
+ok 114 - provider log index gaps are permitted, but impossible supplied positions are unavailable
+  ---
+  duration_ms: 6.940583
+  type: 'test'
+  ...
+# Subtest: identical sibling log payloads cannot hide reversed or interleaved call ordering
+ok 115 - identical sibling log payloads cannot hide reversed or interleaved call ordering
+  ---
+  duration_ms: 5.054916
+  type: 'test'
+  ...
+# Subtest: root constructor SELFDESTRUCT transfers value and removes the whole new account only at finalization
+ok 116 - root constructor SELFDESTRUCT transfers value and removes the whole new account only at finalization
+  ---
+  duration_ms: 33.851875
+  type: 'test'
+  ...
+# Subtest: CREATE and CREATE2 remove prefunded targets with original balance loss and no surviving constructor state
+ok 117 - CREATE and CREATE2 remove prefunded targets with original balance loss and no surviving constructor state
+  ---
+  duration_ms: 18.384291
+  type: 'test'
+  ...
+# Subtest: self-beneficiary burns constructor value and prefunding without inventing a beneficiary credit
+ok 118 - self-beneficiary burns constructor value and prefunding without inventing a beneficiary credit
+  ---
+  duration_ms: 5.16075
+  type: 'test'
+  ...
+# Subtest: fresh runtime remains callable until finalization and repeated SELFDESTRUCT transfers are retained
+ok 119 - fresh runtime remains callable until finalization and repeated SELFDESTRUCT transfers are retained
+  ---
+  duration_ms: 9.608167
+  type: 'test'
+  ...
+# Subtest: funding a scheduled deletion again is burned at finalization rather than causing an unsupported outcome
+ok 120 - funding a scheduled deletion again is burned at finalization rather than causing an unsupported outcome
+  ---
+  duration_ms: 12.691084
+  type: 'test'
+  ...
+# Subtest: same-invocation CREATE2 collision remains until finalization, then a fresh invocation can recreate
+ok 121 - same-invocation CREATE2 collision remains until finalization, then a fresh invocation can recreate
+  ---
+  duration_ms: 7.789834
+  type: 'test'
+  ...
+# Subtest: root and caught ancestor reverts discard committed-child deletion plans and value changes
+ok 122 - root and caught ancestor reverts discard committed-child deletion plans and value changes
+  ---
+  duration_ms: 8.966291
+  type: 'test'
+  ...
+# Subtest: delegate SELFDESTRUCT deletes a new execution account but leaves old implementation intact
+ok 123 - delegate SELFDESTRUCT deletes a new execution account but leaves old implementation intact
+  ---
+  duration_ms: 8.902667
+  type: 'test'
+  ...
+# Subtest: failed STATICCALL and OOG SELFDESTRUCT instructions produce no successful opcode evidence or deletion
+ok 124 - failed STATICCALL and OOG SELFDESTRUCT instructions produce no successful opcode evidence or deletion
+  ---
+  duration_ms: 11.554125
+  type: 'test'
+  ...
+# Subtest: finalizer failure after a deletion rolls back every account and the sender nonce
+ok 125 - finalizer failure after a deletion rolls back every account and the sender nonce
+  ---
+  duration_ms: 8.803708
+  type: 'test'
+  ...
+# Subtest: deadline after deletion and missing finalizer fail closed with complete rollback
+ok 126 - deadline after deletion and missing finalizer fail closed with complete rollback
+  ---
+  duration_ms: 7.132375
+  type: 'test'
+  ...
+# Subtest: fresh after-query sees finalized absence and preserves the prefunded deletion overlay
+ok 127 - fresh after-query sees finalized absence and preserves the prefunded deletion overlay
+  ---
+  duration_ms: 14.827292
+  type: 'test'
+  ...
+# Subtest: parent derives delegated sender eligibility and rejects missing, altered or extra declaration fields
+ok 128 - parent derives delegated sender eligibility and rejects missing, altered or extra declaration fields
+  ---
+  duration_ms: 1578.307208
+  type: 'test'
+  ...
+# Subtest: parent rejects undercounted and overcounted sender creation attempts
+ok 129 - parent rejects undercounted and overcounted sender creation attempts
+  ---
+  duration_ms: 512.5495
+  type: 'test'
+  ...
+# Subtest: entered reverted constructors and collisions retain their creator nonce increment
+ok 130 - entered reverted constructors and collisions retain their creator nonce increment
+  ---
+  duration_ms: 2162.829625
+  type: 'test'
+  ...
+# Subtest: reverted parent ancestry cannot justify an extra sender nonce even when its CREATE succeeded
+ok 131 - reverted parent ancestry cannot justify an extra sender nonce even when its CREATE succeeded
+  ---
+  duration_ms: 2696.398375
+  type: 'test'
+  ...
+# Subtest: parent rejects laundering a callback execution account to hide sender creation attempts
+ok 132 - parent rejects laundering a callback execution account to hide sender creation attempts
+  ---
+  duration_ms: 1475.822333
+  type: 'test'
+  ...
+# Subtest: an empty-code sender cannot acquire delegation authority through metadata or forged input facts
+ok 133 - an empty-code sender cannot acquire delegation authority through metadata or forged input facts
+  ---
+  duration_ms: 1178.101084
+  type: 'test'
+  ...
+# Subtest: trusted pre-Prague fork and exact indicator length remain required at the parent boundary
+ok 134 - trusted pre-Prague fork and exact indicator length remain required at the parent boundary
+  ---
+  duration_ms: 4627.886709
+  type: 'test'
+  ...
+# Subtest: measured probes use the same authenticated delegation but still normalize only one sender nonce
+ok 135 - measured probes use the same authenticated delegation but still normalize only one sender nonce
+  ---
+  duration_ms: 1902.739583
+  type: 'test'
+  ...
+# Subtest: delegated sender can transfer to another address without executing or warming its implementation
+ok 136 - delegated sender can transfer to another address without executing or warming its implementation
+  ---
+  duration_ms: 92.015792
+  type: 'test'
+  ...
+# Subtest: self-call executes in sender storage/address context and warms the resolved implementation
+ok 137 - self-call executes in sender storage/address context and warms the resolved implementation
+  ---
+  duration_ms: 87.461667
+  type: 'test'
+  ...
+# Subtest: entered successful and reverted CREATE both retain the delegated sender creation nonce
+ok 138 - entered successful and reverted CREATE both retain the delegated sender creation nonce
+  ---
+  duration_ms: 35.483792
+  type: 'test'
+  ...
+# Subtest: CREATE2 success followed by collision counts both entered attempts and preserves only the first deployment
+ok 139 - CREATE2 success followed by collision counts both entered attempts and preserves only the first deployment
+  ---
+  duration_ms: 24.569167
+  type: 'test'
+  ...
+# Subtest: callback creation counts only when its parent ancestry commits, even if a successful constructor is later reverted
+ok 140 - callback creation counts only when its parent ancestry commits, even if a successful constructor is later reverted
+  ---
+  duration_ms: 65.002958
+  type: 'test'
+  ...
+# Subtest: root REVERT undoes all entered creation effects but preserves the outer transaction nonce
+ok 141 - root REVERT undoes all entered creation effects but preserves the outer transaction nonce
+  ---
+  duration_ms: 58.383083
+  type: 'test'
+  ...
+# Subtest: pre-entry CREATE balance and uint64 nonce refusals do not invent a creation nonce or frame
+ok 142 - pre-entry CREATE balance and uint64 nonce refusals do not invent a creation nonce or frame
+  ---
+  duration_ms: 34.544792
+  type: 'test'
+  ...
+# Subtest: top-level CREATE uses original sender nonce without executing its designation
+ok 143 - top-level CREATE uses original sender nonce without executing its designation
+  ---
+  duration_ms: 16.732167
+  type: 'test'
+  ...
+# Subtest: exact designations work at Prague while pre-Prague and malformed sender code stay unsupported
+ok 144 - exact designations work at Prague while pre-Prague and malformed sender code stay unsupported
+  ---
+  duration_ms: 29.424208
+  type: 'test'
+  ...
+# Subtest: overflow and unsupported nested bytecode restore the entire attempt even inside a caller checkpoint
+ok 145 - overflow and unsupported nested bytecode restore the entire attempt even inside a caller checkpoint
+  ---
+  duration_ms: 35.945917
+  type: 'test'
+  ...
+# Subtest: real child and parent validation accept committed, reverted-constructor, collision and rolled-back callback nonce accounting
+ok 146 - real child and parent validation accept committed, reverted-constructor, collision and rolled-back callback nonce accounting
+  ---
+  duration_ms: 1118.537708
+  type: 'test'
+  ...
+# Subtest: real preview permits neutral queries from a delegated sender and rejects extra creation nonce effects
+ok 147 - real preview permits neutral queries from a delegated sender and rejects extra creation nonce effects
+  ---
+  duration_ms: 620.453833
+  type: 'test'
+  ...
+# Subtest: CALL with zero value deletes a touched empty account and its nonempty storage
+ok 148 - CALL with zero value deletes a touched empty account and its nonempty storage
+  ---
+  duration_ms: 34.433084
+  type: 'test'
+  ...
+# Subtest: STATICCALL with zero value deletes a touched empty account and its nonempty storage
+ok 149 - STATICCALL with zero value deletes a touched empty account and its nonempty storage
+  ---
+  duration_ms: 7.036
+  type: 'test'
+  ...
+# Subtest: a zero-value root CALL also cleans up an existing empty destination
+ok 150 - a zero-value root CALL also cleans up an existing empty destination
+  ---
+  duration_ms: 10.748083
+  type: 'test'
+  ...
+# Subtest: BALANCE and access-list warming do not touch or delete an empty account
+ok 151 - BALANCE and access-list warming do not touch or delete an empty account
+  ---
+  duration_ms: 8.198709
+  type: 'test'
+  ...
+# Subtest: ordinary empty-account touches revert with their root or caught ancestor frame
+ok 152 - ordinary empty-account touches revert with their root or caught ancestor frame
+  ---
+  duration_ms: 16.131917
+  type: 'test'
+  ...
+# Subtest: a failed RIPEMD160 call retains its sticky touch through child and root reverts
+ok 153 - a failed RIPEMD160 call retains its sticky touch through child and root reverts
+  ---
+  duration_ms: 6.288917
+  type: 'test'
+  ...
+# Subtest: failed SHA256 has no RIPEMD160 sticky-touch exception
+ok 154 - failed SHA256 has no RIPEMD160 sticky-touch exception
+  ---
+  duration_ms: 5.8855
+  type: 'test'
+  ...
+# Subtest: a zero-value call to proven absence remains absent without a fabricated deletion
+ok 155 - a zero-value call to proven absence remains absent without a fabricated deletion
+  ---
+  duration_ms: 3.778042
+  type: 'test'
+  ...
+# Subtest: positive funding retains both initially empty and initially absent recipients
+ok 156 - positive funding retains both initially empty and initially absent recipients
+  ---
+  duration_ms: 8.247375
+  type: 'test'
+  ...
+# Subtest: DELEGATECALL and CALLCODE do not touch their separate empty code address
+ok 157 - DELEGATECALL and CALLCODE do not touch their separate empty code address
+  ---
+  duration_ms: 5.473834
+  type: 'test'
+  ...
+# Subtest: host failure after partial cleanup restores both accounts, storage and sender nonce
+ok 158 - host failure after partial cleanup restores both accounts, storage and sender nonce
+  ---
+  duration_ms: 15.544708
+  type: 'test'
+  ...
+# Subtest: a host deadline during cleanup rolls back completed deletions and closes the cleanup window
+ok 159 - a host deadline during cleanup rolls back completed deletions and closes the cleanup window
+  ---
+  duration_ms: 50.45025
+  type: 'test'
+  ...
+# Subtest: parent accepts actual CALL and STATICCALL cleanup, including an entirely unknown nonempty storage trie
+ok 160 - parent accepts actual CALL and STATICCALL cleanup, including an entirely unknown nonempty storage trie
+  ---
+  duration_ms: 985.6515
+  type: 'test'
+  ...
+# Subtest: ordinary reverted touches retain the empty account while RIPEMD160 OOG touches survive root revert
+ok 161 - ordinary reverted touches retain the empty account while RIPEMD160 OOG touches survive root revert
+  ---
+  duration_ms: 763.595584
+  type: 'test'
+  ...
+# Subtest: Shanghai parent admits EIP-161 cleanup and committed SELFDESTRUCT but rejects unrelated deletion evidence
+ok 162 - Shanghai parent admits EIP-161 cleanup and committed SELFDESTRUCT but rejects unrelated deletion evidence
+  ---
+  duration_ms: 1551.117792
+  type: 'test'
+  ...
+# Subtest: BALANCE-only, delegated code targets and positive value transfers never become empty cleanup
+ok 163 - BALANCE-only, delegated code targets and positive value transfers never become empty cleanup
+  ---
+  duration_ms: 1832.670375
+  type: 'test'
+  ...
+# Subtest: zero-balance SELFDESTRUCT beneficiary cleanup retains its authenticated whole-account deletion
+ok 164 - zero-balance SELFDESTRUCT beneficiary cleanup retains its authenticated whole-account deletion
+  ---
+  duration_ms: 658.256
+  type: 'test'
+  ...
+# Subtest: existing zero-balance deployable targets can create and delete without an invented native delta
+ok 165 - existing zero-balance deployable targets can create and delete without an invented native delta
+  ---
+  duration_ms: 733.499959
+  type: 'test'
+  ...
+# Subtest: parent rejects omitted cleanup, wrong roots, duplicate addresses and forged whole-account slot diffs
+ok 166 - parent rejects omitted cleanup, wrong roots, duplicate addresses and forged whole-account slot diffs
+  ---
+  duration_ms: 6065.876416
+  type: 'test'
+  ...
+# Subtest: parent rejects fabricated cleanup for a read, delegated code address, funding and reverted ordinary touch
+ok 167 - parent rejects fabricated cleanup for a read, delegated code address, funding and reverted ordinary touch
+  ---
+  duration_ms: 2422.408625
+  type: 'test'
+  ...
+# Subtest: parent never promotes ambiguous pre-touch failures into sticky RIPEMD160 cleanup
+ok 168 - parent never promotes ambiguous pre-touch failures into sticky RIPEMD160 cleanup
+  ---
+  duration_ms: 1765.949
+  type: 'test'
+  ...
+# Subtest: retained SELFDESTRUCT value is reconstructed before allowing an empty account to survive
+ok 169 - retained SELFDESTRUCT value is reconstructed before allowing an empty account to survive
+  ---
+  duration_ms: 1663.262916
+  type: 'test'
+  ...
+# Subtest: created self-beneficiary burn precedes later funding and a different SELFDESTRUCT beneficiary
+ok 170 - created self-beneficiary burn precedes later funding and a different SELFDESTRUCT beneficiary
+  ---
+  duration_ms: 564.967042
+  type: 'test'
+  ...
+# Subtest: preview copies retain original cleanup but reject fresh query cleanup as a state mutation
+ok 171 - preview copies retain original cleanup but reject fresh query cleanup as a state mutation
+  ---
+  duration_ms: 1172.7085
+  type: 'test'
+  ...
+# Subtest: canonical whole-account cleanup is unchanged across queries and rejects any introduced/deleted/expanded row
+ok 172 - canonical whole-account cleanup is unchanged across queries and rejects any introduced/deleted/expanded row
+  ---
+  duration_ms: 0.770833
+  type: 'test'
+  ...
+# Subtest: cleanup metadata rejects getters and proxies before executing them
+ok 173 - cleanup metadata rejects getters and proxies before executing them
+  ---
+  duration_ms: 466.639875
+  type: 'test'
+  ...
+# Subtest: blob fork selection independently agrees with ethereumCommon at every pinned transition
+ok 174 - blob fork selection independently agrees with ethereumCommon at every pinned transition
+  ---
+  duration_ms: 6.611791
+  type: 'test'
+  ...
+# Subtest: current excess determines the exact integer fee without a base-fee reserve clamp
+ok 175 - current excess determines the exact integer fee without a base-fee reserve clamp
+  ---
+  duration_ms: 2.173375
+  type: 'test'
+  ...
+# Subtest: uint64 hostile excess and the uint256 price boundary never produce an approximation
+ok 176 - uint64 hostile excess and the uint256 price boundary never produce an approximation
+  ---
+  duration_ms: 3.432042
+  type: 'test'
+  ...
+# Subtest: header inputs require canonical uint64 data and fork-valid blob usage without executing accessors
+ok 177 - header inputs require canonical uint64 data and fork-valid blob usage without executing accessors
+  ---
+  duration_ms: 5.897292
+  type: 'test'
+  ...
+# Subtest: blob profile is explicit with exact caps, bounded hashes and no creation or authorization list
+ok 178 - blob profile is explicit with exact caps, bounded hashes and no creation or authorization list
+  ---
+  duration_ms: 1.025709
+  type: 'test'
+  ...
+# Subtest: fork transaction count is distinct from block capacity and does not subtract used block blobs
+ok 179 - fork transaction count is distinct from block capacity and does not subtract used block blobs
+  ---
+  duration_ms: 1.534625
+  type: 'test'
+  ...
+# Subtest: blob affordability, burn and totals are separate from execution refunds and beneficiary tips
+ok 180 - blob affordability, burn and totals are separate from execution refunds and beneficiary tips
+  ---
+  duration_ms: 1.12575
+  type: 'test'
+  ...
+# Subtest: native self-transfer nets zero while incrementing one nonce, and still requires value affordability
+ok 181 - native self-transfer nets zero while incrementing one nonce, and still requires value affordability
+  ---
+  duration_ms: 7.309916
+  type: 'test'
+  ...
+# Subtest: caught child value revert restores child balance/storage and keeps successful parent native value
+ok 182 - caught child value revert restores child balance/storage and keeps successful parent native value
+  ---
+  duration_ms: 11.787208
+  type: 'test'
+  ...
+# Subtest: existing destination delegation executes in authority storage after Prague and is invalid before activation
+ok 183 - existing destination delegation executes in authority storage after Prague and is invalid before activation
+  ---
+  duration_ms: 34.160917
+  type: 'test'
+  ...
+# Subtest: BLOCKHASH N-1 uses the exact supplied hash
+ok 184 - BLOCKHASH N-1 uses the exact supplied hash
+  ---
+  duration_ms: 12.407292
+  type: 'test'
+  ...
+# Subtest: BLOCKHASH N-256 uses the exact supplied hash
+ok 185 - BLOCKHASH N-256 uses the exact supplied hash
+  ---
+  duration_ms: 5.942291
+  type: 'test'
+  ...
+# Subtest: BLOCKHASH N+0 uses zero without consulting the adapter
+ok 186 - BLOCKHASH N+0 uses zero without consulting the adapter
+  ---
+  duration_ms: 1.401083
+  type: 'test'
+  ...
+# Subtest: BLOCKHASH N+1 uses zero without consulting the adapter
+ok 187 - BLOCKHASH N+1 uses zero without consulting the adapter
+  ---
+  duration_ms: 1.248458
+  type: 'test'
+  ...
+# Subtest: BLOCKHASH N-257 uses zero without consulting the adapter
+ok 188 - BLOCKHASH N-257 uses zero without consulting the adapter
+  ---
+  duration_ms: 1.247083
+  type: 'test'
+  ...
+# Subtest: an in-range BLOCKHASH without supplied ancestry remains unsupported and rolls back nonce
+ok 189 - an in-range BLOCKHASH without supplied ancestry remains unsupported and rolls back nonce
+  ---
+  duration_ms: 11.974833
+  type: 'test'
+  ...
+# Subtest: fork selection uses activation timestamps, never the library default
+ok 190 - fork selection uses activation timestamps, never the library default
+  ---
+  duration_ms: 2.015541
+  type: 'test'
+  ...
+# Subtest: zero message gas permits an ordinary 21000-gas ETH transfer without a root CALL surcharge
+ok 191 - zero message gas permits an ordinary 21000-gas ETH transfer without a root CALL surcharge
+  ---
+  duration_ms: 5.688916
+  type: 'test'
+  ...
+# Subtest: Prague calldata floor changes envelope admission and reported gas, not the message gas subtraction
+ok 192 - Prague calldata floor changes envelope admission and reported gas, not the message gas subtraction
+  ---
+  duration_ms: 3.386084
+  type: 'test'
+  ...
+# Subtest: actual SSTORE refunds are capped at one fifth and the calldata floor is applied afterward
+ok 193 - actual SSTORE refunds are capped at one fifth and the calldata floor is applied afterward
+  ---
+  duration_ms: 4.923375
+  type: 'test'
+  ...
+# Subtest: insufficient native balance and max nonce are invalid before nonce or storage mutation
+ok 194 - insufficient native balance and max nonce are invalid before nonce or storage mutation
+  ---
+  duration_ms: 8.30725
+  type: 'test'
+  ...
+# Subtest: value and SSTORE roll back on real REVERT, while the completed call retains one nonce increment
+ok 195 - value and SSTORE roll back on real REVERT, while the completed call retains one nonce increment
+  ---
+  duration_ms: 1.352333
+  type: 'test'
+  ...
+# Subtest: CHAINID and header opcodes reflect mainnet and explicit unpriced context
+ok 196 - CHAINID and header opcodes reflect mainnet and explicit unpriced context
+  ---
+  duration_ms: 5.033875
+  type: 'test'
+  ...
+# Subtest: new fork precompiles are warm only after their activation
+ok 197 - new fork precompiles are warm only after their activation
+  ---
+  duration_ms: 17.735375
+  type: 'test'
+  ...
+# Subtest: HyperEVM reserved addresses are ordinary mainnet addresses
+ok 198 - HyperEVM reserved addresses are ordinary mainnet addresses
+  ---
+  duration_ms: 5.507958
+  type: 'test'
+  ...
+# Subtest: Osaka CLZ executes only after the fork and a pre-fork invalid opcode consumes message gas
+ok 199 - Osaka CLZ executes only after the fork and a pre-fork invalid opcode consumes message gas
+  ---
+  duration_ms: 3.536
+  type: 'test'
+  ...
+# Subtest: ordinary contract sender and unsupported-manager lifecycle operations retain no writes
+ok 200 - ordinary contract sender and unsupported-manager lifecycle operations retain no writes
+  ---
+  duration_ms: 2.631625
+  type: 'test'
+  ...
+# Subtest: unsupported transaction extras and malformed inputs are rejected before state reads
+ok 201 - unsupported transaction extras and malformed inputs are rejected before state reads
+  ---
+  duration_ms: 3.799167
+  type: 'test'
+  ...
+# Subtest: gas rules preserve byte classes and refund/floor boundary exactly without floating point
+ok 202 - gas rules preserve byte classes and refund/floor boundary exactly without floating point
+  ---
+  duration_ms: 0.20325
+  type: 'test'
+  ...
+# Subtest: access-list occurrences charge intrinsic gas while warming deduplicates and never prefetches unused facts
+ok 203 - access-list occurrences charge intrinsic gas while warming deduplicates and never prefetches unused facts
+  ---
+  duration_ms: 9.283833
+  type: 'test'
+  ...
+# Subtest: declared warming survives nested REVERT and is scoped to each new execution
+ok 204 - declared warming survives nested REVERT and is scoped to each new execution
+  ---
+  duration_ms: 47.22675
+  type: 'test'
+  ...
+# Subtest: declared blob context exposes ordered hashes, bounded index zero and synthetic blob base fee
+ok 205 - declared blob context exposes ordered hashes, bounded index zero and synthetic blob base fee
+  ---
+  duration_ms: 5.24725
+  type: 'test'
+  ...
+# Subtest: blob context propagates through nested calls while absent BLOBBASEFEE stays unsupported and malformed KZG fails normally
+ok 206 - blob context propagates through nested calls while absent BLOBBASEFEE stays unsupported and malformed KZG fails normally
+  ---
+  duration_ms: 2.223666
+  type: 'test'
+  ...
+# Subtest: access intrinsic and blob fork/header validity reject before state reads
+ok 207 - access intrinsic and blob fork/header validity reject before state reads
+  ---
+  duration_ms: 0.71575
+  type: 'test'
+  ...
+# Subtest: Ethereum BLOBHASH without declared blobs returns zero for all tested uint256 indexes at three opcode gas
+ok 208 - Ethereum BLOBHASH without declared blobs returns zero for all tested uint256 indexes at three opcode gas
+  ---
+  duration_ms: 12.502
+  type: 'test'
+  ...
+# Subtest: non-blob BLOBHASH obeys Cancun activation rather than enabling a pre-fork opcode
+ok 209 - non-blob BLOBHASH obeys Cancun activation rather than enabling a pre-fork opcode
+  ---
+  duration_ms: 1.059083
+  type: 'test'
+  ...
+# Subtest: CALL, DELEGATECALL and STATICCALL inherit an empty blob-hash list without extra input state
+ok 210 - CALL, DELEGATECALL and STATICCALL inherit an empty blob-hash list without extra input state
+  ---
+  duration_ms: 2.0675
+  type: 'test'
+  ...
+# Subtest: non-blob BLOBHASH preserves ordinary REVERT and stack-fault rollback including transferred value
+ok 211 - non-blob BLOBHASH preserves ordinary REVERT and stack-fault rollback including transferred value
+  ---
+  duration_ms: 4.445167
+  type: 'test'
+  ...
+# Subtest: unsupported non-blob BLOBBASEFEE after successful BLOBHASH rolls back storage, value and nonce
+ok 212 - unsupported non-blob BLOBBASEFEE after successful BLOBHASH rolls back storage, value and nonce
+  ---
+  duration_ms: 2.719209
+  type: 'test'
+  ...
+# Subtest: creation intrinsic charges exact initcode word boundaries, with unchanged legacy gas shape
+ok 213 - creation intrinsic charges exact initcode word boundaries, with unchanged legacy gas shape
+  ---
+  duration_ms: 30.938542
+  type: 'test'
+  ...
+# Subtest: creation charges duplicate access-list occurrences while the calldata floor stays independent
+ok 214 - creation charges duplicate access-list occurrences while the calldata floor stays independent
+  ---
+  duration_ms: 0.985958
+  type: 'test'
+  ...
+# Subtest: large initcode uses the active calldata floor without subtracting that floor from message gas
+ok 215 - large initcode uses the active calldata floor without subtracting that floor from message gas
+  ---
+  duration_ms: 22.767416
+  type: 'test'
+  ...
+# Subtest: empty initcode admits exactly 53000 gas and increments the proven sender nonce once
+ok 216 - empty initcode admits exactly 53000 gas and increments the proven sender nonce once
+  ---
+  duration_ms: 2.786417
+  type: 'test'
+  ...
+# Subtest: creation returns deployed runtime bytes and retains constructor writes without charging code deposit twice
+ok 217 - creation returns deployed runtime bytes and retains constructor writes without charging code deposit twice
+  ---
+  duration_ms: 42.781959
+  type: 'test'
+  ...
+# Subtest: the 32 KiB product initcode bound remains stricter than EIP-3860 and rejects before any proof read
+ok 218 - the 32 KiB product initcode bound remains stricter than EIP-3860 and rejects before any proof read
+  ---
+  duration_ms: 14.170292
+  type: 'test'
+  ...
+# Subtest: missing or malformed destinations, root salts, blob creation and insufficient gas never touch state
+ok 219 - missing or malformed destinations, root salts, blob creation and insufficient gas never touch state
+  ---
+  duration_ms: 9.185792
+  type: 'test'
+  ...
+# Subtest: creation preview retains explicit getter identities and never turns an absent before-contract into zero
+ok 220 - creation preview retains explicit getter identities and never turns an absent before-contract into zero
+  ---
+  duration_ms: 24.463834
+  type: 'test'
+  ...
+# Subtest: a genuine constructor revert remains completed while existing getters measure unchanged state
+ok 221 - a genuine constructor revert remains completed while existing getters measure unchanged state
+  ---
+  duration_ms: 5.677084
+  type: 'test'
+  ...
+# Subtest: preview rejects malformed creation envelopes and forbidden blob context before state transport
+ok 222 - preview rejects malformed creation envelopes and forbidden blob context before state transport
+  ---
+  duration_ms: 3.774958
+  type: 'test'
+  ...
+# Subtest: fee admission is explicit, detached and canonical while the default adds nothing
+ok 223 - fee admission is explicit, detached and canonical while the default adds nothing
+  ---
+  duration_ms: 1.84425
+  type: 'test'
+  ...
+# Subtest: normalization and plan reads never invoke proxy or accessor code
+ok 224 - normalization and plan reads never invoke proxy or accessor code
+  ---
+  duration_ms: 0.177042
+  type: 'test'
+  ...
+# Subtest: cap affordability differs from actual prepayment and final settlement remains exact
+ok 225 - cap affordability differs from actual prepayment and final settlement remains exact
+  ---
+  duration_ms: 0.873875
+  type: 'test'
+  ...
+# Subtest: header cap, block gas and uint256 affordability overflow fail before any state is supplied
+ok 226 - header cap, block gas and uint256 affordability overflow fail before any state is supplied
+  ---
+  duration_ms: 2.82
+  type: 'test'
+  ...
+# Subtest: real two-provider Ethereum header independently hashes to its selected block identity
+ok 227 - real two-provider Ethereum header independently hashes to its selected block identity
+  ---
+  duration_ms: 3.630959
+  type: 'test'
+  ...
+# Subtest: tampering any execution-header commitment is rejected despite unchanged declared block hash
+ok 228 - tampering any execution-header commitment is rejected despite unchanged declared block hash
+  ---
+  duration_ms: 9.849125
+  type: 'test'
+  ...
+# Subtest: header byte widths, required fork suffixes and canonical integers cannot be guessed
+ok 229 - header byte widths, required fork suffixes and canonical integers cannot be guessed
+  ---
+  duration_ms: 2.735875
+  type: 'test'
+  ...
+# Subtest: wrong requested hash and unknown future header fields fail closed
+ok 230 - wrong requested hash and unknown future header fields fail closed
+  ---
+  duration_ms: 0.261167
+  type: 'test'
+  ...
+# Subtest: Shanghai and Cancun suffix shapes are selected from time and reject later-fork fields
+ok 231 - Shanghai and Cancun suffix shapes are selected from time and reject later-fork fields
+  ---
+  duration_ms: 0.557166
+  type: 'test'
+  ...
+# Subtest: RPC body lists are outside the header-commitment claim
+ok 232 - RPC body lists are outside the header-commitment claim
+  ---
+  duration_ms: 0.128291
+  type: 'test'
+  ...
+# Subtest: pinned Sepolia activation selects exact fork boundaries without mutating global or returned Common state
+ok 233 - pinned Sepolia activation selects exact fork boundaries without mutating global or returned Common state
+  ---
+  duration_ms: 9.374
+  type: 'test'
+  ...
+# Subtest: real saved Sepolia header has the exact 23-field hash and explicit limited network metadata
+ok 234 - real saved Sepolia header has the exact 23-field hash and explicit limited network metadata
+  ---
+  duration_ms: 10.599
+  type: 'test'
+  ...
+# Subtest: Amsterdam suffix ordering, omission, widths and values cannot be substituted
+ok 235 - Amsterdam suffix ordering, omission, widths and values cannot be substituted
+  ---
+  duration_ms: 12.494416
+  type: 'test'
+  ...
+# Subtest: activation boundary requires active suffixes and forbids them before activation
+ok 236 - activation boundary requires active suffixes and forbids them before activation
+  ---
+  duration_ms: 1.274209
+  type: 'test'
+  ...
+# Subtest: chain selectors and hostile header properties reject without invoking caller code
+ok 237 - chain selectors and hostile header properties reject without invoking caller code
+  ---
+  duration_ms: 1.273167
+  type: 'test'
+  ...
+# Subtest: recorded proof packets and their archived local source/header inputs retain sealed hashes
+ok 238 - recorded proof packets and their archived local source/header inputs retain sealed hashes
+  ---
+  duration_ms: 3.943166
+  type: 'test'
+  ...
+# Subtest: Aave three scalar queries derive exact before/after values from saved proof/code only
+ok 239 - Aave three scalar queries derive exact before/after values from saved proof/code only
+  ---
+  duration_ms: 332.039709
+  type: 'test'
+  ...
+# Subtest: Morpho eight queries retain wrapper/vault/fee identities and exact independent raw values
+ok 240 - Morpho eight queries retain wrapper/vault/fee identities and exact independent raw values
+  ---
+  duration_ms: 6402.711208
+  type: 'test'
+  ...
+# Subtest: missing aToken proof last retains original and earlier measurements without invented amount
+ok 241 - missing aToken proof last retains original and earlier measurements without invented amount
+  ---
+  duration_ms: 652.277083
+  type: 'test'
+  ...
+# Subtest: missing proof poisons shared collector and prevents later known query instead of retrying or zero-filling
+ok 242 - missing proof poisons shared collector and prevents later known query instead of retrying or zero-filling
+  ---
+  duration_ms: 695.002417
+  type: 'test'
+  ...
+# Subtest: real EVM queries measure original writes with independent before/post overlays and no extra nonce carry
+ok 243 - real EVM queries measure original writes with independent before/post overlays and no extra nonce carry
+  ---
+  duration_ms: 89.598458
+  type: 'test'
+  ...
+# Subtest: genuine original REVERT and EVM fault preserve zero token delta and their actual status
+ok 244 - genuine original REVERT and EVM fault preserve zero token delta and their actual status
+  ---
+  duration_ms: 46.529416
+  type: 'test'
+  ...
+# Subtest: query mutations, logs, malformed return and query revert are unavailable without altering original
+ok 245 - query mutations, logs, malformed return and query revert are unavailable without altering original
+  ---
+  duration_ms: 60.404791
+  type: 'test'
+  ...
+# Subtest: proven absent sender is materialized once by original; query-only nonce materialization never carries
+ok 246 - proven absent sender is materialized once by original; query-only nonce materialization never carries
+  ---
+  duration_ms: 19.107167
+  type: 'test'
+  ...
+# Subtest: unsupported original has no after-state measurements or speculative getter reads
+ok 247 - unsupported original has no after-state measurements or speculative getter reads
+  ---
+  duration_ms: 18.188625
+  type: 'test'
+  ...
+# Subtest: original plus all probes share execution and root-return budgets
+ok 248 - original plus all probes share execution and root-return budgets
+  ---
+  duration_ms: 26.730417
+  type: 'test'
+  ...
+# Subtest: tightened proof-state and execution limits reach the actual collectors and EVM
+ok 249 - tightened proof-state and execution limits reach the actual collectors and EVM
+  ---
+  duration_ms: 2.735959
+  type: 'test'
+  ...
+# Subtest: injected overlay-isolation failure withholds nested values as well as the final pair
+ok 250 - injected overlay-isolation failure withholds nested values as well as the final pair
+  ---
+  duration_ms: 9.572833
+  type: 'test'
+  ...
+# Subtest: unbound headers, injected poststate and invalid queries reject before any state transport
+ok 251 - unbound headers, injected poststate and invalid queries reject before any state transport
+  ---
+  duration_ms: 2.467667
+  type: 'test'
+  ...
+# Subtest: actual child preview uses original context only and fresh context-free getters over the retained overlay
+ok 252 - actual child preview uses original context only and fresh context-free getters over the retained overlay
+  ---
+  duration_ms: 265.043584
+  type: 'test'
+  ...
+# Subtest: actual child preview BLOBHASH getters see the fresh empty context before and after a blob original
+ok 253 - actual child preview BLOBHASH getters see the fresh empty context before and after a blob original
+  ---
+  duration_ms: 341.398375
+  type: 'test'
+  ...
+# Subtest: Amsterdam budget split has exact regular/total boundaries and does not enable older forks
+ok 254 - Amsterdam budget split has exact regular/total boundaries and does not enable older forks
+  ---
+  duration_ms: 2.79675
+  type: 'test'
+  ...
+# Subtest: signed state/refill counters retain negative values; ordinary refunds and floor remain separate
+ok 255 - signed state/refill counters retain negative values; ordinary refunds and floor remain separate
+  ---
+  duration_ms: 0.741875
+  type: 'test'
+  ...
+# Subtest: arithmetic rejects impossible budget/counter combinations and hostile records without invoking accessors
+ok 256 - arithmetic rejects impossible budget/counter combinations and hostile records without invoking accessors
+  ---
+  duration_ms: 2.174834
+  type: 'test'
+  ...
+# Subtest: signed native transfers distinguish existing, absent and self recipients at transaction-level setup
+ok 257 - signed native transfers distinguish existing, absent and self recipients at transaction-level setup
+  ---
+  duration_ms: 69.170375
+  type: 'test'
+  ...
+# Subtest: signed root creation pays account/code state gas only when committed and preserves prefunding distinction
+ok 258 - signed root creation pays account/code state gas only when committed and preserves prefunding distinction
+  ---
+  duration_ms: 30.751125
+  type: 'test'
+  ...
+# Subtest: signed SSTORE allocation/clear and original-slot refund separate state refills from the refund cap
+ok 259 - signed SSTORE allocation/clear and original-slot refund separate state refills from the refund cap
+  ---
+  duration_ms: 20.71175
+  type: 'test'
+  ...
+# Subtest: signed frame revert and exceptional halt roll state gas back but preserve their distinct regular charges
+ok 260 - signed frame revert and exceptional halt roll state gas back but preserve their distinct regular charges
+  ---
+  duration_ms: 16.402625
+  type: 'test'
+  ...
+# Subtest: signed transactions use a nonzero reservoir for state while returning unused reservoir on revert
+ok 261 - signed transactions use a nonzero reservoir for state while returning unused reservoir on revert
+  ---
+  duration_ms: 75.015208
+  type: 'test'
+  ...
+# Subtest: signed nested calls preserve successful state and discard reverted allocation/refill across frames
+ok 262 - signed nested calls preserve successful state and discard reverted allocation/refill across frames
+  ---
+  duration_ms: 36.27175
+  type: 'test'
+  ...
+# Subtest: signed type-4 preparation debits are counted once and survive only ordinary message rollback
+ok 263 - signed type-4 preparation debits are counted once and survive only ordinary message rollback
+  ---
+  duration_ms: 19.007
+  type: 'test'
+  ...
+# Subtest: signed preparation OOG rolls authorization state back while retaining sender nonce and spent regular gas
+ok 264 - signed preparation OOG rolls authorization state back while retaining sender nonce and spent regular gas
+  ---
+  duration_ms: 18.350792
+  type: 'test'
+  ...
+# Subtest: signed calldata floor changes sender gas and refund reporting without erasing raw message refund
+ok 265 - signed calldata floor changes sender gas and refund reporting without erasing raw message refund
+  ---
+  duration_ms: 7.843041
+  type: 'test'
+  ...
+# Subtest: observed pinned post-target CALL OOG drains reservoir; its above-cap regular dimension is explicitly exceptional
+ok 266 - observed pinned post-target CALL OOG drains reservoir; its above-cap regular dimension is explicitly exceptional
+  ---
+  duration_ms: 18.65825
+  type: 'test'
+  ...
+# Subtest: real SSTORE/SLOAD return exact output and retain message state with nonce increment and no gas fee debit
+ok 267 - real SSTORE/SLOAD return exact output and retain message state with nonce increment and no gas fee debit
+  ---
+  duration_ms: 18.063833
+  type: 'test'
+  ...
+# Subtest: root REVERT returns actual revert bytes and restores storage while retaining the runCall nonce
+ok 268 - root REVERT returns actual revert bytes and restores storage while retaining the runCall nonce
+  ---
+  duration_ms: 3.945625
+  type: 'test'
+  ...
+# Subtest: caught child revert rolls back its writes and logs while parent executes and commits
+ok 269 - caught child revert rolls back its writes and logs while parent executes and commits
+  ---
+  duration_ms: 2.610833
+  type: 'test'
+  ...
+# Subtest: parent revert discards successful child logs/state and preserves failed root call tree
+ok 270 - parent revert discards successful child logs/state and preserves failed root call tree
+  ---
+  duration_ms: 1.82475
+  type: 'test'
+  ...
+# Subtest: committed logs preserve execution order and repeated child emissions without ancestor duplication
+ok 271 - committed logs preserve execution order and repeated child emissions without ancestor duplication
+  ---
+  duration_ms: 15.103125
+  type: 'test'
+  ...
+# Subtest: real DELEGATECALL preserves code/execution address distinction and parent storage
+ok 272 - real DELEGATECALL preserves code/execution address distinction and parent storage
+  ---
+  duration_ms: 1.456541
+  type: 'test'
+  ...
+# Subtest: real CALLCODE preserves code/execution address distinction and parent storage
+ok 273 - real CALLCODE preserves code/execution address distinction and parent storage
+  ---
+  duration_ms: 1.327583
+  type: 'test'
+  ...
+# Subtest: STATICCALL rejects child state mutation while parent handles failure
+ok 274 - STATICCALL rejects child state mutation while parent handles failure
+  ---
+  duration_ms: 4.559167
+  type: 'test'
+  ...
+# Subtest: header, sender, origin, value and GASPRICE instructions use the explicit Cancun environment
+ok 275 - header, sender, origin, value and GASPRICE instructions use the explicit Cancun environment
+  ---
+  duration_ms: 2.702125
+  type: 'test'
+  ...
+# Subtest: real Cancun transient storage resets between independent message executions
+ok 276 - real Cancun transient storage resets between independent message executions
+  ---
+  duration_ms: 13.079208
+  type: 'test'
+  ...
+# Subtest: original SSTORE cache resets and raw refund counter is exposed without transaction refund settlement
+ok 277 - original SSTORE cache resets and raw refund counter is exposed without transaction refund settlement
+  ---
+  duration_ms: 17.422542
+  type: 'test'
+  ...
+# Subtest: unknown slot reads fail closed after real execution and roll back prior writes and nonce
+ok 278 - unknown slot reads fail closed after real execution and roll back prior writes and nonce
+  ---
+  duration_ms: 1.98725
+  type: 'test'
+  ...
+# Subtest: unknown nested account input never becomes a successful empty-code call
+ok 279 - unknown nested account input never becomes a successful empty-code call
+  ---
+  duration_ms: 0.859667
+  type: 'test'
+  ...
+# Subtest: HyperCore reserved reads and CoreWriter are rejected at root and nested call/code forms, never as empty accounts
+ok 280 - HyperCore reserved reads and CoreWriter are rejected at root and nested call/code forms, never as empty accounts
+  ---
+  duration_ms: 43.74225
+  type: 'test'
+  ...
+# Subtest: CREATE, CREATE2 and SELFDESTRUCT are rejected before their lifecycle effects
+ok 281 - CREATE, CREATE2 and SELFDESTRUCT are rejected before their lifecycle effects
+  ---
+  duration_ms: 4.345541
+  type: 'test'
+  ...
+# Subtest: in-range BLOCKHASH requires explicit input and uses supplied hash without a mock-zero fallback
+ok 282 - in-range BLOCKHASH requires explicit input and uses supplied hash without a mock-zero fallback
+  ---
+  duration_ms: 2.082583
+  type: 'test'
+  ...
+# Subtest: blob context and unavailable KZG precompile are explicit unsupported scope
+ok 283 - blob context and unavailable KZG precompile are explicit unsupported scope
+  ---
+  duration_ms: 2.261
+  type: 'test'
+  ...
+# Subtest: ordinary EVM OOG remains a completed failed message, while step exhaustion rolls the entire attempt back
+ok 284 - ordinary EVM OOG remains a completed failed message, while step exhaustion rolls the entire attempt back
+  ---
+  duration_ms: 1.717792
+  type: 'test'
+  ...
+# Subtest: frame/depth/log/memory/output/trace limits abort real programs and restore all state
+ok 285 - frame/depth/log/memory/output/trace limits abort real programs and restore all state
+  ---
+  duration_ms: 4.79475
+  type: 'test'
+  ...
+# Subtest: deadline expiration during execution is deterministic and restores nonce/state without sleeping
+ok 286 - deadline expiration during execution is deterministic and restores nonce/state without sleeping
+  ---
+  duration_ms: 22.617417
+  type: 'test'
+  ...
+# Subtest: trailing memory expansion is bounded even without a following opcode event
+ok 287 - trailing memory expansion is bounded even without a following opcode event
+  ---
+  duration_ms: 3.656125
+  type: 'test'
+  ...
+# Subtest: final successful atomic commit remains coherently successful if the clock advances during commit
+ok 288 - final successful atomic commit remains coherently successful if the clock advances during commit
+  ---
+  duration_ms: 1.354333
+  type: 'test'
+  ...
+# Subtest: host error messages are sanitized and nested open checkpoints are fully unwound
+ok 289 - host error messages are sanitized and nested open checkpoints are fully unwound
+  ---
+  duration_ms: 1.537959
+  type: 'test'
+  ...
+# Subtest: validation never raises fixed resource ceilings or silently supplies incomplete environment/default manager
+ok 290 - validation never raises fixed resource ceilings or silently supplies incomplete environment/default manager
+  ---
+  duration_ms: 2.500084
+  type: 'test'
+  ...
+# Subtest: broker accepts prefunded runtime and empty-runtime deployments without inventing existence changes
+ok 291 - broker accepts prefunded runtime and empty-runtime deployments without inventing existence changes
+  ---
+  duration_ms: 1232.711208
+  type: 'test'
+  ...
+# Subtest: broker accepts nested constructor deployment and removes nested deployments when their constructor reverts
+ok 292 - broker accepts nested constructor deployment and removes nested deployments when their constructor reverts
+  ---
+  duration_ms: 1263.088834
+  type: 'test'
+  ...
+# Subtest: broker retains an honest partial trace after an outer limit while requiring all deployment changes rolled back
+ok 293 - broker retains an honest partial trace after an outer limit while requiring all deployment changes rolled back
+  ---
+  duration_ms: 735.923292
+  type: 'test'
+  ...
+# Subtest: broker rejects coordinated nonce-before and immutable input nonce substitution
+ok 294 - broker rejects coordinated nonce-before and immutable input nonce substitution
+  ---
+  duration_ms: 660.473625
+  type: 'test'
+  ...
+# Subtest: broker rejects fabricated initial existence despite retaining the actual exclusion proof
+ok 295 - broker rejects fabricated initial existence despite retaining the actual exclusion proof
+  ---
+  duration_ms: 671.009833
+  type: 'test'
+  ...
+# Subtest: broker rejects non-sender effects retained after an actual root revert
+ok 296 - broker rejects non-sender effects retained after an actual root revert
+  ---
+  duration_ms: 720.956125
+  type: 'test'
+  ...
+# Subtest: broker rejects an extra sender nonce increment even when immutable inputs and all other output remain valid
+ok 297 - broker rejects an extra sender nonce increment even when immutable inputs and all other output remain valid
+  ---
+  duration_ms: 691.835583
+  type: 'test'
+  ...
+# Subtest: fixture full VM admits exact signed type-2/type-4 inputs with real fees and immutable prestate
+ok 298 - fixture full VM admits exact signed type-2/type-4 inputs with real fees and immutable prestate
+  ---
+  duration_ms: 262.003125
+  type: 'test'
+  ...
+# Subtest: effective price, BASEFEE and sender balance inside execution reflect effective prepayment
+ok 299 - effective price, BASEFEE and sender balance inside execution reflect effective prepayment
+  ---
+  duration_ms: 214.145417
+  type: 'test'
+  ...
+# Subtest: sender equal to coinbase settles sequentially without replacing nonce or returned funds
+ok 300 - sender equal to coinbase settles sequentially without replacing nonce or returned funds
+  ---
+  duration_ms: 60.238792
+  type: 'test'
+  ...
+# Subtest: fee recipient aliases preserve authorization code, nonce and storage through settlement
+ok 301 - fee recipient aliases preserve authorization code, nonce and storage through settlement
+  ---
+  duration_ms: 219.693375
+  type: 'test'
+  ...
+# Subtest: exact cap-plus-value affordability admits a zero-message-gas transfer without charging the cap
+ok 302 - exact cap-plus-value affordability admits a zero-message-gas transfer without charging the cap
+  ---
+  duration_ms: 32.268625
+  type: 'test'
+  ...
+# Subtest: zero-tip coinbase touch removes existing empty accounts including hidden storage, also after REVERT
+ok 303 - zero-tip coinbase touch removes existing empty accounts including hidden storage, also after REVERT
+  ---
+  duration_ms: 278.6825
+  type: 'test'
+  ...
+# Subtest: Shanghai coinbase deletion burns settlement credit; Cancun preexisting coinbase retains it
+ok 304 - Shanghai coinbase deletion burns settlement credit; Cancun preexisting coinbase retains it
+  ---
+  duration_ms: 152.354667
+  type: 'test'
+  ...
+# Subtest: Cancun same-transaction created coinbase receives priority credit before whole-account deletion
+ok 305 - Cancun same-transaction created coinbase receives priority credit before whole-account deletion
+  ---
+  duration_ms: 55.595708
+  type: 'test'
+  ...
+# Subtest: authorization preparation and refund survive REVERT/OOG while message writes roll back
+ok 306 - authorization preparation and refund survive REVERT/OOG while message writes roll back
+  ---
+  duration_ms: 221.057334
+  type: 'test'
+  ...
+# Subtest: storage and authorization refunds are capped before the calldata floor sets charged gas
+ok 307 - storage and authorization refunds are capped before the calldata floor sets charged gas
+  ---
+  duration_ms: 114.992125
+  type: 'test'
+  ...
+# Subtest: maximum-cap affordability and overflowing maximum liability reject without any retained mutation
+ok 308 - maximum-cap affordability and overflowing maximum liability reject without any retained mutation
+  ---
+  duration_ms: 21.666791
+  type: 'test'
+  ...
+# Subtest: priced root creation includes creation gas and exact signed full-state settlement
+ok 309 - priced root creation includes creation gas and exact signed full-state settlement
+  ---
+  duration_ms: 151.851375
+  type: 'test'
+  ...
+# Subtest: actual isolated child validates fees and full postroots for aliases, empty cleanup and authorization failure
+ok 310 - actual isolated child validates fees and full postroots for aliases, empty cleanup and authorization failure
+  ---
+  duration_ms: 3393.474167
+  type: 'test'
+  ...
+# Subtest: actual fee opcodes and sender balance observe the effective-price prepayment before the message
+ok 311 - actual fee opcodes and sender balance observe the effective-price prepayment before the message
+  ---
+  duration_ms: 83.429292
+  type: 'test'
+  ...
+# Subtest: host failures after prepayment, sender refund or coinbase credit roll back the entire priced attempt
+ok 312 - host failures after prepayment, sender refund or coinbase credit roll back the entire priced attempt
+  ---
+  duration_ms: 122.020584
+  type: 'test'
+  ...
+# Subtest: deadline exhaustion after both credits still rolls back all fees, nonce and message storage
+ok 313 - deadline exhaustion after both credits still rolls back all fees, nonce and message storage
+  ---
+  duration_ms: 48.115667
+  type: 'test'
+  ...
+# Subtest: failed fee settlement respects a caller-owned checkpoint and retains only its previous overlay
+ok 314 - failed fee settlement respects a caller-owned checkpoint and retains only its previous overlay
+  ---
+  duration_ms: 15.502709
+  type: 'test'
+  ...
+# Subtest: parent independently binds fee amounts, declared profile, actual base fee and effective gas price
+ok 315 - parent independently binds fee amounts, declared profile, actual base fee and effective gas price
+  ---
+  duration_ms: 7703.158875
+  type: 'test'
+  ...
+# Subtest: exact balance ledger rejects omitted fees, missing credits and fabricated unrelated funding
+ok 316 - exact balance ledger rejects omitted fees, missing credits and fabricated unrelated funding
+  ---
+  duration_ms: 3355.600125
+  type: 'test'
+  ...
+# Subtest: reverted priced messages retain exact authorization and fee effects only
+ok 317 - reverted priced messages retain exact authorization and fee effects only
+  ---
+  duration_ms: 2640.942042
+  type: 'test'
+  ...
+# Subtest: priced original queries remain fresh unpriced contexts with neutral query-only nonces
+ok 318 - priced original queries remain fresh unpriced contexts with neutral query-only nonces
+  ---
+  duration_ms: 678.515333
+  type: 'test'
+  ...
+# Subtest: parent binds internal constructor deletion with absent initial target
+ok 319 - parent binds internal constructor deletion with absent initial target
+  ---
+  duration_ms: 604.404958
+  type: 'test'
+  ...
+# Subtest: parent binds internal constructor deletion with prefunded initial target
+ok 320 - parent binds internal constructor deletion with prefunded initial target
+  ---
+  duration_ms: 661.162208
+  type: 'test'
+  ...
+# Subtest: parent binds top-level constructor deletion with absent initial target
+ok 321 - parent binds top-level constructor deletion with absent initial target
+  ---
+  duration_ms: 807.029125
+  type: 'test'
+  ...
+# Subtest: parent binds top-level constructor deletion with prefunded initial target
+ok 322 - parent binds top-level constructor deletion with prefunded initial target
+  ---
+  duration_ms: 668.684166
+  type: 'test'
+  ...
+# Subtest: parent rejects omitted, duplicate, unbound and contradictory committed deletion evidence
+ok 323 - parent rejects omitted, duplicate, unbound and contradictory committed deletion evidence
+  ---
+  duration_ms: 6836.2375
+  type: 'test'
+  ...
+# Subtest: prefunded deletion cannot hide its original balance or retain nonce, runtime or storage
+ok 324 - prefunded deletion cannot hide its original balance or retain nonce, runtime or storage
+  ---
+  duration_ms: 3940.894792
+  type: 'test'
+  ...
+# Subtest: reverted ancestors retain own-frame observations without any committed finalization
+ok 325 - reverted ancestors retain own-frame observations without any committed finalization
+  ---
+  duration_ms: 1157.820917
+  type: 'test'
+  ...
+# Subtest: disposable getters carry original prefunded deletion unchanged and cannot restore the target
+ok 326 - disposable getters carry original prefunded deletion unchanged and cannot restore the target
+  ---
+  duration_ms: 1201.45575
+  type: 'test'
+  ...
+# Subtest: canonical deletion rows reject hostile objects and permit only unchanged carried net state
+ok 327 - canonical deletion rows reject hostile objects and permit only unchanged carried net state
+  ---
+  duration_ms: 0.792584
+  type: 'test'
+  ...
+# Subtest: lifecycle metadata getters and proxies are rejected without evaluation
+ok 328 - lifecycle metadata getters and proxies are rejected without evaluation
+  ---
+  duration_ms: 508.488875
+  type: 'test'
+  ...
+# Subtest: non-destructing ancestors cannot launder a delegate SELFDESTRUCT into a created target
+ok 329 - non-destructing ancestors cannot launder a delegate SELFDESTRUCT into a created target
+  ---
+  duration_ms: 2200.137792
+  type: 'test'
+  ...
+# Subtest: a query cannot hide its creator nonce change behind transient zero-value creation and deletion
+ok 330 - a query cannot hide its creator nonce change behind transient zero-value creation and deletion
+  ---
+  duration_ms: 498.132791
+  type: 'test'
+  ...
+# Subtest: initial facts reconstruct exact existing, missing-slot and absent-account provenance
+ok 331 - initial facts reconstruct exact existing, missing-slot and absent-account provenance
+  ---
+  duration_ms: 38.968417
+  type: 'test'
+  ...
+# Subtest: coordinated normalized account and provenance substitutions cannot replace the actual proof
+ok 332 - coordinated normalized account and provenance substitutions cannot replace the actual proof
+  ---
+  duration_ms: 42.23625
+  type: 'test'
+  ...
+# Subtest: proof and code IDs bind method, address, ordered keys and exact canonical selector
+ok 333 - proof and code IDs bind method, address, ordered keys and exact canonical selector
+  ---
+  duration_ms: 12.916792
+  type: 'test'
+  ...
+# Subtest: storage facts cannot substitute values, existence, evidence, keys or initial requested inventory
+ok 334 - storage facts cannot substitute values, existence, evidence, keys or initial requested inventory
+  ---
+  duration_ms: 147.702041
+  type: 'test'
+  ...
+# Subtest: failed incomplete loads remain empty facts instead of becoming zero accounts
+ok 335 - failed incomplete loads remain empty facts instead of becoming zero accounts
+  ---
+  duration_ms: 56.2635
+  type: 'test'
+  ...
+# Subtest: cached results cannot authorize a changed proof or code and external cache entries are ignored
+ok 336 - cached results cannot authorize a changed proof or code and external cache entries are ignored
+  ---
+  duration_ms: 49.345666
+  type: 'test'
+  ...
+# Subtest: parent cancellation is checked across proof awaits and input mutation cannot race verification
+ok 337 - parent cancellation is checked across proof awaits and input mutation cannot race verification
+  ---
+  duration_ms: 20.77
+  type: 'test'
+  ...
+# Subtest: descriptors, proxies and malformed provenance cannot invoke caller input traps
+ok 338 - descriptors, proxies and malformed provenance cannot invoke caller input traps
+  ---
+  duration_ms: 2.613458
+  type: 'test'
+  ...
+# Subtest: actual worker resolves repeated N-2 from one hash-selected ancestor and preserves proof-only facts
+ok 339 - actual worker resolves repeated N-2 from one hash-selected ancestor and preserves proof-only facts
+  ---
+  duration_ms: 635.696042
+  type: 'test'
+  ...
+# Subtest: actual before/after preview shares authenticated ancestry without using outputs as state
+ok 340 - actual before/after preview shares authenticated ancestry without using outputs as state
+  ---
+  duration_ms: 733.25325
+  type: 'test'
+  ...
+# Subtest: actual worker ancestor substitution is rejected by the parent before delivery and no output survives
+ok 341 - actual worker ancestor substitution is rejected by the parent before delivery and no output survives
+  ---
+  duration_ms: 2006.939792
+  type: 'test'
+  ...
+# Subtest: actual worker cannot bypass parent ancestry evidence and hash-only RPC binding
+ok 342 - actual worker cannot bypass parent ancestry evidence and hash-only RPC binding
+  ---
+  duration_ms: 3621.280375
+  type: 'test'
+  ...
+# Subtest: ancestor reads cannot exceed the shared proof call budget and missing ancestry rolls back the message
+ok 343 - ancestor reads cannot exceed the shared proof call budget and missing ancestry rolls back the message
+  ---
+  duration_ms: 611.557333
+  type: 'test'
+  ...
+# Subtest: ancestor cancellation drains and late replies cannot restore results
+ok 344 - ancestor cancellation drains and late replies cannot restore results
+  ---
+  duration_ms: 735.813583
+  type: 'test'
+  ...
+# Subtest: public local adapter plus production proof transport executes authenticated ancestry and final source recheck
+ok 345 - public local adapter plus production proof transport executes authenticated ancestry and final source recheck
+  ---
+  duration_ms: 656.70675
+  type: 'test'
+  ...
+# Subtest: real saved proof/code wire replays in an actual fixed worker with exact observed execution and changes
+ok 346 - real saved proof/code wire replays in an actual fixed worker with exact observed execution and changes
+  ---
+  duration_ms: 878.981417
+  type: 'test'
+  ...
+# Subtest: synthetic proven inputs execute real SSTORE/return and native value in the separate worker
+ok 347 - synthetic proven inputs execute real SSTORE/return and native value in the separate worker
+  ---
+  duration_ms: 910.984625
+  type: 'test'
+  ...
+# Subtest: real REVERT rolls back value/storage and retains only the unsigned sender nonce
+ok 348 - real REVERT rolls back value/storage and retains only the unsigned sender nonce
+  ---
+  duration_ms: 749.702
+  type: 'test'
+  ...
+# Subtest: invalid proof after a local write causes rollback; provider exception details are never copied
+ok 349 - invalid proof after a local write causes rollback; provider exception details are never copied
+  ---
+  duration_ms: 1246.248
+  type: 'test'
+  ...
+# Subtest: parent rejects unbound headers, widened limits and non-call fields before forking or dispatch
+ok 350 - parent rejects unbound headers, widened limits and non-call fields before forking or dispatch
+  ---
+  duration_ms: 1.362916
+  type: 'test'
+  ...
+# Subtest: hard process wall timer kills a nonresponsive actual child independently of cooperative EVM checks
+ok 351 - hard process wall timer kills a nonresponsive actual child independently of cooperative EVM checks
+  ---
+  duration_ms: 101.281
+  type: 'test'
+  ...
+# Subtest: a child crash is unavailable, not an empty successful execution
+ok 352 - a child crash is unavailable, not an empty successful execution
+  ---
+  duration_ms: 11.941
+  type: 'test'
+  ...
+# Subtest: cancellation aborts and drains cooperative parent reads before returning
+ok 353 - cancellation aborts and drains cooperative parent reads before returning
+  ---
+  duration_ms: 495.44225
+  type: 'test'
+  ...
+# Subtest: uncooperative late adapter replies cannot restore success or mutate sealed failure evidence
+ok 354 - uncooperative late adapter replies cannot restore success or mutate sealed failure evidence
+  ---
+  duration_ms: 697.648958
+  type: 'test'
+  ...
+# Subtest: RPC deadline, response byte limit and output limit withhold incomplete process results
+ok 355 - RPC deadline, response byte limit and output limit withhold incomplete process results
+  ---
+  duration_ms: 1848.483708
+  type: 'test'
+  ...
+# Subtest: call and cumulative byte ceilings do not create replacement reads; pre-aborted calls never fork
+ok 356 - call and cumulative byte ceilings do not create replacement reads; pre-aborted calls never fork
+  ---
+  duration_ms: 1175.406
+  type: 'test'
+  ...
+# Subtest: N-1 BLOCKHASH uses the verified source header commitment without another provider read
+ok 357 - N-1 BLOCKHASH uses the verified source header commitment without another provider read
+  ---
+  duration_ms: 584.227541
+  type: 'test'
+  ...
+# Subtest: parent IPC rejects wrong method, block, IDs, concurrent reads and malformed results without extra dispatch
+ok 358 - parent IPC rejects wrong method, block, IDs, concurrent reads and malformed results without extra dispatch
+  ---
+  duration_ms: 4.751
+  type: 'test'
+  ...
+# Subtest: diagnostic output is discarded, bounded, and never copied into a result
+ok 359 - diagnostic output is discarded, bounded, and never copied into a result
+  ---
+  duration_ms: 1.409209
+  type: 'test'
+  ...
+# Subtest: actual child preserves access-list occurrence gas and declared blob context without new input kinds
+ok 360 - actual child preserves access-list occurrence gas and declared blob context without new input kinds
+  ---
+  duration_ms: 571.872542
+  type: 'test'
+  ...
+# Subtest: parent rejects actual-child substitutions of optional context, intrinsic gas and gas accounting
+ok 361 - parent rejects actual-child substitutions of optional context, intrinsic gas and gas accounting
+  ---
+  duration_ms: 3101.297417
+  type: 'test'
+  ...
+# Subtest: actual child executes non-blob BLOBHASH from proof-only inputs with no blob metadata or extra RPC kinds
+ok 362 - actual child executes non-blob BLOBHASH from proof-only inputs with no blob metadata or extra RPC kinds
+  ---
+  duration_ms: 622.12925
+  type: 'test'
+  ...
+# Subtest: actual isolated worker retains authenticated CREATE code, storage and balances
+ok 363 - actual isolated worker retains authenticated CREATE code, storage and balances
+  ---
+  duration_ms: 928.3135
+  type: 'test'
+  ...
+# Subtest: actual isolated worker retains authenticated CREATE2 code, storage and balances
+ok 364 - actual isolated worker retains authenticated CREATE2 code, storage and balances
+  ---
+  duration_ms: 789.883125
+  type: 'test'
+  ...
+# Subtest: actual isolated worker retains only the sender nonce after creation then root revert
+ok 365 - actual isolated worker retains only the sender nonce after creation then root revert
+  ---
+  duration_ms: 775.854375
+  type: 'test'
+  ...
+# Subtest: disposable preview queries preserve original deployments and do not invent an absent pre-deployment balance
+ok 366 - disposable preview queries preserve original deployments and do not invent an absent pre-deployment balance
+  ---
+  duration_ms: 671.280042
+  type: 'test'
+  ...
+# Subtest: parent rejects substituted code, initial values, creation ancestry and missing deployment rows
+ok 367 - parent rejects substituted code, initial values, creation ancestry and missing deployment rows
+  ---
+  duration_ms: 4106.5315
+  type: 'test'
+  ...
+# Subtest: actual isolated child executes original Aave once then returns three proof-backed before/after pairs
+ok 368 - actual isolated child executes original Aave once then returns three proof-backed before/after pairs
+  ---
+  duration_ms: 1714.332833
+  type: 'test'
+  ...
+# Subtest: actual child handles eight Morpho queries with all 230 proof/code calls and exact account identities
+ok 369 - actual child handles eight Morpho queries with all 230 proof/code calls and exact account identities
+  ---
+  duration_ms: 6241.039958
+  type: 'test'
+  ...
+# Subtest: actual child preserves a partial preview when an explicitly missing proof poisons later queries
+ok 370 - actual child preserves a partial preview when an explicitly missing proof poisons later queries
+  ---
+  duration_ms: 1213.881833
+  type: 'test'
+  ...
+# Subtest: parent rejects bad queries and unbound inputs before fork or any provider dispatch
+ok 371 - parent rejects bad queries and unbound inputs before fork or any provider dispatch
+  ---
+  duration_ms: 2.920208
+  type: 'test'
+  ...
+# Subtest: hard deadline kills an actual stopped child and withholds the entire preview
+ok 372 - hard deadline kills an actual stopped child and withholds the entire preview
+  ---
+  duration_ms: 100.526375
+  type: 'test'
+  ...
+# Subtest: cancellation aborts and drains the actual child proof read before returning no preview
+ok 373 - cancellation aborts and drains the actual child proof read before returning no preview
+  ---
+  duration_ms: 560.60175
+  type: 'test'
+  ...
+# Subtest: late uncooperative read cannot revive measurements or mutate sealed unavailable preview evidence
+ok 374 - late uncooperative read cannot revive measurements or mutate sealed unavailable preview evidence
+  ---
+  duration_ms: 553.807417
+  type: 'test'
+  ...
+# Subtest: actual child IPC mutations cannot substitute query identities, amounts, return words or original evidence
+ok 375 - actual child IPC mutations cannot substitute query identities, amounts, return words or original evidence
+  ---
+  duration_ms: 8862.256042
+  type: 'test'
+  ...
+# Subtest: synthetic fake child cannot invent a complete preview without parent proof evidence
+ok 376 - synthetic fake child cannot invent a complete preview without parent proof evidence
+  ---
+  duration_ms: 1.114333
+  type: 'test'
+  ...
+# Subtest: protocol admits only canonical proof/code selectors, bounded unique slots and sequential IDs
+ok 377 - protocol admits only canonical proof/code selectors, bounded unique slots and sequential IDs
+  ---
+  duration_ms: 0.877416
+  type: 'test'
+  ...
+# Subtest: JSON boundaries reject accessors, hidden fields, sparse arrays and UTF8 byte overflow
+ok 378 - JSON boundaries reject accessors, hidden fields, sparse arrays and UTF8 byte overflow
+  ---
+  duration_ms: 0.736709
+  type: 'test'
+  ...
+# Subtest: all configured limits only tighten fixed ceilings, and nested clocks respect process deadline
+ok 379 - all configured limits only tighten fixed ceilings, and nested clocks respect process deadline
+  ---
+  duration_ms: 0.144917
+  type: 'test'
+  ...
+# Subtest: data boundaries reject proxy traps and inherited array serializers before executing caller code
+ok 380 - data boundaries reject proxy traps and inherited array serializers before executing caller code
+  ---
+  duration_ms: 0.071584
+  type: 'test'
+  ...
+# Subtest: official point evaluation succeeds without blob context on Cancun, Prague and Osaka
+ok 381 - official point evaluation succeeds without blob context on Cancun, Prague and Osaka
+  ---
+  duration_ms: 1362.37125
+  type: 'test'
+  ...
+# Subtest: direct point evaluation has an exact 49999/50000 message-gas boundary
+ok 382 - direct point evaluation has an exact 49999/50000 message-gas boundary
+  ---
+  duration_ms: 283.88275
+  type: 'test'
+  ...
+# Subtest: CALL, STATICCALL, CALLCODE and DELEGATECALL run the precompile in their exact execution context
+ok 383 - CALL, STATICCALL, CALLCODE and DELEGATECALL run the precompile in their exact execution context
+  ---
+  duration_ms: 783.557708
+  type: 'test'
+  ...
+# Subtest: a caught nested KZG OOG returns zero and retains only successful parent work
+ok 384 - a caught nested KZG OOG returns zero and retains only successful parent work
+  ---
+  duration_ms: 27.746
+  type: 'test'
+  ...
+# Subtest: malformed and well-formed incorrect proofs are ordinary completed EVM failures
+ok 385 - malformed and well-formed incorrect proofs are ordinary completed EVM failures
+  ---
+  duration_ms: 382.96475
+  type: 'test'
+  ...
+# Subtest: caught invalid proof is not a host failure and does not abort valid parent storage
+ok 386 - caught invalid proof is not a host failure and does not abort valid parent storage
+  ---
+  duration_ms: 152.252208
+  type: 'test'
+  ...
+# Subtest: successful precompile value transfer commits, but enclosing REVERT discards value, storage and logs
+ok 387 - successful precompile value transfer commits, but enclosing REVERT discards value, storage and logs
+  ---
+  duration_ms: 467.497917
+  type: 'test'
+  ...
+# Subtest: priced success, invalid proof and precompile OOG retain execution fees with correct value rollback
+ok 388 - priced success, invalid proof and precompile OOG retain execution fees with correct value rollback
+  ---
+  duration_ms: 490.870042
+  type: 'test'
+  ...
+# Subtest: fresh unpriced before/after queries can verify embedded proof without inheriting original blob hashes or fees
+ok 389 - fresh unpriced before/after queries can verify embedded proof without inheriting original blob hashes or fees
+  ---
+  duration_ms: 229.232541
+  type: 'test'
+  ...
+# Subtest: Shanghai address 0x0a remains ordinary code or an ordinary empty recipient
+ok 390 - Shanghai address 0x0a remains ordinary code or an ordinary empty recipient
+  ---
+  duration_ms: 88.929459
+  type: 'test'
+  ...
+# Subtest: legacy chain999 still rejects direct and nested 0x0a without retained mutations
+ok 391 - legacy chain999 still rejects direct and nested 0x0a without retained mutations
+  ---
+  duration_ms: 3.889292
+  type: 'test'
+  ...
+# Subtest: verifier pre/post budget or host failure cannot become a catchable CALL result or retain any outer state
+ok 392 - verifier pre/post budget or host failure cannot become a catchable CALL result or retain any outer state
+  ---
+  duration_ms: 513.966583
+  type: 'test'
+  ...
+# Subtest: nonzero CALLCODE and delegated execution value never transfer native funds to the precompile code address
+ok 393 - nonzero CALLCODE and delegated execution value never transfer native funds to the precompile code address
+  ---
+  duration_ms: 432.321
+  type: 'test'
+  ...
+# Subtest: actual isolated children execute point evaluation with no declared blob hashes or sidecars
+ok 394 - actual isolated children execute point evaluation with no declared blob hashes or sidecars
+  ---
+  duration_ms: 3838.210709
+  type: 'test'
+  ...
+# Subtest: parent retains completed invalid-proof failure fees and rejects its message value transfer
+ok 395 - parent retains completed invalid-proof failure fees and rejects its message value transfer
+  ---
+  duration_ms: 640.280709
+  type: 'test'
+  ...
+# Subtest: fresh before/after query children may verify embedded proofs without repeating fees
+ok 396 - fresh before/after query children may verify embedded proofs without repeating fees
+  ---
+  duration_ms: 1080.263291
+  type: 'test'
+  ...
+# Subtest: missing authenticated precompile account input withholds execution and settlement
+ok 397 - missing authenticated precompile account input withholds execution and settlement
+  ---
+  duration_ms: 544.86475
+  type: 'test'
+  ...
+# Subtest: all retained upstream bytes, setup, licenses and corpus counts are bound
+ok 398 - all retained upstream bytes, setup, licenses and corpus counts are bound
+  ---
+  duration_ms: 343.60725
+  type: 'test'
+  ...
+# Subtest: all 122 upstream verify_kzg_proof cases retain true/false/malformed distinctions
+    # Subtest: verify_kzg_proof_case_correct_proof_02e696ada7d4631d
+    ok 1 - verify_kzg_proof_case_correct_proof_02e696ada7d4631d
+      ---
+      duration_ms: 151.658667
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_05c1f3685f3393f0
+    ok 2 - verify_kzg_proof_case_correct_proof_05c1f3685f3393f0
+      ---
+      duration_ms: 6.002917
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_08f9e2f1cb3d39db
+    ok 3 - verify_kzg_proof_case_correct_proof_08f9e2f1cb3d39db
+      ---
+      duration_ms: 6.169708
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_0cf79b17cb5f4ea2
+    ok 4 - verify_kzg_proof_case_correct_proof_0cf79b17cb5f4ea2
+      ---
+      duration_ms: 2.295292
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_177b58dc7a46b08f
+    ok 5 - verify_kzg_proof_case_correct_proof_177b58dc7a46b08f
+      ---
+      duration_ms: 5.398916
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_1ce8e4f69d5df899
+    ok 6 - verify_kzg_proof_case_correct_proof_1ce8e4f69d5df899
+      ---
+      duration_ms: 107.321667
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_26b753dec0560daa
+    ok 7 - verify_kzg_proof_case_correct_proof_26b753dec0560daa
+      ---
+      duration_ms: 185.02775
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_2b76dc9e3abf42f3
+    ok 8 - verify_kzg_proof_case_correct_proof_2b76dc9e3abf42f3
+      ---
+      duration_ms: 20.706708
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_31ebd010e6098750
+    ok 9 - verify_kzg_proof_case_correct_proof_31ebd010e6098750
+      ---
+      duration_ms: 34.384458
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_3208425794224c3f
+    ok 10 - verify_kzg_proof_case_correct_proof_3208425794224c3f
+      ---
+      duration_ms: 5.297417
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_36817bfd67de97a8
+    ok 11 - verify_kzg_proof_case_correct_proof_36817bfd67de97a8
+      ---
+      duration_ms: 5.569583
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_392169c16a2e5ef6
+    ok 12 - verify_kzg_proof_case_correct_proof_392169c16a2e5ef6
+      ---
+      duration_ms: 22.661458
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_395cf6d697d1a743
+    ok 13 - verify_kzg_proof_case_correct_proof_395cf6d697d1a743
+      ---
+      duration_ms: 3.498333
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_3ac8dc31e9aa6a70
+    ok 14 - verify_kzg_proof_case_correct_proof_3ac8dc31e9aa6a70
+      ---
+      duration_ms: 2.090625
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_3c1e8b38219e3e12
+    ok 15 - verify_kzg_proof_case_correct_proof_3c1e8b38219e3e12
+      ---
+      duration_ms: 25.655917
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_3c87ec986c2656c2
+    ok 16 - verify_kzg_proof_case_correct_proof_3c87ec986c2656c2
+      ---
+      duration_ms: 165.370833
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_3cd183d0bab85fb7
+    ok 17 - verify_kzg_proof_case_correct_proof_3cd183d0bab85fb7
+      ---
+      duration_ms: 9.304542
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_420f2a187ce77035
+    ok 18 - verify_kzg_proof_case_correct_proof_420f2a187ce77035
+      ---
+      duration_ms: 20.927459
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_444b73ff54a19b44
+    ok 19 - verify_kzg_proof_case_correct_proof_444b73ff54a19b44
+      ---
+      duration_ms: 59.597875
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_53a9bdf4f75196da
+    ok 20 - verify_kzg_proof_case_correct_proof_53a9bdf4f75196da
+      ---
+      duration_ms: 11.136292
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_585454b31673dd62
+    ok 21 - verify_kzg_proof_case_correct_proof_585454b31673dd62
+      ---
+      duration_ms: 11.356167
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_7db4f140a955dd1a
+    ok 22 - verify_kzg_proof_case_correct_proof_7db4f140a955dd1a
+      ---
+      duration_ms: 140.57125
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_83e53423a2dd93fe
+    ok 23 - verify_kzg_proof_case_correct_proof_83e53423a2dd93fe
+      ---
+      duration_ms: 113.994375
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_9b24f8997145435c
+    ok 24 - verify_kzg_proof_case_correct_proof_9b24f8997145435c
+      ---
+      duration_ms: 28.357917
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_9b754afb690c47e1
+    ok 25 - verify_kzg_proof_case_correct_proof_9b754afb690c47e1
+      ---
+      duration_ms: 3.586708
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_a0be66af9a97ea52
+    ok 26 - verify_kzg_proof_case_correct_proof_a0be66af9a97ea52
+      ---
+      duration_ms: 5.014583
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_af669445747d2585
+    ok 27 - verify_kzg_proof_case_correct_proof_af669445747d2585
+      ---
+      duration_ms: 121.060917
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_af8b75f664ed7d43
+    ok 28 - verify_kzg_proof_case_correct_proof_af8b75f664ed7d43
+      ---
+      duration_ms: 136.183125
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_b6cb6698327d9835
+    ok 29 - verify_kzg_proof_case_correct_proof_b6cb6698327d9835
+      ---
+      duration_ms: 101.96275
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_b6ec3736f9ff2c62
+    ok 30 - verify_kzg_proof_case_correct_proof_b6ec3736f9ff2c62
+      ---
+      duration_ms: 55.60825
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_becf2e1641bbd4e6
+    ok 31 - verify_kzg_proof_case_correct_proof_becf2e1641bbd4e6
+      ---
+      duration_ms: 6.831625
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_c3d4322ec17fe7cd
+    ok 32 - verify_kzg_proof_case_correct_proof_c3d4322ec17fe7cd
+      ---
+      duration_ms: 4.8045
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_c5e1490d672d026d
+    ok 33 - verify_kzg_proof_case_correct_proof_c5e1490d672d026d
+      ---
+      duration_ms: 20.64275
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_cae5d3491190b777
+    ok 34 - verify_kzg_proof_case_correct_proof_cae5d3491190b777
+      ---
+      duration_ms: 140.375708
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_d0992bc0387790a4
+    ok 35 - verify_kzg_proof_case_correct_proof_d0992bc0387790a4
+      ---
+      duration_ms: 24.326041
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_d736268229bd87ec
+    ok 36 - verify_kzg_proof_case_correct_proof_d736268229bd87ec
+      ---
+      duration_ms: 19.032583
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_e68d7111a2364a49
+    ok 37 - verify_kzg_proof_case_correct_proof_e68d7111a2364a49
+      ---
+      duration_ms: 19.951708
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_ed6b180ec759bcf6
+    ok 38 - verify_kzg_proof_case_correct_proof_ed6b180ec759bcf6
+      ---
+      duration_ms: 19.545958
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_f0ed3dc11cdeb130
+    ok 39 - verify_kzg_proof_case_correct_proof_f0ed3dc11cdeb130
+      ---
+      duration_ms: 17.839959
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_f47eb9fc139f6bfd
+    ok 40 - verify_kzg_proof_case_correct_proof_f47eb9fc139f6bfd
+      ---
+      duration_ms: 16.889542
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_f7f44e1e864aa967
+    ok 41 - verify_kzg_proof_case_correct_proof_f7f44e1e864aa967
+      ---
+      duration_ms: 271.643
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_ffa6e97b97146517
+    ok 42 - verify_kzg_proof_case_correct_proof_ffa6e97b97146517
+      ---
+      duration_ms: 2.619459
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_05c1f3685f3393f0
+    ok 43 - verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_05c1f3685f3393f0
+      ---
+      duration_ms: 3.704417
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_177b58dc7a46b08f
+    ok 44 - verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_177b58dc7a46b08f
+      ---
+      duration_ms: 6.058416
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_2b76dc9e3abf42f3
+    ok 45 - verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_2b76dc9e3abf42f3
+      ---
+      duration_ms: 2.745417
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_395cf6d697d1a743
+    ok 46 - verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_395cf6d697d1a743
+      ---
+      duration_ms: 5.41725
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_585454b31673dd62
+    ok 47 - verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_585454b31673dd62
+      ---
+      duration_ms: 3.421166
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_a0be66af9a97ea52
+    ok 48 - verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_a0be66af9a97ea52
+      ---
+      duration_ms: 5.5715
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_02e696ada7d4631d
+    ok 49 - verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_02e696ada7d4631d
+      ---
+      duration_ms: 2.173875
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_0cf79b17cb5f4ea2
+    ok 50 - verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_0cf79b17cb5f4ea2
+      ---
+      duration_ms: 3.017125
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_3208425794224c3f
+    ok 51 - verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_3208425794224c3f
+      ---
+      duration_ms: 5.076583
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_3ac8dc31e9aa6a70
+    ok 52 - verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_3ac8dc31e9aa6a70
+      ---
+      duration_ms: 3.236667
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_c3d4322ec17fe7cd
+    ok 53 - verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_c3d4322ec17fe7cd
+      ---
+      duration_ms: 1.532917
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_ffa6e97b97146517
+    ok 54 - verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_ffa6e97b97146517
+      ---
+      duration_ms: 2.424708
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_02e696ada7d4631d
+    ok 55 - verify_kzg_proof_case_incorrect_proof_02e696ada7d4631d
+      ---
+      duration_ms: 14.922375
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_05c1f3685f3393f0
+    ok 56 - verify_kzg_proof_case_incorrect_proof_05c1f3685f3393f0
+      ---
+      duration_ms: 14.992084
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_08f9e2f1cb3d39db
+    ok 57 - verify_kzg_proof_case_incorrect_proof_08f9e2f1cb3d39db
+      ---
+      duration_ms: 13.93275
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_0cf79b17cb5f4ea2
+    ok 58 - verify_kzg_proof_case_incorrect_proof_0cf79b17cb5f4ea2
+      ---
+      duration_ms: 157.595958
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_177b58dc7a46b08f
+    ok 59 - verify_kzg_proof_case_incorrect_proof_177b58dc7a46b08f
+      ---
+      duration_ms: 96.026084
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_1ce8e4f69d5df899
+    ok 60 - verify_kzg_proof_case_incorrect_proof_1ce8e4f69d5df899
+      ---
+      duration_ms: 52.930208
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_26b753dec0560daa
+    ok 61 - verify_kzg_proof_case_incorrect_proof_26b753dec0560daa
+      ---
+      duration_ms: 100.216542
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_2b76dc9e3abf42f3
+    ok 62 - verify_kzg_proof_case_incorrect_proof_2b76dc9e3abf42f3
+      ---
+      duration_ms: 15.242041
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_31ebd010e6098750
+    ok 63 - verify_kzg_proof_case_incorrect_proof_31ebd010e6098750
+      ---
+      duration_ms: 24.748042
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_3208425794224c3f
+    ok 64 - verify_kzg_proof_case_incorrect_proof_3208425794224c3f
+      ---
+      duration_ms: 122.034625
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_36817bfd67de97a8
+    ok 65 - verify_kzg_proof_case_incorrect_proof_36817bfd67de97a8
+      ---
+      duration_ms: 36.009375
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_392169c16a2e5ef6
+    ok 66 - verify_kzg_proof_case_incorrect_proof_392169c16a2e5ef6
+      ---
+      duration_ms: 22.991708
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_395cf6d697d1a743
+    ok 67 - verify_kzg_proof_case_incorrect_proof_395cf6d697d1a743
+      ---
+      duration_ms: 98.26675
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_3ac8dc31e9aa6a70
+    ok 68 - verify_kzg_proof_case_incorrect_proof_3ac8dc31e9aa6a70
+      ---
+      duration_ms: 28.807667
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_3c1e8b38219e3e12
+    ok 69 - verify_kzg_proof_case_incorrect_proof_3c1e8b38219e3e12
+      ---
+      duration_ms: 104.322833
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_3c87ec986c2656c2
+    ok 70 - verify_kzg_proof_case_incorrect_proof_3c87ec986c2656c2
+      ---
+      duration_ms: 71.429333
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_3cd183d0bab85fb7
+    ok 71 - verify_kzg_proof_case_incorrect_proof_3cd183d0bab85fb7
+      ---
+      duration_ms: 27.236458
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_420f2a187ce77035
+    ok 72 - verify_kzg_proof_case_incorrect_proof_420f2a187ce77035
+      ---
+      duration_ms: 30.6275
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_444b73ff54a19b44
+    ok 73 - verify_kzg_proof_case_incorrect_proof_444b73ff54a19b44
+      ---
+      duration_ms: 18.487167
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_53a9bdf4f75196da
+    ok 74 - verify_kzg_proof_case_incorrect_proof_53a9bdf4f75196da
+      ---
+      duration_ms: 76.673458
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_585454b31673dd62
+    ok 75 - verify_kzg_proof_case_incorrect_proof_585454b31673dd62
+      ---
+      duration_ms: 78.432416
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_7db4f140a955dd1a
+    ok 76 - verify_kzg_proof_case_incorrect_proof_7db4f140a955dd1a
+      ---
+      duration_ms: 84.425917
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_83e53423a2dd93fe
+    ok 77 - verify_kzg_proof_case_incorrect_proof_83e53423a2dd93fe
+      ---
+      duration_ms: 91.9405
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_9b24f8997145435c
+    ok 78 - verify_kzg_proof_case_incorrect_proof_9b24f8997145435c
+      ---
+      duration_ms: 103.660208
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_9b754afb690c47e1
+    ok 79 - verify_kzg_proof_case_incorrect_proof_9b754afb690c47e1
+      ---
+      duration_ms: 41.589625
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_a0be66af9a97ea52
+    ok 80 - verify_kzg_proof_case_incorrect_proof_a0be66af9a97ea52
+      ---
+      duration_ms: 22.954584
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_af669445747d2585
+    ok 81 - verify_kzg_proof_case_incorrect_proof_af669445747d2585
+      ---
+      duration_ms: 110.730333
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_af8b75f664ed7d43
+    ok 82 - verify_kzg_proof_case_incorrect_proof_af8b75f664ed7d43
+      ---
+      duration_ms: 67.671375
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_b6cb6698327d9835
+    ok 83 - verify_kzg_proof_case_incorrect_proof_b6cb6698327d9835
+      ---
+      duration_ms: 91.498
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_b6ec3736f9ff2c62
+    ok 84 - verify_kzg_proof_case_incorrect_proof_b6ec3736f9ff2c62
+      ---
+      duration_ms: 57.096375
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_becf2e1641bbd4e6
+    ok 85 - verify_kzg_proof_case_incorrect_proof_becf2e1641bbd4e6
+      ---
+      duration_ms: 70.507375
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_c3d4322ec17fe7cd
+    ok 86 - verify_kzg_proof_case_incorrect_proof_c3d4322ec17fe7cd
+      ---
+      duration_ms: 18.658333
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_c5e1490d672d026d
+    ok 87 - verify_kzg_proof_case_incorrect_proof_c5e1490d672d026d
+      ---
+      duration_ms: 55.09125
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_cae5d3491190b777
+    ok 88 - verify_kzg_proof_case_incorrect_proof_cae5d3491190b777
+      ---
+      duration_ms: 113.599333
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_d0992bc0387790a4
+    ok 89 - verify_kzg_proof_case_incorrect_proof_d0992bc0387790a4
+      ---
+      duration_ms: 97.960292
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_d736268229bd87ec
+    ok 90 - verify_kzg_proof_case_incorrect_proof_d736268229bd87ec
+      ---
+      duration_ms: 80.449958
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_e68d7111a2364a49
+    ok 91 - verify_kzg_proof_case_incorrect_proof_e68d7111a2364a49
+      ---
+      duration_ms: 67.977334
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_ed6b180ec759bcf6
+    ok 92 - verify_kzg_proof_case_incorrect_proof_ed6b180ec759bcf6
+      ---
+      duration_ms: 68.74125
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_f0ed3dc11cdeb130
+    ok 93 - verify_kzg_proof_case_incorrect_proof_f0ed3dc11cdeb130
+      ---
+      duration_ms: 94.129125
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_f47eb9fc139f6bfd
+    ok 94 - verify_kzg_proof_case_incorrect_proof_f47eb9fc139f6bfd
+      ---
+      duration_ms: 85.319416
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_f7f44e1e864aa967
+    ok 95 - verify_kzg_proof_case_incorrect_proof_f7f44e1e864aa967
+      ---
+      duration_ms: 27.435167
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_ffa6e97b97146517
+    ok 96 - verify_kzg_proof_case_incorrect_proof_ffa6e97b97146517
+      ---
+      duration_ms: 17.5165
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_point_at_infinity_392169c16a2e5ef6
+    ok 97 - verify_kzg_proof_case_incorrect_proof_point_at_infinity_392169c16a2e5ef6
+      ---
+      duration_ms: 79.948458
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_point_at_infinity_3c1e8b38219e3e12
+    ok 98 - verify_kzg_proof_case_incorrect_proof_point_at_infinity_3c1e8b38219e3e12
+      ---
+      duration_ms: 44.741375
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_point_at_infinity_3c87ec986c2656c2
+    ok 99 - verify_kzg_proof_case_incorrect_proof_point_at_infinity_3c87ec986c2656c2
+      ---
+      duration_ms: 14.825709
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_point_at_infinity_420f2a187ce77035
+    ok 100 - verify_kzg_proof_case_incorrect_proof_point_at_infinity_420f2a187ce77035
+      ---
+      duration_ms: 111.801208
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_point_at_infinity_83e53423a2dd93fe
+    ok 101 - verify_kzg_proof_case_incorrect_proof_point_at_infinity_83e53423a2dd93fe
+      ---
+      duration_ms: 23.808333
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_incorrect_proof_point_at_infinity_ed6b180ec759bcf6
+    ok 102 - verify_kzg_proof_case_incorrect_proof_point_at_infinity_ed6b180ec759bcf6
+      ---
+      duration_ms: 22.276584
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_commitment_1b44e341d56c757d
+    ok 103 - verify_kzg_proof_case_invalid_commitment_1b44e341d56c757d
+      ---
+      duration_ms: 0.98725
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_commitment_32afa9561a4b3b91
+    ok 104 - verify_kzg_proof_case_invalid_commitment_32afa9561a4b3b91
+      ---
+      duration_ms: 2.186083
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_commitment_3e55802a5ed3c757
+    ok 105 - verify_kzg_proof_case_invalid_commitment_3e55802a5ed3c757
+      ---
+      duration_ms: 0.501792
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_commitment_e9d3e9ec16fbc15f
+    ok 106 - verify_kzg_proof_case_invalid_commitment_e9d3e9ec16fbc15f
+      ---
+      duration_ms: 0.687333
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_proof_1b44e341d56c757d
+    ok 107 - verify_kzg_proof_case_invalid_proof_1b44e341d56c757d
+      ---
+      duration_ms: 2.710334
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_proof_32afa9561a4b3b91
+    ok 108 - verify_kzg_proof_case_invalid_proof_32afa9561a4b3b91
+      ---
+      duration_ms: 3.932542
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_proof_3e55802a5ed3c757
+    ok 109 - verify_kzg_proof_case_invalid_proof_3e55802a5ed3c757
+      ---
+      duration_ms: 2.651875
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_proof_e9d3e9ec16fbc15f
+    ok 110 - verify_kzg_proof_case_invalid_proof_e9d3e9ec16fbc15f
+      ---
+      duration_ms: 3.241708
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_y_35d08d612aad2197
+    ok 111 - verify_kzg_proof_case_invalid_y_35d08d612aad2197
+      ---
+      duration_ms: 79.47975
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_y_4aa6def8c35c9097
+    ok 112 - verify_kzg_proof_case_invalid_y_4aa6def8c35c9097
+      ---
+      duration_ms: 5.248625
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_y_4e51cef08a61606f
+    ok 113 - verify_kzg_proof_case_invalid_y_4e51cef08a61606f
+      ---
+      duration_ms: 1.112708
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_y_64b9ff2b8f7dddee
+    ok 114 - verify_kzg_proof_case_invalid_y_64b9ff2b8f7dddee
+      ---
+      duration_ms: 0.57375
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_y_b358a2e763727b70
+    ok 115 - verify_kzg_proof_case_invalid_y_b358a2e763727b70
+      ---
+      duration_ms: 5.942084
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_y_eb0601fec84cc5e9
+    ok 116 - verify_kzg_proof_case_invalid_y_eb0601fec84cc5e9
+      ---
+      duration_ms: 1.650625
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_z_35d08d612aad2197
+    ok 117 - verify_kzg_proof_case_invalid_z_35d08d612aad2197
+      ---
+      duration_ms: 1.713833
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_z_4aa6def8c35c9097
+    ok 118 - verify_kzg_proof_case_invalid_z_4aa6def8c35c9097
+      ---
+      duration_ms: 2.990417
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_z_4e51cef08a61606f
+    ok 119 - verify_kzg_proof_case_invalid_z_4e51cef08a61606f
+      ---
+      duration_ms: 0.670667
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_z_64b9ff2b8f7dddee
+    ok 120 - verify_kzg_proof_case_invalid_z_64b9ff2b8f7dddee
+      ---
+      duration_ms: 0.545958
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_z_b358a2e763727b70
+    ok 121 - verify_kzg_proof_case_invalid_z_b358a2e763727b70
+      ---
+      duration_ms: 0.98075
+      type: 'test'
+      ...
+    # Subtest: verify_kzg_proof_case_invalid_z_eb0601fec84cc5e9
+    ok 122 - verify_kzg_proof_case_invalid_z_eb0601fec84cc5e9
+      ---
+      duration_ms: 0.399875
+      type: 'test'
+      ...
+    1..122
+ok 399 - all 122 upstream verify_kzg_proof cases retain true/false/malformed distinctions
+  ---
+  duration_ms: 5350.305167
+  type: 'test'
+  ...
+# Subtest: pinned Geth point-evaluation vector verifies directly without an EVM execution
+ok 400 - pinned Geth point-evaluation vector verifies directly without an EVM execution
+  ---
+  duration_ms: 47.207875
+  type: 'test'
+  ...
+# Subtest: zero-safe identity terms and zero scalars preserve the pairing equation
+ok 401 - zero-safe identity terms and zero scalars preserve the pairing equation
+  ---
+  duration_ms: 219.77175
+  type: 'test'
+  ...
+# Subtest: exact scalar widths and the unreduced scalar modulus are enforced
+ok 402 - exact scalar widths and the unreduced scalar modulus are enforced
+  ---
+  duration_ms: 68.697083
+  type: 'test'
+  ...
+# Subtest: points require canonical compressed subgroup encodings, including canonical infinity
+ok 403 - points require canonical compressed subgroup encodings, including canonical infinity
+  ---
+  duration_ms: 2.950416
+  type: 'test'
+  ...
+# Subtest: malformed input errors are recognizable while unexpected host failures remain distinct
+ok 404 - malformed input errors are recognizable while unexpected host failures remain distinct
+  ---
+  duration_ms: 2.797
+  type: 'test'
+  ...
+# Subtest: KZG adapter distinguishes completed proof results and malformed inputs from host failure
+ok 405 - KZG adapter distinguishes completed proof results and malformed inputs from host failure
+  ---
+  duration_ms: 2.179667
+  type: 'test'
+  ...
+# Subtest: KZG adapter latches all unexpected thrown values and rejects non-boolean verifiers
+ok 406 - KZG adapter latches all unexpected thrown values and rejects non-boolean verifiers
+  ---
+  duration_ms: 0.151458
+  type: 'test'
+  ...
+# Subtest: KZG adapter checks and latches the budget before and after synchronous verification
+ok 407 - KZG adapter checks and latches the budget before and after synchronous verification
+  ---
+  duration_ms: 0.115458
+  type: 'test'
+  ...
+# Subtest: a constructor can create a second contract while preserving both initial absence proofs
+ok 408 - a constructor can create a second contract while preserving both initial absence proofs
+  ---
+  duration_ms: 27.928334
+  type: 'test'
+  ...
+# Subtest: a constructor executes the freshly deployed child runtime and reads its constructor storage
+ok 409 - a constructor executes the freshly deployed child runtime and reads its constructor storage
+  ---
+  duration_ms: 18.851417
+  type: 'test'
+  ...
+# Subtest: an outer step limit removes a previously committed child deployment and all outer nonce changes
+ok 410 - an outer step limit removes a previously committed child deployment and all outer nonce changes
+  ---
+  duration_ms: 10.6725
+  type: 'test'
+  ...
+# Subtest: CREATE2 collision with a nonempty initial storage root is an EVM failure without clearing that state
+ok 411 - CREATE2 collision with a nonempty initial storage root is an EVM failure without clearing that state
+  ---
+  duration_ms: 20.363458
+  type: 'test'
+  ...
+# Subtest: CREATE reached in STATICCALL remains an ordinary child fault with no creation or creator nonce change
+ok 412 - CREATE reached in STATICCALL remains an ordinary child fault with no creation or creator nonce change
+  ---
+  duration_ms: 13.91475
+  type: 'test'
+  ...
+# Subtest: CREATE deploys runtime and constructor storage from proven absent state
+ok 413 - CREATE deploys runtime and constructor storage from proven absent state
+  ---
+  duration_ms: 122.592542
+  type: 'test'
+  ...
+# Subtest: CREATE2 deploys runtime and constructor storage from proven absent state
+ok 414 - CREATE2 deploys runtime and constructor storage from proven absent state
+  ---
+  duration_ms: 16.616375
+  type: 'test'
+  ...
+# Subtest: prefunded deployable targets retain existing balance and never fabricate account existence
+ok 415 - prefunded deployable targets retain existing balance and never fabricate account existence
+  ---
+  duration_ms: 59.016125
+  type: 'test'
+  ...
+# Subtest: constructor REVERT and EVM faults return zero, revert child state and retain creator nonce when parent continues
+ok 416 - constructor REVERT and EVM faults return zero, revert child state and retain creator nonce when parent continues
+  ---
+  duration_ms: 146.130625
+  type: 'test'
+  ...
+# Subtest: parent REVERT removes deployed code, storage, funding and creator nonce while retaining outer sender nonce
+ok 417 - parent REVERT removes deployed code, storage, funding and creator nonce while retaining outer sender nonce
+  ---
+  duration_ms: 10.733709
+  type: 'test'
+  ...
+# Subtest: CREATE2 collision preserves first deployment and charges the second creator nonce without replacing code
+ok 418 - CREATE2 collision preserves first deployment and charges the second creator nonce without replacing code
+  ---
+  duration_ms: 28.860625
+  type: 'test'
+  ...
+# Subtest: empty-runtime creation is still an existing nonce-one account
+ok 419 - empty-runtime creation is still an existing nonce-one account
+  ---
+  duration_ms: 3.404458
+  type: 'test'
+  ...
+# Subtest: constructor SELFDESTRUCT without a deletion finalizer atomically rolls back attempted changes
+ok 420 - constructor SELFDESTRUCT without a deletion finalizer atomically rolls back attempted changes
+  ---
+  duration_ms: 52.7215
+  type: 'test'
+  ...
+# Subtest: created-account zero slot derivation respects the shared input slot limit and rolls back exhaustion
+ok 421 - created-account zero slot derivation respects the shared input slot limit and rolls back exhaustion
+  ---
+  duration_ms: 4.858834
+  type: 'test'
+  ...
+# Subtest: creation state survives a settled copy without aliasing mutable code or storage
+ok 422 - creation state survives a settled copy without aliasing mutable code or storage
+  ---
+  duration_ms: 6.153833
+  type: 'test'
+  ...
+# Subtest: real child native fee-transfer balances match signed fullVM and independent third-MPT deltas
+ok 423 - real child native fee-transfer balances match signed fullVM and independent third-MPT deltas
+  ---
+  duration_ms: 686.134083
+  type: 'test'
+  ...
+# Subtest: sender equal to coinbase reports net base-fee debit once, without double-counting the tip
+ok 424 - sender equal to coinbase reports net base-fee debit once, without double-counting the tip
+  ---
+  duration_ms: 533.137416
+  type: 'test'
+  ...
+# Subtest: native measurements remain available after completed REVERT and OOG and include only retained fees
+ok 425 - native measurements remain available after completed REVERT and OOG and include only retained fees
+  ---
+  duration_ms: 1095.91725
+  type: 'test'
+  ...
+# Subtest: priced blob calls retain blob burn in native deltas on both success and REVERT
+ok 426 - priced blob calls retain blob burn in native deltas on both success and REVERT
+  ---
+  duration_ms: 1091.729625
+  type: 'test'
+  ...
+# Subtest: native poststate reads follow Shanghai deletion and Cancun retention after miner settlement
+ok 427 - native poststate reads follow Shanghai deletion and Cancun retention after miner settlement
+  ---
+  duration_ms: 1058.011
+  type: 'test'
+  ...
+# Subtest: native reads distinguish surviving creation funding from same-invocation creation/deletion
+ok 428 - native reads distinguish surviving creation funding from same-invocation creation/deletion
+  ---
+  duration_ms: 1246.549417
+  type: 'test'
+  ...
+# Subtest: missing newly requested native proof preserves earlier measured pairs and withholds later queries
+ok 429 - missing newly requested native proof preserves earlier measured pairs and withholds later queries
+  ---
+  duration_ms: 664.431417
+  type: 'test'
+  ...
+# Subtest: native reads remain available when the completed original exhausts the shared VM-step allowance
+ok 430 - native reads remain available when the completed original exhausts the shared VM-step allowance
+  ---
+  duration_ms: 598.713458
+  type: 'test'
+  ...
+# Subtest: cancellation during an extra native proof withholds the entire child preview and drains the read
+ok 431 - cancellation during an extra native proof withholds the entire child preview and drains the read
+  ---
+  duration_ms: 500.688042
+  type: 'test'
+  ...
+# Subtest: unpriced actual transfers reject omitted, invented and conserved-but-wrong balance deltas
+ok 432 - unpriced actual transfers reject omitted, invented and conserved-but-wrong balance deltas
+  ---
+  duration_ms: 106.124875
+  type: 'test'
+  ...
+# Subtest: actual parent rejects unpriced balance-only IPC forgery with authentic proofs and unchanged trace
+ok 433 - actual parent rejects unpriced balance-only IPC forgery with authentic proofs and unchanged trace
+  ---
+  duration_ms: 469.476333
+  type: 'test'
+  ...
+# Subtest: successful descendants of a reverted child never credit the committed native ledger
+ok 434 - successful descendants of a reverted child never credit the committed native ledger
+  ---
+  duration_ms: 10.244792
+  type: 'test'
+  ...
+# Subtest: CALLCODE and DELEGATECALL inherit execution context without transferring to the code account
+ok 435 - CALLCODE and DELEGATECALL inherit execution context without transferring to the code account
+  ---
+  duration_ms: 7.530208
+  type: 'test'
+  ...
+# Subtest: SELFDESTRUCT binds beneficiary credits across retained Cancun and deleted Shanghai accounts
+ok 436 - SELFDESTRUCT binds beneficiary credits across retained Cancun and deleted Shanghai accounts
+  ---
+  duration_ms: 10.554042
+  type: 'test'
+  ...
+# Subtest: created-then-deleted accounts bind prefunded balance and end-of-transaction refill burn
+ok 437 - created-then-deleted accounts bind prefunded balance and end-of-transaction refill burn
+  ---
+  duration_ms: 6.167583
+  type: 'test'
+  ...
+# Subtest: disposable queries retain unvisited prior balance rows and reject their omission or reinvention
+ok 438 - disposable queries retain unvisited prior balance rows and reject their omission or reinvention
+  ---
+  duration_ms: 526.193625
+  type: 'test'
+  ...
+# Subtest: root REVERT retains only nonce and cannot resurrect a successful descendant transfer
+ok 439 - root REVERT retains only nonce and cannot resurrect a successful descendant transfer
+  ---
+  duration_ms: 3.514417
+  type: 'test'
+  ...
+# Subtest: parent binds native rows to authentic initial proofs and exact validated poststate
+    # Subtest: before amount
+    ok 1 - before amount
+      ---
+      duration_ms: 570.753459
+      type: 'test'
+      ...
+    # Subtest: after amount
+    ok 2 - after amount
+      ---
+      duration_ms: 540.582916
+      type: 'test'
+      ...
+    # Subtest: invented ABI execution
+    ok 3 - invented ABI execution
+      ---
+      duration_ms: 505.25375
+      type: 'test'
+      ...
+    # Subtest: wrong read method
+    ok 4 - wrong read method
+      ---
+      duration_ms: 557.722542
+      type: 'test'
+      ...
+    # Subtest: different account read
+    ok 5 - different account read
+      ---
+      duration_ms: 603.320791
+      type: 'test'
+      ...
+    # Subtest: missing read evidence
+    ok 6 - missing read evidence
+      ---
+      duration_ms: 610.587083
+      type: 'test'
+      ...
+    # Subtest: query mutated nonce
+    ok 7 - query mutated nonce
+      ---
+      duration_ms: 622.301625
+      type: 'test'
+      ...
+    # Subtest: changed before overlay
+    ok 8 - changed before overlay
+      ---
+      duration_ms: 630.989708
+      type: 'test'
+      ...
+    # Subtest: false native scope
+    ok 9 - false native scope
+      ---
+      duration_ms: 548.005459
+      type: 'test'
+      ...
+    # Subtest: invented complete coverage
+    ok 10 - invented complete coverage
+      ---
+      duration_ms: 493.141583
+      type: 'test'
+      ...
+    # Subtest: changed declared identity
+    ok 11 - changed declared identity
+      ---
+      duration_ms: 437.605875
+      type: 'test'
+      ...
+    # Subtest: changed units
+    ok 12 - changed units
+      ---
+      duration_ms: 455.238708
+      type: 'test'
+      ...
+    # Subtest: omitted transfer deltas
+    ok 13 - omitted transfer deltas
+      ---
+      duration_ms: 384.492416
+      type: 'test'
+      ...
+    1..13
+ok 440 - parent binds native rows to authentic initial proofs and exact validated poststate
+  ---
+  duration_ms: 6962.882541
+  type: 'test'
+  ...
+# Subtest: native cached proofs keep exact read provenance without charging query executions
+ok 441 - native cached proofs keep exact read provenance without charging query executions
+  ---
+  duration_ms: 458.702
+  type: 'test'
+  ...
+# Subtest: native query is an immutable explicit account read with exact wei units, not ABI calldata
+ok 442 - native query is an immutable explicit account read with exact wei units, not ABI calldata
+  ---
+  duration_ms: 6.481333
+  type: 'test'
+  ...
+# Subtest: native identity cannot be widened with execution fields or duplicate normalized addresses
+ok 443 - native identity cannot be widened with execution fields or duplicate normalized addresses
+  ---
+  duration_ms: 0.356083
+  type: 'test'
+  ...
+# Subtest: native compilation and formatting never execute supplied accessors or trust edited compiled metadata
+ok 444 - native compilation and formatting never execute supplied accessors or trust edited compiled metadata
+  ---
+  duration_ms: 0.678209
+  type: 'test'
+  ...
+# Subtest: native reads remain possible when the completed original exhausted its VM-step/frame allowance
+ok 445 - native reads remain possible when the completed original exhausted its VM-step/frame allowance
+  ---
+  duration_ms: 46.530792
+  type: 'test'
+  ...
+# Subtest: P256 direct valid/invalid signatures complete on Osaka/BPO1/BPO2 with fixed6900 message gas
+ok 446 - P256 direct valid/invalid signatures complete on Osaka/BPO1/BPO2 with fixed6900 message gas
+  ---
+  duration_ms: 316.949209
+  type: 'test'
+  ...
+# Subtest: P256 has exact6899/6900 gas boundary; OOG rolls back value while retaining ordinary transaction fees
+ok 447 - P256 has exact6899/6900 gas boundary; OOG rolls back value while retaining ordinary transaction fees
+  ---
+  duration_ms: 28.170167
+  type: 'test'
+  ...
+# Subtest: P256 all nested call modes preserve output/flag/return-size; invalid is successful empty return and OOG is caught failure
+ok 448 - P256 all nested call modes preserve output/flag/return-size; invalid is successful empty return and OOG is caught failure
+  ---
+  duration_ms: 355.226375
+  type: 'test'
+  ...
+# Subtest: enclosing REVERT removes successful P256 value and storage while preserving fees
+ok 449 - enclosing REVERT removes successful P256 value and storage while preserving fees
+  ---
+  duration_ms: 10.81175
+  type: 'test'
+  ...
+# Subtest: Prague address0x100 remains ordinary account code rather than an early P256 precompile
+ok 450 - Prague address0x100 remains ordinary account code rather than an early P256 precompile
+  ---
+  duration_ms: 6.596042
+  type: 'test'
+  ...
+# Subtest: fresh before/after probes can use P256 without inheriting priced original context
+ok 451 - fresh before/after probes can use P256 without inheriting priced original context
+  ---
+  duration_ms: 56.712209
+  type: 'test'
+  ...
+# Subtest: P256 budget/host failures cannot be hidden by nested CALL and roll back the whole attempt including fees
+ok 452 - P256 budget/host failures cannot be hidden by nested CALL and roll back the whole attempt including fees
+  ---
+  duration_ms: 253.134875
+  type: 'test'
+  ...
+# Subtest: P256 fixed verifier accepts low/high-S signatures, zero/max message hash, and returns detached results
+ok 453 - P256 fixed verifier accepts low/high-S signatures, zero/max message hash, and returns detached results
+  ---
+  duration_ms: 113.789625
+  type: 'test'
+  ...
+# Subtest: P256 invalid encodings and incorrect signatures return empty at6900 without host failure
+ok 454 - P256 invalid encodings and incorrect signatures return empty at6900 without host failure
+  ---
+  duration_ms: 22.268709
+  type: 'test'
+  ...
+# Subtest: P256 OOG precedes input decoding and cryptography
+ok 455 - P256 OOG precedes input decoding and cryptography
+  ---
+  duration_ms: 0.133959
+  type: 'test'
+  ...
+# Subtest: P256 internal hook latches all crypto throws and invalid return types instead of calling them invalid signatures
+ok 456 - P256 internal hook latches all crypto throws and invalid return types instead of calling them invalid signatures
+  ---
+  duration_ms: 0.486458
+  type: 'test'
+  ...
+# Subtest: P256 budget failure before/after crypto is latched, including thrown undefined/null
+ok 457 - P256 budget failure before/after crypto is latched, including thrown undefined/null
+  ---
+  duration_ms: 0.211875
+  type: 'test'
+  ...
+# Subtest: message budget is derived from declared calldata and gas alone, with separate actual and synthetic base fee
+ok 458 - message budget is derived from declared calldata and gas alone, with separate actual and synthetic base fee
+  ---
+  duration_ms: 2.564833
+  type: 'test'
+  ...
+# Subtest: omitted account code requires its own observed completion at the exact canonical hash
+ok 459 - omitted account code requires its own observed completion at the exact canonical hash
+  ---
+  duration_ms: 0.539667
+  type: 'test'
+  ...
+# Subtest: duplicate, unused and malformed completion facts are never used to repair inputs
+ok 460 - duplicate, unused and malformed completion facts are never used to repair inputs
+  ---
+  duration_ms: 0.399125
+  type: 'test'
+  ...
+# Subtest: absent storage remains sparse while all-zero account existence stays unresolved
+ok 461 - absent storage remains sparse while all-zero account existence stays unresolved
+  ---
+  duration_ms: 4.201167
+  type: 'test'
+  ...
+# Subtest: diff mode, disabled storage/code and hidden overrides cannot masquerade as input state
+ok 462 - diff mode, disabled storage/code and hidden overrides cannot masquerade as input state
+  ---
+  duration_ms: 5.897084
+  type: 'test'
+  ...
+# Subtest: unrecognized envelope semantics and insufficient intrinsic gas reject before execution
+ok 463 - unrecognized envelope semantics and insufficient intrinsic gas reject before execution
+  ---
+  duration_ms: 0.166875
+  type: 'test'
+  ...
+# Subtest: malformed explicit fields and duplicate slot representations remain invalid rather than completed
+ok 464 - malformed explicit fields and duplicate slot representations remain invalid rather than completed
+  ---
+  duration_ms: 11.304833
+  type: 'test'
+  ...
+# Subtest: post-execution channels cannot influence this input-only conversion
+ok 465 - post-execution channels cannot influence this input-only conversion
+  ---
+  duration_ms: 0.614417
+  type: 'test'
+  ...
+# Subtest: a clean before-state query admits only the exact caller nonce increment and does not alter inputs
+ok 466 - a clean before-state query admits only the exact caller nonce increment and does not alter inputs
+  ---
+  duration_ms: 23.649916
+  type: 'test'
+  ...
+# Subtest: after-state query preserves original nonce, native balances and storage clears across account/slot reorder
+ok 467 - after-state query preserves original nonce, native balances and storage clears across account/slot reorder
+  ---
+  duration_ms: 0.407333
+  type: 'test'
+  ...
+# Subtest: query cannot clear an original write, restore its base value, change a cleared slot, or introduce another write
+ok 468 - query cannot clear an original write, restore its base value, change a cleared slot, or introduce another write
+  ---
+  duration_ms: 0.557958
+  type: 'test'
+  ...
+# Subtest: native changes on sender or other accounts are rejected while original unrelated changes remain valid
+ok 469 - native changes on sender or other accounts are rejected while original unrelated changes remain valid
+  ---
+  duration_ms: 0.506625
+  type: 'test'
+  ...
+# Subtest: proven absent sender admits only nonce materialization; fabricated presence and other changes are not normalized
+ok 470 - proven absent sender admits only nonce materialization; fabricated presence and other changes are not normalized
+  ---
+  duration_ms: 0.424167
+  type: 'test'
+  ...
+# Subtest: sender materialized by original execution preserves that existence change through the query
+ok 471 - sender materialized by original execution preserves that existence change through the query
+  ---
+  duration_ms: 0.219833
+  type: 'test'
+  ...
+# Subtest: current sender nonce must agree with the prior overlay, and other nonce changes cannot be hidden
+ok 472 - current sender nonce must agree with the prior overlay, and other nonce changes cannot be hidden
+  ---
+  duration_ms: 0.397208
+  type: 'test'
+  ...
+# Subtest: existence changes must describe supported materialization, with zero prior native state and no new storage
+ok 473 - existence changes must describe supported materialization, with zero prior native state and no new storage
+  ---
+  duration_ms: 0.409583
+  type: 'test'
+  ...
+# Subtest: malformed deltas, duplicate accounts/slots and unknown fields fail even when repeated on both snapshots
+ok 474 - malformed deltas, duplicate accounts/slots and unknown fields fail even when repeated on both snapshots
+  ---
+  duration_ms: 3.510292
+  type: 'test'
+  ...
+# Subtest: bounded snapshots reject excessive accounts/slots and do not execute supplied getters
+ok 475 - bounded snapshots reject excessive accounts/slots and do not execute supplied getters
+  ---
+  duration_ms: 5.525333
+  type: 'test'
+  ...
+# Subtest: identical net snapshots do not claim to rule out transient writes
+ok 476 - identical net snapshots do not claim to rule out transient writes
+  ---
+  duration_ms: 1.234333
+  type: 'test'
+  ...
+# Subtest: nested creation-shaped original rows and prefunded deployment carry unchanged through a disposable query
+ok 477 - nested creation-shaped original rows and prefunded deployment carry unchanged through a disposable query
+  ---
+  duration_ms: 8.381792
+  type: 'test'
+  ...
+# Subtest: empty-runtime creation and prefunded empty-runtime nonce/storage changes remain explicit deltas
+ok 478 - empty-runtime creation and prefunded empty-runtime nonce/storage changes remain explicit deltas
+  ---
+  duration_ms: 0.197916
+  type: 'test'
+  ...
+# Subtest: queries cannot introduce creation, change/remove deployed code or mutate carried creation state
+ok 479 - queries cannot introduce creation, change/remove deployed code or mutate carried creation state
+  ---
+  duration_ms: 0.511541
+  type: 'test'
+  ...
+# Subtest: deployment schema rejects unsupported replacement, impossible origin and nonzero initial storage
+ok 480 - deployment schema rejects unsupported replacement, impossible origin and nonzero initial storage
+  ---
+  duration_ms: 0.6975
+  type: 'test'
+  ...
+# Subtest: creation code and aggregate output slots obey fixed bounds without weakening duplicate checks
+ok 481 - creation code and aggregate output slots obey fixed bounds without weakening duplicate checks
+  ---
+  duration_ms: 16.92325
+  type: 'test'
+  ...
+# Subtest: new code and existence fields reject hostile nested descriptors without evaluating them
+ok 482 - new code and existence fields reject hostile nested descriptors without evaluating them
+  ---
+  duration_ms: 0.234834
+  type: 'test'
+  ...
+# Subtest: four independently hashed ABI selectors and full calldata argument order are exact
+ok 483 - four independently hashed ABI selectors and full calldata argument order are exact
+  ---
+  duration_ms: 5.418125
+  type: 'test'
+  ...
+# Subtest: canonical descriptors preserve distinct token accounts, owners, spenders and typed market identities
+ok 484 - canonical descriptors preserve distinct token accounts, owners, spenders and typed market identities
+  ---
+  duration_ms: 0.662833
+  type: 'test'
+  ...
+# Subtest: scalar uint256 zero, above-JS-precision and maximum are exact raw decimal values
+ok 485 - scalar uint256 zero, above-JS-precision and maximum are exact raw decimal values
+  ---
+  duration_ms: 1.032708
+  type: 'test'
+  ...
+# Subtest: Aave six words preserve unknown base currency and raw health sentinel without judgments
+ok 486 - Aave six words preserve unknown base currency and raw health sentinel without judgments
+  ---
+  duration_ms: 0.266041
+  type: 'test'
+  ...
+# Subtest: Morpho shares remain raw and both uint128 high-bit violations reject without truncation
+ok 487 - Morpho shares remain raw and both uint128 high-bit violations reject without truncation
+  ---
+  duration_ms: 0.414209
+  type: 'test'
+  ...
+# Subtest: exact static return lengths reject packed, trailing, empty, RPC envelopes and malformed bytes
+ok 488 - exact static return lengths reject packed, trailing, empty, RPC envelopes and malformed bytes
+  ---
+  duration_ms: 2.442541
+  type: 'test'
+  ...
+# Subtest: one-to-eight dense queries, normalized duplicates and unsupported scalar ABI reject
+ok 489 - one-to-eight dense queries, normalized duplicates and unsupported scalar ABI reject
+  ---
+  duration_ms: 0.559458
+  type: 'test'
+  ...
+# Subtest: chain overrides, missing identity and unsupported fields are rejected
+ok 490 - chain overrides, missing identity and unsupported fields are rejected
+  ---
+  duration_ms: 0.790667
+  type: 'test'
+  ...
+# Subtest: getters, proxies, symbols and hidden or inherited inputs never execute user code
+ok 491 - getters, proxies, symbols and hidden or inherited inputs never execute user code
+  ---
+  duration_ms: 0.690916
+  type: 'test'
+  ...
+# Subtest: compiled metadata is immutable; serialized entries decode only after exact schema rederivation
+ok 492 - compiled metadata is immutable; serialized entries decode only after exact schema rederivation
+  ---
+  duration_ms: 1.465375
+  type: 'test'
+  ...
+# Subtest: omitted, empty and explicit mainnet options preserve pre-change serialized identities and field order
+ok 493 - omitted, empty and explicit mainnet options preserve pre-change serialized identities and field order
+  ---
+  duration_ms: 6.202
+  type: 'test'
+  ...
+# Subtest: trusted Sepolia chain labels every declared identity without changing addresses calldata units or deployment claims
+ok 494 - trusted Sepolia chain labels every declared identity without changing addresses calldata units or deployment claims
+  ---
+  duration_ms: 1.154375
+  type: 'test'
+  ...
+# Subtest: redecoders reject whole compiled-entry substitution across chains including serialized typed and native identities
+ok 495 - redecoders reject whole compiled-entry substitution across chains including serialized typed and native identities
+  ---
+  duration_ms: 1.825708
+  type: 'test'
+  ...
+# Subtest: typed identity address user and market cannot be borrowed from another query on the same trusted chain
+ok 496 - typed identity address user and market cannot be borrowed from another query on the same trusted chain
+  ---
+  duration_ms: 0.527958
+  type: 'test'
+  ...
+# Subtest: query descriptors cannot select their own chain even when it matches the trusted parent
+ok 497 - query descriptors cannot select their own chain even when it matches the trusted parent
+  ---
+  duration_ms: 1.253959
+  type: 'test'
+  ...
+# Subtest: unsupported or noncanonical trusted options reject consistently in compiler and both redecoders
+ok 498 - unsupported or noncanonical trusted options reject consistently in compiler and both redecoders
+  ---
+  duration_ms: 0.607875
+  type: 'test'
+  ...
+# Subtest: trusted options accessors proxies symbols and hidden chain properties never execute supplied code
+ok 499 - trusted options accessors proxies symbols and hidden chain properties never execute supplied code
+  ---
+  duration_ms: 0.216917
+  type: 'test'
+  ...
+# Subtest: funding a deleted nonempty account retains explicit reset provenance and no old namespace
+ok 500 - funding a deleted nonempty account retains explicit reset provenance and no old namespace
+  ---
+  duration_ms: 32.375667
+  type: 'test'
+  ...
+# Subtest: recreation writes use zero baselines, retain old-equal values, and never fetch old slot proofs
+ok 501 - recreation writes use zero baselines, retain old-equal values, and never fetch old slot proofs
+  ---
+  duration_ms: 5.470791
+  type: 'test'
+  ...
+# Subtest: a lazily discovered old proof seeds each rollback namespace independently
+ok 502 - a lazily discovered old proof seeds each rollback namespace independently
+  ---
+  duration_ms: 11.778583
+  type: 'test'
+  ...
+# Subtest: nested recreation commits roll back atomically and independent copies retain their own namespaces
+ok 503 - nested recreation commits roll back atomically and independent copies retain their own namespaces
+  ---
+  duration_ms: 18.608667
+  type: 'test'
+  ...
+# Subtest: repeated deletion clears new writes and records the original root when a recreated contract is deleted
+ok 504 - repeated deletion clears new writes and records the original root when a recreated contract is deleted
+  ---
+  duration_ms: 4.875209
+  type: 'test'
+  ...
+# Subtest: a reset removes stale authorization write authority and rollback restores the previous incarnation
+ok 505 - a reset removes stale authorization write authority and rollback restores the previous incarnation
+  ---
+  duration_ms: 45.755
+  type: 'test'
+  ...
+# Subtest: empty-account cleanup authenticates an otherwise unknown nonempty trie reset before funding and creation
+ok 506 - empty-account cleanup authenticates an otherwise unknown nonempty trie reset before funding and creation
+  ---
+  duration_ms: 4.772167
+  type: 'test'
+  ...
+# Subtest: creation still rejects original nonempty state and unsupported root replacement
+ok 507 - creation still rejects original nonempty state and unsupported root replacement
+  ---
+  duration_ms: 1.287542
+  type: 'test'
+  ...
+# Subtest: each real execution refreshes SSTORE original-value gas caching after a namespace reset
+ok 508 - each real execution refreshes SSTORE original-value gas caching after a namespace reset
+  ---
+  duration_ms: 7.201083
+  type: 'test'
+  ...
+# Subtest: final deletion removes code and demanded and undemanded storage without loading more RPC inputs
+ok 509 - final deletion removes code and demanded and undemanded storage without loading more RPC inputs
+  ---
+  duration_ms: 78.894041
+  type: 'test'
+  ...
+# Subtest: nested deletion rollback restores the created account, code, storage and creation eligibility marker
+ok 510 - nested deletion rollback restores the created account, code, storage and creation eligibility marker
+  ---
+  duration_ms: 3.013625
+  type: 'test'
+  ...
+# Subtest: a copied deletion can be funded and recreated without restoring old code or storage in either overlay
+ok 511 - a copied deletion can be funded and recreated without restoring old code or storage in either overlay
+  ---
+  duration_ms: 7.047084
+  type: 'test'
+  ...
+# Subtest: zero-value touches after deletion stay absent and rollback preserves the deletion marker
+ok 512 - zero-value touches after deletion stay absent and rollback preserves the deletion marker
+  ---
+  duration_ms: 6.64275
+  type: 'test'
+  ...
+# Subtest: deletion requires a checkpoint and a retained authenticated creation marker
+ok 513 - deletion requires a checkpoint and a retained authenticated creation marker
+  ---
+  duration_ms: 45.12625
+  type: 'test'
+  ...
+# Subtest: empty-account cleanup removes an authenticated nonempty storage trie without enumerating it
+ok 514 - empty-account cleanup removes an authenticated nonempty storage trie without enumerating it
+  ---
+  duration_ms: 20.048125
+  type: 'test'
+  ...
+# Subtest: cleanup rollback restores loaded storage and account existence without changing immutable facts
+ok 515 - cleanup rollback restores loaded storage and account existence without changing immutable facts
+  ---
+  duration_ms: 2.989875
+  type: 'test'
+  ...
+# Subtest: cleanup window rejects arbitrary deletion, nested activation and live accounts
+ok 516 - cleanup window rejects arbitrary deletion, nested activation and live accounts
+  ---
+  duration_ms: 2.58625
+  type: 'test'
+  ...
+# Subtest: positive funding preserves an existing empty account and its storage
+ok 517 - positive funding preserves an existing empty account and its storage
+  ---
+  duration_ms: 2.70475
+  type: 'test'
+  ...
+# Subtest: rematerializing and recreating a cleaned nonempty trie uses explicit reset provenance
+ok 518 - rematerializing and recreating a cleaned nonempty trie uses explicit reset provenance
+  ---
+  duration_ms: 3.307459
+  type: 'test'
+  ...
+# Subtest: Shanghai whole-account reset masks both demanded and unknown storage and survives a query copy
+ok 519 - Shanghai whole-account reset masks both demanded and unknown storage and survives a query copy
+  ---
+  duration_ms: 21.734708
+  type: 'test'
+  ...
+# Subtest: Shanghai deletion rolls back code, account and lazily read storage through nested checkpoints
+ok 520 - Shanghai deletion rolls back code, account and lazily read storage through nested checkpoints
+  ---
+  duration_ms: 7.11
+  type: 'test'
+  ...
+# Subtest: funding of deleted code commits only with explicit reset provenance and still rolls back exactly
+ok 521 - funding of deleted code commits only with explicit reset provenance and still rolls back exactly
+  ---
+  duration_ms: 2.878125
+  type: 'test'
+  ...
+# Subtest: Shanghai deletion entrypoint requires a checkpoint and an execution-capable authenticated account
+ok 522 - Shanghai deletion entrypoint requires a checkpoint and an execution-capable authenticated account
+  ---
+  duration_ms: 16.516083
+  type: 'test'
+  ...
+# Subtest: first reads and writes fetch proven prior account/storage values without zero-filling
+ok 523 - first reads and writes fetch proven prior account/storage values without zero-filling
+  ---
+  duration_ms: 25.500125
+  type: 'test'
+  ...
+# Subtest: facts first loaded inside nested checkpoints survive rollback while mutable writes do not
+ok 524 - facts first loaded inside nested checkpoints survive rollback while mutable writes do not
+  ---
+  duration_ms: 6.25
+  type: 'test'
+  ...
+# Subtest: proof-absent zero-value touches remain absent; positive native funding and unsigned nonce materialization are explicit
+ok 525 - proof-absent zero-value touches remain absent; positive native funding and unsigned nonce materialization are explicit
+  ---
+  duration_ms: 2.7965
+  type: 'test'
+  ...
+# Subtest: returned objects, copied overlays and immutable proof facts cannot mutate one another
+ok 526 - returned objects, copied overlays and immutable proof facts cannot mutate one another
+  ---
+  duration_ms: 6.47175
+  type: 'test'
+  ...
+# Subtest: invalid storage proof blocks a write and prior overlay state remains available for rollback
+ok 527 - invalid storage proof blocks a write and prior overlay state remains available for rollback
+  ---
+  duration_ms: 70.782334
+  type: 'test'
+  ...
+# Subtest: proven existing empty accounts remain present until explicit transaction-end cleanup
+ok 528 - proven existing empty accounts remain present until explicit transaction-end cleanup
+  ---
+  duration_ms: 20.163958
+  type: 'test'
+  ...
+# Subtest: runtime code/lifecycle changes, fake collectors and unsettled copies stay unsupported
+ok 529 - runtime code/lifecycle changes, fake collectors and unsettled copies stay unsupported
+  ---
+  duration_ms: 2.547667
+  type: 'test'
+  ...
+# Subtest: recorded input preserves explicit zero and rejects an unknown slot instead of inventing zero
+ok 530 - recorded input preserves explicit zero and rejects an unknown slot instead of inventing zero
+  ---
+  duration_ms: 2.656583
+  type: 'test'
+  ...
+# Subtest: missing account, code and storage are unavailable while explicitly absent account remains distinct
+ok 531 - missing account, code and storage are unavailable while explicitly absent account remains distinct
+  ---
+  duration_ms: 1.374375
+  type: 'test'
+  ...
+# Subtest: nested checkpoints commit successful child changes and roll back reverted parent state
+ok 532 - nested checkpoints commit successful child changes and roll back reverted parent state
+  ---
+  duration_ms: 1.456875
+  type: 'test'
+  ...
+# Subtest: zeroing a known slot and later reverting never converts it into unknown state
+ok 533 - zeroing a known slot and later reverting never converts it into unknown state
+  ---
+  duration_ms: 0.969334
+  type: 'test'
+  ...
+# Subtest: external input and returned mutable arrays/accounts cannot change the recorded base
+ok 534 - external input and returned mutable arrays/accounts cannot change the recorded base
+  ---
+  duration_ms: 0.693375
+  type: 'test'
+  ...
+# Subtest: unsupported lifecycle mutations and unbalanced checkpoints cannot destroy recorded facts
+ok 535 - unsupported lifecycle mutations and unbalanced checkpoints cannot destroy recorded facts
+  ---
+  duration_ms: 0.875458
+  type: 'test'
+  ...
+# Subtest: input records reject omitted basic fields, unknown fields and case-colliding addresses/slots
+ok 536 - input records reject omitted basic fields, unknown fields and case-colliding addresses/slots
+  ---
+  duration_ms: 0.389958
+  type: 'test'
+  ...
+# Subtest: nonce, balance, code and storage bounds reject malformed or oversized state
+ok 537 - nonce, balance, code and storage bounds reject malformed or oversized state
+  ---
+  duration_ms: 0.638375
+  type: 'test'
+  ...
+# Subtest: a caught recreated-contract subtree makes a neutral after-query available through the real child
+ok 538 - a caught recreated-contract subtree makes a neutral after-query available through the real child
+  ---
+  duration_ms: 790.765
+  type: 'test'
+  ...
+# Subtest: a successful getter that leaves recreation behind remains an unavailable measurement
+ok 539 - a successful getter that leaves recreation behind remains an unavailable measurement
+  ---
+  duration_ms: 612.074667
+  type: 'test'
+  ...
+# Subtest: live reset shape retains cleared namespace and exact old-to-new account fields
+ok 540 - live reset shape retains cleared namespace and exact old-to-new account fields
+  ---
+  duration_ms: 89.763375
+  type: 'test'
+  ...
+# Subtest: reset representation cannot masquerade as sparse old-storage differences or an existence transition
+ok 541 - reset representation cannot masquerade as sparse old-storage differences or an existence transition
+  ---
+  duration_ms: 1.439
+  type: 'test'
+  ...
+# Subtest: query purity preserves inherited reset state but rejects introducing or dropping it
+ok 542 - query purity preserves inherited reset state but rejects introducing or dropping it
+  ---
+  duration_ms: 2.667083
+  type: 'test'
+  ...
+# Subtest: actual isolated parent rejects invented namespace reset even with authentic initial root and unchanged scalars
+ok 543 - actual isolated parent rejects invented namespace reset even with authentic initial root and unchanged scalars
+  ---
+  duration_ms: 592.984333
+  type: 'test'
+  ...
+# Subtest: lazy collection uses only canonical proof/code reads and preserves exact proven zero versus unknown slots
+ok 544 - lazy collection uses only canonical proof/code reads and preserves exact proven zero versus unknown slots
+  ---
+  duration_ms: 147.582208
+  type: 'test'
+  ...
+# Subtest: first storage demand collects only that slot; concurrent demands cannot duplicate provider reads
+ok 545 - first storage demand collects only that slot; concurrent demands cannot duplicate provider reads
+  ---
+  duration_ms: 10.685375
+  type: 'test'
+  ...
+# Subtest: account nonexistence is proven, and its empty code/storage are not inferred from missing data
+ok 546 - account nonexistence is proven, and its empty code/storage are not inferred from missing data
+  ---
+  duration_ms: 57.073458
+  type: 'test'
+  ...
+# Subtest: invalid proof/code or missing storage fails closed with no retries and no trace-derived repair
+ok 547 - invalid proof/code or missing storage fails closed with no retries and no trace-derived repair
+  ---
+  duration_ms: 16.4705
+  type: 'test'
+  ...
+# Subtest: provider exceptions are sanitized; timeout completion cannot mutate evidence or facts later
+ok 548 - provider exceptions are sanitized; timeout completion cannot mutate evidence or facts later
+  ---
+  duration_ms: 35.148333
+  type: 'test'
+  ...
+# Subtest: budgets include calls, slots, accounts, read count, result bytes and wall time without raising defaults
+ok 549 - budgets include calls, slots, accounts, read count, result bytes and wall time without raising defaults
+  ---
+  duration_ms: 75.056833
+  type: 'test'
+  ...
+# Subtest: trace, poststate, overrides and mismatched header inputs are rejected before any reads
+ok 550 - trace, poststate, overrides and mismatched header inputs are rejected before any reads
+  ---
+  duration_ms: 15.123875
+  type: 'test'
+  ...
+# Subtest: Sepolia sparse facts require an explicit parent-selected chain even when the proof cache is warm
+ok 551 - Sepolia sparse facts require an explicit parent-selected chain even when the proof cache is warm
+  ---
+  duration_ms: 134.465
+  type: 'test'
+  ...
+# Subtest: Sepolia authenticated ancestry selects each ancestor fork across the Amsterdam boundary
+ok 552 - Sepolia authenticated ancestry selects each ancestor fork across the Amsterdam boundary
+  ---
+  duration_ms: 57.70625
+  type: 'test'
+  ...
+# Subtest: network labels, ancestor fork claims and committed fields cannot replace parent-selected verification
+ok 553 - network labels, ancestor fork claims and committed fields cannot replace parent-selected verification
+  ---
+  duration_ms: 29.397
+  type: 'test'
+  ...
+# Subtest: wrong or unsupported ancestry network rejects before transport dispatch
+ok 554 - wrong or unsupported ancestry network rejects before transport dispatch
+  ---
+  duration_ms: 1.512459
+  type: 'test'
+  ...
+# Subtest: Sepolia BLOCKHASH range rules need no extra RPC outside the committed 256-block window
+ok 555 - Sepolia BLOCKHASH range rules need no extra RPC outside the committed 256-block window
+  ---
+  duration_ms: 1.037375
+  type: 'test'
+  ...
+# Subtest: signed full-MPT sequence: delete old code/nonce/storage then native-fund the address without resurrection
+ok 556 - signed full-MPT sequence: delete old code/nonce/storage then native-fund the address without resurrection
+  ---
+  duration_ms: 436.5185
+  type: 'test'
+  ...
+# Subtest: signed full-MPT sequence: CREATE2 reuses an authenticated deleted namespace and a fresh getter sees only new storage
+ok 557 - signed full-MPT sequence: CREATE2 reuses an authenticated deleted namespace and a fresh getter sees only new storage
+  ---
+  duration_ms: 102.518667
+  type: 'test'
+  ...
+# Subtest: signed full-MPT sequence: a recreated contract can delete and be recreated again across Shanghai transactions
+ok 558 - signed full-MPT sequence: a recreated contract can delete and be recreated again across Shanghai transactions
+  ---
+  duration_ms: 185.974
+  type: 'test'
+  ...
+# Subtest: signed full-MPT sequence: constructor revert retains deletion and factory nonce, without old storage
+ok 559 - signed full-MPT sequence: constructor revert retains deletion and factory nonce, without old storage
+  ---
+  duration_ms: 37.800625
+  type: 'test'
+  ...
+# Subtest: actual local rollback and signed sequence agree when later funding is reverted by its ancestor
+ok 560 - actual local rollback and signed sequence agree when later funding is reverted by its ancestor
+  ---
+  duration_ms: 100.665584
+  type: 'test'
+  ...
+# Subtest: pinned reference cache diagnostic: committed empty trie differs from the stale address cache without altering sequence execution
+ok 561 - pinned reference cache diagnostic: committed empty trie differs from the stale address cache without altering sequence execution
+  ---
+  duration_ms: 46.192167
+  type: 'test'
+  ...
+# {"kind":"pinned_ethereumjs_storage_trie_cache_diagnostic","transactionsExecuted":2,"address":"0xf08b8ca285e2ba5906cb5745d7f887ea4d977e62","slot":"0x00000000000000000000000000000000000000000000000000000000000003df","cachedRaw":"99","freshCommittedRaw":"0","unchangedRoot":"0x5ae7f504a0c20b0ca9bd9e39199aada5ce80dfd71dc3ea81fc8ba4cf3fafe2ab","referenceExecutionModified":false}
+# Subtest: retained local manager matches signed sequence and third-MPT roots for direct/nested permanent native rematerialization
+ok 562 - retained local manager matches signed sequence and third-MPT roots for direct/nested permanent native rematerialization
+  ---
+  duration_ms: 328.165416
+  type: 'test'
+  ...
+# Subtest: retained local manager matches repeated CREATE2 recreation, fresh getters and entire cleared storage roots
+ok 563 - retained local manager matches repeated CREATE2 recreation, fresh getters and entire cleared storage roots
+  ---
+  duration_ms: 238.980208
+  type: 'test'
+  ...
+# Subtest: failed constructor and copied-manager recreation preserve the correct reset namespace and rollback
+ok 564 - failed constructor and copied-manager recreation preserve the correct reset namespace and rollback
+  ---
+  duration_ms: 177.0815
+  type: 'test'
+  ...
+# Subtest: host failure during surviving rematerialization rolls back nonce, balance and reset provenance atomically
+ok 565 - host failure during surviving rematerialization rolls back nonce, balance and reset provenance atomically
+  ---
+  duration_ms: 8.460958
+  type: 'test'
+  ...
+# Subtest: actual isolated before/after recreation getter agrees with separate signed full-VM sequences and unchanged rollback roots
+ok 566 - actual isolated before/after recreation getter agrees with separate signed full-VM sequences and unchanged rollback roots
+  ---
+  duration_ms: 592.003333
+  type: 'test'
+  ...
+# Subtest: Shanghai parent binds preexisting code/nonce and an entirely unrequested storage trie deletion
+ok 567 - Shanghai parent binds preexisting code/nonce and an entirely unrequested storage trie deletion
+  ---
+  duration_ms: 1110.578833
+  type: 'test'
+  ...
+# Subtest: Shanghai self-beneficiary burns before a refill and later transfer, including an initially empty recipient
+ok 568 - Shanghai self-beneficiary burns before a refill and later transfer, including an initially empty recipient
+  ---
+  duration_ms: 565.922958
+  type: 'test'
+  ...
+# Subtest: delegate SELFDESTRUCT deletes the execution account, never its code address
+ok 569 - delegate SELFDESTRUCT deletes the execution account, never its code address
+  ---
+  duration_ms: 1095.49775
+  type: 'test'
+  ...
+# Subtest: reverted ancestors preserve observations but never finalize Shanghai deletions
+ok 570 - reverted ancestors preserve observations but never finalize Shanghai deletions
+  ---
+  duration_ms: 835.278417
+  type: 'test'
+  ...
+# Subtest: Shanghai constructor deletion keeps absence and uses its own basis for prefunded targets
+ok 571 - Shanghai constructor deletion keeps absence and uses its own basis for prefunded targets
+  ---
+  duration_ms: 914.193209
+  type: 'test'
+  ...
+# Subtest: parent rejects missing/wrong-root/duplicate/basis-forged deletions and partial whole-account deltas
+ok 572 - parent rejects missing/wrong-root/duplicate/basis-forged deletions and partial whole-account deltas
+  ---
+  duration_ms: 3942.597292
+  type: 'test'
+  ...
+# Subtest: direct callers retain Cancun defaults while the isolated parent uses the trusted Shanghai header
+ok 573 - direct callers retain Cancun defaults while the isolated parent uses the trusted Shanghai header
+  ---
+  duration_ms: 406.906667
+  type: 'test'
+  ...
+# Subtest: disposable getters preserve original Shanghai deletion and see no resurrected code
+ok 574 - disposable getters preserve original Shanghai deletion and see no resurrected code
+  ---
+  duration_ms: 987.407125
+  type: 'test'
+  ...
+# Subtest: query destruction of an original creation is valid lifecycle evidence but never a measured getter
+ok 575 - query destruction of an original creation is valid lifecycle evidence but never a measured getter
+  ---
+  duration_ms: 936.709083
+  type: 'test'
+  ...
+# Subtest: Shanghai whole-account rows carry unchanged and reject unsafe extra fields or hostile objects
+ok 576 - Shanghai whole-account rows carry unchanged and reject unsafe extra fields or hostile objects
+  ---
+  duration_ms: 0.6115
+  type: 'test'
+  ...
+# Subtest: Shanghai deletes preexisting code and the entire authenticated nonempty storage trie
+ok 577 - Shanghai deletes preexisting code and the entire authenticated nonempty storage trie
+  ---
+  duration_ms: 323.11
+  type: 'test'
+  ...
+# Subtest: root SELFDESTRUCT preserves prior committed logs while removing its old code and storage
+ok 578 - root SELFDESTRUCT preserves prior committed logs while removing its old code and storage
+  ---
+  duration_ms: 86.459375
+  type: 'test'
+  ...
+# Subtest: Shanghai self-beneficiary burns immediately, yet later funding remains until final deletion
+ok 579 - Shanghai self-beneficiary burns immediately, yet later funding remains until final deletion
+  ---
+  duration_ms: 31.941792
+  type: 'test'
+  ...
+# Subtest: scheduled deletion retains executable code/storage and transfers repeated balances to different beneficiaries
+ok 580 - scheduled deletion retains executable code/storage and transfers repeated balances to different beneficiaries
+  ---
+  duration_ms: 80.270833
+  type: 'test'
+  ...
+# Subtest: DELEGATECALL and CALLCODE delete their execution account while implementation remains intact
+ok 581 - DELEGATECALL and CALLCODE delete their execution account while implementation remains intact
+  ---
+  duration_ms: 128.230333
+  type: 'test'
+  ...
+# Subtest: Shanghai root constructors delete both absent and prefunded creation targets
+ok 582 - Shanghai root constructors delete both absent and prefunded creation targets
+  ---
+  duration_ms: 106.303541
+  type: 'test'
+  ...
+# Subtest: CREATE2 collision remains until transaction finalization even after a constructor SELFDESTRUCT
+ok 583 - CREATE2 collision remains until transaction finalization even after a constructor SELFDESTRUCT
+  ---
+  duration_ms: 80.508166
+  type: 'test'
+  ...
+# Subtest: root revert and caught ancestor revert discard child deletion and native transfers
+ok 584 - root revert and caught ancestor revert discard child deletion and native transfers
+  ---
+  duration_ms: 111.358083
+  type: 'test'
+  ...
+# Subtest: STATICCALL and opcode OOG do not record a successful SELFDESTRUCT or delete the target
+ok 585 - STATICCALL and opcode OOG do not record a successful SELFDESTRUCT or delete the target
+  ---
+  duration_ms: 55.906042
+  type: 'test'
+  ...
+# Subtest: zero-balance SELFDESTRUCT deletes its old account without materializing an absent beneficiary
+ok 586 - zero-balance SELFDESTRUCT deletes its old account without materializing an absent beneficiary
+  ---
+  duration_ms: 34.6285
+  type: 'test'
+  ...
+# Subtest: fresh after-query sees deletion without restoring unknown original storage or changing its overlay
+ok 587 - fresh after-query sees deletion without restoring unknown original storage or changing its overlay
+  ---
+  duration_ms: 61.531958
+  type: 'test'
+  ...
+# Subtest: fresh query deletion of an original-created contract is rejected as a net mutation
+ok 588 - fresh query deletion of an original-created contract is rejected as a net mutation
+  ---
+  duration_ms: 13.230209
+  type: 'test'
+  ...
+# Subtest: finalizer host failure after multiple deletions rolls back all code, slots, balances and sender nonce
+ok 589 - finalizer host failure after multiple deletions rolls back all code, slots, balances and sender nonce
+  ---
+  duration_ms: 37.966083
+  type: 'test'
+  ...
+# Subtest: deadline after partial finalization and missing Shanghai finalizer fail closed with rollback
+ok 590 - deadline after partial finalization and missing Shanghai finalizer fail closed with rollback
+  ---
+  duration_ms: 68.223791
+  type: 'test'
+  ...
+# Subtest: a later invocation explicitly represents rematerialization without restoring old code or storage
+ok 591 - a later invocation explicitly represents rematerialization without restoring old code or storage
+  ---
+  duration_ms: 25.573292
+  type: 'test'
+  ...
+# Subtest: generic manager failures in sender/recipient value writes cannot become successful or caught EVM results
+ok 592 - generic manager failures in sender/recipient value writes cannot become successful or caught EVM results
+  ---
+  duration_ms: 59.504833
+  type: 'test'
+  ...
+# Subtest: explicit root CREATE executes constructor storage/value and derives address from original sender nonce
+ok 593 - explicit root CREATE executes constructor storage/value and derives address from original sender nonce
+  ---
+  duration_ms: 30.040375
+  type: 'test'
+  ...
+# Subtest: constructor ADDRESS, CALLER, ORIGIN and CALLVALUE use the new root context
+ok 594 - constructor ADDRESS, CALLER, ORIGIN and CALLVALUE use the new root context
+  ---
+  duration_ms: 7.500333
+  type: 'test'
+  ...
+# Subtest: prefunded deployable target retains funding without a false existence transition
+ok 595 - prefunded deployable target retains funding without a false existence transition
+  ---
+  duration_ms: 30.984042
+  type: 'test'
+  ...
+# Subtest: collision consumes message budget, preserves target and increments only sender nonce
+ok 596 - collision consumes message budget, preserves target and increments only sender nonce
+  ---
+  duration_ms: 67.153167
+  type: 'test'
+  ...
+# Subtest: constructor REVERT, invalid opcode and invalid runtime roll back target/value while retaining sender nonce
+ok 597 - constructor REVERT, invalid opcode and invalid runtime roll back target/value while retaining sender nonce
+  ---
+  duration_ms: 56.69375
+  type: 'test'
+  ...
+# Subtest: code-deposit gas exact boundary and runtime-size bound execute through EthereumJS
+ok 598 - code-deposit gas exact boundary and runtime-size bound execute through EthereumJS
+  ---
+  duration_ms: 27.718583
+  type: 'test'
+  ...
+# Subtest: empty initcode creates an empty-runtime nonce-one account and accepts zero message gas
+ok 599 - empty initcode creates an empty-runtime nonce-one account and accepts zero message gas
+  ---
+  duration_ms: 30.430333
+  type: 'test'
+  ...
+# Subtest: root constructor can perform nested creation with distinct origin markers and correct caller
+ok 600 - root constructor can perform nested creation with distinct origin markers and correct caller
+  ---
+  duration_ms: 9.760042
+  type: 'test'
+  ...
+# Subtest: missing deletion finalizer and host resource failure roll back all changes including sender nonce
+ok 601 - missing deletion finalizer and host resource failure roll back all changes including sender nonce
+  ---
+  duration_ms: 43.92975
+  type: 'test'
+  ...
+# Subtest: missing destination, legacy chain creation, root salt and blob creation are rejected before any state read
+ok 602 - missing destination, legacy chain creation, root salt and blob creation are rejected before any state read
+  ---
+  duration_ms: 4.617917
+  type: 'test'
+  ...
+# Subtest: EthereumJS warms the derived CREATE address, including an explicitly empty access list
+ok 603 - EthereumJS warms the derived CREATE address, including an explicitly empty access list
+  ---
+  duration_ms: 23.495166
+  type: 'test'
+  ...
+# Subtest: parent accepts absent/prefunded top-level CREATE including empty initcode and runtime
+ok 604 - parent accepts absent/prefunded top-level CREATE including empty initcode and runtime
+  ---
+  duration_ms: 2097.197209
+  type: 'test'
+  ...
+# Subtest: root CREATE derivation uses authenticated original nonce with canonical RLP boundary encoding
+ok 605 - root CREATE derivation uses authenticated original nonce with canonical RLP boundary encoding
+  ---
+  duration_ms: 1213.402084
+  type: 'test'
+  ...
+# Subtest: nested constructors preserve top-level versus internal origin and discard all creations on root revert
+ok 606 - nested constructors preserve top-level versus internal origin and discard all creations on root revert
+  ---
+  duration_ms: 720.944541
+  type: 'test'
+  ...
+# Subtest: CREATE collision and resource failure retain their distinct rollback semantics
+ok 607 - CREATE collision and resource failure retain their distinct rollback semantics
+  ---
+  duration_ms: 818.066708
+  type: 'test'
+  ...
+# Subtest: root CREATE destination is independently derived even if all creation rows/facts are coherently relabelled
+ok 608 - root CREATE destination is independently derived even if all creation rows/facts are coherently relabelled
+  ---
+  duration_ms: 493.353917
+  type: 'test'
+  ...
+# Subtest: actual parent rejects CREATE identity, runtime, provenance, gas and nonce substitutions
+ok 609 - actual parent rejects CREATE identity, runtime, provenance, gas and nonce substitutions
+  ---
+  duration_ms: 4904.173459
+  type: 'test'
+  ...
+# Subtest: a reverted constructor cannot retain fabricated creation effects or successful nested effects
+ok 610 - a reverted constructor cannot retain fabricated creation effects or successful nested effects
+  ---
+  duration_ms: 273.265417
+  type: 'test'
+  ...
+# Subtest: actual constructor revert, invalid opcode and success cannot be relabelled inconsistently
+ok 611 - actual constructor revert, invalid opcode and success cannot be relabelled inconsistently
+  ---
+  duration_ms: 821.607167
+  type: 'test'
+  ...
+# Subtest: disposable CALL getters preserve creation origin and original deployment state
+ok 612 - disposable CALL getters preserve creation origin and original deployment state
+  ---
+  duration_ms: 551.485167
+  type: 'test'
+  ...
+# Subtest: after-preview helper funding followed by REVERT is measured with unchanged deletion overlay; full VM agrees
+ok 613 - after-preview helper funding followed by REVERT is measured with unchanged deletion overlay; full VM agrees
+  ---
+  duration_ms: 313.89525
+  type: 'test'
+  ...
+# Subtest: real child and parent proof validation retain both measurements after reverted rematerialization
+ok 614 - real child and parent proof validation retain both measurements after reverted rematerialization
+  ---
+  duration_ms: 565.867875
+  type: 'test'
+  ...
+# Subtest: an ancestor REVERT permits nested successful commits, restores rematerialization, and agrees with full VM
+ok 615 - an ancestor REVERT permits nested successful commits, restores rematerialization, and agrees with full VM
+  ---
+  duration_ms: 22.076584
+  type: 'test'
+  ...
+# Subtest: root helper REVERT restores temporary funding without classifying it as a host failure
+ok 616 - root helper REVERT restores temporary funding without classifying it as a host failure
+  ---
+  duration_ms: 28.831125
+  type: 'test'
+  ...
+# Subtest: surviving direct and nested rematerialization has explicit reset provenance and matches full-VM execution
+ok 617 - surviving direct and nested rematerialization has explicit reset provenance and matches full-VM execution
+  ---
+  duration_ms: 99.50575
+  type: 'test'
+  ...
+# Subtest: a caller-owned outer checkpoint can revert the entire successful rematerializing invocation
+ok 618 - a caller-owned outer checkpoint can revert the entire successful rematerializing invocation
+  ---
+  duration_ms: 7.096625
+  type: 'test'
+  ...
+# Subtest: unknown old slots and code stay masked during actual transient funding and across a copied rollback
+ok 619 - unknown old slots and code stay masked during actual transient funding and across a copied rollback
+  ---
+  duration_ms: 29.383667
+  type: 'test'
+  ...
+# Subtest: direct rematerialization needs a checkpoint and defensive snapshots/commits reject invalid reset provenance
+ok 620 - direct rematerialization needs a checkpoint and defensive snapshots/commits reject invalid reset provenance
+  ---
+  duration_ms: 8.214583
+  type: 'test'
+  ...
+# Subtest: synthetic valid account/storage inclusion and exclusion bind to the explicit root
+ok 621 - synthetic valid account/storage inclusion and exclusion bind to the explicit root
+  ---
+  duration_ms: 3.040084
+  type: 'test'
+  ...
+# Subtest: proofs cannot substitute another state root or another account address
+ok 622 - proofs cannot substitute another state root or another account address
+  ---
+  duration_ms: 0.702875
+  type: 'test'
+  ...
+# Subtest: valid absent account proves zero basic state and empty code, distinct from unknown
+ok 623 - valid absent account proves zero basic state and empty code, distinct from unknown
+  ---
+  duration_ms: 1.236083
+  type: 'test'
+  ...
+# Subtest: empty global trie and empty storage trie require empty proofs and bind absence
+ok 624 - empty global trie and empty storage trie require empty proofs and bind absence
+  ---
+  duration_ms: 21.312542
+  type: 'test'
+  ...
+# Subtest: missing proof/code/slots do not become zero or empty by default
+ok 625 - missing proof/code/slots do not become zero or empty by default
+  ---
+  duration_ms: 5.173834
+  type: 'test'
+  ...
+# Subtest: every redundant account field is checked against the RLP-proven value
+ok 626 - every redundant account field is checked against the RLP-proven value
+  ---
+  duration_ms: 3.130167
+  type: 'test'
+  ...
+# Subtest: code is checked against the account proof, not merely the reported hash
+ok 627 - code is checked against the account proof, not merely the reported hash
+  ---
+  duration_ms: 3.505458
+  type: 'test'
+  ...
+# Subtest: storage root/value/key substitutions cannot borrow another valid proof
+ok 628 - storage root/value/key substitutions cannot borrow another valid proof
+  ---
+  duration_ms: 18.497959
+  type: 'test'
+  ...
+# Subtest: response storage keys accept canonical quantity or full word but reject ambiguous aliases
+ok 629 - response storage keys accept canonical quantity or full word but reject ambiguous aliases
+  ---
+  duration_ms: 1.064292
+  type: 'test'
+  ...
+# Subtest: extra, duplicate, reordered and truncated proof nodes are rejected
+ok 630 - extra, duplicate, reordered and truncated proof nodes are rejected
+  ---
+  duration_ms: 3.163959
+  type: 'test'
+  ...
+# Subtest: quantities reject leading zeros, decimal, numbers, negatives and overflowing nonce/balance
+ok 631 - quantities reject leading zeros, decimal, numbers, negatives and overflowing nonce/balance
+  ---
+  duration_ms: 0.328
+  type: 'test'
+  ...
+# Subtest: record shapes reject unknown properties, getters, coercible arrays and nonplain prototypes
+ok 632 - record shapes reject unknown properties, getters, coercible arrays and nonplain prototypes
+  ---
+  duration_ms: 0.2095
+  type: 'test'
+  ...
+# Subtest: sparse and accessor arrays are invalid and cumulative work is bounded before trie reads
+ok 633 - sparse and accessor arrays are invalid and cumulative work is bounded before trie reads
+  ---
+  duration_ms: 2.315583
+  type: 'test'
+  ...
+# Subtest: malformed and nonminimal account RLP is rejected even under its matching synthetic root
+ok 634 - malformed and nonminimal account RLP is rejected even under its matching synthetic root
+  ---
+  duration_ms: 2.047208
+  type: 'test'
+  ...
+# Subtest: explicit-zero and leading-zero storage leaves are not canonical Ethereum storage
+ok 635 - explicit-zero and leading-zero storage leaves are not canonical Ethereum storage
+  ---
+  duration_ms: 5.559208
+  type: 'test'
+  ...
+# Subtest: asynchronous verification snapshots inputs and returns immutable detached facts
+ok 636 - asynchronous verification snapshots inputs and returns immutable detached facts
+  ---
+  duration_ms: 0.973208
+  type: 'test'
+  ...
+# Subtest: embedded extension/branch/leaf children are verified without inventing external proof nodes
+ok 637 - embedded extension/branch/leaf children are verified without inventing external proof nodes
+  ---
+  duration_ms: 1.671834
+  type: 'test'
+  ...
+# Subtest: malformed compact paths and short secure-key leaves are rejected under matching roots
+ok 638 - malformed compact paths and short secure-key leaves are rejected under matching roots
+  ---
+  duration_ms: 2.528833
+  type: 'test'
+  ...
+# Subtest: shared proof-byte budget rejects a large collection before evaluating any trie
+ok 639 - shared proof-byte budget rejects a large collection before evaluating any trie
+  ---
+  duration_ms: 222.280416
+  type: 'test'
+  ...
+# Subtest: explicit EOA existence remains distinct from proof of absence
+ok 640 - explicit EOA existence remains distinct from proof of absence
+  ---
+  duration_ms: 2.640917
+  type: 'test'
+  ...
+# Subtest: Geth zero hash metadata is admitted only after account exclusion and kept separate
+ok 641 - Geth zero hash metadata is admitted only after account exclusion and kept separate
+  ---
+  duration_ms: 1.958541
+  type: 'test'
+  ...
+# Subtest: pinned public development packet proves both USDC responses and dRPC account absence offline
+ok 642 - pinned public development packet proves both USDC responses and dRPC account absence offline
+  ---
+  duration_ms: 10.3185
+  type: 'test'
+  ...
+1..642
+# tests 777
+# suites 0
+# pass 777
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 38551.566583

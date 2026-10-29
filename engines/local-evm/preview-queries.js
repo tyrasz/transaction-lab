@@ -60,7 +60,17 @@ function list(value, min, max) {
 }
 function address(value) { need(typeof value === 'string' && value.length === 42 && ADDRESS.test(value), 'Query identity requires a 20-byte address.'); return value.toLowerCase(); }
 function freeze(value) { if (value !== null && typeof value === 'object') { for (const child of Object.values(value)) freeze(child); Object.freeze(value); } return value; }
-function compileOne(input) {
+function trustedChainId(options) {
+  if (options === undefined) return '1';
+  // Options belong to the admitted parent context, never a query descriptor or
+  // serialized child identity. Inspect descriptors before reading the chain.
+  need(options !== null && typeof options === 'object' && !types.isProxy(options) && !Array.isArray(options), 'A plain trusted query options record is required.');
+  record(options, own(options, 'chainId') ? ['chainId'] : []);
+  const chainId = own(options, 'chainId') ? options.chainId : 1;
+  need(chainId === 1 || chainId === 11155111, 'Trusted query chain must be mainnet 1 or Sepolia 11155111.');
+  return String(chainId);
+}
+function compileOne(input, chainId) {
   // Inspect descriptors before reading even the discriminator.
   need(input !== null && typeof input === 'object' && !types.isProxy(input) && !Array.isArray(input), 'A plain query record is required.');
   const typed = own(input, 'kind');
@@ -71,7 +81,7 @@ function compileOne(input) {
     need(typeof data === 'string' && data.length <= 138 && (BALANCE.test(data) || ALLOWANCE.test(data)), 'Only canonical balanceOf and allowance calldata is supported.');
     descriptor = { to, data: data.toLowerCase() }; query = { ...descriptor };
     const account = '0x' + descriptor.data.slice(34, 74), balance = BALANCE.test(descriptor.data);
-    identity = { kind: balance ? 'balanceOf' : 'allowance', chainId: '1', token: to,
+    identity = { kind: balance ? 'balanceOf' : 'allowance', chainId, token: to,
       ...(balance ? { account } : { owner: account, spender: '0x' + descriptor.data.slice(98, 138) }), contractIdentityVerified: false };
     fields = [{ name: balance ? 'balance' : 'allowance', bits: 256, unit: { kind: 'token_raw_units', scale: null } }];
   } else {
@@ -81,7 +91,7 @@ function compileOne(input) {
     if (kind === 'native_balance') {
       record(input, ['kind', 'account']);
       descriptor = { kind, account: address(input.account) };
-      return freeze({ descriptor, query: null, identity: { ...descriptor, chainId: '1' }, returnBytes: 0,
+      return freeze({ descriptor, query: null, identity: { ...descriptor, chainId }, returnBytes: 0,
         fields: [{ name: 'balance', bits: 256, unit: { kind: 'native_wei', scale: '1000000000000000000' } }] });
     }
     record(input, kind === 'morpho_blue_position' ? ['kind', 'contract', 'user', 'marketId'] : ['kind', 'contract', 'user']);
@@ -90,21 +100,23 @@ function compileOne(input) {
       need(typeof input.marketId === 'string' && input.marketId.length === 66 && WORD.test(input.marketId), 'Morpho position requires an explicit 32-byte market ID.');
       descriptor.marketId = input.marketId.toLowerCase();
     }
-    identity = { ...descriptor, chainId: '1', contractIdentityVerified: false };
+    identity = { ...descriptor, chainId, contractIdentityVerified: false };
     query = { to: descriptor.contract, data: SCHEMAS[kind].selector + (descriptor.marketId?.slice(2) ?? '') + '0'.repeat(24) + descriptor.user.slice(2) };
     fields = structuredClone(SCHEMAS[kind].fields);
   }
   return freeze({ descriptor, query, identity, returnBytes: fields.length * 32, fields });
 }
 
-/** Fixed Ethereum chain1. Zero addresses/market IDs are valid ABI words, not
- * evidence that an account or market exists. Every list is validated fully
- * before its compiled output is returned. Duplicate canonical calls reject. */
-export function compilePreviewQueries(queries) {
+/** The optional trusted parent chain defaults to mainnet. This helper does not
+ * admit a network to execution or verify a deployment. Zero addresses/market
+ * IDs are valid ABI words, not evidence of existence. Every list is validated
+ * fully before returning; duplicate canonical calls reject. */
+export function compilePreviewQueries(queries, options) {
+  const chainId = trustedChainId(options);
   list(queries, 1, 8);
   const compiled = [], seen = new Set();
   for (const input of queries) {
-    const entry = compileOne(input), key = entry.query === null ? 'native:' + entry.descriptor.account : entry.query.to + ':' + entry.query.data;
+    const entry = compileOne(input, chainId), key = entry.query === null ? 'native:' + entry.descriptor.account : entry.query.to + ':' + entry.query.data;
     need(!seen.has(key), 'Duplicate canonical preview query.'); seen.add(key); compiled.push(entry);
   }
   return freeze(compiled);
@@ -122,9 +134,10 @@ function sameTree(actual, expected) {
 /** Decode one compiled query's raw return bytes. This is not an RPC envelope,
  * call-success assertion or measurement. Unit labels describe the declared ABI
  * only. No decimals, prices, share conversions or health judgment are inferred. */
-export function decodePreviewValues(compiled, returnData) {
+export function decodePreviewValues(compiled, returnData, options) {
+  const chainId = trustedChainId(options);
   record(compiled, ['descriptor', 'query', 'identity', 'returnBytes', 'fields']);
-  const canonical = compileOne(compiled.descriptor); sameTree(compiled, canonical);
+  const canonical = compileOne(compiled.descriptor, chainId); sameTree(compiled, canonical);
   need(canonical.query !== null, 'A native balance is an account-state read, not ABI return data.');
   need(typeof returnData === 'string' && returnData.length === 2 + canonical.returnBytes * 2 && /^0x[0-9a-fA-F]+$/.test(returnData), 'Return data must contain exactly the declared static ABI words.');
   return canonical.fields.map((field, index) => {
@@ -137,9 +150,10 @@ export function decodePreviewValues(compiled, returnData) {
 /** Format only an explicitly observed native account balance. Provenance,
  * execution completion and state immutability are checked by the core/parent.
  * This helper accepts no ABI bytes or Number conversion. */
-export function nativeBalanceValues(compiled, balance) {
+export function nativeBalanceValues(compiled, balance, options) {
+  const chainId = trustedChainId(options);
   record(compiled, ['descriptor', 'query', 'identity', 'returnBytes', 'fields']);
-  const canonical = compileOne(compiled.descriptor); sameTree(compiled, canonical);
+  const canonical = compileOne(compiled.descriptor, chainId); sameTree(compiled, canonical);
   need(canonical.query === null && typeof balance === 'bigint' && balance >= 0n && balance < (1n << 256n), 'A native read requires an exact uint256 balance.');
   return [{ name: 'balance', raw: balance.toString(), unit: structuredClone(canonical.fields[0].unit) }];
 }
