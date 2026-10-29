@@ -1,0 +1,226 @@
+TAP version 13
+# Subtest: state eligibility charges absent and EIP161-empty authorities, not funded/nonce/code-existing accounts
+ok 1 - state eligibility charges absent and EIP161-empty authorities, not funded/nonce/code-existing accounts
+  ---
+  duration_ms: 9.610417
+  type: 'test'
+  ...
+# Subtest: combined charge is atomic at exact execution/state boundaries and tracks reservoir spill once
+ok 2 - combined charge is atomic at exact execution/state boundaries and tracks reservoir spill once
+  ---
+  duration_ms: 1.07225
+  type: 'test'
+  ...
+# Subtest: trusted fork/chain and malformed envelopes fail before state reads; universal tuple and explicit mainnet work
+ok 3 - trusted fork/chain and malformed envelopes fail before state reads; universal tuple and explicit mainnet work
+  ---
+  duration_ms: 12.326291
+  type: 'test'
+  ...
+# Subtest: recovery-before-access order preserves skipped authority reads, rejects nonexact designation, never warms delegate
+ok 4 - recovery-before-access order preserves skipped authority reads, rejects nonexact designation, never warms delegate
+  ---
+  duration_ms: 14.78875
+  type: 'test'
+  ...
+# Subtest: repeated set/clear/set charges account and indicator once; original designation survives charge accounting
+ok 5 - repeated set/clear/set charges account and indicator once; original designation survives charge accounting
+  ---
+  duration_ms: 14.259459
+  type: 'test'
+  ...
+# Subtest: sender compares already-incremented nonce without a second increment and recipient value prepays first write
+ok 6 - sender compares already-incremented nonce without a second increment and recipient value prepays first write
+  ---
+  duration_ms: 10.012333
+  type: 'test'
+  ...
+# Subtest: late authorization OOG exposes attempted rows and caller rollback discards all writes but retains sender nonce
+ok 7 - late authorization OOG exposes attempted rows and caller rollback discards all writes but retains sender nonce
+  ---
+  duration_ms: 4.098208
+  type: 'test'
+  ...
+# Subtest: unexpected state/clock failures propagate unchanged and whole-attempt rollback preserves prior overlay
+ok 8 - unexpected state/clock failures propagate unchanged and whole-attempt rollback preserves prior overlay
+  ---
+  duration_ms: 33.612209
+  type: 'test'
+  ...
+# Subtest: real proof manager retains storage and reports absent authorization materialization with authenticated inputs
+ok 9 - real proof manager retains storage and reports absent authorization materialization with authenticated inputs
+  ---
+  duration_ms: 5.045666
+  type: 'test'
+  ...
+# Subtest: signed full-VM preparation agrees for absent/funded/predelegated and repeated authorities with reservoir/spill
+ok 10 - signed full-VM preparation agrees for absent/funded/predelegated and repeated authorities with reservoir/spill
+  ---
+  duration_ms: 92.890375
+  type: 'test'
+  ...
+# Subtest: entered root REVERT/INVALID retains authorization state and state gas in signed full-VM controls
+ok 11 - entered root REVERT/INVALID retains authorization state and state gas in signed full-VM controls
+  ---
+  duration_ms: 15.013166
+  type: 'test'
+  ...
+# Subtest: authorization vs recipient preparation OOG preserves distinction and rolls back the same state in full VM
+ok 12 - authorization vs recipient preparation OOG preserves distinction and rolls back the same state in full VM
+  ---
+  duration_ms: 11.542084
+  type: 'test'
+  ...
+# Subtest: named pinned-EthereumJS divergence: existing-empty authority misses new-leaf charge, helper follows EIP8037/Geth
+ok 13 - named pinned-EthereumJS divergence: existing-empty authority misses new-leaf charge, helper follows EIP8037/Geth
+  ---
+  duration_ms: 7.100125
+  type: 'test'
+  ...
+# Subtest: install, replace and clear retain exact authority storage and full signed type-4 postroots
+ok 14 - install, replace and clear retain exact authority storage and full signed type-4 postroots
+  ---
+  duration_ms: 76.387083
+  type: 'test'
+  ...
+# Subtest: proof-absent and existing empty authorities differ by the existence refund
+ok 15 - proof-absent and existing empty authorities differ by the existence refund
+  ---
+  duration_ms: 23.995084
+  type: 'test'
+  ...
+# Subtest: ordered duplicate authorizations consume sequential nonces and keep skipped tuples in place
+ok 16 - ordered duplicate authorizations consume sequential nonces and keep skipped tuples in place
+  ---
+  duration_ms: 16.069625
+  type: 'test'
+  ...
+# Subtest: self-authorization reads the sender nonce after its outer increment and executes the new code
+ok 17 - self-authorization reads the sender nonce after its outer increment and executes the new code
+  ---
+  duration_ms: 18.252416
+  type: 'test'
+  ...
+# Subtest: wrong chain, max nonce, invalid parity, high-s and zero-r are protocol skips, not dropped inputs
+ok 18 - wrong chain, max nonce, invalid parity, high-s and zero-r are protocol skips, not dropped inputs
+  ---
+  duration_ms: 14.044916
+  type: 'test'
+  ...
+# Subtest: code and nonce guards skip recoverable authorities without mutating them
+ok 19 - code and nonce guards skip recoverable authorities without mutating them
+  ---
+  duration_ms: 18.372792
+  type: 'test'
+  ...
+# Subtest: recoverable skipped authorities are warm even though their authorization was not applied
+ok 20 - recoverable skipped authorities are warm even though their authorization was not applied
+  ---
+  duration_ms: 9.021708
+  type: 'test'
+  ...
+# Subtest: REVERT and out of gas roll back message writes but retain preceding authorization state and refunds
+ok 21 - REVERT and out of gas roll back message writes but retain preceding authorization state and refunds
+  ---
+  duration_ms: 30.93775
+  type: 'test'
+  ...
+# Subtest: successful delegated message storage writes use authority context and preserve old unknown slots
+ok 22 - successful delegated message storage writes use authority context and preserve old unknown slots
+  ---
+  duration_ms: 11.507459
+  type: 'test'
+  ...
+# Subtest: a newly materialized authority may write storage without being marked as a constructor creation
+ok 23 - a newly materialized authority may write storage without being marked as a constructor creation
+  ---
+  duration_ms: 11.72325
+  type: 'test'
+  ...
+# Subtest: authorization materialization is not EIP-6780 creation and SELFDESTRUCT keeps its designation
+ok 24 - authorization materialization is not EIP-6780 creation and SELFDESTRUCT keeps its designation
+  ---
+  duration_ms: 8.752875
+  type: 'test'
+  ...
+# Subtest: message storage-clear refund is separate from the authorization existence refund
+ok 25 - message storage-clear refund is separate from the authorization existence refund
+  ---
+  duration_ms: 9.626208
+  type: 'test'
+  ...
+# Subtest: authorization nonce precedes CREATE and only committed message ancestry retains creator increments
+ok 26 - authorization nonce precedes CREATE and only committed message ancestry retains creator increments
+  ---
+  duration_ms: 21.934583
+  type: 'test'
+  ...
+# Subtest: self-authorization and committed sender creation attempts each consume their distinct nonce
+ok 27 - self-authorization and committed sender creation attempts each consume their distinct nonce
+  ---
+  duration_ms: 17.347583
+  type: 'test'
+  ...
+# Subtest: Prague activates authorization processing and uses the same signed transaction behavior
+ok 28 - Prague activates authorization processing and uses the same signed transaction behavior
+  ---
+  duration_ms: 8.418041
+  type: 'test'
+  ...
+# Subtest: a proof failure after authorization and a post-authorization deadline restore the complete attempt
+ok 29 - a proof failure after authorization and a post-authorization deadline restore the complete attempt
+  ---
+  duration_ms: 5.700458
+  type: 'test'
+  ...
+# Subtest: failure inside a caller checkpoint restores that checkpoint without retaining authorization provenance
+ok 30 - failure inside a caller checkpoint restores that checkpoint without retaining authorization provenance
+  ---
+  duration_ms: 2.918917
+  type: 'test'
+  ...
+# Subtest: real isolated child retains signature decisions, complete changes and five full-VM channels
+ok 31 - real isolated child retains signature decisions, complete changes and five full-VM channels
+  ---
+  duration_ms: 130.806791
+  type: 'test'
+  ...
+# Subtest: real isolated before/after queries see old/new code without replaying original authorizations
+ok 32 - real isolated before/after queries see old/new code without replaying original authorizations
+  ---
+  duration_ms: 145.127292
+  type: 'test'
+  ...
+# Subtest: authorization normalization preserves ordered duplicates, detaches, and freezes canonical values
+ok 33 - authorization normalization preserves ordered duplicates, detaches, and freezes canonical values
+  ---
+  duration_ms: 0.707125
+  type: 'test'
+  ...
+# Subtest: structural bounds reject ambiguous encodings, extra fields, sparse/getter/proxy values without evaluating them
+ok 34 - structural bounds reject ambiguous encodings, extra fields, sparse/getter/proxy values without evaluating them
+  ---
+  duration_ms: 0.574292
+  type: 'test'
+  ...
+# Subtest: recover known offline signer and chain-zero domain; malformed signatures are skipped not admitted as recovered authorities
+ok 35 - recover known offline signer and chain-zero domain; malformed signatures are skipped not admitted as recovered authorities
+  ---
+  duration_ms: 19.088291
+  type: 'test'
+  ...
+# Subtest: state decisions distinguish existence from emptiness and enforce exact delegation code before nonce matching
+ok 36 - state decisions distinguish existence from emptiness and enforce exact delegation code before nonce matching
+  ---
+  duration_ms: 0.146292
+  type: 'test'
+  ...
+1..36
+# tests 36
+# suites 0
+# pass 36
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 772.641209

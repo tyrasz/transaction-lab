@@ -1,0 +1,172 @@
+TAP version 13
+# Subtest: fork selection uses activation timestamps, never the library default
+ok 1 - fork selection uses activation timestamps, never the library default
+  ---
+  duration_ms: 1.976
+  type: 'test'
+  ...
+# Subtest: zero message gas permits an ordinary 21000-gas ETH transfer without a root CALL surcharge
+ok 2 - zero message gas permits an ordinary 21000-gas ETH transfer without a root CALL surcharge
+  ---
+  duration_ms: 4.1275
+  type: 'test'
+  ...
+# Subtest: Prague calldata floor changes envelope admission and reported gas, not the message gas subtraction
+ok 3 - Prague calldata floor changes envelope admission and reported gas, not the message gas subtraction
+  ---
+  duration_ms: 4.077959
+  type: 'test'
+  ...
+# Subtest: actual SSTORE refunds are capped at one fifth and the calldata floor is applied afterward
+ok 4 - actual SSTORE refunds are capped at one fifth and the calldata floor is applied afterward
+  ---
+  duration_ms: 5.241708
+  type: 'test'
+  ...
+# Subtest: insufficient native balance and max nonce are invalid before nonce or storage mutation
+ok 5 - insufficient native balance and max nonce are invalid before nonce or storage mutation
+  ---
+  duration_ms: 1.963334
+  type: 'test'
+  ...
+# Subtest: value and SSTORE roll back on real REVERT, while the completed call retains one nonce increment
+ok 6 - value and SSTORE roll back on real REVERT, while the completed call retains one nonce increment
+  ---
+  duration_ms: 1.204792
+  type: 'test'
+  ...
+# Subtest: CHAINID and header opcodes reflect mainnet and explicit unpriced context
+ok 7 - CHAINID and header opcodes reflect mainnet and explicit unpriced context
+  ---
+  duration_ms: 1.339625
+  type: 'test'
+  ...
+# Subtest: new fork precompiles are warm only after their activation
+ok 8 - new fork precompiles are warm only after their activation
+  ---
+  duration_ms: 3.204583
+  type: 'test'
+  ...
+# Subtest: HyperEVM reserved addresses are ordinary mainnet addresses
+ok 9 - HyperEVM reserved addresses are ordinary mainnet addresses
+  ---
+  duration_ms: 2.142333
+  type: 'test'
+  ...
+# Subtest: Osaka CLZ executes only after the fork and a pre-fork invalid opcode consumes message gas
+ok 10 - Osaka CLZ executes only after the fork and a pre-fork invalid opcode consumes message gas
+  ---
+  duration_ms: 1.33575
+  type: 'test'
+  ...
+# Subtest: ordinary contract sender and unsupported-manager lifecycle operations retain no writes
+ok 11 - ordinary contract sender and unsupported-manager lifecycle operations retain no writes
+  ---
+  duration_ms: 1.116625
+  type: 'test'
+  ...
+# Subtest: unsupported transaction extras and malformed inputs are rejected before state reads
+ok 12 - unsupported transaction extras and malformed inputs are rejected before state reads
+  ---
+  duration_ms: 1.126333
+  type: 'test'
+  ...
+# Subtest: gas rules preserve byte classes and refund/floor boundary exactly without floating point
+ok 13 - gas rules preserve byte classes and refund/floor boundary exactly without floating point
+  ---
+  duration_ms: 0.091083
+  type: 'test'
+  ...
+# Subtest: access-list occurrences charge intrinsic gas while warming deduplicates and never prefetches unused facts
+ok 14 - access-list occurrences charge intrinsic gas while warming deduplicates and never prefetches unused facts
+  ---
+  duration_ms: 1.649416
+  type: 'test'
+  ...
+# Subtest: declared warming survives nested REVERT and is scoped to each new execution
+ok 15 - declared warming survives nested REVERT and is scoped to each new execution
+  ---
+  duration_ms: 2.234208
+  type: 'test'
+  ...
+# Subtest: declared blob context exposes ordered hashes, bounded index zero and synthetic blob base fee
+ok 16 - declared blob context exposes ordered hashes, bounded index zero and synthetic blob base fee
+  ---
+  duration_ms: 0.795042
+  type: 'test'
+  ...
+# Subtest: blob context propagates through nested calls while absent BLOBBASEFEE stays unsupported and malformed KZG fails normally
+ok 17 - blob context propagates through nested calls while absent BLOBBASEFEE stays unsupported and malformed KZG fails normally
+  ---
+  duration_ms: 2.25425
+  type: 'test'
+  ...
+# Subtest: access intrinsic and blob fork/header validity reject before state reads
+ok 18 - access intrinsic and blob fork/header validity reject before state reads
+  ---
+  duration_ms: 0.665375
+  type: 'test'
+  ...
+# Subtest: Ethereum BLOBHASH without declared blobs returns zero for all tested uint256 indexes at three opcode gas
+ok 19 - Ethereum BLOBHASH without declared blobs returns zero for all tested uint256 indexes at three opcode gas
+  ---
+  duration_ms: 2.566291
+  type: 'test'
+  ...
+# Subtest: non-blob BLOBHASH obeys Cancun activation rather than enabling a pre-fork opcode
+ok 20 - non-blob BLOBHASH obeys Cancun activation rather than enabling a pre-fork opcode
+  ---
+  duration_ms: 0.891166
+  type: 'test'
+  ...
+# Subtest: CALL, DELEGATECALL and STATICCALL inherit an empty blob-hash list without extra input state
+ok 21 - CALL, DELEGATECALL and STATICCALL inherit an empty blob-hash list without extra input state
+  ---
+  duration_ms: 1.935292
+  type: 'test'
+  ...
+# Subtest: non-blob BLOBHASH preserves ordinary REVERT and stack-fault rollback including transferred value
+ok 22 - non-blob BLOBHASH preserves ordinary REVERT and stack-fault rollback including transferred value
+  ---
+  duration_ms: 1.274667
+  type: 'test'
+  ...
+# Subtest: unsupported non-blob BLOBBASEFEE after successful BLOBHASH rolls back storage, value and nonce
+ok 23 - unsupported non-blob BLOBBASEFEE after successful BLOBHASH rolls back storage, value and nonce
+  ---
+  duration_ms: 0.670292
+  type: 'test'
+  ...
+# Subtest: fee admission is explicit, detached and canonical while the default adds nothing
+ok 24 - fee admission is explicit, detached and canonical while the default adds nothing
+  ---
+  duration_ms: 2.041125
+  type: 'test'
+  ...
+# Subtest: normalization and plan reads never invoke proxy or accessor code
+ok 25 - normalization and plan reads never invoke proxy or accessor code
+  ---
+  duration_ms: 0.237791
+  type: 'test'
+  ...
+# Subtest: cap affordability differs from actual prepayment and final settlement remains exact
+ok 26 - cap affordability differs from actual prepayment and final settlement remains exact
+  ---
+  duration_ms: 1.143042
+  type: 'test'
+  ...
+# Subtest: header cap, block gas and uint256 affordability overflow fail before any state is supplied
+ok 27 - header cap, block gas and uint256 affordability overflow fail before any state is supplied
+  ---
+  duration_ms: 2.016459
+  type: 'test'
+  ...
+1..27
+# tests 27
+# suites 0
+# pass 27
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 177.357958

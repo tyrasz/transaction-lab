@@ -1,0 +1,532 @@
+TAP version 13
+# Subtest: Amsterdam clearing binds created/selfdestruct intersection and preserves absent or prefunded native balances
+ok 1 - Amsterdam clearing binds created/selfdestruct intersection and preserves absent or prefunded native balances
+  ---
+  duration_ms: 45.97925
+  type: 'test'
+  ...
+# Subtest: zero residual clearing has exact whole-account removal only for an originally existing target
+ok 2 - zero residual clearing has exact whole-account removal only for an originally existing target
+  ---
+  duration_ms: 42.611084
+  type: 'test'
+  ...
+# Subtest: SELFDESTRUCT followed by a later refill preserves only the reconstructed residual balance
+ok 3 - SELFDESTRUCT followed by a later refill preserves only the reconstructed residual balance
+  ---
+  duration_ms: 37.020125
+  type: 'test'
+  ...
+# Subtest: preexisting self-beneficiary has no burn or clearing and cannot borrow a creation marker
+ok 4 - preexisting self-beneficiary has no burn or clearing and cannot borrow a creation marker
+  ---
+  duration_ms: 15.4215
+  type: 'test'
+  ...
+# Subtest: a pending cleared coinbase retains its fee credit after all native transfers and settlement
+ok 5 - a pending cleared coinbase retains its fee credit after all native transfers and settlement
+  ---
+  duration_ms: 16.510625
+  type: 'test'
+  ...
+# Subtest: missing, duplicated, fabricated or old-fork clearing evidence and surviving namespace fields fail closed
+ok 6 - missing, duplicated, fabricated or old-fork clearing evidence and surviving namespace fields fail closed
+  ---
+  duration_ms: 15.337417
+  type: 'test'
+  ...
+# Subtest: root revert retains observed SELFDESTRUCT but cannot fabricate committed clearing
+ok 7 - root revert retains observed SELFDESTRUCT but cannot fabricate committed clearing
+  ---
+  duration_ms: 3.937125
+  type: 'test'
+  ...
+# Subtest: balance-only and zero-empty clearing rows carry through neutral query copies without new lifecycle claims
+ok 8 - balance-only and zero-empty clearing rows carry through neutral query copies without new lifecycle claims
+  ---
+  duration_ms: 16.231125
+  type: 'test'
+  ...
+# Subtest: reset namespace shapes preserve immutable roots and remain neutral only when carried unchanged
+ok 9 - reset namespace shapes preserve immutable roots and remain neutral only when carried unchanged
+  ---
+  duration_ms: 0.294667
+  type: 'test'
+  ...
+# Subtest: actual isolated parent admits clearing and native queries observe preserved balance with no query mutation
+ok 10 - actual isolated parent admits clearing and native queries observe preserved balance with no query mutation
+  ---
+  duration_ms: 415.595084
+  type: 'test'
+  ...
+# Subtest: an original creation is not newly created by a disposable query, even when it selfdestructs there
+ok 11 - an original creation is not newly created by a disposable query, even when it selfdestructs there
+  ---
+  duration_ms: 206.22775
+  type: 'test'
+  ...
+# Subtest: actual worker reply cannot erase the clearing or replace its residual with a mutually forged balance
+ok 12 - actual worker reply cannot erase the clearing or replace its residual with a mutually forged balance
+  ---
+  duration_ms: 404.107916
+  type: 'test'
+  ...
+# Subtest: inherited static mode rejects the reproduced delegated SELFDESTRUCT clearing forgery in an actual worker reply
+ok 13 - inherited static mode rejects the reproduced delegated SELFDESTRUCT clearing forgery in an actual worker reply
+  ---
+  duration_ms: 203.654834
+  type: 'test'
+  ...
+# Subtest: static ancestry cannot acquire entered CREATE/CREATE2 or a value-bearing CALL by relabeling a normal ancestor
+ok 14 - static ancestry cannot acquire entered CREATE/CREATE2 or a value-bearing CALL by relabeling a normal ancestor
+  ---
+  duration_ms: 12.197791
+  type: 'test'
+  ...
+# Subtest: inherited static mode still permits zero-value CALL and nonzero CALLCODE without balance transfer
+ok 15 - inherited static mode still permits zero-value CALL and nonzero CALLCODE without balance transfer
+  ---
+  duration_ms: 11.413208
+  type: 'test'
+  ...
+# Subtest: blob parent binds complete fee accounting, authenticated price and declared hashes
+ok 16 - blob parent binds complete fee accounting, authenticated price and declared hashes
+  ---
+  duration_ms: 2460.120875
+  type: 'test'
+  ...
+# Subtest: blob parent rejects omitted burn and invented beneficiary blob credits, including sender alias
+ok 17 - blob parent rejects omitted burn and invented beneficiary blob credits, including sender alias
+  ---
+  duration_ms: 1065.873334
+  type: 'test'
+  ...
+# Subtest: blob parent validates burn and rollback on REVERT and out of gas
+ok 18 - blob parent validates burn and rollback on REVERT and out of gas
+  ---
+  duration_ms: 1073.687166
+  type: 'test'
+  ...
+# Subtest: blob before/after measurements receive no hashes or charges and retain explicit opcode limitations
+ok 19 - blob before/after measurements receive no hashes or charges and retain explicit opcode limitations
+  ---
+  duration_ms: 316.853417
+  type: 'test'
+  ...
+# Subtest: blob count and cap admission happen before proof I/O
+ok 20 - blob count and cap admission happen before proof I/O
+  ---
+  duration_ms: 5.420458
+  type: 'test'
+  ...
+# Subtest: parent derives delegated sender eligibility and rejects missing, altered or extra declaration fields
+ok 21 - parent derives delegated sender eligibility and rejects missing, altered or extra declaration fields
+  ---
+  duration_ms: 1259.926792
+  type: 'test'
+  ...
+# Subtest: parent rejects undercounted and overcounted sender creation attempts
+ok 22 - parent rejects undercounted and overcounted sender creation attempts
+  ---
+  duration_ms: 375.740084
+  type: 'test'
+  ...
+# Subtest: entered reverted constructors and collisions retain their creator nonce increment
+ok 23 - entered reverted constructors and collisions retain their creator nonce increment
+  ---
+  duration_ms: 716.702167
+  type: 'test'
+  ...
+# Subtest: reverted parent ancestry cannot justify an extra sender nonce even when its CREATE succeeded
+ok 24 - reverted parent ancestry cannot justify an extra sender nonce even when its CREATE succeeded
+  ---
+  duration_ms: 718.259459
+  type: 'test'
+  ...
+# Subtest: parent rejects laundering a callback execution account to hide sender creation attempts
+ok 25 - parent rejects laundering a callback execution account to hide sender creation attempts
+  ---
+  duration_ms: 355.892125
+  type: 'test'
+  ...
+# Subtest: an empty-code sender cannot acquire delegation authority through metadata or forged input facts
+ok 26 - an empty-code sender cannot acquire delegation authority through metadata or forged input facts
+  ---
+  duration_ms: 352.391
+  type: 'test'
+  ...
+# Subtest: trusted pre-Prague fork and exact indicator length remain required at the parent boundary
+ok 27 - trusted pre-Prague fork and exact indicator length remain required at the parent boundary
+  ---
+  duration_ms: 1115.656417
+  type: 'test'
+  ...
+# Subtest: measured probes use the same authenticated delegation but still normalize only one sender nonce
+ok 28 - measured probes use the same authenticated delegation but still normalize only one sender nonce
+  ---
+  duration_ms: 457.174708
+  type: 'test'
+  ...
+# Subtest: parent accepts actual CALL and STATICCALL cleanup, including an entirely unknown nonempty storage trie
+ok 29 - parent accepts actual CALL and STATICCALL cleanup, including an entirely unknown nonempty storage trie
+  ---
+  duration_ms: 945.4125
+  type: 'test'
+  ...
+# Subtest: ordinary reverted touches retain the empty account while RIPEMD160 OOG touches survive root revert
+ok 30 - ordinary reverted touches retain the empty account while RIPEMD160 OOG touches survive root revert
+  ---
+  duration_ms: 587.86925
+  type: 'test'
+  ...
+# Subtest: Shanghai parent admits EIP-161 cleanup and committed SELFDESTRUCT but rejects unrelated deletion evidence
+ok 31 - Shanghai parent admits EIP-161 cleanup and committed SELFDESTRUCT but rejects unrelated deletion evidence
+  ---
+  duration_ms: 709.26475
+  type: 'test'
+  ...
+# Subtest: BALANCE-only, delegated code targets and positive value transfers never become empty cleanup
+ok 32 - BALANCE-only, delegated code targets and positive value transfers never become empty cleanup
+  ---
+  duration_ms: 524.265709
+  type: 'test'
+  ...
+# Subtest: zero-balance SELFDESTRUCT beneficiary cleanup retains its authenticated whole-account deletion
+ok 33 - zero-balance SELFDESTRUCT beneficiary cleanup retains its authenticated whole-account deletion
+  ---
+  duration_ms: 185.077292
+  type: 'test'
+  ...
+# Subtest: existing zero-balance deployable targets can create and delete without an invented native delta
+ok 34 - existing zero-balance deployable targets can create and delete without an invented native delta
+  ---
+  duration_ms: 182.41375
+  type: 'test'
+  ...
+# Subtest: parent rejects omitted cleanup, wrong roots, duplicate addresses and forged whole-account slot diffs
+ok 35 - parent rejects omitted cleanup, wrong roots, duplicate addresses and forged whole-account slot diffs
+  ---
+  duration_ms: 1554.081417
+  type: 'test'
+  ...
+# Subtest: parent rejects fabricated cleanup for a read, delegated code address, funding and reverted ordinary touch
+ok 36 - parent rejects fabricated cleanup for a read, delegated code address, funding and reverted ordinary touch
+  ---
+  duration_ms: 570.052083
+  type: 'test'
+  ...
+# Subtest: parent never promotes ambiguous pre-touch failures into sticky RIPEMD160 cleanup
+ok 37 - parent never promotes ambiguous pre-touch failures into sticky RIPEMD160 cleanup
+  ---
+  duration_ms: 373.8615
+  type: 'test'
+  ...
+# Subtest: retained SELFDESTRUCT value is reconstructed before allowing an empty account to survive
+ok 38 - retained SELFDESTRUCT value is reconstructed before allowing an empty account to survive
+  ---
+  duration_ms: 357.346916
+  type: 'test'
+  ...
+# Subtest: created self-beneficiary burn precedes later funding and a different SELFDESTRUCT beneficiary
+ok 39 - created self-beneficiary burn precedes later funding and a different SELFDESTRUCT beneficiary
+  ---
+  duration_ms: 120.92875
+  type: 'test'
+  ...
+# Subtest: preview copies retain original cleanup but reject fresh query cleanup as a state mutation
+ok 40 - preview copies retain original cleanup but reject fresh query cleanup as a state mutation
+  ---
+  duration_ms: 254.706083
+  type: 'test'
+  ...
+# Subtest: canonical whole-account cleanup is unchanged across queries and rejects any introduced/deleted/expanded row
+ok 41 - canonical whole-account cleanup is unchanged across queries and rejects any introduced/deleted/expanded row
+  ---
+  duration_ms: 0.460292
+  type: 'test'
+  ...
+# Subtest: cleanup metadata rejects getters and proxies before executing them
+ok 42 - cleanup metadata rejects getters and proxies before executing them
+  ---
+  duration_ms: 115.881708
+  type: 'test'
+  ...
+# Subtest: parent independently binds fee amounts, declared profile, actual base fee and effective gas price
+ok 43 - parent independently binds fee amounts, declared profile, actual base fee and effective gas price
+  ---
+  duration_ms: 2290.488792
+  type: 'test'
+  ...
+# Subtest: exact balance ledger rejects omitted fees, missing credits and fabricated unrelated funding
+ok 44 - exact balance ledger rejects omitted fees, missing credits and fabricated unrelated funding
+  ---
+  duration_ms: 867.873208
+  type: 'test'
+  ...
+# Subtest: reverted priced messages retain exact authorization and fee effects only
+ok 45 - reverted priced messages retain exact authorization and fee effects only
+  ---
+  duration_ms: 801.42775
+  type: 'test'
+  ...
+# Subtest: priced original queries remain fresh unpriced contexts with neutral query-only nonces
+ok 46 - priced original queries remain fresh unpriced contexts with neutral query-only nonces
+  ---
+  duration_ms: 203.18725
+  type: 'test'
+  ...
+# Subtest: parent binds internal constructor deletion with absent initial target
+ok 47 - parent binds internal constructor deletion with absent initial target
+  ---
+  duration_ms: 276.316791
+  type: 'test'
+  ...
+# Subtest: parent binds internal constructor deletion with prefunded initial target
+ok 48 - parent binds internal constructor deletion with prefunded initial target
+  ---
+  duration_ms: 238.758709
+  type: 'test'
+  ...
+# Subtest: parent binds top-level constructor deletion with absent initial target
+ok 49 - parent binds top-level constructor deletion with absent initial target
+  ---
+  duration_ms: 192.975625
+  type: 'test'
+  ...
+# Subtest: parent binds top-level constructor deletion with prefunded initial target
+ok 50 - parent binds top-level constructor deletion with prefunded initial target
+  ---
+  duration_ms: 184.539458
+  type: 'test'
+  ...
+# Subtest: parent rejects omitted, duplicate, unbound and contradictory committed deletion evidence
+ok 51 - parent rejects omitted, duplicate, unbound and contradictory committed deletion evidence
+  ---
+  duration_ms: 1855.772292
+  type: 'test'
+  ...
+# Subtest: prefunded deletion cannot hide its original balance or retain nonce, runtime or storage
+ok 52 - prefunded deletion cannot hide its original balance or retain nonce, runtime or storage
+  ---
+  duration_ms: 1085.96
+  type: 'test'
+  ...
+# Subtest: reverted ancestors retain own-frame observations without any committed finalization
+ok 53 - reverted ancestors retain own-frame observations without any committed finalization
+  ---
+  duration_ms: 358.861083
+  type: 'test'
+  ...
+# Subtest: disposable getters carry original prefunded deletion unchanged and cannot restore the target
+ok 54 - disposable getters carry original prefunded deletion unchanged and cannot restore the target
+  ---
+  duration_ms: 363.004625
+  type: 'test'
+  ...
+# Subtest: canonical deletion rows reject hostile objects and permit only unchanged carried net state
+ok 55 - canonical deletion rows reject hostile objects and permit only unchanged carried net state
+  ---
+  duration_ms: 0.443667
+  type: 'test'
+  ...
+# Subtest: lifecycle metadata getters and proxies are rejected without evaluation
+ok 56 - lifecycle metadata getters and proxies are rejected without evaluation
+  ---
+  duration_ms: 157.826875
+  type: 'test'
+  ...
+# Subtest: non-destructing ancestors cannot launder a delegate SELFDESTRUCT into a created target
+ok 57 - non-destructing ancestors cannot launder a delegate SELFDESTRUCT into a created target
+  ---
+  duration_ms: 596.479584
+  type: 'test'
+  ...
+# Subtest: a query cannot hide its creator nonce change behind transient zero-value creation and deletion
+ok 58 - a query cannot hide its creator nonce change behind transient zero-value creation and deletion
+  ---
+  duration_ms: 141.557208
+  type: 'test'
+  ...
+# Subtest: a clean before-state query admits only the exact caller nonce increment and does not alter inputs
+ok 59 - a clean before-state query admits only the exact caller nonce increment and does not alter inputs
+  ---
+  duration_ms: 2.864625
+  type: 'test'
+  ...
+# Subtest: after-state query preserves original nonce, native balances and storage clears across account/slot reorder
+ok 60 - after-state query preserves original nonce, native balances and storage clears across account/slot reorder
+  ---
+  duration_ms: 0.349875
+  type: 'test'
+  ...
+# Subtest: query cannot clear an original write, restore its base value, change a cleared slot, or introduce another write
+ok 61 - query cannot clear an original write, restore its base value, change a cleared slot, or introduce another write
+  ---
+  duration_ms: 0.318667
+  type: 'test'
+  ...
+# Subtest: native changes on sender or other accounts are rejected while original unrelated changes remain valid
+ok 62 - native changes on sender or other accounts are rejected while original unrelated changes remain valid
+  ---
+  duration_ms: 0.175875
+  type: 'test'
+  ...
+# Subtest: proven absent sender admits only nonce materialization; fabricated presence and other changes are not normalized
+ok 63 - proven absent sender admits only nonce materialization; fabricated presence and other changes are not normalized
+  ---
+  duration_ms: 0.166667
+  type: 'test'
+  ...
+# Subtest: sender materialized by original execution preserves that existence change through the query
+ok 64 - sender materialized by original execution preserves that existence change through the query
+  ---
+  duration_ms: 0.091083
+  type: 'test'
+  ...
+# Subtest: current sender nonce must agree with the prior overlay, and other nonce changes cannot be hidden
+ok 65 - current sender nonce must agree with the prior overlay, and other nonce changes cannot be hidden
+  ---
+  duration_ms: 1.813125
+  type: 'test'
+  ...
+# Subtest: existence changes must describe supported materialization, with zero prior native state and no new storage
+ok 66 - existence changes must describe supported materialization, with zero prior native state and no new storage
+  ---
+  duration_ms: 0.46375
+  type: 'test'
+  ...
+# Subtest: malformed deltas, duplicate accounts/slots and unknown fields fail even when repeated on both snapshots
+ok 67 - malformed deltas, duplicate accounts/slots and unknown fields fail even when repeated on both snapshots
+  ---
+  duration_ms: 1.519375
+  type: 'test'
+  ...
+# Subtest: bounded snapshots reject excessive accounts/slots and do not execute supplied getters
+ok 68 - bounded snapshots reject excessive accounts/slots and do not execute supplied getters
+  ---
+  duration_ms: 1.878
+  type: 'test'
+  ...
+# Subtest: identical net snapshots do not claim to rule out transient writes
+ok 69 - identical net snapshots do not claim to rule out transient writes
+  ---
+  duration_ms: 0.167792
+  type: 'test'
+  ...
+# Subtest: nested creation-shaped original rows and prefunded deployment carry unchanged through a disposable query
+ok 70 - nested creation-shaped original rows and prefunded deployment carry unchanged through a disposable query
+  ---
+  duration_ms: 1.383667
+  type: 'test'
+  ...
+# Subtest: empty-runtime creation and prefunded empty-runtime nonce/storage changes remain explicit deltas
+ok 71 - empty-runtime creation and prefunded empty-runtime nonce/storage changes remain explicit deltas
+  ---
+  duration_ms: 0.511875
+  type: 'test'
+  ...
+# Subtest: queries cannot introduce creation, change/remove deployed code or mutate carried creation state
+ok 72 - queries cannot introduce creation, change/remove deployed code or mutate carried creation state
+  ---
+  duration_ms: 0.957375
+  type: 'test'
+  ...
+# Subtest: deployment schema rejects unsupported replacement, impossible origin and nonzero initial storage
+ok 73 - deployment schema rejects unsupported replacement, impossible origin and nonzero initial storage
+  ---
+  duration_ms: 0.961083
+  type: 'test'
+  ...
+# Subtest: creation code and aggregate output slots obey fixed bounds without weakening duplicate checks
+ok 74 - creation code and aggregate output slots obey fixed bounds without weakening duplicate checks
+  ---
+  duration_ms: 12.491542
+  type: 'test'
+  ...
+# Subtest: new code and existence fields reject hostile nested descriptors without evaluating them
+ok 75 - new code and existence fields reject hostile nested descriptors without evaluating them
+  ---
+  duration_ms: 0.248375
+  type: 'test'
+  ...
+# Subtest: a caught recreated-contract subtree makes a neutral after-query available through the real child
+ok 76 - a caught recreated-contract subtree makes a neutral after-query available through the real child
+  ---
+  duration_ms: 292.448
+  type: 'test'
+  ...
+# Subtest: a successful getter that leaves recreation behind remains an unavailable measurement
+ok 77 - a successful getter that leaves recreation behind remains an unavailable measurement
+  ---
+  duration_ms: 245.145583
+  type: 'test'
+  ...
+# Subtest: Shanghai parent binds preexisting code/nonce and an entirely unrequested storage trie deletion
+ok 78 - Shanghai parent binds preexisting code/nonce and an entirely unrequested storage trie deletion
+  ---
+  duration_ms: 479.352459
+  type: 'test'
+  ...
+# Subtest: Shanghai self-beneficiary burns before a refill and later transfer, including an initially empty recipient
+ok 79 - Shanghai self-beneficiary burns before a refill and later transfer, including an initially empty recipient
+  ---
+  duration_ms: 204.401084
+  type: 'test'
+  ...
+# Subtest: delegate SELFDESTRUCT deletes the execution account, never its code address
+ok 80 - delegate SELFDESTRUCT deletes the execution account, never its code address
+  ---
+  duration_ms: 390.480667
+  type: 'test'
+  ...
+# Subtest: reverted ancestors preserve observations but never finalize Shanghai deletions
+ok 81 - reverted ancestors preserve observations but never finalize Shanghai deletions
+  ---
+  duration_ms: 385.920583
+  type: 'test'
+  ...
+# Subtest: Shanghai constructor deletion keeps absence and uses its own basis for prefunded targets
+ok 82 - Shanghai constructor deletion keeps absence and uses its own basis for prefunded targets
+  ---
+  duration_ms: 345.138625
+  type: 'test'
+  ...
+# Subtest: parent rejects missing/wrong-root/duplicate/basis-forged deletions and partial whole-account deltas
+ok 83 - parent rejects missing/wrong-root/duplicate/basis-forged deletions and partial whole-account deltas
+  ---
+  duration_ms: 1795.447959
+  type: 'test'
+  ...
+# Subtest: direct callers retain Cancun defaults while the isolated parent uses the trusted Shanghai header
+ok 84 - direct callers retain Cancun defaults while the isolated parent uses the trusted Shanghai header
+  ---
+  duration_ms: 196.811209
+  type: 'test'
+  ...
+# Subtest: disposable getters preserve original Shanghai deletion and see no resurrected code
+ok 85 - disposable getters preserve original Shanghai deletion and see no resurrected code
+  ---
+  duration_ms: 370.909
+  type: 'test'
+  ...
+# Subtest: query destruction of an original creation is valid lifecycle evidence but never a measured getter
+ok 86 - query destruction of an original creation is valid lifecycle evidence but never a measured getter
+  ---
+  duration_ms: 382.990667
+  type: 'test'
+  ...
+# Subtest: Shanghai whole-account rows carry unchanged and reject unsafe extra fields or hostile objects
+ok 87 - Shanghai whole-account rows carry unchanged and reject unsafe extra fields or hostile objects
+  ---
+  duration_ms: 0.544667
+  type: 'test'
+  ...
+1..87
+# tests 87
+# suites 0
+# pass 87
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6669.155459

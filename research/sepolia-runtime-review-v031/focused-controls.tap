@@ -1,0 +1,286 @@
+TAP version 13
+# Subtest: Amsterdam transfers distinguish existing, absent, empty and self while preserving exact fees and native logs
+ok 1 - Amsterdam transfers distinguish existing, absent, empty and self while preserving exact fees and native logs
+  ---
+  duration_ms: 163.202708
+  type: 'test'
+  ...
+# Subtest: SLOTNUM and CHAINID use the explicit Sepolia execution context
+ok 2 - SLOTNUM and CHAINID use the explicit Sepolia execution context
+  ---
+  duration_ms: 7.927375
+  type: 'test'
+  ...
+# Subtest: state allocation, clearing, refund floor and root rollback match signed transaction settlement
+ok 3 - state allocation, clearing, refund floor and root rollback match signed transaction settlement
+  ---
+  duration_ms: 44.141084
+  type: 'test'
+  ...
+# Subtest: root creation charges runtime state once and rolls failed constructors back
+ok 4 - root creation charges runtime state once and rolls failed constructors back
+  ---
+  duration_ms: 37.109458
+  type: 'test'
+  ...
+# Subtest: root creation into a prefunded empty address preserves funds without a new-account charge
+ok 5 - root creation into a prefunded empty address preserves funds without a new-account charge
+  ---
+  duration_ms: 8.639625
+  type: 'test'
+  ...
+# Subtest: a delegated child clears its caller storage with a signed reservoir refill and exact settlement
+ok 6 - a delegated child clears its caller storage with a signed reservoir refill and exact settlement
+  ---
+  duration_ms: 12.147042
+  type: 'test'
+  ...
+# Subtest: post-target out-of-gas consumes root regular gas but a caught child latch does not consume its caller budget
+ok 7 - post-target out-of-gas consumes root regular gas but a caught child latch does not consume its caller budget
+  ---
+  duration_ms: 23.862333
+  type: 'test'
+  ...
+# Subtest: created self-beneficiary clearing preserves endowment and residual prefunding
+ok 8 - created self-beneficiary clearing preserves endowment and residual prefunding
+  ---
+  duration_ms: 25.685833
+  type: 'test'
+  ...
+# Subtest: unknown slot or unsupported Amsterdam preparation does not retain execution state
+ok 9 - unknown slot or unsupported Amsterdam preparation does not retain execution state
+  ---
+  duration_ms: 10.86
+  type: 'test'
+  ...
+# Subtest: raw restored reservoir settles to retained independent Geth outcome and force-drained counters fail
+ok 10 - raw restored reservoir settles to retained independent Geth outcome and force-drained counters fail
+  ---
+  duration_ms: 1.3285
+  type: 'test'
+  ...
+# Subtest: parent independently derives every ordered authority decision and refund
+ok 11 - parent independently derives every ordered authority decision and refund
+  ---
+  duration_ms: 1146.888125
+  type: 'test'
+  ...
+# Subtest: parent requires exact retained code, nonce and materialization for authenticated absent authorities
+ok 12 - parent requires exact retained code, nonce and materialization for authenticated absent authorities
+  ---
+  duration_ms: 741.298375
+  type: 'test'
+  ...
+# Subtest: message REVERT cannot discard preceding authorization state or retain message writes
+ok 13 - message REVERT cannot discard preceding authorization state or retain message writes
+  ---
+  duration_ms: 505.669292
+  type: 'test'
+  ...
+# Subtest: parent checks repeated self-authorization before committed sender creation attempts
+ok 14 - parent checks repeated self-authorization before committed sender creation attempts
+  ---
+  duration_ms: 752.769083
+  type: 'test'
+  ...
+# Subtest: skipped signatures cannot authorize extra code or nonce changes
+ok 15 - skipped signatures cannot authorize extra code or nonce changes
+  ---
+  duration_ms: 483.335541
+  type: 'test'
+  ...
+# Subtest: before/after query sender semantics use original and prepared code separately
+ok 16 - before/after query sender semantics use original and prepared code separately
+  ---
+  duration_ms: 763.838375
+  type: 'test'
+  ...
+# Subtest: parent derives delegated sender eligibility and rejects missing, altered or extra declaration fields
+ok 17 - parent derives delegated sender eligibility and rejects missing, altered or extra declaration fields
+  ---
+  duration_ms: 909.116375
+  type: 'test'
+  ...
+# Subtest: parent rejects undercounted and overcounted sender creation attempts
+ok 18 - parent rejects undercounted and overcounted sender creation attempts
+  ---
+  duration_ms: 256.94
+  type: 'test'
+  ...
+# Subtest: entered reverted constructors and collisions retain their creator nonce increment
+ok 19 - entered reverted constructors and collisions retain their creator nonce increment
+  ---
+  duration_ms: 489.188667
+  type: 'test'
+  ...
+# Subtest: reverted parent ancestry cannot justify an extra sender nonce even when its CREATE succeeded
+ok 20 - reverted parent ancestry cannot justify an extra sender nonce even when its CREATE succeeded
+  ---
+  duration_ms: 488.516458
+  type: 'test'
+  ...
+# Subtest: parent rejects laundering a callback execution account to hide sender creation attempts
+ok 21 - parent rejects laundering a callback execution account to hide sender creation attempts
+  ---
+  duration_ms: 249.963333
+  type: 'test'
+  ...
+# Subtest: an empty-code sender cannot acquire delegation authority through metadata or forged input facts
+ok 22 - an empty-code sender cannot acquire delegation authority through metadata or forged input facts
+  ---
+  duration_ms: 242.880166
+  type: 'test'
+  ...
+# Subtest: trusted pre-Prague fork and exact indicator length remain required at the parent boundary
+ok 23 - trusted pre-Prague fork and exact indicator length remain required at the parent boundary
+  ---
+  duration_ms: 826.022375
+  type: 'test'
+  ...
+# Subtest: measured probes use the same authenticated delegation but still normalize only one sender nonce
+ok 24 - measured probes use the same authenticated delegation but still normalize only one sender nonce
+  ---
+  duration_ms: 394.944917
+  type: 'test'
+  ...
+# Subtest: explicit Sepolia selection admits internal execution independently of header and query identity checks
+ok 25 - explicit Sepolia selection admits internal execution independently of header and query identity checks
+  ---
+  duration_ms: 11.319083
+  type: 'test'
+  ...
+# Subtest: trusted Sepolia fork selection crosses BPO2 to Amsterdam while malformed slot input fails before state access
+ok 26 - trusted Sepolia fork selection crosses BPO2 to Amsterdam while malformed slot input fails before state access
+  ---
+  duration_ms: 1.332375
+  type: 'test'
+  ...
+# Subtest: unknown or noncanonical trusted chain values reject before state reads
+ok 27 - unknown or noncanonical trusted chain values reject before state reads
+  ---
+  duration_ms: 0.7115
+  type: 'test'
+  ...
+# Subtest: request and header metadata cannot override the trusted execution network
+ok 28 - request and header metadata cannot override the trusted execution network
+  ---
+  duration_ms: 0.820375
+  type: 'test'
+  ...
+# Subtest: default and explicitly selected mainnet execute with identical stable outputs and state changes
+ok 29 - default and explicitly selected mainnet execute with identical stable outputs and state changes
+  ---
+  duration_ms: 12.732458
+  type: 'test'
+  ...
+# Subtest: Amsterdam budget split has exact regular/total boundaries and does not enable older forks
+ok 30 - Amsterdam budget split has exact regular/total boundaries and does not enable older forks
+  ---
+  duration_ms: 1.6665
+  type: 'test'
+  ...
+# Subtest: reservoir refills retain a negative delta; ordinary refunds and floor remain separate
+ok 31 - reservoir refills retain a negative delta; ordinary refunds and floor remain separate
+  ---
+  duration_ms: 0.268042
+  type: 'test'
+  ...
+# Subtest: restored OOG reservoir settles, drained counters fail and negative final state usage is unsupported
+ok 32 - restored OOG reservoir settles, drained counters fail and negative final state usage is unsupported
+  ---
+  duration_ms: 0.699041
+  type: 'test'
+  ...
+# Subtest: arithmetic rejects impossible budget/counter combinations and hostile records without invoking accessors
+ok 33 - arithmetic rejects impossible budget/counter combinations and hostile records without invoking accessors
+  ---
+  duration_ms: 0.799833
+  type: 'test'
+  ...
+# Subtest: signed native transfers distinguish existing, absent and self recipients at transaction-level setup
+ok 34 - signed native transfers distinguish existing, absent and self recipients at transaction-level setup
+  ---
+  duration_ms: 67.902708
+  type: 'test'
+  ...
+# Subtest: signed root creation pays account/code state gas only when committed and preserves prefunding distinction
+ok 35 - signed root creation pays account/code state gas only when committed and preserves prefunding distinction
+  ---
+  duration_ms: 16.714084
+  type: 'test'
+  ...
+# Subtest: signed SSTORE allocation/clear and original-slot refund separate state refills from the refund cap
+ok 36 - signed SSTORE allocation/clear and original-slot refund separate state refills from the refund cap
+  ---
+  duration_ms: 17.036584
+  type: 'test'
+  ...
+# Subtest: signed frame revert and exceptional halt roll state gas back but preserve their distinct regular charges
+ok 37 - signed frame revert and exceptional halt roll state gas back but preserve their distinct regular charges
+  ---
+  duration_ms: 11.101125
+  type: 'test'
+  ...
+# Subtest: signed transactions use a nonzero reservoir for state while returning unused reservoir on revert
+ok 38 - signed transactions use a nonzero reservoir for state while returning unused reservoir on revert
+  ---
+  duration_ms: 9.311
+  type: 'test'
+  ...
+# Subtest: signed nested calls preserve successful state and discard reverted allocation/refill across frames
+ok 39 - signed nested calls preserve successful state and discard reverted allocation/refill across frames
+  ---
+  duration_ms: 20.012833
+  type: 'test'
+  ...
+# Subtest: signed type-4 preparation debits are counted once and survive only ordinary message rollback
+ok 40 - signed type-4 preparation debits are counted once and survive only ordinary message rollback
+  ---
+  duration_ms: 15.047208
+  type: 'test'
+  ...
+# Subtest: signed preparation OOG rolls authorization state back while retaining sender nonce and spent regular gas
+ok 41 - signed preparation OOG rolls authorization state back while retaining sender nonce and spent regular gas
+  ---
+  duration_ms: 10.226417
+  type: 'test'
+  ...
+# Subtest: signed calldata floor changes sender gas and refund reporting without erasing raw message refund
+ok 42 - signed calldata floor changes sender gas and refund reporting without erasing raw message refund
+  ---
+  duration_ms: 6.397333
+  type: 'test'
+  ...
+# Subtest: observed pinned post-target CALL OOG remains reproducible but local settlement refuses its result
+ok 43 - observed pinned post-target CALL OOG remains reproducible but local settlement refuses its result
+  ---
+  duration_ms: 4.038042
+  type: 'test'
+  ...
+# Subtest: historical Sepolia root and actual parent bind tuples to11155111; mainnet skips and wildcard applies
+ok 44 - historical Sepolia root and actual parent bind tuples to11155111; mainnet skips and wildcard applies
+  ---
+  duration_ms: 530.741583
+  type: 'test'
+  ...
+# Subtest: historical Sepolia self-authorization and fresh delegated query semantics pass actual parent independently
+ok 45 - historical Sepolia self-authorization and fresh delegated query semantics pass actual parent independently
+  ---
+  duration_ms: 291.21025
+  type: 'test'
+  ...
+# Subtest: authorization parent fold rejects unsupported chains and never infers chain from tuple or input labels
+ok 46 - authorization parent fold rejects unsupported chains and never infers chain from tuple or input labels
+  ---
+  duration_ms: 5.908542
+  type: 'test'
+  ...
+1..46
+# tests 46
+# suites 0
+# pass 46
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4632.129875

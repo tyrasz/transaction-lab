@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: Amsterdam transfers distinguish existing, absent, empty and self while preserving exact fees and native logs
+ok 1 - Amsterdam transfers distinguish existing, absent, empty and self while preserving exact fees and native logs
+  ---
+  duration_ms: 113.839625
+  type: 'test'
+  ...
+# Subtest: SLOTNUM and CHAINID use the explicit Sepolia execution context
+ok 2 - SLOTNUM and CHAINID use the explicit Sepolia execution context
+  ---
+  duration_ms: 6.64975
+  type: 'test'
+  ...
+# Subtest: state allocation, clearing, refund floor and root rollback match signed transaction settlement
+ok 3 - state allocation, clearing, refund floor and root rollback match signed transaction settlement
+  ---
+  duration_ms: 35.543042
+  type: 'test'
+  ...
+# Subtest: root creation charges runtime state once and rolls failed constructors back
+ok 4 - root creation charges runtime state once and rolls failed constructors back
+  ---
+  duration_ms: 26.264292
+  type: 'test'
+  ...
+# Subtest: root creation into a prefunded empty address preserves funds without a new-account charge
+ok 5 - root creation into a prefunded empty address preserves funds without a new-account charge
+  ---
+  duration_ms: 5.837375
+  type: 'test'
+  ...
+# Subtest: a delegated child clears its caller storage with a signed reservoir refill and exact settlement
+ok 6 - a delegated child clears its caller storage with a signed reservoir refill and exact settlement
+  ---
+  duration_ms: 8.48625
+  type: 'test'
+  ...
+# Subtest: post-target out-of-gas consumes root regular gas but a caught child latch does not consume its caller budget
+ok 7 - post-target out-of-gas consumes root regular gas but a caught child latch does not consume its caller budget
+  ---
+  duration_ms: 18.639417
+  type: 'test'
+  ...
+# Subtest: created self-beneficiary clearing preserves endowment and residual prefunding
+ok 8 - created self-beneficiary clearing preserves endowment and residual prefunding
+  ---
+  duration_ms: 18.11475
+  type: 'test'
+  ...
+# Subtest: unknown slot or unsupported Amsterdam preparation does not retain execution state
+ok 9 - unknown slot or unsupported Amsterdam preparation does not retain execution state
+  ---
+  duration_ms: 4.262459
+  type: 'test'
+  ...
+# Subtest: raw restored reservoir settles to retained independent Geth outcome and force-drained counters fail
+ok 10 - raw restored reservoir settles to retained independent Geth outcome and force-drained counters fail
+  ---
+  duration_ms: 0.904041
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 421.658334
