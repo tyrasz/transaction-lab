@@ -5,6 +5,7 @@ import { createAddressFromString, createContractAddress } from '@ethereumjs/util
 import { existingDelegationTarget } from './sender-delegation.js';
 import { deriveAuthorizationPreparation } from './authorization-validation.js';
 import { deriveVerifiedFees, revertedFeeRows } from './fee-validation.js';
+import { validateCreationAttempts } from './creation-attempt-validation.js';
 
 const ADDRESS = /^0x[0-9a-f]{40}$/, WORD = /^0x[0-9a-f]{64}$/, DATA = /^0x(?:[0-9a-f]{2})*$/;
 const ZERO = '0x' + '00'.repeat(32);
@@ -52,10 +53,12 @@ function emptyFact(inputs, address) {
 /** Check invocation-local lifecycle evidence without assuming a query starts
  * from the immutable base. Net query effects are validated separately. This is
  * trace/result consistency, not an independent replay or post-state-root proof. */
-export function validateExecutionLifecycle({ output, inputs, destination, changes, startingChanges, selfdestructOnlyCreated = true, fees = null, common }) {
+export function validateExecutionLifecycle({ output, inputs, destination, changes, startingChanges, selfdestructOnlyCreated = true, fees = null, common, rootNoncePrepared = false }) {
   need(typeof selfdestructOnlyCreated === 'boolean');
   const clearsCreated = common?.isActivatedEIP(8246) === true;
-  const created = new Map(), creationAttempts = new Map(), destructed = new Set(), eligibleTouches = new Set(), justifiedTouches = new Set(); let frames = 0;
+  const amsterdamAttempts = common?.isActivatedEIP(7928) === true;
+  let creationAttempts = new Map();
+  const created = new Map(), destructed = new Set(), eligibleTouches = new Set(), justifiedTouches = new Set(); let frames = 0;
   const lifecycle = output === null ? undefined : ownData(output, 'lifecycle');
   const complete = ['success', 'reverted', 'failed'].includes(output?.execution?.status);
   if (!complete) { need(lifecycle === undefined); return { created, creationAttempts, deleted: new Set(), cleared: new Set(), emptyDeleted: new Set() }; }
@@ -80,6 +83,7 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     need(frame && !types.isProxy(frame) && ++frames <= 1000 && depth <= 32);
     for (const key of ['calls', 'type', 'error', 'output', 'to', 'executionAddress', 'from', 'caller', 'depth', 'value']) ownData(frame, key);
     boundedArray(frame.calls, 1000);
+    if (!amsterdamAttempts) need(ownData(frame, 'creationAttempts') === undefined);
     need(['CALL', 'CALLCODE', 'DELEGATECALL', 'STATICCALL', 'CREATE', 'CREATE2'].includes(frame.type));
     const isStatic = inheritedStatic || frame.type === 'STATICCALL';
     // Static mode propagates through every descendant, including delegated
@@ -97,6 +101,7 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     if (parent) {
       need(frame.from === parent.executionAddress);
       need(frame.caller === (frame.type === 'DELEGATECALL' ? parent.caller : parent.executionAddress));
+      if (frame.type === 'DELEGATECALL') need(frame.value === parent.value);
     } else need(frame.from === frame.caller);
     if (['CREATE', 'CREATE2'].includes(frame.type)) {
       need(frame.to === frame.executionAddress);
@@ -110,7 +115,7 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     // CREATE increments its creator before entering the constructor. A child
     // revert or collision retains that increment when its parent commits;
     // a reverted parent discards it. Do not count the root transaction CREATE.
-    if (depth > 0 && retained && ['CREATE', 'CREATE2'].includes(frame.type)) {
+    if (!amsterdamAttempts && depth > 0 && retained && ['CREATE', 'CREATE2'].includes(frame.type)) {
       creationAttempts.set(frame.from, (creationAttempts.get(frame.from) ?? 0) + 1);
     }
     if (depth === 0) justifiedTouches.add(frame.from); // Root nonce is outside its message checkpoint.
@@ -118,7 +123,8 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
       justifiedTouches.add(frame.from); justifiedTouches.add(frame.executionAddress);
       need(typeof frame.value === 'string' && /^0x(?:0|[1-9a-f][0-9a-f]*)$/.test(frame.value) && frame.value.length <= 66);
       if (frame.type === 'STATICCALL') need(frame.value === '0x0');
-      if (frame.type !== 'CALLCODE') transfer(frame.from, frame.executionAddress, BigInt(frame.value));
+      if (frame.type === 'CALLCODE') need(BigInt(frame.value) <= balance(frame.executionAddress));
+      else transfer(frame.from, frame.executionAddress, BigInt(frame.value));
       if (['CALL', 'STATICCALL'].includes(frame.type)) {
         eligibleTouches.add(frame.executionAddress);
       }
@@ -160,6 +166,7 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     need(before >= debit); balances.set(fees.sender, before - debit);
   }
   walk(output.trace, true, 0);
+  if (amsterdamAttempts) creationAttempts = validateCreationAttempts({ output, inputs, startingChanges, rootNoncePrepared, fees, common });
   if (fees) {
     // Refund and tip are sequential account updates before lifecycle deletion.
     // A pending-deletion coinbase receives its credit and then burns it.
@@ -321,7 +328,7 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
       need(root.to === createContractAddress(createAddressFromString(senderAddress), nonce).toString());
     }
   }
-  const { created, creationAttempts, deleted, cleared, emptyDeleted } = validateExecutionLifecycle({ output, inputs, destination, changes: snapshot, startingChanges: preparation?.snapshot, selfdestructOnlyCreated, fees, common });
+  const { created, creationAttempts, deleted, cleared, emptyDeleted } = validateExecutionLifecycle({ output, inputs, destination, changes: snapshot, startingChanges: preparation?.snapshot, selfdestructOnlyCreated, fees, common, rootNoncePrepared: Boolean(preparation) });
   if (!complete) { need(snapshot.accounts.length === 0); return; }
   need(senderInitial && typeof senderInitial.exists === 'boolean');
   need(output.trace.from === senderAddress && output.trace.caller === senderAddress);

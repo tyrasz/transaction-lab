@@ -113,7 +113,7 @@ test('balance-only and zero-empty clearing rows carry through neutral query copi
     const { f } = await constructorCase({ prefunded: true, self }), r = await run(f), before = r.changes, after = structuredClone(before);
     after.accounts.find(row => row.address === SENDER).nonce.after = '0x3';
     assert.equal(validateQueryMutation({ before, after, sender: SENDER, nonceBefore: '2', senderExistedBefore: true }).status, 'verified');
-    const output = { execution: { status: 'success' }, trace: { type: 'CALL', from: SENDER, caller: SENDER, to: FACTORY, executionAddress: FACTORY, depth: 0, value: '0x0', output: '0x', error: null, calls: [] } };
+    const output = { execution: { status: 'success' }, trace: { type: 'CALL', from: SENDER, caller: SENDER, to: FACTORY, executionAddress: FACTORY, depth: 0, value: '0x0', input: '0x', output: '0x', error: null, calls: [], creationAttempts: [] } };
     assert.doesNotThrow(() => validateExecutionLifecycle({ output, inputs: r.inputs, destination: FACTORY, changes: after, startingChanges: before, common: f.common }));
     if (!self) assert.throws(() => validateExecutionLifecycle({ output, inputs: r.inputs, destination: FACTORY, changes: after, common: f.common }));
   }

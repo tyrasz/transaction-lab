@@ -1,0 +1,214 @@
+TAP version 13
+# Subtest: repeated CREATE2 records two increments with one constructor and no second endowment
+ok 1 - repeated CREATE2 records two increments with one constructor and no second endowment
+  ---
+  duration_ms: 184.283584
+  type: 'test'
+  ...
+# Subtest: initial nonce/code collisions for both creation opcodes retain nonce but never transfer endowment
+ok 2 - initial nonce/code collisions for both creation opcodes retain nonce but never transfer endowment
+  ---
+  duration_ms: 515.242875
+  type: 'test'
+  ...
+# Subtest: constructor REVERT/INVALID retain creator nonce but roll back value/code/storage
+ok 3 - constructor REVERT/INVALID retain creator nonce but roll back value/code/storage
+  ---
+  duration_ms: 276.320208
+  type: 'test'
+  ...
+# Subtest: root and caught enclosing rollback discard observed collision increments and deployments
+ok 4 - root and caught enclosing rollback discard observed collision increments and deployments
+  ---
+  duration_ms: 290.186792
+  type: 'test'
+  ...
+# Subtest: constructor-created child has separate nonce-one baseline and distinct attempt ancestry
+ok 5 - constructor-created child has separate nonce-one baseline and distinct attempt ancestry
+  ---
+  duration_ms: 141.187083
+  type: 'test'
+  ...
+# Subtest: DELEGATECALL creations increment execution address, never implementation address
+ok 6 - DELEGATECALL creations increment execution address, never implementation address
+  ---
+  duration_ms: 137.862833
+  type: 'test'
+  ...
+# Subtest: reentrant creation observes chronological nonce changes and resumed-parent positions
+ok 7 - reentrant creation observes chronological nonce changes and resumed-parent positions
+  ---
+  duration_ms: 142.530292
+  type: 'test'
+  ...
+# Subtest: balance/nonce fail-fast and inherited static creation produce no nonce-write attempts
+ok 8 - balance/nonce fail-fast and inherited static creation produce no nonce-write attempts
+  ---
+  duration_ms: 428.844042
+  type: 'test'
+  ...
+# Subtest: pre-target and account-state-charge OOG cannot be counted as nonce writes
+ok 9 - pre-target and account-state-charge OOG cannot be counted as nonce writes
+  ---
+  duration_ms: 276.380583
+  type: 'test'
+  ...
+# Subtest: CREATE as final opcode resolves success and no-child collision from terminal stack
+ok 10 - CREATE as final opcode resolves success and no-child collision from terminal stack
+  ---
+  duration_ms: 252.620208
+  type: 'test'
+  ...
+# Subtest: Amsterdam transfers distinguish existing, absent, empty and self while preserving exact fees and native logs
+ok 11 - Amsterdam transfers distinguish existing, absent, empty and self while preserving exact fees and native logs
+  ---
+  duration_ms: 120.300292
+  type: 'test'
+  ...
+# Subtest: SLOTNUM and CHAINID use the explicit Sepolia execution context
+ok 12 - SLOTNUM and CHAINID use the explicit Sepolia execution context
+  ---
+  duration_ms: 7.88625
+  type: 'test'
+  ...
+# Subtest: state allocation, clearing, refund floor and root rollback match signed transaction settlement
+ok 13 - state allocation, clearing, refund floor and root rollback match signed transaction settlement
+  ---
+  duration_ms: 38.061041
+  type: 'test'
+  ...
+# Subtest: root creation charges runtime state once and rolls failed constructors back
+ok 14 - root creation charges runtime state once and rolls failed constructors back
+  ---
+  duration_ms: 27.965
+  type: 'test'
+  ...
+# Subtest: root creation into a prefunded empty address preserves funds without a new-account charge
+ok 15 - root creation into a prefunded empty address preserves funds without a new-account charge
+  ---
+  duration_ms: 6.093959
+  type: 'test'
+  ...
+# Subtest: a delegated child clears its caller storage with a signed reservoir refill and exact settlement
+ok 16 - a delegated child clears its caller storage with a signed reservoir refill and exact settlement
+  ---
+  duration_ms: 9.108583
+  type: 'test'
+  ...
+# Subtest: post-target out-of-gas consumes root regular gas but a caught child latch does not consume its caller budget
+ok 17 - post-target out-of-gas consumes root regular gas but a caught child latch does not consume its caller budget
+  ---
+  duration_ms: 19.577708
+  type: 'test'
+  ...
+# Subtest: created self-beneficiary clearing preserves endowment and residual prefunding
+ok 18 - created self-beneficiary clearing preserves endowment and residual prefunding
+  ---
+  duration_ms: 19.343041
+  type: 'test'
+  ...
+# Subtest: unknown slot or unsupported Amsterdam preparation does not retain execution state
+ok 19 - unknown slot or unsupported Amsterdam preparation does not retain execution state
+  ---
+  duration_ms: 4.52625
+  type: 'test'
+  ...
+# Subtest: raw restored reservoir settles to retained independent Geth outcome and force-drained counters fail
+ok 20 - raw restored reservoir settles to retained independent Geth outcome and force-drained counters fail
+  ---
+  duration_ms: 0.948084
+  type: 'test'
+  ...
+# Subtest: failed creator writes before and after mutation roll back nonce, upfront fees and value
+ok 21 - failed creator writes before and after mutation roll back nonce, upfront fees and value
+  ---
+  duration_ms: 22.981458
+  type: 'test'
+  ...
+# Subtest: failed post-increment collision-state read cannot retain a creator write
+ok 22 - failed post-increment collision-state read cannot retain a creator write
+  ---
+  duration_ms: 7.075667
+  type: 'test'
+  ...
+# Subtest: no-child attempts consume the existing frame evidence budget and roll back on exhaustion
+ok 23 - no-child attempts consume the existing frame evidence budget and roll back on exhaustion
+  ---
+  duration_ms: 4.252583
+  type: 'test'
+  ...
+# Subtest: observer binds successful CREATE/CREATE2 writes, detached target facts and terminal result stacks
+ok 24 - observer binds successful CREATE/CREATE2 writes, detached target facts and terminal result stacks
+  ---
+  duration_ms: 2.772125
+  type: 'test'
+  ...
+# Subtest: only acknowledged nonce writes produce attempts; zero-write huge-memory and underflow candidates disappear
+ok 25 - only acknowledged nonce writes produce attempts; zero-write huge-memory and underflow candidates disappear
+  ---
+  duration_ms: 1.2905
+  type: 'test'
+  ...
+# Subtest: collision facts cover nonce, code and storage; repeated collisions share the unconsumed child position
+ok 26 - collision facts cover nonce, code and storage; repeated collisions share the unconsumed child position
+  ---
+  duration_ms: 1.40975
+  type: 'test'
+  ...
+# Subtest: constructor faults retain the own-parent attempt and bind zero; pinned code-store exception binds address
+ok 27 - constructor faults retain the own-parent attempt and bind zero; pinned code-store exception binds address
+  ---
+  duration_ms: 1.524792
+  type: 'test'
+  ...
+# Subtest: creator reads are limited to armed matching writes, and every unchanged account field is bound
+ok 28 - creator reads are limited to armed matching writes, and every unchanged account field is bound
+  ---
+  duration_ms: 1.552625
+  type: 'test'
+  ...
+# Subtest: zero-length initcode ignores huge offset, and short pre-op memory supplies zero-padded initcode
+ok 29 - zero-length initcode ignores huge offset, and short pre-op memory supplies zero-padded initcode
+  ---
+  duration_ms: 0.206958
+  type: 'test'
+  ...
+# Subtest: wrong target, missing target, orphan creation and colliding child are rejected
+ok 30 - wrong target, missing target, orphan creation and colliding child are rejected
+  ---
+  duration_ms: 0.269542
+  type: 'test'
+  ...
+# Subtest: child joins reject altered type, input, value, sender, depth, salt and returned address
+ok 31 - child joins reject altered type, input, value, sender, depth, salt and returned address
+  ---
+  duration_ms: 0.447792
+  type: 'test'
+  ...
+# Subtest: resolution rejects wrong result, changed stack prefix, missing terminal stack and unfinished child
+ok 32 - resolution rejects wrong result, changed stack prefix, missing terminal stack and unfinished child
+  ---
+  duration_ms: 0.470542
+  type: 'test'
+  ...
+# Subtest: attempt count, pending bytes, final trace bytes, memory and calldata obey supplied ceilings
+ok 33 - attempt count, pending bytes, final trace bytes, memory and calldata obey supplied ceilings
+  ---
+  duration_ms: 0.471541
+  type: 'test'
+  ...
+# Subtest: host errors and nullish throws propagate unchanged through reads and budget hooks
+ok 34 - host errors and nullish throws propagate unchanged through reads and budget hooks
+  ---
+  duration_ms: 0.237792
+  type: 'test'
+  ...
+1..34
+# tests 34
+# suites 0
+# pass 34
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2855.375875

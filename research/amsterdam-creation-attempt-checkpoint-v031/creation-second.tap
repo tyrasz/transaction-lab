@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: repeated CREATE2 records two increments with one constructor and no second endowment
+ok 1 - repeated CREATE2 records two increments with one constructor and no second endowment
+  ---
+  duration_ms: 167.763208
+  type: 'test'
+  ...
+# Subtest: initial nonce/code collisions for both creation opcodes retain nonce but never transfer endowment
+ok 2 - initial nonce/code collisions for both creation opcodes retain nonce but never transfer endowment
+  ---
+  duration_ms: 503.4715
+  type: 'test'
+  ...
+# Subtest: constructor REVERT/INVALID retain creator nonce but roll back value/code/storage
+ok 3 - constructor REVERT/INVALID retain creator nonce but roll back value/code/storage
+  ---
+  duration_ms: 251.776083
+  type: 'test'
+  ...
+# Subtest: root and caught enclosing rollback discard observed collision increments and deployments
+ok 4 - root and caught enclosing rollback discard observed collision increments and deployments
+  ---
+  duration_ms: 261.8675
+  type: 'test'
+  ...
+# Subtest: constructor-created child has separate nonce-one baseline and distinct attempt ancestry
+ok 5 - constructor-created child has separate nonce-one baseline and distinct attempt ancestry
+  ---
+  duration_ms: 126.247042
+  type: 'test'
+  ...
+# Subtest: DELEGATECALL creations increment execution address, never implementation address
+ok 6 - DELEGATECALL creations increment execution address, never implementation address
+  ---
+  duration_ms: 126.641667
+  type: 'test'
+  ...
+# Subtest: reentrant creation observes chronological nonce changes and resumed-parent positions
+ok 7 - reentrant creation observes chronological nonce changes and resumed-parent positions
+  ---
+  duration_ms: 137.1825
+  type: 'test'
+  ...
+# Subtest: balance/nonce fail-fast and inherited static creation produce no nonce-write attempts
+ok 8 - balance/nonce fail-fast and inherited static creation produce no nonce-write attempts
+  ---
+  duration_ms: 374.532667
+  type: 'test'
+  ...
+# Subtest: pre-target and account-state-charge OOG cannot be counted as nonce writes
+ok 9 - pre-target and account-state-charge OOG cannot be counted as nonce writes
+  ---
+  duration_ms: 247.389959
+  type: 'test'
+  ...
+# Subtest: CREATE as final opcode resolves success and no-child collision from terminal stack
+ok 10 - CREATE as final opcode resolves success and no-child collision from terminal stack
+  ---
+  duration_ms: 253.129666
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2632.063958

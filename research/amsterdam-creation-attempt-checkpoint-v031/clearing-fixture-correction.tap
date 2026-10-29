@@ -1,0 +1,100 @@
+TAP version 13
+# Subtest: Amsterdam clearing binds created/selfdestruct intersection and preserves absent or prefunded native balances
+ok 1 - Amsterdam clearing binds created/selfdestruct intersection and preserves absent or prefunded native balances
+  ---
+  duration_ms: 28.089792
+  type: 'test'
+  ...
+# Subtest: zero residual clearing has exact whole-account removal only for an originally existing target
+ok 2 - zero residual clearing has exact whole-account removal only for an originally existing target
+  ---
+  duration_ms: 10.270292
+  type: 'test'
+  ...
+# Subtest: SELFDESTRUCT followed by a later refill preserves only the reconstructed residual balance
+ok 3 - SELFDESTRUCT followed by a later refill preserves only the reconstructed residual balance
+  ---
+  duration_ms: 5.45825
+  type: 'test'
+  ...
+# Subtest: preexisting self-beneficiary has no burn or clearing and cannot borrow a creation marker
+ok 4 - preexisting self-beneficiary has no burn or clearing and cannot borrow a creation marker
+  ---
+  duration_ms: 2.832833
+  type: 'test'
+  ...
+# Subtest: a pending cleared coinbase retains its fee credit after all native transfers and settlement
+ok 5 - a pending cleared coinbase retains its fee credit after all native transfers and settlement
+  ---
+  duration_ms: 9.501875
+  type: 'test'
+  ...
+# Subtest: missing, duplicated, fabricated or old-fork clearing evidence and surviving namespace fields fail closed
+ok 6 - missing, duplicated, fabricated or old-fork clearing evidence and surviving namespace fields fail closed
+  ---
+  duration_ms: 5.534334
+  type: 'test'
+  ...
+# Subtest: root revert retains observed SELFDESTRUCT but cannot fabricate committed clearing
+ok 7 - root revert retains observed SELFDESTRUCT but cannot fabricate committed clearing
+  ---
+  duration_ms: 3.852958
+  type: 'test'
+  ...
+# Subtest: balance-only and zero-empty clearing rows carry through neutral query copies without new lifecycle claims
+ok 8 - balance-only and zero-empty clearing rows carry through neutral query copies without new lifecycle claims
+  ---
+  duration_ms: 6.711209
+  type: 'test'
+  ...
+# Subtest: reset namespace shapes preserve immutable roots and remain neutral only when carried unchanged
+ok 9 - reset namespace shapes preserve immutable roots and remain neutral only when carried unchanged
+  ---
+  duration_ms: 0.258834
+  type: 'test'
+  ...
+# Subtest: actual isolated parent admits clearing and native queries observe preserved balance with no query mutation
+ok 10 - actual isolated parent admits clearing and native queries observe preserved balance with no query mutation
+  ---
+  duration_ms: 244.305
+  type: 'test'
+  ...
+# Subtest: an original creation is not newly created by a disposable query, even when it selfdestructs there
+ok 11 - an original creation is not newly created by a disposable query, even when it selfdestructs there
+  ---
+  duration_ms: 126.401208
+  type: 'test'
+  ...
+# Subtest: actual worker reply cannot erase the clearing or replace its residual with a mutually forged balance
+ok 12 - actual worker reply cannot erase the clearing or replace its residual with a mutually forged balance
+  ---
+  duration_ms: 238.452334
+  type: 'test'
+  ...
+# Subtest: inherited static mode rejects the reproduced delegated SELFDESTRUCT clearing forgery in an actual worker reply
+ok 13 - inherited static mode rejects the reproduced delegated SELFDESTRUCT clearing forgery in an actual worker reply
+  ---
+  duration_ms: 122.049625
+  type: 'test'
+  ...
+# Subtest: static ancestry cannot acquire entered CREATE/CREATE2 or a value-bearing CALL by relabeling a normal ancestor
+ok 14 - static ancestry cannot acquire entered CREATE/CREATE2 or a value-bearing CALL by relabeling a normal ancestor
+  ---
+  duration_ms: 8.829833
+  type: 'test'
+  ...
+# Subtest: inherited static mode still permits zero-value CALL and nonzero CALLCODE without balance transfer
+ok 15 - inherited static mode still permits zero-value CALL and nonzero CALLCODE without balance transfer
+  ---
+  duration_ms: 4.865625
+  type: 'test'
+  ...
+1..15
+# tests 15
+# suites 0
+# pass 15
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 974.59725

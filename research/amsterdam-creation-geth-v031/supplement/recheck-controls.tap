@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: fabricated empty and nonempty log receipts match original five fields plus payload and bloom
+ok 1 - fabricated empty and nonempty log receipts match original five fields plus payload and bloom
+  ---
+  duration_ms: 3.27675
+  type: 'test'
+  ...
+# Subtest: self-consistent changed native log payload is a disagreement, not malformed or matched
+ok 2 - self-consistent changed native log payload is a disagreement, not malformed or matched
+  ---
+  duration_ms: 1.878417
+  type: 'test'
+  ...
+# Subtest: missing/malformed/unbound log data and inconsistent hashes or blooms never match
+ok 3 - missing/malformed/unbound log data and inconsistent hashes or blooms never match
+  ---
+  duration_ms: 5.342417
+  type: 'test'
+  ...
+# Subtest: root/status/gas disagreements survive and malformed envelopes are unavailable
+ok 4 - root/status/gas disagreements survive and malformed envelopes are unavailable
+  ---
+  duration_ms: 0.668625
+  type: 'test'
+  ...
+# Subtest: raw process bytes, failures, UTF8, elapsed and output caps fail closed; empty Geth stdout is valid
+ok 5 - raw process bytes, failures, UTF8, elapsed and output caps fail closed; empty Geth stdout is valid
+  ---
+  duration_ms: 1.055584
+  type: 'test'
+  ...
+# Subtest: inventory byte/mode/type and path substitutions are rejected
+ok 6 - inventory byte/mode/type and path substitutions are rejected
+  ---
+  duration_ms: 1.471209
+  type: 'test'
+  ...
+# Subtest: fresh MPT arithmetic validates before values and reconstructs independent delta allocation
+ok 7 - fresh MPT arithmetic validates before values and reconstructs independent delta allocation
+  ---
+  duration_ms: 1.135208
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 100.033458

@@ -16,6 +16,7 @@ import { guardKzgVerifier } from './kzg-runtime.js';
 import { createGuardedBls } from './bls-runtime.js';
 import { P256_ADDRESS, createP256Precompile } from './p256-runtime.js';
 import { ethereumStateGasBudget, settleEthereumStateGas } from './ethereum-state-gas.js';
+import { createCreationAttemptObserver } from './creation-attempt-observer.js';
 
 export const EXECUTION_LIMITS = Object.freeze({ gas: 5000000, steps: 1000000, frames: 1000, depth: 32, logs: 2000, memoryBytes: 1048576, returnBytes: 1048576, calldataBytes: 32768, traceBytes: 8388608, wallMs: 10000 });
 export const ETHEREUM_EXECUTION_LIMITS = Object.freeze({ ...EXECUTION_LIMITS, wallMs: 120000 });
@@ -151,6 +152,12 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     }
     environment = { chainId, hardfork: common.hardfork(), ...(amsterdam ? { slotNumber: quantity(block.slotNumber).toString() } : {}), number: quantity(block.number).toString(), timestamp: quantity(block.timestamp).toString(), gasLimit: quantity(block.gasLimit).toString(), baseFeePerGas: quantity(block.baseFeePerGas).toString(), mixHash: block.mixHash.toLowerCase(), miner: address(block.miner), ...(block.hash ? { sourceBlockHash: block.hash.toLowerCase() } : {}), ...(block.parentHash ? { sourceParentHash: block.parentHash.toLowerCase() } : {}), sourceBlockIdentityVerified: false, ...(feePlan?.blobContext ? { blobBaseFeePerGas: feePlan.blobContext.blobBaseFeePerGas.toString() } : {}) };
     activeManagers.add(stateManager); ownsManager = true;
+    // EIP-7928 can increment a creator without entering a constructor. Observe
+    // real nonce writes and their subsequent target checks, rather than infer
+    // those attempts from final nonce differences or entered messages alone.
+    const creationObserver = common.isActivatedEIP(7928) ? createCreationAttemptObserver({
+      common, getAccount: stateManager.getAccount.bind(stateManager), check: clockCheck, bound, retain,
+    }) : null;
     const methods = new Map();
     let originalStorage;
     // Bind methods to the real manager; track every nested checkpoint so a host
@@ -176,7 +183,11 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
         try {
           clockCheck();
           if (['getAccount', 'putAccount', 'deleteAccount', 'modifyAccountFields', 'getCode', 'putCode', 'getCodeSize', 'getStorage', 'putStorage', 'clearStorage', 'beginContractCreation', 'finalizeCreatedContractDeletion', 'finalizeCreatedContractClearing', 'finalizeShanghaiContractDeletion', 'applyAuthorization'].includes(property)) reserved(args[0]);
+          const creationWrite = property === 'putAccount' && creationObserver
+            ? await creationObserver.beforePutAccount(stack.at(-1)?.frame, args[0], args[1]) : null;
           const result = await member.apply(target, args);
+          if (creationWrite) creationObserver.afterPutAccount(creationWrite);
+          if (property === 'getAccount') creationObserver?.afterGetAccount(stack.at(-1)?.frame, args[0], result);
           if (property === 'checkpoint') checkpointDepth++;
           else if (property === 'commit' || property === 'revert') checkpointDepth--;
           clockCheck();
@@ -224,11 +235,12 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       if (creation) { observedCreation = true; describeLifecycle(); }
       const frame = { type, from: parent?.frame.executionAddress ?? message.caller.toString(), to: creation ? null : message.codeAddress.toString(), executionAddress: creation ? null : message.to.toString(), caller: message.caller.toString(), value: hex(message.value), input: bytesToHex(message.data), gas: hex(message.gasLimit), gasUsed: null, output: null, error: null, depth: message.depth, calls: [] };
       if (parent) parent.frame.calls.push(frame); else root = frame;
+      creationObserver?.enterFrame(frame, message, parent?.frame ?? null);
       // CREATE increments the creator before the child's checkpoint. A failed
       // constructor or collision keeps that increment if its parent commits.
-      // Count entered attempts in the parent, then merge only committed
-      // descendants. The supported fork range excludes EIP-7928's alternate
-      // collision path, which would need a different observation point.
+      // Historical delegated-sender profiles count entered attempts here.
+      // Amsterdam uses the write observer above; its delegated-sender gate
+      // remains closed until authorization/nonce restoration is integrated.
       if (delegatedSenderNonce !== null && creation && parent && frame.from === from) parent.senderCreations++;
       // This is the EVM's invocation-local creation set. The state manager's
       // creation marker deliberately survives copied after-state query forks.
@@ -245,6 +257,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     evm.events.on('step', step => {
       clockCheck(); bound('steps', ++usage.steps); bound('memoryBytes', step.memory.length);
       const active = stack.at(-1);
+      if (active) creationObserver?.step(active.frame, step);
       if (createOpcodes.has(step.opcode.code) && !canCreate) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'This local profile does not support the requested lifecycle operation.', 'unsupported');
       if (step.opcode.code === 0xff) {
         // runCall applies the balance transfer but leaves transaction-end
@@ -285,6 +298,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       active.frame.gasUsed = hex(result.execResult.executionGasUsed); active.frame.output = bytesToHex(output);
       const error = result.execResult.exceptionError?.error;
       active.frame.error = error === undefined ? null : evmErrors.has(error) ? error : 'unrecognized EVM exception';
+      creationObserver?.exitFrame(active.frame, result);
       if (error === undefined) {
         const parent = stack.at(-1);
         if (parent) parent.senderCreations += active.senderCreations;
@@ -351,6 +365,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     const result = await evm.runCall({ caller: createAddressFromString(from), origin: createAddressFromString(from), ...(to ? { to: createAddressFromString(to) } : {}), data: hexToBytes(request.data), value, gasLimit, gasPrice: feePlan?.effectiveGasPrice ?? 0n, ...(authorizationList !== undefined ? { skipNonceIncrement: true } : {}), ...(context.blobVersionedHashes ? { blobVersionedHashes: [...context.blobVersionedHashes] } : {}), block: { header: { ...(amsterdam ? { slotNumber: quantity(block.slotNumber) } : {}), number: quantity(block.number), timestamp: quantity(block.timestamp), gasLimit: quantity(block.gasLimit), baseFeePerGas: quantity(block.baseFeePerGas), difficulty: 0n, prevRandao: hexToBytes(block.mixHash), coinbase: createAddressFromString(address(block.miner)), getBlobGasPrice() { if (feePlan?.blobContext) return feePlan.blobContext.blobBaseFeePerGas; if (context.blobVersionedHashes) return 0n; reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is unsupported.', 'unsupported'); } } } });
     clockCheck();
     if (stack.length || checkpointDepth !== 1) reject('LOCAL_TRACE_INVALID', 'Local call-tree or checkpoint completion is inconsistent.');
+    creationObserver?.finish();
     if (stateGasBudget) {
       const counters = { messageGasUsed: result.execResult.executionGasUsed, authorizationGasUsed: 0n,
         stateGasReservoir: evm.stateGasReservoir, executionStateGasUsed: evm.executionStateGasUsed,

@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "planSha256": "a5d002b304adca9d2790155eecb2ba032b98367062ff6ec1ee105b35d78c79bf",
+  "sourceManifestSha256": "f60cfd73f3987ac3f1a7cc826251a44cf2a2f8b36dacbc7ebb0f1e818e0fcc41",
+  "status": "complete",
+  "comparisonsUsable": true,
+  "sourceUnchanged": true,
+  "artifactsUnchanged": true,
+  "fatal": null,
+  "terminalTiming": {
+    "wallMs": 6106,
+    "monotonicMs": 6106.2318749999995,
+    "clockReversed": false,
+    "valid": true
+  },
+  "totalOutputBytes": 263810,
+  "artifactHashCoverageComplete": true,
+  "rows": [
+    {
+      "id": "repeated_create2",
+      "status": "unavailable",
+      "channels": null,
+      "reason": "Malformed, rejected or unbound transition evidence: Expected values to be strictly deep-equal:\n+ actual - expected\n\n+ [\n+   {\n+     address: '0xfffffffffffffffffffffffffffffffffffffffe',\n+     blockHash: '0x1337000000000000000000000000000000000000000000000000000000000000',\n+     blockNumber: '0xb76214',\n+     blockTimestamp: '0x6ae2fe68',\n+     data: '0x0000000000000000000000000000000000000000000000000000000000000005',\n+     logIndex: '0x0',\n+     removed: false,\n+     topics: [\n+       '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',\n+       '0x0000000000000000000000004444444444444444444444444444444444444444',\n+       '0x0000000000000000000000006d5a8b33b570d007f6ee0f8073c48ef154f15ef7'\n+     ],\n+     transactionHash: '0xf3e9028a30a18715a9a5dd62edbe290dfec46a5d112f13c8935dc72761231158',\n+     transactionIndex: '0x0'\n+   }\n+ ]\n- []\n"
+    },
+    {
+      "id": "initial_nonce_collision",
+      "status": "matched",
+      "channels": {
+        "stateRoot": true,
+        "logsHash": true,
+        "receiptStatus": true,
+        "receiptGas": true,
+        "blockGas": true
+      },
+      "reason": null,
+      "observed": {
+        "stateRoot": "0xac6798af4dc0821ba9653a5ec64f9de64a67debc05347ac1522a20f6604ca896",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "receiptStatus": "1",
+        "receiptGas": "4922310",
+        "blockGas": "4922310"
+      }
+    },
+    {
+      "id": "initial_code_collision",
+      "status": "matched",
+      "channels": {
+        "stateRoot": true,
+        "logsHash": true,
+        "receiptStatus": true,
+        "receiptGas": true,
+        "blockGas": true
+      },
+      "reason": null,
+      "observed": {
+        "stateRoot": "0x25015266f18f7352eac9957edb73a61209bcf93e035447624b328cff4568a406",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "receiptStatus": "1",
+        "receiptGas": "4922310",
+        "blockGas": "4922310"
+      }
+    },
+    {
+      "id": "constructor_revert",
+      "status": "matched",
+      "channels": {
+        "stateRoot": true,
+        "logsHash": true,
+        "receiptStatus": true,
+        "receiptGas": true,
+        "blockGas": true
+      },
+      "reason": null,
+      "observed": {
+        "stateRoot": "0x6ea919b9276b6a70b1b90c7a758983fba801d439f9b96bbbe1c4cc91a769f4f0",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "receiptStatus": "1",
+        "receiptGas": "39143",
+        "blockGas": "39143"
+      }
+    },
+    {
+      "id": "parent_rollback",
+      "status": "matched",
+      "channels": {
+        "stateRoot": true,
+        "logsHash": true,
+        "receiptStatus": true,
+        "receiptGas": true,
+        "blockGas": true
+      },
+      "reason": null,
+      "observed": {
+        "stateRoot": "0x8ce614e87d1212579610b4d34e9a498488d600113ae03d469c96c2936e2a27cc",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "receiptStatus": "0",
+        "receiptGas": "4740257",
+        "blockGas": "4740257"
+      }
+    },
+    {
+      "id": "reentrant_creation",
+      "status": "matched",
+      "channels": {
+        "stateRoot": true,
+        "logsHash": true,
+        "receiptStatus": true,
+        "receiptGas": true,
+        "blockGas": true
+      },
+      "reason": null,
+      "observed": {
+        "stateRoot": "0x8984dc1315305c6c8248b88fe21e7dcaa589a57e5cc2e401c212be418892e2c5",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "receiptStatus": "1",
+        "receiptGas": "609759",
+        "blockGas": "555390"
+      }
+    }
+  ],
+  "counts": {
+    "matched": 5,
+    "mismatched": 0,
+    "unavailable": 1,
+    "not_attempted": 0
+  },
+  "scope": {
+    "classification": "six_predeclared_synthetic_creation_attempt_development_cases",
+    "isolatedParentValidatedProduct": true,
+    "publicApiHttpTested": false,
+    "publicRpc": false,
+    "populationAccuracy": false,
+    "canonicalConsensusEstablished": false,
+    "withinFiveMillionGasBudget": true,
+    "unsignedProductVersusSignedType2": true,
+    "sameAmendedInitialAllocation": true,
+    "systemScaffolding": "four_disclosed_inert_STOP_accounts",
+    "productSystemCallsExecuted": false,
+    "gethSystemCallsExecuted": true,
+    "gethReturnDataCompared": false,
+    "gethSeparateGasDimensionsObserved": false,
+    "gethBlockGasMeaning": "max(cumulative_execution_dimension,cumulative_state_dimension)",
+    "receiptGasComparedSeparately": true,
+    "allProductObservationsSealedBeforeGeth": true,
+    "productDeltaAppliedToFreshMPT": true,
+    "fullVmExpectedOutputConsumed": false,
+    "rawOpcodeTraceRetained": true,
+    "automaticExecutionPathEquivalenceClaimed": false
+  }
+}

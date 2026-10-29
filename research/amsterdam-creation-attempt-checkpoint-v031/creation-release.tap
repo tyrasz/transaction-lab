@@ -1,0 +1,82 @@
+TAP version 13
+# Subtest: repeated Amsterdam CREATE2 collision completes with its explicit two-attempt ledger
+ok 1 - repeated Amsterdam CREATE2 collision completes with its explicit two-attempt ledger
+  ---
+  duration_ms: 177.578958
+  type: 'test'
+  ...
+# Subtest: omitting the no-child collision evidence still withholds all completed parent output
+ok 2 - omitting the no-child collision evidence still withholds all completed parent output
+  ---
+  duration_ms: 133.946791
+  type: 'test'
+  ...
+# Subtest: repeated CREATE2 records two increments with one constructor and no second endowment
+ok 3 - repeated CREATE2 records two increments with one constructor and no second endowment
+  ---
+  duration_ms: 180.03175
+  type: 'test'
+  ...
+# Subtest: initial nonce/code collisions for both creation opcodes retain nonce but never transfer endowment
+ok 4 - initial nonce/code collisions for both creation opcodes retain nonce but never transfer endowment
+  ---
+  duration_ms: 521.197458
+  type: 'test'
+  ...
+# Subtest: constructor REVERT/INVALID retain creator nonce but roll back value/code/storage
+ok 5 - constructor REVERT/INVALID retain creator nonce but roll back value/code/storage
+  ---
+  duration_ms: 255.004333
+  type: 'test'
+  ...
+# Subtest: root and caught enclosing rollback discard observed collision increments and deployments
+ok 6 - root and caught enclosing rollback discard observed collision increments and deployments
+  ---
+  duration_ms: 265.072708
+  type: 'test'
+  ...
+# Subtest: constructor-created child has separate nonce-one baseline and distinct attempt ancestry
+ok 7 - constructor-created child has separate nonce-one baseline and distinct attempt ancestry
+  ---
+  duration_ms: 127.892375
+  type: 'test'
+  ...
+# Subtest: DELEGATECALL creations increment execution address, never implementation address
+ok 8 - DELEGATECALL creations increment execution address, never implementation address
+  ---
+  duration_ms: 127.603834
+  type: 'test'
+  ...
+# Subtest: reentrant creation observes chronological nonce changes and resumed-parent positions
+ok 9 - reentrant creation observes chronological nonce changes and resumed-parent positions
+  ---
+  duration_ms: 136.029167
+  type: 'test'
+  ...
+# Subtest: balance/nonce fail-fast and inherited static creation produce no nonce-write attempts
+ok 10 - balance/nonce fail-fast and inherited static creation produce no nonce-write attempts
+  ---
+  duration_ms: 374.259
+  type: 'test'
+  ...
+# Subtest: pre-target and account-state-charge OOG cannot be counted as nonce writes
+ok 11 - pre-target and account-state-charge OOG cannot be counted as nonce writes
+  ---
+  duration_ms: 245.546584
+  type: 'test'
+  ...
+# Subtest: CREATE as final opcode resolves success and no-child collision from terminal stack
+ok 12 - CREATE as final opcode resolves success and no-child collision from terminal stack
+  ---
+  duration_ms: 252.062333
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2673.424458

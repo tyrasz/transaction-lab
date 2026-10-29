@@ -1,0 +1,64 @@
+TAP version 13
+# Subtest: parent requires exact canonical attempt and target records without invoking accessors
+ok 1 - parent requires exact canonical attempt and target records without invoking accessors
+  ---
+  duration_ms: 25.70125
+  type: 'test'
+  ...
+# Subtest: parent binds attempts to opcode, target derivation, current target state and child result
+ok 2 - parent binds attempts to opcode, target derivation, current target state and child result
+  ---
+  duration_ms: 3.867208
+  type: 'test'
+  ...
+# Subtest: each entered creation has one ledger join and every entered frame has an explicit array
+ok 3 - each entered creation has one ledger join and every entered frame has an explicit array
+  ---
+  duration_ms: 1.595791
+  type: 'test'
+  ...
+# Subtest: reentrant creation must observe intermediate nonce updates at its declared child position
+ok 4 - reentrant creation must observe intermediate nonce updates at its declared child position
+  ---
+  duration_ms: 10.24375
+  type: 'test'
+  ...
+# Subtest: delegated creation inherits its parent value as well as caller and execution address
+ok 5 - delegated creation inherits its parent value as well as caller and execution address
+  ---
+  duration_ms: 6.474125
+  type: 'test'
+  ...
+# Subtest: enclosing rollback discards descendant attempts and inherited static cannot acquire them
+ok 6 - enclosing rollback discards descendant attempts and inherited static cannot acquire them
+  ---
+  duration_ms: 10.537667
+  type: 'test'
+  ...
+# Subtest: root construction starts target nonce at one without counting outer sender preparation twice
+ok 7 - root construction starts target nonce at one without counting outer sender preparation twice
+  ---
+  duration_ms: 3.378208
+  type: 'test'
+  ...
+# Subtest: query chronology starts from carried nonce/code state and separately increments its caller
+ok 8 - query chronology starts from carried nonce/code state and separately increments its caller
+  ---
+  duration_ms: 4.406459
+  type: 'test'
+  ...
+# Subtest: actual child target-state forgery is withheld even after recounting trace bytes
+ok 9 - actual child target-state forgery is withheld even after recounting trace bytes
+  ---
+  duration_ms: 121.272833
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 364.962708
