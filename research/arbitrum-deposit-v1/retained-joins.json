@@ -1,0 +1,48 @@
+{
+  "scope": "Offline request-to-scenario joins only; no new RPC and no current balance claim.",
+  "checks": [
+    {
+      "path": "retained/cctp-100-usdc-simulation.json",
+      "callMatchesScenario": true,
+      "blockSelector": "0x1ed72ba4",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 6,
+        "result": "0x"
+      },
+      "balanceDeltaIndependentlyVerified": false
+    },
+    {
+      "path": "retained/cctp-100-usdc-retry-rpc.json",
+      "callMatchesScenario": true,
+      "blockSelector": "0x1ed73ed5",
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 4,
+        "result": "0x"
+      },
+      "balanceDeltaIndependentlyVerified": false
+    },
+    {
+      "path": "retained/dynamic-cctp-100-usdc-before-setting-change.json",
+      "requestExactlyMatchesScenario": true,
+      "time": "2026-10-23T03:16:53.801Z",
+      "responseKind": "provider_summary",
+      "balanceDeltaIndependentlyVerified": false
+    },
+    {
+      "path": "retained/dynamic-cctp-100-usdc-after-setting-change.json",
+      "requestExactlyMatchesScenario": true,
+      "time": "2026-10-23T03:39:09.524Z",
+      "responseKind": "provider_summary",
+      "balanceDeltaIndependentlyVerified": false
+    },
+    {
+      "path": "retained/dynamic-cctp-100-usdc-live-simulation.json",
+      "requestExactlyMatchesScenario": true,
+      "time": "2026-10-23T04:05:37.018Z",
+      "responseKind": "provider_summary",
+      "balanceDeltaIndependentlyVerified": false
+    }
+  ]
+}

@@ -1,0 +1,213 @@
+{
+  "description": "Actual read-only CCTP deposit simulation against current Arbitrum mainnet state. No state overrides, signatures, approvals, or broadcasts. This is an RPC simulation, not a Dynamic or Blockaid response.",
+  "sender": "0xe721a0532a7828df67ad519aa25c602da076159a",
+  "blockNumber": 517417892,
+  "usdcBalanceRaw": "21026870000",
+  "usdcAllowanceRaw": "2623096912320744",
+  "senderCode": "0xef0100e40ccb2d94975c51bff0c004efdfd9b3a5796fa4",
+  "decodedCall": {
+    "function": "depositForBurnWithHook",
+    "amount": "100000000",
+    "destinationDomain": 19,
+    "mintRecipient": "0xb21d281dedb17ae5b501f6aa8256fe38c4e45757",
+    "burnToken": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+    "destinationCaller": "0xb21d281dedb17ae5b501f6aa8256fe38c4e45757",
+    "maxFee": "200000",
+    "minFinalityThreshold": 1000,
+    "hyperCoreRecipient": "0xe721a0532a7828df67ad519aa25c602da076159a",
+    "hyperCoreDestinationDex": 0
+  },
+  "simulationResponse": {
+    "jsonrpc": "2.0",
+    "id": 6,
+    "result": "0x"
+  },
+  "gasEstimateResponse": {
+    "jsonrpc": "2.0",
+    "id": 7,
+    "result": "0x1dc80"
+  },
+  "calls": [
+    {
+      "requestedAtUtc": "2026-10-23T03:15:40.110975+00:00",
+      "request": {
+        "url": "https://iris-api.circle.com/v2/burn/USDC/fees/3/19?forward=true&hyperCoreDeposit=true",
+        "method": "GET"
+      },
+      "response": [
+        {
+          "finalityThreshold": 1000,
+          "minimumFee": 0,
+          "forwardFee": {
+            "low": 200000,
+            "med": 200000,
+            "high": 200000
+          }
+        },
+        {
+          "finalityThreshold": 2000,
+          "minimumFee": 0,
+          "forwardFee": {
+            "low": 200000,
+            "med": 200000,
+            "high": 200000
+          }
+        }
+      ]
+    },
+    {
+      "requestedAtUtc": "2026-10-23T03:15:40.514519+00:00",
+      "request": {
+        "url": "https://arb1.arbitrum.io/rpc",
+        "method": "POST",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 2,
+          "method": "eth_blockNumber",
+          "params": []
+        }
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 2,
+        "result": "0x1ed72ba4"
+      }
+    },
+    {
+      "requestedAtUtc": "2026-10-23T03:15:40.806803+00:00",
+      "request": {
+        "url": "https://arb1.arbitrum.io/rpc",
+        "method": "POST",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 3,
+          "method": "eth_call",
+          "params": [
+            {
+              "to": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+              "data": "0x70a08231000000000000000000000000e721a0532a7828df67ad519aa25c602da076159a"
+            },
+            "0x1ed72ba4"
+          ]
+        }
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 3,
+        "result": "0x00000000000000000000000000000000000000000000000000000004e54c92f0"
+      }
+    },
+    {
+      "requestedAtUtc": "2026-10-23T03:15:41.116703+00:00",
+      "request": {
+        "url": "https://arb1.arbitrum.io/rpc",
+        "method": "POST",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 4,
+          "method": "eth_call",
+          "params": [
+            {
+              "to": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+              "data": "0xdd62ed3e000000000000000000000000e721a0532a7828df67ad519aa25c602da076159a00000000000000000000000028b5a0e9c621a5badaa536219b3a228c8168cf5d"
+            },
+            "0x1ed72ba4"
+          ]
+        }
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 4,
+        "result": "0x000000000000000000000000000000000000000000000000000951b157ab98e8"
+      }
+    },
+    {
+      "requestedAtUtc": "2026-10-23T03:15:41.435968+00:00",
+      "request": {
+        "url": "https://arb1.arbitrum.io/rpc",
+        "method": "POST",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 5,
+          "method": "eth_getCode",
+          "params": [
+            "0xe721a0532a7828df67ad519aa25c602da076159a",
+            "0x1ed72ba4"
+          ]
+        }
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 5,
+        "result": "0xef0100e40ccb2d94975c51bff0c004efdfd9b3a5796fa4"
+      }
+    },
+    {
+      "requestedAtUtc": "2026-10-23T03:15:41.761078+00:00",
+      "request": {
+        "url": "https://arb1.arbitrum.io/rpc",
+        "method": "POST",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 6,
+          "method": "eth_call",
+          "params": [
+            {
+              "from": "0xe721a0532a7828df67ad519aa25c602da076159a",
+              "to": "0x28b5a0e9c621a5badaa536219b3a228c8168cf5d",
+              "value": "0x0",
+              "data": "0x779b432d0000000000000000000000000000000000000000000000000000000005f5e1000000000000000000000000000000000000000000000000000000000000000013000000000000000000000000b21d281dedb17ae5b501f6aa8256fe38c4e45757000000000000000000000000af88d065e77c8cc2239327c5edb3a432268e5831000000000000000000000000b21d281dedb17ae5b501f6aa8256fe38c4e457570000000000000000000000000000000000000000000000000000000000030d4000000000000000000000000000000000000000000000000000000000000003e800000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000038636374702d666f72776172640000000000000000000000000000000000000018e721a0532a7828df67ad519aa25c602da076159a000000000000000000000000"
+            },
+            "0x1ed72ba4"
+          ]
+        }
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 6,
+        "result": "0x"
+      }
+    },
+    {
+      "requestedAtUtc": "2026-10-23T03:15:42.529482+00:00",
+      "request": {
+        "url": "https://arb1.arbitrum.io/rpc",
+        "method": "POST",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 7,
+          "method": "eth_estimateGas",
+          "params": [
+            {
+              "from": "0xe721a0532a7828df67ad519aa25c602da076159a",
+              "to": "0x28b5a0e9c621a5badaa536219b3a228c8168cf5d",
+              "value": "0x0",
+              "data": "0x779b432d0000000000000000000000000000000000000000000000000000000005f5e1000000000000000000000000000000000000000000000000000000000000000013000000000000000000000000b21d281dedb17ae5b501f6aa8256fe38c4e45757000000000000000000000000af88d065e77c8cc2239327c5edb3a432268e5831000000000000000000000000b21d281dedb17ae5b501f6aa8256fe38c4e457570000000000000000000000000000000000000000000000000000000000030d4000000000000000000000000000000000000000000000000000000000000003e800000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000038636374702d666f72776172640000000000000000000000000000000000000018e721a0532a7828df67ad519aa25c602da076159a000000000000000000000000"
+            },
+            "0x1ed72ba4"
+          ]
+        }
+      },
+      "response": {
+        "jsonrpc": "2.0",
+        "id": 7,
+        "result": "0x1dc80"
+      }
+    }
+  ],
+  "dynamicSimulation": {
+    "status": "run",
+    "requestedAtUtc": "2026-10-23T03:16:53.801Z",
+    "httpStatus": 200,
+    "response": {
+      "inAssets": [],
+      "outAssets": [],
+      "priceData": {
+        "nativeTokenUsdPrice": 2410.01
+      },
+      "showTotalFiat": false
+    },
+    "transcriptFile": "dynamic-cctp-100-usdc-live-simulation.json"
+  },
+  "approvalTransaction": "0x27f926e7d7b7d582f1f52f3b3388ab5cee66b035e3a901b951471a4a075556f2"
+}

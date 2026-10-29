@@ -1,0 +1,841 @@
+# Circle Docs
+
+> Developer documentation for Circle's developer tools
+
+> ## Agent Instructions
+> Before reading these docs, install the relevant Circle Skill to get pre-loaded context — skills are LLM-optimized and cover architecture decisions, correct flows, and common pitfalls. In Claude Code: run /plugin marketplace add circlefin/skills then /plugin install circle-skills@circle. With Vercel Skills CLI: run npx skills add circlefin/skills. Available skills: use-usdc https://github.com/circlefin/skills/blob/master/plugins/circle/skills/use-usdc/SKILL.md (balances, transfers, approvals on EVM and Solana); EURC has no skill — see https://developers.circle.com/stablecoins/what-is-eurc.md; bridge-stablecoin https://github.com/circlefin/skills/blob/master/plugins/circle/skills/bridge-stablecoin/SKILL.md (crosschain transfers via CCTP, USDC, EURC, and third-party assets); use-arc https://github.com/circlefin/skills/blob/master/plugins/circle/skills/use-arc/SKILL.md (Arc chain config, contract deployment, USDC bridging — Arc docs: https://docs.arc.io/llms.txt); use-circle-wallets https://github.com/circlefin/skills/blob/master/plugins/circle/skills/use-circle-wallets/SKILL.md (choose wallet type); use-developer-controlled-wallets https://github.com/circlefin/skills/blob/master/plugins/circle/skills/use-developer-controlled-wallets/SKILL.md (custodial wallets for payouts and treasury); use-user-controlled-wallets https://github.com/circlefin/skills/blob/master/plugins/circle/skills/use-user-controlled-wallets/SKILL.md (embedded wallets with Web2 login); use-modular-wallets https://github.com/circlefin/skills/blob/master/plugins/circle/skills/use-modular-wallets/SKILL.md (smart contract wallets with passkeys and ERC-4337); use-gateway https://github.com/circlefin/skills/blob/master/plugins/circle/skills/use-gateway/SKILL.md (unified USDC balance, nanopayments); use-smart-contract-platform https://github.com/circlefin/skills/blob/master/plugins/circle/skills/use-smart-contract-platform/SKILL.md (deploy, interact, monitor contracts). Pair any skill with the Circle MCP server for live SDK signatures, contract addresses, and chain IDs: {"mcpServers":{"circle":{"url":"https://api.circle.com/v1/codegen/mcp"}}}.
+> Read the product overview first. Each product has an overview explaining when and why to use it. Read it before quickstarts.
+> Pick the right wallet type. Developer-controlled (you hold keys), user-controlled (end user holds keys via PIN/social login), or modular (smart contract wallets with passkeys). See https://developers.circle.com/wallets.md.
+> Use CCTP V2 for crosschain transfers. CCTP natively transfers USDC and EURC via burn-and-mint, and supports permissionless wrapping of third-party assets via lock-and-mint. V1 is legacy; always use V2 unless V1 is specified or the chain requires it (Noble, Sui, and Aptos still require V1). Migration guide: https://developers.circle.com/cctp/migration-from-v1-to-v2.md.
+> Use Bridge Kit for frontend bridging. Wraps CCTP with a simpler SDK for user-facing apps. Use CCTP directly for backend transfers.
+> Gas Station vs Paymaster. Gas Station sponsors gas for Circle Wallet transactions. Paymaster lets users pay gas in USDC. Different use cases — read both overviews.
+> Gateway Nanopayments for sub-cent payments. Gasless USDC micropayments down to $0.000001 via x402 and batched settlement. For pay-per-request APIs, AI agent payments, streaming.
+> Look up USDC addresses per chain. Never hardcode — use https://developers.circle.com/stablecoins/usdc-contract-addresses.md.
+> Prefer SDKs over raw API calls. Node.js and Python SDKs handle auth, retries, and errors.
+> API key required. Bearer token in Authorization header. Testnet and mainnet use separate keys and may use different base URLs depending on the product.
+> Set up webhooks when available. Most operations are async. Webhooks deliver transaction confirmations and state changes.
+> When calling list endpoints, paginate using pageSize and pageAfter until no nextPageAfter cursor is returned—stopping at the first page silently misses records.
+> Building an AI agent? Start with the Agent Stack—Circle CLI, agent wallets, and nanopayments built for autonomous use cases: https://developers.circle.com/agent-stack.md.
+
+## Get started
+
+- [Circle developer docs](https://developers.circle.com/index.md)
+
+### Build with AI
+
+- [Arc Studio](https://developers.circle.com/ai/arc-studio.md): Build and deploy onchain apps with Circle's AI coding agent.
+- [AI skills for building with Circle](https://developers.circle.com/ai/skills.md)
+- [Use Circle's MCP server in your IDE](https://developers.circle.com/ai/mcp.md)
+
+## Assets
+
+- [Assets](https://developers.circle.com/assets.md): Issue, transfer, and integrate digital assets into your applications.
+
+### USDC
+
+- [USDC overview](https://developers.circle.com/stablecoins/what-is-usdc.md): USDC is a dollar-backed digital currency issued by Circle, available on many major blockchains.
+- [USDC contract addresses](https://developers.circle.com/stablecoins/usdc-contract-addresses.md)
+
+#### Transfer USDC
+
+- [Quickstart: Transfer USDC on EVM chains](https://developers.circle.com/stablecoins/quickstarts/transfer-usdc-evm.md): Transfer USDC between wallets on EVM-compatible blockchains using Viem and Node.js
+- [Quickstart: Transfer USDC on Aptos](https://developers.circle.com/stablecoins/quickstarts/transfer-usdc-aptos.md): Send USDC between accounts on Aptos Testnet using the Aptos TypeScript SDK.
+- [Quickstart: Transfer USDC on Solana](https://developers.circle.com/stablecoins/quickstart-transfer-10-usdc-on-solana.md): Transfer USDC between wallets on Solana Devnet using a Node.js script
+- [Quickstart: Set up and transfer USDC on Starknet](https://developers.circle.com/stablecoins/quickstart-setup-transfer-usdc-starknet.md)
+- [Quickstart: Set up and transfer USDC on Sui](https://developers.circle.com/stablecoins/quickstart-setup-transfer-usdc-sui.md)
+- [Quickstart: Set up a USDC trustline on Stellar](https://developers.circle.com/stablecoins/quickstarts/setup-usdc-trustline-stellar.md): Fund a wallet on Stellar Testnet and open a USDC trustline so the account can hold USDC.
+- [Quickstart: Transfer USDC on Stellar](https://developers.circle.com/stablecoins/quickstarts/transfer-usdc-stellar.md): Send USDC between accounts on Stellar Testnet using the Stellar SDK.
+- [Quickstart: Set up a USDC trustline on XRPL](https://developers.circle.com/stablecoins/quickstart-setup-usdc-trustline-xrpl.md)
+
+### EURC
+
+- [EURC overview](https://developers.circle.com/stablecoins/what-is-eurc.md): EURC is a euro-backed digital currency issued by Circle, compliant with MiCA regulation, and available on many major blockchains.
+- [EURC contract addresses](https://developers.circle.com/stablecoins/eurc-contract-addresses.md)
+- [Quickstart: Transfer EURC on EVM chains](https://developers.circle.com/stablecoins/quickstarts/transfer-eurc-evm.md): Transfer EURC between wallets on EVM chains using a Node.js script
+
+### cirBTC
+
+- [cirBTC overview](https://developers.circle.com/assets/what-is-cirbtc.md): Circle Wrapped Bitcoin (cirBTC) is a 1:1 BTC-backed token issued by Circle on Arc and Ethereum with real-time onchain reserve verification through Chainlink Proof of Reserves.
+- [cirBTC contract addresses](https://developers.circle.com/assets/cirbtc-contract-addresses.md): Smart contract addresses for cirBTC (Circle Wrapped Bitcoin) on supported mainnet and testnet blockchains.
+
+### xReserve
+
+- [xReserve overview](https://developers.circle.com/xreserve.md): xReserve lets blockchain teams deploy USDC-backed stablecoins on their own blockchains.
+
+#### Get started
+
+- [How xReserve works](https://developers.circle.com/xreserve/concepts/how-xreserve-works.md)
+- [xReserve supported blockchains and domains](https://developers.circle.com/xreserve/references/supported-blockchains-and-domains.md)
+- [Quickstart: Deposit USDC into xReserve](https://developers.circle.com/xreserve/tutorials/deposit-usdc-into-xreserve.md): Learn how to deposit USDC into xReserve on Ethereum Sepolia.
+- [Quickstart: Deposit into xReserve from CCTP blockchains](https://developers.circle.com/xreserve/tutorials/deposit-from-cctp-blockchains.md): Deposit USDC from Base Sepolia through Arc Testnet into xReserve to receive USDCx on Movement Bardock.
+
+#### Withdrawals
+
+- [Initiate a withdrawal from xReserve as a remote blockchain](https://developers.circle.com/xreserve/tutorials/initiate-a-withdrawal-as-a-remote-blockchain.md)
+- [xReserve withdrawal fees](https://developers.circle.com/xreserve/references/fees.md)
+
+#### Learn more
+
+- [xReserve technical guide](https://developers.circle.com/xreserve/concepts/technical-guide.md)
+- [USDC-backed stablecoin reference specification](https://developers.circle.com/xreserve/concepts/usdc-backed-stablecoin-specification.md)
+
+### USYC
+
+- [USYC overview](https://developers.circle.com/tokenized/usyc/overview.md): Onchain access to a yield-bearing money market fund for qualified investors.
+
+#### Get started
+
+##### Subscribe and redeem
+
+- [Quickstart: Subscribe and redeem USYC using the Teller smart contract](https://developers.circle.com/tokenized/usyc/subscribe-and-redeem.md)
+- [Quickstart: Subscribe and redeem USYC using the USYC Portal](https://developers.circle.com/tokenized/usyc/subscribe-and-redeem-portal.md)
+- [Quickstart: Subscribe and redeem USYC on Solana](https://developers.circle.com/tokenized/usyc/subscribe-and-redeem-solana.md)
+
+#### Learn more
+
+- [USYC contract addresses](https://developers.circle.com/tokenized/usyc/smart-contracts.md)
+- [API endpoints](https://developers.circle.com/tokenized/usyc/web2-apis.md)
+
+## Build onchain
+
+- [Build onchain experiences](https://developers.circle.com/build-onchain.md): Compose wallets, contracts, gas sponsorship, and compliance to ship onchain apps faster.
+
+### Wallets
+
+- [Circle Wallets](https://developers.circle.com/wallets.md): Add secure, embedded wallets to your application with Circle's APIs and SDKs. Manage keys, sign transactions, and support multiple blockchains.
+
+#### Get started
+
+- [Choose your wallet product and account types](https://developers.circle.com/wallets/account-types.md): Choose the right Circle Wallets product and account type for your use case.
+- [Supported blockchains](https://developers.circle.com/wallets/supported-blockchains.md): Supported blockchains for Circle Wallets, including account types, token standards, and API limitations.
+
+##### Core concepts
+
+- [Transaction signing and authorization](https://developers.circle.com/wallets/signing-and-authorization-models.md): How signing and authorization work across Circle Wallets products, including who initiates and approves transactions, where keys live, and the transaction signing lifecycle.
+- [Key management](https://developers.circle.com/wallets/key-management.md): How Circle Wallets secures keys with MPC and passkeys across developer-controlled, user-controlled, and modular wallets.
+- [Blockchain infrastructure](https://developers.circle.com/wallets/blockchain-infrastructure.md): The blockchain infrastructure Circle Wallets provides, including broadcasting, indexing, gas fees, and transaction bundling.
+- [Blockchain confirmations](https://developers.circle.com/wallets/blockchain-confirmations.md): How Circle Wallets uses blockchain confirmations to determine transaction finality.
+
+#### Wallets: Dev-Controlled
+
+- [Dev-controlled wallets](https://developers.circle.com/wallets/dev-controlled.md): Understand how dev-controlled wallets work, when to use them, and how Circle enables programmatic wallet infrastructure.
+- [Quickstart: Create a dev-controlled wallet](https://developers.circle.com/wallets/dev-controlled/create-your-first-wallet.md): Get started with developer-controlled wallets by creating a wallet set and a wallet within it.
+- [Send tokens across wallets](https://developers.circle.com/wallets/dev-controlled/transfer-tokens-across-wallets.md): Send USDC from one dev-controlled wallet to another, then verify the transaction status and recipient balance.
+- [How-to: Retire existing wallets](https://developers.circle.com/wallets/dev-controlled/retire-existing-wallets.md): Retire dev-controlled wallets from active use by sweeping balances, re-tagging metadata, and blocking further activity with Compliance Engine policies.
+
+##### Entity secret
+
+- [How the entity secret works](https://developers.circle.com/wallets/dev-controlled/entity-secret-management.md): Learn how the entity secret secures developer-controlled wallets and how it is used in API requests.
+- [How-to: Generate and register your entity secret](https://developers.circle.com/wallets/dev-controlled/register-entity-secret.md): Generate an entity secret and register it with Circle.
+
+##### Manage wallet creation
+
+- [How-to: Batch-create wallets for existing users](https://developers.circle.com/wallets/dev-controlled/batch-create-wallets.md): Create up to 200 dev-controlled wallets in a single API call and link each wallet to an existing user in your system using metadata.
+- [How-to: Pre-create wallets and assign on demand](https://developers.circle.com/wallets/dev-controlled/pre-create-wallets.md): Create a pool of unassigned wallets in advance and assign them to new users on demand as they sign up.
+
+##### Transaction signing
+
+- [How signing APIs work](https://developers.circle.com/wallets/signing-apis.md): Learn how Circle's signing APIs work for developer-controlled wallets when you manage broadcasting yourself.
+- [Sign transactions](https://developers.circle.com/wallets/sign-transactions.md): Sign transactions with developer-controlled wallets on EVM, Solana, or NEAR when you manage broadcasting yourself.
+- [EVM testnet chain IDs for signing](https://developers.circle.com/wallets/sign-tx-chain-id.md): Chain IDs supported by EVM testnet wallets for signing transactions.
+
+#### Wallets: User-Controlled
+
+- [User-controlled wallets](https://developers.circle.com/wallets/user-controlled.md): Understand how user-controlled wallets work, when to use them, and how Circle enables user-owned keys with social or email authentication, or PIN validation.
+- [Authentication methods](https://developers.circle.com/wallets/user-controlled/authentication-methods.md): Choose the right way to authenticate users in your user-controlled wallets app.
+- [Build a wallet app](https://developers.circle.com/wallets/user-controlled/build-a-wallet-app.md): Build a web app with user-controlled wallets using social login, email OTP, or PIN authentication.
+- [How-to: Transfer tokens](https://developers.circle.com/wallets/user-controlled/transfer-tokens.md): Send tokens or execute a smart contract from a user-controlled wallet, with the user authorizing the transaction through the SDK.
+- [How-to: Request a signature](https://developers.circle.com/wallets/user-controlled/request-a-signature.md): Have a user sign a message or typed data with their user-controlled wallet for offchain authentication and consent.
+
+##### Account management
+
+- [How-to: Reset a user's PIN](https://developers.circle.com/wallets/user-controlled/reset-pin.md): Let a user set a new PIN for their user-controlled wallet, requiring them to enter their current PIN.
+- [How-to: Recover an account](https://developers.circle.com/wallets/user-controlled/recover-account.md): Restore a user's wallet access after they forget their PIN, using their pre-set security questions.
+- [How-to: Remove a user](https://developers.circle.com/wallets/user-controlled/remove-a-user.md): Stop a user from using your app by revoking their session and removing the user-to-wallet mapping in your system. Funds remain in the user's self-custodial wallet.
+
+#### Wallets: Modular
+
+- [Modular wallets](https://developers.circle.com/wallets/modular.md): Understand how modular wallets work, when to use them, and how Circle enables passkey-based smart accounts with gasless transactions, batch execution, and optional modules.
+- [How passkeys and modules work](https://developers.circle.com/wallets/modular/how-passkeys-and-modules-work.md): How a passkey signs modular wallet operations and how modules extend the wallet's behavior.
+- [Create a modular wallet](https://developers.circle.com/wallets/modular/create-a-modular-wallet.md): Create a passkey-backed modular wallet for your user in a web, iOS, or Android app.
+- [How-to: Set up passkey recovery](https://developers.circle.com/wallets/modular/set-up-passkey-recovery.md): Register a recovery key for a modular wallet so users can restore access to their MSCA if they lose their primary passkey.
+- [How-to: Use Dynamic as a signer](https://developers.circle.com/wallets/modular/use-dynamic-as-a-signer.md): Use a Dynamic-managed EOA as the signer for a modular wallet, instead of a passkey.
+
+##### Wallet operations
+
+- [How-to: Transfer tokens](https://developers.circle.com/wallets/modular/transfer-tokens.md): Send tokens from a modular wallet, with gas optionally sponsored by Circle's paymaster.
+- [Batch and parallel user operations](https://developers.circle.com/wallets/modular/batch-and-parallel-user-operations.md): Combine multiple actions into a single user operation, or run independent operations in parallel using 2D nonces.
+- [Sign and verify messages](https://developers.circle.com/wallets/modular/sign-and-verify-messages.md): Sign offchain messages and EIP-712 typed data with a modular wallet, and verify the signatures against the user's MSCA.
+- [How-to: Use a modular wallet as an EIP-1193 provider](https://developers.circle.com/wallets/modular/use-as-eip-1193-provider.md): Expose a modular wallet through the EIP-1193 provider interface so libraries such as `viem` and `ethers` can use it as a wallet.
+
+#### Learn more
+
+- [Gas fees](https://developers.circle.com/wallets/gas-fees.md): Fee parameters for Circle Wallets transactions, how fees are calculated on EVM and Solana, and estimated costs per blockchain.
+- [Transaction throughput](https://developers.circle.com/wallets/transaction-limits-and-optimizations.md): How per-wallet queue limits and Circle's queue shape blockchain transaction throughput, how to increase it, and how to resolve stuck transactions.
+- [Batch operations for smart contract accounts](https://developers.circle.com/wallets/batch-operations.md): Batch multiple contract calls into a single atomic transaction on SCA and MSCA wallets using the contractExecution endpoint.
+- [Unified wallet addressing on EVM blockchains](https://developers.circle.com/wallets/unified-wallet-addressing-evm.md): How Circle Wallets share the same address across supported EVM blockchains, and how to add or recover wallets.
+- [Token IDs](https://developers.circle.com/wallets/tokens.md): Token IDs are Circle's unique identifiers for tokens across blockchains. Reference tables of USDC, EURC, and native token IDs and how to scope wallet responses with monitored tokens.
+- [Smart contract account (SCA) upgrades](https://developers.circle.com/wallets/wallet-upgrades.md): How to upgrade Smart Contract Account (SCA) wallets to a newer contract version, without changing the wallet address.
+- [Compliance requirements](https://developers.circle.com/wallets/compliance-requirements.md): Sanctions compliance obligations for Circle Wallets, and what happens when Circle detects a sanctioned transaction.
+
+### Gas fees
+
+#### Gas Station
+
+- [Gas Station](https://developers.circle.com/wallets/gas-station.md)
+
+##### Quickstarts
+
+- [Send a gasless transaction](https://developers.circle.com/wallets/gas-station/send-a-gasless-transaction.md)
+- [Quickstart: Create and fund a Solana associated token account (ATA)](https://developers.circle.com/wallets/gas-station/create-solana-ata.md): Create a Solana ATA for an owner wallet and pay the creation rent from a payer wallet
+
+##### References
+
+- [Gas Station contract addresses](https://developers.circle.com/wallets/gas-station/contract-addresses.md)
+- [Solana ATA sponsorship](https://developers.circle.com/wallets/gas-station/solana-ata-sponsorship.md)
+- [Billing for sponsored gas fees](https://developers.circle.com/wallets/gas-station/billing.md)
+- [Policy management](https://developers.circle.com/wallets/gas-station/policy-management.md)
+
+#### Paymaster
+
+- [Paymaster](https://developers.circle.com/paymaster.md): Pay gas fees with USDC
+
+##### Quickstarts
+
+- [Quickstart: Circle Paymaster](https://developers.circle.com/paymaster/pay-gas-fees-usdc.md): Build a smart wallet that pays fees in USDC
+
+##### References
+
+- [Paymaster addresses and events](https://developers.circle.com/paymaster/addresses-and-events.md)
+
+### Compliance
+
+#### Compliance Engine
+
+- [Compliance Engine](https://developers.circle.com/wallets/compliance-engine.md)
+
+##### Concepts
+
+- [Transaction screening](https://developers.circle.com/wallets/compliance-engine/tx-screening.md)
+
+##### Quickstarts
+
+- [Quickstart: Assess the risk of wallet addresses](https://developers.circle.com/wallets/compliance-engine/tx-screening-quickstart.md)
+
+##### Tutorials
+
+- [Testing guide](https://developers.circle.com/wallets/compliance-engine/tx-screening-testing.md)
+- [Rule management](https://developers.circle.com/wallets/compliance-engine/tx-screening-rule-management.md)
+- [Alert management](https://developers.circle.com/wallets/compliance-engine/tx-screening-alert-management.md)
+
+### Contracts
+
+- [Contracts](https://developers.circle.com/contracts.md)
+
+#### Concepts
+
+- [Contracts templates](https://developers.circle.com/contracts/scp-templates-overview.md): Deploy pre-audited smart contracts without writing Solidity code.
+
+#### Quickstarts
+
+- [Quickstart: Deploy a smart contract using bytecode](https://developers.circle.com/contracts/scp-deploy-smart-contract.md): Deploy smart contract bytecode using Circle Contracts
+- [Quickstart: Deploy an ERC-1155 contract template](https://developers.circle.com/contracts/deploy-smart-contract-template.md): Use Circle Contract Templates to deploy smart contracts without writing Solidity
+- [Quickstart: Interact with a smart contract](https://developers.circle.com/contracts/scp-interact-smart-contract.md)
+- [Quickstart: Event monitoring for smart contracts](https://developers.circle.com/contracts/scp-event-monitoring.md)
+
+#### References
+
+- [Circle Contracts supported blockchains](https://developers.circle.com/contracts/supported-blockchains.md): Blockchains supported by Circle Contracts for smart contract deployment and management.
+- [Airdrop template](https://developers.circle.com/contracts/airdrop.md)
+- [Token template](https://developers.circle.com/contracts/erc-20-token.md)
+- [Multi-token template](https://developers.circle.com/contracts/erc-1155-multi-token.md)
+- [NFT template](https://developers.circle.com/contracts/erc-721-nft.md)
+- [How-to: Create an API key](https://developers.circle.com/contracts/create-api-key.md): Create an API key in the Circle Console to authenticate Smart Contract Platform API requests.
+
+## Crosschain transfers
+
+- [Crosschain transfers](https://developers.circle.com/crosschain-transfers.md): Move digital assets across blockchains with native burn-and-mint, permissionless lock-and-mint, and unified balances.
+
+### CCTP for USDC
+
+- [Cross-Chain Transfer Protocol](https://developers.circle.com/cctp.md): Permissionless crosschain transfers of USDC, EURC, and registered third-party tokens.
+
+#### Get started
+
+- [Supported blockchains and domains](https://developers.circle.com/cctp/concepts/supported-chains-and-domains.md): Blockchains and domain identifiers supported by CCTP
+- [Finality and block confirmations](https://developers.circle.com/cctp/concepts/finality-and-block-confirmations.md): Block confirmation requirements and attestation timing for CCTP
+
+##### Quickstarts
+
+- [Transfer USDC from Ethereum to Arc](https://developers.circle.com/cctp/quickstarts/transfer-usdc-ethereum-to-arc.md): Build a script to transfer USDC between EVM blockchains using CCTP
+- [Transfer USDC from Solana to Arc](https://developers.circle.com/cctp/quickstarts/transfer-usdc-solana-to-arc.md): Transfer USDC from Solana to an EVM blockchain using CCTP
+- [Transfer USDC between Stellar and Arc](https://developers.circle.com/cctp/quickstarts/transfer-usdc-stellar-arc.md): Build scripts to transfer USDC between Arc Testnet and Stellar Testnet using CCTP
+- [Transfer USDC between Aptos and Arc](https://developers.circle.com/cctp/quickstarts/transfer-usdc-aptos-arc.md): Build scripts to transfer USDC between Aptos Testnet and Arc Testnet using CCTP
+- [Transfer USDC between Starknet and Arc](https://developers.circle.com/cctp/quickstarts/transfer-usdc-starknet-arc.md): Build scripts to transfer USDC between Arc Testnet and Starknet Sepolia using CCTP
+- [Transfer USDC between Sui and Arc](https://developers.circle.com/cctp/quickstarts/transfer-usdc-sui-arc.md): Build scripts to transfer USDC between Sui Testnet and Arc Testnet using CCTP
+
+#### Fees and allowances
+
+- [CCTP fees](https://developers.circle.com/cctp/concepts/fees.md): Understanding CCTP transfer fees for Fast and Standard transfers
+- [Fast transfer allowance](https://developers.circle.com/cctp/concepts/fast-transfer-allowance.md): Understanding Circle's Fast Transfer allowance mechanism
+- [Get the fee for your transfer](https://developers.circle.com/cctp/howtos/get-transfer-fee.md): Retrieve CCTP transfer fees using the API
+- [Get the fast transfer allowance](https://developers.circle.com/cctp/howtos/get-fast-transfer-allowance.md): Check the remaining Fast Transfer allowance for USDC transfers
+
+#### Upfront fees
+
+- [Upfront fees for CCTP](https://developers.circle.com/cctp/concepts/upfront-fees.md): Quote and pay CCTP Fast Transfer and Forwarding Service fees upfront on the source blockchain so the recipient receives the full transferred USDC amount.
+- [How upfront fees work](https://developers.circle.com/cctp/concepts/how-upfront-fees-work.md): Learn how CCTP collects upfront fees and completes Fast Transfer and Forwarding Service transfers.
+- [Upfront fee quotes](https://developers.circle.com/cctp/concepts/upfront-fee-quotes.md): Request a signed quote for CCTP Fast Transfer and Forwarding Service fees and learn how fee types and quote expiry work.
+- [How-to: Transfer USDC with upfront fees](https://developers.circle.com/cctp/howtos/transfer-usdc-with-upfront-fees.md): Pay CCTP fees upfront on the source blockchain so the full USDC amount mints on the destination blockchain.
+
+#### Forwarding Service
+
+- [Circle Forwarding Service for CCTP](https://developers.circle.com/cctp/concepts/forwarding-service.md): Forward destination chain mints to simplify crosschain transfers
+- [How-to: Transfer USDC with the Forwarding Service](https://developers.circle.com/cctp/howtos/transfer-usdc-with-forwarding-service.md): Transfer USDC Crosschain with the Circle Forwarding Service
+
+#### Troubleshoot transfers
+
+- [Troubleshoot CCTP transfers](https://developers.circle.com/cctp/howtos/troubleshoot-transfers.md): Diagnose and resolve stuck or failed crosschain USDC transfers
+- [Resolve attestation issues](https://developers.circle.com/cctp/howtos/resolve-stuck-attestation.md): Troubleshoot and resolve common problems with CCTP attestations
+- [Retry a failed mint](https://developers.circle.com/cctp/howtos/retry-failed-mint.md): Complete a CCTP transfer when the mint transaction fails
+
+#### Blockchain integrations
+
+- [CCTP Solana Programs and Interfaces](https://developers.circle.com/cctp/references/solana-programs.md): Programs for CCTP support on the Solana blockchain
+- [CCTP Starknet contracts and interfaces](https://developers.circle.com/cctp/references/starknet-contracts.md): Contracts for CCTP support on the Starknet blockchain
+- [CCTP Aptos packages and interfaces](https://developers.circle.com/cctp/references/aptos-packages.md): Move packages and function interfaces for CCTP on Aptos
+- [CCTP Sui packages and interfaces](https://developers.circle.com/cctp/references/sui-packages.md): Move packages and shared objects for CCTP on Sui
+
+##### EVM
+
+- [Contract addresses](https://developers.circle.com/cctp/references/contract-addresses.md): CCTP smart contract addresses for EVM-compatible blockchains
+- [EVM contract interfaces](https://developers.circle.com/cctp/references/contract-interfaces.md): Public methods and events for CCTP smart contracts on EVM-compatible blockchains
+
+##### Stellar
+
+- [CCTP on Stellar](https://developers.circle.com/cctp/references/stellar.md): Learn how to send funds to Stellar addresses and how CCTP handles Stellar USDC.
+- [CCTP Stellar contracts and interfaces](https://developers.circle.com/cctp/references/stellar-contracts.md): Contracts for CCTP support on the Stellar network
+
+#### HyperCore
+
+- [CCTP-enabled HyperCore transfers](https://developers.circle.com/cctp/concepts/cctp-on-hypercore.md)
+- [HyperCore CCTP-enablement contract addresses](https://developers.circle.com/cctp/references/hypercore-contract-addresses.md)
+- [CctpExtensionV2 Contract Interface](https://developers.circle.com/cctp/references/cctp-extension-v2-contract-interface.md): Sponsored CCTP deposits from Arbitrum using EIP-3009 and a relayer.
+- [CoreDepositWallet contract interface](https://developers.circle.com/cctp/references/coredepositwallet-contract-interface.md)
+- [Transfer USDC from Arbitrum to HyperCore](https://developers.circle.com/cctp/howtos/transfer-usdc-from-arbitrum-to-hypercore.md)
+- [How-to: Transfer USDC from Arbitrum to HyperCore with CctpExtensionV2](https://developers.circle.com/cctp/howtos/transfer-usdc-from-arbitrum-to-hypercore-with-cctp-extension-v2.md): Submit a gas-sponsored CCTP deposit to HyperCore using EIP-3009 and a relayer.
+- [Transfer USDC from Ethereum to HyperCore](https://developers.circle.com/cctp/howtos/transfer-usdc-from-ethereum-to-hypercore.md)
+- [Transfer USDC from Solana to HyperCore](https://developers.circle.com/cctp/howtos/transfer-usdc-from-solana-to-hypercore.md)
+- [Transfer USDC from HyperEVM to HyperCore](https://developers.circle.com/cctp/howtos/transfer-usdc-from-hyperevm-to-hypercore.md)
+- [Withdraw USDC from HyperCore to EVM chains](https://developers.circle.com/cctp/howtos/withdraw-usdc-from-hypercore-to-evm.md)
+- [How-to: Withdraw USDC from HyperCore to Solana](https://developers.circle.com/cctp/howtos/withdraw-usdc-from-hypercore-to-solana.md): Withdraw USDC from a HyperCore spot or perp balance to a Solana associated token account using CCTP.
+- [Withdraw USDC from HyperCore to HyperEVM](https://developers.circle.com/cctp/howtos/withdraw-usdc-from-hypercore-to-hyperevm.md)
+
+#### Reference
+
+- [CCTP technical guide](https://developers.circle.com/cctp/references/technical-guide.md): Technical explainer for CCTP
+- [Attestation verification](https://developers.circle.com/cctp/references/attestation-verification.md): Technical reference for verifying CCTP attestation signatures
+- [Migrate from CCTP V1 (Legacy) to V2](https://developers.circle.com/cctp/migration-from-v1-to-v2.md): Complete migration guide for developers upgrading CCTP integrations
+
+#### CCTP V1 (Legacy)
+
+- [Cross-Chain Transfer Protocol V1](https://developers.circle.com/cctp/v1.md): Move USDC securely across blockchains and simplify user experience
+
+##### Concepts
+
+- [CCTP message passing V1](https://developers.circle.com/cctp/v1/generic-message-passing.md): CCTP V1 architecture on EVM and non-EVM domains
+- [CCTP message format V1](https://developers.circle.com/cctp/v1/message-format.md): Format arbitrary and application-specific messages using CCTP V1
+- [CCTP API hosts and endpoints V1](https://developers.circle.com/cctp/v1/cctp-apis.md): API hosts and endpoints for CCTP V1
+- [CCTP limits V1](https://developers.circle.com/cctp/v1/limits.md): Limits for CCTP V1 burning and minting
+
+##### Quickstarts
+
+- [Transfer USDC on testnet from Ethereum to Avalanche using CCTP V1](https://developers.circle.com/cctp/v1/transfer-usdc-on-testnet-from-ethereum-to-avalanche.md): Explore this script to transfer USDC on testnet between two EVM-compatible chains via CCTP V1
+- [Transfer USDC on testnet between Noble and Ethereum using CCTP V1](https://developers.circle.com/cctp/v1/transfer-usdc-on-testnet-from-noble-to-ethereum.md): Explore this tutorial for transferring USDC on testnet between Noble via CCTP V1 and Ethereum
+- [Transfer USDC on testnet between Sui and Ethereum using CCTP V1](https://developers.circle.com/cctp/v1/transfer-usdc-on-testnet-from-sui-to-ethereum.md): Explore this tutorial for transferring USDC between Sui testnet and Ethereum Sepolia Testnet via CCTP V1
+- [Transfer USDC on testnet between Aptos and Base using CCTP V1](https://developers.circle.com/cctp/v1/transfer-usdc-on-testnet-from-aptos-to-base.md): Explore this tutorial for transferring USDC between Aptos testnet and Base Sepolia Testnet via CCTP V1
+- [Transfer USDC on devnet between Solana and other chains using CCTP V1](https://developers.circle.com/cctp/v1/transfer-testnet-usdc-between-solana-devnet.md): Explore this tutorial for transferring USDC between Solana devnet and other testnets via CCTP V1
+
+##### References
+
+- [CCTP supported blockchains V1](https://developers.circle.com/cctp/v1/cctp-supported-blockchains.md)
+- [CCTP EVM contracts and interfaces V1](https://developers.circle.com/cctp/v1/evm-smart-contracts.md): CCTP V1 smart contracts for EVM-compatible blockchains
+- [CCTP block confirmations V1](https://developers.circle.com/cctp/v1/required-block-confirmations.md): Block confirmation requirements for attestations by chain
+- [CCTP chain domains V1](https://developers.circle.com/cctp/v1/supported-domains.md): Mapping of supported CCTP V1 domains
+
+###### Non-EVM contracts and interfaces
+
+- [CCTP Solana programs and interfaces V1](https://developers.circle.com/cctp/v1/solana-programs.md): Programs for CCTP V1 support on the Solana blockchain
+- [CCTP Noble Cosmos module V1](https://developers.circle.com/cctp/v1/noble-cosmos-module.md): Cosmos SDK Module for CCTP V1 support on Noble
+- [CCTP Sui packages and interfaces V1](https://developers.circle.com/cctp/v1/sui-packages.md): Packages for CCTP V1 support on the Sui blockchain
+- [CCTP Aptos packages and interfaces V1](https://developers.circle.com/cctp/v1/aptos-packages.md): Packages for CCTP V1 support on the Aptos blockchain
+
+### CCTP for non-USDC
+
+- [CCTP for non-USDC assets](https://developers.circle.com/cctp/expanded-assets.md): A permissionless wrapping layer for third-party assets, built on CCTP.
+
+#### Get started
+
+- [Supported blockchains and domains](https://developers.circle.com/cctp/expanded-assets/concepts/supported-chains-and-domains.md): Blockchains, domains, and pre-configured tokens available on CCTP for non-USDC.
+- [Ownerless and custom tokens](https://developers.circle.com/cctp/expanded-assets/concepts/ownerless-vs-custom-tokens.md): The two integration models CCTP for non-USDC supports for making a token crosschain.
+
+##### Quickstarts
+
+- [Transfer EURC from Ethereum to Arc](https://developers.circle.com/cctp/expanded-assets/quickstarts/transfer-eurc-ethereum-to-arc.md): Send EURC from Ethereum Sepolia to Arc Testnet end to end with CCTP for non-USDC.
+- [Configure a custom token](https://developers.circle.com/cctp/expanded-assets/quickstarts/configure-custom-token.md): Configure an existing ERC-20 as a custom BURN_MINT crosschain token on Ethereum Sepolia and Base Sepolia using CCTP for non-USDC.
+- [Deploy a native crosschain token](https://developers.circle.com/cctp/expanded-assets/quickstarts/deploy-native-crosschain-token.md): Deploy a new CrossChainToken ERC-20 on Ethereum Sepolia and extend it to Base Sepolia using CCTP for non-USDC.
+- [Configure an ownerless token](https://developers.circle.com/cctp/expanded-assets/quickstarts/configure-ownerless-token.md): Set up a crosschain bridge for an existing ERC-20 using CCTP for non-USDC's ownerless token model.
+
+#### Make your token crosschain
+
+- [How-to: Manage TokenManager roles](https://developers.circle.com/cctp/expanded-assets/howtos/manage-token-manager-roles.md): Transfer ownership, replace the operator, and update the pauser on a CCTP for non-USDC TokenManager.
+- [How-to: Configure rate limits and transfer caps](https://developers.circle.com/cctp/expanded-assets/howtos/configure-rate-limits-and-caps.md): Set the rate limit, max transfer amount, and rate-limit window on a CCTP for non-USDC TokenManager.
+- [Denylist layers](https://developers.circle.com/cctp/expanded-assets/concepts/denylist-layers.md): The two independent address-screening layers enforced on every non-USDC transfer.
+- [How-to: Configure a denylist provider](https://developers.circle.com/cctp/expanded-assets/howtos/configure-denylist-provider.md): Configure a per-token denylist provider on a CrossChainToken you own.
+
+#### Build for non-USDC assets
+
+- [CCTP for non-USDC compared to CCTP](https://developers.circle.com/cctp/expanded-assets/concepts/cctp-differences.md): Key integration differences for developers already familiar with CCTP who want to transfer existing configured tokens.
+- [Hooks](https://developers.circle.com/cctp/expanded-assets/concepts/hooks.md): Atomically execute logic on the destination blockchain when a CCTP for non-USDC transfer arrives.
+- [How-to: Build a hook receiver](https://developers.circle.com/cctp/expanded-assets/howtos/build-hook-receiver.md): Implement executeWithCrossChainToken so logic runs atomically when a CCTP for non-USDC transfer arrives.
+
+#### Learn more
+
+- [CCTP for non-USDC architecture](https://developers.circle.com/cctp/expanded-assets/concepts/architecture.md): How the CCTP for non-USDC contracts work together to move non-USDC assets across blockchains.
+- [CCTP for non-USDC contract addresses](https://developers.circle.com/cctp/expanded-assets/references/contract-addresses.md): Deployed CCTP for non-USDC contract addresses across supported blockchains and environments.
+- [CCTP for non-USDC contract reference](https://developers.circle.com/cctp/expanded-assets/references/contract-reference.md): CCTP for non-USDC contracts, types, errors, and non-obvious behaviors integrators need.
+
+### Gateway
+
+- [Circle Gateway](https://developers.circle.com/gateway.md)
+
+#### Get started
+
+- [Gateway supported blockchains](https://developers.circle.com/gateway/references/supported-blockchains.md): Blockchains and assets that Gateway supports, including USDC, EURC, and cirBTC
+- [Use EURC and cirBTC with Gateway](https://developers.circle.com/gateway/concepts/non-usdc-assets.md): Differences between USDC and the EURC and cirBTC assets in Gateway, including supported blockchains, the API token field, decimals, fees, and Nanopayments.
+- [Gateway fees](https://developers.circle.com/gateway/references/fees.md): Understanding Gateway transfer fees and gas costs
+- [Circle Forwarding Service for Gateway](https://developers.circle.com/gateway/references/forwarding-service.md): Forward destination chain mints to simplify crosschain transfers
+
+##### Quickstarts
+
+- [Quickstart: Create and transfer a unified USDC balance on EVM](https://developers.circle.com/gateway/quickstarts/unified-balance-evm.md): Create and transfer a unified USDC balance on EVM using Circle Gateway.
+- [Quickstart: Create and transfer a unified USDC balance on Solana](https://developers.circle.com/gateway/quickstarts/unified-balance-solana.md): Create and transfer a unified USDC balance on Solana using Circle Gateway.
+- [How-to: Transfer with the Forwarding Service](https://developers.circle.com/gateway/howtos/forwarding-service.md): Transfer USDC crosschain using the Forwarding Service to automatically handle destination chain minting
+
+#### Transfer from a unified balance
+
+- [How-to: Create a unified USDC balance](https://developers.circle.com/gateway/howtos/create-unified-usdc-balance.md)
+- [How-to: Transfer a unified USDC balance instantly](https://developers.circle.com/gateway/howtos/transfer-unified-usdc-balance.md)
+- [How-to: Manage delegates for Gateway transfers](https://developers.circle.com/gateway/howtos/manage-delegates.md): Add or remove delegate accounts that can authorize Gateway transfers on behalf of a depositor.
+- [How-to: Transfer USDC from a smart contract account](https://developers.circle.com/gateway/howtos/transfer-with-erc-1271.md): Sign a Gateway burn intent with a Circle smart contract account and transfer a unified USDC balance using ERC-1271 programmable authorization.
+
+#### Webhooks
+
+- [Gateway webhooks](https://developers.circle.com/gateway/webhooks.md): Get Gateway event updates for your registered wallet addresses.
+
+#### Learn more
+
+- [Gateway technical guide](https://developers.circle.com/gateway/references/technical-guide.md)
+- [ERC-1271 programmable authorization](https://developers.circle.com/gateway/references/erc-1271.md): How Gateway validates smart contract signatures with ERC-1271, including the offchain TEE and RPC quorum security model, usage, and limitations.
+- [Technical guide for Gateway on Solana](https://developers.circle.com/gateway/references/solana.md): Differences between Gateway on Solana and EVM
+- [Gateway smart contract addresses on EVM](https://developers.circle.com/gateway/references/contract-addresses.md): Circle Gateway smart contract addresses on EVM
+- [Gateway contract interfaces and events on EVM](https://developers.circle.com/gateway/references/contract-interfaces-and-events.md): Learn about the Circle Gateway smart contracts on EVM
+- [Solana programs and interfaces for Gateway](https://developers.circle.com/gateway/references/solana-programs.md)
+
+## Agent stack
+
+- [Agent stack](https://developers.circle.com/agent-stack.md): Empower your AI agents to autonomously operate wallets, transact onchain, and pay for API services through Circle's agent-native tooling.
+
+### Circle CLI
+
+- [Circle CLI](https://developers.circle.com/agent-stack/circle-cli.md): A command-line tool to access Circle's product suite, including agent wallets, x402-compatible payments, and crosschain transfers.
+- [CLI command reference](https://developers.circle.com/agent-stack/circle-cli/command-reference.md): Complete command reference for Circle's agent command-line tool, organized by resource.
+
+#### Agent Wallets
+
+- [Agent Wallets](https://developers.circle.com/agent-stack/agent-wallets.md): Wallets that let your agent autonomously hold, spend, trade, and earn USDC and other tokens with built-in spending controls.
+- [Quickstart: Create an agent wallet](https://developers.circle.com/agent-stack/agent-wallets/quickstart.md): Get your first agent wallet set up in minutes.
+- [Agent wallet supported blockchains](https://developers.circle.com/agent-stack/agent-wallets/supported-blockchains.md): Blockchains supported by Agent Wallets on mainnet and testnet.
+- [Agent wallet fees](https://developers.circle.com/agent-stack/agent-wallets/fees.md): Fee breakdown for agent wallet operations, including bridging, swapping, and payments.
+
+##### Wallet operations
+
+- [Wallet operations](https://developers.circle.com/agent-stack/agent-wallets/wallet-operations.md): Tasks you can perform with an agent wallet using Circle CLI, including transfers, bridging, payments, and more.
+- [How-to: Authenticate an agent wallet](https://developers.circle.com/agent-stack/agent-wallets/wallet-operations/authenticate.md): Log in with your email to create an agent wallet session on all supported blockchains.
+- [How-to: Fund an agent wallet](https://developers.circle.com/agent-stack/agent-wallets/wallet-operations/fund.md): Add USDC to your agent wallet using a wallet transfer or fiat onramp.
+- [How-to: Transfer USDC](https://developers.circle.com/agent-stack/agent-wallets/wallet-operations/transfer.md): Send USDC from your agent wallet to another address on a supported blockchain.
+- [How-to: Bridge USDC](https://developers.circle.com/agent-stack/agent-wallets/wallet-operations/bridge.md): Move USDC from one blockchain to another using CCTP.
+- [How-to: Swap tokens](https://developers.circle.com/agent-stack/agent-wallets/wallet-operations/swap.md): Swap one token for another from your agent wallet.
+- [How-to: Execute a smart contract](https://developers.circle.com/agent-stack/agent-wallets/wallet-operations/execute-contract.md): Call a write function on a smart contract from your agent wallet.
+- [How-to: Sign a message](https://developers.circle.com/agent-stack/agent-wallets/wallet-operations/sign.md): Sign a plain text message or EIP-712 typed data with your agent wallet.
+- [How-to: Set spending policies](https://developers.circle.com/agent-stack/agent-wallets/wallet-operations/custom-policies.md): Set transfer limits or address allowlists and blocklists on your agent wallet to control how it can move USDC and interact with contracts.
+
+#### Agent Nanopayments
+
+- [Agent Nanopayments](https://developers.circle.com/agent-stack/agent-nanopayments.md): Gas-free, batched USDC payments at sub-cent scale for AI agents.
+- [Quickstart: Make a nanopayment](https://developers.circle.com/agent-stack/agent-nanopayments/quickstart.md): Deposit USDC into Gateway, find an x402-compatible service, and pay for it with your agent wallet.
+- [Seller integration tools](https://developers.circle.com/agent-stack/agent-nanopayments/seller-integration-tools.md): Third-party platforms that help API providers accept x402 and nanopayments.
+
+##### Nanopayment operations
+
+- [Nanopayment operations](https://developers.circle.com/agent-stack/agent-nanopayments/operations.md): Tasks your agent can perform using Circle CLI to deposit USDC, pay for services, and withdraw funds.
+- [How-to: Deposit for nanopayments](https://developers.circle.com/agent-stack/agent-nanopayments/operations/deposit.md): Deposit USDC into Gateway to enable gas-free, sub-cent payments powered by Circle Gateway.
+- [How-to: Pay for a service](https://developers.circle.com/agent-stack/agent-nanopayments/operations/pay-for-service.md): Discover and pay for x402-compatible API services using USDC.
+- [How-to: Withdraw your balance](https://developers.circle.com/agent-stack/agent-nanopayments/operations/withdraw.md): Withdraw remaining USDC from your Gateway balance back to your agent wallet.
+
+### Agent marketplace
+
+- [Agent marketplace](https://developers.circle.com/agent-stack/agent-marketplace.md): A curated, compliance-first catalog of x402 services that accept USDC, built for AI agents to discover and pay per request.
+- [How-to: Become a seller](https://developers.circle.com/agent-stack/agent-marketplace/become-a-seller.md): Monetize your API by charging AI agents per request in USDC, with no API keys and no invoices.
+- [How-to: Get listed](https://developers.circle.com/agent-stack/agent-marketplace/get-listed.md): Submit your x402 service for review to appear in the Agent Marketplace catalog and the Discovery API.
+- [Discover x402 services](https://developers.circle.com/agent-stack/agent-marketplace/discovery-api.md): One public endpoint to discover x402 services that accept USDC, across many blockchains. No API key, no account.
+
+### x402 facilitators
+
+- [x402 facilitators](https://developers.circle.com/x402-facilitators.md): Circle's x402 facilitators for accepting USDC payments over the x402 protocol: Facilitator Service and Gateway Nanopayments
+- [What is x402?](https://developers.circle.com/x402-facilitators/x402.md): The x402 open payment standard and how Circle's facilitators use it to settle USDC payments for HTTP resources
+
+#### Facilitator Service
+
+- [Facilitator Service](https://developers.circle.com/facilitator-service.md): Circle's hosted x402 facilitator for USDC settlement on Arc, Base, and Polygon PoS
+- [How Facilitator Service works](https://developers.circle.com/facilitator-service/how-it-works.md): How Facilitator Service settles USDC payments as the facilitator between buyer and seller
+- [Quickstart: Accept x402 payments with Facilitator Service](https://developers.circle.com/facilitator-service/quickstart.md): Accept your first x402 payment on Arc testnet with the Facilitator Service keyless trial
+- [How-to: Set up a Permit2 allowance](https://developers.circle.com/facilitator-service/set-up-permit2-allowance.md): Grant the Permit2 contract an allowance on the buyer's USDC so Facilitator Service can settle usage-based payments
+- [Supported networks](https://developers.circle.com/facilitator-service/supported-networks.md): Identifiers and USDC contracts for the blockchains Facilitator Service supports
+
+##### Keyless trial
+
+- [The keyless trial](https://developers.circle.com/facilitator-service/keyless-trial.md): How the Facilitator Service keyless trial lets sellers settle without a Circle account
+- [How-to: Sign a seller proof](https://developers.circle.com/facilitator-service/sign-seller-proof.md): Construct the Facilitator-Seller-Proof header for keyless Facilitator Service requests
+
+#### Gateway Nanopayments
+
+- [Gateway Nanopayments](https://developers.circle.com/gateway-nanopayments.md): Gas-free USDC nanopayments down to $0.000001, powered by Circle Gateway batched settlement
+- [How batched settlement works](https://developers.circle.com/gateway-nanopayments/concepts/batched-settlement.md): How Circle Gateway aggregates payment authorizations and settles them onchain in a single transaction
+- [How-to: Reconcile nanopayments as a seller](https://developers.circle.com/gateway-nanopayments/howtos/x402-seller-reconciliation.md): Attribute each settled nanopayment to the request that triggered it and reconcile Gateway transfer history
+- [Supported networks](https://developers.circle.com/gateway-nanopayments/supported-networks.md): Blockchains supported by nanopayments for deposits, gas-free payments, and withdrawals
+
+##### Quickstarts
+
+- [Quickstart: Pay for resources with nanopayments](https://developers.circle.com/gateway-nanopayments/quickstarts/buyer.md): Deposit USDC into Gateway and make gasless payments to x402-protected APIs
+- [Quickstart: Accept payments with nanopayments](https://developers.circle.com/gateway-nanopayments/quickstarts/seller.md): Add gasless USDC payment support to your Express API using Circle Gateway
+
+##### Use with x402
+
+- [How-to: Use nanopayments with x402](https://developers.circle.com/gateway-nanopayments/howtos/x402-integration.md): Add gas-free nanopayments alongside your existing x402 onchain payment flows
+- [How-to: Add nanopayments to an x402 buyer](https://developers.circle.com/gateway-nanopayments/howtos/x402-buyer.md): Add gas-free nanopayments to your x402 client alongside standard onchain payments
+- [How-to: Add nanopayments to an x402 seller](https://developers.circle.com/gateway-nanopayments/howtos/x402-seller.md): Add gas-free nanopayments to your x402 resource server alongside standard onchain payments
+- [How-to: Integrate nanopayments into your existing facilitator](https://developers.circle.com/gateway-nanopayments/howtos/facilitator-integration.md): Add nanopayments gas-free settlement to your x402 facilitator service
+- [How-to: Sign EIP-3009 payment authorizations](https://developers.circle.com/gateway-nanopayments/howtos/eip-3009-signing.md): Manually construct and sign EIP-3009 TransferWithAuthorization messages for Circle Gateway batched payments
+
+## Payments
+
+- [Circle Payments Network](https://developers.circle.com/cpn.md): Move and settle money globally through Circle Payments Network, a stablecoin payments network for accepting, converting, moving, and settling funds with USDC.
+
+### Fiat payouts
+
+- [Fiat payouts](https://developers.circle.com/cpn/fiat-payouts.md): Send cross-border fiat payouts with real-time FX quoting, USDC settlement, and built-in compliance.
+- [Integrate with CPN as an OFI](https://developers.circle.com/cpn/quickstarts/integrate-with-cpn-ofi.md): Request, lock, and fulfill a USDC payment quote as an OFI using CPN. Covers Transactions V2 on EVM blockchains and Solana signing.
+
+#### Guides
+
+- [Mainnet vs. testnet](https://developers.circle.com/cpn/concepts/environments/mainnet-vs-testnet.md): How Circle Payments Network (CPN) behavior differs between the mainnet and testnet environments, including authentication, blockchain identifiers, settlement, and pricing.
+- [Quotes](https://developers.circle.com/cpn/concepts/quotes.md)
+
+##### API
+
+- [CPN integration concepts](https://developers.circle.com/cpn/concepts/api/api-integration.md)
+- [CPN API changes and compatibility](https://developers.circle.com/cpn/concepts/api/api-changes.md): Additive and breaking changes as CPN adds fields, values, events, and capabilities, and how to keep your integration compatible.
+- [JSON Schema](https://developers.circle.com/cpn/concepts/api/json-schema.md)
+- [CPN component states and workflows](https://developers.circle.com/cpn/concepts/payments/component-states-and-workflows.md)
+
+##### Payments
+
+- [Payment](https://developers.circle.com/cpn/concepts/payments/payments.md)
+- [Payment reference](https://developers.circle.com/cpn/concepts/payments/payment-reference.md)
+- [Supported payment methods](https://developers.circle.com/cpn/references/payments/supported-payment-methods.md)
+- [Payment reason codes](https://developers.circle.com/cpn/references/payments/payment-reason-codes.md)
+
+##### Compliance
+
+- [CPN supported countries](https://developers.circle.com/cpn/references/compliance/supported-countries.md): Countries supported by the Circle Payments Network
+- [Requests for information](https://developers.circle.com/cpn/concepts/compliance/rfis.md)
+- [RFI levels](https://developers.circle.com/cpn/references/compliance/rfi-levels.md)
+- [Travel rule requirements](https://developers.circle.com/cpn/references/compliance/travel-rule-requirements.md)
+- [Validating Brazilian tax ID and bank account numbers](https://developers.circle.com/cpn/references/compliance/validating-brazil-tax-account-id.md)
+- [Validating IBAN bank account numbers](https://developers.circle.com/cpn/references/compliance/validating-iban.md): Validate IBAN account numbers by checking structure, country-specific length, and bank country match.
+
+##### Transactions
+
+- [Transaction](https://developers.circle.com/cpn/concepts/transactions/transaction-overview.md)
+- [Transactions V2](https://developers.circle.com/cpn/concepts/transactions/transactions-v2.md)
+- [Wallet nonce management](https://developers.circle.com/cpn/concepts/transactions/wallet-nonce-management.md)
+
+##### Blockchains
+
+- [Supported blockchains](https://developers.circle.com/cpn/references/blockchains/supported-blockchains.md)
+- [Wallet provider compatibility](https://developers.circle.com/cpn/references/blockchains/wallet-provider-compatibility.md)
+- [Bring your own wallet for CPN](https://developers.circle.com/cpn/concepts/wallets/bring-your-own-wallet.md): How using your own wallet infrastructure fits into Circle Payments Network integrations.
+- [Block confirmation and transaction finality](https://developers.circle.com/cpn/concepts/transactions/block-confirmation-and-finality.md)
+- [Payment smart contract addresses](https://developers.circle.com/cpn/references/blockchains/contract-addresses.md): Payment smart contract addresses for CPN
+
+##### Webhooks
+
+- [Webhook retries](https://developers.circle.com/cpn/concepts/webhooks/webhook-retries.md)
+- [Webhook security](https://developers.circle.com/cpn/concepts/webhooks/webhook-security.md): Secure your CPN webhook endpoint by allowlisting source IP addresses and verifying request signatures.
+
+##### Errors
+
+- [Payment and transaction failure reasons](https://developers.circle.com/cpn/references/errors/payment-and-transaction-failure-reasons.md)
+- [Payment failure codes](https://developers.circle.com/cpn/references/errors/payment-failure-codes.md)
+
+##### Testing
+
+- [Magic values for testing](https://developers.circle.com/cpn/references/testing/magic-values.md)
+
+#### How-tos
+
+##### Wallets and liquidity
+
+- [How-to: Set up a Circle wallet for CPN payments](https://developers.circle.com/cpn/guides/wallets/setup-circle-wallet-for-cpn-payments.md): Configure a Circle-hosted dev-controlled wallet as your operational wallet for CPN onchain payment flows.
+- [How-to: Set up Circle on/off-ramps for CPN payments](https://developers.circle.com/cpn/guides/circle-liquidity/setup-circle-on-off-ramps-for-cpn-payments.md): Use Circle APIs to move fiat and USDC in support of CPN payment flows (onramp liquidity and optional offramp).
+
+##### Compliance
+
+- [How-to: Respond to an RFI](https://developers.circle.com/cpn/guides/compliance/respond-to-rfi.md)
+
+##### Payments
+
+- [Request payment configurations and routes](https://developers.circle.com/cpn/guides/payments/request-payment-config.md)
+- [Integrate with JSON Schema](https://developers.circle.com/cpn/guides/payments/integrate-with-json-schema.md)
+- [How-to: Encrypt travel rule and beneficiary data](https://developers.circle.com/cpn/guides/payments/encrypt-travel-rule-beneficiary-data.md)
+- [Encrypt files for RFI transmission](https://developers.circle.com/cpn/guides/payments/encrypt-files.md)
+
+##### Transactions
+
+- [Create an onchain transaction](https://developers.circle.com/cpn/guides/transactions/create-an-onchain-txn.md)
+- [How-to: Grant USDC allowance to Permit2](https://developers.circle.com/cpn/guides/transactions/grant-usdc-allowance-to-permit2.md): Grant a USDC token allowance to the Permit2 contract using a Circle Wallets developer-controlled wallet, a headless BYOW wallet, or an EIP-1193 Ethereum wallet
+- [How-to: Migrate from transactions V1 to V2](https://developers.circle.com/cpn/guides/transactions/migrate-from-txn-v1-to-v2.md): Update your CPN integration from Transactions V1 to V2
+
+### Managed Payments
+
+- [Managed Payments](https://developers.circle.com/cpn/managed-payments.md): CPN Managed Payments is a turnkey stablecoin solution in which Circle takes on licensing, compliance, minting, and global settlement.
+- [Settlement flows](https://developers.circle.com/cpn/managed-payments/concepts/settlement-flows.md): How Managed Payments moves value between fiat and USDC for payin-heavy and payout-heavy setups
+- [Stablecoin payin and payout lifecycle](https://developers.circle.com/cpn/managed-payments/concepts/stablecoin-payin-payout-lifecycle.md): How Managed Payments stablecoin payins and payouts progress through the Circle APIs, from payment intents and deposit addresses to address book recipients and payout completion
+- [Subaccount architecture](https://developers.circle.com/cpn/managed-payments/concepts/sub-account-architecture.md): Subaccounts, your main wallet, and how they work together in Managed Payments
+- [How-to: Refund a stablecoin payin](https://developers.circle.com/cpn/managed-payments/howtos/refund-payin.md): Issue a refund for a stablecoin payin. Covers the Circle LLC (US) and Circle Singapore (CIRCLE_SG) flows.
+
+#### Quickstarts
+
+- [Quickstart: Receive stablecoin payins](https://developers.circle.com/cpn/managed-payments/quickstarts/receive-stablecoin-payins.md): Accept USDC with Managed Payments by creating a continuous payment intent, sharing its deposit address, and confirming the onchain payment.
+- [Quickstart: Send stablecoin payouts](https://developers.circle.com/cpn/managed-payments/quickstarts/send-stablecoin-payouts.md): Send USDC payouts with Managed Payments using the address book and optional main-wallet funding
+
+#### End User Onboarding
+
+- [End User Onboarding](https://developers.circle.com/cpn/managed-payments/end-user-onboarding.md): Programmatically onboard your end users to Managed Payments using the End User Onboarding API
+
+##### Get started
+
+- [Application types and states](https://developers.circle.com/cpn/managed-payments/end-user-onboarding/references/application-states.md): Reference for all application types and their statuses
+- [Submit onboarding application](https://developers.circle.com/cpn/managed-payments/end-user-onboarding/quickstarts/submit-onboarding-application.md): Submit an onboarding application using the End User Onboarding API in sandbox
+
+##### Build applications
+
+- [How-to: Create and populate applications](https://developers.circle.com/cpn/managed-payments/end-user-onboarding/howtos/create-and-populate-applications.md): Retrieve onboarding applications, discover the schema, and save section data
+- [How-to: Upload documents](https://developers.circle.com/cpn/managed-payments/end-user-onboarding/howtos/upload-documents.md): Upload, list, and manage supporting documents for onboarding applications
+- [How-to: Submit and track applications](https://developers.circle.com/cpn/managed-payments/end-user-onboarding/howtos/submit-and-track-applications.md): Submit applications for review and handle Requests for Information
+- [How-to: Handle requests for information](https://developers.circle.com/cpn/managed-payments/end-user-onboarding/howtos/handle-rfis.md): Respond to compliance team RFIs by updating data, re-uploading documents, and resubmitting applications
+- [Webhook notifications](https://developers.circle.com/cpn/managed-payments/end-user-onboarding/references/webhook-notifications.md): Reference for End User Onboarding webhook event types with example payloads.
+
+##### Concepts
+
+- [Conditional logic](https://developers.circle.com/cpn/managed-payments/end-user-onboarding/concepts/conditional-logic.md): Understand how Nature of Business and JSON Schema conditionals control which fields are required
+- [Array sections](https://developers.circle.com/cpn/managed-payments/end-user-onboarding/concepts/array-sections.md): Understand how to work with repeatable entity sections like beneficial owners and directors
+
+#### Learn more
+
+- [Stablecoin payin states](https://developers.circle.com/cpn/managed-payments/references/payment-intent-states.md): Reference for PaymentIntent, Payment, and Refund states in the Managed Payments stablecoin payin flow.
+- [Error codes](https://developers.circle.com/cpn/managed-payments/references/error-codes.md): HTTP status codes and numeric error codes returned by Managed Payments endpoints, with causes and remediation steps
+- [Reporting](https://developers.circle.com/cpn/managed-payments/references/reporting.md): Reference for Managed Payments reporting: the report types available through the /v1/reports API, how to request and download them, and how they differ from Circle Mint reporting.
+
+### Stablecoin payments
+
+- [Stablecoin payments](https://developers.circle.com/cpn/stablecoin-payments.md): Accept and send USDC and EURC onchain with external counterparties through Circle Payments Network, using Stablecoin Payins and Stablecoin Payouts.
+
+#### Get started
+
+- [Supported blockchains](https://developers.circle.com/cpn/stablecoin-payments/references/supported-blockchains.md): Blockchains supported by Stablecoin Payins and Stablecoin Payouts in Circle Payments Network.
+- [How stablecoin payments work](https://developers.circle.com/cpn/stablecoin-payments/concepts/how-stablecoin-payments-work.md): Understand how Stablecoin Payins and Stablecoin Payouts work in Circle Payments Network, including payment intents, recipient management, refunds, and regional availability.
+
+#### Payins
+
+- [How-to: Receive a stablecoin payin](https://developers.circle.com/cpn/stablecoin-payments/howtos/receive-stablecoin-payin.md): Accept an onchain USDC or EURC payin into your Circle Mint account by creating a payment intent, sharing the deposit address, and confirming the payment.
+- [How-to: Refund a stablecoin payin](https://developers.circle.com/cpn/stablecoin-payments/howtos/refund-stablecoin-payin.md): Issue a full or partial refund against a settled Stablecoin Payins payment intent using the Circle Mint refund APIs.
+
+#### Payouts
+
+- [How-to: Send a stablecoin payout](https://developers.circle.com/cpn/stablecoin-payments/howtos/send-stablecoin-payout.md): Send USDC or EURC onchain to a third-party recipient with the Stablecoin Payouts API. Covers the Circle LLC (US), Circle Singapore (CIRCLE_SG), and Circle SAS (CIRCLE_FR) flows.
+
+#### Learn more
+
+- [Webhook events](https://developers.circle.com/cpn/stablecoin-payments/references/webhook-events.md): Reference for Stablecoin Payins and Stablecoin Payouts webhook event types, payloads, and the notification subscription system.
+
+- [Liquidity services (104 pages)](https://developers.circle.com/_llms/liquidity-services.txt): Documentation for Liquidity services.
+- [API reference (587 pages)](https://developers.circle.com/_llms/api-reference.txt): Documentation for API reference.
+
+## Developer tools
+
+### Sample projects
+
+- [Browse sample projects](https://developers.circle.com/sample-projects.md)
+
+### SDKs
+
+- [SDKs](https://developers.circle.com/sdks.md): Circle's SDKs for building wallet, contract, and payout integrations across server and client environments.
+
+#### Developer-controlled wallets
+
+##### Server SDKs
+
+- [Getting started with the developer-controlled wallets Node.js SDK](https://developers.circle.com/sdks/developer-controlled-wallets-nodejs-sdk.md)
+- [Getting started with the developer-controlled wallets Python SDK](https://developers.circle.com/sdks/developer-controlled-wallets-python-sdk.md)
+
+#### User-controlled wallets
+
+- [User-controlled wallets client SDKs](https://developers.circle.com/sdks/user-controlled/overview.md): Client SDKs for embedding user-controlled wallets in web, iOS, Android, and React Native applications.
+
+##### Client SDKs
+
+- [Web SDK](https://developers.circle.com/sdks/user-controlled/web-sdk.md): Set up the client-side web SDK for user-controlled wallets in your web application.
+- [iOS mobile SDK](https://developers.circle.com/sdks/user-controlled/ios-sdk.md): Set up the client-side iOS SDK for user-controlled wallets in your mobile application.
+- [Android mobile SDK](https://developers.circle.com/sdks/user-controlled/android-sdk.md): Set up the client-side Android SDK for user-controlled wallets in your mobile application.
+- [React Native SDK](https://developers.circle.com/sdks/user-controlled/react-native-sdk.md): Set up the client-side React Native SDK for user-controlled wallets in your mobile application.
+- [User-controlled wallet SDK error codes](https://developers.circle.com/sdks/user-controlled/error-codes.md): Error codes surfaced by the user-controlled wallet SDK's built-in UI.
+
+###### UI customization
+
+- [Confirmation UIs](https://developers.circle.com/sdks/user-controlled/confirmation-uis.md)
+- [Web SDK UI customizations](https://developers.circle.com/sdks/user-controlled/web-sdk-ui-customizations.md)
+- [iOS SDK UI customization API](https://developers.circle.com/sdks/user-controlled/ios-sdk-ui-customization-api.md): iOS SDK UI and key mapping reference for customizations.
+- [Android SDK UI customization API](https://developers.circle.com/sdks/user-controlled/android-sdk-ui-customization-api.md): Android SDK UI and key mapping reference for customizations.
+- [React Native SDK UI customization API](https://developers.circle.com/sdks/user-controlled/react-native-sdk-ui-customization-api.md): React Native SDK UI and key mapping reference for customizations.
+
+##### Server SDKs
+
+- [Getting started with the user-controlled wallets Node.js SDK](https://developers.circle.com/sdks/user-controlled-wallets-nodejs-sdk.md)
+- [Getting started with the user-controlled wallets Python SDK](https://developers.circle.com/sdks/user-controlled-wallets-python-sdk.md)
+
+#### Modular wallets
+
+- [Modular wallets client SDKs](https://developers.circle.com/sdks/modular/overview.md): Client SDKs for embedding passkey-based modular wallets in web, iOS, and Android applications.
+
+##### Client SDKs
+
+- [Modular wallets Web SDK](https://developers.circle.com/sdks/modular/web-sdk.md)
+- [Modular wallets iOS SDK](https://developers.circle.com/sdks/modular/ios-sdk.md)
+- [Modular wallets Android SDK](https://developers.circle.com/sdks/modular/android-sdk.md)
+
+#### Digital Asset Accounts
+
+##### Client SDKs
+
+- [DAA web SDK reference](https://developers.circle.com/sdks/daa/web-sdk.md): SDK reference for the DAA web SDK package, which runs the Strong Customer Authentication ceremony in your web application.
+
+#### Contracts
+
+##### Server SDKs
+
+- [Getting started with the Contracts Node.js SDK](https://developers.circle.com/sdks/contracts-nodejs-sdk.md)
+- [Getting started with the Contracts Python SDK](https://developers.circle.com/sdks/contracts-python-sdk.md)
+
+#### Gateway Nanopayments
+
+##### Client SDKs
+
+- [Gateway Nanopayments SDK reference](https://developers.circle.com/sdks/gateway-nanopayments-sdk.md): Reference for the @circle-fin/x402-batching SDK: buyer and seller integrations for Gateway Nanopayments
+
+#### Migration guides
+
+- [Server-side SDK Pydantic v2 upgrade](https://developers.circle.com/sdks/pydantic-v2-upgrade.md)
+
+### Release notes
+
+- [Release notes](https://developers.circle.com/release-notes.md): Release notes for Circle's developer products.
+
+#### 2026
+
+- [Release notes - Agent stack - 2026](https://developers.circle.com/release-notes/agent-stack-2026.md): 2026 release notes for Agent Stack
+- [Release notes - CCTP - 2026](https://developers.circle.com/release-notes/cctp-2026.md): 2026 release notes for CCTP
+- [Release notes - Gateway - 2026](https://developers.circle.com/release-notes/gateway-2026.md): 2026 release notes for Gateway
+- [Release notes - xReserve - 2026](https://developers.circle.com/release-notes/xreserve-2026.md): 2026 release notes for xReserve
+- [Release notes - Wallets - 2026](https://developers.circle.com/release-notes/wallets-2026.md): 2026 release notes for Wallets
+- [Release notes - Bridge Kit - 2026](https://developers.circle.com/release-notes/bridge-kit-2026.md): 2026 release notes for Circle's Bridge Kit SDK
+- [Release notes - USDC - 2026](https://developers.circle.com/release-notes/usdc-2026.md): 2026 release notes for USDC
+- [Release notes - EURC - 2026](https://developers.circle.com/release-notes/eurc-2026.md): 2026 release notes for EURC
+- [Release notes - Mint - 2026](https://developers.circle.com/release-notes/mint-2026.md): 2026 release notes for Mint
+- [Release notes - Circle Payments Network - 2026](https://developers.circle.com/release-notes/cpn-2026.md): 2026 release notes for Circle Payments Network
+- [Release notes - StableFX - 2026](https://developers.circle.com/release-notes/stablefx-2026.md): 2026 release notes for StableFX
+- [Release notes - Digital Asset Accounts - 2026](https://developers.circle.com/release-notes/digital-asset-accounts-2026.md): 2026 release notes for Digital Asset Accounts
+- [Release notes - Partner Onboarding - 2026](https://developers.circle.com/release-notes/partner-onboarding-2026.md): 2026 release notes for the Partner Onboarding API
+
+#### 2025
+
+- [Release notes - Developer Services - 2025](https://developers.circle.com/release-notes/w3s-2025.md): 2025 release notes for Circle's Developer Services platform
+- [Release notes - Circle Mint - 2025](https://developers.circle.com/release-notes/circle-mint-2025.md): 2025 release notes for Circle Mint
+- [Release notes - Stablecoins - 2025](https://developers.circle.com/release-notes/stablecoins-2025.md): 2025 release notes for Stablecoins
+- [Release notes - Tokenized Funds - 2025](https://developers.circle.com/release-notes/tokenized-funds-2025.md): 2025 release notes for Tokenized Funds
+- [Release notes - Circle Payments Network - 2025](https://developers.circle.com/release-notes/cpn-2025.md): 2025 release notes for Circle Payments Network
+- [Release notes - StableFX - 2025](https://developers.circle.com/release-notes/stablefx-2025.md): 2025 release notes for StableFX
+
+#### 2024
+
+- [Release notes - Developer Services - 2024](https://developers.circle.com/release-notes/w3s-2024.md): 2024 release notes for Circle's Developer Services platform
+- [Release notes - Circle Mint - 2024](https://developers.circle.com/release-notes/circle-mint-2024.md): 2024 release notes for Circle Mint
+- [Release notes - Stablecoins - 2024](https://developers.circle.com/release-notes/stablecoins-2024.md): 2024 release notes for Stablecoins
+
+## OpenAPI Specs
+
+- [agent-marketplace-discovery](/openapi/agent-marketplace-discovery.yaml)
+- [openapi-public](/openapi/openapi-public.yaml)
+- [configurations_2](/openapi/configurations_2.yaml)
+- [configurations_1](/openapi/configurations_1.yaml)
+- [developer-controlled-wallets](/openapi/developer-controlled-wallets.yaml)
+- [user-controlled-wallets](/openapi/user-controlled-wallets.yaml)
+- [buidl-wallets](/openapi/buidl-wallets.yaml)
+- [compliance](/openapi/compliance.yaml)
+- [smart-contract-platform](/openapi/smart-contract-platform.yaml)
+- [cctp](/openapi/cctp.yaml)
+- [gateway](/openapi/gateway.yaml)
+- [facilitator-service](/openapi/facilitator-service.yaml)
+- [gateway-nanopayments](/openapi/gateway-nanopayments.yaml)
+- [accounts](/openapi/accounts.yaml)
+- [customer-orchestration](/openapi/customer-orchestration.yaml)
+- [partner-openapi](/openapi/partner-openapi.yaml)
+- [general](/openapi/general.yaml)
+- [account](/openapi/account.yaml)
+- [cross-currency](/openapi/cross-currency.yaml)
+- [reserve-management](/openapi/reserve-management.yaml)
+- [credit](/openapi/credit.yaml)
+- [digital-asset-backed-borrowing](/openapi/digital-asset-backed-borrowing.yaml)
+- [mint-webhooks](/openapi/mint-webhooks.yaml)
+- [configurations](/openapi/configurations.yaml)
+- [cpn-ofi](/openapi/cpn-ofi.yaml)
+- [managed-payments](/openapi/managed-payments.yaml)
+- [payments](/openapi/payments.yaml)
+- [payouts](/openapi/payouts.yaml)
+- [managed-payments-webhooks](/openapi/managed-payments-webhooks.yaml)
+- [stablefx](/openapi/stablefx.yaml)
+- [xreserve](/openapi/xreserve.yaml)
+- [match](/openapi/match.yaml)
+- [institutional](/openapi/institutional.yaml)
+
+> The links below point to documentation indexes. Follow each `/_llms/` index recursively until you reach documentation pages.
+
+## Indexes
+
+- [Liquidity services (104 pages)](https://developers.circle.com/_llms/liquidity-services.txt): Documentation for Liquidity services.
+- [API reference (587 pages)](https://developers.circle.com/_llms/api-reference.txt): Documentation for API reference.
+- [API reference / Wallets (98 pages)](https://developers.circle.com/_llms/api-reference/wallets.txt): Documentation for API reference / Wallets.
+- [API reference / Digital Asset Accounts (79 pages)](https://developers.circle.com/_llms/api-reference/digital-asset-accounts.txt): Documentation for API reference / Digital Asset Accounts.
+- [API reference / Mint and Custody (128 pages)](https://developers.circle.com/_llms/api-reference/mint-and-custody.txt): Documentation for API reference / Mint and Custody.
+- [API reference / Circle Payments Network (119 pages)](https://developers.circle.com/_llms/api-reference/circle-payments-network.txt): Documentation for API reference / Circle Payments Network.

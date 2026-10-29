@@ -1,0 +1,291 @@
+{
+  "scope": "Exact entries selected from published ABIs; deployment code identity not independently attested.",
+  "contracts": [
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/circlefin/evm-cctp-contracts/a92a2b4e7e6ef99bf0b05dca71780f5ec190e729/docs/abis/cctp/v2/TokenMessengerV2.json",
+        "path": "sources/evm-cctp-contracts/docs/abis/cctp/v2/TokenMessengerV2.json",
+        "bytes": 20718,
+        "sha256": "2b96b34a304038b5497a2b2dc9650c5c60e13eabf8403adf8711db229eec4420",
+        "gitBlobSha1": "0b15c62d81e32d7a14f55c3c84d65bfe770a7a76",
+        "commit": "a92a2b4e7e6ef99bf0b05dca71780f5ec190e729",
+        "retrievedAt": "2026-10-29T01:58:43.376800+00:00"
+      },
+      "entries": [
+        {
+          "type": "function",
+          "name": "depositForBurnWithHook",
+          "inputs": [
+            {
+              "name": "amount",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "destinationDomain",
+              "type": "uint32",
+              "internalType": "uint32"
+            },
+            {
+              "name": "mintRecipient",
+              "type": "bytes32",
+              "internalType": "bytes32"
+            },
+            {
+              "name": "burnToken",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "destinationCaller",
+              "type": "bytes32",
+              "internalType": "bytes32"
+            },
+            {
+              "name": "maxFee",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "minFinalityThreshold",
+              "type": "uint32",
+              "internalType": "uint32"
+            },
+            {
+              "name": "hookData",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ],
+          "outputs": [],
+          "stateMutability": "nonpayable"
+        },
+        {
+          "type": "event",
+          "name": "DepositForBurn",
+          "inputs": [
+            {
+              "name": "burnToken",
+              "type": "address",
+              "indexed": true,
+              "internalType": "address"
+            },
+            {
+              "name": "amount",
+              "type": "uint256",
+              "indexed": false,
+              "internalType": "uint256"
+            },
+            {
+              "name": "depositor",
+              "type": "address",
+              "indexed": true,
+              "internalType": "address"
+            },
+            {
+              "name": "mintRecipient",
+              "type": "bytes32",
+              "indexed": false,
+              "internalType": "bytes32"
+            },
+            {
+              "name": "destinationDomain",
+              "type": "uint32",
+              "indexed": false,
+              "internalType": "uint32"
+            },
+            {
+              "name": "destinationTokenMessenger",
+              "type": "bytes32",
+              "indexed": false,
+              "internalType": "bytes32"
+            },
+            {
+              "name": "destinationCaller",
+              "type": "bytes32",
+              "indexed": false,
+              "internalType": "bytes32"
+            },
+            {
+              "name": "maxFee",
+              "type": "uint256",
+              "indexed": false,
+              "internalType": "uint256"
+            },
+            {
+              "name": "minFinalityThreshold",
+              "type": "uint32",
+              "indexed": true,
+              "internalType": "uint32"
+            },
+            {
+              "name": "hookData",
+              "type": "bytes",
+              "indexed": false,
+              "internalType": "bytes"
+            }
+          ],
+          "anonymous": false
+        }
+      ]
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/circlefin/evm-cctp-contracts/a92a2b4e7e6ef99bf0b05dca71780f5ec190e729/docs/abis/cctp/v2/MessageTransmitterV2.json",
+        "path": "sources/evm-cctp-contracts/docs/abis/cctp/v2/MessageTransmitterV2.json",
+        "bytes": 17399,
+        "sha256": "3b69a84a25687acd293da25a1e88727ce9323f8102e93e26f734cd8f42cf803e",
+        "gitBlobSha1": "ee6c1adaff672e24058f74ea66bb4fdb967b38ca",
+        "commit": "a92a2b4e7e6ef99bf0b05dca71780f5ec190e729",
+        "retrievedAt": "2026-10-29T01:58:43.388750+00:00"
+      },
+      "entries": [
+        {
+          "type": "event",
+          "name": "MessageSent",
+          "inputs": [
+            {
+              "name": "message",
+              "type": "bytes",
+              "indexed": false,
+              "internalType": "bytes"
+            }
+          ],
+          "anonymous": false
+        }
+      ]
+    },
+    {
+      "source": {
+        "url": "https://raw.githubusercontent.com/circlefin/evm-cctp-contracts/a92a2b4e7e6ef99bf0b05dca71780f5ec190e729/docs/abis/Usdc.json",
+        "path": "sources/evm-cctp-contracts/docs/abis/Usdc.json",
+        "bytes": 29862,
+        "sha256": "4ae37bd3ffae2fc75ad761d33cd9013caecde256650d6a11c67d77899bbfb730",
+        "gitBlobSha1": "ad45d8365860244eb5e306d30a3d173e16027571",
+        "commit": "a92a2b4e7e6ef99bf0b05dca71780f5ec190e729",
+        "retrievedAt": "2026-10-29T01:58:43.623510+00:00"
+      },
+      "entries": [
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "spender",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "Approval",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "to",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "value",
+              "type": "uint256"
+            }
+          ],
+          "name": "Transfer",
+          "type": "event"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "spender",
+              "type": "address"
+            }
+          ],
+          "name": "allowance",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "name": "balanceOf",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "decimals",
+          "outputs": [
+            {
+              "internalType": "uint8",
+              "name": "",
+              "type": "uint8"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "totalSupply",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "status": "recognized_intent",
+  "reason": null,
+  "intent": {
+    "kind": "cctp_v2_hypercore_forwarding",
+    "sourceChainId": "42161",
+    "sourceCctpDomain": 3,
+    "sender": "0xe721a0532a7828df67ad519aa25c602da076159a",
+    "tokenMessenger": "0x28b5a0e9c621a5badaa536219b3a228c8168cf5d",
+    "function": "depositForBurnWithHook(uint256,uint32,bytes32,address,bytes32,uint256,uint32,bytes)",
+    "requestedBurn": {
+      "token": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+      "symbol": "USDC",
+      "decimals": 6,
+      "amountRaw": "100000000",
+      "amountFormatted": "100"
+    },
+    "destination": {
+      "cctpDomain": 19,
+      "chainId": "999",
+      "mintRecipient": "0xb21d281dedb17ae5b501f6aa8256fe38c4e45757",
+      "destinationCaller": "0xb21d281dedb17ae5b501f6aa8256fe38c4e45757",
+      "hypercoreRecipient": "0xe721a0532a7828df67ad519aa25c602da076159a",
+      "recipientIsSender": true,
+      "destinationDex": "0",
+      "requestedBalance": "perps"
+    },
+    "maxFee": {
+      "raw": "200000",
+      "formatted": "0.2",
+      "kind": "cap_not_quote"
+    },
+    "minFinalityThreshold": 1000,
+    "hook": {
+      "raw": "0x636374702d666f72776172640000000000000000000000000000000000000018e721a0532a7828df67ad519aa25c602da076159a00000000",
+      "magic": "cctp-forward",
+      "version": 0,
+      "payloadBytes": 24,
+      "totalBytes": 56
+    },
+    "basis": {
+      "kind": "calldata_and_declared_deployment_metadata",
+      "metadataId": "arbitrum_usdc_cctp_v2_hypercore_v0",
+      "contractIdentityVerified": false,
+      "balancesRead": false,
+      "allowanceRead": false,
+      "sourceExecutionObserved": false,
+      "destinationRecipientValidationVerified": false
+    },
+    "sourceExecution": null,
+    "measuredOutgoingAmount": null,
+    "destinationSettlement": null,
+    "destinationCreditAmount": null,
+    "limitations": [
+      "Requested perps routing can fall back to spot under destination configuration.",
+      "Configured tokenSystemAddress and recipient blacklist state are unobserved; recipient eligibility is not established.",
+      "Current fees, account charges, liquidity, attestation and forwarding state are not observed.",
+      "No chain balance, approval sufficiency, execution result or destination credit is inferred."
+    ]
+  }
+}
