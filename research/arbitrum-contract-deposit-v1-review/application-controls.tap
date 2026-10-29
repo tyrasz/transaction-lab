@@ -1,0 +1,4102 @@
+
+> transaction-lab@0.27.0 test
+> node --test test/*.test.js
+
+TAP version 13
+# Subtest: observed router includes all five USDC event participants, with exact independent event nets
+ok 1 - observed router includes all five USDC event participants, with exact independent event nets
+  ---
+  duration_ms: 11.21425
+  type: 'test'
+  ...
+# Subtest: observed direct transferFrom retains the owner distinct from submitting recipient
+ok 2 - observed direct transferFrom retains the owner distinct from submitting recipient
+  ---
+  duration_ms: 3.858584
+  type: 'test'
+  ...
+# Subtest: self-transfer, zero events and absent events remain different observations
+ok 3 - self-transfer, zero events and absent events remain different observations
+  ---
+  duration_ms: 0.305917
+  type: 'test'
+  ...
+# Subtest: mint/burn excludes zero-address pseudo-account and preserves liability and unknown units
+ok 4 - mint/burn excludes zero-address pseudo-account and preserves liability and unknown units
+  ---
+  duration_ms: 0.148875
+  type: 'test'
+  ...
+# Subtest: separate receipt-token state delta is preserved when interest changes event total
+ok 5 - separate receipt-token state delta is preserved when interest changes event total
+  ---
+  duration_ms: 0.262375
+  type: 'test'
+  ...
+# Subtest: unavailable balances do not become zeros or reference stale assets
+ok 6 - unavailable balances do not become zeros or reference stale assets
+  ---
+  duration_ms: 0.100667
+  type: 'test'
+  ...
+# Subtest: additional measured accounts retain source indexes and cannot duplicate base pairs
+ok 7 - additional measured accounts retain source indexes and cannot duplicate base pairs
+  ---
+  duration_ms: 0.310292
+  type: 'test'
+  ...
+# Subtest: withheld additional measurements never turn event totals into balance results
+ok 8 - withheld additional measurements never turn event totals into balance results
+  ---
+  duration_ms: 0.104583
+  type: 'test'
+  ...
+# Subtest: final zero allowance is linked to both owner and spender without claiming no spending
+ok 9 - final zero allowance is linked to both owner and spender without claiming no spending
+  ---
+  duration_ms: 0.445834
+  type: 'test'
+  ...
+# Subtest: failed execution and unsupported chain never project effective account changes
+ok 10 - failed execution and unsupported chain never project effective account changes
+  ---
+  duration_ms: 0.555042
+  type: 'test'
+  ...
+# Subtest: malformed amounts, inconsistent measurements and duplicate balance references are withheld
+ok 11 - malformed amounts, inconsistent measurements and duplicate balance references are withheld
+  ---
+  duration_ms: 0.326667
+  type: 'test'
+  ...
+# Subtest: bounded account and observation limits fail explicitly rather than silently dropping victims
+ok 12 - bounded account and observation limits fail explicitly rather than silently dropping victims
+  ---
+  duration_ms: 0.634084
+  type: 'test'
+  ...
+# Subtest: frozen development oracle retains all source and raw-response fingerprints and exactly seven independently queried pairs
+ok 13 - frozen development oracle retains all source and raw-response fingerprints and exactly seven independently queried pairs
+  ---
+  duration_ms: 9.857125
+  type: 'test'
+  ...
+# Subtest: observed original-position router balances reproduce every raw oracle amount without unrecorded responses
+ok 14 - observed original-position router balances reproduce every raw oracle amount without unrecorded responses
+  ---
+  duration_ms: 11.199834
+  type: 'test'
+  ...
+# Subtest: observed original-position direct-a balances reproduce every raw oracle amount without unrecorded responses
+ok 15 - observed original-position direct-a balances reproduce every raw oracle amount without unrecorded responses
+  ---
+  duration_ms: 4.704625
+  type: 'test'
+  ...
+# Subtest: real cached original-position readings prove reused pairs without any additional recorded token requests
+ok 16 - real cached original-position readings prove reused pairs without any additional recorded token requests
+  ---
+  duration_ms: 11.148167
+  type: 'test'
+  ...
+# Subtest: exact uint256 state is independent of event amounts and owner differs from submitter
+ok 17 - exact uint256 state is independent of event amounts and owner differs from submitter
+  ---
+  duration_ms: 4.686583
+  type: 'test'
+  ...
+# Subtest: false-returning transferFrom remains a candidate without inventing movement
+ok 18 - false-returning transferFrom remains a candidate without inventing movement
+  ---
+  duration_ms: 0.428791
+  type: 'test'
+  ...
+# Subtest: hUSDC and variable debt events preserve interest differences and liability metadata
+ok 19 - hUSDC and variable debt events preserve interest differences and liability metadata
+  ---
+  duration_ms: 2.861625
+  type: 'test'
+  ...
+# Subtest: self transfers retain gross totals and zero net; zero-address mint/burn legs are excluded
+ok 20 - self transfers retain gross totals and zero net; zero-address mint/burn legs are excluded
+  ---
+  duration_ms: 1.318417
+  type: 'test'
+  ...
+# Subtest: successful siblings survive failed/static branches and removed logs
+ok 21 - successful siblings survive failed/static branches and removed logs
+  ---
+  duration_ms: 2.056292
+  type: 'test'
+  ...
+# Subtest: failed root and unsupported chain perform no state reads
+ok 22 - failed root and unsupported chain perform no state reads
+  ---
+  duration_ms: 0.455125
+  type: 'test'
+  ...
+# Subtest: supplied forged analysis and permissions cannot add participants or suppress actual trace evidence
+ok 23 - supplied forged analysis and permissions cannot add participants or suppress actual trace evidence
+  ---
+  duration_ms: 0.21375
+  type: 'test'
+  ...
+# Subtest: unknown token events do not block configured participants or become measurement targets
+ok 24 - unknown token events do not block configured participants or become measurement targets
+  ---
+  duration_ms: 0.189792
+  type: 'test'
+  ...
+# Subtest: strict root identity and caller provenance reject stale or malformed traces before RPC
+ok 25 - strict root identity and caller provenance reject stale or malformed traces before RPC
+  ---
+  duration_ms: 0.563792
+  type: 'test'
+  ...
+# Subtest: configured event provenance requires the exact known token delegate and canonical ABI
+ok 26 - configured event provenance requires the exact known token delegate and canonical ABI
+  ---
+  duration_ms: 1.231667
+  type: 'test'
+  ...
+# Subtest: noncanonical transferFrom arguments without events cannot create candidates
+ok 27 - noncanonical transferFrom arguments without events cannot create candidates
+  ---
+  duration_ms: 0.112667
+  type: 'test'
+  ...
+# Subtest: same frame and indexed log duplicates do not overcount but conflicting indexes fail closed
+ok 28 - same frame and indexed log duplicates do not overcount but conflicting indexes fail closed
+  ---
+  duration_ms: 0.179292
+  type: 'test'
+  ...
+# Subtest: unindexed separate identical events remain separate observations
+ok 29 - unindexed separate identical events remain separate observations
+  ---
+  duration_ms: 0.0845
+  type: 'test'
+  ...
+# Subtest: temporary lifecycle frames are rejected even under reverted/static ancestors before any RPC
+ok 30 - temporary lifecycle frames are rejected even under reverted/static ancestors before any RPC
+  ---
+  duration_ms: 0.342708
+  type: 'test'
+  ...
+# Subtest: eight-pair candidate limit includes reused pairs, and a ninth never truncates
+ok 31 - eight-pair candidate limit includes reused pairs, and a ninth never truncates
+  ---
+  duration_ms: 0.8145
+  type: 'test'
+  ...
+# Subtest: frame, depth, event and cyclic resource limits fail before measurement
+ok 32 - frame, depth, event and cyclic resource limits fail before measurement
+  ---
+  duration_ms: 8.229917
+  type: 'test'
+  ...
+# Subtest: reuse requires exact identity/basis, unique valid pairs, and independent same-context value proof
+ok 33 - reuse requires exact identity/basis, unique valid pairs, and independent same-context value proof
+  ---
+  duration_ms: 1.440125
+  type: 'test'
+  ...
+# Subtest: partial reuse retains only additional independently measured assets
+ok 34 - partial reuse retains only additional independently measured assets
+  ---
+  duration_ms: 0.814541
+  type: 'test'
+  ...
+# Subtest: metadata, mismatching context, malformed amounts and poisoned exceptions fail closed
+ok 35 - metadata, mismatching context, malformed amounts and poisoned exceptions fail closed
+  ---
+  duration_ms: 3.084875
+  type: 'test'
+  ...
+# Subtest: canonical failure, including a previous shared failure, withholds all new and reused results
+ok 36 - canonical failure, including a previous shared failure, withholds all new and reused results
+  ---
+  duration_ms: 0.4375
+  type: 'test'
+  ...
+# Subtest: current affected queries remain unavailable until both implementation paths are validated, without RPC or context preparation
+ok 37 - current affected queries remain unavailable until both implementation paths are validated, without RPC or context preparation
+  ---
+  duration_ms: 0.254583
+  type: 'test'
+  ...
+# Subtest: validated current context admits affected participants with independently returned values and explicit synthetic environment
+ok 38 - validated current context admits affected participants with independently returned values and explicit synthetic environment
+  ---
+  duration_ms: 0.262584
+  type: 'test'
+  ...
+# Subtest: current context basis alone cannot admit an unvalidated query/environment profile
+ok 39 - current context basis alone cannot admit an unvalidated query/environment profile
+  ---
+  duration_ms: 0.391333
+  type: 'test'
+  ...
+# Subtest: current measured pair reuse retains the validated basis and rechecks exact same-context amounts
+ok 40 - current measured pair reuse retains the validated basis and rechecks exact same-context amounts
+  ---
+  duration_ms: 0.337417
+  type: 'test'
+  ...
+# Subtest: observed supply trace identifies USDC sender/custody and hUSDC beneficiary; synthetic query values are separate
+ok 41 - observed supply trace identifies USDC sender/custody and hUSDC beneficiary; synthetic query values are separate
+  ---
+  duration_ms: 7.0815
+  type: 'test'
+  ...
+# Subtest: observed router trace selects exactly five USDC participants with independent net-event arithmetic
+ok 42 - observed router trace selects exactly five USDC participants with independent net-event arithmetic
+  ---
+  duration_ms: 1.870958
+  type: 'test'
+  ...
+# Subtest: all six observed lending traces select known cash and position participants with preserved debt roles
+ok 43 - all six observed lending traces select known cash and position participants with preserved debt roles
+  ---
+  duration_ms: 7.579375
+  type: 'test'
+  ...
+# Subtest: observed direct transferFrom selects the original owner and recipient independently of request.from
+ok 44 - observed direct transferFrom selects the original owner and recipient independently of request.from
+  ---
+  duration_ms: 1.223458
+  type: 'test'
+  ...
+# Subtest: synthetic late affected-consumer canonical failure invalidates earlier supply balances, allowances and reuse
+ok 45 - synthetic late affected-consumer canonical failure invalidates earlier supply balances, allowances and reuse
+  ---
+  duration_ms: 17.152167
+  type: 'test'
+  ...
+# Subtest: synthetic late affected-consumer canonical failure invalidates earlier repay balances, allowances and reuse
+ok 46 - synthetic late affected-consumer canonical failure invalidates earlier repay balances, allowances and reuse
+  ---
+  duration_ms: 30.05125
+  type: 'test'
+  ...
+# Subtest: synthetic failure of the additional supply custody query preserves already-proven balances and allowance
+ok 47 - synthetic failure of the additional supply custody query preserves already-proven balances and allowance
+  ---
+  duration_ms: 10.931792
+  type: 'test'
+  ...
+# Subtest: bounded allowance is measured once per pair with whole-transaction state and exact units
+ok 48 - bounded allowance is measured once per pair with whole-transaction state and exact units
+  ---
+  duration_ms: 3.991459
+  type: 'test'
+  ...
+# Subtest: an already-maximum approval with empty or nonce-only diff is a measured unchanged permission
+ok 49 - an already-maximum approval with empty or nonce-only diff is a measured unchanged permission
+  ---
+  duration_ms: 0.789958
+  type: 'test'
+  ...
+# Subtest: revoke clears a pre-only storage slot and preserves unrelated storage
+ok 50 - revoke clears a pre-only storage slot and preserves unrelated storage
+  ---
+  duration_ms: 0.439833
+  type: 'test'
+  ...
+# Subtest: approve returning false measures actual unchanged allowance without claiming activation
+ok 51 - approve returning false measures actual unchanged allowance without claiming activation
+  ---
+  duration_ms: 0.348583
+  type: 'test'
+  ...
+# Subtest: sequential approve then revoke measures final zero once and compares only last ordered event
+ok 52 - sequential approve then revoke measures final zero once and compares only last ordered event
+  ---
+  duration_ms: 0.40875
+  type: 'test'
+  ...
+# Subtest: a final allowance differing from event evidence remains a measured result with a separate difference
+ok 53 - a final allowance differing from event evidence remains a measured result with a separate difference
+  ---
+  duration_ms: 0.164042
+  type: 'test'
+  ...
+# Subtest: multiple events without global indexes do not invent a final event order
+ok 54 - multiple events without global indexes do not invent a final event order
+  ---
+  duration_ms: 0.198625
+  type: 'test'
+  ...
+# Subtest: failed roots and subtrees, unknown contracts and debt tokens yield no allowance targets
+ok 55 - failed roots and subtrees, unknown contracts and debt tokens yield no allowance targets
+  ---
+  duration_ms: 0.20175
+  type: 'test'
+  ...
+# Subtest: hUSDC is measurable, but stale supplied permission evidence is rejected
+ok 56 - hUSDC is measurable, but stale supplied permission evidence is rejected
+  ---
+  duration_ms: 0.450292
+  type: 'test'
+  ...
+# Subtest: successful sibling approval is measured while a reverted sibling pair is excluded
+ok 57 - successful sibling approval is measured while a reverted sibling pair is excluded
+  ---
+  duration_ms: 0.368875
+  type: 'test'
+  ...
+# Subtest: nine distinct pairs exceed the explicit resource cap before any RPC request
+ok 58 - nine distinct pairs exceed the explicit resource cap before any RPC request
+  ---
+  duration_ms: 0.214333
+  type: 'test'
+  ...
+# Subtest: malformed uint256 return, unsupported account/code changes and reorg fail closed
+ok 59 - malformed uint256 return, unsupported account/code changes and reorg fail closed
+  ---
+  duration_ms: 0.398417
+  type: 'test'
+  ...
+# Subtest: provider exception messages and arbitrary details never reach output
+ok 60 - provider exception messages and arbitrary details never reach output
+  ---
+  duration_ms: 0.192666
+  type: 'test'
+  ...
+# Subtest: a shared context is lazy and performs one state trace across repeated measurements
+ok 61 - a shared context is lazy and performs one state trace across repeated measurements
+  ---
+  duration_ms: 1.285
+  type: 'test'
+  ...
+# Subtest: real Hyperlend trace: exact USDC principal and distinct accrued interest
+ok 62 - real Hyperlend trace: exact USDC principal and distinct accrued interest
+  ---
+  duration_ms: 1.981167
+  type: 'test'
+  ...
+# Subtest: real CoreWriter trace is incomplete HyperCore coverage and creates no invented assets
+ok 63 - real CoreWriter trace is incomplete HyperCore coverage and creates no invented assets
+  ---
+  duration_ms: 0.149959
+  type: 'test'
+  ...
+# Subtest: a top-level revert discards every descendant log
+ok 64 - a top-level revert discards every descendant log
+  ---
+  duration_ms: 0.1985
+  type: 'test'
+  ...
+# Subtest: out-of-gas differs from a contract revert and also discards events
+ok 65 - out-of-gas differs from a contract revert and also discards events
+  ---
+  duration_ms: 0.094917
+  type: 'test'
+  ...
+# Subtest: caught inner failure discards its entire subtree but preserves successful siblings
+ok 66 - caught inner failure discards its entire subtree but preserves successful siblings
+  ---
+  duration_ms: 0.151334
+  type: 'test'
+  ...
+# Subtest: duplicate global log records are counted once; separate identical emissions remain separate
+ok 67 - duplicate global log records are counted once; separate identical emissions remain separate
+  ---
+  duration_ms: 0.346
+  type: 'test'
+  ...
+# Subtest: amounts above Number.MAX_SAFE_INTEGER stay exact and decimals are never guessed
+ok 68 - amounts above Number.MAX_SAFE_INTEGER stay exact and decimals are never guessed
+  ---
+  duration_ms: 0.122875
+  type: 'test'
+  ...
+# Subtest: deposit for another beneficiary keeps sender-only incoming assets and principal reconciliation
+ok 69 - deposit for another beneficiary keeps sender-only incoming assets and principal reconciliation
+  ---
+  duration_ms: 0.14775
+  type: 'test'
+  ...
+# Subtest: missing receipt logs downgrade otherwise recognized supply coverage
+ok 70 - missing receipt logs downgrade otherwise recognized supply coverage
+  ---
+  duration_ms: 0.236333
+  type: 'test'
+  ...
+# Subtest: recognized supply with successful but empty trace is not supported complete event coverage
+ok 71 - recognized supply with successful but empty trace is not supported complete event coverage
+  ---
+  duration_ms: 0.290583
+  type: 'test'
+  ...
+# Subtest: missing or malformed token decimals downgrade known supply without inventing display units
+ok 72 - missing or malformed token decimals downgrade known supply without inventing display units
+  ---
+  duration_ms: 2.769208
+  type: 'test'
+  ...
+# Subtest: unknown empty calls are unsupported rather than complete empty previews
+ok 73 - unknown empty calls are unsupported rather than complete empty previews
+  ---
+  duration_ms: 0.068834
+  type: 'test'
+  ...
+# Subtest: malformed events and ERC721 events are omitted, with incomplete coverage
+ok 74 - malformed events and ERC721 events are omitted, with incomplete coverage
+  ---
+  duration_ms: 0.083958
+  type: 'test'
+  ...
+# Subtest: protocol identity requires matching chain and deployed pool, not selector alone
+ok 75 - protocol identity requires matching chain and deployed pool, not selector alone
+  ---
+  duration_ms: 0.397417
+  type: 'test'
+  ...
+# Subtest: native value is not silently claimed as complete ERC20 coverage
+ok 76 - native value is not silently claimed as complete ERC20 coverage
+  ---
+  duration_ms: 0.285708
+  type: 'test'
+  ...
+# Subtest: self transfers are visible in both directions without fabricating a net loss
+ok 77 - self transfers are visible in both directions without fabricating a net loss
+  ---
+  duration_ms: 0.116792
+  type: 'test'
+  ...
+# Subtest: missing trace is a failed result rather than successful empty simulation
+ok 78 - missing trace is a failed result rather than successful empty simulation
+  ---
+  duration_ms: 0.064459
+  type: 'test'
+  ...
+# Subtest: observed one-unit rounding distinguishes deposited USDC from Mint-implied principal
+ok 79 - observed one-unit rounding distinguishes deposited USDC from Mint-implied principal
+  ---
+  duration_ms: 0.473833
+  type: 'test'
+  ...
+# Subtest: rounding reconciliation rejects values outside the mathematically derived interval
+ok 80 - rounding reconciliation rejects values outside the mathematically derived interval
+  ---
+  duration_ms: 0.348375
+  type: 'test'
+  ...
+# Subtest: one-unit mismatch is not accepted without the verified implementation and matching scaled mint input
+ok 81 - one-unit mismatch is not accepted without the verified implementation and matching scaled mint input
+  ---
+  duration_ms: 0.860625
+  type: 'test'
+  ...
+# Subtest: rounding bound depends on index and scaled amount, not a blanket one-unit tolerance
+ok 82 - rounding bound depends on index and scaled amount, not a blanket one-unit tolerance
+  ---
+  duration_ms: 0.405583
+  type: 'test'
+  ...
+# Subtest: revert decoding preserves RPC error and only interprets failed contract return data
+ok 83 - revert decoding preserves RPC error and only interprets failed contract return data
+  ---
+  duration_ms: 0.1775
+  type: 'test'
+  ...
+# Subtest: Arbitrum loader binds stable startup, complete dependency additions and cached identity
+ok 84 - Arbitrum loader binds stable startup, complete dependency additions and cached identity
+  ---
+  duration_ms: 150.768208
+  type: 'test'
+  ...
+# Subtest: source drift after startup is rejected before engine invocation
+ok 85 - source drift after startup is rejected before engine invocation
+  ---
+  duration_ms: 92.823958
+  type: 'test'
+  ...
+# Subtest: post-execution drift and cancellation remove usable values but preserve the raw attempt
+ok 86 - post-execution drift and cancellation remove usable values but preserve the raw attempt
+  ---
+  duration_ms: 252.792791
+  type: 'test'
+  ...
+# Subtest: escaped dependency symlink cannot produce an available engine identity
+ok 87 - escaped dependency symlink cannot produce an available engine identity
+  ---
+  duration_ms: 91.833459
+  type: 'test'
+  ...
+# Subtest: source hashing shares the request deadline and cancellation before engine dispatch
+ok 88 - source hashing shares the request deadline and cancellation before engine dispatch
+  ---
+  duration_ms: 318.883416
+  type: 'test'
+  ...
+# Subtest: shared timer spans source hashing and aborts in-flight engine work without granting a fresh window
+ok 89 - shared timer spans source hashing and aborts in-flight engine work without granting a fresh window
+  ---
+  duration_ms: 205.411125
+  type: 'test'
+  ...
+# Subtest: caller cancellation is relayed to the shared engine signal and cleaned up after success
+ok 90 - caller cancellation is relayed to the shared engine signal and cleaned up after success
+  ---
+  duration_ms: 113.734209
+  type: 'test'
+  ...
+# Subtest: Arbitrum input and origin validation happen before creating a transport
+ok 91 - Arbitrum input and origin validation happen before creating a transport
+  ---
+  duration_ms: 57.9725
+  type: 'test'
+  ...
+# Subtest: missing Arbitrum engine leaves health available and reports explicit unavailability
+ok 92 - missing Arbitrum engine leaves health available and reports explicit unavailability
+  ---
+  duration_ms: 4188.104958
+  type: 'test'
+  ...
+# Subtest: pre-dispatch deadline and cancellation have explicit unavailable HTTP responses
+ok 93 - pre-dispatch deadline and cancellation have explicit unavailable HTTP responses
+  ---
+  duration_ms: 5.362792
+  type: 'test'
+  ...
+# Subtest: withheld observations do not retain a usable measured-asset count
+ok 94 - withheld observations do not retain a usable measured-asset count
+  ---
+  duration_ms: 0.176125
+  type: 'test'
+  ...
+# Subtest: Arbitrum shares the concurrency limit and checks again after asynchronous loading
+ok 95 - Arbitrum shares the concurrency limit and checks again after asynchronous loading
+  ---
+  duration_ms: 19.449541
+  type: 'test'
+  ...
+# Subtest: disconnect cancels the active Arbitrum transport and releases its shared slot
+ok 96 - disconnect cancels the active Arbitrum transport and releases its shared slot
+  ---
+  duration_ms: 10.701916
+  type: 'test'
+  ...
+# Subtest: protocol interpretation never turns a requested burn into a measured debit or destination credit
+ok 97 - protocol interpretation never turns a requested burn into a measured debit or destination credit
+  ---
+  duration_ms: 1.4285
+  type: 'test'
+  ...
+# Subtest: production HTTP adapter replays the saved live revert without inventing a 100 USDC debit
+ok 98 - production HTTP adapter replays the saved live revert without inventing a 100 USDC debit
+  ---
+  duration_ms: 30.73525
+  type: 'test'
+  ...
+# Subtest: Arbitrum uses its original public example at latest and hides Ethereum-only controls
+ok 99 - Arbitrum uses its original public example at latest and hides Ethereum-only controls
+  ---
+  duration_ms: 10.477167
+  type: 'test'
+  ...
+# Subtest: dedicated payload excludes hidden query/context/fee controls and locks fields during the call
+ok 100 - dedicated payload excludes hidden query/context/fee controls and locks fields during the call
+  ---
+  duration_ms: 4.696916
+  type: 'test'
+  ...
+# Subtest: Arbitrum gas defaults to omission, validates canonical bounds and never enters another network payload
+ok 101 - Arbitrum gas defaults to omission, validates canonical bounds and never enters another network payload
+  ---
+  duration_ms: 11.126833
+  type: 'test'
+  ...
+# Subtest: input/gas/network/example/reset edits invalidate old and pending Arbitrum results
+ok 102 - input/gas/network/example/reset edits invalidate old and pending Arbitrum results
+  ---
+  duration_ms: 7.372459
+  type: 'test'
+  ...
+# Subtest: execution success is separate from exact balances, incomplete coverage and CCTP intent
+ok 103 - execution success is separate from exact balances, incomplete coverage and CCTP intent
+  ---
+  duration_ms: 0.76
+  type: 'test'
+  ...
+# Subtest: revert and unavailable remain explicit; missing probes never become zero rows or successful deposits
+ok 104 - revert and unavailable remain explicit; missing probes never become zero rows or successful deposits
+  ---
+  duration_ms: 0.61225
+  type: 'test'
+  ...
+# Subtest: malformed amounts, wrong chain and unconfirmed headers withhold amounts; unsafe strings stay literal text
+ok 105 - malformed amounts, wrong chain and unconfirmed headers withhold amounts; unsafe strings stay literal text
+  ---
+  duration_ms: 8.199875
+  type: 'test'
+  ...
+# Subtest: observed same-block balance delta excludes interest already present before mint
+ok 106 - observed same-block balance delta excludes interest already present before mint
+  ---
+  duration_ms: 4.3465
+  type: 'test'
+  ...
+# Subtest: all changed slots are applied with stateDiff and pre-only cleared slots are zeroed
+ok 107 - all changed slots are applied with stateDiff and pre-only cleared slots are zeroed
+  ---
+  duration_ms: 1.296042
+  type: 'test'
+  ...
+# Subtest: reverted or unsupported analysis never invokes the measurement provider
+ok 108 - reverted or unsupported analysis never invokes the measurement provider
+  ---
+  duration_ms: 1.385709
+  type: 'test'
+  ...
+# Subtest: invalid block identity and a provider header mismatch fail closed
+ok 109 - invalid block identity and a provider header mismatch fail closed
+  ---
+  duration_ms: 0.474667
+  type: 'test'
+  ...
+# Subtest: block becoming noncanonical suppresses all measured deltas
+ok 110 - block becoming noncanonical suppresses all measured deltas
+  ---
+  duration_ms: 0.420209
+  type: 'test'
+  ...
+# Subtest: reverting balance query or malformed return data cannot become a zero balance
+ok 111 - reverting balance query or malformed return data cannot become a zero balance
+  ---
+  duration_ms: 4.947167
+  type: 'test'
+  ...
+# Subtest: created/deleted accounts, changed code and malformed storage are rejected
+ok 112 - created/deleted accounts, changed code and malformed storage are rejected
+  ---
+  duration_ms: 1.106041
+  type: 'test'
+  ...
+# Subtest: successful trace paired with a reverted or inconsistent diff is rejected by principal reconciliation
+ok 113 - successful trace paired with a reverted or inconsistent diff is rejected by principal reconciliation
+  ---
+  duration_ms: 0.402167
+  type: 'test'
+  ...
+# Subtest: even a one-unit disagreement with same-context Mint principal is rejected
+ok 114 - even a one-unit disagreement with same-context Mint principal is rejected
+  ---
+  duration_ms: 1.126875
+  type: 'test'
+  ...
+# Subtest: trace-reconciled rounding delta is retained without a fixed one-unit tolerance
+ok 115 - trace-reconciled rounding delta is retained without a fixed one-unit tolerance
+  ---
+  duration_ms: 0.760125
+  type: 'test'
+  ...
+# Subtest: arbitrary provider exception text and detail never reach saved evidence or warnings
+ok 116 - arbitrary provider exception text and detail never reach saved evidence or warnings
+  ---
+  duration_ms: 0.312292
+  type: 'test'
+  ...
+# Subtest: another beneficiary receives separate before/after observations for both configured tokens
+ok 117 - another beneficiary receives separate before/after observations for both configured tokens
+  ---
+  duration_ms: 0.961083
+  type: 'test'
+  ...
+# Subtest: supply for another beneficiary rejects unexpected changes outside the deposited position
+ok 118 - supply for another beneficiary rejects unexpected changes outside the deposited position
+  ---
+  duration_ms: 0.663125
+  type: 'test'
+  ...
+# Subtest: public evidence corpus and synthetic controls are reported separately
+ok 119 - public evidence corpus and synthetic controls are reported separately
+  ---
+  duration_ms: 13.595792
+  type: 'test'
+  ...
+# Subtest: six lending regression cases preserve source hashes, exact amounts and block provenance
+ok 120 - six lending regression cases preserve source hashes, exact amounts and block provenance
+  ---
+  duration_ms: 23.989542
+  type: 'test'
+  ...
+# Subtest: lending checks catch requested/actual confusion, position errors and liabilities in either asset direction
+ok 121 - lending checks catch requested/actual confusion, position errors and liabilities in either asset direction
+  ---
+  duration_ms: 7.550459
+  type: 'test'
+  ...
+# Subtest: a broken analyzer cannot produce a passing report; failures are persisted
+ok 122 - a broken analyzer cannot produce a passing report; failures are persisted
+  ---
+  duration_ms: 9.05575
+  type: 'test'
+  ...
+# Subtest: saved reference contains public payload and no authentication or environment fields
+ok 123 - saved reference contains public payload and no authentication or environment fields
+  ---
+  duration_ms: 3.781083
+  type: 'test'
+  ...
+# Subtest: recorded five/eight views retain every reference, alias and occurrence without replay-index inference
+ok 124 - recorded five/eight views retain every reference, alias and occurrence without replay-index inference
+  ---
+  duration_ms: 5.520292
+  type: 'test'
+  ...
+# Subtest: later genuine eight/eight responses are separate per-response views, never a permanent endpoint profile
+ok 125 - later genuine eight/eight responses are separate per-response views, never a permanent endpoint profile
+  ---
+  duration_ms: 4.297875
+  type: 'test'
+  ...
+# Subtest: ambiguous twelve-field system matches retain both reference rows and withhold a combined denominator
+ok 126 - ambiguous twelve-field system matches retain both reference rows and withhold a combined denominator
+  ---
+  duration_ms: 0.992625
+  type: 'test'
+  ...
+# Subtest: changed, missing, unfamiliar and unbound system envelope evidence is never an alias wildcard
+ok 127 - changed, missing, unfamiliar and unbound system envelope evidence is never an alias wildcard
+  ---
+  duration_ms: 20.566
+  type: 'test'
+  ...
+# Subtest: ordinary hash/envelope conflicts, duplicate occurrences, overlap and reordering are preserved, not trimmed
+ok 128 - ordinary hash/envelope conflicts, duplicate occurrences, overlap and reordering are preserved, not trimmed
+  ---
+  duration_ms: 6.508166
+  type: 'test'
+  ...
+# Subtest: unknown extra actions and missing envelopes remain visible without claiming an all-action fraction
+ok 129 - unknown extra actions and missing envelopes remain visible without claiming an all-action fraction
+  ---
+  duration_ms: 12.993125
+  type: 'test'
+  ...
+# Subtest: unavailable official system enumeration differs from a successfully observed empty list
+ok 130 - unavailable official system enumeration differs from a successfully observed empty list
+  ---
+  duration_ms: 2.206333
+  type: 'test'
+  ...
+# Subtest: different system counts and interleaved lists never imply arithmetic execution boundaries
+ok 131 - different system counts and interleaved lists never imply arithmetic execution boundaries
+  ---
+  duration_ms: 0.788042
+  type: 'test'
+  ...
+# Subtest: unknown system targets are retained as unassessed actions, independent of execution outcomes
+ok 132 - unknown system targets are retained as unassessed actions, independent of execution outcomes
+  ---
+  duration_ms: 0.921458
+  type: 'test'
+  ...
+# Subtest: untrusted provenance, inline malformed envelopes and conflicting block fields cannot produce complete mapping
+ok 133 - untrusted provenance, inline malformed envelopes and conflicting block fields cannot produce complete mapping
+  ---
+  duration_ms: 10.69
+  type: 'test'
+  ...
+# Subtest: bounded pure API rejects excessive or non-JSON input without returning a truncated population
+ok 134 - bounded pure API rejects excessive or non-JSON input without returning a truncated population
+  ---
+  duration_ms: 2.308958
+  type: 'test'
+  ...
+# Subtest: historical supply resolves to a byte-exact committed capture without an ignored live-report dependency
+ok 135 - historical supply resolves to a byte-exact committed capture without an ignored live-report dependency
+  ---
+  duration_ms: 2.951916
+  type: 'test'
+  ...
+# Subtest: four original cases are fixed to verified hashes, original indexes and known amounts
+ok 136 - four original cases are fixed to verified hashes, original indexes and known amounts
+  ---
+  duration_ms: 0.230917
+  type: 'test'
+  ...
+# Subtest: comparison ignores run timing and IDs but compares original executions and exact balances
+ok 137 - comparison ignores run timing and IDs but compares original executions and exact balances
+  ---
+  duration_ms: 15.137834
+  type: 'test'
+  ...
+# Subtest: supply measured delta disagreement with event-implied value is highlighted without substituting events
+ok 138 - supply measured delta disagreement with event-implied value is highlighted without substituting events
+  ---
+  duration_ms: 1.443458
+  type: 'test'
+  ...
+# Subtest: receipt, trace, event, identity and exact before/after differences are detected
+ok 139 - receipt, trace, event, identity and exact before/after differences are detected
+  ---
+  duration_ms: 15.244167
+  type: 'test'
+  ...
+# Subtest: both providers agreeing on incorrect original identity, cash or debt classification still fails
+ok 140 - both providers agreeing on incorrect original identity, cash or debt classification still fails
+  ---
+  duration_ms: 5.305625
+  type: 'test'
+  ...
+# Subtest: unavailable, malformed and duplicate balances cannot produce a successful comparison
+ok 141 - unavailable, malformed and duplicate balances cannot produce a successful comparison
+  ---
+  duration_ms: 2.176083
+  type: 'test'
+  ...
+# Subtest: runner is bounded to eight original replays and persists complete public requests/results
+ok 142 - runner is bounded to eight original replays and persists complete public requests/results
+  ---
+  duration_ms: 29.794709
+  type: 'test'
+  ...
+# Subtest: provider failures remain bounded, sanitized and incomplete rather than successful empty output
+ok 143 - provider failures remain bounded, sanitized and incomplete rather than successful empty output
+  ---
+  duration_ms: 7.472459
+  type: 'test'
+  ...
+# Subtest: nested provider error objects from injected clients are rejected before raw retention
+ok 144 - nested provider error objects from injected clients are rejected before raw retention
+  ---
+  duration_ms: 7.732375
+  type: 'test'
+  ...
+# Subtest: fixed observed inputs have verified original identity, hashes and independent expected amounts
+ok 145 - fixed observed inputs have verified original identity, hashes and independent expected amounts
+  ---
+  duration_ms: 2.131167
+  type: 'test'
+  ...
+# Subtest: all three original envelopes compare while ignoring timings, IDs and provider names
+ok 146 - all three original envelopes compare while ignoring timings, IDs and provider names
+  ---
+  duration_ms: 23.131375
+  type: 'test'
+  ...
+# Subtest: same wrong amounts, event-as-final substitution and party conflation fail independent expectations
+ok 147 - same wrong amounts, event-as-final substitution and party conflation fail independent expectations
+  ---
+  duration_ms: 16.187625
+  type: 'test'
+  ...
+# Subtest: original trace, receipt, execution identity, and allowance before-values are checked
+ok 148 - original trace, receipt, execution identity, and allowance before-values are checked
+  ---
+  duration_ms: 2.504333
+  type: 'test'
+  ...
+# Subtest: unavailable results stay incomplete while malformed claimed measurements fail
+ok 149 - unavailable results stay incomplete while malformed claimed measurements fail
+  ---
+  duration_ms: 2.097708
+  type: 'test'
+  ...
+# Subtest: security verdicts or findings fail even when providers agree
+ok 150 - security verdicts or findings fail even when providers agree
+  ---
+  duration_ms: 1.250583
+  type: 'test'
+  ...
+# Subtest: later malformed evidence cannot mask an earlier independent mismatch
+ok 151 - later malformed evidence cannot mask an earlier independent mismatch
+  ---
+  duration_ms: 0.399667
+  type: 'test'
+  ...
+# Subtest: runner performs exactly six attempts, validates replay inputs and retains successful public RPC data
+ok 152 - runner performs exactly six attempts, validates replay inputs and retains successful public RPC data
+  ---
+  duration_ms: 55.962958
+  type: 'test'
+  ...
+# Subtest: known unavailable provider remains visible and is not counted as a matched comparison
+ok 153 - known unavailable provider remains visible and is not counted as a matched comparison
+  ---
+  duration_ms: 13.770458
+  type: 'test'
+  ...
+# Subtest: arbitrary exceptions and nested provider metadata are scrubbed, never retried or saved as success
+ok 154 - arbitrary exceptions and nested provider metadata are scrubbed, never retried or saved as success
+  ---
+  duration_ms: 7.803458
+  type: 'test'
+  ...
+# Subtest: first prospective pilot preserves every artifact and its actual frozen source provenance
+ok 155 - first prospective pilot preserves every artifact and its actual frozen source provenance
+  ---
+  duration_ms: 567.43325
+  type: 'test'
+  ...
+# Subtest: recorded headers isolate the first selected block transaction-list disagreement without attributing correctness
+ok 156 - recorded headers isolate the first selected block transaction-list disagreement without attributing correctness
+  ---
+  duration_ms: 2.108208
+  type: 'test'
+  ...
+# Subtest: exact nine-request offline replay fails selection with no cohort, transaction inspection or fallback
+ok 157 - exact nine-request offline replay fails selection with no cohort, transaction inspection or fallback
+  ---
+  duration_ms: 9.920125
+  type: 'test'
+  ...
+# Subtest: saved A5/B8 and later A8/B8 map eight references without changing literal indices or boundaries
+ok 158 - saved A5/B8 and later A8/B8 map eight references without changing literal indices or boundaries
+  ---
+  duration_ms: 7.055958
+  type: 'test'
+  ...
+# Subtest: missing official enumeration, unknown transaction semantics and missing ordinary envelopes retain unresolved rows with null fractions
+ok 159 - missing official enumeration, unknown transaction semantics and missing ordinary envelopes retain unresolved rows with null fractions
+  ---
+  duration_ms: 10.4095
+  type: 'test'
+  ...
+# Subtest: unavailable full-enumeration progress, source-view changes and cross-block duplicates cannot admit N
+ok 160 - unavailable full-enumeration progress, source-view changes and cross-block duplicates cannot admit N
+  ---
+  duration_ms: 3.746083
+  type: 'test'
+  ...
+# Subtest: unknown extra anchor occurrences and structural rejection retain raw occurrence rows
+ok 161 - unknown extra anchor occurrences and structural rejection retain raw occurrence rows
+  ---
+  duration_ms: 1.986458
+  type: 'test'
+  ...
+# Subtest: fixed sixteen-slot schedule preserves system and unresolved strata and every omitted row
+ok 162 - fixed sixteen-slot schedule preserves system and unresolved strata and every omitted row
+  ---
+  duration_ms: 0.468291
+  type: 'test'
+  ...
+# Subtest: scheduled selection uses only fixed hash-bound official methods and seals genuine composites as development controls
+ok 163 - scheduled selection uses only fixed hash-bound official methods and seals genuine composites as development controls
+  ---
+  duration_ms: 14.287833
+  type: 'test'
+  ...
+# Subtest: same-hash anchor/full representation change is retained and not repaired by later successful normalization
+ok 164 - same-hash anchor/full representation change is retained and not repaired by later successful normalization
+  ---
+  duration_ms: 7.369958
+  type: 'test'
+  ...
+# Subtest: a malformed selected header retains the other anchor occurrences without admitting a block identity
+ok 165 - a malformed selected header retains the other anchor occurrences without admitting a block identity
+  ---
+  duration_ms: 11.539
+  type: 'test'
+  ...
+# Subtest: anchor-only changes in complete header fields prevent stable-view admission
+ok 166 - anchor-only changes in complete header fields prevent stable-view admission
+  ---
+  duration_ms: 17.32125
+  type: 'test'
+  ...
+# Subtest: unexpected full objects in hash-only anchors remain raw unresolved observations
+ok 167 - unexpected full objects in hash-only anchors remain raw unresolved observations
+  ---
+  duration_ms: 1.936625
+  type: 'test'
+  ...
+# Subtest: structural normalizer rejection retains every attempted null lookup packet with exact request identity
+ok 168 - structural normalizer rejection retains every attempted null lookup packet with exact request identity
+  ---
+  duration_ms: 5.266041
+  type: 'test'
+  ...
+# Subtest: unsupported system-by-hash result cannot become empty or trigger method fallback
+ok 169 - unsupported system-by-hash result cannot become empty or trigger method fallback
+  ---
+  duration_ms: 2.47225
+  type: 'test'
+  ...
+# Subtest: finality/parent failure and exhausted envelope-discovery budget preserve bounded evidence without replacement
+ok 170 - finality/parent failure and exhausted envelope-discovery budget preserve bounded evidence without replacement
+  ---
+  duration_ms: 5.224583
+  type: 'test'
+  ...
+# Subtest: v2 budget charges official and engine calls together, rejects fallback/write methods and clones retained results
+ok 171 - v2 budget charges official and engine calls together, rejects fallback/write methods and clones retained results
+  ---
+  duration_ms: 1.11675
+  type: 'test'
+  ...
+# Subtest: official transport counts error bodies without retaining secret text and seals ignored late completions
+ok 172 - official transport counts error bodies without retaining secret text and seals ignored late completions
+  ---
+  duration_ms: 13.194667
+  type: 'test'
+  ...
+# Subtest: every v2 endpoint rejects invalid UTF-8 without losing the complete raw-byte hash or count
+ok 173 - every v2 endpoint rejects invalid UTF-8 without losing the complete raw-byte hash or count
+  ---
+  duration_ms: 0.974583
+  type: 'test'
+  ...
+# Subtest: every v2 endpoint rejects BOM-prefixed JSON without changing the complete byte evidence
+ok 174 - every v2 endpoint rejects BOM-prefixed JSON without changing the complete byte evidence
+  ---
+  duration_ms: 0.288375
+  type: 'test'
+  ...
+# Subtest: runnable offline v2 seals all eight product failures before comparator, preserves all rows and immutable files
+ok 175 - runnable offline v2 seals all eight product failures before comparator, preserves all rows and immutable files
+  ---
+  duration_ms: 73.233875
+  type: 'test'
+  ...
+# Subtest: eight current API outcomes preserve frozen source, complete raw HTTP/RPC bytes and all196 calls
+ok 176 - eight current API outcomes preserve frozen source, complete raw HTTP/RPC bytes and all196 calls
+  ---
+  duration_ms: 24.294875
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-supply on drpc
+ok 177 - genuine full current transport replay: current-supply on drpc
+  ---
+  duration_ms: 64.149875
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-supply on hyperlend-archive
+ok 178 - genuine full current transport replay: current-supply on hyperlend-archive
+  ---
+  duration_ms: 15.596083
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-borrow on drpc
+ok 179 - genuine full current transport replay: current-borrow on drpc
+  ---
+  duration_ms: 16.3175
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-borrow on hyperlend-archive
+ok 180 - genuine full current transport replay: current-borrow on hyperlend-archive
+  ---
+  duration_ms: 15.430416
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-direct-transferfrom-a on drpc
+ok 181 - genuine full current transport replay: current-direct-transferfrom-a on drpc
+  ---
+  duration_ms: 7.375583
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-direct-transferfrom-a on hyperlend-archive
+ok 182 - genuine full current transport replay: current-direct-transferfrom-a on hyperlend-archive
+  ---
+  duration_ms: 6.633458
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-usdc-router-permit-consumed on drpc
+ok 183 - genuine full current transport replay: current-usdc-router-permit-consumed on drpc
+  ---
+  duration_ms: 1.534292
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-usdc-router-permit-consumed on hyperlend-archive
+ok 184 - genuine full current transport replay: current-usdc-router-permit-consumed on hyperlend-archive
+  ---
+  duration_ms: 1.86125
+  type: 'test'
+  ...
+# Subtest: the original eight hexadecimal-value HTTP400 failures remain intact and still reject before any RPC
+ok 185 - the original eight hexadecimal-value HTTP400 failures remain intact and still reject before any RPC
+  ---
+  duration_ms: 0.932041
+  type: 'test'
+  ...
+# Subtest: capability evidence remains immutable and each retained response binds its exact bytes and request
+ok 186 - capability evidence remains immutable and each retained response binds its exact bytes and request
+  ---
+  duration_ms: 6.152667
+  type: 'test'
+  ...
+# Subtest: recorded supply queries on A, with explicitly synthetic root-code preparation control
+ok 187 - recorded supply queries on A, with explicitly synthetic root-code preparation control
+  ---
+  duration_ms: 7.739125
+  type: 'test'
+  ...
+# Subtest: recorded borrow queries on A, with explicitly synthetic root-code preparation control
+ok 188 - recorded borrow queries on A, with explicitly synthetic root-code preparation control
+  ---
+  duration_ms: 4.8365
+  type: 'test'
+  ...
+# Subtest: recorded supply queries on B, with explicitly synthetic root-code preparation control
+ok 189 - recorded supply queries on B, with explicitly synthetic root-code preparation control
+  ---
+  duration_ms: 3.019625
+  type: 'test'
+  ...
+# Subtest: recorded borrow queries on B, with explicitly synthetic root-code preparation control
+ok 190 - recorded borrow queries on B, with explicitly synthetic root-code preparation control
+  ---
+  duration_ms: 4.0335
+  type: 'test'
+  ...
+# Subtest: context snapshots inputs, caches inflight/completed queries, and returns isolated values and evidence
+ok 191 - context snapshots inputs, caches inflight/completed queries, and returns isolated values and evidence
+  ---
+  duration_ms: 1.828125
+  type: 'test'
+  ...
+# Subtest: malformed ABI and unknown/debt-allowance queries fail without preparing or making RPC calls
+ok 192 - malformed ABI and unknown/debt-allowance queries fail without preparing or making RPC calls
+  ---
+  duration_ms: 0.893125
+  type: 'test'
+  ...
+# Subtest: original failure, envelope mismatch and every lifecycle branch are rejected before any extra RPC
+ok 193 - original failure, envelope mismatch and every lifecycle branch are rejected before any extra RPC
+  ---
+  duration_ms: 6.168208
+  type: 'test'
+  ...
+# Subtest: pinned header, sender/root/witness classification, and direct nonce/native reads fail closed
+ok 194 - pinned header, sender/root/witness classification, and direct nonce/native reads fail closed
+  ---
+  duration_ms: 3.356125
+  type: 'test'
+  ...
+# Subtest: original diff must be strict, complete for sender nonce, and free of lifecycle/code changes
+ok 195 - original diff must be strict, complete for sender nonce, and free of lifecycle/code changes
+  ---
+  duration_ms: 9.942125
+  type: 'test'
+  ...
+# Subtest: every witnessed header field is validated before and after with BASEFEE explicitly zero
+ok 196 - every witnessed header field is validated before and after with BASEFEE explicitly zero
+  ---
+  duration_ms: 19.924208
+  type: 'test'
+  ...
+# Subtest: synthetic override-fidelity control preserves cleared/new slots and all accounts in both isolated after tracers
+ok 197 - synthetic override-fidelity control preserves cleared/new slots and all accounts in both isolated after tracers
+  ---
+  duration_ms: 3.083041
+  type: 'test'
+  ...
+# Subtest: shared preparation failure is cached across all consumers without further RPC or identity
+ok 198 - shared preparation failure is cached across all consumers without further RPC or identity
+  ---
+  duration_ms: 10.179208
+  type: 'test'
+  ...
+# Subtest: post override queries must follow the configured token and Pool implementations even for unchanged output
+ok 199 - post override queries must follow the configured token and Pool implementations even for unchanged output
+  ---
+  duration_ms: 22.154875
+  type: 'test'
+  ...
+# Subtest: successful-looking query outputs cannot hide malformed/failed/static/extra-child traces
+ok 200 - successful-looking query outputs cannot hide malformed/failed/static/extra-child traces
+  ---
+  duration_ms: 12.056875
+  type: 'test'
+  ...
+# Subtest: header witnesses require their exact 300000-gas envelope before and after
+ok 201 - header witnesses require their exact 300000-gas envelope before and after
+  ---
+  duration_ms: 4.486791
+  type: 'test'
+  ...
+# Subtest: fake monotonic clock expires before a new RPC and never resumes cached results or requests
+ok 202 - fake monotonic clock expires before a new RPC and never resumes cached results or requests
+  ---
+  duration_ms: 1.520625
+  type: 'test'
+  ...
+# Subtest: fake clock discards late successful and failed RPC results, retaining fixed terminal timeout evidence
+ok 203 - fake clock discards late successful and failed RPC results, retaining fixed terminal timeout evidence
+  ---
+  duration_ms: 3.662917
+  type: 'test'
+  ...
+# Subtest: fake clock timeout is shared across pending queries and every in-flight request settles before evidence finalization
+ok 204 - fake clock timeout is shared across pending queries and every in-flight request settles before evidence finalization
+  ---
+  duration_ms: 1.716
+  type: 'test'
+  ...
+# Subtest: query mutations require exactly independent sender nonce increments and unchanged absolute native balance
+ok 205 - query mutations require exactly independent sender nonce increments and unchanged absolute native balance
+  ---
+  duration_ms: 64.835583
+  type: 'test'
+  ...
+# Subtest: failed pairs are cached, unrelated successful queries and canonical checks remain usable
+ok 206 - failed pairs are cached, unrelated successful queries and canonical checks remain usable
+  ---
+  duration_ms: 2.259708
+  type: 'test'
+  ...
+# Subtest: canonical errors latch across concurrent/later successful checks and never expose provider secrets
+ok 207 - canonical errors latch across concurrent/later successful checks and never expose provider secrets
+  ---
+  duration_ms: 7.317375
+  type: 'test'
+  ...
+# Subtest: RPC/provider and local non-JSON/size failures retain only bounded terminal diagnostics
+ok 208 - RPC/provider and local non-JSON/size failures retain only bounded terminal diagnostics
+  ---
+  duration_ms: 27.391916
+  type: 'test'
+  ...
+# Subtest: 32 MiB retained response evidence limit uses UTF-8 bytes and canonical failure is latched
+ok 209 - 32 MiB retained response evidence limit uses UTF-8 bytes and canonical failure is latched
+  ---
+  duration_ms: 122.305333
+  type: 'test'
+  ...
+# Subtest: 12 distinct query cap shares inflight promises and leaves three canonical checks within 64 RPC
+ok 210 - 12 distinct query cap shares inflight promises and leaves three canonical checks within 64 RPC
+  ---
+  duration_ms: 2.071833
+  type: 'test'
+  ...
+# Subtest: transport reserves concurrent calls before fetching and limits both providers together
+ok 211 - transport reserves concurrent calls before fetching and limits both providers together
+  ---
+  duration_ms: 11.330583
+  type: 'test'
+  ...
+# Subtest: transport counts HTTP error bodies but retains no arbitrary secret-bearing error text
+ok 212 - transport counts HTTP error bodies but retains no arbitrary secret-bearing error text
+  ---
+  duration_ms: 0.978209
+  type: 'test'
+  ...
+# Subtest: oversized HTTP error body is canceled, charged and never retained as a usable response
+ok 213 - oversized HTTP error body is canceled, charged and never retained as a usable response
+  ---
+  duration_ms: 0.224458
+  type: 'test'
+  ...
+# Subtest: global byte cap includes simultaneous bodies and blocks subsequent requests
+ok 214 - global byte cap includes simultaneous bodies and blocks subsequent requests
+  ---
+  duration_ms: 1.578709
+  type: 'test'
+  ...
+# (node:29199) ExperimentalWarning: The MockTimers API is an experimental feature and might change at any time
+# (Use `node --trace-warnings ...` to show where the warning was created)
+# Subtest: late fetch ignoring AbortSignal cannot mutate a closed record and its body is canceled
+ok 215 - late fetch ignoring AbortSignal cannot mutate a closed record and its body is canceled
+  ---
+  duration_ms: 12.370417
+  type: 'test'
+  ...
+# Subtest: late reader ignoring cancellation cannot mutate or hash a closed record twice
+ok 216 - late reader ignoring cancellation cannot mutate or hash a closed record twice
+  ---
+  duration_ms: 1.262666
+  type: 'test'
+  ...
+# Subtest: stream wall limit is checked even if the injected clock jumps before the timer fires
+ok 217 - stream wall limit is checked even if the injected clock jumps before the timer fires
+  ---
+  duration_ms: 0.510583
+  type: 'test'
+  ...
+# Subtest: frozen endpoint transport disables redirects, clones results and rejects writes
+ok 218 - frozen endpoint transport disables redirects, clones results and rejects writes
+  ---
+  duration_ms: 0.691541
+  type: 'test'
+  ...
+# Subtest: nested provider errors are scrubbed before raw response retention
+ok 219 - nested provider errors are scrubbed before raw response retention
+  ---
+  duration_ms: 0.456083
+  type: 'test'
+  ...
+# Subtest: strict full-tree comparisons retain failed branches, ordering, gas and missing-versus-zero
+ok 220 - strict full-tree comparisons retain failed branches, ordering, gas and missing-versus-zero
+  ---
+  duration_ms: 0.855792
+  type: 'test'
+  ...
+# Subtest: trace retrieval availability requires receipt event content, not merely matching roots
+ok 221 - trace retrieval availability requires receipt event content, not merely matching roots
+  ---
+  duration_ms: 0.491834
+  type: 'test'
+  ...
+# Subtest: original transaction fee and nonce disagreements are independent of call-tree equality
+ok 222 - original transaction fee and nonce disagreements are independent of call-tree equality
+  ---
+  duration_ms: 0.198833
+  type: 'test'
+  ...
+# Subtest: candidate inventory includes unknown tokens and owner distinct from submitter, excludes failed calls
+ok 223 - candidate inventory includes unknown tokens and owner distinct from submitter, excludes failed calls
+  ---
+  duration_ms: 8.999792
+  type: 'test'
+  ...
+# Subtest: exact replay requires original-position evidence and full legacy envelope; typed fee substitution remains incomplete
+ok 224 - exact replay requires original-position evidence and full legacy envelope; typed fee substitution remains incomplete
+  ---
+  duration_ms: 2.863
+  type: 'test'
+  ...
+# Subtest: exact replay independently requires both original and replay diffs, plus the completed state-validation identity
+ok 225 - exact replay independently requires both original and replay diffs, plus the completed state-validation identity
+  ---
+  duration_ms: 2.965833
+  type: 'test'
+  ...
+# Subtest: replay state requests bind the original hash and exact trace envelope/context, without ambiguity or overrides
+ok 226 - replay state requests bind the original hash and exact trace envelope/context, without ambiguity or overrides
+  ---
+  duration_ms: 2.058625
+  type: 'test'
+  ...
+# Subtest: state comparison preserves absolute native balances, missing fields and every storage slot
+ok 227 - state comparison preserves absolute native balances, missing fields and every storage slot
+  ---
+  duration_ms: 0.414416
+  type: 'test'
+  ...
+# Subtest: equal malformed state maps and normalized-key collisions never become exact replay proof
+ok 228 - equal malformed state maps and normalized-key collisions never become exact replay proof
+  ---
+  duration_ms: 3.212167
+  type: 'test'
+  ...
+# Subtest: state evidence bounds cover the union and identical empty evidence cannot replace original sender nonce proof
+ok 229 - state evidence bounds cover the union and identical empty evidence cannot replace original sender nonce proof
+  ---
+  duration_ms: 16.692417
+  type: 'test'
+  ...
+# Subtest: recorded trace-equal wrong positions differ in absolute fee-recipient state; typed positives remain incomplete
+ok 230 - recorded trace-equal wrong positions differ in absolute fee-recipient state; typed positives remain incomplete
+  ---
+  duration_ms: 158.715042
+  type: 'test'
+  ...
+# Subtest: selection uses exactly two future finalized blocks, keeps complete all-N lists and reports lateness
+ok 231 - selection uses exactly two future finalized blocks, keeps complete all-N lists and reports lateness
+  ---
+  duration_ms: 3.653292
+  type: 'test'
+  ...
+# Subtest: selection disagreement and empty blocks never trigger replacements
+ok 232 - selection disagreement and empty blocks never trigger replacements
+  ---
+  duration_ms: 7.463667
+  type: 'test'
+  ...
+# Subtest: pilot seals all product outputs before B adjudication, retains unattempted N, and separates optional oracle failure
+ok 233 - pilot seals all product outputs before B adjudication, retains unattempted N, and separates optional oracle failure
+  ---
+  duration_ms: 83.310375
+  type: 'test'
+  ...
+# Subtest: metrics never count missing oracle inventory or empty event sets as all-effects passes
+ok 234 - metrics never count missing oracle inventory or empty event sets as all-effects passes
+  ---
+  duration_ms: 0.269791
+  type: 'test'
+  ...
+# Subtest: successful envelopes with error:null are rejected and EOF rechecks both deadlines
+ok 235 - successful envelopes with error:null are rejected and EOF rechecks both deadlines
+  ---
+  duration_ms: 0.903917
+  type: 'test'
+  ...
+# Subtest: missing nested CALL destination and mandatory typed-envelope fields never compare complete
+ok 236 - missing nested CALL destination and mandatory typed-envelope fields never compare complete
+  ---
+  duration_ms: 0.20175
+  type: 'test'
+  ...
+# Subtest: original-position comparisons reject bundle, state, header and tracer overrides
+ok 237 - original-position comparisons reject bundle, state, header and tracer overrides
+  ---
+  duration_ms: 0.274209
+  type: 'test'
+  ...
+# Subtest: duplicate product pair identity disagreement and malformed measured collections remain mismatches
+ok 238 - duplicate product pair identity disagreement and malformed measured collections remain mismatches
+  ---
+  duration_ms: 0.191875
+  type: 'test'
+  ...
+# Subtest: provenance requires version, exact engine source list and frozen SHA; mismatched reverts are not genuine
+ok 239 - provenance requires version, exact engine source list and frozen SHA; mismatched reverts are not genuine
+  ---
+  duration_ms: 0.074458
+  type: 'test'
+  ...
+# Subtest: a post-inventory failure cannot erase independently observed candidate denominators
+ok 240 - a post-inventory failure cannot erase independently observed candidate denominators
+  ---
+  duration_ms: 23.621875
+  type: 'test'
+  ...
+# Subtest: optional context is collapsed, Ethereum-only, and blank or empty object omits both fields
+ok 241 - optional context is collapsed, Ethereum-only, and blank or empty object omits both fields
+  ---
+  duration_ms: 18.1925
+  type: 'test'
+  ...
+# Subtest: context parser preserves list order, duplicate occurrences and user bytes; backend normalization agrees
+ok 242 - context parser preserves list order, duplicate occurrences and user bytes; backend normalization agrees
+  ---
+  duration_ms: 1.088834
+  type: 'test'
+  ...
+# Subtest: malformed JSON, unknown fields and bounded list violations block dispatch in either single engine
+ok 243 - malformed JSON, unknown fields and bounded list violations block dispatch in either single engine
+  ---
+  duration_ms: 35.02025
+  type: 'test'
+  ...
+# Subtest: provider and local submission forward exact optional context while manual queries remain unchanged
+ok 244 - provider and local submission forward exact optional context while manual queries remain unchanged
+  ---
+  duration_ms: 2.576209
+  type: 'test'
+  ...
+# Subtest: blank context has no payload keys, and hidden HyperEVM context is never forwarded or parsed
+ok 245 - blank context has no payload keys, and hidden HyperEVM context is never forwarded or parsed
+  ---
+  duration_ms: 1.630625
+  type: 'test'
+  ...
+# Subtest: sequence context belongs to its step, follows reordering, and never leaks into a new step or top-level request
+ok 246 - sequence context belongs to its step, follows reordering, and never leaks into a new step or top-level request
+  ---
+  duration_ms: 2.392375
+  type: 'test'
+  ...
+# Subtest: malformed per-step context opens the affected panel and blocks the whole sequence before fetch
+ok 247 - malformed per-step context opens the affected panel and blocks the whole sequence before fetch
+  ---
+  duration_ms: 1.188625
+  type: 'test'
+  ...
+# Subtest: example, custom-selection, network and reset paths clear prior context including stored sequence drafts
+ok 248 - example, custom-selection, network and reset paths clear prior context including stored sequence drafts
+  ---
+  duration_ms: 2.941125
+  type: 'test'
+  ...
+# Subtest: pending requests lock context editing and changed context invalidates a late result for single and sequence modes
+ok 249 - pending requests lock context editing and changed context invalidates a late result for single and sequence modes
+  ---
+  duration_ms: 2.178708
+  type: 'test'
+  ...
+# Subtest: optional context preserves absence, empty access lists, ordered duplicates and detached lowercase bytes
+ok 250 - optional context preserves absence, empty access lists, ordered duplicates and detached lowercase bytes
+  ---
+  duration_ms: 2.345833
+  type: 'test'
+  ...
+# Subtest: fixed occurrence limits include duplicate addresses and total slots across entries
+ok 251 - fixed occurrence limits include duplicate addresses and total slots across entries
+  ---
+  duration_ms: 2.395666
+  type: 'test'
+  ...
+# Subtest: strict records, dense arrays, byte lengths and hash version reject ambiguous input without invoking accessors
+ok 252 - strict records, dense arrays, byte lengths and hash version reject ambiguous input without invoking accessors
+  ---
+  duration_ms: 0.535792
+  type: 'test'
+  ...
+# Subtest: v0.6 six-run capture retains the frozen source and full HTTP outcomes
+ok 253 - v0.6 six-run capture retains the frozen source and full HTTP outcomes
+  ---
+  duration_ms: 1.245417
+  type: 'test'
+  ...
+# Subtest: v0.7 predeclared eleven attempts retain frozen implementation and every original RPC/HTTP response
+ok 254 - v0.7 predeclared eleven attempts retain frozen implementation and every original RPC/HTTP response
+  ---
+  duration_ms: 28.220458
+  type: 'test'
+  ...
+# Subtest: v0.7.1 retains all fourteen guarded API outcomes and every genuine new RPC response
+ok 255 - v0.7.1 retains all fourteen guarded API outcomes and every genuine new RPC response
+  ---
+  duration_ms: 28.538875
+  type: 'test'
+  ...
+# Subtest: recorded full replay: supply through drpc
+ok 256 - recorded full replay: supply through drpc
+  ---
+  duration_ms: 24.873291
+  type: 'test'
+  ...
+# Subtest: recorded full replay: supply through hyperlend-archive
+ok 257 - recorded full replay: supply through hyperlend-archive
+  ---
+  duration_ms: 13.624625
+  type: 'test'
+  ...
+# Subtest: recorded full replay: withdraw through drpc
+ok 258 - recorded full replay: withdraw through drpc
+  ---
+  duration_ms: 80.543458
+  type: 'test'
+  ...
+# Subtest: recorded full replay: borrow through drpc
+ok 259 - recorded full replay: borrow through drpc
+  ---
+  duration_ms: 18.91375
+  type: 'test'
+  ...
+# Subtest: recorded full replay: borrow through hyperlend-archive
+ok 260 - recorded full replay: borrow through hyperlend-archive
+  ---
+  duration_ms: 16.048209
+  type: 'test'
+  ...
+# Subtest: recorded full replay: repay through drpc
+ok 261 - recorded full replay: repay through drpc
+  ---
+  duration_ms: 37.044708
+  type: 'test'
+  ...
+# Subtest: recorded full replay: repay through hyperlend-archive
+ok 262 - recorded full replay: repay through hyperlend-archive
+  ---
+  duration_ms: 29.427416
+  type: 'test'
+  ...
+# Subtest: recorded affected owner replay: direct-transferfrom-a
+ok 263 - recorded affected owner replay: direct-transferfrom-a
+  ---
+  duration_ms: 32.764542
+  type: 'test'
+  ...
+# Subtest: recorded affected owner replay: direct-transferfrom-b
+ok 264 - recorded affected owner replay: direct-transferfrom-b
+  ---
+  duration_ms: 10.070583
+  type: 'test'
+  ...
+# Subtest: original v0.6 direct-B index inconsistency still withholds all state using its untouched recording
+ok 265 - original v0.6 direct-B index inconsistency still withholds all state using its untouched recording
+  ---
+  duration_ms: 4.54925
+  type: 'test'
+  ...
+# Subtest: historical API keeps original execution while refusing balances after canonical state changes
+ok 266 - historical API keeps original execution while refusing balances after canonical state changes
+  ---
+  duration_ms: 11.603333
+  type: 'test'
+  ...
+# Subtest: historical API retains original events but safely rejects nested provider failures during measurement
+ok 267 - historical API retains original events but safely rejects nested provider failures during measurement
+  ---
+  duration_ms: 5.002541
+  type: 'test'
+  ...
+# Subtest: recorded archive failure remains a provider failure and cannot become an empty preview
+ok 268 - recorded archive failure remains a provider failure and cannot become an empty preview
+  ---
+  duration_ms: 0.781542
+  type: 'test'
+  ...
+# Subtest: observed withdraw returns exact historical-position balance change
+ok 269 - observed withdraw returns exact historical-position balance change
+  ---
+  duration_ms: 7.408541
+  type: 'test'
+  ...
+# Subtest: observed borrow returns exact historical-position balance change
+ok 270 - observed borrow returns exact historical-position balance change
+  ---
+  duration_ms: 2.456292
+  type: 'test'
+  ...
+# Subtest: observed repay returns exact historical-position balance change
+ok 271 - observed repay returns exact historical-position balance change
+  ---
+  duration_ms: 1.796875
+  type: 'test'
+  ...
+# Subtest: historical context snapshots inputs, caches repeated pairs and shares lazy preparation
+ok 272 - historical context snapshots inputs, caches repeated pairs and shares lazy preparation
+  ---
+  duration_ms: 3.242291
+  type: 'test'
+  ...
+# Subtest: preparation compares one original replay diff before witnesses or token queries
+ok 273 - preparation compares one original replay diff before witnesses or token queries
+  ---
+  duration_ms: 2.736333
+  type: 'test'
+  ...
+# Subtest: matching empty or missing-sender-nonce diffs cannot establish historical preparation
+ok 274 - matching empty or missing-sender-nonce diffs cannot establish historical preparation
+  ---
+  duration_ms: 10.853583
+  type: 'test'
+  ...
+# Subtest: a full-diff mismatch rejects shared preparation before any consumer can read state
+ok 275 - a full-diff mismatch rejects shared preparation before any consumer can read state
+  ---
+  duration_ms: 1.920708
+  type: 'test'
+  ...
+# Subtest: the new original replay diff rejects malformed bundles and sanitizes provider errors
+ok 276 - the new original replay diff rejects malformed bundles and sanitizes provider errors
+  ---
+  duration_ms: 10.2195
+  type: 'test'
+  ...
+# Subtest: historical evidence rejection retains a sanitized terminal response record
+ok 277 - historical evidence rejection retains a sanitized terminal response record
+  ---
+  duration_ms: 31.465
+  type: 'test'
+  ...
+# Subtest: original transaction, receipt, block and array position must agree before execution
+ok 278 - original transaction, receipt, block and array position must agree before execution
+  ---
+  duration_ms: 12.888583
+  type: 'test'
+  ...
+# Subtest: ignored indexes and altered original execution fail semantic replay validation
+ok 279 - ignored indexes and altered original execution fail semantic replay validation
+  ---
+  duration_ms: 8.318542
+  type: 'test'
+  ...
+# Subtest: input gas annotations alone may differ but nested gas used and event position may not
+ok 280 - input gas annotations alone may differ but nested gas used and event position may not
+  ---
+  duration_ms: 3.659959
+  type: 'test'
+  ...
+# Subtest: original code/account changes and query execution header changes fail closed
+ok 281 - original code/account changes and query execution header changes fail closed
+  ---
+  duration_ms: 10.369541
+  type: 'test'
+  ...
+# Subtest: only known balanceOf queries are allowed and malformed query traces are rejected
+ok 282 - only known balanceOf queries are allowed and malformed query traces are rejected
+  ---
+  duration_ms: 16.32275
+  type: 'test'
+  ...
+# Subtest: balance queries may incur fee/nonce effects but may not alter token storage or other accounts
+ok 283 - balance queries may incur fee/nonce effects but may not alter token storage or other accounts
+  ---
+  duration_ms: 12.688083
+  type: 'test'
+  ...
+# Subtest: canonical recheck catches a reorg and public errors never contain provider exception text
+ok 284 - canonical recheck catches a reorg and public errors never contain provider exception text
+  ---
+  duration_ms: 3.396625
+  type: 'test'
+  ...
+# Subtest: historical canonical failures stay latched and sanitized across later successful checks
+ok 285 - historical canonical failures stay latched and sanitized across later successful checks
+  ---
+  duration_ms: 5.402291
+  type: 'test'
+  ...
+# Subtest: historical query-shape failure remains local to that pair
+ok 286 - historical query-shape failure remains local to that pair
+  ---
+  duration_ms: 2.347625
+  type: 'test'
+  ...
+# Subtest: successful RPC error envelopes are sanitized before historical evidence retention
+ok 287 - successful RPC error envelopes are sanitized before historical evidence retention
+  ---
+  duration_ms: 5.91225
+  type: 'test'
+  ...
+# Subtest: blob, authorization and inconsistent fee envelopes are rejected
+ok 288 - blob, authorization and inconsistent fee envelopes are rejected
+  ---
+  duration_ms: 6.688792
+  type: 'test'
+  ...
+# Subtest: independent sender nonce evidence detects ignored or clamped positions even if replay matches
+ok 289 - independent sender nonce evidence detects ignored or clamped positions even if replay matches
+  ---
+  duration_ms: 4.054458
+  type: 'test'
+  ...
+# Subtest: native changes must equal the query gas charge and beneficiary tip exactly
+ok 290 - native changes must equal the query gas charge and beneficiary tip exactly
+  ---
+  duration_ms: 4.497959
+  type: 'test'
+  ...
+# Subtest: historical query resources are capped and duplicate pairs consume no extra calls
+ok 291 - historical query resources are capped and duplicate pairs consume no extra calls
+  ---
+  duration_ms: 4.799916
+  type: 'test'
+  ...
+# Subtest: address and event topic arrays are rejected without coercing them into strings
+ok 292 - address and event topic arrays are rejected without coercing them into strings
+  ---
+  duration_ms: 2.976125
+  type: 'test'
+  ...
+# Subtest: receipt comparison excludes reverted child logs while full replay still matches them
+ok 293 - receipt comparison excludes reverted child logs while full replay still matches them
+  ---
+  duration_ms: 4.976292
+  type: 'test'
+  ...
+# Subtest: saved live module evidence: withdraw on hyperliquid.drpc.org
+ok 294 - saved live module evidence: withdraw on hyperliquid.drpc.org
+  ---
+  duration_ms: 8.979792
+  type: 'test'
+  ...
+# Subtest: saved live module evidence: borrow on hyperliquid.drpc.org
+ok 295 - saved live module evidence: borrow on hyperliquid.drpc.org
+  ---
+  duration_ms: 14.891
+  type: 'test'
+  ...
+# Subtest: saved live module evidence: repay on hyperliquid.drpc.org
+ok 296 - saved live module evidence: repay on hyperliquid.drpc.org
+  ---
+  duration_ms: 4.737209
+  type: 'test'
+  ...
+# Subtest: saved live module evidence: withdraw on rpc.hyperlend.finance
+ok 297 - saved live module evidence: withdraw on rpc.hyperlend.finance
+  ---
+  duration_ms: 8.231
+  type: 'test'
+  ...
+# Subtest: saved live module evidence: borrow on rpc.hyperlend.finance
+ok 298 - saved live module evidence: borrow on rpc.hyperlend.finance
+  ---
+  duration_ms: 7.278792
+  type: 'test'
+  ...
+# Subtest: saved live module evidence: repay on rpc.hyperlend.finance
+ok 299 - saved live module evidence: repay on rpc.hyperlend.finance
+  ---
+  duration_ms: 7.67
+  type: 'test'
+  ...
+# Subtest: composite recorded allowance evidence: supply on hyperliquid.drpc.org
+ok 300 - composite recorded allowance evidence: supply on hyperliquid.drpc.org
+  ---
+  duration_ms: 2.926333
+  type: 'test'
+  ...
+# Subtest: composite recorded allowance evidence: supply on rpc.hyperlend.finance
+ok 301 - composite recorded allowance evidence: supply on rpc.hyperlend.finance
+  ---
+  duration_ms: 2.308709
+  type: 'test'
+  ...
+# Subtest: recorded allowance state: approve-usdc-hyperlend-verified on hyperliquid.drpc.org
+ok 302 - recorded allowance state: approve-usdc-hyperlend-verified on hyperliquid.drpc.org
+  ---
+  duration_ms: 0.206667
+  type: 'test'
+  ...
+# Subtest: recorded allowance state: approve-usdc-hyperlend-verified on rpc.hyperlend.finance
+ok 303 - recorded allowance state: approve-usdc-hyperlend-verified on rpc.hyperlend.finance
+  ---
+  duration_ms: 0.901334
+  type: 'test'
+  ...
+# Subtest: recorded allowance state: permit-husdc-direct-verified on hyperliquid.drpc.org
+ok 304 - recorded allowance state: permit-husdc-direct-verified on hyperliquid.drpc.org
+  ---
+  duration_ms: 0.836958
+  type: 'test'
+  ...
+# Subtest: recorded allowance state: permit-husdc-direct-verified on rpc.hyperlend.finance
+ok 305 - recorded allowance state: permit-husdc-direct-verified on rpc.hyperlend.finance
+  ---
+  duration_ms: 0.838083
+  type: 'test'
+  ...
+# Subtest: recorded allowance state: router-permit-candidate-verified on hyperliquid.drpc.org
+ok 306 - recorded allowance state: router-permit-candidate-verified on hyperliquid.drpc.org
+  ---
+  duration_ms: 18.624917
+  type: 'test'
+  ...
+# Subtest: recorded allowance state: router-permit-candidate-verified on rpc.hyperlend.finance
+ok 307 - recorded allowance state: router-permit-candidate-verified on rpc.hyperlend.finance
+  ---
+  duration_ms: 11.910209
+  type: 'test'
+  ...
+# Subtest: allowance view ABI is strict and variable-debt allowances remain unsupported
+ok 308 - allowance view ABI is strict and variable-debt allowances remain unsupported
+  ---
+  duration_ms: 1.051916
+  type: 'test'
+  ...
+# Subtest: allowance query rejects extra implementation calls and mismatching owner/spender input
+ok 309 - allowance query rejects extra implementation calls and mismatching owner/spender input
+  ---
+  duration_ms: 2.614709
+  type: 'test'
+  ...
+# Subtest: generic router root needs original runtime code and does not authorize arbitrary queries
+ok 310 - generic router root needs original runtime code and does not authorize arbitrary queries
+  ---
+  duration_ms: 16.6965
+  type: 'test'
+  ...
+# Subtest: historical measurement rejects every lifecycle type, including reverted subtrees, before RPC
+ok 311 - historical measurement rejects every lifecycle type, including reverted subtrees, before RPC
+  ---
+  duration_ms: 9.969708
+  type: 'test'
+  ...
+# Subtest: temporary create then selfdestruct cannot be accepted through an empty final account diff
+ok 312 - temporary create then selfdestruct cannot be accepted through an empty final account diff
+  ---
+  duration_ms: 0.912291
+  type: 'test'
+  ...
+# Subtest: direct permission roots require strict approve and permit ABI plus known implementation
+ok 313 - direct permission roots require strict approve and permit ABI plus known implementation
+  ---
+  duration_ms: 3.346375
+  type: 'test'
+  ...
+# Subtest: recorded permit final allowance reflects consumption and owner differs from submitter
+ok 314 - recorded permit final allowance reflects consumption and owner differs from submitter
+  ---
+  duration_ms: 0.196
+  type: 'test'
+  ...
+# Subtest: withdraw: measured cash and position reconcile independently with reserve custody
+ok 315 - withdraw: measured cash and position reconcile independently with reserve custody
+  ---
+  duration_ms: 5.0535
+  type: 'test'
+  ...
+# Subtest: borrow: measured cash and position reconcile independently with reserve custody
+ok 316 - borrow: measured cash and position reconcile independently with reserve custody
+  ---
+  duration_ms: 1.445
+  type: 'test'
+  ...
+# Subtest: repay: measured cash and position reconcile independently with reserve custody
+ok 317 - repay: measured cash and position reconcile independently with reserve custody
+  ---
+  duration_ms: 1.907708
+  type: 'test'
+  ...
+# Subtest: trace-reconciled debt rounding is exact and never replaced by the cash amount
+ok 318 - trace-reconciled debt rounding is exact and never replaced by the cash amount
+  ---
+  duration_ms: 1.24725
+  type: 'test'
+  ...
+# Subtest: withdrawal recipient and position owner remain distinct
+ok 319 - withdrawal recipient and position owner remain distinct
+  ---
+  duration_ms: 2.097917
+  type: 'test'
+  ...
+# Subtest: delegated borrow and third-party repay measure debt owner separately from cash account
+ok 320 - delegated borrow and third-party repay measure debt owner separately from cash account
+  ---
+  duration_ms: 2.37725
+  type: 'test'
+  ...
+# Subtest: max sentinel measures actual cash without numeric precision loss or max-sized payment
+ok 321 - max sentinel measures actual cash without numeric precision loss or max-sized payment
+  ---
+  duration_ms: 0.875916
+  type: 'test'
+  ...
+# Subtest: unreconciled, reverted, unsupported, or mismatched requests perform no state RPC
+ok 322 - unreconciled, reverted, unsupported, or mismatched requests perform no state RPC
+  ---
+  duration_ms: 2.552042
+  type: 'test'
+  ...
+# Subtest: one-unit cash, custody, position or unrelated-position disagreements fail closed
+ok 323 - one-unit cash, custody, position or unrelated-position disagreements fail closed
+  ---
+  duration_ms: 1.383292
+  type: 'test'
+  ...
+# Subtest: unrelated user cash is also required to remain unchanged
+ok 324 - unrelated user cash is also required to remain unchanged
+  ---
+  duration_ms: 0.444666
+  type: 'test'
+  ...
+# Subtest: incomplete metadata and mismatched shared state context fail before state queries
+ok 325 - incomplete metadata and mismatched shared state context fail before state queries
+  ---
+  duration_ms: 0.438125
+  type: 'test'
+  ...
+# Subtest: a matching shared state context reuses its one prepared diff
+ok 326 - a matching shared state context reuses its one prepared diff
+  ---
+  duration_ms: 0.908
+  type: 'test'
+  ...
+# Subtest: reorg or malformed token result suppresses all balance output
+ok 327 - reorg or malformed token result suppresses all balance output
+  ---
+  duration_ms: 1.552541
+  type: 'test'
+  ...
+# Subtest: arbitrary provider errors do not leak credentials in warnings or evidence
+ok 328 - arbitrary provider errors do not leak credentials in warnings or evidence
+  ---
+  duration_ms: 0.567541
+  type: 'test'
+  ...
+# Subtest: captured public RPC state diffs and balance queries replay all three observed lending operations
+ok 329 - captured public RPC state diffs and balance queries replay all three observed lending operations
+  ---
+  duration_ms: 11.888334
+  type: 'test'
+  ...
+# Subtest: observed withdraw-historical reconciles exact underlying and position evidence
+ok 330 - observed withdraw-historical reconciles exact underlying and position evidence
+  ---
+  duration_ms: 2.627042
+  type: 'test'
+  ...
+# Subtest: observed withdraw-current reconciles exact underlying and position evidence
+ok 331 - observed withdraw-current reconciles exact underlying and position evidence
+  ---
+  duration_ms: 1.166167
+  type: 'test'
+  ...
+# Subtest: observed borrow-historical reconciles exact underlying and position evidence
+ok 332 - observed borrow-historical reconciles exact underlying and position evidence
+  ---
+  duration_ms: 0.878083
+  type: 'test'
+  ...
+# Subtest: observed borrow-current reconciles exact underlying and position evidence
+ok 333 - observed borrow-current reconciles exact underlying and position evidence
+  ---
+  duration_ms: 0.4235
+  type: 'test'
+  ...
+# Subtest: observed repay-historical reconciles exact underlying and position evidence
+ok 334 - observed repay-historical reconciles exact underlying and position evidence
+  ---
+  duration_ms: 0.282959
+  type: 'test'
+  ...
+# Subtest: observed repay-current reconciles exact underlying and position evidence
+ok 335 - observed repay-current reconciles exact underlying and position evidence
+  ---
+  duration_ms: 0.181
+  type: 'test'
+  ...
+# Subtest: current repay is capped by actual outstanding debt instead of the larger requested amount
+ok 336 - current repay is capped by actual outstanding debt instead of the larger requested amount
+  ---
+  duration_ms: 0.192
+  type: 'test'
+  ...
+# Subtest: malformed ABI length, padded addresses and overflowed referral code are not decoded
+ok 337 - malformed ABI length, padded addresses and overflowed referral code are not decoded
+  ---
+  duration_ms: 0.363833
+  type: 'test'
+  ...
+# Subtest: unknown assets, rate modes and pool addresses never receive supported lending coverage
+ok 338 - unknown assets, rate modes and pool addresses never receive supported lending coverage
+  ---
+  duration_ms: 2.64125
+  type: 'test'
+  ...
+# Subtest: wrong pool events, transferred amounts, recipients or return values downgrade coverage
+ok 339 - wrong pool events, transferred amounts, recipients or return values downgrade coverage
+  ---
+  duration_ms: 1.16425
+  type: 'test'
+  ...
+# Subtest: repayment can emit a Mint when accrued interest exceeds the position reduction
+ok 340 - repayment can emit a Mint when accrued interest exceeds the position reduction
+  ---
+  duration_ms: 0.278625
+  type: 'test'
+  ...
+# Subtest: changed position implementation or an incorrect scaled amount fails reconciliation
+ok 341 - changed position implementation or an incorrect scaled amount fails reconciliation
+  ---
+  duration_ms: 0.883333
+  type: 'test'
+  ...
+# Subtest: a verified sibling delegatecall cannot authenticate events from an unknown implementation
+ok 342 - a verified sibling delegatecall cannot authenticate events from an unknown implementation
+  ---
+  duration_ms: 0.676459
+  type: 'test'
+  ...
+# Subtest: top-level revert discards position evidence; reverted position subtree cannot support success
+ok 343 - top-level revert discards position evidence; reverted position subtree cannot support success
+  ---
+  duration_ms: 0.46975
+  type: 'test'
+  ...
+# Subtest: borrow on behalf of another account separates caller cash from beneficiary liability
+ok 344 - borrow on behalf of another account separates caller cash from beneficiary liability
+  ---
+  duration_ms: 0.158542
+  type: 'test'
+  ...
+# Subtest: repay on behalf of another account spends caller USDC and reduces the other liability
+ok 345 - repay on behalf of another account spends caller USDC and reduces the other liability
+  ---
+  duration_ms: 0.1345
+  type: 'test'
+  ...
+# Subtest: withdrawal to another recipient does not fabricate incoming cash for the caller
+ok 346 - withdrawal to another recipient does not fabricate incoming cash for the caller
+  ---
+  duration_ms: 0.1375
+  type: 'test'
+  ...
+# Subtest: maximum withdrawal and repayment are request modes, with finite actual amounts kept separately
+ok 347 - maximum withdrawal and repayment are request modes, with finite actual amounts kept separately
+  ---
+  duration_ms: 0.272
+  type: 'test'
+  ...
+# Subtest: withdraw-all position reduction must equal the entire reported underlying balance exactly
+ok 348 - withdraw-all position reduction must equal the entire reported underlying balance exactly
+  ---
+  duration_ms: 0.3135
+  type: 'test'
+  ...
+# Subtest: repay-all or debt-capped repayment must reduce the full outstanding liability exactly
+ok 349 - repay-all or debt-capped repayment must reduce the full outstanding liability exactly
+  ---
+  duration_ms: 0.377042
+  type: 'test'
+  ...
+# Subtest: duplicate operation events and extra token movements prevent complete reconciliation
+ok 350 - duplicate operation events and extra token movements prevent complete reconciliation
+  ---
+  duration_ms: 0.240458
+  type: 'test'
+  ...
+# Subtest: saved local API fixtures bind the original parent headers and runtime source bytes
+ok 351 - saved local API fixtures bind the original parent headers and runtime source bytes
+  ---
+  duration_ms: 3.521667
+  type: 'test'
+  ...
+# Subtest: owned API executes aave-usdc-supply-with-permit in a real child using 58 exact saved proof/code inputs
+ok 352 - owned API executes aave-usdc-supply-with-permit in a real child using 58 exact saved proof/code inputs
+  ---
+  duration_ms: 5455.813125
+  type: 'test'
+  ...
+# Subtest: owned API executes morpho-kiln-usdc-deposit in a real child using 230 exact saved proof/code inputs
+ok 353 - owned API executes morpho-kiln-usdc-deposit in a real child using 230 exact saved proof/code inputs
+  ---
+  duration_ms: 3632.45775
+  type: 'test'
+  ...
+# Subtest: owned API retains partial original and earlier values when one absent fixture proof poisons later queries
+ok 354 - owned API retains partial original and earlier values when one absent fixture proof poisons later queries
+  ---
+  duration_ms: 2290.991375
+  type: 'test'
+  ...
+# Subtest: a final complete-header mismatch withholds every nested measurement despite successful local execution
+ok 355 - a final complete-header mismatch withholds every nested measurement despite successful local execution
+  ---
+  duration_ms: 2268.005708
+  type: 'test'
+  ...
+# Subtest: local admission detaches ordered authorizations while provider admission remains unchanged
+ok 356 - local admission detaches ordered authorizations while provider admission remains unchanged
+  ---
+  duration_ms: 1.966791
+  type: 'test'
+  ...
+# Subtest: invalid and incompatible local authorization inputs are rejected before transport
+ok 357 - invalid and incompatible local authorization inputs are rejected before transport
+  ---
+  duration_ms: 0.897875
+  type: 'test'
+  ...
+# Subtest: actual local API forwards original authorizations and keeps fresh queries authorization-free
+ok 358 - actual local API forwards original authorizations and keeps fresh queries authorization-free
+  ---
+  duration_ms: 365.911958
+  type: 'test'
+  ...
+# Subtest: API retains applied authority changes and refund on both original success and revert
+ok 359 - API retains applied authority changes and refund on both original success and revert
+  ---
+  duration_ms: 544.602541
+  type: 'test'
+  ...
+# Subtest: blob API admission binds the explicit profile, caps and hashes without changing provider support
+ok 360 - blob API admission binds the explicit profile, caps and hashes without changing provider support
+  ---
+  duration_ms: 29.088708
+  type: 'test'
+  ...
+# Subtest: blob API settles execution and blob charges separately and keeps measurements unpriced
+ok 361 - blob API settles execution and blob charges separately and keeps measurements unpriced
+  ---
+  duration_ms: 337.415417
+  type: 'test'
+  ...
+# Subtest: blob API preserves charged fees on message failures and withholds all amounts on final-header failure
+ok 362 - blob API preserves charged fees on message failures and withholds all amounts on final-header failure
+  ---
+  duration_ms: 831.740667
+  type: 'test'
+  ...
+# Subtest: blob API refuses unaffordable or underpriced envelopes without retaining settlement
+ok 363 - blob API refuses unaffordable or underpriced envelopes without retaining settlement
+  ---
+  duration_ms: 228.701125
+  type: 'test'
+  ...
+# Subtest: public API admits only explicit null CREATE, rejects blob creation and preserves access-list occurrences
+ok 364 - public API admits only explicit null CREATE, rejects blob creation and preserves access-list occurrences
+  ---
+  duration_ms: 6.5205
+  type: 'test'
+  ...
+# Subtest: actual API returns proof-backed root deployment and keeps disposable getter queries independent
+ok 365 - actual API returns proof-backed root deployment and keeps disposable getter queries independent
+  ---
+  duration_ms: 316.064167
+  type: 'test'
+  ...
+# Subtest: constructor revert leaves only the sender nonce and honest unchanged getter pair
+ok 366 - constructor revert leaves only the sender nonce and honest unchanged getter pair
+  ---
+  duration_ms: 242.043833
+  type: 'test'
+  ...
+# Subtest: new contract getter is unavailable before deployment instead of inventing a zero balance
+ok 367 - new contract getter is unavailable before deployment instead of inventing a zero balance
+  ---
+  duration_ms: 276.11975
+  type: 'test'
+  ...
+# Subtest: missing deployment proof never retains deployment effects or measurements
+ok 368 - missing deployment proof never retains deployment effects or measurements
+  ---
+  duration_ms: 246.433792
+  type: 'test'
+  ...
+# Subtest: full final-header mismatch withholds otherwise successful deployment measurements
+ok 369 - full final-header mismatch withholds otherwise successful deployment measurements
+  ---
+  duration_ms: 308.131833
+  type: 'test'
+  ...
+# Subtest: local fees are explicit, detached and conditional; provider admission stays unchanged
+ok 370 - local fees are explicit, detached and conditional; provider admission stays unchanged
+  ---
+  duration_ms: 2.089125
+  type: 'test'
+  ...
+# Subtest: partial, malformed, hostile and blob-combined fee requests reject before transport
+ok 371 - partial, malformed, hostile and blob-combined fee requests reject before transport
+  ---
+  duration_ms: 1.739584
+  type: 'test'
+  ...
+# Subtest: actual API prices only the original and retains fresh unpriced measurement queries
+ok 372 - actual API prices only the original and retains fresh unpriced measurement queries
+  ---
+  duration_ms: 328.569959
+  type: 'test'
+  ...
+# Subtest: completed revert and out-of-gas retain validated fee accounting without turning execution into success
+ok 373 - completed revert and out-of-gas retain validated fee accounting without turning execution into success
+  ---
+  duration_ms: 535.024542
+  type: 'test'
+  ...
+# Subtest: fee admission or canonical-check failures withhold all measurements and settlement claims
+ok 374 - fee admission or canonical-check failures withhold all measurements and settlement claims
+  ---
+  duration_ms: 555.589208
+  type: 'test'
+  ...
+# Subtest: optional gas has a canonical bounded API value; malformed values never reach transport
+ok 375 - optional gas has a canonical bounded API value; malformed values never reach transport
+  ---
+  duration_ms: 3.105625
+  type: 'test'
+  ...
+# Subtest: omitted and explicit default gas have identical actual execution and measured query values
+ok 376 - omitted and explicit default gas have identical actual execution and measured query values
+  ---
+  duration_ms: 570.098208
+  type: 'test'
+  ...
+# Subtest: GAS observes selected original gas while both isolated query invocations retain one million
+ok 377 - GAS observes selected original gas while both isolated query invocations retain one million
+  ---
+  duration_ms: 505.952666
+  type: 'test'
+  ...
+# Subtest: the same original writes succeed or genuinely run out of gas, with failed writes rolled back
+ok 378 - the same original writes succeed or genuinely run out of gas, with failed writes rolled back
+  ---
+  duration_ms: 574.295292
+  type: 'test'
+  ...
+# Subtest: selected-gas OOG retains authorization preparation but rolls back message writes, matching a signed full VM
+ok 379 - selected-gas OOG retains authorization preparation but rolls back message writes, matching a signed full VM
+  ---
+  duration_ms: 289.405209
+  type: 'test'
+  ...
+# Subtest: trusted fork admission enforces exact base, access-list, authorization, CREATE and calldata-floor boundaries
+ok 380 - trusted fork admission enforces exact base, access-list, authorization, CREATE and calldata-floor boundaries
+  ---
+  duration_ms: 1252.448958
+  type: 'test'
+  ...
+# Subtest: final-header invalidation with caller gas withholds all measured values
+ok 381 - final-header invalidation with caller gas withholds all measured values
+  ---
+  duration_ms: 254.063167
+  type: 'test'
+  ...
+# Subtest: owned capability is independent of the standard engine and configuration creates no transport
+ok 382 - owned capability is independent of the standard engine and configuration creates no transport
+  ---
+  duration_ms: 14514.335417
+  type: 'test'
+  ...
+# Subtest: local route rejects malformed requests, unsupported fields and origins before provider construction
+ok 383 - local route rejects malformed requests, unsupported fields and origins before provider construction
+  ---
+  duration_ms: 38.345
+  type: 'test'
+  ...
+# Subtest: missing owned dependencies disable only this route and create no proof transport
+ok 384 - missing owned dependencies disable only this route and create no proof transport
+  ---
+  duration_ms: 3.7535
+  type: 'test'
+  ...
+# Subtest: actual HTTP retains core statuses and raw result, attaches implementation and saves the same JSON
+ok 385 - actual HTTP retains core statuses and raw result, attaches implementation and saves the same JSON
+  ---
+  duration_ms: 3.225875
+  type: 'test'
+  ...
+# Subtest: local imports cannot bypass shared two-simulation limit and slots release afterward
+ok 386 - local imports cannot bypass shared two-simulation limit and slots release afterward
+  ---
+  duration_ms: 4.123833
+  type: 'test'
+  ...
+# Subtest: client disconnect aborts the running owned request and cancels transport before releasing its slot
+ok 387 - client disconnect aborts the running owned request and cancels transport before releasing its slot
+  ---
+  duration_ms: 2.331291
+  type: 'test'
+  ...
+# Subtest: API permits executed point evaluation while preserving caught invalid-proof outcomes
+ok 388 - API permits executed point evaluation while preserving caught invalid-proof outcomes
+  ---
+  duration_ms: 925.71725
+  type: 'test'
+  ...
+# Subtest: API withholds KZG-path measurements when final header or starting-state proof is unavailable
+ok 389 - API withholds KZG-path measurements when final header or starting-state proof is unavailable
+  ---
+  duration_ms: 686.168166
+  type: 'test'
+  ...
+# Subtest: actual local API retains CREATE deployment and measured getter across canonical-header validation
+ok 390 - actual local API retains CREATE deployment and measured getter across canonical-header validation
+  ---
+  duration_ms: 358.626416
+  type: 'test'
+  ...
+# Subtest: actual local API retains CREATE2 deployment and measured getter across canonical-header validation
+ok 391 - actual local API retains CREATE2 deployment and measured getter across canonical-header validation
+  ---
+  duration_ms: 274.807834
+  type: 'test'
+  ...
+# Subtest: API keeps a genuine parent revert and zero getter delta without retaining the reverted deployment
+ok 392 - API keeps a genuine parent revert and zero getter delta without retaining the reverted deployment
+  ---
+  duration_ms: 314.963625
+  type: 'test'
+  ...
+# Subtest: API and proof transport authenticate two ancestor headers once for original and both query sides
+ok 393 - API and proof transport authenticate two ancestor headers once for original and both query sides
+  ---
+  duration_ms: 231.188
+  type: 'test'
+  ...
+# Subtest: final header mismatch withholds creation and ancestry query values despite completed local work
+ok 394 - final header mismatch withholds creation and ancestry query values despite completed local work
+  ---
+  duration_ms: 475.503625
+  type: 'test'
+  ...
+# Subtest: hash-contradicting ancestor bytes cannot yield any API measurements or a canonical success
+ok 395 - hash-contradicting ancestor bytes cannot yield any API measurements or a canonical success
+  ---
+  duration_ms: 254.551917
+  type: 'test'
+  ...
+# Subtest: actual local API exposes constructor deletion and carries it through stable queries
+ok 396 - actual local API exposes constructor deletion and carries it through stable queries
+  ---
+  duration_ms: 404.5675
+  type: 'test'
+  ...
+# Subtest: actual local API retains authenticated empty-account cleanup even after a root revert
+ok 397 - actual local API retains authenticated empty-account cleanup even after a root revert
+  ---
+  duration_ms: 532.407708
+  type: 'test'
+  ...
+# Subtest: actual local API removes a Shanghai contract with unknown storage and keeps stable after-state queries
+ok 398 - actual local API removes a Shanghai contract with unknown storage and keeps stable after-state queries
+  ---
+  duration_ms: 214.264
+  type: 'test'
+  ...
+# Subtest: local loader binds full static closure, worker entry, entire dependencies, symlink target and Node bytes
+ok 399 - local loader binds full static closure, worker entry, entire dependencies, symlink target and Node bytes
+  ---
+  duration_ms: 190.897084
+  type: 'test'
+  ...
+# Subtest: missing optional worker at startup stays unavailable until a new process
+ok 400 - missing optional worker at startup stays unavailable until a new process
+  ---
+  duration_ms: 246.100542
+  type: 'test'
+  ...
+# Subtest: changed source between startup and lazy import rejects, rather than relabeling cached modules
+ok 401 - changed source between startup and lazy import rejects, rather than relabeling cached modules
+  ---
+  duration_ms: 120.349042
+  type: 'test'
+  ...
+# Subtest: changed source during lazy import is rejected
+ok 402 - changed source during lazy import is rejected
+  ---
+  duration_ms: 234.175708
+  type: 'test'
+  ...
+# Subtest: every simulation rechecks added dependency files before invoking its adapter
+ok 403 - every simulation rechecks added dependency files before invoking its adapter
+  ---
+  duration_ms: 157.904291
+  type: 'test'
+  ...
+# Subtest: source changes during a simulation remove all nested preview amounts afterward
+ok 404 - source changes during a simulation remove all nested preview amounts afterward
+  ---
+  duration_ms: 209.435458
+  type: 'test'
+  ...
+# Subtest: escaping dependency symlinks are rejected before import
+ok 405 - escaping dependency symlinks are rejected before import
+  ---
+  duration_ms: 103.919
+  type: 'test'
+  ...
+# Subtest: cancellation or exhausted deadline after execution is rechecked after final source verification
+ok 406 - cancellation or exhausted deadline after execution is rechecked after final source verification
+  ---
+  duration_ms: 215.046292
+  type: 'test'
+  ...
+# Subtest: real installed closure contains all current local runtime and complete pinned dependency tree without copying it
+ok 407 - real installed closure contains all current local runtime and complete pinned dependency tree without copying it
+  ---
+  duration_ms: 5642.377292
+  type: 'test'
+  ...
+# Subtest: local input is normalized independently, with explicit bounded queries and no arbitrary execution settings
+ok 408 - local input is normalized independently, with explicit bounded queries and no arbitrary execution settings
+  ---
+  duration_ms: 16.747875
+  type: 'test'
+  ...
+# Subtest: actual isolated execution measures synthetic writes and binds latest and full final header
+ok 409 - actual isolated execution measures synthetic writes and binds latest and full final header
+  ---
+  duration_ms: 316.692709
+  type: 'test'
+  ...
+# Subtest: public local API preserves access-list occurrences and explicit blob context through the real child
+ok 410 - public local API preserves access-list occurrences and explicit blob context through the real child
+  ---
+  duration_ms: 273.806375
+  type: 'test'
+  ...
+# Subtest: hash selector does not add a number-resolution call, and wrong numeric header fails before proof dispatch
+ok 411 - hash selector does not add a number-resolution call, and wrong numeric header fails before proof dispatch
+  ---
+  duration_ms: 291.020959
+  type: 'test'
+  ...
+# Subtest: full header mismatch clears all nested measurement amounts but retains labeled original audit
+ok 412 - full header mismatch clears all nested measurement amounts but retains labeled original audit
+  ---
+  duration_ms: 509.939
+  type: 'test'
+  ...
+# Subtest: completed revert retains execution and independently measured zero effect, unsupported stays unavailable
+ok 413 - completed revert retains execution and independently measured zero effect, unsupported stays unavailable
+  ---
+  duration_ms: 490.74275
+  type: 'test'
+  ...
+# Subtest: Cancun existing-contract SELFDESTRUCT retains storage queries and reports native balance transfer
+ok 414 - Cancun existing-contract SELFDESTRUCT retains storage queries and reports native balance transfer
+  ---
+  duration_ms: 249.181542
+  type: 'test'
+  ...
+# Subtest: query mutation produces partial availability; proof failures do not leak provider text
+ok 415 - query mutation produces partial availability; proof failures do not leak provider text
+  ---
+  duration_ms: 529.141958
+  type: 'test'
+  ...
+# Subtest: cancellation before dispatch and incomplete drain withhold all preview values
+ok 416 - cancellation before dispatch and incomplete drain withhold all preview values
+  ---
+  duration_ms: 273.542958
+  type: 'test'
+  ...
+# Subtest: source invalidation removes successful nested preview and declared amounts
+ok 417 - source invalidation removes successful nested preview and declared amounts
+  ---
+  duration_ms: 343.213334
+  type: 'test'
+  ...
+# Subtest: provider stays default; config gates local independently and local requires a manual single call
+ok 418 - provider stays default; config gates local independently and local requires a manual single call
+  ---
+  duration_ms: 34.88775
+  type: 'test'
+  ...
+# Subtest: engine switch preserves single-call inputs but clears stale result and download state
+ok 419 - engine switch preserves single-call inputs but clears stale result and download state
+  ---
+  duration_ms: 3.268792
+  type: 'test'
+  ...
+# Subtest: local submission uses only the dedicated endpoint, sends explicit queries and locks all request controls
+ok 420 - local submission uses only the dedicated endpoint, sends explicit queries and locks all request controls
+  ---
+  duration_ms: 2.447958
+  type: 'test'
+  ...
+# Subtest: empty manual queries block local dispatch and a changed fingerprint suppresses a pending result
+ok 421 - empty manual queries block local dispatch and a changed fingerprint suppresses a pending result
+  ---
+  duration_ms: 2.384584
+  type: 'test'
+  ...
+# Subtest: deployment selection sends explicit null only to local execution and restores the call recipient on engine change
+ok 422 - deployment selection sends explicit null only to local execution and restores the call recipient on engine change
+  ---
+  duration_ms: 4.068042
+  type: 'test'
+  ...
+# Subtest: deployment rejects blob context before dispatch and changes invalidate pending results
+ok 423 - deployment rejects blob context before dispatch and changes invalidate pending results
+  ---
+  duration_ms: 1.366042
+  type: 'test'
+  ...
+# Subtest: local exact values remain raw, identities explicit, full JSON intact, provider summaries hidden
+ok 424 - local exact values remain raw, identities explicit, full JSON intact, provider summaries hidden
+  ---
+  duration_ms: 0.933125
+  type: 'test'
+  ...
+# Subtest: unavailable, partial, malformed and unverified rows never turn missing values into zero
+ok 425 - unavailable, partial, malformed and unverified rows never turn missing values into zero
+  ---
+  duration_ms: 15.345167
+  type: 'test'
+  ...
+# Subtest: typed identity is separate, unsafe text stays text, and a later provider result hides local rows
+ok 426 - typed identity is separate, unsafe text stays text, and a later provider result hides local rows
+  ---
+  duration_ms: 2.721167
+  type: 'test'
+  ...
+# Subtest: verified same-call deletion is visible without claiming the contract remains deployed
+ok 427 - verified same-call deletion is visible without claiming the contract remains deployed
+  ---
+  duration_ms: 1.846084
+  type: 'test'
+  ...
+# Subtest: verified empty-account cleanup is visible after a reverted call and hidden when unverified
+ok 428 - verified empty-account cleanup is visible after a reverted call and hidden when unverified
+  ---
+  duration_ms: 0.743042
+  type: 'test'
+  ...
+# Subtest: advanced local gas defaults to omission and forwards exact bounded decimal selections
+ok 429 - advanced local gas defaults to omission and forwards exact bounded decimal selections
+  ---
+  duration_ms: 2.308792
+  type: 'test'
+  ...
+# Subtest: malformed or out-of-range local gas blocks dispatch and opens the field
+ok 430 - malformed or out-of-range local gas blocks dispatch and opens the field
+  ---
+  duration_ms: 4.459916
+  type: 'test'
+  ...
+# Subtest: gas edits clear stale output, lock during dispatch, and suppress mismatched pending results
+ok 431 - gas edits clear stale output, lock during dispatch, and suppress mismatched pending results
+  ---
+  duration_ms: 1.056917
+  type: 'test'
+  ...
+# Subtest: gas is hidden and absent from provider, sequence, HyperEVM and historical requests
+ok 432 - gas is hidden and absent from provider, sequence, HyperEVM and historical requests
+  ---
+  duration_ms: 4.565625
+  type: 'test'
+  ...
+# Subtest: example, reset and network changes restore default gas and clear prior results
+ok 433 - example, reset and network changes restore default gas and clear prior results
+  ---
+  duration_ms: 1.711333
+  type: 'test'
+  ...
+# Subtest: local result shows its retained gas limit rather than the current form value
+ok 434 - local result shows its retained gas limit rather than the current form value
+  ---
+  duration_ms: 1.082708
+  type: 'test'
+  ...
+# Subtest: fees opt in only for local mode and leave default and provider payloads unchanged
+ok 435 - fees opt in only for local mode and leave default and provider payloads unchanged
+  ---
+  duration_ms: 4.375
+  type: 'test'
+  ...
+# Subtest: both canonical fee inputs and their relationship are checked before dispatch, including the required blob cap
+ok 436 - both canonical fee inputs and their relationship are checked before dispatch, including the required blob cap
+  ---
+  duration_ms: 6.355333
+  type: 'test'
+  ...
+# Subtest: fee toggles and amounts clear stale results, lock while busy and fingerprint pending responses
+ok 437 - fee toggles and amounts clear stale results, lock while busy and fingerprint pending responses
+  ---
+  duration_ms: 1.236042
+  type: 'test'
+  ...
+# Subtest: fee example and reset paths restore the explicit mode without leaking into other networks
+ok 438 - fee example and reset paths restore the explicit mode without leaking into other networks
+  ---
+  duration_ms: 1.420166
+  type: 'test'
+  ...
+# Subtest: fee labels use only complete validated retained accounting, including genuine failed execution
+ok 439 - fee labels use only complete validated retained accounting, including genuine failed execution
+  ---
+  duration_ms: 6.750167
+  type: 'test'
+  ...
+# Subtest: priced cleanup is labeled only with its matching completed fee context
+ok 440 - priced cleanup is labeled only with its matching completed fee context
+  ---
+  duration_ms: 0.708583
+  type: 'test'
+  ...
+# Subtest: blob pricing selects only the local profile; missing, malformed, stray and excessive blob caps or counts do not dispatch
+ok 441 - blob pricing selects only the local profile; missing, malformed, stray and excessive blob caps or counts do not dispatch
+  ---
+  duration_ms: 5.974041
+  type: 'test'
+  ...
+# Subtest: blob fee field participates in reset, examples, busy locks, stale invalidation and pending fingerprints
+ok 442 - blob fee field participates in reset, examples, busy locks, stale invalidation and pending fingerprints
+  ---
+  duration_ms: 6.172709
+  type: 'test'
+  ...
+# Subtest: all pinned blob forks use exact integer pricing and retained execution, blob burn and total amounts
+ok 443 - all pinned blob forks use exact integer pricing and retained execution, blob burn and total amounts
+  ---
+  duration_ms: 8.394667
+  type: 'test'
+  ...
+# Subtest: blob fee displays reject malformed arithmetic, identities, fork limits, unbounded price and lost final-header binding
+ok 444 - blob fee displays reject malformed arithmetic, identities, fork limits, unbounded price and lost final-header binding
+  ---
+  duration_ms: 31.276791
+  type: 'test'
+  ...
+# Subtest: blob cleanup requires validated blob fee scope and loses its label when fee evidence fails
+ok 445 - blob cleanup requires validated blob fee scope and loses its label when fee evidence fails
+  ---
+  duration_ms: 4.633416
+  type: 'test'
+  ...
+# Subtest: actual offline blob API response renders validated totals; canonical recheck failure withholds them
+ok 446 - actual offline blob API response renders validated totals; canonical recheck failure withholds them
+  ---
+  duration_ms: 913.056166
+  type: 'test'
+  ...
+# Subtest: permission capture contains exactly six observed HTTP200 responses with the frozen engine
+ok 447 - permission capture contains exactly six observed HTTP200 responses with the frozen engine
+  ---
+  duration_ms: 2.867834
+  type: 'test'
+  ...
+# Subtest: recorded full permission replay: usdc-approve-hyperlend through drpc
+ok 448 - recorded full permission replay: usdc-approve-hyperlend through drpc
+  ---
+  duration_ms: 5.828416
+  type: 'test'
+  ...
+# Subtest: recorded full permission replay: usdc-approve-hyperlend through hyperlend-archive
+ok 449 - recorded full permission replay: usdc-approve-hyperlend through hyperlend-archive
+  ---
+  duration_ms: 5.345708
+  type: 'test'
+  ...
+# Subtest: recorded full permission replay: husdc-relayed-permit through drpc
+ok 450 - recorded full permission replay: husdc-relayed-permit through drpc
+  ---
+  duration_ms: 3.161167
+  type: 'test'
+  ...
+# Subtest: recorded full permission replay: husdc-relayed-permit through hyperlend-archive
+ok 451 - recorded full permission replay: husdc-relayed-permit through hyperlend-archive
+  ---
+  duration_ms: 3.379167
+  type: 'test'
+  ...
+# Subtest: recorded full permission replay: usdc-router-permit-consumed through drpc
+ok 452 - recorded full permission replay: usdc-router-permit-consumed through drpc
+  ---
+  duration_ms: 15.393583
+  type: 'test'
+  ...
+# Subtest: recorded full permission replay: usdc-router-permit-consumed through hyperlend-archive
+ok 453 - recorded full permission replay: usdc-router-permit-consumed through hyperlend-archive
+  ---
+  duration_ms: 14.969458
+  type: 'test'
+  ...
+# Subtest: verified ERC20 approval request and emitted evidence are distinct and correlate exactly
+ok 454 - verified ERC20 approval request and emitted evidence are distinct and correlate exactly
+  ---
+  duration_ms: 3.576709
+  type: 'test'
+  ...
+# Subtest: maximum uint256 approval yields one scoped event finding, without claiming maliciousness
+ok 455 - maximum uint256 approval yields one scoped event finding, without claiming maliciousness
+  ---
+  duration_ms: 0.412917
+  type: 'test'
+  ...
+# Subtest: a calldata-only unlimited request never becomes a confirmed permission event
+ok 456 - a calldata-only unlimited request never becomes a confirmed permission event
+  ---
+  duration_ms: 0.135209
+  type: 'test'
+  ...
+# Subtest: zero approvals are labeled revoke and huge non-max allowances remain exact bounded values
+ok 457 - zero approvals are labeled revoke and huge non-max allowances remain exact bounded values
+  ---
+  duration_ms: 0.692875
+  type: 'test'
+  ...
+# Subtest: reversed owner/spender and altered amount cannot be correlated to the requested approval
+ok 458 - reversed owner/spender and altered amount cannot be correlated to the requested approval
+  ---
+  duration_ms: 0.8105
+  type: 'test'
+  ...
+# Subtest: a maximum event for another owner or spender is attributed to the event addresses
+ok 459 - a maximum event for another owner or spender is attributed to the event addresses
+  ---
+  duration_ms: 0.236666
+  type: 'test'
+  ...
+# Subtest: whole-call failures discard all requested/event observations and findings
+ok 460 - whole-call failures discard all requested/event observations and findings
+  ---
+  duration_ms: 0.23625
+  type: 'test'
+  ...
+# Subtest: a reverted child subtree is discarded while a successful sibling approval remains
+ok 461 - a reverted child subtree is discarded while a successful sibling approval remains
+  ---
+  duration_ms: 0.158125
+  type: 'test'
+  ...
+# Subtest: duplicate indexed logs are counted once; independently emitted events remain separate
+ok 462 - duplicate indexed logs are counted once; independently emitted events remain separate
+  ---
+  duration_ms: 0.670584
+  type: 'test'
+  ...
+# Subtest: unknown contracts stay unverified even when supplied token metadata and familiar signatures
+ok 463 - unknown contracts stay unverified even when supplied token metadata and familiar signatures
+  ---
+  duration_ms: 0.526833
+  type: 'test'
+  ...
+# Subtest: unknown selectors create no approval request, while a valid Approval event remains separate evidence
+ok 464 - unknown selectors create no approval request, while a valid Approval event remains separate evidence
+  ---
+  duration_ms: 0.200833
+  type: 'test'
+  ...
+# Subtest: approve returning false is not approval success despite successful EVM execution
+ok 465 - approve returning false is not approval success despite successful EVM execution
+  ---
+  duration_ms: 0.154375
+  type: 'test'
+  ...
+# Subtest: hUSDC is configured, missing decimals are not guessed, and wrong-chain identities are unverified
+ok 466 - hUSDC is configured, missing decimals are not guessed, and wrong-chain identities are unverified
+  ---
+  duration_ms: 0.139875
+  type: 'test'
+  ...
+# Subtest: proxy delegate frames do not duplicate approve requests; only the proxy-emitted Approval is decoded
+ok 467 - proxy delegate frames do not duplicate approve requests; only the proxy-emitted Approval is decoded
+  ---
+  duration_ms: 0.120542
+  type: 'test'
+  ...
+# Subtest: malformed ABI, NFT-shaped Approval, static calls, mismatched traces and missing traces are not interpreted as approvals
+ok 468 - malformed ABI, NFT-shaped Approval, static calls, mismatched traces and missing traces are not interpreted as approvals
+  ---
+  duration_ms: 0.237208
+  type: 'test'
+  ...
+# Subtest: a parent approve cannot claim a nested approve event as its own confirmation
+ok 469 - a parent approve cannot claim a nested approve event as its own confirmation
+  ---
+  duration_ms: 0.282792
+  type: 'test'
+  ...
+# Subtest: conflicting indexed evidence is explicitly limited instead of silently double counted
+ok 470 - conflicting indexed evidence is explicitly limited instead of silently double counted
+  ---
+  duration_ms: 0.318625
+  type: 'test'
+  ...
+# Subtest: observed direct hUSDC permit separates owner, transaction submitter and emitted approval
+ok 471 - observed direct hUSDC permit separates owner, transaction submitter and emitted approval
+  ---
+  duration_ms: 1.402917
+  type: 'test'
+  ...
+# Subtest: observed nested permit keeps router caller distinct from the external sender and its own approval
+ok 472 - observed nested permit keeps router caller distinct from the external sender and its own approval
+  ---
+  duration_ms: 1.448584
+  type: 'test'
+  ...
+# Subtest: permit deadline uses the recorded execution time, not the current wall clock
+ok 473 - permit deadline uses the recorded execution time, not the current wall clock
+  ---
+  duration_ms: 0.524167
+  type: 'test'
+  ...
+# Subtest: synthetic unbounded deadline is a redemption observation, not allowance expiry or maliciousness
+ok 474 - synthetic unbounded deadline is a redemption observation, not allowance expiry or maliciousness
+  ---
+  duration_ms: 0.218042
+  type: 'test'
+  ...
+# Subtest: unknown tokens, implementations and unrelated delegate frames do not prove permit semantics
+ok 475 - unknown tokens, implementations and unrelated delegate frames do not prove permit semantics
+  ---
+  duration_ms: 0.339417
+  type: 'test'
+  ...
+# Subtest: malformed permits do not invent owners, values or canonical uint8 signature fields
+ok 476 - malformed permits do not invent owners, values or canonical uint8 signature fields
+  ---
+  duration_ms: 0.944291
+  type: 'test'
+  ...
+# Subtest: failed whole calls and failed permit subtrees contribute no effective permit observations
+ok 477 - failed whole calls and failed permit subtrees contribute no effective permit observations
+  ---
+  duration_ms: 0.574708
+  type: 'test'
+  ...
+# Subtest: permit correlation cannot borrow a mismatched event or duplicate delegate calldata
+ok 478 - permit correlation cannot borrow a mismatched event or duplicate delegate calldata
+  ---
+  duration_ms: 0.245416
+  type: 'test'
+  ...
+# Subtest: relayed permit measures the token owner allowance, never the external submitter allowance
+ok 479 - relayed permit measures the token owner allowance, never the external submitter allowance
+  ---
+  duration_ms: 1.020958
+  type: 'test'
+  ...
+# Subtest: nested permit and router approval compare final consumed allowances against their own events
+ok 480 - nested permit and router approval compare final consumed allowances against their own events
+  ---
+  duration_ms: 0.626417
+  type: 'test'
+  ...
+# Subtest: stale permit owner, deadline, submitter and immediate caller cannot influence allowance queries
+ok 481 - stale permit owner, deadline, submitter and immediate caller cannot influence allowance queries
+  ---
+  duration_ms: 0.319208
+  type: 'test'
+  ...
+# Subtest: fixed defaults, server URL and request transport options have no credential-bearing evidence
+ok 482 - fixed defaults, server URL and request transport options have no credential-bearing evidence
+  ---
+  duration_ms: 38.803041
+  type: 'test'
+  ...
+# Subtest: exact method/parameter allowlist and one-time canonical hash pin reject before dispatch
+ok 483 - exact method/parameter allowlist and one-time canonical hash pin reject before dispatch
+  ---
+  duration_ms: 13.729917
+  type: 'test'
+  ...
+# Subtest: request objects, getters, proxies, sparse lists and options cannot execute input traps
+ok 484 - request objects, getters, proxies, sparse lists and options cannot execute input traps
+  ---
+  duration_ms: 0.710875
+  type: 'test'
+  ...
+# Subtest: all budgets only tighten; call and constructor-started wall ceilings prevent new reads
+ok 485 - all budgets only tighten; call and constructor-started wall ceilings prevent new reads
+  ---
+  duration_ms: 1.356416
+  type: 'test'
+  ...
+# Subtest: exact successful UTF8 chunks and request bytes are retained, detached and hashed
+ok 486 - exact successful UTF8 chunks and request bytes are retained, detached and hashed
+  ---
+  duration_ms: 0.664167
+  type: 'test'
+  ...
+# Subtest: HTTP, RPC, nested errors and thrown adapter secrets retain only safe messages and body hashes
+ok 487 - HTTP, RPC, nested errors and thrown adapter secrets retain only safe messages and body hashes
+  ---
+  duration_ms: 2.011708
+  type: 'test'
+  ...
+# Subtest: provider URL secrets echoed by a successful envelope are withheld
+ok 488 - provider URL secrets echoed by a successful envelope are withheld
+  ---
+  duration_ms: 1.690375
+  type: 'test'
+  ...
+# Subtest: adapter same-class errors cannot inject text, detail, codes or getters into retained evidence
+ok 489 - adapter same-class errors cannot inject text, detail, codes or getters into retained evidence
+  ---
+  duration_ms: 0.877209
+  type: 'test'
+  ...
+# Subtest: invalid JSON, UTF8, BOM and inconsistent envelopes fail without raw error-body retention
+ok 490 - invalid JSON, UTF8, BOM and inconsistent envelopes fail without raw error-body retention
+  ---
+  duration_ms: 1.840125
+  type: 'test'
+  ...
+# Subtest: oversized stream chunks are counted in full but only bounded prefix bytes are held
+ok 491 - oversized stream chunks are counted in full but only bounded prefix bytes are held
+  ---
+  duration_ms: 0.493292
+  type: 'test'
+  ...
+# Subtest: shared byte ceiling spans calls and closes dispatch after an overshooting chunk
+ok 492 - shared byte ceiling spans calls and closes dispatch after an overshooting chunk
+  ---
+  duration_ms: 0.376125
+  type: 'test'
+  ...
+# Subtest: pre-abort and shared cancellation dispatch nothing; abort reasons never leak
+ok 493 - pre-abort and shared cancellation dispatch nothing; abort reasons never leak
+  ---
+  duration_ms: 0.116292
+  type: 'test'
+  ...
+# Subtest: external abort terminates ignored-signal fetch, reports pending adapter and seals evidence
+ok 494 - external abort terminates ignored-signal fetch, reports pending adapter and seals evidence
+  ---
+  duration_ms: 7.967625
+  type: 'test'
+  ...
+# Subtest: request deadline terminates stalled stream and ignores all late bytes/results
+ok 495 - request deadline terminates stalled stream and ignores all late bytes/results
+  ---
+  duration_ms: 18.443125
+  type: 'test'
+  ...
+# Subtest: shared cancel stops concurrent requests and later adapter failure cannot rewrite evidence
+ok 496 - shared cancel stops concurrent requests and later adapter failure cannot rewrite evidence
+  ---
+  duration_ms: 2.308125
+  type: 'test'
+  ...
+# Subtest: drain is explicitly bounded and cannot accept widened or unbounded waits
+ok 497 - drain is explicitly bounded and cannot accept widened or unbounded waits
+  ---
+  duration_ms: 0.512875
+  type: 'test'
+  ...
+# Subtest: backward or nonfinite clock closes all future dispatch without NaN telemetry
+ok 498 - backward or nonfinite clock closes all future dispatch without NaN telemetry
+  ---
+  duration_ms: 0.176292
+  type: 'test'
+  ...
+# Subtest: header-aware pin allows only source rechecks and sequential hash-selected parents
+ok 499 - header-aware pin allows only source rechecks and sequential hash-selected parents
+  ---
+  duration_ms: 1.025625
+  type: 'test'
+  ...
+# Subtest: transport ancestry rejects malformed or skipped header numbers without advancing the gate
+ok 500 - transport ancestry rejects malformed or skipped header numbers without advancing the gate
+  ---
+  duration_ms: 0.481042
+  type: 'test'
+  ...
+# Subtest: transport bounds ancestry to255 fetched intermediate headers inside its unchanged shared call cap
+ok 501 - transport bounds ancestry to255 fetched intermediate headers inside its unchanged shared call cap
+  ---
+  duration_ms: 32.040958
+  type: 'test'
+  ...
+# Subtest: ancestor gate prevents concurrent chain advancement and preserves cancellation evidence
+ok 502 - ancestor gate prevents concurrent chain advancement and preserves cancellation evidence
+  ---
+  duration_ms: 0.5735
+  type: 'test'
+  ...
+# Subtest: 134 saved balance/allowance query traces preserve exact raw amounts and traced gas
+ok 503 - 134 saved balance/allowance query traces preserve exact raw amounts and traced gas
+  ---
+  duration_ms: 5.406917
+  type: 'test'
+  ...
+# Subtest: query normalization accepts only canonical configured ABI and preserves case-insensitive behavior
+ok 504 - query normalization accepts only canonical configured ABI and preserves case-insensitive behavior
+  ---
+  duration_ms: 1.298
+  type: 'test'
+  ...
+# Subtest: one trace object is required and envelope handling cannot be mistaken for query validation
+ok 505 - one trace object is required and envelope handling cannot be mistaken for query validation
+  ---
+  duration_ms: 0.198667
+  type: 'test'
+  ...
+# Subtest: external query sender remains distinct from balance account and allowance owner
+ok 506 - external query sender remains distinct from balance account and allowance owner
+  ---
+  duration_ms: 0.232875
+  type: 'test'
+  ...
+# Subtest: root and delegate callers, value, ABI, implementation and exact child counts are bound
+ok 507 - root and delegate callers, value, ABI, implementation and exact child counts are bound
+  ---
+  duration_ms: 0.659625
+  type: 'test'
+  ...
+# Subtest: successful uint256 output cannot override failure, event, lifecycle or malformed evidence
+ok 508 - successful uint256 output cannot override failure, event, lifecycle or malformed evidence
+  ---
+  duration_ms: 0.806459
+  type: 'test'
+  ...
+# Subtest: receipt balance requires the precise reserve-index and Pool implementation path
+ok 509 - receipt balance requires the precise reserve-index and Pool implementation path
+  ---
+  duration_ms: 0.622958
+  type: 'test'
+  ...
+# Subtest: debt balance requires the precise reserve-index and Pool implementation path
+ok 510 - debt balance requires the precise reserve-index and Pool implementation path
+  ---
+  duration_ms: 0.340083
+  type: 'test'
+  ...
+# Subtest: allowance owner/spender words are bound at root and implementation, with no Pool child
+ok 511 - allowance owner/spender words are bound at root and implementation, with no Pool child
+  ---
+  duration_ms: 0.357208
+  type: 'test'
+  ...
+# Subtest: semantic normalization preserves historical gas, failure and event comparison rules
+ok 512 - semantic normalization preserves historical gas, failure and event comparison rules
+  ---
+  duration_ms: 0.559833
+  type: 'test'
+  ...
+# Subtest: semantic normalization retains frame, depth and event resource bounds
+ok 513 - semantic normalization retains frame, depth and event resource bounds
+  ---
+  duration_ms: 6.426959
+  type: 'test'
+  ...
+# Subtest: decodes the live insufficient-balance revert and preserves attribution
+ok 514 - decodes the live insufficient-balance revert and preserves attribution
+  ---
+  duration_ms: 2.0205
+  type: 'test'
+  ...
+# Subtest: decodes UTF-8 strings and empty Error strings without guessing a diagnosis
+ok 515 - decodes UTF-8 strings and empty Error strings without guessing a diagnosis
+  ---
+  duration_ms: 0.169709
+  type: 'test'
+  ...
+# Subtest: rejects truncated, oversized, misaligned and invalid UTF-8 standard errors
+ok 516 - rejects truncated, oversized, misaligned and invalid UTF-8 standard errors
+  ---
+  duration_ms: 0.097375
+  type: 'test'
+  ...
+# Subtest: interprets known panic codes, preserving unknown codes exactly
+ok 517 - interprets known panic codes, preserving unknown codes exactly
+  ---
+  duration_ms: 0.052834
+  type: 'test'
+  ...
+# Subtest: does not invent custom error names or decode invalid hex
+ok 518 - does not invent custom error names or decode invalid hex
+  ---
+  duration_ms: 0.106292
+  type: 'test'
+  ...
+# Subtest: removes display control characters while raw bytes remain with the trace
+ok 519 - removes display control characters while raw bytes remain with the trace
+  ---
+  duration_ms: 0.112875
+  type: 'test'
+  ...
+# Subtest: write and signing methods never reach the RPC transport
+ok 520 - write and signing methods never reach the RPC transport
+  ---
+  duration_ms: 2.156583
+  type: 'test'
+  ...
+# Subtest: rejects a provider on the wrong chain
+ok 521 - rejects a provider on the wrong chain
+  ---
+  duration_ms: 34.049959
+  type: 'test'
+  ...
+# Subtest: preserves provider execution errors separately from transport failures
+ok 522 - preserves provider execution errors separately from transport failures
+  ---
+  duration_ms: 0.435416
+  type: 'test'
+  ...
+# Subtest: rejects wrong response identifiers rather than using unrelated state
+ok 523 - rejects wrong response identifiers rather than using unrelated state
+  ---
+  duration_ms: 0.645917
+  type: 'test'
+  ...
+# Subtest: normalizes block numbers as exact integers
+ok 524 - normalizes block numbers as exact integers
+  ---
+  duration_ms: 2.740375
+  type: 'test'
+  ...
+# Subtest: provider errors never expose credential-bearing messages or nested response data
+ok 525 - provider errors never expose credential-bearing messages or nested response data
+  ---
+  duration_ms: 0.812125
+  type: 'test'
+  ...
+# Subtest: malformed JSON envelopes and invalid URL errors stay bounded and credential-free
+ok 526 - malformed JSON envelopes and invalid URL errors stay bounded and credential-free
+  ---
+  duration_ms: 1.277708
+  type: 'test'
+  ...
+# Subtest: historical call-many is a permitted read method while destructive debug methods remain blocked
+ok 527 - historical call-many is a permitted read method while destructive debug methods remain blocked
+  ---
+  duration_ms: 0.755917
+  type: 'test'
+  ...
+# Subtest: nested RPC error envelopes are sanitized before any successful result can be captured
+ok 528 - nested RPC error envelopes are sanitized before any successful result can be captured
+  ---
+  duration_ms: 3.198542
+  type: 'test'
+  ...
+# Subtest: valid EVM reverts and their raw output remain unchanged by the RPC envelope guard
+ok 529 - valid EVM reverts and their raw output remain unchanged by the RPC envelope guard
+  ---
+  duration_ms: 0.988667
+  type: 'test'
+  ...
+# Subtest: simulation binds trace to the observed block hash and never switches to latest
+ok 530 - simulation binds trace to the observed block hash and never switches to latest
+  ---
+  duration_ms: 3.7835
+  type: 'test'
+  ...
+# Subtest: historical trace rejects a transaction and receipt from different blocks
+ok 531 - historical trace rejects a transaction and receipt from different blocks
+  ---
+  duration_ms: 0.4195
+  type: 'test'
+  ...
+# Subtest: HTTP API rejects invalid and cross-origin requests before network activity
+ok 532 - HTTP API rejects invalid and cross-origin requests before network activity
+  ---
+  duration_ms: 21.54325
+  type: 'test'
+  ...
+# Subtest: incomplete or unrelated root traces are rejected rather than shown as empty success
+ok 533 - incomplete or unrelated root traces are rejected rather than shown as empty success
+  ---
+  duration_ms: 0.546333
+  type: 'test'
+  ...
+# Subtest: real nested delegate calls and omitted zero root value remain valid
+ok 534 - real nested delegate calls and omitted zero root value remain valid
+  ---
+  duration_ms: 3.273708
+  type: 'test'
+  ...
+# Subtest: simulation rejects a returned block that differs from the requested numeric block
+ok 535 - simulation rejects a returned block that differs from the requested numeric block
+  ---
+  duration_ms: 0.156875
+  type: 'test'
+  ...
+# Subtest: approval observations are exposed with partial coverage, without a general safety verdict
+ok 536 - approval observations are exposed with partial coverage, without a general safety verdict
+  ---
+  duration_ms: 0.564167
+  type: 'test'
+  ...
+# Subtest: historical replay validates block hash, number, receipt index and gas
+ok 537 - historical replay validates block hash, number, receipt index and gas
+  ---
+  duration_ms: 1.012
+  type: 'test'
+  ...
+# Subtest: replay rejects status inconsistency without modifying the raw trace
+ok 538 - replay rejects status inconsistency without modifying the raw trace
+  ---
+  duration_ms: 0.715833
+  type: 'test'
+  ...
+# Subtest: replay preserves actual evidence and rechecks receipt identity after tracing
+ok 539 - replay preserves actual evidence and rechecks receipt identity after tracing
+  ---
+  duration_ms: 0.869666
+  type: 'test'
+  ...
+# Subtest: synthetic shared canonical early_mismatch withholds all three current consumers after settlement
+ok 540 - synthetic shared canonical early_mismatch withholds all three current consumers after settlement
+  ---
+  duration_ms: 10.250625
+  type: 'test'
+  ...
+# Subtest: synthetic shared canonical middle_mismatch withholds all three current consumers after settlement
+ok 541 - synthetic shared canonical middle_mismatch withholds all three current consumers after settlement
+  ---
+  duration_ms: 3.384958
+  type: 'test'
+  ...
+# Subtest: synthetic shared canonical late_mismatch withholds all three current consumers after settlement
+ok 542 - synthetic shared canonical late_mismatch withholds all three current consumers after settlement
+  ---
+  duration_ms: 4.21825
+  type: 'test'
+  ...
+# Subtest: synthetic shared canonical late_rpc_error withholds all three current consumers after settlement
+ok 543 - synthetic shared canonical late_rpc_error withholds all three current consumers after settlement
+  ---
+  duration_ms: 4.005167
+  type: 'test'
+  ...
+# Subtest: synthetic stable current run retains base, allowance and affected custody measurements with complete shared evidence
+ok 544 - synthetic stable current run retains base, allowance and affected custody measurements with complete shared evidence
+  ---
+  duration_ms: 3.186292
+  type: 'test'
+  ...
+# Subtest: synthetic local hUSDC query failure preserves allowance and withholds the affected consumer sharing the failed pair
+ok 545 - synthetic local hUSDC query failure preserves allowance and withholds the affected consumer sharing the failed pair
+  ---
+  duration_ms: 2.601417
+  type: 'test'
+  ...
+# Subtest: automatic Aave API adapter discovers four measured queries from composite saved results, not explicit query input
+ok 546 - automatic Aave API adapter discovers four measured queries from composite saved results, not explicit query input
+  ---
+  duration_ms: 29.595042
+  type: 'test'
+  ...
+# Subtest: missing independent aToken query response cannot be replaced by an observed mint or requested amount
+ok 547 - missing independent aToken query response cannot be replaced by an observed mint or requested amount
+  ---
+  duration_ms: 7.794875
+  type: 'test'
+  ...
+# Subtest: independent inventory covers static server imports and the optional engine import closure
+ok 548 - independent inventory covers static server imports and the optional engine import closure
+  ---
+  duration_ms: 16.779791
+  type: 'test'
+  ...
+# Subtest: stable startup loads the real adapter once with the complete immutable disk identity
+ok 549 - stable startup loads the real adapter once with the complete immutable disk identity
+  ---
+  duration_ms: 127.363667
+  type: 'test'
+  ...
+# Subtest: optional dependency absent at startup remains unavailable after installation until restart
+ok 550 - optional dependency absent at startup remains unavailable after installation until restart
+  ---
+  duration_ms: 203.257792
+  type: 'test'
+  ...
+# Subtest: rejects post-startup drift in src/analyze.js before optional import and caches rejection
+ok 551 - rejects post-startup drift in src/analyze.js before optional import and caches rejection
+  ---
+  duration_ms: 89.184
+  type: 'test'
+  ...
+# Subtest: rejects post-startup drift in src/config.js before optional import and caches rejection
+ok 552 - rejects post-startup drift in src/config.js before optional import and caches rejection
+  ---
+  duration_ms: 90.790875
+  type: 'test'
+  ...
+# Subtest: rejects post-startup drift in src/standard-rpc.js before optional import and caches rejection
+ok 553 - rejects post-startup drift in src/standard-rpc.js before optional import and caches rejection
+  ---
+  duration_ms: 95.140958
+  type: 'test'
+  ...
+# Subtest: rejects post-startup drift in engines/standard-evm/sequence-state.js before optional import and caches rejection
+ok 554 - rejects post-startup drift in engines/standard-evm/sequence-state.js before optional import and caches rejection
+  ---
+  duration_ms: 98.571375
+  type: 'test'
+  ...
+# Subtest: rejects post-startup drift in engines/standard-evm/node_modules/@noble/hashes/utils.js before optional import and caches rejection
+ok 555 - rejects post-startup drift in engines/standard-evm/node_modules/@noble/hashes/utils.js before optional import and caches rejection
+  ---
+  duration_ms: 104.924667
+  type: 'test'
+  ...
+# Subtest: rejects changes during optional module evaluation after the pre-import check
+ok 556 - rejects changes during optional module evaluation after the pre-import check
+  ---
+  duration_ms: 132.199916
+  type: 'test'
+  ...
+# Subtest: removing an optional source after startup withholds the adapter
+ok 557 - removing an optional source after startup withholds the adapter
+  ---
+  duration_ms: 93.751833
+  type: 'test'
+  ...
+# Subtest: manual list accepts both typed descriptors mixed with token calls without changing identities
+ok 558 - manual list accepts both typed descriptors mixed with token calls without changing identities
+  ---
+  duration_ms: 18.877167
+  type: 'test'
+  ...
+# Subtest: manual typed query validation rejects unknown, mixed, missing and malformed fields
+ok 559 - manual typed query validation rejects unknown, mixed, missing and malformed fields
+  ---
+  duration_ms: 2.134833
+  type: 'test'
+  ...
+# Subtest: single-call Aave position shows exact raw words, reference units and original mixed-query index
+ok 560 - single-call Aave position shows exact raw words, reference units and original mixed-query index
+  ---
+  duration_ms: 29.573542
+  type: 'test'
+  ...
+# Subtest: Morpho market identity and shares stay separate from token balances and user ownership
+ok 561 - Morpho market identity and shares stay separate from token balances and user ownership
+  ---
+  duration_ms: 1.677917
+  type: 'test'
+  ...
+# Subtest: unavailable or malformed position values never render stale amounts or measured counts
+ok 562 - unavailable or malformed position values never render stale amounts or measured counts
+  ---
+  duration_ms: 10.702291
+  type: 'test'
+  ...
+# Subtest: failed execution or unverified single context withholds position values defensively
+ok 563 - failed execution or unverified single context withholds position values defensively
+  ---
+  duration_ms: 3.825334
+  type: 'test'
+  ...
+# Subtest: sequence invalidation deletes position rows, resets counts and preserves full raw response
+ok 564 - sequence invalidation deletes position rows, resets counts and preserves full raw response
+  ---
+  duration_ms: 1.941541
+  type: 'test'
+  ...
+# Subtest: sequence step selection renders per-step columns and clears positions on later token-only step
+ok 565 - sequence step selection renders per-step columns and clears positions on later token-only step
+  ---
+  duration_ms: 0.826292
+  type: 'test'
+  ...
+# Subtest: sequence editor uses the same mixed-list validator and keeps automatic mode omitted
+ok 566 - sequence editor uses the same mixed-list validator and keeps automatic mode omitted
+  ---
+  duration_ms: 1.218625
+  type: 'test'
+  ...
+# Subtest: position values/references use text nodes and safe links; narrow tables wrap raw integers
+ok 567 - position values/references use text nodes and safe links; narrow tables wrap raw integers
+  ---
+  duration_ms: 0.7825
+  type: 'test'
+  ...
+# Subtest: existing automatic token fixture remains token-only without adding position queries or totals
+ok 568 - existing automatic token fixture remains token-only without adding position queries or totals
+  ---
+  duration_ms: 16.022292
+  type: 'test'
+  ...
+# Subtest: mixed query API accepts exact declarations and normalizes without caller chain or metadata
+ok 569 - mixed query API accepts exact declarations and normalizes without caller chain or metadata
+  ---
+  duration_ms: 2.009333
+  type: 'test'
+  ...
+# Subtest: position projection preserves mixed indexes, queried owner, exact tuple fields and units
+ok 570 - position projection preserves mixed indexes, queried owner, exact tuple fields and units
+  ---
+  duration_ms: 0.882125
+  type: 'test'
+  ...
+# Subtest: position preview withholds tuples on identity, ABI, arithmetic or context inconsistency
+ok 571 - position preview withholds tuples on identity, ABI, arithmetic or context inconsistency
+  ---
+  duration_ms: 1.522292
+  type: 'test'
+  ...
+# Subtest: unavailable positions keep identity and reason without exposing stale amounts
+ok 572 - unavailable positions keep identity and reason without exposing stale amounts
+  ---
+  duration_ms: 0.194584
+  type: 'test'
+  ...
+# Subtest: sequence typed inputs are validated completely before provider work
+ok 573 - sequence typed inputs are validated completely before provider work
+  ---
+  duration_ms: 0.376584
+  type: 'test'
+  ...
+# Subtest: sequence resource profile is explicit and bounded without widening single-call limits
+ok 574 - sequence resource profile is explicit and bounded without widening single-call limits
+  ---
+  duration_ms: 37.170875
+  type: 'test'
+  ...
+# Subtest: Ethereum endpoint defaults and server-configured overrides never appear in saved request metadata
+ok 575 - Ethereum endpoint defaults and server-configured overrides never appear in saved request metadata
+  ---
+  duration_ms: 2.026208
+  type: 'test'
+  ...
+# Subtest: only the seven configured read methods reach transport; limits can only tighten
+ok 576 - only the seven configured read methods reach transport; limits can only tighten
+  ---
+  duration_ms: 3.17725
+  type: 'test'
+  ...
+# Subtest: successful multi-chunk UTF-8 is retained byte-for-byte with exact hashes and isolated snapshots
+ok 577 - successful multi-chunk UTF-8 is retained byte-for-byte with exact hashes and isolated snapshots
+  ---
+  duration_ms: 2.323916
+  type: 'test'
+  ...
+# Subtest: wrong JSON-RPC ids, absent result, result-plus-error and malformed JSON fail closed
+ok 578 - wrong JSON-RPC ids, absent result, result-plus-error and malformed JSON fail closed
+  ---
+  duration_ms: 5.803125
+  type: 'test'
+  ...
+# Subtest: invalid UTF-8 and leading BOM are rejected without losing complete original byte hash
+ok 579 - invalid UTF-8 and leading BOM are rejected without losing complete original byte hash
+  ---
+  duration_ms: 0.72275
+  type: 'test'
+  ...
+# Subtest: HTTP, direct RPC, nested RPC and transport errors retain only safe diagnostics and body hashes
+ok 580 - HTTP, direct RPC, nested RPC and transport errors retain only safe diagnostics and body hashes
+  ---
+  duration_ms: 1.798042
+  type: 'test'
+  ...
+# Subtest: real EVM failure strings are preserved while provider-configuration echoes are withheld
+ok 581 - real EVM failure strings are preserved while provider-configuration echoes are withheld
+  ---
+  duration_ms: 1.723625
+  type: 'test'
+  ...
+# Subtest: JSON Unicode escaping cannot hide a private provider value from the response filter
+ok 582 - JSON Unicode escaping cannot hide a private provider value from the response filter
+  ---
+  duration_ms: 0.644
+  type: 'test'
+  ...
+# Subtest: per-response oversize retains bounded prefix hash but never labels it a complete body
+ok 583 - per-response oversize retains bounded prefix hash but never labels it a complete body
+  ---
+  duration_ms: 0.533917
+  type: 'test'
+  ...
+# Subtest: shared byte and call budgets stop subsequent requests before fetch
+ok 584 - shared byte and call budgets stop subsequent requests before fetch
+  ---
+  duration_ms: 0.58825
+  type: 'test'
+  ...
+# Subtest: concurrent calls share the total retained-byte cap and cannot fetch again after exhaustion
+ok 585 - concurrent calls share the total retained-byte cap and cannot fetch again after exhaustion
+  ---
+  duration_ms: 0.197042
+  type: 'test'
+  ...
+# Subtest: wall deadline is checked at EOF and prevents later requests
+ok 586 - wall deadline is checked at EOF and prevents later requests
+  ---
+  duration_ms: 0.535042
+  type: 'test'
+  ...
+# Subtest: the request deadline is checked at EOF even before its timer callback runs
+ok 587 - the request deadline is checked at EOF even before its timer callback runs
+  ---
+  duration_ms: 0.393583
+  type: 'test'
+  ...
+# Subtest: request timeout includes body reading, even when reader ignores AbortSignal
+ok 588 - request timeout includes body reading, even when reader ignores AbortSignal
+  ---
+  duration_ms: 36.157125
+  type: 'test'
+  ...
+# Subtest: late fetch completion cannot mutate sealed timeout evidence or retain response bytes
+ok 589 - late fetch completion cannot mutate sealed timeout evidence or retain response bytes
+  ---
+  duration_ms: 36.744542
+  type: 'test'
+  ...
+# Subtest: a never-settling cancellation cannot block an already detected byte-limit failure
+ok 590 - a never-settling cancellation cannot block an already detected byte-limit failure
+  ---
+  duration_ms: 30.039292
+  type: 'test'
+  ...
+# Subtest: sequence validation normalizes all calls together without accepting per-step sender, block or overrides
+ok 591 - sequence validation normalizes all calls together without accepting per-step sender, block or overrides
+  ---
+  duration_ms: 2.922917
+  type: 'test'
+  ...
+# Subtest: constructed Aave example preserves the fixed discovery envelopes and labels their nonhistorical sequence
+ok 592 - constructed Aave example preserves the fixed discovery envelopes and labels their nonhistorical sequence
+  ---
+  duration_ms: 4.062666
+  type: 'test'
+  ...
+# Subtest: API projects independent step balances after carried state, preserving mixed auto/manual scope and raw evidence
+ok 593 - API projects independent step balances after carried state, preserving mixed auto/manual scope and raw evidence
+  ---
+  duration_ms: 7.108292
+  type: 'test'
+  ...
+# Subtest: sequence resolves latest once, keeps each step pinned and binds the complete selection header
+ok 594 - sequence resolves latest once, keeps each step pinned and binds the complete selection header
+  ---
+  duration_ms: 4.326
+  type: 'test'
+  ...
+# Subtest: a reverted later call preserves the verified prefix and explicitly skips subsequent calls
+ok 595 - a reverted later call preserves the verified prefix and explicitly skips subsequent calls
+  ---
+  duration_ms: 1.899667
+  type: 'test'
+  ...
+# Subtest: a final canonical failure is projected only after all prior token and native amounts are invalidated
+ok 596 - a final canonical failure is projected only after all prior token and native amounts are invalidated
+  ---
+  duration_ms: 1.868791
+  type: 'test'
+  ...
+# Subtest: sequence HTTP uses one bounded sequence transport and retains complete exact wire evidence
+ok 597 - sequence HTTP uses one bounded sequence transport and retains complete exact wire evidence
+  ---
+  duration_ms: 31.327958
+  type: 'test'
+  ...
+# Subtest: sequence HTTP rejects invalid later calls and external controls before provider creation
+ok 598 - sequence HTTP rejects invalid later calls and external controls before provider creation
+  ---
+  duration_ms: 8.200959
+  type: 'test'
+  ...
+# Subtest: sequence absence is explicit and cannot fall back to a single-call engine
+ok 599 - sequence absence is explicit and cannot fall back to a single-call engine
+  ---
+  duration_ms: 12965.572584
+  type: 'test'
+  ...
+# Subtest: sequence body cap admits four full-size calls without raising the existing single-call body cap
+ok 600 - sequence body cap admits four full-size calls without raising the existing single-call body cap
+  ---
+  duration_ms: 16.586209
+  type: 'test'
+  ...
+# Subtest: configuration exposes experimental Ethereum separately and binds its complete current implementation closure
+ok 601 - configuration exposes experimental Ethereum separately and binds its complete current implementation closure
+  ---
+  duration_ms: 12720.294334
+  type: 'test'
+  ...
+# Subtest: HTTP validation, origin and host protections reject inputs before creating either provider
+ok 602 - HTTP validation, origin and host protections reject inputs before creating either provider
+  ---
+  duration_ms: 38.033625
+  type: 'test'
+  ...
+# Subtest: missing optional dependency returns 503 while health and the established HyperEVM route keep working
+ok 603 - missing optional dependency returns 503 while health and the established HyperEVM route keep working
+  ---
+  duration_ms: 7.137041
+  type: 'test'
+  ...
+# Subtest: the two-simulation limit is rechecked after asynchronous loading and shared with the legacy route
+ok 604 - the two-simulation limit is rechecked after asynchronous loading and shared with the legacy route
+  ---
+  duration_ms: 4.513792
+  type: 'test'
+  ...
+# Subtest: full HTTP production transport: aave-usdc-supply-with-permit (exact original Aave playback)
+ok 605 - full HTTP production transport: aave-usdc-supply-with-permit (exact original Aave playback)
+  ---
+  duration_ms: 27.035625
+  type: 'test'
+  ...
+# Subtest: full HTTP production transport: morpho-kiln-usdc-deposit (ID-adapted Morpho playback)
+ok 606 - full HTTP production transport: morpho-kiln-usdc-deposit (ID-adapted Morpho playback)
+  ---
+  duration_ms: 27.209167
+  type: 'test'
+  ...
+# Subtest: provider failure remains an explicit unavailable HTTP result with hashed, withheld error bytes
+ok 607 - provider failure remains an explicit unavailable HTTP result with hashed, withheld error bytes
+  ---
+  duration_ms: 1.449041
+  type: 'test'
+  ...
+# Subtest: HTTP accepts canonical positive wei and preserves its exact engine value without displaying unmeasured native balances
+ok 608 - HTTP accepts canonical positive wei and preserves its exact engine value without displaying unmeasured native balances
+  ---
+  duration_ms: 0.836708
+  type: 'test'
+  ...
+# Subtest: full genuine standard adapter playback: aave-usdc-supply-with-permit (30 recorded RPCs)
+ok 609 - full genuine standard adapter playback: aave-usdc-supply-with-permit (30 recorded RPCs)
+  ---
+  duration_ms: 74.414541
+  type: 'test'
+  ...
+# Subtest: full genuine standard adapter playback: morpho-kiln-usdc-deposit (46 recorded RPCs)
+ok 610 - full genuine standard adapter playback: morpho-kiln-usdc-deposit (46 recorded RPCs)
+  ---
+  duration_ms: 51.690208
+  type: 'test'
+  ...
+# Subtest: examples retain the frozen selections, exact calldata, zero value and query roles without runtime report imports
+ok 611 - examples retain the frozen selections, exact calldata, zero value and query roles without runtime report imports
+  ---
+  duration_ms: 0.186583
+  type: 'test'
+  ...
+# Subtest: input normalizes address/query case, accepts canonical blocks and applies only declared defaults
+ok 612 - input normalizes address/query case, accepts canonical blocks and applies only declared defaults
+  ---
+  duration_ms: 1.898042
+  type: 'test'
+  ...
+# Subtest: omitting queries explicitly selects automatic discovery, while null or an empty manual list remain invalid
+ok 613 - omitting queries explicitly selects automatic discovery, while null or an empty manual list remain invalid
+  ---
+  duration_ms: 1.050167
+  type: 'test'
+  ...
+# Subtest: an early automatic provider failure is explicit and cannot fabricate token observations
+ok 614 - an early automatic provider failure is explicit and cannot fabricate token observations
+  ---
+  duration_ms: 1.418666
+  type: 'test'
+  ...
+# Subtest: automatic preview binds selected query identities to measured values and preserves unknown raw units
+ok 615 - automatic preview binds selected query identities to measured values and preserves unknown raw units
+  ---
+  duration_ms: 0.680667
+  type: 'test'
+  ...
+# Subtest: unsupported chain, noncanonical/overflow wei values and block selectors fail before RPC
+ok 616 - unsupported chain, noncanonical/overflow wei values and block selectors fail before RPC
+  ---
+  duration_ms: 8.513666
+  type: 'test'
+  ...
+# Subtest: canonical decimal wei preserves exact positive amounts through uint256 max in explicit and automatic input
+ok 617 - canonical decimal wei preserves exact positive amounts through uint256 max in explicit and automatic input
+  ---
+  duration_ms: 1.096208
+  type: 'test'
+  ...
+# Subtest: nonzero decimal wei reaches the unsigned engine as exact hexadecimal without introducing fee or nonce inputs
+ok 618 - nonzero decimal wei reaches the unsigned engine as exact hexadecimal without introducing fee or nonce inputs
+  ---
+  duration_ms: 5.336875
+  type: 'test'
+  ...
+# Subtest: optional access and blob context reaches the original engine request in manual and automatic modes
+ok 619 - optional access and blob context reaches the original engine request in manual and automatic modes
+  ---
+  duration_ms: 2.371583
+  type: 'test'
+  ...
+# Subtest: URLs, override/metadata/fee/signing fields and accessor/symbol/prototype records are rejected
+ok 620 - URLs, override/metadata/fee/signing fields and accessor/symbol/prototype records are rejected
+  ---
+  duration_ms: 3.09725
+  type: 'test'
+  ...
+# Subtest: calldata bounds and strict query ABI/cap/duplicate controls
+ok 621 - calldata bounds and strict query ABI/cap/duplicate controls
+  ---
+  duration_ms: 8.744625
+  type: 'test'
+  ...
+# Subtest: numeric selector: composite genuine recorded selection header plus unchanged thirty engine requests
+ok 622 - numeric selector: composite genuine recorded selection header plus unchanged thirty engine requests
+  ---
+  duration_ms: 26.002792
+  type: 'test'
+  ...
+# Subtest: latest selector fault control adds one selection, then keeps the returned hash pinned
+ok 623 - latest selector fault control adds one selection, then keeps the returned hash pinned
+  ---
+  duration_ms: 9.8465
+  type: 'test'
+  ...
+# Subtest: malformed, mismatching, oversized and poisoned selector results do not reach the engine
+ok 624 - malformed, mismatching, oversized and poisoned selector results do not reach the engine
+  ---
+  duration_ms: 52.077666
+  type: 'test'
+  ...
+# Subtest: selection binding fault control rejects a conflicting number under a repeated block hash
+ok 625 - selection binding fault control rejects a conflicting number under a repeated block hash
+  ---
+  duration_ms: 20.577667
+  type: 'test'
+  ...
+# Subtest: complete selection binding rejects same-hash timestamp, state-root and transaction-list conflicts
+ok 626 - complete selection binding rejects same-hash timestamp, state-root and transaction-list conflicts
+  ---
+  duration_ms: 28.141
+  type: 'test'
+  ...
+# Subtest: selection binding permits an entire matching header independent of object field insertion order
+ok 627 - selection binding permits an entire matching header independent of object field insertion order
+  ---
+  duration_ms: 14.396958
+  type: 'test'
+  ...
+# Subtest: an unavailable engine before a valid fetched header remains an ordinary unavailable result
+ok 628 - an unavailable engine before a valid fetched header remains an ordinary unavailable result
+  ---
+  duration_ms: 0.531667
+  type: 'test'
+  ...
+# Subtest: engine wrong-chain and poisoned provider failure remain explicit unavailable results, never success assets
+ok 629 - engine wrong-chain and poisoned provider failure remain explicit unavailable results, never success assets
+  ---
+  duration_ms: 0.48175
+  type: 'test'
+  ...
+# Subtest: pure display control: unknown tokens remain raw and account ownership is decoded rather than assumed
+ok 630 - pure display control: unknown tokens remain raw and account ownership is decoded rather than assumed
+  ---
+  duration_ms: 0.170666
+  type: 'test'
+  ...
+# Subtest: pure display control: max uint256 uses exact decimal formatting and stale query bindings withhold display values
+ok 631 - pure display control: max uint256 uses exact decimal formatting and stale query bindings withhold display values
+  ---
+  duration_ms: 0.114042
+  type: 'test'
+  ...
+# Subtest: native preview uses measured balances only, retains account identity and proof references, and formats ETH exactly
+ok 632 - native preview uses measured balances only, retains account identity and proof references, and formats ETH exactly
+  ---
+  duration_ms: 0.627875
+  type: 'test'
+  ...
+# Subtest: native preview preserves unmeasured states without amounts and rejects inconsistent measured arithmetic
+ok 633 - native preview preserves unmeasured states without amounts and rejects inconsistent measured arithmetic
+  ---
+  duration_ms: 0.331333
+  type: 'test'
+  ...
+# Subtest: diagnostic comparator fixtures retain all original response bytes and RPC identities
+ok 634 - diagnostic comparator fixtures retain all original response bytes and RPC identities
+  ---
+  duration_ms: 14.907875
+  type: 'test'
+  ...
+# Subtest: observed original/replay diff: A, ordinary position 0
+ok 635 - observed original/replay diff: A, ordinary position 0
+  ---
+  duration_ms: 7.001292
+  type: 'test'
+  ...
+# Subtest: observed original/replay diff: A, ordinary position 1
+ok 636 - observed original/replay diff: A, ordinary position 1
+  ---
+  duration_ms: 0.415417
+  type: 'test'
+  ...
+# Subtest: observed original/replay diff: A, ordinary position 2
+ok 637 - observed original/replay diff: A, ordinary position 2
+  ---
+  duration_ms: 17.160709
+  type: 'test'
+  ...
+# Subtest: observed original/replay diff: A, ordinary position 3
+ok 638 - observed original/replay diff: A, ordinary position 3
+  ---
+  duration_ms: 9.303458
+  type: 'test'
+  ...
+# Subtest: observed original/replay diff: A, ordinary position 4
+ok 639 - observed original/replay diff: A, ordinary position 4
+  ---
+  duration_ms: 0.13175
+  type: 'test'
+  ...
+# Subtest: observed original/replay diff: B, ordinary position 0
+ok 640 - observed original/replay diff: B, ordinary position 0
+  ---
+  duration_ms: 2.16425
+  type: 'test'
+  ...
+# Subtest: observed original/replay diff: B, ordinary position 1
+ok 641 - observed original/replay diff: B, ordinary position 1
+  ---
+  duration_ms: 2.625708
+  type: 'test'
+  ...
+# Subtest: observed original/replay diff: B, ordinary position 2
+ok 642 - observed original/replay diff: B, ordinary position 2
+  ---
+  duration_ms: 12.851542
+  type: 'test'
+  ...
+# Subtest: observed original/replay diff: B, ordinary position 3
+ok 643 - observed original/replay diff: B, ordinary position 3
+  ---
+  duration_ms: 10.972167
+  type: 'test'
+  ...
+# Subtest: observed original/replay diff: B, ordinary position 4
+ok 644 - observed original/replay diff: B, ordinary position 4
+  ---
+  duration_ms: 0.324792
+  type: 'test'
+  ...
+# Subtest: canonical equality normalizes object order, integer representation and hex case only
+ok 645 - canonical equality normalizes object order, integer representation and hex case only
+  ---
+  duration_ms: 0.312417
+  type: 'test'
+  ...
+# Subtest: absolute pre and post values matter even when every delta is unchanged
+ok 646 - absolute pre and post values matter even when every delta is unchanged
+  ---
+  duration_ms: 0.219042
+  type: 'test'
+  ...
+# Subtest: omission, zero values, empty storage and code presence remain distinct
+ok 647 - omission, zero values, empty storage and code presence remain distinct
+  ---
+  duration_ms: 0.385583
+  type: 'test'
+  ...
+# Subtest: unknown fields and malformed shapes are rejected before comparison
+ok 648 - unknown fields and malformed shapes are rejected before comparison
+  ---
+  duration_ms: 0.976709
+  type: 'test'
+  ...
+# Subtest: normalized key collisions and non-JSON object behavior fail closed
+ok 649 - normalized key collisions and non-JSON object behavior fail closed
+  ---
+  duration_ms: 0.413666
+  type: 'test'
+  ...
+# Subtest: 100-account and 2000-slot bounds count the pre/post union without double counting
+ok 650 - 100-account and 2000-slot bounds count the pre/post union without double counting
+  ---
+  duration_ms: 21.5975
+  type: 'test'
+  ...
+# Subtest: contract code text is bounded independently of transport response limits
+ok 651 - contract code text is bounded independently of transport response limits
+  ---
+  duration_ms: 13.819416
+  type: 'test'
+  ...
+# Subtest: empty state diffs and nonce-only diffs are valid, without fabricating storage
+ok 652 - empty state diffs and nonce-only diffs are valid, without fabricating storage
+  ---
+  duration_ms: 2.285958
+  type: 'test'
+  ...
+# Subtest: state reconstruction includes inserted, changed and cleared slots plus native balance changes
+ok 653 - state reconstruction includes inserted, changed and cleared slots plus native balance changes
+  ---
+  duration_ms: 0.394
+  type: 'test'
+  ...
+# Subtest: storage, account and numeric resource bounds reject malformed or unbounded state
+ok 654 - storage, account and numeric resource bounds reject malformed or unbounded state
+  ---
+  duration_ms: 8.341417
+  type: 'test'
+  ...
+# Subtest: lazy context snapshots request identity and shares in-flight preparation
+ok 655 - lazy context snapshots request identity and shares in-flight preparation
+  ---
+  duration_ms: 0.824959
+  type: 'test'
+  ...
+# Subtest: shared canonical failure is sanitized and remains latched after a later successful check
+ok 656 - shared canonical failure is sanitized and remains latched after a later successful check
+  ---
+  duration_ms: 1.083125
+  type: 'test'
+  ...
+# Subtest: an isolated token query failure does not latch a canonical failure
+ok 657 - an isolated token query failure does not latch a canonical failure
+  ---
+  duration_ms: 0.322459
+  type: 'test'
+  ...
+# Subtest: concurrent normalized queries share one pair and callers cannot mutate cached values
+ok 658 - concurrent normalized queries share one pair and callers cannot mutate cached values
+  ---
+  duration_ms: 0.459333
+  type: 'test'
+  ...
+# Subtest: query failures are cached without hidden retries or leaking provider details
+ok 659 - query failures are cached without hidden retries or leaking provider details
+  ---
+  duration_ms: 0.28425
+  type: 'test'
+  ...
+# Subtest: shared context limits distinct pairs and total requests before contacting the provider
+ok 660 - shared context limits distinct pairs and total requests before contacting the provider
+  ---
+  duration_ms: 2.259458
+  type: 'test'
+  ...
+# Subtest: non-JSON and oversized results retain one sanitized terminal error per request
+ok 661 - non-JSON and oversized results retain one sanitized terminal error per request
+  ---
+  duration_ms: 27.587083
+  type: 'test'
+  ...
+# Subtest: individually bounded responses cannot exceed the shared evidence budget
+ok 662 - individually bounded responses cannot exceed the shared evidence budget
+  ---
+  duration_ms: 200.900916
+  type: 'test'
+  ...
+# Subtest: verified transferFrom separates four roles and transfer amount from allowance requests
+ok 663 - verified transferFrom separates four roles and transfer amount from allowance requests
+  ---
+  duration_ms: 3.160125
+  type: 'test'
+  ...
+# Subtest: only one CALL observation is emitted for a proxy delegate and repeated objects are not counted twice
+ok 664 - only one CALL observation is emitted for a proxy delegate and repeated objects are not counted twice
+  ---
+  duration_ms: 0.8595
+  type: 'test'
+  ...
+# Subtest: a direct hUSDC transferFrom keeps its top-level submitter and calldata owner distinct
+ok 665 - a direct hUSDC transferFrom keeps its top-level submitter and calldata owner distinct
+  ---
+  duration_ms: 0.361084
+  type: 'test'
+  ...
+# Subtest: unknown token, chain, delegate implementation or proxy provenance cannot establish transfer arguments
+ok 666 - unknown token, chain, delegate implementation or proxy provenance cannot establish transfer arguments
+  ---
+  duration_ms: 1.302166
+  type: 'test'
+  ...
+# Subtest: transferFrom ABI requires exactly three canonical words and zero native value
+ok 667 - transferFrom ABI requires exactly three canonical words and zero native value
+  ---
+  duration_ms: 0.474708
+  type: 'test'
+  ...
+# Subtest: failed roots, failed ancestors, and static ancestors exclude transferFrom descendants
+ok 668 - failed roots, failed ancestors, and static ancestors exclude transferFrom descendants
+  ---
+  duration_ms: 0.198625
+  type: 'test'
+  ...
+# Subtest: false and missing boolean returns remain call evidence without claiming successful token movement
+ok 669 - false and missing boolean returns remain call evidence without claiming successful token movement
+  ---
+  duration_ms: 0.94025
+  type: 'test'
+  ...
+# Subtest: measured unchanged maximum allowance does not erase an observed transferFrom
+ok 670 - measured unchanged maximum allowance does not erase an observed transferFrom
+  ---
+  duration_ms: 0.189084
+  type: 'test'
+  ...
+# Subtest: self-owner spender remains explicit and zero allowance does not imply failed authorization
+ok 671 - self-owner spender remains explicit and zero allowance does not imply failed authorization
+  ---
+  duration_ms: 0.300333
+  type: 'test'
+  ...
+# Subtest: stale transfer owner/spender/recipient/submitter/provenance is rejected before state queries
+ok 672 - stale transfer owner/spender/recipient/submitter/provenance is rejected before state queries
+  ---
+  duration_ms: 1.27675
+  type: 'test'
+  ...
+# Subtest: transferFrom allowance candidates obey eight-pair and 256-observation bounds before RPC
+ok 673 - transferFrom allowance candidates obey eight-pair and 256-observation bounds before RPC
+  ---
+  duration_ms: 4.842625
+  type: 'test'
+  ...
+# Subtest: duplicate pairs are queried once while distinct successful calls retain their observations
+ok 674 - duplicate pairs are queried once while distinct successful calls retain their observations
+  ---
+  duration_ms: 0.308875
+  type: 'test'
+  ...
+# Subtest: observed historical supply transferFrom identifies the Pool and measures its recorded allowance decrease
+ok 675 - observed historical supply transferFrom identifies the Pool and measures its recorded allowance decrease
+  ---
+  duration_ms: 66.682083
+  type: 'test'
+  ...
+# Subtest: observed router transferFrom calls retain owner versus router spending roles after permit
+ok 676 - observed router transferFrom calls retain owner versus router spending roles after permit
+  ---
+  duration_ms: 4.282792
+  type: 'test'
+  ...
+# Subtest: preserves uint256 values without floating point conversion
+ok 677 - preserves uint256 values without floating point conversion
+  ---
+  duration_ms: 0.783875
+  type: 'test'
+  ...
+# Subtest: rejects unsupported chains, malformed addresses and malformed calldata
+ok 678 - rejects unsupported chains, malformed addresses and malformed calldata
+  ---
+  duration_ms: 0.074625
+  type: 'test'
+  ...
+# Subtest: does not accept arbitrary provider or JSON RPC commands from callers
+ok 679 - does not accept arbitrary provider or JSON RPC commands from callers
+  ---
+  duration_ms: 0.156375
+  type: 'test'
+  ...
+# Subtest: supports explicit block numbers and rejects unbounded block values
+ok 680 - supports explicit block numbers and rejects unbounded block values
+  ---
+  duration_ms: 0.098584
+  type: 'test'
+  ...
+# Subtest: historical requests require a full transaction hash
+ok 681 - historical requests require a full transaction hash
+  ---
+  duration_ms: 0.125208
+  type: 'test'
+  ...
+1..681
+# tests 681
+# suites 0
+# pass 681
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 38063.016083

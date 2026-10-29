@@ -80,6 +80,7 @@ if (process.argv[2] === '--prepare') {
   console.log(json({ planSha256: plan.sha256, runtimeManifestSha256: identity.sha256, input, files: snapshot.files.length }));
 } else if (process.argv[2] === '--run') {
   const planPin = process.argv[3]; verify(planPin);
+  const qualificationHeader = read(path.join(CAPTURE, 'qualification-header.json'));
   put(path.join(CAPTURE, 'STARTED.json'), { planSha256: planPin, at: new Date().toISOString(), pid: process.pid });
   let result, api, adapterInvoked = false, terminalError = null;
   try {
@@ -95,7 +96,7 @@ if (process.argv[2] === '--prepare') {
     if (api) api.withholdArbitrumSimulation(result, code);
     else Object.assign(result, { status: 'unavailable', error: { code }, execution: { status: 'unavailable' }, assetChanges: [] });
   };
-  const qualificationHeaderConfirmed = isDeepStrictEqual(result.source?.header, read(path.join(CAPTURE, 'qualification-header.json')));
+  const qualificationHeaderConfirmed = isDeepStrictEqual(result.source?.header, qualificationHeader);
   if (!qualificationHeaderConfirmed) withhold('ARBITRUM_QUALIFICATION_HEADER');
   let sourceUnchanged = false;
   try { verify(planPin); sourceUnchanged = true; } catch { withhold('ARBITRUM_SOURCE_CHANGED'); }
