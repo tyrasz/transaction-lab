@@ -1,6 +1,8 @@
 import { RLP } from '@ethereumjs/rlp';
 import { keccak_256 } from '@noble/hashes/sha3.js';
-import { ethereumCommon, ethereumQuantity } from './ethereum-profile.js';
+import { types } from 'node:util';
+import { ethereumQuantity } from './ethereum-profile.js';
+import { ethereumNetworkCommon, ETHEREUM_NETWORK_SCHEDULES } from './ethereum-network.js';
 
 const DATA = /^0x(?:[0-9a-f]{2})*$/i, QUANTITY = /^0x(?:0|[1-9a-f][0-9a-f]*)$/i;
 const EMPTY_OMMERS = '0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347';
@@ -23,22 +25,25 @@ function integer(value, bits = 64) {
 }
 
 /** Recompute the post-Merge Ethereum execution-header hash, including active
- * Shanghai/Cancun/Prague suffixes. EIP-4788 specifies the Cancun RLP order;
- * EIP-7685 appends requestsHash. This binds stateRoot to an externally chosen
+ * Shanghai/Cancun/Prague/Amsterdam suffixes. EIP-4788 specifies the Cancun RLP
+ * order; EIP-7685 appends requestsHash, then EIP-7928 and EIP-7843 append the
+ * block-access-list commitment and slot number. This binds stateRoot to a chosen
  * block hash, not to consensus, finality, chain membership or body validity. */
-export function verifyEthereumHeader({ header, expectedHash }) {
-  if (!header || typeof header !== 'object' || Array.isArray(header) || ![Object.prototype, null].includes(Object.getPrototypeOf(header))) fail('A plain RPC header is required.');
-  const allowed = [...CORE, ...CANCUN, 'requestsHash', ...EXTRAS];
+export function verifyEthereumHeader({ header, expectedHash, chainId = 1 }) {
+  if (!header || typeof header !== 'object' || types.isProxy(header) || Array.isArray(header) || ![Object.prototype, null].includes(Object.getPrototypeOf(header))) fail('A plain RPC header is required.');
+  const allowed = [...CORE, ...CANCUN, 'requestsHash', 'blockAccessListHash', 'slotNumber', ...EXTRAS];
   for (const key of Reflect.ownKeys(header)) {
     const d = Object.getOwnPropertyDescriptor(header, key);
     if (typeof key !== 'string' || !allowed.includes(key) || !d.enumerable || !Object.hasOwn(d, 'value')) fail('Unsupported header field or property.');
   }
   data(expectedHash, 32); data(header.hash, 32);
   if (header.hash.toLowerCase() !== expectedHash.toLowerCase()) fail('Returned header hash differs from the requested hash.');
-  const common = ethereumCommon(header), cancun = common.isActivatedEIP(4844), prague = common.isActivatedEIP(7685);
+  const common = ethereumNetworkCommon(header, chainId), cancun = common.isActivatedEIP(4844), prague = common.isActivatedEIP(7685);
+  const accessList = common.isActivatedEIP(7928), slot = common.isActivatedEIP(7843);
   if (header.sha3Uncles?.toLowerCase() !== EMPTY_OMMERS || header.difficulty !== '0x0' || header.nonce !== '0x0000000000000000') fail('Post-Merge fixed header fields are inconsistent.');
   if (ethereumQuantity(header.gasUsed) > ethereumQuantity(header.gasLimit) || ethereumQuantity(header.gasLimit) === 0n) fail('Header gas quantities are inconsistent.');
   if ((!cancun && CANCUN.some(k => Object.hasOwn(header, k))) || (!prague && Object.hasOwn(header, 'requestsHash'))) fail('Header contains fields before their configured fork.');
+  if ((!accessList && Object.hasOwn(header, 'blockAccessListHash')) || (!slot && Object.hasOwn(header, 'slotNumber'))) fail('Unsupported header field before its configured fork.');
   const values = CORE.map(key => {
     if (['difficulty', 'baseFeePerGas'].includes(key)) return integer(header[key], 256);
     if (['number', 'gasLimit', 'gasUsed', 'timestamp'].includes(key)) return integer(header[key]);
@@ -47,7 +52,10 @@ export function verifyEthereumHeader({ header, expectedHash }) {
   });
   if (cancun) values.push(integer(header.blobGasUsed), integer(header.excessBlobGas), data(header.parentBeaconBlockRoot, 32));
   if (prague) values.push(data(header.requestsHash, 32));
+  if (accessList) values.push(data(header.blockAccessListHash, 32));
+  if (slot) values.push(integer(header.slotNumber));
   const encoded = RLP.encode(values), computed = '0x' + Buffer.from(keccak_256(encoded)).toString('hex');
   if (computed !== expectedHash.toLowerCase()) fail('Execution-header fields do not hash to the requested block.');
-  return Object.freeze({ status: 'verified', blockHash: computed, stateRoot: header.stateRoot.toLowerCase(), parentHash: header.parentHash.toLowerCase(), number: ethereumQuantity(header.number).toString(), timestamp: ethereumQuantity(header.timestamp).toString(), hardfork: common.hardfork(), encodedBytes: encoded.length, headerFields: values.length, consensusVerified: false, finalityVerified: false, bodyVerified: false });
+  return Object.freeze({ status: 'verified', blockHash: computed, stateRoot: header.stateRoot.toLowerCase(), parentHash: header.parentHash.toLowerCase(), number: ethereumQuantity(header.number).toString(), timestamp: ethereumQuantity(header.timestamp).toString(), hardfork: common.hardfork(), encodedBytes: encoded.length, headerFields: values.length, consensusVerified: false, finalityVerified: false, bodyVerified: false,
+    ...(chainId === 1 ? {} : { chainId, forkSchedule: ETHEREUM_NETWORK_SCHEDULES[chainId] }) });
 }

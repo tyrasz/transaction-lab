@@ -1,0 +1,280 @@
+TAP version 13
+# Subtest: Amsterdam EIP-2780 reference shapes have the independently specified intrinsic and floor costs
+ok 1 - Amsterdam EIP-2780 reference shapes have the independently specified intrinsic and floor costs
+  ---
+  duration_ms: 1.477167
+  type: 'test'
+  ...
+# Subtest: Amsterdam access-list duplicates pay both access and data charges; floor includes every declared byte
+ok 2 - Amsterdam access-list duplicates pay both access and data charges; floor includes every declared byte
+  ---
+  duration_ms: 0.400667
+  type: 'test'
+  ...
+# Subtest: Amsterdam uniform calldata floor is independent of zero bytes; intrinsic data cost still distinguishes them
+ok 3 - Amsterdam uniform calldata floor is independent of zero bytes; intrinsic data cost still distinguishes them
+  ---
+  duration_ms: 1.242708
+  type: 'test'
+  ...
+# Subtest: every Amsterdam authorization occurrence pays 7816 even if signature or chain would later skip
+ok 4 - every Amsterdam authorization occurrence pays 7816 even if signature or chain would later skip
+  ---
+  duration_ms: 0.241667
+  type: 'test'
+  ...
+# Subtest: owned intrinsic/floor arithmetic matches separately signed transaction calculations across declared shapes
+ok 5 - owned intrinsic/floor arithmetic matches separately signed transaction calculations across declared shapes
+  ---
+  duration_ms: 74.629291
+  type: 'test'
+  ...
+# Subtest: Amsterdam gas calculation requires complete explicit envelope and retains input bounds
+ok 6 - Amsterdam gas calculation requires complete explicit envelope and retains input bounds
+  ---
+  duration_ms: 0.513916
+  type: 'test'
+  ...
+# Subtest: older gas results remain unchanged and public mainnet execution still does not enable Amsterdam
+ok 7 - older gas results remain unchanged and public mainnet execution still does not enable Amsterdam
+  ---
+  duration_ms: 0.935916
+  type: 'test'
+  ...
+# Subtest: absent authorization context preserves legacy cost and profile shape
+ok 8 - absent authorization context preserves legacy cost and profile shape
+  ---
+  duration_ms: 1.643458
+  type: 'test'
+  ...
+# Subtest: every declared tuple occurrence pays 25000 intrinsic even when protocol-skippable
+ok 9 - every declared tuple occurrence pays 25000 intrinsic even when protocol-skippable
+  ---
+  duration_ms: 0.634541
+  type: 'test'
+  ...
+# Subtest: authorization admission starts at Prague and excludes creation and blob context
+ok 10 - authorization admission starts at Prague and excludes creation and blob context
+  ---
+  duration_ms: 1.593
+  type: 'test'
+  ...
+# Subtest: authorization intrinsic participates in admission, refund cap and unchanged calldata floor
+ok 11 - authorization intrinsic participates in admission, refund cap and unchanged calldata floor
+  ---
+  duration_ms: 0.414208
+  type: 'test'
+  ...
+# Subtest: malformed authorization structures fail before any state or query input read
+ok 12 - malformed authorization structures fail before any state or query input read
+  ---
+  duration_ms: 2.498083
+  type: 'test'
+  ...
+# Subtest: fork selection uses activation timestamps, never the library default
+ok 13 - fork selection uses activation timestamps, never the library default
+  ---
+  duration_ms: 1.839541
+  type: 'test'
+  ...
+# Subtest: zero message gas permits an ordinary 21000-gas ETH transfer without a root CALL surcharge
+ok 14 - zero message gas permits an ordinary 21000-gas ETH transfer without a root CALL surcharge
+  ---
+  duration_ms: 4.7225
+  type: 'test'
+  ...
+# Subtest: Prague calldata floor changes envelope admission and reported gas, not the message gas subtraction
+ok 15 - Prague calldata floor changes envelope admission and reported gas, not the message gas subtraction
+  ---
+  duration_ms: 3.4055
+  type: 'test'
+  ...
+# Subtest: actual SSTORE refunds are capped at one fifth and the calldata floor is applied afterward
+ok 16 - actual SSTORE refunds are capped at one fifth and the calldata floor is applied afterward
+  ---
+  duration_ms: 7.75
+  type: 'test'
+  ...
+# Subtest: insufficient native balance and max nonce are invalid before nonce or storage mutation
+ok 17 - insufficient native balance and max nonce are invalid before nonce or storage mutation
+  ---
+  duration_ms: 5.19375
+  type: 'test'
+  ...
+# Subtest: value and SSTORE roll back on real REVERT, while the completed call retains one nonce increment
+ok 18 - value and SSTORE roll back on real REVERT, while the completed call retains one nonce increment
+  ---
+  duration_ms: 2.693208
+  type: 'test'
+  ...
+# Subtest: CHAINID and header opcodes reflect mainnet and explicit unpriced context
+ok 19 - CHAINID and header opcodes reflect mainnet and explicit unpriced context
+  ---
+  duration_ms: 1.236292
+  type: 'test'
+  ...
+# Subtest: new fork precompiles are warm only after their activation
+ok 20 - new fork precompiles are warm only after their activation
+  ---
+  duration_ms: 5.032
+  type: 'test'
+  ...
+# Subtest: HyperEVM reserved addresses are ordinary mainnet addresses
+ok 21 - HyperEVM reserved addresses are ordinary mainnet addresses
+  ---
+  duration_ms: 0.86575
+  type: 'test'
+  ...
+# Subtest: Osaka CLZ executes only after the fork and a pre-fork invalid opcode consumes message gas
+ok 22 - Osaka CLZ executes only after the fork and a pre-fork invalid opcode consumes message gas
+  ---
+  duration_ms: 3.142209
+  type: 'test'
+  ...
+# Subtest: ordinary contract sender and unsupported-manager lifecycle operations retain no writes
+ok 23 - ordinary contract sender and unsupported-manager lifecycle operations retain no writes
+  ---
+  duration_ms: 1.592083
+  type: 'test'
+  ...
+# Subtest: unsupported transaction extras and malformed inputs are rejected before state reads
+ok 24 - unsupported transaction extras and malformed inputs are rejected before state reads
+  ---
+  duration_ms: 1.262083
+  type: 'test'
+  ...
+# Subtest: gas rules preserve byte classes and refund/floor boundary exactly without floating point
+ok 25 - gas rules preserve byte classes and refund/floor boundary exactly without floating point
+  ---
+  duration_ms: 0.07825
+  type: 'test'
+  ...
+# Subtest: access-list occurrences charge intrinsic gas while warming deduplicates and never prefetches unused facts
+ok 26 - access-list occurrences charge intrinsic gas while warming deduplicates and never prefetches unused facts
+  ---
+  duration_ms: 1.809958
+  type: 'test'
+  ...
+# Subtest: declared warming survives nested REVERT and is scoped to each new execution
+ok 27 - declared warming survives nested REVERT and is scoped to each new execution
+  ---
+  duration_ms: 2.334709
+  type: 'test'
+  ...
+# Subtest: declared blob context exposes ordered hashes, bounded index zero and synthetic blob base fee
+ok 28 - declared blob context exposes ordered hashes, bounded index zero and synthetic blob base fee
+  ---
+  duration_ms: 0.875333
+  type: 'test'
+  ...
+# Subtest: blob context propagates through nested calls while absent BLOBBASEFEE stays unsupported and malformed KZG fails normally
+ok 29 - blob context propagates through nested calls while absent BLOBBASEFEE stays unsupported and malformed KZG fails normally
+  ---
+  duration_ms: 1.905334
+  type: 'test'
+  ...
+# Subtest: access intrinsic and blob fork/header validity reject before state reads
+ok 30 - access intrinsic and blob fork/header validity reject before state reads
+  ---
+  duration_ms: 0.628125
+  type: 'test'
+  ...
+# Subtest: Ethereum BLOBHASH without declared blobs returns zero for all tested uint256 indexes at three opcode gas
+ok 31 - Ethereum BLOBHASH without declared blobs returns zero for all tested uint256 indexes at three opcode gas
+  ---
+  duration_ms: 3.244084
+  type: 'test'
+  ...
+# Subtest: non-blob BLOBHASH obeys Cancun activation rather than enabling a pre-fork opcode
+ok 32 - non-blob BLOBHASH obeys Cancun activation rather than enabling a pre-fork opcode
+  ---
+  duration_ms: 1.046416
+  type: 'test'
+  ...
+# Subtest: CALL, DELEGATECALL and STATICCALL inherit an empty blob-hash list without extra input state
+ok 33 - CALL, DELEGATECALL and STATICCALL inherit an empty blob-hash list without extra input state
+  ---
+  duration_ms: 2.791167
+  type: 'test'
+  ...
+# Subtest: non-blob BLOBHASH preserves ordinary REVERT and stack-fault rollback including transferred value
+ok 34 - non-blob BLOBHASH preserves ordinary REVERT and stack-fault rollback including transferred value
+  ---
+  duration_ms: 1.095209
+  type: 'test'
+  ...
+# Subtest: unsupported non-blob BLOBBASEFEE after successful BLOBHASH rolls back storage, value and nonce
+ok 35 - unsupported non-blob BLOBBASEFEE after successful BLOBHASH rolls back storage, value and nonce
+  ---
+  duration_ms: 0.602583
+  type: 'test'
+  ...
+# Subtest: creation intrinsic charges exact initcode word boundaries, with unchanged legacy gas shape
+ok 36 - creation intrinsic charges exact initcode word boundaries, with unchanged legacy gas shape
+  ---
+  duration_ms: 10.03925
+  type: 'test'
+  ...
+# Subtest: creation charges duplicate access-list occurrences while the calldata floor stays independent
+ok 37 - creation charges duplicate access-list occurrences while the calldata floor stays independent
+  ---
+  duration_ms: 2.6185
+  type: 'test'
+  ...
+# Subtest: large initcode uses the active calldata floor without subtracting that floor from message gas
+ok 38 - large initcode uses the active calldata floor without subtracting that floor from message gas
+  ---
+  duration_ms: 9.780959
+  type: 'test'
+  ...
+# Subtest: empty initcode admits exactly 53000 gas and increments the proven sender nonce once
+ok 39 - empty initcode admits exactly 53000 gas and increments the proven sender nonce once
+  ---
+  duration_ms: 3.252334
+  type: 'test'
+  ...
+# Subtest: creation returns deployed runtime bytes and retains constructor writes without charging code deposit twice
+ok 40 - creation returns deployed runtime bytes and retains constructor writes without charging code deposit twice
+  ---
+  duration_ms: 3.458625
+  type: 'test'
+  ...
+# Subtest: the 32 KiB product initcode bound remains stricter than EIP-3860 and rejects before any proof read
+ok 41 - the 32 KiB product initcode bound remains stricter than EIP-3860 and rejects before any proof read
+  ---
+  duration_ms: 6.568083
+  type: 'test'
+  ...
+# Subtest: missing or malformed destinations, root salts, blob creation and insufficient gas never touch state
+ok 42 - missing or malformed destinations, root salts, blob creation and insufficient gas never touch state
+  ---
+  duration_ms: 5.011417
+  type: 'test'
+  ...
+# Subtest: creation preview retains explicit getter identities and never turns an absent before-contract into zero
+ok 43 - creation preview retains explicit getter identities and never turns an absent before-contract into zero
+  ---
+  duration_ms: 9.461084
+  type: 'test'
+  ...
+# Subtest: a genuine constructor revert remains completed while existing getters measure unchanged state
+ok 44 - a genuine constructor revert remains completed while existing getters measure unchanged state
+  ---
+  duration_ms: 5.107375
+  type: 'test'
+  ...
+# Subtest: preview rejects malformed creation envelopes and forbidden blob context before state transport
+ok 45 - preview rejects malformed creation envelopes and forbidden blob context before state transport
+  ---
+  duration_ms: 2.634666
+  type: 'test'
+  ...
+1..45
+# tests 45
+# suites 0
+# pass 45
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 204.991667

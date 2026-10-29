@@ -1,0 +1,112 @@
+TAP version 13
+# Subtest: source commitment supplies N-1; N-256 follows exactly255 authenticated hash links and caches
+ok 1 - source commitment supplies N-1; N-256 follows exactly255 authenticated hash links and caches
+  ---
+  duration_ms: 174.892959
+  type: 'test'
+  ...
+# Subtest: current/future/older-than256 return zero without adapter dispatch or retained ancestry lookups
+ok 2 - current/future/older-than256 return zero without adapter dispatch or retained ancestry lookups
+  ---
+  duration_ms: 0.509917
+  type: 'test'
+  ...
+# Subtest: hash substitution, changed fields, number gaps and nondecreasing timestamp cannot extend ancestry
+ok 3 - hash substitution, changed fields, number gaps and nondecreasing timestamp cannot extend ancestry
+  ---
+  duration_ms: 2.119917
+  type: 'test'
+  ...
+# Subtest: snapshots cannot add unsupported lookups, omit received header proof or invent provenance
+ok 4 - snapshots cannot add unsupported lookups, omit received header proof or invent provenance
+  ---
+  duration_ms: 2.101709
+  type: 'test'
+  ...
+# Subtest: ancestor reads share call/byte/time budgets and poison subsequent reads on failure
+ok 5 - ancestor reads share call/byte/time budgets and poison subsequent reads on failure
+  ---
+  duration_ms: 18.46275
+  type: 'test'
+  ...
+# Subtest: invalid ancestors retain rejected evidence and do not become valid cached facts
+ok 6 - invalid ancestors retain rejected evidence and do not become valid cached facts
+  ---
+  duration_ms: 0.872917
+  type: 'test'
+  ...
+# Subtest: real two-provider Ethereum header independently hashes to its selected block identity
+ok 7 - real two-provider Ethereum header independently hashes to its selected block identity
+  ---
+  duration_ms: 2.8065
+  type: 'test'
+  ...
+# Subtest: tampering any execution-header commitment is rejected despite unchanged declared block hash
+ok 8 - tampering any execution-header commitment is rejected despite unchanged declared block hash
+  ---
+  duration_ms: 7.085
+  type: 'test'
+  ...
+# Subtest: header byte widths, required fork suffixes and canonical integers cannot be guessed
+ok 9 - header byte widths, required fork suffixes and canonical integers cannot be guessed
+  ---
+  duration_ms: 0.905709
+  type: 'test'
+  ...
+# Subtest: wrong requested hash and unknown future header fields fail closed
+ok 10 - wrong requested hash and unknown future header fields fail closed
+  ---
+  duration_ms: 0.279541
+  type: 'test'
+  ...
+# Subtest: Shanghai and Cancun suffix shapes are selected from time and reject later-fork fields
+ok 11 - Shanghai and Cancun suffix shapes are selected from time and reject later-fork fields
+  ---
+  duration_ms: 0.583875
+  type: 'test'
+  ...
+# Subtest: RPC body lists are outside the header-commitment claim
+ok 12 - RPC body lists are outside the header-commitment claim
+  ---
+  duration_ms: 0.133916
+  type: 'test'
+  ...
+# Subtest: pinned Sepolia activation selects exact fork boundaries without mutating global or returned Common state
+ok 13 - pinned Sepolia activation selects exact fork boundaries without mutating global or returned Common state
+  ---
+  duration_ms: 2.810292
+  type: 'test'
+  ...
+# Subtest: real saved Sepolia header has the exact 23-field hash and explicit limited network metadata
+ok 14 - real saved Sepolia header has the exact 23-field hash and explicit limited network metadata
+  ---
+  duration_ms: 2.433667
+  type: 'test'
+  ...
+# Subtest: Amsterdam suffix ordering, omission, widths and values cannot be substituted
+ok 15 - Amsterdam suffix ordering, omission, widths and values cannot be substituted
+  ---
+  duration_ms: 3.4155
+  type: 'test'
+  ...
+# Subtest: activation boundary requires active suffixes and forbids them before activation
+ok 16 - activation boundary requires active suffixes and forbids them before activation
+  ---
+  duration_ms: 2.00525
+  type: 'test'
+  ...
+# Subtest: chain selectors and hostile header properties reject without invoking caller code
+ok 17 - chain selectors and hostile header properties reject without invoking caller code
+  ---
+  duration_ms: 0.679125
+  type: 'test'
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 290.672583

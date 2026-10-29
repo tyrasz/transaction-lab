@@ -30,19 +30,45 @@ export function ethereumCallGas(data, common, request = {}) {
   if (typeof data !== 'string' || !BYTES.test(data) || data.length > 65538) throw profileError('LOCAL_ETHEREUM_INPUT_INVALID', 'Expected bounded even-length calldata.');
   const creation = request.to === null;
   if (creation && context.blobVersionedHashes) throw profileError('LOCAL_ETHEREUM_INPUT_INVALID', 'Unsigned creation does not accept blob transaction context.');
+  // EIP-2780 replaces the flat transaction base with state-independent
+  // components. Runtime account/delegation charges belong to execution, not
+  // this admission calculation. Public execution remains fork-gated above.
+  const decomposed = common.isActivatedEIP(2780);
+  let recipientIntrinsic = 0n, valueIntrinsic = 0n;
+  if (decomposed) {
+    if (typeof request.from !== 'string' || !/^0x[0-9a-f]{40}$/i.test(request.from)
+      || (!creation && (typeof request.to !== 'string' || !/^0x[0-9a-f]{40}$/i.test(request.to)))) {
+      throw profileError('LOCAL_ETHEREUM_INPUT_INVALID', 'Amsterdam intrinsic gas requires an explicit sender and destination.');
+    }
+    const value = ethereumQuantity(request.value);
+    const self = !creation && request.from.toLowerCase() === request.to.toLowerCase();
+    recipientIntrinsic = !creation && !self ? 3000n : 0n;
+    valueIntrinsic = !creation && !self && value > 0n ? 6000n : 0n;
+  }
   let zeroBytes = 0n, nonzeroBytes = 0n;
   for (let i = 2; i < data.length; i += 2) data.slice(i, i + 2) === '00' ? zeroBytes++ : nonzeroBytes++;
   const tokens = zeroBytes + nonzeroBytes * 4n;
   const addressCount = BigInt(context.accessList?.length ?? 0), storageKeyCount = BigInt(context.accessList?.reduce((n, row) => n + row.storageKeys.length, 0) ?? 0);
-  const accessListGas = 2400n * addressCount + 1900n * storageKeyCount;
+  // EIP-8038's access-minus-warm charges and EIP-7981's data surcharge
+  // are distinct: the latter also enters the calldata floor.
+  const accessListAccessGas = common.isActivatedEIP(8038)
+    ? 2900n * addressCount + 2000n * storageKeyCount
+    : 2400n * addressCount + 1900n * storageKeyCount;
+  const accessListDataGas = common.isActivatedEIP(7981) ? 64n * (20n * addressCount + 32n * storageKeyCount) : 0n;
+  const accessListGas = accessListAccessGas + accessListDataGas;
   // The declared root envelope pays these charges once. Internal CREATE and
   // CREATE2 pay their own opcode/initcode charges inside the EVM instead.
-  const creationCosts = creation ? { creationIntrinsic: 32000n, initcodeBytes: zeroBytes + nonzeroBytes,
+  const creationCosts = creation ? { creationIntrinsic: decomposed ? 12000n : 32000n, initcodeBytes: zeroBytes + nonzeroBytes,
     initcodeWordGas: common.isActivatedEIP(3860) ? 2n * ((zeroBytes + nonzeroBytes + 31n) / 32n) : 0n } : {};
-  const authorizationCosts = authorizationList ? { authorizationCount: BigInt(authorizationList.length), authorizationIntrinsic: 25000n * BigInt(authorizationList.length) } : {};
-  const intrinsic = 21000n + tokens * 4n + accessListGas + (creationCosts.creationIntrinsic ?? 0n) + (creationCosts.initcodeWordGas ?? 0n) + (authorizationCosts.authorizationIntrinsic ?? 0n);
-  const floor = common.isActivatedEIP(7623) ? 21000n + tokens * 10n : 0n;
-  return { intrinsic, floor, minimum: intrinsic > floor ? intrinsic : floor, zeroBytes, nonzeroBytes, ...creationCosts, ...authorizationCosts };
+  const authorizationCosts = authorizationList ? { authorizationCount: BigInt(authorizationList.length), authorizationIntrinsic: (common.isActivatedEIP(8037) ? 7816n : 25000n) * BigInt(authorizationList.length) } : {};
+  const base = decomposed ? 12000n : 21000n;
+  const shape = base + recipientIntrinsic + valueIntrinsic;
+  const intrinsic = shape + tokens * 4n + accessListGas + (creationCosts.creationIntrinsic ?? 0n) + (creationCosts.initcodeWordGas ?? 0n) + (authorizationCosts.authorizationIntrinsic ?? 0n);
+  const floor = common.isActivatedEIP(7623)
+    ? shape + (decomposed ? creationCosts.creationIntrinsic ?? 0n : 0n)
+      + (common.isActivatedEIP(7976) ? 64n * (zeroBytes + nonzeroBytes) : tokens * 10n) + accessListDataGas : 0n;
+  return { intrinsic, floor, minimum: intrinsic > floor ? intrinsic : floor, zeroBytes, nonzeroBytes, ...creationCosts, ...authorizationCosts,
+    ...(decomposed ? { intrinsicBase: base, recipientIntrinsic, valueIntrinsic, accessListAccessGas, accessListDataGas } : {}) };
 }
 
 export function ethereumUsedGas({ messageGasUsed, refundCounter, intrinsic, floor }) {
@@ -67,7 +93,10 @@ export function ethereumContextProfile(request, header, common = ethereumCommon(
   }
   if (context.accessList) {
     const addresses = BigInt(context.accessList.length), slots = BigInt(context.accessList.reduce((n, item) => n + item.storageKeys.length, 0));
-    Object.assign(profile, { accessListAddressCount: addresses.toString(), accessListStorageKeyCount: slots.toString(), accessListIntrinsicGas: (addresses * 2400n + slots * 1900n).toString() });
+    const costs = common.isActivatedEIP(2780) ? ethereumCallGas(request.data, common, request) : null;
+    Object.assign(profile, { accessListAddressCount: addresses.toString(), accessListStorageKeyCount: slots.toString(),
+      accessListIntrinsicGas: (costs ? costs.accessListAccessGas + costs.accessListDataGas : addresses * 2400n + slots * 1900n).toString(),
+      ...(costs ? { accessListDataGas: costs.accessListDataGas.toString() } : {}) });
   }
   if (context.blobVersionedHashes) {
     if (!common.isActivatedEIP(4844)) throw profileError('LOCAL_ETHEREUM_INPUT_INVALID', 'Declared blob context requires Cancun or later.');
