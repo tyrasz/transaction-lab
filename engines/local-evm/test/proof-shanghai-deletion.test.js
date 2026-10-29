@@ -45,7 +45,7 @@ test('Shanghai deletion rolls back code, account and lazily read storage through
   assert.deepEqual(s.snapshotChanges().accounts, []);
 });
 
-test('transient funding of deleted code cannot escape as a balance-only row or outer commit', async () => {
+test('funding of deleted code commits only with explicit reset provenance and still rolls back exactly', async () => {
   const f = await fixture({}), s = f.stateManager;
   await s.checkpoint(); await s.finalizeShanghaiContractDeletion(address); await s.commit();
   const before = s.snapshotChanges();
@@ -53,10 +53,16 @@ test('transient funding of deleted code cannot escape as a balance-only row or o
   await s.checkpoint();
   await s.putAccount(address, new Account(0n, 1n));
   assert.equal((await s.getAccount(address)).balance, 1n);
-  assert.throws(() => s.snapshotChanges(), { code: 'LOCAL_STATE_UNSUPPORTED' });
-  await assert.rejects(s.commit(), { code: 'LOCAL_STATE_UNSUPPORTED' });
+  const funded = s.snapshotChanges();
+  const change = funded.accounts.find(row => row.address === FACTORY);
+  assert.deepEqual(change.reset, { basis: 'shanghai_selfdestruct_deletion', initialStorageRoot: s.base.get(FACTORY).storageRoot });
+  assert.deepEqual(change.nonce, { before: '0x7', after: '0x0' });
+  assert.deepEqual(change.code, { before: code, after: '0x' });
+  assert.deepEqual(change.balance, { before: '0xb', after: '0x1' });
   await s.revert();
   assert.deepEqual(s.snapshotChanges(), before);
+  await s.checkpoint(); await s.putAccount(address, new Account(0n, 1n)); await s.commit();
+  assert.deepEqual(s.snapshotChanges(), funded);
   await s.checkpoint(); await s.putAccount(address, new Account()); await s.commit();
   assert.equal(await s.getAccount(address), undefined);
   assert.deepEqual(s.snapshotChanges(), before);

@@ -69,7 +69,7 @@ test('funding a scheduled deletion again is burned at finalization rather than c
   const init=initcode(sd(BENEFICIARY),''),target=createdAddress();
   const f=await lifecycleFixture({code:factoryCode(init,{value:5,tail:'50'+call(target)+'50'+call(IMPLEMENTATION)+'5000'}),accounts:{[IMPLEMENTATION]:{nonce:1n,balance:7n,code:'0x'+sd(target)}}});
   let atDeletion;const finalize=f.stateManager.finalizeCreatedContractDeletion.bind(f.stateManager);
-  f.stateManager.finalizeCreatedContractDeletion=async address=>{atDeletion=(await account(f.stateManager,address.toString())).balance;await finalize(address);};
+  f.stateManager.finalizeCreatedContractDeletion=async address=>{atDeletion=(await account(f.stateManager,address.toString())).balance;return finalize(address);};
   const result=await executeEthereumCall(f);assert.equal(result.execution.status,'success');assert.equal(atDeletion,7n);
   assert.equal((await account(f.stateManager,BENEFICIARY)).balance,5n);assert.equal((await account(f.stateManager,IMPLEMENTATION)).balance,0n);
   assert.equal(await code(f.stateManager,IMPLEMENTATION),'0x'+sd(target));await gone(f,target);
@@ -122,7 +122,7 @@ test('finalizer failure after a deletion rolls back every account and the sender
   const init=sd(BENEFICIARY),targets=[7n,8n].map(nonce=>createdAddress({nonce}));
   const f=await lifecycleFixture({code:factoryCode(init,{value:5,repeat:2})}),calls=[];
   const finalize=f.stateManager.finalizeCreatedContractDeletion.bind(f.stateManager);
-  f.stateManager.finalizeCreatedContractDeletion=async address=>{calls.push(address.toString());await finalize(address);if(calls.length===2)throw Error('synthetic finalizer failure');};
+  f.stateManager.finalizeCreatedContractDeletion=async address=>{calls.push(address.toString());const result=await finalize(address);if(calls.length===2)throw Error('synthetic finalizer failure');return result;};
   const result=await executeEthereumCall(f);assert.equal(result.execution.status,'unavailable');assert.equal(result.stateDisposition,'rolled_back');
   assert.deepEqual(calls,[...targets].sort());assert.equal(Object.hasOwn(result,'lifecycle'),false);
   assert.deepEqual(f.stateManager.snapshotChanges().accounts,[]);assert.equal((await account(f.stateManager,SENDER)).nonce,1n);assert.equal((await account(f.stateManager,FACTORY)).nonce,7n);
@@ -133,7 +133,7 @@ test('deadline after deletion and missing finalizer fail closed with complete ro
   for(const missing of [false,true]){
     const f=await lifecycleFixture({code:factoryCode(sd(BENEFICIARY))});let expired=false;
     if(missing)f.stateManager.finalizeCreatedContractDeletion=undefined;
-    else{const finalize=f.stateManager.finalizeCreatedContractDeletion.bind(f.stateManager);f.stateManager.finalizeCreatedContractDeletion=async address=>{await finalize(address);expired=true;};}
+    else{const finalize=f.stateManager.finalizeCreatedContractDeletion.bind(f.stateManager);f.stateManager.finalizeCreatedContractDeletion=async address=>{const result=await finalize(address);expired=true;return result;};}
     const result=await executeEthereumCall({...f,limits:{wallMs:100},now:()=>expired?101:0});
     assert.equal(result.execution.status,missing?'unsupported':'unavailable');assert.equal(result.execution.error.code,missing?'LOCAL_LIFECYCLE_UNSUPPORTED':'LOCAL_RESOURCE_LIMIT');
     assert.deepEqual(f.stateManager.snapshotChanges().accounts,[]);assert.equal((await account(f.stateManager,SENDER)).nonce,1n);

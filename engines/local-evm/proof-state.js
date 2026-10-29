@@ -7,6 +7,8 @@ import { EMPTY_CODE_HASH, EMPTY_STORAGE_ROOT } from './verified-state-proof.js';
 const ADDRESS = /^0x[0-9a-f]{40}$/i;
 const MAX_UINT = (1n << 256n) - 1n, MAX_NONCE = (1n << 64n) - 1n;
 const LIMITS = Object.freeze({ reads: 200000, checkpoints: 128 });
+const ZERO_WORD = '0x' + '00'.repeat(32);
+const RESET_BASES = new Set(['same_invocation_created_contract_deletion', 'shanghai_selfdestruct_deletion', 'eip161_empty_account_cleanup']);
 const copyAccount = account => account === undefined ? undefined : createAccountFromRLP(account.serialize());
 const quantity = value => '0x' + value.toString(16);
 const padded = bytes => '0x' + bytesToHex(bytes).slice(2).padStart(64, '0');
@@ -52,7 +54,14 @@ class ProofStateManager extends SimpleStateManager {
     if (!this.slotLoading.has(id)) this.slotLoading.set(id, (async () => {
       const value = await this.inputs.getStorage(key, slot);
       account.storage.set(slot, value);
-      for (const frame of this.storageStack) if (!frame.has(id)) frame.set(id, hexToBytes(value));
+      // A proof belongs to the immutable input namespace. An ancestor may
+      // still use it while a descendant has already deleted that namespace.
+      // Seed each checkpoint independently so neither commit nor rollback can
+      // resurrect an old slot in a cleared account.
+      for (let index = 0; index < this.storageStack.length; index++) {
+        const frame = this.storageStack[index];
+        if (!frame.has(id)) frame.set(id, this.resetStack[index].has(key) ? new Uint8Array() : hexToBytes(value));
+      }
     })());
     await this.slotLoading.get(id);
   }
@@ -82,9 +91,8 @@ class ProofStateManager extends SimpleStateManager {
     const reset = this.resetStack.at(-1).has(key);
     if ((!base.exists || reset) && account.nonce === 0n && account.balance === 0n && emptyRoots) { this.topAccountStack().set(key, undefined); return; }
     if (current === undefined) {
-      // A later disposable invocation may fund a deleted address inside a
-      // subtree which subsequently reverts. Keep that transient EVM behavior;
-      // only a surviving reset needs a richer net-change representation.
+      // Rematerialization changes the account namespace, so it must remain
+      // inside a rollback checkpoint even when the final reset is representable.
       if (reset && this.accountStack.length < 2 && (base.storageRoot !== EMPTY_STORAGE_ROOT || base.code !== '0x' || base.nonceRaw !== '0')) fail('LOCAL_STATE_UNSUPPORTED', 'Rematerializing a deleted account requires an active rollback checkpoint.');
       if ((base.exists && !reset) || account.nonce > 1n || !emptyRoots) {
         fail('LOCAL_STATE_UNSUPPORTED', 'Only native funding or the unsigned sender nonce may materialize a proof-absent account.');
@@ -98,7 +106,9 @@ class ProofStateManager extends SimpleStateManager {
     const account = this.addressKey(address), slot = this.slotKey(key), base = await this.loadAccount(account);
     if ((!base.exists || this.resetStack.at(-1).has(account)) && !this.created(account) && !this.authorizationStack.at(-1).has(account)) fail('LOCAL_STATE_UNSUPPORTED', 'Storage writes require an existing account, authenticated creation or authorized materialization.');
     if (!(value instanceof Uint8Array) || value.length > 32) fail('LOCAL_STATE_INVALID', 'Storage values cannot exceed 32 bytes.');
-    await this.loadSlot(account, slot);
+    // The old trie is wholly removed. A new write has a zero baseline and
+    // does not need (or permit) an old-namespace slot proof to seed the overlay.
+    if (!this.resetStack.at(-1).has(account)) await this.loadSlot(account, slot);
     this.topStorageStack().set(account + '_' + slot, new Uint8Array(value));
   }
   async clearStorage(address) {
@@ -107,9 +117,11 @@ class ProofStateManager extends SimpleStateManager {
   assertDeployable(key) {
     const base = this.base.get(key), current = this.topAccountStack().get(key);
     // CREATE first checks collisions, then clears storage before newContract.
-    // A sparse manager cannot clear an unknown trie. A proven empty initial
-    // root plus a still-deployable current account makes this an exact no-op.
-    if (!base || base.storageRoot !== EMPTY_STORAGE_ROOT || base.code !== '0x' || base.nonceRaw !== '0' ||
+    // Either the initial proof was empty, or an authenticated whole-account
+    // deletion has already removed that trie. The current incarnation must
+    // still be deployable; a reset never bypasses CREATE collision rules.
+    const reset = this.resetStack.at(-1).has(key);
+    if (!base || (!reset && (base.storageRoot !== EMPTY_STORAGE_ROOT || base.code !== '0x' || base.nonceRaw !== '0')) ||
         (current && (current.nonce !== 0n || bytesToHex(current.codeHash) !== EMPTY_CODE_HASH)) || this.created(key)) {
       fail('LOCAL_STATE_UNSUPPORTED', 'Storage clearing requires a proven empty deployable creation target.');
     }
@@ -125,7 +137,7 @@ class ProofStateManager extends SimpleStateManager {
   }
   async putCode(address, value) {
     const key = this.addressKey(address), base = await this.loadAccount(key), current = this.topAccountStack().get(key);
-    if (!this.created(key) || base.code !== '0x' || !current || current.nonce === 0n || bytesToHex(current.codeHash) !== EMPTY_CODE_HASH) {
+    if (!this.created(key) || (!this.resetStack.at(-1).has(key) && base.code !== '0x') || !current || current.nonce === 0n || bytesToHex(current.codeHash) !== EMPTY_CODE_HASH) {
       fail('LOCAL_STATE_UNSUPPORTED', 'Code installation requires a new authenticated contract creation.');
     }
     if (!(value instanceof Uint8Array) || value.length === 0 || value.length > 24576) fail('LOCAL_STATE_INVALID', 'Created runtime code exceeds the supported contract-code bound.');
@@ -168,15 +180,17 @@ class ProofStateManager extends SimpleStateManager {
     this.topCodeStack().set(key, new Uint8Array());
     for (const slot of this.topStorageStack().keys()) if (slot.startsWith(key + '_')) this.topStorageStack().set(slot, new Uint8Array());
     this.creationStack.at(-1).delete(key);
+    this.authorizationStack.at(-1).delete(key);
     this.resetStack.at(-1).set(key, basis);
   }
   async finalizeCreatedContractDeletion(address) {
     if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'Contract deletion requires an active rollback checkpoint.');
     const key = this.addressKey(address), base = await this.loadAccount(key), current = this.topAccountStack().get(key);
-    if (!this.created(key) || !current || current.nonce === 0n || base.nonceRaw !== '0' || base.code !== '0x' || base.storageRoot !== EMPTY_STORAGE_ROOT) {
+    if (!this.created(key) || !current || current.nonce === 0n || (!this.resetStack.at(-1).has(key) && (base.nonceRaw !== '0' || base.code !== '0x' || base.storageRoot !== EMPTY_STORAGE_ROOT))) {
       fail('LOCAL_STATE_UNSUPPORTED', 'Finalized deletion requires an authenticated newly created contract with an initially empty storage trie.');
     }
     this.#resetAccount(key, 'same_invocation_created_contract_deletion');
+    return { address: key, scope: 'entire_account_including_code_and_storage', initialStorageRoot: base.storageRoot };
   }
   async finalizeShanghaiContractDeletion(address) {
     if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'Contract deletion requires an active rollback checkpoint.');
@@ -199,11 +213,10 @@ class ProofStateManager extends SimpleStateManager {
     this.authorizationStack.push(new Set(this.authorizationStack.at(-1)));
   }
   assertRepresentableAccountResets() {
-    for (const address of this.resetStack.at(-1).keys()) {
+    for (const [address, basis] of this.resetStack.at(-1)) {
       const base = this.base.get(address);
-      if (this.topAccountStack().get(address) !== undefined && (base.storageRoot !== EMPTY_STORAGE_ROOT || base.code !== '0x' || base.nonceRaw !== '0')) {
-        fail('LOCAL_STATE_UNSUPPORTED', 'Retaining a rematerialized account with original code, nonce or storage requires explicit account-reset provenance.');
-      }
+      const current = this.topAccountStack().get(address);
+      if (!base || !RESET_BASES.has(basis) || (current && bytesToHex(current.storageRoot) !== EMPTY_STORAGE_ROOT)) fail('LOCAL_STATE_INVALID', 'Account reset provenance or the current cleared namespace is invalid.');
     }
   }
   async commit() {
@@ -250,11 +263,25 @@ class ProofStateManager extends SimpleStateManager {
         const before = BigInt(base[field + 'Raw']);
         if (before !== current[field]) changes[field] = { before: quantity(before), after: quantity(current[field]) };
       }
-      const storage = [];
-      for (const [slot, before] of base.storage) {
-        const after = padded(this.topStorageStack().get(address + '_' + slot));
-        if (before !== after) storage.push({ slot, before, after });
+      const reset = this.resetStack.at(-1).get(address);
+      if (current !== undefined && reset && (base.storageRoot !== EMPTY_STORAGE_ROOT || base.code !== '0x' || base.nonceRaw !== '0')) {
+        changes.reset = { basis: reset, initialStorageRoot: base.storageRoot };
       }
+      const storage = [];
+      if (reset) {
+        // This is the complete set of nonzero overlay writes in the cleared
+        // namespace, not an enumeration of the removed authenticated trie.
+        // Keep even writes equal to the old value: reset application starts
+        // from an empty trie, independently of the immutable original slots.
+        const prefix = address + '_';
+        for (const [id, value] of this.topStorageStack()) if (id.startsWith(prefix)) {
+          const after = padded(value);
+          if (after !== ZERO_WORD) storage.push({ slot: id.slice(prefix.length), before: ZERO_WORD, after });
+        }
+      } else for (const [slot, before] of base.storage) {
+          const after = padded(this.topStorageStack().get(address + '_' + slot));
+          if (before !== after) storage.push({ slot, before, after });
+        }
       if (storage.length) changes.storage = storage;
       const code = bytesToHex(this.topCodeStack().get(address));
       if (code !== base.code) changes.code = { before: base.code, after: code };

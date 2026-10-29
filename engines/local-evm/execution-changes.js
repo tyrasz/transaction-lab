@@ -247,6 +247,11 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
  * independent EVM execution or a recomputed post-state-root proof. */
 export function validateExecutionChanges({ changes, inputs, output, sender, destination, selfdestructOnlyCreated = true, common, request, header }) {
   const snapshot = canonicalStateChanges(changes), complete = ['success', 'reverted', 'failed'].includes(output?.execution?.status);
+  // This entrypoint validates the first invocation over immutable proven state.
+  // Finalized deletion occurs only at transaction end, so no surviving later
+  // incarnation can be justified here. Internal state continuations carry reset
+  // provenance, but the public single-call host must never accept it as input.
+  need(snapshot.accounts.every(row => row.reset === undefined));
   const topCreation = destination === null, senderAddress = sender.toLowerCase(), senderInitial = inputs?.accounts?.[senderAddress];
   const preparation = complete && request ? deriveAuthorizationPreparation({ request, inputs, common }) : null;
   if (preparation) need(isDeepStrictEqual(output.authorizationProcessing, preparation.processing));

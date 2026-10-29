@@ -45,8 +45,13 @@ test('positive funding preserves an existing empty account and its storage',asyn
   assert.equal((await m.getAccount(address)).balance,7n);assert.equal(bytesToHex(await m.getStorage(address,bytes(word(0)))),word(42));
 });
 
-test('rematerializing an initially nonempty trie stays unsupported until its reset can be represented',async()=>{
+test('rematerializing and recreating a cleaned nonempty trie uses explicit reset provenance',async()=>{
   const {stateManager:m}=await fixture();await m.checkpoint();m.beginEmptyAccountCleanup();await m.deleteAccount(address);m.endEmptyAccountCleanup();await m.commit();
+  const prior=m.snapshotChanges(),initialStorageRoot=m.base.get(target).storageRoot;
   await assert.rejects(m.putAccount(address,new Account(0n,7n)),{code:'LOCAL_STATE_UNSUPPORTED'});assert.ok((await m.getStorage(address,bytes(word(0)))).every(v=>v===0));
-  await m.checkpoint();assert.throws(()=>m.beginContractCreation(address),{code:'LOCAL_STATE_UNSUPPORTED'});await m.revert();
+  await m.checkpoint();await m.putAccount(address,new Account(0n,7n));
+  assert.deepEqual(m.snapshotChanges().accounts,[{address:target,balance:{before:'0x0',after:'0x7'},reset:{basis:'eip161_empty_account_cleanup',initialStorageRoot}}]);
+  await m.clearStorage(address);m.beginContractCreation(address);await m.putAccount(address,new Account(1n,7n));await m.putStorage(address,bytes(word(0)),bytes(word(42)));
+  assert.deepEqual(m.snapshotChanges().accounts[0].storage,[{slot:word(0),before:word(0),after:word(42)}]);
+  await m.revert();assert.deepEqual(m.snapshotChanges(),prior);assert.equal(await m.getAccount(address),undefined);assert.ok((await m.getStorage(address,bytes(word(0)))).every(v=>v===0));
 });

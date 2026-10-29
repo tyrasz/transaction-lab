@@ -4,6 +4,7 @@ const SCOPE = 'Demanded proof-verified inputs and local overlay writes only; no 
 const ADDRESS = /^0x[0-9a-f]{40}$/, WORD = /^0x[0-9a-f]{64}$/, DATA = /^0x(?:[0-9a-f]{2})*$/;
 const UINT256 = (1n << 256n) - 1n, UINT64 = (1n << 64n) - 1n;
 const MAX_ACCOUNTS = 128, MAX_SLOTS = 1024, MAX_CODE_BYTES = 24576;
+const MAX_INITIAL_CODE_BYTES = 131072;
 const CREATION_BASES = ['internal_contract_creation', 'top_level_contract_creation'];
 const DELETION_BASIS = 'same_invocation_created_contract_deletion';
 const SHANGHAI_DELETION_BASIS = 'shanghai_selfdestruct_deletion';
@@ -49,9 +50,18 @@ function canonical(snapshot) {
   fields(snapshot, ['scope', 'accounts']); need(snapshot.scope === SCOPE); array(snapshot.accounts, MAX_ACCOUNTS);
   const accounts = [], addresses = new Set(); let slots = 0;
   for (const account of snapshot.accounts) {
-    fields(account, ['address'], ['existence', 'nonce', 'balance', 'storage', 'code']);
+    fields(account, ['address'], ['existence', 'nonce', 'balance', 'storage', 'code', 'reset']);
     need(matches(account.address, ADDRESS) && !addresses.has(account.address)); addresses.add(account.address);
     const row = { address: account.address };
+    if (Object.hasOwn(account, 'reset')) {
+      const value = account.reset; fields(value, ['basis', 'initialStorageRoot']);
+      need([DELETION_BASIS, SHANGHAI_DELETION_BASIS, EMPTY_CLEANUP_BASIS].includes(value.basis) && matches(value.initialStorageRoot, WORD));
+      // A surviving replacement of an originally existing account retains the
+      // whole cleared namespace. This is shape only: execution provenance must
+      // establish the prior finalized deletion before accepting such a row.
+      need(!Object.hasOwn(account, 'existence'));
+      row.reset = { basis: value.basis, initialStorageRoot: value.initialStorageRoot };
+    }
     if (Object.hasOwn(account, 'existence')) {
       const value = account.existence; fields(value, ['before', 'after', 'basis']);
       const deletion = value.before === true && value.after === false && [DELETION_BASIS, SHANGHAI_DELETION_BASIS, EMPTY_CLEANUP_BASIS].includes(value.basis);
@@ -63,7 +73,9 @@ function canonical(snapshot) {
       const value = account.code; fields(value, ['before', 'after']);
       const designation = code => code === '0x' || (typeof code === 'string' && /^0xef0100[0-9a-f]{40}$/.test(code));
       const delegationChange = value.before !== value.after && designation(value.before) && designation(value.after);
-      need(delegationChange || (value.before === '0x' && typeof value.after === 'string' && value.after.length > 2 && value.after.length <= 2 + MAX_CODE_BYTES * 2 && DATA.test(value.after)));
+      const replacement = row.reset && matches(value.before, DATA) && matches(value.after, DATA) && value.before !== value.after
+        && value.before.length <= 2 + MAX_INITIAL_CODE_BYTES * 2 && value.after.length <= 2 + MAX_CODE_BYTES * 2;
+      need(replacement || delegationChange || (value.before === '0x' && typeof value.after === 'string' && value.after.length > 2 && value.after.length <= 2 + MAX_CODE_BYTES * 2 && DATA.test(value.after)));
       row.code = { before: value.before, after: value.after };
     }
     if (Object.hasOwn(account, 'storage')) {
@@ -77,14 +89,18 @@ function canonical(snapshot) {
     const creation = CREATION_BASES.includes(row.existence?.basis);
     const authorization = row.existence?.basis === AUTHORIZATION_BASIS;
     const delegationCode = row.code && [row.code.before, row.code.after].every(code => code === '0x' || /^0xef0100[0-9a-f]{40}$/.test(code));
-    if (creation || (row.code && !delegationCode)) {
+    if (row.reset) {
+      // These slots are the nonzero contents of the new namespace, not a sparse
+      // diff against the deleted trie. Even an old equal value must be retained.
+      need(!row.storage || row.storage.every(value => value.before === ZERO_WORD));
+    } else if (creation || (row.code && !delegationCode)) {
       // Deployment starts from nonce0 and a proven empty code/storage state.
       // A prefunded deployable target already existed, so has no existence row.
       need(row.nonce?.before === '0x0' && BigInt(row.nonce.after) > 0n);
       need(!row.existence || creation);
       need(!row.storage || row.storage.every(value => value.before === ZERO_WORD));
     }
-    if (delegationCode || authorization) {
+    if (!row.reset && (delegationCode || authorization)) {
       // Shape only. The parent must independently recover signatures and bind
       // this delta to the ordered prepared state; a designation is not proof.
       need(row.nonce && BigInt(row.nonce.after) > BigInt(row.nonce.before));

@@ -44,7 +44,7 @@ async function reference(f){
     const sender=await account(state,request.from),tx=createTx({type:0,nonce:sender.nonce,gasPrice:0n,gasLimit:BigInt(request.gas),to:request.to,value:BigInt(request.value),data:request.data},{common}).sign(bytes(SHANGHAI_TEST_KEY));assert.equal(tx.getSenderAddress().toString(),request.from);
     const result=await runTx(vm,{tx,block:b}),error=result.execResult.exceptionError?.error;
     assert.equal(expected.execution.status,error==='revert'?'reverted':error?'failed':'success');assert.equal(expected.execution.returnData,bytesToHex(result.execResult.returnValue));assert.equal(expected.execution.executionGasUsed,result.execResult.executionGasUsed.toString());assert.equal(expected.gasAccounting.gasUsed,result.totalGasSpent.toString());
-    assert.deepEqual(expected.logs.map(({address,topics,data})=>({address,topics,data})),result.execResult.logs.map(([a,t,d])=>({address:bytesToHex(a),topics:t.map(bytesToHex),data:bytesToHex(d)})));return result;
+    assert.deepEqual(expected.logs.map(({address,topics,data})=>({address,topics,data})),(result.execResult.logs??[]).map(([a,t,d])=>({address:bytesToHex(a),topics:t.map(bytesToHex),data:bytesToHex(d)})));return result;
   }};
 }
 async function expectedNonceOnlyRoot(state){const expected=state.shallowCopy(),a=await account(expected,SHANGHAI_SENDER);await expected.modifyAccountFields(createAddressFromString(SHANGHAI_SENDER),{nonce:a.nonce+1n});return bytesToHex(await expected.getStateRoot());}
@@ -108,31 +108,41 @@ test('root helper REVERT restores temporary funding without classifying it as a 
   const full=await reference(f);await full.run(f.request,original);const expected=await expectedNonceOnlyRoot(full.state);await full.run(request,second);assert.equal(bytesToHex(await full.state.getStateRoot()),expected);
 });
 
-test('surviving direct and nested positive rematerialization remain unsupported with whole-attempt rollback',async()=>{
+test('surviving direct and nested rematerialization has explicit reset provenance and matches full-VM execution',async()=>{
   for(const nested of [false,true]){
-    const f=await fixture({helperReverts:false});await deleteOriginal(f);const prior=structuredClone(f.stateManager.snapshotChanges()),oldNonce=await nonce(f.stateManager);
+    const f=await fixture({helperReverts:false}),original=await deleteOriginal(f),oldNonce=await nonce(f.stateManager);
     const request=nested?query(f):{...f.request,to:VICTIM,value:'1'},second=await executeEthereumCall({...f,request});
-    assert.equal(second.execution.status,'unsupported');assert.equal(second.execution.error.code,'LOCAL_STATE_UNSUPPORTED');assert.equal(second.stateDisposition,'rolled_back');assert.equal(second.execution.returnData,null);
-    assert.deepEqual(f.stateManager.snapshotChanges(),prior);assert.equal(await nonce(f.stateManager),oldNonce);assert.equal((await account(f.stateManager,HELPER)).balance,2n);await assertMasked(f.stateManager);
+    assert.equal(second.execution.status,'success');assert.equal(second.stateDisposition,'message_result_retained_in_supplied_manager');
+    const change=f.stateManager.snapshotChanges().accounts.find(row=>row.address===VICTIM);
+    assert.deepEqual(change.reset,{basis:'shanghai_selfdestruct_deletion',initialStorageRoot:original.lifecycle.finalizedDeletions[0].initialStorageRoot});
+    assert.deepEqual(change.nonce,{before:'0x3',after:'0x0'});assert.deepEqual(change.balance,{before:'0x11',after:'0x1'});assert.deepEqual(change.code,{before:'0x73'+BENEFICIARY.slice(2)+'ff',after:'0x'});
+    assert.equal(await nonce(f.stateManager),oldNonce+1n);assert.equal((await account(f.stateManager,HELPER)).balance,nested?1n:2n);assert.equal((await account(f.stateManager,VICTIM)).balance,1n);
+    assert.equal(await code(f.stateManager,VICTIM),'0x');for(const slot of [991,992])assert.equal(await storage(f.stateManager,VICTIM,slot),0n);
+    const full=await reference(f);await full.run(f.request,original);await full.run(request,second);
+    assert.equal((await account(full.state,VICTIM)).balance,1n);assert.equal((await account(full.state,VICTIM)).nonce,0n);assert.equal(await code(full.state,VICTIM),'0x');
   }
 });
 
-test('the explicit execution guard cannot be bypassed by a caller-owned outer checkpoint',async()=>{
+test('a caller-owned outer checkpoint can revert the entire successful rematerializing invocation',async()=>{
   const f=await fixture();await deleteOriginal(f);const prior=structuredClone(f.stateManager.snapshotChanges());await f.stateManager.checkpoint();
-  const second=await executeEthereumCall({...f,request:{...f.request,to:VICTIM,value:'1'}});assert.equal(second.execution.status,'unsupported');assert.equal(second.stateDisposition,'rolled_back');assert.deepEqual(f.stateManager.snapshotChanges(),prior);
+  const second=await executeEthereumCall({...f,request:{...f.request,to:VICTIM,value:'1'}});assert.equal(second.execution.status,'success');assert.equal(second.stateDisposition,'message_result_retained_in_supplied_manager');
+  assert.equal((await account(f.stateManager,VICTIM)).balance,1n);assert.equal(f.stateManager.snapshotChanges().accounts.find(row=>row.address===VICTIM).reset.basis,'shanghai_selfdestruct_deletion');
   await f.stateManager.revert();assert.deepEqual(f.stateManager.snapshotChanges(),prior);await assertMasked(f.stateManager);
 });
 
 test('unknown old slots and code stay masked during actual transient funding and across a copied rollback',async()=>{
   const f=await fixture();await deleteOriginal(f);const original=structuredClone(f.stateManager.snapshotChanges()),manager=f.stateManager.shallowCopy(),put=manager.putAccount.bind(manager);let observed=0;
-  manager.putAccount=async(a,value)=>{await put(a,value);if(a.toString()===VICTIM&&value.balance===1n){observed++;const calls=f.calls.length;assert.equal(await code(manager,VICTIM),'0x');assert.equal(await storage(manager,VICTIM,991),0n);assert.equal(await storage(manager,VICTIM,992),0n);assert.equal(f.calls.length,calls);assert.throws(()=>manager.snapshotChanges(),unsupported);}};
+  manager.putAccount=async(a,value)=>{await put(a,value);if(a.toString()===VICTIM&&value.balance===1n){observed++;const calls=f.calls.length;assert.equal(await code(manager,VICTIM),'0x');assert.equal(await storage(manager,VICTIM,991),0n);assert.equal(await storage(manager,VICTIM,992),0n);assert.equal(f.calls.length,calls);const row=manager.snapshotChanges().accounts.find(row=>row.address===VICTIM);assert.equal(row.reset.basis,'shanghai_selfdestruct_deletion');assert.deepEqual(row.nonce,{before:'0x3',after:'0x0'});}};
   const second=await executeEthereumCall({...f,stateManager:manager,request:query(f)});assert.equal(second.execution.status,'success',JSON.stringify(second.execution));assert.equal(observed,1);assert.equal(BigInt(second.execution.returnData),42n);await assertMasked(manager);
   assert.deepEqual(f.stateManager.snapshotChanges(),original);assert.equal(f.calls.some(r=>r.method==='eth_getProof'&&r.params[1].includes(word(991))),false,'reset reads must not fetch or resurrect the original undemanded trie');
 });
 
-test('direct writes need an active checkpoint and defensive snapshots/outer commits reject surviving resets',async()=>{
+test('direct rematerialization needs a checkpoint and defensive snapshots/commits reject invalid reset provenance',async()=>{
   const f=await fixture();await deleteOriginal(f);const prior=structuredClone(f.stateManager.snapshotChanges()),target=createAddressFromString(VICTIM),value=createAccount({nonce:0n,balance:1n});
   await assert.rejects(f.stateManager.putAccount(target,value),unsupported);assert.deepEqual(f.stateManager.snapshotChanges(),prior);
-  await f.stateManager.checkpoint();await f.stateManager.putAccount(target,value);assert.equal((await account(f.stateManager,VICTIM)).balance,1n);assert.throws(()=>f.stateManager.assertRepresentableAccountResets(),unsupported);assert.throws(()=>f.stateManager.snapshotChanges(),unsupported);await assert.rejects(f.stateManager.commit(),unsupported);
+  await f.stateManager.checkpoint();await f.stateManager.putAccount(target,value);assert.equal((await account(f.stateManager,VICTIM)).balance,1n);
+  assert.doesNotThrow(()=>f.stateManager.assertRepresentableAccountResets());assert.equal(f.stateManager.snapshotChanges().accounts.find(row=>row.address===VICTIM).reset.basis,'shanghai_selfdestruct_deletion');
+  f.stateManager.resetStack.at(-1).set(VICTIM,'unverified_override');
+  assert.throws(()=>f.stateManager.assertRepresentableAccountResets(),{code:'LOCAL_STATE_INVALID'});assert.throws(()=>f.stateManager.snapshotChanges(),{code:'LOCAL_STATE_INVALID'});await assert.rejects(f.stateManager.commit(),{code:'LOCAL_STATE_INVALID'});
   await f.stateManager.revert();assert.deepEqual(f.stateManager.snapshotChanges(),prior);await assertMasked(f.stateManager);
 });

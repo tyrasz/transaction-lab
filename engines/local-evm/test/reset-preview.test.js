@@ -1,0 +1,52 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { executeIsolatedEthereumPreview } from '../isolated-call.js';
+import { validateQueryMutation } from '../preview-mutations.js';
+import { word } from './lifecycle-fixture.js';
+import { RESET_HELPER, RESET_RUNTIME, RESET_TARGET, resetPreviewFixture } from './reset-preview-fixture.js';
+
+test('a caught recreated-contract subtree makes a neutral after-query available through the real child',async()=>{
+  const f=await resetPreviewFixture(),initial=structuredClone(f.allocation);
+  const r=await executeIsolatedEthereumPreview({request:f.request,header:f.header,rpc:f.rpc,queries:[f.query,{kind:'native_balance',account:RESET_TARGET}]});
+  assert.equal(r.status,'completed',JSON.stringify(r.error));assert.equal(r.isolation.processSeparated,true);assert.equal(r.isolation.processClosed,true);assert.equal(r.broker.pendingAtReturn,0);
+  const p=r.preview,m=p.measurements[0];assert.equal(p.original.output.execution.status,'success');
+  assert.equal(p.status,'complete',JSON.stringify({error:p.error,before:m.before?.reason,after:m.after?.reason,execution:m.after?.output?.execution}));assert.equal(m.status,'measured');
+  assert.deepEqual(m.values.map(v=>[v.beforeRaw,v.afterRaw,v.deltaRaw]),[['0','43','43']]);
+  const beforeHelper=m.before.output.trace.calls[0],afterHelper=m.after.output.trace.calls[0];
+  assert.equal(beforeHelper.error,'revert');assert.equal(beforeHelper.calls[0].type,'CREATE2');assert.equal(beforeHelper.calls[0].error,'create collision');
+  assert.equal(afterHelper.error,'revert');assert.equal(afterHelper.calls[0].type,'CREATE2');assert.equal(afterHelper.calls[0].to,RESET_TARGET);assert.equal(afterHelper.calls[0].error,null);assert.equal(afterHelper.calls[0].output,'0x'+RESET_RUNTIME);
+  assert.equal(afterHelper.calls[1].to,RESET_TARGET);assert.equal(afterHelper.calls[1].error,null);assert.equal(afterHelper.calls[1].output,word(43));
+  assert.equal(m.after.output.execution.returnData,word(43));assert.equal(m.after.output.lifecycle,undefined);
+  assert.equal(m.before.mutationValidation.status,'verified');assert.equal(m.after.mutationValidation.status,'verified');
+  const initialDeletion=p.original.changes.accounts.find(a=>a.address===RESET_TARGET);
+  assert.equal(initialDeletion.existence.after,false);assert.equal(initialDeletion.existence.basis,'shanghai_selfdestruct_deletion');
+  assert.deepEqual(m.after.changesBefore,p.original.changes);
+  assert.deepEqual(m.after.changesAfter.accounts.filter(a=>a.address!==f.request.from),p.original.changes.accounts.filter(a=>a.address!==f.request.from));
+  assert.equal(m.after.changesAfter.accounts.some(a=>a.address===RESET_HELPER),false,'Caught helper creation nonce/funding must roll back');
+  assert.equal(m.after.changesAfter.accounts.some(a=>Object.hasOwn(a,'reset')),false,'Caught transient recreation leaves the original deletion, not a live reset');
+  const native=p.measurements[1];assert.equal(native.status,'measured');
+  assert.deepEqual(native.values.map(v=>[v.beforeRaw,v.afterRaw,v.deltaRaw]),[['17','0','-17']]);
+  assert.equal(native.after.output,null);assert.deepEqual(native.after.changesBefore,p.original.changes);
+  assert.equal(p.usage.executions,3,'The later native read adds no EVM or fee execution');
+  const targetProofs=f.calls.filter(c=>c.method==='eth_getProof'&&c.params[0]===RESET_TARGET);
+  assert(targetProofs.some(c=>c.params[1].includes(word(0))),'Original deletion demanded an old slot before clearing');
+  assert.equal(targetProofs.some(c=>c.params[1].some(slot=>[word(1),word(991)].includes(slot))),false,'Fresh namespace reads/writes must not request unknown old trie slots');
+  assert.deepEqual(f.allocation,initial);assert.deepEqual(f.stateManager.snapshotChanges().accounts,[]);
+});
+
+test('a successful getter that leaves recreation behind remains an unavailable measurement',async()=>{
+  const f=await resetPreviewFixture({helperReverts:false});
+  const r=await executeIsolatedEthereumPreview({request:f.request,header:f.header,rpc:f.rpc,queries:[f.query,{kind:'native_balance',account:RESET_TARGET}]});
+  assert.equal(r.status,'completed',JSON.stringify(r.error));assert.equal(r.preview.original.output.execution.status,'success');
+  const m=r.preview.measurements[0];assert.equal(r.preview.status,'partial');assert.equal(m.status,'unavailable');assert.equal(m.values,null);
+  assert.equal(m.before.status,'measured');assert.equal(m.before.values[0].raw,'0');
+  assert.equal(m.before.output.trace.calls[0].calls[0].error,'create collision');
+  assert.equal(m.after.output.execution.status,'success');assert.equal(m.after.output.execution.returnData,word(43));
+  assert.equal(m.after.status,'unavailable');assert.equal(m.after.values,null);
+  assert.equal(m.after.changesAfter.accounts.find(a=>a.address===RESET_HELPER).nonce.after,'0x2');
+  assert.throws(()=>validateQueryMutation({before:m.after.changesBefore,after:m.after.changesAfter,sender:f.request.from,nonceBefore:'2',senderExistedBefore:true}));
+  assert.equal(r.preview.original.changes.accounts.find(a=>a.address===RESET_TARGET).existence.after,false);
+  const native=r.preview.measurements[1];assert.equal(native.status,'measured');
+  assert.deepEqual(native.values.map(v=>[v.beforeRaw,v.afterRaw,v.deltaRaw]),[['17','0','-17']]);
+  assert.deepEqual(native.after.changesBefore,r.preview.original.changes,'Discarded mutator output must not poison the subsequent native read');
+});

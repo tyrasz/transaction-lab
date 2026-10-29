@@ -1,8 +1,18 @@
-# Transaction Lab checkpoint — 0.29.0
+# Transaction Lab checkpoint — 0.30.0
 
 Updated October 29, 2026. The user's long-term objective remains to improve measured correctness and coverage; no background goal-runner status is implied. **No representative 90% or 100% accuracy rate or superiority to Blockaid has been established.** This is a working prototype with narrow measured coverage, not a general EVM simulation or security product.
 
 The app uses http://127.0.0.1:5174/ without a wallet connection or Dynamic authentication. Version 0.14 adds `POST /api/evm/local-preview`: an experimental Ethereum call executed in an isolated local worker from verified starting-state proofs/code, with explicit before/after ETH balance, token and Aave/Morpho position queries. The existing provider-backed Ethereum path retains automatic token/native measurements, typed positions and complete state continuation across ordered sequences. HyperEVM endpoints retain their semantics. The new local endpoint has its own availability, source/runtime identity, transport bounds and failure handling; it does not establish full signed-transaction support or complete economic-effect coverage. Security remains `not_assessed`. No signing or broadcasting occurs.
+
+## Deleted-account recreation — 0.30.0
+
+The proof manager now carries explicit whole-account reset provenance across internal invocations. Funding or recreating a deleted account starts from empty code/storage and the current nonce, without fetching old storage proofs. New storage is represented against a zero baseline, including values equal to the old deleted values. Reset markers and authorization/creation markers follow checkpoints and copies; failed constructors, EVM reverts and host failures preserve rollback boundaries.
+
+The public single-call API gains a previously unsupported neutral after-state getter: its helper recreates a deleted contract, reads new storage, then reverts; the outer getter catches that revert and returns its value. The positive control measures **0 → 43**, while a getter that retains the recreation remains unavailable. A following native query still measures **17 → 0** in both cases. The parent rejects invented surviving reset markers in the original execution. Persistent internal sequences are development controls, not a new public sequence endpoint or signed-transaction admission support.
+
+The full **737/737 local-engine controls pass** (72.643 seconds) and **701/701 application controls pass** (68.744 seconds). The initial application run retained 25 sandbox port-binding failures and twelve source-identity failures caused by changing the release version during that run; the final rerun used stable source and allowed localhost binding. The [two-case API packet](research/account-reset-v030-api/NOTES.md) retains both raw responses and all 32 synthetic proof-transport replies. Its saved-artifact consistency check passes independently of target execution.
+
+The independent Geth comparison is being collected for this release. These synthetic cases are development evidence, not a population accuracy percentage. Complete effect discovery, local API sequences and full HyperCore processing remain outside the supported scope.
 
 ## Explicit native ETH balances — 0.29.0
 

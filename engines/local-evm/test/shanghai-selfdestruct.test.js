@@ -204,11 +204,17 @@ test('deadline after partial finalization and missing Shanghai finalizer fail cl
   }
 });
 
-test('a later invocation cannot silently rematerialize an originally nonempty deleted account',async()=>{
+test('a later invocation explicitly represents rematerialization without restoring old code or storage',async()=>{
   const f=await shanghaiFixture({code:'0x'+call(VICTIM)+'5000',accounts:{[VICTIM]:oldVictim()}});
   const first=await executeEthereumCall(f);assert.equal(first.execution.status,'success');const prior=structuredClone(f.stateManager.snapshotChanges());
   const second=await executeEthereumCall({...f,request:{...f.request,to:VICTIM,value:'1'}});
-  assert.equal(second.execution.status,'unsupported');assert.equal(second.stateDisposition,'rolled_back');assert.deepEqual(f.stateManager.snapshotChanges(),prior);await gone(f,VICTIM);
+  assert.equal(second.execution.status,'success');assert.equal(second.stateDisposition,'message_result_retained_in_supplied_manager');
+  const change=row(f,VICTIM);assert.deepEqual(change.reset,{basis:'shanghai_selfdestruct_deletion',initialStorageRoot:first.lifecycle.finalizedDeletions[0].initialStorageRoot});
+  assert.deepEqual(change.nonce,{before:'0x3',after:'0x0'});assert.deepEqual(change.balance,{before:'0x11',after:'0x1'});assert.deepEqual(change.code,{before:oldVictim().code,after:'0x'});
+  assert.equal((await account(f.stateManager,VICTIM)).balance,1n);assert.equal(await code(f.stateManager,VICTIM),'0x');
+  const calls=f.calls.length;for(const key of [0,991,992])assert.equal(await slot(f.stateManager,VICTIM,key),0n);assert.equal(f.calls.length,calls);
+  const copy=f.stateManager.shallowCopy();await copy.checkpoint();await copy.putAccount(createAddressFromString(VICTIM),createAccount({nonce:0n,balance:7n}));await copy.revert();assert.deepEqual(copy.snapshotChanges(),f.stateManager.snapshotChanges());
+  assert.notDeepEqual(f.stateManager.snapshotChanges(),prior);
 });
 
 test('generic manager failures in sender/recipient value writes cannot become successful or caught EVM results',async()=>{

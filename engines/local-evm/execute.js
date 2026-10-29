@@ -8,7 +8,6 @@ import { createEVM, EVMError } from '@ethereumjs/evm';
 import { Account, bytesToHex, createAddressFromString, hexToBytes } from '@ethereumjs/util';
 import { ethereumCommon, ethereumContextProfile, ethereumCallGas, ethereumUsedGas } from './ethereum-profile.js';
 import { normalizeEvmContext } from '../evm-context.js';
-import { EMPTY_STORAGE_ROOT } from './verified-state-proof.js';
 import { existingDelegationTarget } from './sender-delegation.js';
 import { normalizeAuthorizationList, recoverAuthorization, authorizationStateDecision } from './authorization-list.js';
 import { normalizeEthereumFees, ethereumFeePlan, settleEthereumFees } from './ethereum-fees.js';
@@ -346,8 +345,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       for (const key of deletions) {
         if (!ADDRESS.test(key) || (cancun ? !canFinalizeDeletion : !canFinalizeShanghai)) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'Committed deletion requires an authenticated fork-appropriate finalizer.', 'unsupported');
         if (cancun) {
-          await guarded.finalizeCreatedContractDeletion(createAddressFromString(key));
-          finalizedDeletions.push({ address: key, scope: 'entire_account_including_code_and_storage', initialStorageRoot: EMPTY_STORAGE_ROOT });
+          finalizedDeletions.push(await guarded.finalizeCreatedContractDeletion(createAddressFromString(key)));
         } else finalizedDeletions.push(await guarded.finalizeShanghaiContractDeletion(createAddressFromString(key)));
       }
     }
