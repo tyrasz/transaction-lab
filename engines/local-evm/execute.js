@@ -5,7 +5,7 @@
 import { performance } from 'node:perf_hooks';
 import { createCustomCommon, Hardfork, Mainnet } from '@ethereumjs/common';
 import { createEVM, EVMError } from '@ethereumjs/evm';
-import { Account, bytesToHex, createAddressFromString, hexToBytes } from '@ethereumjs/util';
+import { Account, bytesToHex, createAddressFromString, hexToBytes, unpadBytes } from '@ethereumjs/util';
 import { ethereumCommon, ethereumContextProfile, ethereumCallGas, ethereumUsedGas } from './ethereum-profile.js';
 import { normalizeEvmContext } from '../evm-context.js';
 import { existingDelegationTarget } from './sender-delegation.js';
@@ -15,6 +15,7 @@ import { verifyKzgProof } from './kzg-point-evaluation.js';
 import { guardKzgVerifier } from './kzg-runtime.js';
 import { createGuardedBls } from './bls-runtime.js';
 import { P256_ADDRESS, createP256Precompile } from './p256-runtime.js';
+import { ethereumStateGasBudget, settleEthereumStateGas } from './ethereum-state-gas.js';
 
 export const EXECUTION_LIMITS = Object.freeze({ gas: 5000000, steps: 1000000, frames: 1000, depth: 32, logs: 2000, memoryBytes: 1048576, returnBytes: 1048576, calldataBytes: 32768, traceBytes: 8388608, wallMs: 10000 });
 export const ETHEREUM_EXECUTION_LIMITS = Object.freeze({ ...EXECUTION_LIMITS, wallMs: 120000 });
@@ -45,6 +46,7 @@ function supportedAddress(value, chainId) {
 function safeFailure(error) {
   if (error instanceof ExecutionError) return { status: error.status, error: { code: error.code, message: error.message } };
   if (error?.code === 'LOCAL_STATE_MISSING') return { status: 'unavailable', error: { code: 'LOCAL_STATE_MISSING', message: 'Required local input state was not supplied.' } };
+  if (['LOCAL_ETHEREUM_STATE_GAS_UNSUPPORTED', 'LOCAL_ETHEREUM_FORK_UNSUPPORTED'].includes(error?.code)) return { status: 'unsupported', error: { code: error.code, message: error.message } };
   if (error?.code === 'LOCAL_STATE_UNSUPPORTED') return { status: 'unsupported', error: { code: 'LOCAL_STATE_UNSUPPORTED', message: 'The supplied sparse state adapter does not support this state change.' } };
   return { status: 'unavailable', error: { code: 'LOCAL_EXECUTION_FAILED', message: 'Local execution could not complete; arbitrary host error details are omitted.' } };
 }
@@ -54,7 +56,8 @@ function safeFailure(error) {
  * The supplied manager and blockchain must themselves bound asynchronous I/O.
  * `now` is an internal deterministic test clock, never a public request field. */
 export async function executeUnsignedCall({ request, block, stateManager, blockchain, chainId = 999, limits: requestedLimits = {}, now = () => performance.now() }) {
-  const ceilings = chainId === 1 ? ETHEREUM_EXECUTION_LIMITS : EXECUTION_LIMITS;
+  const ethereumProfile = chainId === 1 || chainId === 11155111;
+  const ceilings = ethereumProfile ? ETHEREUM_EXECUTION_LIMITS : EXECUTION_LIMITS;
   const limits = { ...ceilings }, startedAt = now();
   const usage = { steps: 0, frames: 0, maxDepth: 0, logOpcodes: 0, retainedTraceBytes: 0 };
   const semantics = {
@@ -64,13 +67,13 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     warmAddresses: 'sender_destination_coinbase_and_Ethereum_precompiles_1_to_10_no_access_list',
     logs: 'committed_root_result_only_no_duplicated_descendant_log_arrays', callTree: 'entered_messages_only',
     chainScope: 'Ethereum_Cancun_rules_with_chainId999_not_full_HyperEVM_equivalence',
-    lifecycle: chainId === 1 ? 'no_lifecycle_operation_encountered' : 'CREATE_CREATE2_SELFDESTRUCT_unsupported', deadline: 'cooperative_until_final_atomic_commit_no_forceful_IO_cancellation',
+    lifecycle: ethereumProfile ? 'no_lifecycle_operation_encountered' : 'CREATE_CREATE2_SELFDESTRUCT_unsupported', deadline: 'cooperative_until_final_atomic_commit_no_forceful_IO_cancellation',
   };
   let root = null, environment = null, evm, checkpointDepth = 0, ownsManager = false;
   let hostFailed = false, hostError;
   let delegatedSenderNonce = null, retainedSenderCreations = 0;
   let authorizationProcessing = null, authorizationSenderIncrements = 0, authorizationBaseline = null;
-  let feePlan = null, feeCosts = null, feeAccounting = null;
+  let feePlan = null, feeCosts = null, feeAccounting = null, stateGasBudget = null, stateGasAccounting = null;
   const stack = [];
   function latchHostFailure(error) { if (!hostFailed) { hostFailed = true; hostError = error; } }
   const reserved = value => supportedAddress(value, chainId);
@@ -87,7 +90,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     while (checkpointDepth > 0) { await stateManager.revert(); checkpointDepth--; }
   }
   try {
-    if (![1, 999].includes(chainId)) reject('LOCAL_INVALID_INPUT', 'Only the explicit Ethereum mainnet and legacy HyperEVM development profiles are supported.');
+    if (![1, 11155111, 999].includes(chainId)) reject('LOCAL_INVALID_INPUT', 'Only the explicit Ethereum mainnet, Sepolia and legacy HyperEVM development profiles are supported.');
     for (const [key, value] of Object.entries(requestedLimits)) {
       if (!Object.hasOwn(ceilings, key) || !Number.isSafeInteger(value) || value <= 0 || value > ceilings[key]) reject('LOCAL_INVALID_INPUT', 'Execution limits must be positive integers no greater than the fixed ceilings.');
       limits[key] = value;
@@ -95,68 +98,89 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     if (!stateManager || typeof stateManager !== 'object' || ['getAccount', 'putAccount', 'getCode', 'getStorage', 'checkpoint', 'commit', 'revert'].some(method => typeof stateManager[method] !== 'function')) reject('LOCAL_INVALID_INPUT', 'A compatible explicit state manager is required.');
     if (activeManagers.has(stateManager)) reject('LOCAL_STATE_BUSY', 'Concurrent execution on the same state manager is not supported.');
     let context, authorizationList, feeContext; try { context = normalizeEvmContext(request); authorizationList = normalizeAuthorizationList(request); feeContext = normalizeEthereumFees(request); } catch { reject('LOCAL_INVALID_INPUT', 'Optional EVM context is malformed.'); }
-    if (chainId !== 1 && (Object.keys(context).length || authorizationList !== undefined || feeContext.executionProfile)) reject('LOCAL_INVALID_INPUT', 'Optional execution context requires the Ethereum profile.');
-    const topLevelCreation = chainId === 1 && request?.to === null;
+    if (!ethereumProfile && (Object.keys(context).length || authorizationList !== undefined || feeContext.executionProfile)) reject('LOCAL_INVALID_INPUT', 'Optional execution context requires the Ethereum profile.');
+    const topLevelCreation = ethereumProfile && request?.to === null;
     const from = address(request?.from), to = address(request?.to), value = quantity(request?.value), gasLimit = quantity(request?.gasLimit);
     if (!from || (!to && !topLevelCreation) || (topLevelCreation && context.blobVersionedHashes !== undefined) || value === null || gasLimit === null || (chainId === 999 && gasLimit === 0n) || gasLimit > BigInt(limits.gas) || typeof request?.data !== 'string' || !BYTES.test(request.data) || request.data.length > 2 + limits.calldataBytes * 2 || Object.keys(request).some(key => !['from', 'to', 'data', 'value', 'gasLimit', 'accessList', 'blobVersionedHashes', 'authorizationList', 'executionProfile', 'fees'].includes(key))) reject('LOCAL_INVALID_INPUT', 'A bounded unsigned message with explicit from, destination (or Ethereum creation null), data, value and message gasLimit is required.');
     reserved(from); reserved(to);
     if (!block || ['number', 'timestamp', 'gasLimit', 'baseFeePerGas'].some(field => quantity(block[field]) === null) || quantity(block.gasLimit) === 0n || typeof block.mixHash !== 'string' || !WORD.test(block.mixHash) || !address(block.miner) || ['hash', 'parentHash'].some(field => block[field] !== undefined && (typeof block[field] !== 'string' || !WORD.test(block[field])))) reject('LOCAL_INVALID_INPUT', 'Explicit block number, timestamp, gas limit, base fee, prevRandao and coinbase are required.');
-    const common = chainId === 1 ? ethereumCommon(block) : createCustomCommon({ chainId: 999, name: 'experimental-hyperevm-message' }, Mainnet, { hardfork: Hardfork.Cancun });
-    if (chainId === 1 && common.isActivatedEIP(4844)) {
+    const common = ethereumProfile ? ethereumCommon(block, chainId) : createCustomCommon({ chainId: 999, name: 'experimental-hyperevm-message' }, Mainnet, { hardfork: Hardfork.Cancun });
+    if (ethereumProfile && common.isActivatedEIP(4844)) {
       common.customCrypto.kzg = guardKzgVerifier(verifyKzgProof, clockCheck, latchHostFailure);
     }
     if (authorizationList !== undefined && (!common.isActivatedEIP(7702) || topLevelCreation || context.blobVersionedHashes !== undefined)) reject('LOCAL_INVALID_INPUT', 'Authorization lists require a Prague-or-later Ethereum call without blob context.', 'invalid');
     if (authorizationList !== undefined && typeof stateManager.applyAuthorization !== 'function') reject('LOCAL_STATE_UNSUPPORTED', 'Authorization lists require an authenticated authorization-capable state manager.', 'unsupported');
-    const canCreate = chainId === 1 && typeof stateManager.beginContractCreation === 'function';
-    const canFinalizeDeletion = chainId === 1 && typeof stateManager.finalizeCreatedContractDeletion === 'function';
-    const canFinalizeShanghai = chainId === 1 && typeof stateManager.finalizeShanghaiContractDeletion === 'function';
-    const canCleanupEmpty = chainId === 1 && typeof stateManager.beginEmptyAccountCleanup === 'function' && typeof stateManager.endEmptyAccountCleanup === 'function';
-    if (feeContext.executionProfile) {
-      if (!canCleanupEmpty) reject('LOCAL_STATE_UNSUPPORTED', 'Fee settlement requires transaction-end empty-account cleanup.', 'unsupported');
+    const canCreate = ethereumProfile && typeof stateManager.beginContractCreation === 'function';
+    const canFinalizeDeletion = ethereumProfile && typeof stateManager.finalizeCreatedContractDeletion === 'function';
+    const canFinalizeClearing = ethereumProfile && typeof stateManager.finalizeCreatedContractClearing === 'function';
+    const canFinalizeShanghai = ethereumProfile && typeof stateManager.finalizeShanghaiContractDeletion === 'function';
+    const canCleanupEmpty = ethereumProfile && typeof stateManager.beginEmptyAccountCleanup === 'function' && typeof stateManager.endEmptyAccountCleanup === 'function';
+    const amsterdam = common.isActivatedEIP(8037);
+    if (amsterdam && authorizationList !== undefined) reject('LOCAL_AUTHORIZATION_UNSUPPORTED', 'Amsterdam authorization preparation and parent validation are not yet integrated.', 'unsupported');
+    if (amsterdam && (quantity(block.slotNumber) === null || quantity(block.slotNumber) >= 1n << 64n)) reject('LOCAL_INVALID_INPUT', 'Amsterdam execution requires an explicit uint64 slot number.', 'invalid');
+    if (feeContext.executionProfile || amsterdam) {
+      if (feeContext.executionProfile && !canCleanupEmpty) reject('LOCAL_STATE_UNSUPPORTED', 'Fee settlement requires transaction-end empty-account cleanup.', 'unsupported');
       try {
         feeCosts = ethereumCallGas(request.data, common, request);
         const totalGas = gasLimit + feeCosts.intrinsic;
-        if (totalGas < feeCosts.minimum) reject('LOCAL_INVALID_INPUT', 'The priced envelope cannot cover the selected fork gas minimum.', 'invalid');
-        feePlan = ethereumFeePlan({ ...request, value: value.toString(), gas: totalGas.toString() }, block);
+        if (totalGas < feeCosts.minimum || (amsterdam && totalGas > BigInt(ETHEREUM_EXECUTION_LIMITS.gas))) reject('LOCAL_INVALID_INPUT', 'The envelope does not meet the selected fork gas bounds.', 'invalid');
+        feePlan = ethereumFeePlan({ ...request, value: value.toString(), gas: totalGas.toString() }, block, chainId);
+        if (amsterdam) stateGasBudget = ethereumStateGasBudget({ gasLimit: totalGas, intrinsicRegular: feeCosts.intrinsic, floor: feeCosts.floor }, common);
       } catch (error) {
         if (error?.code === 'LOCAL_ETHEREUM_BLOB_PRICE_LIMIT') reject(error.code, 'Blob base fee exceeds the bounded exact calculation profile.', 'unsupported');
         reject('LOCAL_INVALID_INPUT', 'The explicit fee profile does not match the selected header or gas envelope.', 'invalid');
       }
-      semantics.gasPrice = feePlan.effectiveGasPrice.toString();
+      semantics.gasPrice = feePlan?.effectiveGasPrice.toString() ?? '0';
     }
     let observedCreation = false, observedSelfdestruct = false, observedCreatedSelfdestruct = false;
     function describeLifecycle() {
       const unsupported = canFinalizeDeletion ? (canCleanupEmpty ? (canFinalizeShanghai ? 'fork_selected_SELFDESTRUCT_finalization' : 'Shanghai_SELFDESTRUCT_unsupported') : 'Shanghai_SELFDESTRUCT_and_full_EIP161_cleanup_unsupported') : 'same_invocation_creation_and_Shanghai_SELFDESTRUCT_unsupported';
-      if (observedSelfdestruct && !common.isActivatedEIP(6780)) semantics.lifecycle = 'Shanghai_SELFDESTRUCT_with_root_commit_gated_whole_account_deletion';
+      if (observedCreatedSelfdestruct && common.isActivatedEIP(8246)) semantics.lifecycle = 'Amsterdam_created_account_SELFDESTRUCT_with_root_commit_gated_balance_preserving_clearing';
+      else if (observedSelfdestruct && !common.isActivatedEIP(6780)) semantics.lifecycle = 'Shanghai_SELFDESTRUCT_with_root_commit_gated_whole_account_deletion';
       else if (observedCreatedSelfdestruct) semantics.lifecycle = 'Cancun_created_account_SELFDESTRUCT_with_root_commit_gated_deletion_' + unsupported;
       else if (observedSelfdestruct) semantics.lifecycle = (observedCreation ? (topLevelCreation ? 'top_level_CREATE_and_' : '') + 'internal_CREATE_CREATE2_and_' : '') + 'preexisting_Cancun_SELFDESTRUCT_without_deletion_' + unsupported;
       else if (observedCreation) semantics.lifecycle = (topLevelCreation ? 'top_level_CREATE_and_' : '') + 'internal_CREATE_CREATE2_with_proven_deployable_targets_' + unsupported;
     }
     if (topLevelCreation && !canCreate) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'Top-level creation requires an authenticated creation-capable state manager.', 'unsupported');
-    if (chainId === 1) {
-      try { ethereumContextProfile(context, block, common); } catch { reject('LOCAL_INVALID_INPUT', 'Optional execution context does not match the selected fork/header.'); }
-      semantics.chainScope = 'Ethereum_mainnet_pinned_timestamp_selected_fork';
+    if (ethereumProfile) {
+      try { ethereumContextProfile(request, block, common); } catch { reject('LOCAL_INVALID_INPUT', 'Optional execution context does not match the selected fork/header.'); }
+      semantics.chainScope = chainId === 1 ? 'Ethereum_mainnet_pinned_timestamp_selected_fork' : 'Ethereum_Sepolia_pinned_timestamp_selected_fork';
       semantics.warmAddresses = topLevelCreation
         ? context.accessList ? 'sender_coinbase_fork_active_precompiles_and_declared_access_list_creation_target_warmed_by_EVM' : 'sender_coinbase_and_fork_active_precompiles_creation_target_warmed_by_EVM_no_access_list'
         : context.accessList ? 'sender_destination_coinbase_fork_active_precompiles_and_declared_access_list' : 'sender_destination_coinbase_and_fork_active_precompiles_no_access_list';
     }
-    environment = { chainId, hardfork: common.hardfork(), number: quantity(block.number).toString(), timestamp: quantity(block.timestamp).toString(), gasLimit: quantity(block.gasLimit).toString(), baseFeePerGas: quantity(block.baseFeePerGas).toString(), mixHash: block.mixHash.toLowerCase(), miner: address(block.miner), ...(block.hash ? { sourceBlockHash: block.hash.toLowerCase() } : {}), ...(block.parentHash ? { sourceParentHash: block.parentHash.toLowerCase() } : {}), sourceBlockIdentityVerified: false, ...(feePlan?.blobContext ? { blobBaseFeePerGas: feePlan.blobContext.blobBaseFeePerGas.toString() } : {}) };
+    environment = { chainId, hardfork: common.hardfork(), ...(amsterdam ? { slotNumber: quantity(block.slotNumber).toString() } : {}), number: quantity(block.number).toString(), timestamp: quantity(block.timestamp).toString(), gasLimit: quantity(block.gasLimit).toString(), baseFeePerGas: quantity(block.baseFeePerGas).toString(), mixHash: block.mixHash.toLowerCase(), miner: address(block.miner), ...(block.hash ? { sourceBlockHash: block.hash.toLowerCase() } : {}), ...(block.parentHash ? { sourceParentHash: block.parentHash.toLowerCase() } : {}), sourceBlockIdentityVerified: false, ...(feePlan?.blobContext ? { blobBaseFeePerGas: feePlan.blobContext.blobBaseFeePerGas.toString() } : {}) };
     activeManagers.add(stateManager); ownsManager = true;
     const methods = new Map();
+    let originalStorage;
     // Bind methods to the real manager; track every nested checkpoint so a host
     // exception in an EVM event cannot leave partially applied state behind.
     const guarded = new Proxy(stateManager, { get(target, property) {
       const member = Reflect.get(target, property, target);
+      // Sparse proof facts retain canonical 32-byte words. The Amsterdam
+      // opcode handler instead uses an empty byte array to recognize zero.
+      // Normalize only at the EVM boundary, including its original-value
+      // cache; never alter authenticated facts or snapshot representations.
+      if (amsterdam && property === 'originalStorageCache' && member) {
+        originalStorage ??= {
+          async get(...args) {
+            try { clockCheck(); const value = await member.get(...args); clockCheck(); return new Uint8Array(unpadBytes(value)); }
+            catch (error) { latchHostFailure(error); throw error; }
+          },
+          clear: () => member.clear(),
+        };
+        return originalStorage;
+      }
       if (typeof member !== 'function') return member;
       if (!methods.has(property)) methods.set(property, async (...args) => {
         try {
           clockCheck();
-          if (['getAccount', 'putAccount', 'deleteAccount', 'modifyAccountFields', 'getCode', 'putCode', 'getCodeSize', 'getStorage', 'putStorage', 'clearStorage', 'beginContractCreation', 'finalizeCreatedContractDeletion', 'finalizeShanghaiContractDeletion', 'applyAuthorization'].includes(property)) reserved(args[0]);
+          if (['getAccount', 'putAccount', 'deleteAccount', 'modifyAccountFields', 'getCode', 'putCode', 'getCodeSize', 'getStorage', 'putStorage', 'clearStorage', 'beginContractCreation', 'finalizeCreatedContractDeletion', 'finalizeCreatedContractClearing', 'finalizeShanghaiContractDeletion', 'applyAuthorization'].includes(property)) reserved(args[0]);
           const result = await member.apply(target, args);
           if (property === 'checkpoint') checkpointDepth++;
           else if (property === 'commit' || property === 'revert') checkpointDepth--;
           clockCheck();
-          return result;
+          return amsterdam && property === 'getStorage' ? new Uint8Array(unpadBytes(result)) : result;
         } catch (error) {
           latchHostFailure(error);
           throw error;
@@ -177,8 +201,8 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       shallowCopy() { return this; },
     };
     evm = await createEVM({ common, stateManager: guarded, blockchain: hashes,
-      ...(chainId === 1 && common.isActivatedEIP(2537) ? { bls: createGuardedBls(clockCheck, latchHostFailure) } : {}),
-      ...(chainId === 1 && common.isActivatedEIP(7951) ? { customPrecompiles: [{ address: P256_ADDRESS,
+      ...(ethereumProfile && common.isActivatedEIP(2537) ? { bls: createGuardedBls(clockCheck, latchHostFailure) } : {}),
+      ...(ethereumProfile && common.isActivatedEIP(7951) ? { customPrecompiles: [{ address: P256_ADDRESS,
         function: createP256Precompile(clockCheck, latchHostFailure) }] } : {}),
     });
     // Each invocation is a fresh message/transaction-context boundary for
@@ -227,8 +251,8 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
         // deletion to our bounded finalizer after the committed root result.
         const executionAddress = step.address.toString();
         const cancun = common.isActivatedEIP(6780);
-        if (chainId !== 1 || !active || active.frame.executionAddress !== executionAddress ||
-            (cancun ? !(active.createdAddresses instanceof Set) || (active.createdAddresses.has(executionAddress) && !canFinalizeDeletion) : !canFinalizeShanghai)) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'SELFDESTRUCT deletion or unsupported fork context is outside this local profile.', 'unsupported');
+        if (!ethereumProfile || !active || active.frame.executionAddress !== executionAddress ||
+            (cancun ? !(active.createdAddresses instanceof Set) || (active.createdAddresses.has(executionAddress) && !(common.isActivatedEIP(8246) ? canFinalizeClearing : canFinalizeDeletion)) : !canFinalizeShanghai)) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'SELFDESTRUCT deletion or unsupported fork context is outside this local profile.', 'unsupported');
         observedCreatedSelfdestruct ||= cancun && active.createdAddresses.has(executionAddress);
         // The step event precedes gas/static/stack checks. Promote this into
         // trace evidence only if this frame actually completes successfully.
@@ -238,7 +262,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       // On Ethereum, absent blob hashes are the empty transaction list: BLOBHASH
       // returns zero through the fork-selected EVM opcode. Real BLOBBASEFEE
       // belongs only to explicit priced contexts; unpriced probes stay fresh.
-      if (((step.opcode.code === 0x4a && !feePlan?.blobContext) || (step.opcode.code === 0x49 && chainId !== 1)) && !context.blobVersionedHashes) reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is outside this local engine profile.', 'unsupported');
+      if (((step.opcode.code === 0x4a && !feePlan?.blobContext) || (step.opcode.code === 0x49 && !ethereumProfile)) && !context.blobVersionedHashes) reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is outside this local engine profile.', 'unsupported');
       if (step.opcode.code >= 0xa0 && step.opcode.code <= 0xa4) bound('logs', ++usage.logOpcodes);
       if (active) active.pendingCall = callOpcodes.get(step.opcode.code) ?? createOpcodes.get(step.opcode.code) ?? null;
       if (callOpcodes.has(step.opcode.code) && step.stack.length >= 2) reserved('0x' + (step.stack.at(-2) & ((1n << 160n) - 1n)).toString(16).padStart(40, '0'));
@@ -271,11 +295,12 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
         active.frame.selfdestruct = { beneficiary: active.pendingSelfdestruct }; retain(96);
       }
     });
-    if (chainId === 1) {
+    if (ethereumProfile) {
       const sender = createAddressFromString(from), account = await guarded.getAccount(sender), code = await guarded.getCode(sender);
       if (code.length) {
         const delegation = existingDelegationTarget(bytesToHex(code), common);
         if (delegation === null) reject('LOCAL_SENDER_CODE_UNSUPPORTED', 'The unsigned reference requires an empty-code sender or an exact existing EIP-7702 delegation on Prague or later.', 'unsupported');
+        if (amsterdam) reject('LOCAL_SENDER_CODE_UNSUPPORTED', 'Amsterdam delegated-sender creation and parent nonce validation are not yet integrated.', 'unsupported');
         delegatedSenderNonce = account?.nonce ?? 0n;
         semantics.senderDelegation = { address: delegation, authorizationListProcessed: false };
         semantics.callerNonce = 'runCall_increment_and_committed_sender_creation_attempts';
@@ -295,7 +320,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       account.nonce++; await evm.journal.putAccount(sender, account);
       const entries = []; let gasRefund = 0n;
       for (let index = 0; index < authorizationList.length; index++) {
-        clockCheck(); const tuple = authorizationList[index], recovered = recoverAuthorization(tuple);
+        clockCheck(); const tuple = authorizationList[index], recovered = recoverAuthorization(tuple, common.chainId());
         let reason = recovered.reason;
         if (reason === null) {
           const authority = createAddressFromString(recovered.authority);
@@ -319,11 +344,24 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       semantics.callerNonce = 'outer_increment_authorizations_and_committed_sender_creation_attempts';
       semantics.warmAddresses += '_and_recovered_authorities';
     }
-    const result = await evm.runCall({ caller: createAddressFromString(from), origin: createAddressFromString(from), ...(to ? { to: createAddressFromString(to) } : {}), data: hexToBytes(request.data), value, gasLimit, gasPrice: feePlan?.effectiveGasPrice ?? 0n, ...(authorizationList !== undefined ? { skipNonceIncrement: true } : {}), ...(context.blobVersionedHashes ? { blobVersionedHashes: [...context.blobVersionedHashes] } : {}), block: { header: { number: quantity(block.number), timestamp: quantity(block.timestamp), gasLimit: quantity(block.gasLimit), baseFeePerGas: quantity(block.baseFeePerGas), difficulty: 0n, prevRandao: hexToBytes(block.mixHash), coinbase: createAddressFromString(address(block.miner)), getBlobGasPrice() { if (feePlan?.blobContext) return feePlan.blobContext.blobBaseFeePerGas; if (context.blobVersionedHashes) return 0n; reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is unsupported.', 'unsupported'); } } } });
+    if (stateGasBudget) {
+      evm.stateGasReservoir = stateGasBudget.stateGasReservoirInitial; evm.executionStateGasUsed = 0n;
+      evm.eip7928CallPostTargetOog = false; evm.eip2780PrepOog = false;
+    }
+    const result = await evm.runCall({ caller: createAddressFromString(from), origin: createAddressFromString(from), ...(to ? { to: createAddressFromString(to) } : {}), data: hexToBytes(request.data), value, gasLimit, gasPrice: feePlan?.effectiveGasPrice ?? 0n, ...(authorizationList !== undefined ? { skipNonceIncrement: true } : {}), ...(context.blobVersionedHashes ? { blobVersionedHashes: [...context.blobVersionedHashes] } : {}), block: { header: { ...(amsterdam ? { slotNumber: quantity(block.slotNumber) } : {}), number: quantity(block.number), timestamp: quantity(block.timestamp), gasLimit: quantity(block.gasLimit), baseFeePerGas: quantity(block.baseFeePerGas), difficulty: 0n, prevRandao: hexToBytes(block.mixHash), coinbase: createAddressFromString(address(block.miner)), getBlobGasPrice() { if (feePlan?.blobContext) return feePlan.blobContext.blobBaseFeePerGas; if (context.blobVersionedHashes) return 0n; reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is unsupported.', 'unsupported'); } } } });
     clockCheck();
     if (stack.length || checkpointDepth !== 1) reject('LOCAL_TRACE_INVALID', 'Local call-tree or checkpoint completion is inconsistent.');
+    if (stateGasBudget) {
+      const counters = { messageGasUsed: result.execResult.executionGasUsed, authorizationGasUsed: 0n,
+        stateGasReservoir: evm.stateGasReservoir, executionStateGasUsed: evm.executionStateGasUsed,
+        messageRefundCounter: result.execResult.gasRefund ?? 0n, authorizationRefundCounter: 0n,
+        postTargetOutOfGas: result.execResult.exceptionError?.error === 'out of gas' && evm.eip7928CallPostTargetOog === true };
+      const settled = settleEthereumStateGas(stateGasBudget, counters);
+      const strings = row => Object.fromEntries(Object.entries(row).map(([key, value]) => [key, typeof value === 'bigint' ? value.toString() : value]));
+      stateGasAccounting = { budget: strings(stateGasBudget), counters: strings(counters), settled: strings(settled) };
+    }
     if (feePlan) {
-      const used = ethereumUsedGas({ messageGasUsed: result.execResult.executionGasUsed, refundCounter: (result.execResult.gasRefund ?? 0n) + BigInt(authorizationProcessing?.gasRefundCounter ?? '0'), intrinsic: feeCosts.intrinsic, floor: feeCosts.floor });
+      const used = stateGasAccounting ? { gasUsed: BigInt(stateGasAccounting.settled.gasUsed) } : ethereumUsedGas({ messageGasUsed: result.execResult.executionGasUsed, refundCounter: (result.execResult.gasRefund ?? 0n) + BigInt(authorizationProcessing?.gasRefundCounter ?? '0'), intrinsic: feeCosts.intrinsic, floor: feeCosts.floor });
       feeAccounting = settleEthereumFees(feePlan, { gasUsed: used.gasUsed });
       // Read current state separately for each credit: sender and coinbase can
       // coincide. Credit even a zero tip so EIP-161 sees the coinbase touch.
@@ -336,15 +374,17 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       // refunding or crediting it after finalization would resurrect state.
       semantics.feeSettlement = true;
     }
-    const finalizedDeletions = [];
+    const finalizedDeletions = [], finalizedClearings = [];
     if (!result.execResult.exceptionError && result.execResult.selfdestruct?.size) {
       const cancun = common.isActivatedEIP(6780);
       if (!(result.execResult.selfdestruct instanceof Map) || (cancun && !(result.execResult.createdAddresses instanceof Set))) reject('LOCAL_TRACE_INVALID', 'Committed lifecycle collections are malformed.');
       const deletions = [...result.execResult.selfdestruct.keys()].filter(key => !cancun || result.execResult.createdAddresses.has(key)).sort();
       bound('frames', deletions.length);
       for (const key of deletions) {
-        if (!ADDRESS.test(key) || (cancun ? !canFinalizeDeletion : !canFinalizeShanghai)) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'Committed deletion requires an authenticated fork-appropriate finalizer.', 'unsupported');
-        if (cancun) {
+        if (!ADDRESS.test(key) || (cancun ? !(common.isActivatedEIP(8246) ? canFinalizeClearing : canFinalizeDeletion) : !canFinalizeShanghai)) reject('LOCAL_LIFECYCLE_UNSUPPORTED', 'Committed deletion requires an authenticated fork-appropriate finalizer.', 'unsupported');
+        if (common.isActivatedEIP(8246)) {
+          finalizedClearings.push(await guarded.finalizeCreatedContractClearing(createAddressFromString(key), { mode: 'amsterdam_eip8246' }));
+        } else if (cancun) {
           finalizedDeletions.push(await guarded.finalizeCreatedContractDeletion(createAddressFromString(key)));
         } else finalizedDeletions.push(await guarded.finalizeShanghaiContractDeletion(createAddressFromString(key)));
       }
@@ -363,15 +403,16 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
         semantics.lifecycle = (semantics.lifecycle === 'no_lifecycle_operation_encountered' ? '' : semantics.lifecycle + '_and_') + 'EIP161_empty_account_cleanup';
       }
     }
-    const lifecycle = finalizedDeletions.length || emptyAccountCleanup ? {
+    const lifecycle = finalizedDeletions.length || finalizedClearings.length || emptyAccountCleanup ? {
       ...(finalizedDeletions.length ? { finalizedDeletions } : {}),
+      ...(finalizedClearings.length ? { finalizedClearings } : {}),
       ...(emptyAccountCleanup ? { emptyAccountCleanup } : {}),
     } : null;
     const logs = (result.execResult.logs ?? []).map(([emitter, topics, data]) => ({ address: bytesToHex(emitter), topics: topics.map(bytesToHex), data: bytesToHex(data) }));
     bound('logs', logs.length); bound('returnBytes', result.execResult.returnValue.length);
-    usage.retainedTraceBytes = Buffer.byteLength(JSON.stringify({ trace: root, logs, ...(lifecycle ? { lifecycle } : {}), ...(authorizationProcessing ? { authorizationProcessing } : {}), ...(feeAccounting ? { feeAccounting } : {}) }), 'utf8'); bound('traceBytes', usage.retainedTraceBytes);
+    usage.retainedTraceBytes = Buffer.byteLength(JSON.stringify({ trace: root, logs, ...(lifecycle ? { lifecycle } : {}), ...(authorizationProcessing ? { authorizationProcessing } : {}), ...(feeAccounting ? { feeAccounting } : {}), ...(stateGasAccounting ? { stateGasAccounting } : {}) }), 'utf8'); bound('traceBytes', usage.retainedTraceBytes);
     const error = root.error, status = !error ? 'success' : error === 'revert' ? 'reverted' : 'failed';
-    const report = { execution: { status, executionGasUsed: result.execResult.executionGasUsed.toString(), gasRefundCounter: (result.execResult.gasRefund ?? 0n).toString(), returnData: bytesToHex(result.execResult.returnValue), error }, trace: root, logs, environment, semantics, limits, usage, ...(lifecycle ? { lifecycle } : {}), ...(authorizationProcessing ? { authorizationProcessing } : {}), ...(feeAccounting ? { feeAccounting } : {}), stateDisposition: 'message_result_retained_in_supplied_manager' };
+    const report = { execution: { status, executionGasUsed: result.execResult.executionGasUsed.toString(), gasRefundCounter: (result.execResult.gasRefund ?? 0n).toString(), ...(stateGasAccounting ? { executionStateGasUsed: evm.executionStateGasUsed.toString() } : {}), returnData: bytesToHex(result.execResult.returnValue), error }, trace: root, logs, environment, semantics, limits, usage, ...(lifecycle ? { lifecycle } : {}), ...(authorizationProcessing ? { authorizationProcessing } : {}), ...(feeAccounting ? { feeAccounting } : {}), ...(stateGasAccounting ? { stateGasAccounting } : {}), stateDisposition: 'message_result_retained_in_supplied_manager' };
     // Transient writes in reverted subtrees are gone now. Any remaining whole
     // namespace reset must be representable before the invocation is retained,
     // including when a caller supplied an already-checkpointed manager.

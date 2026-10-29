@@ -1,6 +1,7 @@
 import { normalizeEvmContext } from '../evm-context.js';
 import { normalizeEthereumFees, ethereumFeePlan } from './ethereum-fees.js';
 import { deriveVerifiedFees } from './fee-validation.js';
+import { deriveVerifiedGas } from './gas-validation.js';
 import childProcess from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
@@ -8,7 +9,8 @@ import { fileURLToPath } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
 import { createAuthenticatedAncestry, validateAncestryEvidence } from './authenticated-ancestry.js';
 import { verifyEthereumHeader } from './ethereum-header.js';
-import { ethereumQuantity, ethereumCallGas, ethereumCommon, ethereumContextProfile, ethereumUsedGas } from './ethereum-profile.js';
+import { ETHEREUM_NETWORK_SCHEDULES } from './ethereum-network.js';
+import { ethereumQuantity, ethereumCallGas, ethereumCommon, ethereumContextProfile } from './ethereum-profile.js';
 import { compilePreviewQueries, decodePreviewValues, nativeBalanceValues } from './preview-queries.js';
 import { validateQueryMutation, canonicalStateChanges } from './preview-mutations.js';
 import { validateExecutionChanges, validateExecutionLifecycle } from './execution-changes.js';
@@ -24,7 +26,7 @@ const sha = text => createHash('sha256').update(text).digest('hex');
 const EMPTY = { output: null, inputs: null, inputEvidence: null, inputUsage: null, inputReads: null, stateReads: null, changes: null };
 const safe = (code, message) => ({ code, message });
 
-/** Executes one unsigned chain-1 call in a fixed Node child. rpc.call is a trusted
+/** Executes one unsigned call on an explicitly admitted Ethereum network in a fixed Node child. rpc.call is a trusted
  * bounded parent adapter; raw transport evidence remains its responsibility.
  * No endpoint/expected execution/poststate is given to the child. Process/V8
  * bounds are not OS permissions or hard total-memory/network restrictions.
@@ -41,14 +43,15 @@ export async function executeIsolatedEthereumPreview(options) {
 }
 
 async function executeIsolated(options, previewMode) {
-  let request, header, limits, rpc, signal, headerVerification, compiledQueries, previewLimits;
+  let request, header, limits, rpc, signal, headerVerification, compiledQueries, previewLimits, chainId = 1;
   const emptyResult = previewMode ? { preview: null } : EMPTY;
   try {
-    fields(options, ['request', 'header', 'rpc', 'limits', 'signal', ...(previewMode ? ['queries'] : [])], ['request', 'header', 'rpc', ...(previewMode ? ['queries'] : [])]);
+    fields(options, ['request', 'header', 'rpc', 'limits', 'signal', 'chainId', ...(previewMode ? ['queries'] : [])], ['request', 'header', 'rpc', ...(previewMode ? ['queries'] : [])]);
+    chainId = options.chainId === undefined ? 1 : options.chainId; need(chainId === 1 || chainId === 11155111);
     ({ rpc, signal } = options); need(typeof rpc?.call === 'function');
     need(signal === undefined || (typeof signal.aborted === 'boolean' && typeof signal.addEventListener === 'function' && typeof signal.removeEventListener === 'function'));
     limits = normalizeLimits(options.limits);
-    if (previewMode) compiledQueries = compilePreviewQueries(options.queries);
+    if (previewMode) compiledQueries = compilePreviewQueries(options.queries, { chainId });
     request = decode(encode(options.request, 128 * 1024), 128 * 1024); fields(request, ['from', 'to', 'data', 'value', 'gas', 'accessList', 'blobVersionedHashes', 'authorizationList', 'executionProfile', 'fees'], ['from', 'to', 'data', 'value', 'gas']);
     Object.assign(request, normalizeEvmContext(request), normalizeEthereumFees(request));
     const authorizations = normalizeAuthorizationList(request);
@@ -57,9 +60,9 @@ async function executeIsolated(options, previewMode) {
     need(request.to === null || (typeof request.to === 'string' && /^0x[0-9a-f]{40}$/i.test(request.to)));
     ethereumQuantity(request.value); const gas = ethereumQuantity(request.gas);
     header = decode(encode(options.header, 128 * 1024), 128 * 1024);
-    headerVerification = verifyEthereumHeader({ header, expectedHash: header.hash });
-    ethereumContextProfile(request, header); ethereumFeePlan(request, header);
-    need(gas <= 5000000n && gas >= ethereumCallGas(request.data, ethereumCommon(header), request).minimum);
+    headerVerification = verifyEthereumHeader({ header, expectedHash: header.hash, chainId });
+    ethereumContextProfile(request, header, ethereumCommon(header, chainId)); ethereumFeePlan(request, header, chainId);
+    need(gas <= 5000000n && gas >= ethereumCallGas(request.data, ethereumCommon(header, chainId), request).minimum);
     header.hash = header.hash.toLowerCase();
     if (previewMode) previewLimits = {
       wallMs: Math.min(limits.wallMs, limits.inputs.wallMs, limits.execution.wallMs), requestMs: limits.requestMs,
@@ -71,7 +74,7 @@ async function executeIsolated(options, previewMode) {
   } catch {
     return { status: 'unavailable', error: safe('LOCAL_ISOLATED_INPUT', previewMode ? 'The fixed call, header, queries or limits are invalid.' : 'The fixed call, header or limits are invalid.'), ...emptyResult, headerVerification: null, isolation: null, broker: { calls: 0, records: [], pendingAtReturn: 0 } };
   }
-  const ancestry = createAuthenticatedAncestry(header);
+  const ancestry = createAuthenticatedAncestry(header, chainId);
   const began = performance.now(), records = [], active = new Set(), controllers = new Set();
   let child, closed = false, sealed = false, failure = null, candidate = null, pendingId = null, totalBytes = 0, stdioBytes = 0, dispatches = 0, timer, killTimer;
   let exitCode = null, exitSignal = null, terminateRequested = false, completion;
@@ -129,9 +132,9 @@ async function executeIsolated(options, previewMode) {
   }
   function validateInputs(result, count) {
     const context = result.inputs?.context;
-    need(context?.chainId === 1 && context.blockHash === header.hash && context.stateRoot === header.stateRoot.toLowerCase() && isDeepStrictEqual(context.header, header));
+    need(context?.chainId === chainId && context.blockHash === header.hash && context.stateRoot === header.stateRoot.toLowerCase() && isDeepStrictEqual(context.header, header));
     need(Array.isArray(result.inputEvidence) && result.inputEvidence.length === count && result.inputUsage?.calls === count);
-    validateAncestryEvidence(header, result.inputs.ancestry, result.inputEvidence);
+    validateAncestryEvidence(header, result.inputs.ancestry, result.inputEvidence, chainId);
     for (const [i, entry] of result.inputEvidence.entries()) {
       need(entry.id === i + 1 && isDeepStrictEqual(entry.request, records[i].request));
       if (Object.hasOwn(entry, 'result')) need(sha(encode(entry.result, limits.responseBytes)) === records[i].resultSha256);
@@ -150,8 +153,8 @@ async function executeIsolated(options, previewMode) {
   }
   function executionContext(output, call, complete, inputs, startingChanges) {
     if (output === null) { need(!complete); return; }
-    const common = ethereumCommon(header), costs = ethereumCallGas(call.data, common, call), gas = ethereumQuantity(call.gas);
-    const feePlan = ethereumFeePlan(call, header);
+    const common = ethereumCommon(header, chainId), costs = ethereumCallGas(call.data, common, call), gas = ethereumQuantity(call.gas);
+    const feePlan = ethereumFeePlan(call, header, chainId);
     const initial = inputs?.accounts?.[call.from.toLowerCase()];
     const prior = startingChanges?.accounts?.find(row => row.address === call.from.toLowerCase());
     let code = prior?.existence?.after === false ? '0x' : prior?.code?.after ?? (initial?.exists === true ? initial.code : initial?.exists === false ? '0x' : null);
@@ -162,6 +165,7 @@ async function executeIsolated(options, previewMode) {
     } else need(output.authorizationProcessing === undefined);
     const delegation = existingDelegationTarget(code, common), advertised = output.semantics?.senderDelegation;
     if (complete) need(code === '0x' || delegation !== null);
+    if (complete && common.isActivatedEIP(8037)) need(delegation === null && preparation === null);
     if (preparation) {
       need(output.semantics?.callerNonce === 'outer_increment_authorizations_and_committed_sender_creation_attempts');
       need(isDeepStrictEqual(advertised, delegation === null ? undefined : { address: delegation, authorizationListProcessed: true }));
@@ -171,29 +175,30 @@ async function executeIsolated(options, previewMode) {
     } else {
       need(advertised === undefined && output.semantics?.callerNonce === 'runCall_increments_once_including_EVM_revert');
     }
-    if (Object.hasOwn(output, 'lifecycle') || preparation || output.feeAccounting !== undefined) {
+    if (Object.hasOwn(output, 'lifecycle') || preparation || output.feeAccounting !== undefined || output.stateGasAccounting !== undefined) {
       need(complete);
       // Lifecycle rules are checked below using the authenticated header's
       // fork, never the worker's claimed environment or deletion basis.
-      const traceBytes = Buffer.byteLength(JSON.stringify({ trace: output.trace, logs: output.logs, ...(output.lifecycle ? { lifecycle: output.lifecycle } : {}), ...(preparation ? { authorizationProcessing: output.authorizationProcessing } : {}), ...(output.feeAccounting ? { feeAccounting: output.feeAccounting } : {}) }));
+      const traceBytes = Buffer.byteLength(JSON.stringify({ trace: output.trace, logs: output.logs, ...(output.lifecycle ? { lifecycle: output.lifecycle } : {}), ...(preparation ? { authorizationProcessing: output.authorizationProcessing } : {}), ...(output.feeAccounting ? { feeAccounting: output.feeAccounting } : {}), ...(output.stateGasAccounting ? { stateGasAccounting: output.stateGasAccounting } : {}) }));
       need(output.usage?.retainedTraceBytes === traceBytes && traceBytes <= limits.execution.traceBytes);
     }
-    const environment = { chainId: 1, hardfork: ethereumCommon(header).hardfork(),
+    const environment = { chainId, hardfork: ethereumCommon(header, chainId).hardfork(),
       number: ethereumQuantity(header.number).toString(), timestamp: ethereumQuantity(header.timestamp).toString(),
       gasLimit: ethereumQuantity(header.gasLimit).toString(), baseFeePerGas: feePlan?.baseFeePerGas.toString() ?? '0', mixHash: header.mixHash.toLowerCase(), miner: header.miner.toLowerCase(),
       sourceBlockHash: header.hash, sourceParentHash: header.parentHash.toLowerCase(), sourceBlockIdentityVerified: false,
+      ...(common.isActivatedEIP(7843) ? { slotNumber: ethereumQuantity(header.slotNumber).toString() } : {}),
       ...(feePlan?.blobContext ? { blobBaseFeePerGas: feePlan.blobContext.blobBaseFeePerGas.toString() } : {}) };
     if (complete || output.environment !== null) need(isDeepStrictEqual(output.environment, environment));
     if (complete || output.profile !== null) {
       const profile = {
-        name: call.executionProfile === 'unsigned_eip4844_block_end' ? 'ethereum_unsigned_eip4844_call' : feePlan ? 'ethereum_unsigned_eip1559_call' : 'ethereum_unsigned_unpriced_call', chainId: 1, hardfork: environment.hardfork,
-        forkSchedule: 'pinned_ethereumjs_common_10.1.3_mainnet', sourceBlockHash: header.hash, sourceStateRoot: header.stateRoot.toLowerCase(),
+        name: call.executionProfile === 'unsigned_eip4844_block_end' ? 'ethereum_unsigned_eip4844_call' : feePlan ? 'ethereum_unsigned_eip1559_call' : 'ethereum_unsigned_unpriced_call', chainId, hardfork: environment.hardfork,
+        forkSchedule: ETHEREUM_NETWORK_SCHEDULES[chainId], sourceBlockHash: header.hash, sourceStateRoot: header.stateRoot.toLowerCase(),
         sourceBlockIdentityVerified: false, sourceStateProofVerified: false,
         actualBlockBaseFee: ethereumQuantity(header.baseFeePerGas).toString(), executionBaseFee: feePlan?.baseFeePerGas.toString() ?? '0', gasPrice: feePlan?.effectiveGasPrice.toString() ?? '0',
         declaredGasLimit: gas.toString(), intrinsicGas: costs.intrinsic.toString(), calldataFloor: costs.floor.toString(), messageGasLimit: (gas - costs.intrinsic).toString(),
         calldataZeroBytes: costs.zeroBytes.toString(), calldataNonzeroBytes: costs.nonzeroBytes.toString(),
         outerSignatureVerified: false, feesSettled: Boolean(feePlan && complete), originalTransactionPosition: false, expectedOutputsUsed: false,
-        ...ethereumContextProfile(call, header), ...normalizeEthereumFees(call),
+        ...ethereumContextProfile(call, header, common), ...normalizeEthereumFees(call),
       };
       need(isDeepStrictEqual(output.profile, profile));
     }
@@ -202,12 +207,9 @@ async function executeIsolated(options, previewMode) {
       const error = output.execution.error;
       need(error === null || (typeof error === 'string' && error.length > 0));
       need(output.execution.status === (error === null ? 'success' : error === 'revert' ? 'reverted' : 'failed'));
-      const messageGasUsed = ethereumQuantity(output.execution.executionGasUsed), refundCounter = ethereumQuantity(output.execution.gasRefundCounter) + BigInt(preparation?.processing.gasRefundCounter ?? '0');
-      need(messageGasUsed <= gas - costs.intrinsic);
-      const accounting = ethereumUsedGas({ messageGasUsed, refundCounter, intrinsic: costs.intrinsic, floor: costs.floor });
-      need(isDeepStrictEqual(output.gasAccounting, Object.fromEntries(Object.entries(accounting).map(([key, value]) => [key, value.toString()]))));
     }
-    deriveVerifiedFees({ request: call, header, inputs, output });
+    deriveVerifiedGas({ request: call, header, output, chainId });
+    deriveVerifiedFees({ request: call, header, inputs, output, chainId });
     if (complete || output.semantics !== undefined) {
       need(output.semantics?.gasPrice === (feePlan?.effectiveGasPrice.toString() ?? '0'));
       need(output.semantics?.feeSettlement === Boolean(feePlan && complete));
@@ -225,7 +227,7 @@ async function executeIsolated(options, previewMode) {
     need((allowNullOutput && result.output === null) || (result.output && ['success', 'reverted', 'failed', 'unsupported', 'unavailable', 'invalid'].includes(result.output.execution?.status)));
     validateInputs(result, count);
     executionContext(result.output, request, ['success', 'reverted', 'failed'].includes(result.output?.execution?.status), result.inputs);
-    validateExecutionChanges({ changes: result.changes, inputs: result.inputs, output: result.output, sender: request.from, destination: request.to, selfdestructOnlyCreated: ethereumCommon(header).isActivatedEIP(6780), common: ethereumCommon(header), request, header });
+    validateExecutionChanges({ changes: result.changes, inputs: result.inputs, output: result.output, sender: request.from, destination: request.to, selfdestructOnlyCreated: ethereumCommon(header, chainId).isActivatedEIP(6780), common: ethereumCommon(header, chainId), request, header, chainId });
     for (const reads of [result.stateReads, result.inputReads]) validateReads(reads);
     return result;
   }
@@ -238,7 +240,7 @@ async function executeIsolated(options, previewMode) {
     validateCallResult(value.original, value.original.inputUsage.calls, true);
     need(isDeepStrictEqual(value.original.inputEvidence, value.inputEvidence.slice(0, value.original.inputEvidence.length)));
     const hasNative = compiledQueries.some(query => query.query === null);
-    need(value.scope?.chainId === 1 && value.scope.queries === (hasNative ? 'explicit_calls_and_native_account_balance_reads' : 'explicit_only_same_sender_zero_value_disposable_CALLs') && value.scope.queryGas === '1000000' && value.scope.processIsolation === false);
+    need(value.scope?.chainId === chainId && value.scope.queries === (hasNative ? 'explicit_calls_and_native_account_balance_reads' : 'explicit_only_same_sender_zero_value_disposable_CALLs') && value.scope.queryGas === '1000000' && value.scope.processIsolation === false);
     need(['consensusVerified', 'contractIdentityVerified', 'originalTransactionReplay'].every(key => value.scope[key] === false));
     if (hasNative) {
       need(value.scope.nativeBalanceCoverage === 'explicit_accounts_only' && value.scope.queryGasScope === 'CALL_only');
@@ -269,7 +271,7 @@ async function executeIsolated(options, previewMode) {
         // transfer/fee/deletion ledger by validateCallResult, including omitted
         // deltas. A fresh read cannot supply or modify that poststate.
         const balance = change?.existence?.after === false ? 0n : change?.balance ? BigInt(change.balance.after) : before;
-        need(isDeepStrictEqual(side.values, nativeBalanceValues(compiled, balance)));
+        need(isDeepStrictEqual(side.values, nativeBalanceValues(compiled, balance, { chainId })));
         need(isDeepStrictEqual(side.changesBefore, side.changesAfter));
         if (phase === 'before') need(canonicalStateChanges(side.changesBefore).accounts.length === 0);
         else need(isDeepStrictEqual(side.changesBefore, value.original.changes));
@@ -279,8 +281,8 @@ async function executeIsolated(options, previewMode) {
       need(originalComplete && side.reason === null && side.output?.execution?.status === 'success' && side.output.stateDisposition === 'message_result_retained_in_supplied_manager' && Array.isArray(side.output.logs) && side.output.logs.length === 0);
       const trace = side.output.trace, queryRequest = { from: request.from.toLowerCase(), ...compiled.query, value: '0', gas: '1000000' };
       executionContext(side.output, queryRequest, true, value.inputs, side.changesBefore); need(trace.error === null);
-      validateExecutionLifecycle({ output: side.output, inputs: value.inputs, destination: queryRequest.to, changes: side.changesAfter, startingChanges: side.changesBefore, selfdestructOnlyCreated: ethereumCommon(header).isActivatedEIP(6780) });
-      need(isDeepStrictEqual(side.values, decodePreviewValues(compiled, side.output.execution.returnData)));
+      validateExecutionLifecycle({ output: side.output, inputs: value.inputs, destination: queryRequest.to, changes: side.changesAfter, startingChanges: side.changesBefore, selfdestructOnlyCreated: ethereumCommon(header, chainId).isActivatedEIP(6780), common: ethereumCommon(header, chainId) });
+      need(isDeepStrictEqual(side.values, decodePreviewValues(compiled, side.output.execution.returnData, { chainId })));
       need(side.changesBefore && side.changesAfter);
       if (phase === 'before') need(side.changesBefore.accounts?.length === 0);
       else need(isDeepStrictEqual(side.changesBefore, value.original.changes));
@@ -365,7 +367,7 @@ async function executeIsolated(options, previewMode) {
         } catch { fail('LOCAL_ISOLATED_PROTOCOL', 'The isolated worker protocol was invalid.'); }
       });
       timer = setTimeout(() => fail('LOCAL_ISOLATED_TIMEOUT', 'The isolated process exceeded its wall-time budget.'), Math.max(1, limits.wallMs - (performance.now() - began)));
-      send({ v: 1, type: 'start', id: 1, payload: { request, header, limits, ...(previewMode ? { mode: 'preview', queries: compiledQueries.map(row => row.descriptor) } : {}) } }, 256 * 1024);
+      send({ v: 1, type: 'start', id: 1, payload: { request, header, limits, ...(chainId === 1 ? {} : { chainId }), ...(previewMode ? { mode: 'preview', queries: compiledQueries.map(row => row.descriptor) } : {}) } }, 256 * 1024);
     }
     await finished;
     if (!failure && candidate) {
@@ -374,7 +376,7 @@ async function executeIsolated(options, previewMode) {
         const views = previewMode ? [candidate.preview.original, candidate.preview] : [candidate];
         for (const view of views) {
           check();
-          await validateInputFacts({ inputs: view.inputs, inputEvidence: view.inputEvidence, stateRoot: header.stateRoot.toLowerCase(), cache, check });
+          await validateInputFacts({ inputs: view.inputs, inputEvidence: view.inputEvidence, stateRoot: header.stateRoot.toLowerCase(), cache, check, chainId });
           check();
         }
       } catch { fail('LOCAL_ISOLATED_PROTOCOL', 'The isolated worker input facts did not match verified parent evidence.'); }

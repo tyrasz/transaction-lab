@@ -34,17 +34,16 @@ test('reservoir refills retain a negative delta; ordinary refunds and floor rema
   assert.equal(floor.gasUsed, 120000n); assert.equal(floor.floorAdjustment, 5001n); assert.equal(floor.reportedRefundCounter, 0n);
 });
 
-test('disputed OOG paths and unestablished negative final state usage withhold settlement', () => {
+test('restored OOG reservoir settles, drained counters fail and negative final state usage is unsupported', () => {
   for (const executionStateGasUsed of [-1n, -200n]) {
     assert.throws(() => settleEthereumStateGas(budget(), counters({ executionStateGasUsed })), { code: 'LOCAL_ETHEREUM_STATE_GAS_UNSUPPORTED' });
   }
   const b = budget({ gasLimit: 20000000n });
-  // Both the captured drained reservoir and a preserved-reservoir alternative
-  // are refused. Choosing a client is not a resolution of the discrepancy.
-  for (const stateGasReservoir of [0n, b.stateGasReservoirInitial]) {
-    assert.throws(() => settleEthereumStateGas(b, counters({ messageGasUsed: b.messageGasLimit,
-      stateGasReservoir, postTargetOutOfGas: true })), { code: 'LOCAL_ETHEREUM_STATE_GAS_UNSUPPORTED' });
-  }
+  const c = counters({ messageGasUsed: b.messageGasLimit, stateGasReservoir: b.stateGasReservoirInitial, postTargetOutOfGas: true });
+  const settled = settleEthereumStateGas(b, c);
+  assert.equal(settled.gasUsed, 16777216n); assert.equal(settled.regularGasUsed, 16777216n);
+  assert.throws(() => settleEthereumStateGas(b, { ...c, stateGasReservoir: 0n }), { code: 'LOCAL_ETHEREUM_STATE_GAS_INVALID' });
+  assert.throws(() => settleEthereumStateGas(b, { ...c, messageGasUsed: b.messageGasLimit - 1n }), { code: 'LOCAL_ETHEREUM_STATE_GAS_INVALID' });
 });
 
 test('arithmetic rejects impossible budget/counter combinations and hostile records without invoking accessors', () => {
@@ -199,7 +198,7 @@ test('observed pinned post-target CALL OOG remains reproducible but local settle
   const third = '6000600060006000600073' + CHILD.slice(2) + '6111945a03f150';
   const bytecode = '0x' + callCode(CHILD, { gas: 16000000 }) + callCode(CHILD, { gas: 600000 })
     + third + callCode(delegated, { gas: 0 }) + '00';
-  const f = await signedStateGasCase({ gasLimit: 20000000n, expectSettlementUnsupported: true, target: { nonce: 1n, code: bytecode }, accounts: {
+  const f = await signedStateGasCase({ gasLimit: 20000000n, expectedSettlementError: 'LOCAL_ETHEREUM_STATE_GAS_INVALID', target: { nonce: 1n, code: bytecode }, accounts: {
     [CHILD]: { nonce: 1n, code: '0xfe' }, [delegated]: { nonce: 1n, code: '0xef0100' + implementation.slice(2) },
     [implementation]: { nonce: 1n, code: '0x00' },
   } });

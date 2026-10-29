@@ -70,9 +70,11 @@ export function ethereumStateGasBudget(input, common) {
  *
  * postTargetOutOfGas must be the conjunction of the final root OUT_OF_GAS error
  * and the EVM's eip7928CallPostTargetOog latch, retained before runTx clears it.
- * Pinned runTx force-drains the reservoir in this case, whereas the independently
- * captured Geth transition preserves it. Until resolved, this helper refuses
- * settlement for that path. A negative FINAL state counter is also unsupported;
+ * Pinned runTx force-drains the reservoir in this case, whereas raw runCall,
+ * the independently captured Geth transition and EIP-8037 preserve it. Only
+ * regular gas is exhausted. The normal regular bound rejects the force-drained
+ * counters instead of adopting that library-specific override.
+ * A negative FINAL state counter remains unsupported;
  * a signed frame counter does not establish that it is valid at transaction end.
  *
  * These are arithmetic consistency checks, not proof of the execution or of
@@ -91,7 +93,7 @@ export function settleEthereumStateGas(budget, counters) {
   const reservoirDelta = plan.stateGasReservoirInitial - c.stateGasReservoir;
   const beforeRefund = plan.intrinsicRegular + regularPoolUsed + reservoirDelta;
   need(beforeRefund >= 0n && beforeRefund <= plan.gasLimit);
-  if (c.postTargetOutOfGas) unsupported('Post-target out-of-gas settlement differs between the pinned execution clients.');
+  if (c.postTargetOutOfGas) need(regularPoolUsed === plan.messageGasLimit);
   if (c.executionStateGasUsed < 0n) unsupported('Negative final transaction state-gas usage has not been independently established.');
   // State drawn from gas_left is already included in regularPoolUsed. Remove
   // it once to recover actual non-state work; do not charge that spill twice.

@@ -8,6 +8,7 @@ const MAX_INITIAL_CODE_BYTES = 131072;
 const CREATION_BASES = ['internal_contract_creation', 'top_level_contract_creation'];
 const DELETION_BASIS = 'same_invocation_created_contract_deletion';
 const SHANGHAI_DELETION_BASIS = 'shanghai_selfdestruct_deletion';
+const AMSTERDAM_CLEARING_BASIS = 'same_invocation_created_contract_clearing_eip8246';
 const EMPTY_CLEANUP_BASIS = 'eip161_empty_account_cleanup';
 const AUTHORIZATION_BASIS = 'eip7702_authorization_materialization';
 const EXISTENCE_BASES = ['unsigned_sender_nonce_materialization', 'positive_native_funding_of_proof_absent_account', AUTHORIZATION_BASIS, ...CREATION_BASES];
@@ -55,7 +56,7 @@ function canonical(snapshot) {
     const row = { address: account.address };
     if (Object.hasOwn(account, 'reset')) {
       const value = account.reset; fields(value, ['basis', 'initialStorageRoot']);
-      need([DELETION_BASIS, SHANGHAI_DELETION_BASIS, EMPTY_CLEANUP_BASIS].includes(value.basis) && matches(value.initialStorageRoot, WORD));
+      need([DELETION_BASIS, SHANGHAI_DELETION_BASIS, EMPTY_CLEANUP_BASIS, AMSTERDAM_CLEARING_BASIS].includes(value.basis) && matches(value.initialStorageRoot, WORD));
       // A surviving replacement of an originally existing account retains the
       // whole cleared namespace. This is shape only: execution provenance must
       // establish the prior finalized deletion before accepting such a row.
@@ -64,7 +65,7 @@ function canonical(snapshot) {
     }
     if (Object.hasOwn(account, 'existence')) {
       const value = account.existence; fields(value, ['before', 'after', 'basis']);
-      const deletion = value.before === true && value.after === false && [DELETION_BASIS, SHANGHAI_DELETION_BASIS, EMPTY_CLEANUP_BASIS].includes(value.basis);
+      const deletion = value.before === true && value.after === false && [DELETION_BASIS, SHANGHAI_DELETION_BASIS, EMPTY_CLEANUP_BASIS, AMSTERDAM_CLEARING_BASIS].includes(value.basis);
       need(deletion || (value.before === false && value.after === true && EXISTENCE_BASES.includes(value.basis)));
       row.existence = { before: value.before, after: value.after, basis: value.basis };
     }
@@ -111,7 +112,7 @@ function canonical(snapshot) {
       // removed. Its authenticated prior root is bound by lifecycle evidence.
       // Individual slot deltas would misleadingly imply exhaustive coverage.
       need(!row.nonce && !row.balance && !row.code && !row.storage);
-    } else if ([DELETION_BASIS, SHANGHAI_DELETION_BASIS].includes(row.existence?.basis)) {
+    } else if ([DELETION_BASIS, SHANGHAI_DELETION_BASIS, AMSTERDAM_CLEARING_BASIS].includes(row.existence?.basis)) {
       // Whole-account finalization subsumes nonce, code and every slot. The
       // fork-specific lifecycle validator binds its authenticated initial root;
       // only Cancun-created deletion requires an initially deployable account.

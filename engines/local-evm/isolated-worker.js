@@ -25,8 +25,9 @@ process.on('message', raw => {
     const message = decode(raw, started ? limits.responseBytes + 1024 : 256 * 1024);
     if (!started) {
       envelope(message, 'start', ['payload']); need(message.id === 1);
-      if (message.payload?.mode === 'preview') fields(message.payload, ['request', 'header', 'limits', 'mode', 'queries']);
-      else fields(message.payload, ['request', 'header', 'limits']);
+      if (message.payload?.mode === 'preview') fields(message.payload, ['request', 'header', 'limits', 'mode', 'queries', 'chainId'], ['request', 'header', 'limits', 'mode', 'queries']);
+      else fields(message.payload, ['request', 'header', 'limits', 'chainId'], ['request', 'header', 'limits']);
+      need(message.payload.chainId === undefined || message.payload.chainId === 1 || message.payload.chainId === 11155111);
       started = true; limits = normalizeLimits(message.payload.limits);
       void run(message.payload).catch(fatal); return;
     }
@@ -38,7 +39,7 @@ process.on('message', raw => {
   } catch { fatal(); }
 });
 
-async function run({ request, header, mode, queries }) {
+async function run({ request, header, mode, queries, chainId = 1 }) {
   const rpc = { call(method, params, { signal } = {}) {
     return new Promise((resolve, reject) => {
       need(!pending && !terminal); const id = nextId++;
@@ -57,7 +58,7 @@ async function run({ request, header, mode, queries }) {
   let result;
   if (mode === 'preview') {
     const { executeEthereumPreview } = await import('./ethereum-preview.js');
-    result = { preview: await executeEthereumPreview({ request, header, rpc, queries, limits: {
+    result = { preview: await executeEthereumPreview({ request, header, chainId, rpc, queries, limits: {
       wallMs: Math.min(limits.wallMs, limits.inputs.wallMs, limits.execution.wallMs), requestMs: limits.requestMs,
       calls: limits.calls, responseBytes: limits.responseBytes, totalBytes: limits.totalResponseBytes,
       ...Object.fromEntries(['accounts', 'slots', 'codeBytes', 'reads'].map(key => [key, limits.inputs[key]])),
@@ -65,11 +66,11 @@ async function run({ request, header, mode, queries }) {
       rootReturnBytes: limits.execution.returnBytes,
     } }) };
   } else {
-    const inputs = createRpcStateInputs({ chainId: 1, blockHash: header.hash, header, rpc, limits: {
+    const inputs = createRpcStateInputs({ chainId, blockHash: header.hash, header, rpc, limits: {
       ...limits.inputs, calls: limits.calls, requestMs: limits.requestMs, responseBytes: limits.responseBytes, totalBytes: limits.totalResponseBytes,
     } });
     const state = createProofStateManager({ inputs });
-    const output = await executeEthereumCall({ request, header, stateManager: state, blockchain: inputs.blockchain, limits: limits.execution });
+    const output = await executeEthereumCall({ request, header, chainId, stateManager: state, blockchain: inputs.blockchain, limits: limits.execution });
     result = { output, inputs: inputs.snapshotInputs(), inputEvidence: inputs.snapshotEvidence(), inputUsage: inputs.snapshotUsage(),
       inputReads: inputs.snapshotReads(), stateReads: state.snapshotReads(), changes: state.snapshotChanges() };
   }

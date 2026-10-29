@@ -29,7 +29,7 @@ export function callCode(address, { value = 0, gas = 1000000, opcode = 'f1', suf
 }
 
 export async function signedStateGasCase({ target = { nonce: 1n, code: '0x00' }, accounts = {}, to = TARGET,
-  value = 0n, data = '0x', gasLimit = 5000000n, authorizationList, accessList, expectSettlementUnsupported = false } = {}) {
+  value = 0n, data = '0x', gasLimit = 5000000n, authorizationList, accessList, expectedSettlementError = null } = {}) {
   const common = commonForStateGas();
   const supplied = { [SENDER]: { nonce: 1n, balance: FUNDS }, ...(target === null ? {} : { [TARGET]: target }), ...accounts };
   const allocation = Object.fromEntries(Object.entries(supplied).map(([address, input]) => {
@@ -72,8 +72,8 @@ export async function signedStateGasCase({ target = { nonce: 1n, code: '0x00' },
     stateGasReservoir: vm.evm.stateGasReservoir, executionStateGasUsed: vm.evm.executionStateGasUsed,
     messageRefundCounter: result.execResult.gasRefund ?? 0n, authorizationRefundCounter: 0n, postTargetOutOfGas,
   };
-  if (expectSettlementUnsupported) {
-    assert.throws(() => settleEthereumStateGas(budget, counters), { code: 'LOCAL_ETHEREUM_STATE_GAS_UNSUPPORTED' });
+  if (expectedSettlementError) {
+    assert.throws(() => settleEthereumStateGas(budget, counters), { code: expectedSettlementError });
     return { state, vm, tx, block, request, result, costs, budget, counters, settled: null, rootEntry };
   }
   const settled = settleEthereumStateGas(budget, counters);

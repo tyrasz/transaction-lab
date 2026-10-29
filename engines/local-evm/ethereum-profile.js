@@ -16,8 +16,8 @@ export function ethereumQuantity(value) {
 }
 
 /** Execution admission is deliberately separate from header/network support.
- * Only the reviewed mainnet fork set is currently admitted. A valid Sepolia
- * header or query identity cannot enable execution; the trusted caller must
+ * Mainnet keeps its reviewed fork set; Sepolia also admits Amsterdam in the
+ * internal executor. HTTP admission is separate. The trusted caller must
  * pass chainId explicitly when it differs from the legacy mainnet default.
  * Header authenticity and finality remain the caller's responsibility. */
 export function ethereumCommon(header, chainId = 1) {
@@ -25,7 +25,7 @@ export function ethereumCommon(header, chainId = 1) {
   let common;
   try { common = ethereumNetworkCommon(header, chainId); }
   catch (error) { if (error?.code === 'LOCAL_ETHEREUM_FORK_UNSUPPORTED') throw unavailable(); throw error; }
-  if (chainId !== 1 || !SUPPORTED.has(common.hardfork())) throw unavailable();
+  if (!SUPPORTED.has(common.hardfork()) && !(chainId === 11155111 && common.hardfork() === 'amsterdam')) throw unavailable();
   return common;
 }
 
@@ -110,7 +110,7 @@ export function ethereumContextProfile(request, header, common = ethereumCommon(
     Object.assign(profile, { executionBlobBaseFee: '0', sourceExcessBlobGas: excess.toString() });
   }
   if (profile.executionProfile) {
-    const blobContext = ethereumBlobContext(header);
+    const blobContext = ethereumBlobContext(header, Number(common.chainId()));
     if (blobContext) Object.assign(profile, { executionBlobBaseFee: blobContext.blobBaseFeePerGas.toString(), sourceExcessBlobGas: blobContext.excessBlobGas.toString() });
   }
   return profile;

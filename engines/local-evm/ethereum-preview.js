@@ -39,12 +39,14 @@ const error = code => ({ code, message: code === 'LOCAL_PREVIEW_INPUT' ? 'The fi
  * Each query pair preserves its own status. A later input failure cannot change
  * an already retained original execution or previously completed query pair. */
 export async function executeEthereumPreview(options) {
-  let request, header, rpc, queries, limits, now, headerVerification;
+  let request, header, rpc, queries, limits, now, headerVerification, chainId = 1, scope = SCOPE;
   try {
-    fields(options, ['request', 'header', 'rpc', 'queries', 'limits', 'now'], ['request', 'header', 'rpc', 'queries']);
+    fields(options, ['request', 'header', 'rpc', 'queries', 'limits', 'now', 'chainId'], ['request', 'header', 'rpc', 'queries']);
+    chainId = options.chainId === undefined ? 1 : options.chainId; need(chainId === 1 || chainId === 11155111);
+    if (chainId !== 1) scope = { ...SCOPE, chainId };
     rpc = options.rpc; need(typeof rpc?.call === 'function');
     now = options.now ?? (() => performance.now()); need(typeof now === 'function');
-    queries = compilePreviewQueries(options.queries);
+    queries = compilePreviewQueries(options.queries, { chainId });
     request = decode(encode(options.request, 128 * 1024), 128 * 1024);
     fields(request, ['from', 'to', 'data', 'value', 'gas', 'accessList', 'blobVersionedHashes', 'authorizationList', 'executionProfile', 'fees'], ['from', 'to', 'data', 'value', 'gas']);
     Object.assign(request, normalizeEvmContext(request), normalizeEthereumFees(request));
@@ -55,9 +57,9 @@ export async function executeEthereumPreview(options) {
     request.from = request.from.toLowerCase(); request.to = request.to === null ? null : request.to.toLowerCase();
     ethereumQuantity(request.value); const gas = ethereumQuantity(request.gas);
     header = decode(encode(options.header, 128 * 1024), 128 * 1024);
-    headerVerification = verifyEthereumHeader({ header, expectedHash: header.hash });
-    ethereumContextProfile(request, header); ethereumFeePlan(request, header);
-    need(gas <= 5000000n && gas >= ethereumCallGas(request.data, ethereumCommon(header), request).minimum);
+    headerVerification = verifyEthereumHeader({ header, expectedHash: header.hash, chainId });
+    ethereumContextProfile(request, header, ethereumCommon(header, chainId)); ethereumFeePlan(request, header, chainId);
+    need(gas <= 5000000n && gas >= ethereumCallGas(request.data, ethereumCommon(header, chainId), request).minimum);
     header.hash = header.hash.toLowerCase();
     const supplied = options.limits ?? {}; fields(supplied, Object.keys(ETHEREUM_PREVIEW_LIMITS), []);
     limits = { ...ETHEREUM_PREVIEW_LIMITS };
@@ -66,7 +68,7 @@ export async function executeEthereumPreview(options) {
     }
   } catch {
     return { status: 'unavailable', error: error('LOCAL_PREVIEW_INPUT'), headerVerification: null,
-      original: null, measurements: [], inputs: null, inputEvidence: [], inputUsage: null, inputReads: null, usage: null, scope: SCOPE };
+      original: null, measurements: [], inputs: null, inputEvidence: [], inputUsage: null, inputReads: null, usage: null, scope };
   }
   const began = now(), counters = { executions: 0, steps: 0, frames: 0, logs: 0, rootReturnBytes: 0, traceBytes: 0 };
   const measurements = queries.map(compiled => ({ ...compiled, status: 'not_attempted', reason: 'Original execution has no complete retained state.', before: null, after: null, values: null }));
@@ -79,7 +81,7 @@ export async function executeEthereumPreview(options) {
     if (!available()) return null;
     const remaining = Object.fromEntries(EXECUTION_COUNTS.map(key => [key, limits[key] - counters[key]]));
     const { rootReturnBytes, ...executionRemaining } = remaining;
-    const output = await executeEthereumCall({ request: call, header, stateManager: manager, blockchain: inputs.blockchain, now,
+    const output = await executeEthereumCall({ request: call, header, chainId, stateManager: manager, blockchain: inputs.blockchain, now,
       limits: { ...executionRemaining, gas: limits.gas, depth: limits.depth, memoryBytes: limits.memoryBytes, calldataBytes: limits.calldataBytes,
         returnBytes: rootReturnBytes, wallMs: Math.max(1, Math.min(120000, Math.floor(limits.wallMs - elapsed()))) } });
     counters.executions++;
@@ -103,7 +105,7 @@ export async function executeEthereumPreview(options) {
       if (output.execution.status !== 'success') return unavailable('The declared query did not complete successfully.', output);
       need(output.stateDisposition === 'message_result_retained_in_supplied_manager' && output.logs.length === 0);
       const mutationValidation = validateQueryMutation({ before, after, sender: request.from, nonceBefore, senderExistedBefore: account !== undefined });
-      const values = decodePreviewValues(compiled, output.execution.returnData);
+      const values = decodePreviewValues(compiled, output.execution.returnData, { chainId });
       return { status: 'measured', reason: null, values, output, changesBefore: before, changesAfter: after, mutationValidation,
         inputEvidenceIds: Array.from({ length: inputs.snapshotUsage().calls - firstInput }, (_, i) => firstInput + i + 1), stateReads: manager.snapshotReads() };
     } catch {
@@ -120,7 +122,7 @@ export async function executeEthereumPreview(options) {
       const account = await manager.getAccount(createAddressFromString(compiled.descriptor.account));
       after = manager.snapshotChanges();
       need(available(false) && equal(before, after));
-      result = { status: 'measured', reason: null, output: null, values: nativeBalanceValues(compiled, account?.balance ?? 0n) };
+      result = { status: 'measured', reason: null, output: null, values: nativeBalanceValues(compiled, account?.balance ?? 0n, { chainId }) };
     } catch {
       result = unavailable('The native balance or its verified input state could not be established.');
     }
@@ -128,7 +130,7 @@ export async function executeEthereumPreview(options) {
       inputEvidenceIds: Array.from({ length: inputs.snapshotUsage().calls - firstInput }, (_, i) => firstInput + i + 1), stateReads: manager.snapshotReads() };
   }
   try {
-    inputs = createRpcStateInputs({ chainId: 1, blockHash: header.hash, header, rpc, now, limits: {
+    inputs = createRpcStateInputs({ chainId, blockHash: header.hash, header, rpc, now, limits: {
       wallMs: limits.wallMs, calls: limits.calls, requestMs: limits.requestMs, responseBytes: limits.responseBytes, totalBytes: limits.totalBytes,
       accounts: limits.accounts, slots: limits.slots, codeBytes: limits.codeBytes, reads: limits.reads,
     } });
@@ -182,10 +184,10 @@ export async function executeEthereumPreview(options) {
     error: sharedFailure, headerVerification, original, measurements,
     inputs: inputs?.snapshotInputs() ?? null, inputEvidence: inputs?.snapshotEvidence() ?? [], inputUsage: inputs?.snapshotUsage() ?? null,
     inputReads: inputs?.snapshotReads() ?? null, usage: { ...counters, wallMs: elapsed(), limits },
-    scope: { ...SCOPE, ...(request.executionProfile ? { execution: request.executionProfile, feesSettled: Boolean(completeOriginal) } : {}), ...nativeScope } };
+    scope: { ...scope, ...(request.executionProfile ? { execution: request.executionProfile, feesSettled: Boolean(completeOriginal) } : {}), ...nativeScope } };
   // The isolated host applies the same bound to IPC. The internal core also
   // refuses a result too large to retain, without presenting a partial success.
   try { encode(result, 64 * 1024 * 1024); return result; }
   catch { return { status: 'unavailable', error: error('LOCAL_PREVIEW_OUTPUT'), headerVerification, original: null, measurements: [],
-    inputs: null, inputEvidence: [], inputUsage: null, inputReads: null, usage: { ...counters, wallMs: elapsed(), limits }, scope: SCOPE }; }
+    inputs: null, inputEvidence: [], inputUsage: null, inputReads: null, usage: { ...counters, wallMs: elapsed(), limits }, scope }; }
 }

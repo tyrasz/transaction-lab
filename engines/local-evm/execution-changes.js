@@ -13,6 +13,7 @@ const hex = value => '0x' + BigInt(value).toString(16);
 
 const DELETION_BASIS = 'same_invocation_created_contract_deletion';
 const SHANGHAI_DELETION_BASIS = 'shanghai_selfdestruct_deletion';
+const AMSTERDAM_CLEARING_BASIS = 'same_invocation_created_contract_clearing_eip8246';
 const EMPTY_CLEANUP_BASIS = 'eip161_empty_account_cleanup';
 const RIPEMD160 = '0x0000000000000000000000000000000000000003';
 const cleanupRow = address => ({ address, existence: { before: true, after: false, basis: EMPTY_CLEANUP_BASIS } });
@@ -51,12 +52,13 @@ function emptyFact(inputs, address) {
 /** Check invocation-local lifecycle evidence without assuming a query starts
  * from the immutable base. Net query effects are validated separately. This is
  * trace/result consistency, not an independent replay or post-state-root proof. */
-export function validateExecutionLifecycle({ output, inputs, destination, changes, startingChanges, selfdestructOnlyCreated = true, fees = null }) {
+export function validateExecutionLifecycle({ output, inputs, destination, changes, startingChanges, selfdestructOnlyCreated = true, fees = null, common }) {
   need(typeof selfdestructOnlyCreated === 'boolean');
+  const clearsCreated = common?.isActivatedEIP(8246) === true;
   const created = new Map(), creationAttempts = new Map(), destructed = new Set(), eligibleTouches = new Set(), justifiedTouches = new Set(); let frames = 0;
   const lifecycle = output === null ? undefined : ownData(output, 'lifecycle');
   const complete = ['success', 'reverted', 'failed'].includes(output?.execution?.status);
-  if (!complete) { need(lifecycle === undefined); return { created, creationAttempts, deleted: new Set(), emptyDeleted: new Set() }; }
+  if (!complete) { need(lifecycle === undefined); return { created, creationAttempts, deleted: new Set(), cleared: new Set(), emptyDeleted: new Set() }; }
   const rows = new Map(changes ? canonicalStateChanges(changes).accounts.map(row => [row.address, row]) : []);
   const priorRows = new Map(startingChanges ? canonicalStateChanges(startingChanges).accounts.map(row => [row.address, row]) : []);
   // Only value transfers are reconstructed, from the already-bound complete
@@ -74,11 +76,19 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     const source = balance(from), target = balance(to); need(value <= source);
     if (from !== to) { need(target + value < (1n << 256n)); balances.set(from, source - value); balances.set(to, target + value); }
   }
-  function walk(frame, retained, depth, parent = null) {
+  function walk(frame, retained, depth, parent = null, inheritedStatic = false) {
     need(frame && !types.isProxy(frame) && ++frames <= 1000 && depth <= 32);
     for (const key of ['calls', 'type', 'error', 'output', 'to', 'executionAddress', 'from', 'caller', 'depth', 'value']) ownData(frame, key);
     boundedArray(frame.calls, 1000);
     need(['CALL', 'CALLCODE', 'DELEGATECALL', 'STATICCALL', 'CREATE', 'CREATE2'].includes(frame.type));
+    const isStatic = inheritedStatic || frame.type === 'STATICCALL';
+    // Static mode propagates through every descendant, including delegated
+    // code. CREATE and value-bearing CALL trap before entering a child frame;
+    // CALLCODE may carry value because it does not transfer native balance.
+    if (isStatic) {
+      need(!['CREATE', 'CREATE2'].includes(frame.type));
+      if (['CALL', 'STATICCALL'].includes(frame.type)) need(frame.value === '0x0');
+    }
     need(frame.error === null || (typeof frame.error === 'string' && frame.error.length > 0));
     need(typeof frame.output === 'string' && DATA.test(frame.output));
     need(frame.depth === depth && typeof frame.from === 'string' && ADDRESS.test(frame.from) && typeof frame.caller === 'string' && ADDRESS.test(frame.caller));
@@ -127,7 +137,7 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
       fields(selfdestruct, ['beneficiary']);
       need(typeof selfdestruct.beneficiary === 'string' && ADDRESS.test(selfdestruct.beneficiary) && frame.error === null);
       need(typeof frame.executionAddress === 'string' && ADDRESS.test(frame.executionAddress));
-      need(frame.type !== 'STATICCALL');
+      need(!isStatic);
       if (parent) need(frame.from === parent.executionAddress);
       if (['DELEGATECALL', 'CALLCODE'].includes(frame.type)) need(parent && frame.executionAddress === parent.executionAddress);
       else need(frame.executionAddress === frame.to);
@@ -136,14 +146,13 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
         justifiedTouches.add(selfdestruct.beneficiary); eligibleTouches.add(selfdestruct.beneficiary);
       }
     }
-    for (const child of frame.calls) walk(child, commits, depth + 1, frame);
+    for (const child of frame.calls) walk(child, commits, depth + 1, frame, isStatic);
     // SELFDESTRUCT is terminal in its own frame, after all entered children.
-    // Shanghai always burns a self-beneficiary balance immediately. Cancun
-    // does so only for this invocation's creations. Later refills precede the
-    // separate end-of-invocation deletion burn.
+    // Amsterdam never burns a self-beneficiary balance. Earlier forks retain
+    // their immediate burn and end-of-invocation whole-account deletion rules.
     if (selfdestruct !== undefined && commits) {
       if (selfdestruct.beneficiary !== frame.executionAddress) transfer(frame.executionAddress, selfdestruct.beneficiary, balance(frame.executionAddress));
-      else if (!selfdestructOnlyCreated || created.has(frame.executionAddress)) balances.set(frame.executionAddress, 0n);
+      else if (!clearsCreated && (!selfdestructOnlyCreated || created.has(frame.executionAddress))) balances.set(frame.executionAddress, 0n);
     }
   }
   if (fees) {
@@ -159,9 +168,43 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
       justifiedTouches.add(address); eligibleTouches.add(address);
     }
   }
-  const deleted = new Set([...destructed].filter(address => !selfdestructOnlyCreated || created.has(address)).sort());
+  const cleared = new Set(clearsCreated ? [...destructed].filter(address => created.has(address)).sort() : []);
+  const deleted = new Set(clearsCreated ? [] : [...destructed].filter(address => !selfdestructOnlyCreated || created.has(address)).sort());
   const deletionBasis = selfdestructOnlyCreated ? DELETION_BASIS : SHANGHAI_DELETION_BASIS;
-  if (lifecycle !== undefined) { fields(lifecycle, [], ['finalizedDeletions', 'emptyAccountCleanup']); need(Object.keys(lifecycle).length > 0); }
+  if (lifecycle !== undefined) { fields(lifecycle, [], ['finalizedDeletions', 'finalizedClearings', 'emptyAccountCleanup']); need(Object.keys(lifecycle).length > 0); }
+  if (cleared.size === 0) need(lifecycle?.finalizedClearings === undefined);
+  else {
+    need(output.execution.status === 'success' && lifecycle); boundedArray(lifecycle.finalizedClearings, 128);
+    need(lifecycle.finalizedClearings.length === cleared.size && changes !== undefined);
+    for (const [index, address] of [...cleared].entries()) {
+      const row = lifecycle.finalizedClearings[index]; fields(row, ['address', 'scope', 'initialStorageRoot', 'preservedBalance']);
+      const initial = inputs.accounts?.[address], proof = inputs.provenance?.find(item => item.account === address)?.accountProof;
+      need(initial && proof && proof.exists === initial.exists && typeof proof.storageRoot === 'string' && WORD.test(proof.storageRoot));
+      need(row.address === address && row.scope === 'code_nonce_and_entire_storage_preserving_balance' && row.initialStorageRoot === proof.storageRoot);
+      const preserved = balance(address); need(row.preservedBalance === hex(preserved));
+      const prior = priorRows.get(address);
+      // A disposable continuation may recreate a previously cleared namespace.
+      // Its starting overlay is separately bound to the original result. A
+      // nonempty immutable namespace cannot become deployable by assertion.
+      const clearedNamespace = prior?.existence?.after === false || (prior?.reset &&
+        prior.reset.initialStorageRoot === proof.storageRoot && !prior.storage &&
+        (prior.nonce?.after ?? hex(initial.exists ? initial.nonce : '0')) === '0x0' &&
+        (prior.code?.after ?? (initial.exists ? initial.code : '0x')) === '0x');
+      if (!clearedNamespace) deployableFact(inputs, address);
+      const before = initial.exists ? BigInt(initial.balance) : 0n;
+      const expected = { address };
+      if (preserved === 0n) {
+        if (initial.exists) expected.existence = { before: true, after: false, basis: AMSTERDAM_CLEARING_BASIS };
+      } else if (!initial.exists) expected.existence = { before: false, after: true, basis: 'positive_native_funding_of_proof_absent_account' };
+      else {
+        if (initial.nonce !== '0') expected.nonce = { before: hex(initial.nonce), after: '0x0' };
+        if (initial.nonce !== '0' || initial.code !== '0x' || proof.storageRoot !== EMPTY_STORAGE_ROOT) expected.reset = { basis: AMSTERDAM_CLEARING_BASIS, initialStorageRoot: proof.storageRoot };
+        if (initial.code !== '0x') expected.code = { before: initial.code, after: '0x' };
+      }
+      if (before !== preserved) expected.balance = { before: hex(before), after: hex(preserved) };
+      need(isDeepStrictEqual(rows.get(address), Object.keys(expected).length > 1 ? expected : undefined));
+    }
+  }
   if (deleted.size === 0) need(lifecycle?.finalizedDeletions === undefined);
   else {
     need(output.execution.status === 'success' && lifecycle); boundedArray(lifecycle.finalizedDeletions, 128);
@@ -192,7 +235,7 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
   for (const address of deleted) balances.set(address, 0n);
   const requiredCleanup = new Set();
   for (const address of eligibleTouches) {
-    if (!emptyFact(inputs, address) || deleted.has(address) || created.has(address)) continue;
+    if (!emptyFact(inputs, address) || deleted.has(address) || cleared.has(address) || created.has(address)) continue;
     const prior = priorRows.get(address), after = rows.get(address);
     if (prior?.existence?.after === false || (prior?.nonce && BigInt(prior.nonce.after) > 0n) || prior?.code) continue;
     if (address === output.trace.from) {
@@ -239,7 +282,13 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     const after = deleted.has(address) || emptyDeleted.has(address) ? 0n : balance(address);
     need(isDeepStrictEqual(rows.get(address)?.balance, before === after ? undefined : { before: hex(before), after: hex(after) }));
   }
-  return { created, creationAttempts, deleted, emptyDeleted };
+  // New clearing/reset evidence requires the current invocation's exact
+  // creation/SELFDESTRUCT intersection. An unchanged earlier row may be carried
+  // by a query; its starting overlay is validated by the enclosing parent.
+  for (const row of rows.values()) if (row.reset?.basis === AMSTERDAM_CLEARING_BASIS || row.existence?.basis === AMSTERDAM_CLEARING_BASIS) {
+    need(clearsCreated && (cleared.has(row.address) || isDeepStrictEqual(row, priorRows.get(row.address))));
+  }
+  return { created, creationAttempts, deleted, cleared, emptyDeleted };
 }
 
 /** Bind the bounded overlay schema to the worker's immutable input facts and
@@ -256,7 +305,8 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
   const preparation = complete && request ? deriveAuthorizationPreparation({ request, inputs, common }) : null;
   if (preparation) need(isDeepStrictEqual(output.authorizationProcessing, preparation.processing));
   else need(output?.authorizationProcessing === undefined);
-  const fees = request && header ? deriveVerifiedFees({ request, header, inputs, output }) : null;
+  const chainId = common ? Number(common.chainId()) : 1; need(chainId === 1 || chainId === 11155111);
+  const fees = request && header ? deriveVerifiedFees({ request, header, inputs, output, chainId }) : null;
   if (!fees) need(output?.feeAccounting === undefined);
   // Derive the root CREATE address from independently reverified initial facts,
   // never from the worker's trace or its claimed after-nonce. An unfinished
@@ -271,16 +321,17 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
       need(root.to === createContractAddress(createAddressFromString(senderAddress), nonce).toString());
     }
   }
-  const { created, creationAttempts, deleted, emptyDeleted } = validateExecutionLifecycle({ output, inputs, destination, changes: snapshot, startingChanges: preparation?.snapshot, selfdestructOnlyCreated, fees });
+  const { created, creationAttempts, deleted, cleared, emptyDeleted } = validateExecutionLifecycle({ output, inputs, destination, changes: snapshot, startingChanges: preparation?.snapshot, selfdestructOnlyCreated, fees, common });
   if (!complete) { need(snapshot.accounts.length === 0); return; }
   need(senderInitial && typeof senderInitial.exists === 'boolean');
   need(output.trace.from === senderAddress && output.trace.caller === senderAddress);
   const senderCode = senderInitial.exists ? senderInitial.code : '0x';
   const delegated = common && existingDelegationTarget(senderCode, common) !== null;
   need(senderCode === '0x' || delegated);
-  // The trusted supported schedule stops at BPO2. Later EIP-7928 can increment
-  // a creator on collision without entering a child and needs another ledger.
-  if (delegated) need(common.chainId() === 1n && !common.isActivatedEIP(7928));
+  // Historical mainnet and Sepolia delegations use the entered-frame nonce
+  // ledger. EIP-7928 can increment a creator on collision without entering a
+  // child, so delegated senders remain closed there pending that evidence.
+  if (delegated) need([1n, 11155111n].includes(common.chainId()) && !common.isActivatedEIP(7928));
   const senderNonce = senderInitial.exists ? BigInt(senderInitial.nonce) : 0n;
   const nonceAfter = (preparation?.accounts.get(senderAddress).current.nonce ?? senderNonce + 1n) + (delegated || preparation ? BigInt(creationAttempts.get(senderAddress) ?? 0) : 0n);
   need(senderNonce < (1n << 64n) - 1n && nonceAfter < (1n << 64n));
@@ -302,7 +353,7 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
   // nonce change. Check missing rows too, so omission cannot hide increments.
   const nonceAccounts = new Set([senderAddress, ...rows.keys(), ...created.keys(), ...creationAttempts.keys(), ...(preparation?.accounts.keys() ?? [])]);
   for (const address of nonceAccounts) {
-    if (deleted.has(address) || emptyDeleted.has(address)) continue;
+    if (deleted.has(address) || cleared.has(address) || emptyDeleted.has(address)) continue;
     const initial = inputs.accounts?.[address]; need(initial && typeof initial.exists === 'boolean');
     const before = initial.exists ? BigInt(initial.nonce) : 0n;
     let after = preparation?.accounts.get(address)?.current.nonce ?? before + (address === senderAddress ? 1n : 0n);
@@ -315,6 +366,7 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
     const initial = inputs.accounts?.[row.address];
     need(initial && typeof initial.exists === 'boolean');
     for (const name of ['balance', 'nonce']) if (row[name]) need(row[name].before === hex(initial.exists ? initial[name] : '0'));
+    if (cleared.has(row.address)) continue; // Exact whole-clearing row was independently derived above.
     if (row.existence?.basis === EMPTY_CLEANUP_BASIS) {
       need(emptyDeleted.has(row.address) && initial.exists);
     } else if ([DELETION_BASIS, SHANGHAI_DELETION_BASIS].includes(row.existence?.basis)) {
@@ -346,7 +398,7 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
   }
   for (const [address, { frame, basis }] of created) {
     const initial = deployableFact(inputs, address), row = rows.get(address);
-    if (deleted.has(address)) {
+    if (deleted.has(address) || cleared.has(address)) {
       // Its exact whole-account row was checked with the fork-specific basis.
       continue;
     }

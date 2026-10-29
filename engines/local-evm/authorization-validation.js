@@ -10,7 +10,7 @@ const SCOPE = 'Demanded proof-verified inputs and local overlay writes only; no 
 export function deriveAuthorizationPreparation({ request, inputs, common }) {
   const list = normalizeAuthorizationList(request);
   if (list === undefined) return null;
-  need(common?.chainId() === 1n && common.isActivatedEIP(7702) && !common.isActivatedEIP(7928) && request.to !== null && request.blobVersionedHashes === undefined);
+  need([1n, 11155111n].includes(common?.chainId()) && common.isActivatedEIP(7702) && !common.isActivatedEIP(7928) && request.to !== null && request.blobVersionedHashes === undefined);
   const accounts = new Map(), applied = new Set(), entries = [];
   const sender = request.from.toLowerCase();
   function account(address) {
