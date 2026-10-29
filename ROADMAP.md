@@ -14,6 +14,7 @@ Historical transaction-position state uses a validated state-context method afte
 2. Extend the implemented pre/post balance strategy to more assets and affected accounts, and expand validated permission types. Keep transfer events, principal and accrued interest distinct from balance deltas.
 3. Test allowances, transfer taxes, rebases, delegated accounts, proxies, reverted subcalls, unusual logs and failed execution.
 4. Cross-check a held-out transaction corpus against independent execution engines and receipts. Preserve disagreements as failures with raw evidence.
+5. Complete Sepolia's proof-backed input path and public admission. The latest two live attempts are unavailable at RPC input collection. Investigate deriving empty bytecode directly from a verified empty-code hash or account-absence proof, with explicit provenance and parent validation; continue requiring hash-verified bytecode for nonempty code. Keep Amsterdam authorization preparation and the CREATE2 attempted-creation ledger separate unresolved integration items.
 
 Exit evidence: exact supported-asset amounts against independent state observations, explicit unknowns, no hidden exclusion of failing cases, and a published denominator by transaction family.
 
