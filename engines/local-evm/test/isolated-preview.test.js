@@ -6,9 +6,11 @@ import { createHash } from 'node:crypto';
 import { EventEmitter } from 'node:events';
 import { PassThrough } from 'node:stream';
 import { executeIsolatedEthereumPreview } from '../isolated-call.js';
+import { EMPTY_CODE_HASH, verifyStateProof } from '../verified-state-proof.js';
 
 // Public saved development inputs, never provider traces/diffs as input state.
-// The exact proof/code request sequence is replayed through a real child.
+// The saved request order is retained after removing only independently
+// reverified empty-code reads; no saved execution result enters the child.
 const PACKET = new URL('../../../reports/ethereum-lending-local-reference/', import.meta.url);
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const read = name => readFileSync(new URL(name, PACKET));
@@ -36,11 +38,47 @@ const queries = [
 ];
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 const absentProofRequest = { method: 'eth_getProof', params: [ATOKEN, [word(61)], { blockHash: c.header.hash, requireCanonical: true }] };
+async function prepareReplay(caseInput, saved) {
+  const rows = [], remap = new Map(), derived = new Map();
+  for (const [index, row] of saved.transport.entries()) {
+    assert.equal(row.requestText, JSON.stringify(row.request));
+    assert.equal(row.request.id, index + 1);
+    assert.equal(sha(row.responseText), row.responseSha256);
+    assert.deepEqual(JSON.parse(row.responseText), row.parsed);
+    if (row.request.method === 'eth_getCode' && row.parsed.result === '0x') {
+      const proof = saved.transport[index - 1];
+      assert.equal(proof.request.method, 'eth_getProof');
+      assert.equal(proof.request.params[0], row.request.params[0]);
+      assert.deepEqual(proof.request.params.at(-1), { blockHash: caseInput.header.hash, requireCanonical: true });
+      assert.deepEqual(row.request.params.at(-1), proof.request.params.at(-1));
+      const verified = await verifyStateProof({ stateRoot: caseInput.header.stateRoot,
+        address: row.request.params[0], storageKeys: proof.request.params[1], proof: proof.parsed.result, code: '0x' });
+      assert.equal(verified.account.codeHash, EMPTY_CODE_HASH);
+      derived.set(row.request.id, verified.account.exists ? 'verified_account_empty_code_hash' : 'verified_account_absence');
+    } else {
+      rows.push(row); remap.set(row.request.id, rows.length);
+    }
+  }
+  const inputs = structuredClone(saved.inputs);
+  for (const item of inputs.provenance) {
+    item.proofEvidenceId = remap.get(item.proofEvidenceId);
+    assert.ok(Number.isSafeInteger(item.proofEvidenceId));
+    if (derived.has(item.codeEvidenceId)) {
+      item.codeDerivation = derived.get(item.codeEvidenceId); item.codeEvidenceId = null;
+    } else {
+      item.codeEvidenceId = remap.get(item.codeEvidenceId); assert.ok(Number.isSafeInteger(item.codeEvidenceId));
+    }
+    for (const slot of item.storage) { slot.evidenceId = remap.get(slot.evidenceId); assert.ok(Number.isSafeInteger(slot.evidenceId)); }
+  }
+  return { rows, inputs };
+}
+const prepared = new Map([[recorded, await prepareReplay(c, recorded)], [morphoRecorded, await prepareReplay(morpho, morphoRecorded)]]);
 function playback({ allowMissingProof = false, caseInput = c, saved = recorded } = {}) {
+  const { rows, inputs } = prepared.get(saved);
   let at = 0, missing = 0; const mismatches = [];
-  return { rpc: { async call(method, params) {
-    const row = saved.transport[at++];
-    if (!row && allowMissingProof && at === 59) {
+  return { expectedInputs: inputs, rpc: { async call(method, params) {
+    const row = rows[at++];
+    if (!row && allowMissingProof && at === rows.length + 1) {
       try { assert.deepEqual({ method, params }, absentProofRequest); }
       catch (error) { mismatches.push(error.message); throw error; }
       missing++;
@@ -48,16 +86,14 @@ function playback({ allowMissingProof = false, caseInput = c, saved = recorded }
     }
     try {
       assert.ok(row, 'Unrecorded proof/code request');
-      assert.equal(row.requestText, JSON.stringify({ jsonrpc: '2.0', id: at, method, params }));
-      assert.equal(sha(row.responseText), row.responseSha256);
-      assert.deepEqual(JSON.parse(row.responseText), row.parsed);
+      assert.deepEqual({ method, params }, { method: row.request.method, params: row.request.params });
       assert.ok(['eth_getProof', 'eth_getCode'].includes(method));
       assert.deepEqual(params.at(-1), { blockHash: caseInput.header.hash, requireCanonical: true });
     } catch (error) { mismatches.push(error.message); throw error; }
     return structuredClone(row.parsed.result);
   } }, assertComplete() {
     assert.deepEqual(mismatches, [], 'External mismatch latch must remain empty');
-    assert.equal(at, saved.transport.length + (allowMissingProof ? 1 : 0));
+    assert.equal(at, rows.length + (allowMissingProof ? 1 : 0));
     assert.equal(missing, allowMissingProof ? 1 : 0);
   } };
 }
@@ -86,9 +122,9 @@ test('actual isolated child executes original Aave once then returns three proof
   assert.equal(result.preview.status, 'complete');
   sameOriginalOutput(result.preview.original.output);
   assert.deepEqual(result.preview.original.changes, recorded.changes);
-  assert.deepEqual(result.preview.original.inputs, recorded.inputs);
+  assert.deepEqual(result.preview.original.inputs, f.expectedInputs);
   assert.deepEqual(result.headerVerification, recorded.headerVerification);
-  assert.equal(result.broker.calls, 58); assert.equal(result.broker.dispatches, 58); assert.equal(result.broker.pendingAtReturn, 0);
+  assert.equal(result.broker.calls, 56); assert.equal(result.broker.dispatches, 56); assert.equal(result.broker.pendingAtReturn, 0);
   assert.equal(result.isolation.processSeparated, true); assert.notEqual(result.isolation.childPid, process.pid);
   assert.equal(result.isolation.processClosed, true); assert.equal(result.isolation.exitCode, 0);
   assert.equal(result.isolation.osNetworkSandbox, false); assert.equal(result.isolation.osFilesystemSandbox, false);
@@ -112,7 +148,7 @@ test('actual isolated child executes original Aave once then returns three proof
   assert.notEqual(ATOKEN, c.request.from);
 });
 
-test('actual child handles eight Morpho queries with all 230 proof/code calls and exact account identities', async () => {
+test('actual child handles eight Morpho queries with 229 required proof/code calls and exact account identities', async () => {
   const wallet = morpho.request.from, wrapper = morpho.request.to;
   const vault = '0xbeef01735c132ada46aa9aa4c54623caa92a64cb';
   const blue = '0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb';
@@ -135,9 +171,9 @@ test('actual child handles eight Morpho queries with all 230 proof/code calls an
   assert.equal(result.preview.status, 'complete');
   sameOriginalOutput(result.preview.original.output, morphoRecorded.output);
   assert.deepEqual(result.preview.original.changes, morphoRecorded.changes);
-  assert.deepEqual(result.preview.original.inputs, morphoRecorded.inputs);
+  assert.deepEqual(result.preview.original.inputs, f.expectedInputs);
   assert.deepEqual(result.headerVerification, morphoRecorded.headerVerification);
-  assert.equal(result.broker.calls, 230); assert.equal(result.broker.dispatches, 230); assert.equal(result.broker.pendingAtReturn, 0);
+  assert.equal(result.broker.calls, 229); assert.equal(result.broker.dispatches, 229); assert.equal(result.broker.pendingAtReturn, 0);
   assert.equal(result.isolation.processSeparated, true); assert.notEqual(result.isolation.childPid, process.pid);
   assert.equal(result.isolation.processClosed, true); assert.equal(result.isolation.exitCode, 0);
   assert.equal(result.isolation.v8OldSpaceMiB, 256); assert.equal(result.preview.usage.executions, 17);
@@ -174,7 +210,7 @@ test('actual child preserves a partial preview when an explicitly missing proof 
   assert.equal(measured.status, 'measured'); assert.equal(measured.values[0].beforeRaw, '3962903485'); assert.equal(measured.values[0].afterRaw, '0');
   assert.equal(missing.status, 'unavailable'); assert.equal(missing.values, null); assert.deepEqual(missing.query, aTokenQuery);
   assert.equal(later.status, 'not_attempted'); assert.equal(later.values, null); assert.deepEqual(later.query, queries[1]);
-  assert.equal(result.broker.calls, 59); assert.equal(result.broker.dispatches, 59);
+  assert.equal(result.broker.calls, 57); assert.equal(result.broker.dispatches, 57);
   assert.equal(result.broker.records.at(-1).status, 'unavailable');
   assert.equal(result.broker.pendingAtReturn, 0); assert.equal(result.isolation.processClosed, true);
 });

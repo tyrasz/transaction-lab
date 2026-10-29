@@ -58,7 +58,8 @@ test('API and proof transport authenticate two ancestor headers once for origina
  assert.equal(result.status,'complete');assert.equal(result.source.canonicalStatus,'verified');
  const expected=BigInt(f.blocks.at(-4).hash).toString(),value=result.measurements[0].values[0];assert.equal(value.beforeRaw,expected);assert.equal(value.afterRaw,expected);assert.equal(value.deltaRaw,'0');
  const headers=wire.filter(row=>row.method==='eth_getBlockByHash');assert.deepEqual(headers.map(row=>row.params),[[f.header.hash,false],[f.header.parentHash,false],[f.blocks.at(-2).parentHash,false]]);
- assert.equal(result.attempt.preview.inputs.ancestry.headers.length,2);assert.equal(result.attempt.preview.original.inputs.ancestry.headers.length,2);assert.equal(wire.length,9);
+ assert.equal(result.attempt.preview.inputs.ancestry.headers.length,2);assert.equal(result.attempt.preview.original.inputs.ancestry.headers.length,2);assert.equal(wire.length,8);
+ assert.deepEqual(wire.filter(row=>row.method==='eth_getCode').map(row=>row.params[0]),[f.request.to]);
  assert.equal(rpc.snapshotEvidence().every(row=>row.status==='completed'),true);assert.equal(wire.at(-1).method,'eth_getBlockByNumber');
 });
 

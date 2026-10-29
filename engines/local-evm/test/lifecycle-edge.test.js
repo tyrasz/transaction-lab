@@ -62,7 +62,10 @@ test('a constructor executes the freshly deployed child runtime and reads its co
   assert.equal(await storage(f, outer), 42n);
   assert.equal(await storage(f, inner), 42n);
   assert.deepEqual(f.stateManager.snapshotInputs().accounts[inner], { exists: false });
-  assert.equal(f.calls.filter(call => call.method === 'eth_getCode' && call.params[0] === inner).length, 1);
+  assert.equal(f.calls.filter(call => call.method === 'eth_getCode' && call.params[0] === inner).length, 0);
+  const provenance = f.stateManager.snapshotInputs().provenance.find(row => row.account === inner);
+  assert.equal(provenance.codeEvidenceId, null);
+  assert.equal(provenance.codeDerivation, 'verified_account_absence');
 });
 
 test('an outer step limit removes a previously committed child deployment and all outer nonce changes', async () => {

@@ -11,11 +11,13 @@ import { createAppServer } from '../src/server.js';
 import { ProofRpcClient } from '../src/proof-rpc.js';
 import { loadLocalApi } from '../src/local-loader.js';
 import { assertReadsWithCleanup } from '../engines/local-evm/test/cleanup-read-regression.js';
+import { EMPTY_CODE_HASH, verifyStateProof } from '../engines/local-evm/verified-state-proof.js';
 
 // Composite saved-input development regression, not a new observation or an
 // exact original wire replay. Metadata envelopes are constructed around the
 // sealed parent header. Proof/code response bytes change only their top-level
-// JSON-RPC IDs to account for the two preceding metadata requests. No provider
+// JSON-RPC IDs to account for metadata requests and proof-derived empty-code
+// omissions. No provider
 // trace, diff, expected amount, or poststate is passed to the actual child.
 const PACKET = new URL('../reports/ethereum-lending-local-reference/', import.meta.url);
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -66,11 +68,12 @@ const apiInput = (c, rows) => ({ chainId: 1, from: c.request.from, to: c.request
   value: BigInt(c.request.value).toString(), block: c.header.hash, queries: rows.map(row => row[0]) });
 const missingQuery = balance(ATOKEN, AAVE.request.from);
 
-function playback(c, { missingProof = false, changedFinalHeader = false } = {}) {
+async function playback(c, { missingProof = false, changedFinalHeader = false } = {}) {
   const saved = fixtures.get(c.id), expected = [
     { method: 'eth_chainId', params: [], result: '0x1', origin: 'constructed_metadata_envelope' },
     { method: 'eth_getBlockByHash', params: [c.header.hash, false], result: c.header, origin: 'sealed_parent_header' },
   ];
+  const retained = [], ids = new Map(), proofs = new Map(), latestProof = new Map(), derivations = new Map();
   for (const [index, row] of saved.transport.entries()) {
     assert.equal(row.id, index + 1); assert.equal(row.status, 'completed');
     assert.equal(sha(row.requestText), row.requestSha256);
@@ -80,8 +83,34 @@ function playback(c, { missingProof = false, changedFinalHeader = false } = {}) 
     assert.ok(['eth_getProof', 'eth_getCode'].includes(row.request.method));
     assert.deepEqual(row.request.params.at(-1), { blockHash: c.header.hash, requireCanonical: true });
     assert.deepEqual(saved.inputEvidence[index].result, row.parsed.result);
+    if (row.request.method === 'eth_getProof') latestProof.set(row.request.params[0], row);
+    else {
+      const proof = latestProof.get(row.request.params[0]); assert(proof, 'Saved code must follow its authenticated account proof');
+      const verified = await verifyStateProof({ stateRoot: c.header.stateRoot, address: row.request.params[0],
+        storageKeys: proof.request.params[1], proof: proof.parsed.result, code: row.parsed.result });
+      proofs.set(proof.id, verified);
+      if (verified.account.codeHash === EMPTY_CODE_HASH) {
+        assert.equal(row.parsed.result, '0x');
+        derivations.set(row.id, { proofId: proof.id, label: verified.account.exists ? 'verified_account_empty_code_hash' : 'verified_account_absence' });
+        continue;
+      }
+    }
+    ids.set(row.id, retained.length + 1); retained.push(row);
     expected.push({ method: row.request.method, params: row.request.params, source: row, origin: 'saved_proof_code_id_adapted' });
   }
+  assert.deepEqual([...derivations.keys()], c.id === AAVE.id ? [2, 20] : [2], 'Only independently proven empty-code reads may be omitted');
+  const remap = id => { assert(ids.has(id), 'Evidence IDs must identify retained real reads'); return ids.get(id); };
+  const expectedInputs = structuredClone(saved.inputs);
+  for (const item of expectedInputs.provenance) {
+    const proofId = item.proofEvidenceId, derivation = derivations.get(item.codeEvidenceId);
+    assert.deepEqual(item.accountProof, proofs.get(proofId).account);
+    item.proofEvidenceId = remap(proofId);
+    if (derivation) { assert.equal(derivation.proofId, proofId); item.codeEvidenceId = null; item.codeDerivation = derivation.label; }
+    else item.codeEvidenceId = remap(item.codeEvidenceId);
+    for (const slot of item.storage) slot.evidenceId = remap(slot.evidenceId);
+  }
+  assert.deepEqual(expectedInputs.accounts, saved.inputs.accounts);
+  const expectedEvidence = saved.inputEvidence.filter(row => ids.has(row.id)).map(row => ({ ...structuredClone(row), id: remap(row.id) }));
   if (missingProof) expected.push({ method: 'eth_getProof',
     params: [ATOKEN, [word(61)], { blockHash: c.header.hash, requireCanonical: true }],
     error: { code: -32000, message: 'Synthetic missing-proof control; no response exists in saved input facts.' }, origin: 'synthetic_missing_proof' });
@@ -107,10 +136,10 @@ function playback(c, { missingProof = false, changedFinalHeader = false } = {}) 
       return new Response(responseText, { status: 200, headers: { 'content-type': 'application/json' } });
     } catch (error) { mismatches.push({ index: at, message: error.message }); throw error; }
   } });
-  return { rpc, saved, wires, assertComplete() {
+  return { rpc, saved, expectedInputs, expectedEvidence, wires, assertComplete() {
     assert.deepEqual(mismatches, [], 'Transport assertion failures must survive engine catches');
     assert.equal(at, expected.length); assert.equal(wires.length, expected.length);
-    assert.deepEqual(usedSourceIds, saved.transport.map(row => row.id), 'Every proof/code source is consumed once in exact original order');
+    assert.deepEqual(usedSourceIds, retained.map(row => row.id), 'Every retained proof/code source is consumed once in exact original order');
   } };
 }
 
@@ -156,7 +185,8 @@ function assertTransport(report, f) {
   }
   assert.equal(report.drain.complete, true);
 }
-function assertOriginal(report, c, saved) {
+function assertOriginal(report, c, fixture) {
+  const { saved, expectedInputs, expectedEvidence } = fixture;
   assert.equal(report.kind, 'local_proof_preview');
   assert.equal(report.source.canonicalStatus, 'verified'); assert.equal(report.source.originalTransactionReplay, false);
   assert.equal(report.source.consensusVerified, false); assert.deepEqual(report.source.blockSelection.header, c.header);
@@ -173,9 +203,9 @@ function assertOriginal(report, c, saved) {
   assert.equal(saved.output.semantics.lifecycle, 'CREATE_CREATE2_SELFDESTRUCT_unsupported');
   normalized.semantics.lifecycle = saved.output.semantics.lifecycle;
   assert.deepEqual(normalized, saved.output); assert.deepEqual(original.changes, saved.changes);
-  assert.deepEqual(original.inputs, saved.inputs); assertReadsWithCleanup(original.stateReads, saved.stateReads, saved.output.trace);
+  assert.deepEqual(original.inputs, expectedInputs); assertReadsWithCleanup(original.stateReads, saved.stateReads, saved.output.trace);
   const omitDuration = rows => rows.map(({ durationMs, ...row }) => row);
-  assert.deepEqual(omitDuration(original.inputEvidence), omitDuration(saved.inputEvidence));
+  assert.deepEqual(omitDuration(original.inputEvidence), omitDuration(expectedEvidence));
   assert.deepEqual(report.attempt.headerVerification, saved.headerVerification);
   assert.equal(report.attempt.preview.scope.feesSettled, false);
   assert.equal(report.attempt.preview.scope.allEffectsCoverage, 'not_established');
@@ -212,11 +242,11 @@ test('saved local API fixtures bind the original parent headers and runtime sour
   }
 });
 
-for (const [c, rows, reads] of [[AAVE, aaveRows, 58], [MORPHO, morphoRows, 230]]) {
+for (const [c, rows, reads] of [[AAVE, aaveRows, 56], [MORPHO, morphoRows, 229]]) {
   test(`owned API executes ${c.id} in a real child using ${reads} exact saved proof/code inputs`, async t => {
-    const f = playback(c), report = await invoke(t, apiInput(c, rows), f.rpc);
+    const f = await playback(c), report = await invoke(t, apiInput(c, rows), f.rpc);
     assertTransport(report, f); assert.equal(report.status, 'complete'); assert.equal(report.error, null);
-    assertOriginal(report, c, f.saved); assertRows(report, c, rows);
+    assertOriginal(report, c, f); assertRows(report, c, rows);
     assert.equal(report.attempt.broker.calls, reads); assert.equal(report.transportEvidence.length, reads + 3);
     if (c === MORPHO) {
       assert.equal(report.measurements[7].identity.account, FEES); assert.notEqual(FEES, c.request.from);
@@ -226,20 +256,20 @@ for (const [c, rows, reads] of [[AAVE, aaveRows, 58], [MORPHO, morphoRows, 230]]
 }
 
 test('owned API retains partial original and earlier values when one absent fixture proof poisons later queries', async t => {
-  const rows = [aaveRows[0], missingQuery, aaveRows[1]], f = playback(AAVE, { missingProof: true });
+  const rows = [aaveRows[0], missingQuery, aaveRows[1]], f = await playback(AAVE, { missingProof: true });
   const report = await invoke(t, apiInput(AAVE, rows), f.rpc);
-  assertTransport(report, f); assertOriginal(report, AAVE, f.saved); assert.equal(report.status, 'partial');
+  assertTransport(report, f); assertOriginal(report, AAVE, f); assert.equal(report.status, 'partial');
   assert.deepEqual(report.measurements.map(row => row.status), ['measured', 'unavailable', 'not_attempted']);
   assert.deepEqual(report.measurements[0].values, [{ name: 'balance', beforeRaw: '3962903485', afterRaw: '0', deltaRaw: '-3962903485', unit: { kind: 'token_raw_units', scale: null } }]);
   for (const index of [1, 2]) {
     assert.equal(report.measurements[index].values, null); assert.equal(report.attempt.preview.measurements[index].values, null);
     assert.deepEqual(report.measurements[index].query, rows[index][0]);
   }
-  assert.equal(report.attempt.broker.calls, 59); assert.equal(report.attempt.preview.inputUsage.status, 'unavailable');
+  assert.equal(report.attempt.broker.calls, 57); assert.equal(report.attempt.preview.inputUsage.status, 'unavailable');
 });
 
 test('a final complete-header mismatch withholds every nested measurement despite successful local execution', async t => {
-  const f = playback(AAVE, { changedFinalHeader: true }), report = await invoke(t, apiInput(AAVE, aaveRows), f.rpc);
+  const f = await playback(AAVE, { changedFinalHeader: true }), report = await invoke(t, apiInput(AAVE, aaveRows), f.rpc);
   assertTransport(report, f); assert.equal(report.status, 'unavailable'); assert.equal(report.error.code, 'LOCAL_PREVIEW_CANONICAL');
   assert.equal(report.source.canonicalStatus, 'unverified'); assert.equal(report.execution.status, 'unavailable');
   assert.deepEqual(report.measurements, []); assert.equal(report.attempt.preview, null); assert.equal(report.attempt.status, 'unavailable');

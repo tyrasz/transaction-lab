@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { executeEthereumPreview } from '../ethereum-preview.js';
+import { EMPTY_CODE_HASH, verifyStateProof } from '../verified-state-proof.js';
 import { assertReadsWithCleanup } from './cleanup-read-regression.js';
 
 // Development regression inputs, not held-out accuracy cases. The RPC adapter
@@ -46,8 +47,9 @@ const aaveQueries = [balance(USDC, AAVE.request.from), allowance(USDC, AAVE.requ
 const aTokenQuery = balance(ATOKEN, AAVE.request.from);
 const missingATokenProof = { method: 'eth_getProof', params: [ATOKEN, ['0x' + '0'.repeat(62) + '3d'], { blockHash: AAVE.header.hash, requireCanonical: true }] };
 
-function playback(c, { expectedMissing = [] } = {}) {
+async function playback(c, { expectedMissing = [] } = {}) {
   const original = captured.get(c.id), records = new Map(), calls = [], unexpected = [], missed = [];
+  const retained = [], ids = new Map(), proofs = new Map(), latestProof = new Map(), derivations = new Map();
   for (const [i, wire] of original.transport.entries()) {
     assert.equal(wire.status, 'completed');
     assert.equal(wire.id, i + 1);
@@ -58,13 +60,39 @@ function playback(c, { expectedMissing = [] } = {}) {
     assert.deepEqual(wire.request.params.at(-1), { blockHash: c.header.hash, requireCanonical: true });
     assert.ok(['eth_getProof', 'eth_getCode'].includes(wire.request.method));
     const request = { method: wire.request.method, params: wire.request.params }, key = JSON.stringify(request);
-    assert.equal(records.has(key), false, 'No ambiguous equal-key source results');
-    records.set(key, { sourceId: wire.id, result: wire.parsed.result });
     const evidence = original.inputEvidence[i];
     assert.deepEqual(evidence.request, request);
     assert.deepEqual(evidence.result, wire.parsed.result);
     assert.equal(evidence.resultSha256, sha(JSON.stringify(wire.parsed.result)));
+    if (wire.request.method === 'eth_getProof') latestProof.set(wire.request.params[0], wire);
+    else {
+      const proof = latestProof.get(wire.request.params[0]); assert(proof, 'Code must follow its saved account proof');
+      const verified = await verifyStateProof({ stateRoot: c.header.stateRoot, address: wire.request.params[0],
+        storageKeys: proof.request.params[1], proof: proof.parsed.result, code: wire.parsed.result });
+      proofs.set(proof.id, verified);
+      if (verified.account.codeHash === EMPTY_CODE_HASH) {
+        assert.equal(wire.parsed.result, '0x');
+        derivations.set(wire.id, { proofId: proof.id, label: verified.account.exists ? 'verified_account_empty_code_hash' : 'verified_account_absence' });
+        continue;
+      }
+    }
+    assert.equal(records.has(key), false, 'No ambiguous equal-key source results');
+    records.set(key, { sourceId: wire.id, result: wire.parsed.result });
+    ids.set(wire.id, retained.length + 1); retained.push(wire);
   }
+  assert.deepEqual([...derivations.keys()], c.id === AAVE.id ? [2, 20] : [2], 'Only fixed, independently proven empty-code reads are omitted');
+  const remap = id => { assert(ids.has(id), 'Every retained evidence ID must map to a real read'); return ids.get(id); };
+  const expectedInputs = structuredClone(original.inputs);
+  for (const item of expectedInputs.provenance) {
+    const oldProofId = item.proofEvidenceId, derivation = derivations.get(item.codeEvidenceId);
+    assert.deepEqual(item.accountProof, proofs.get(oldProofId).account);
+    item.proofEvidenceId = remap(oldProofId);
+    if (derivation) { assert.equal(derivation.proofId, oldProofId); item.codeEvidenceId = null; item.codeDerivation = derivation.label; }
+    else item.codeEvidenceId = remap(item.codeEvidenceId);
+    for (const slot of item.storage) slot.evidenceId = remap(slot.evidenceId);
+  }
+  assert.deepEqual(expectedInputs.accounts, original.inputs.accounts);
+  const expectedEvidence = original.inputEvidence.filter(row => ids.has(row.id)).map(row => ({ ...structuredClone(row), id: remap(row.id) }));
   const rpc = { async call(method, params) {
     const request = { method, params }, key = JSON.stringify(request), found = records.get(key);
     if (!found) {
@@ -75,10 +103,10 @@ function playback(c, { expectedMissing = [] } = {}) {
     calls.push({ request: structuredClone(request), sourceId: found.sourceId });
     return structuredClone(found.result);
   } };
-  return { rpc, original, calls, unexpected, missed, verifyCalls() {
+  return { rpc, original, expectedInputs, expectedEvidence, retained, calls, unexpected, missed, verifyCalls() {
     assert.deepEqual(unexpected, [], 'Unexpected reads cannot be hidden by an unavailable engine result');
-    assert.equal(calls.length, original.transport.length, 'Original execution runs once and getters use only already-proven facts');
-    assert.deepEqual(calls.map(row => row.sourceId), original.transport.map(row => row.id), 'Every source record is used exactly once, in original execution order');
+    assert.equal(calls.length, retained.length, 'Original execution runs once and getters use only already-proven facts');
+    assert.deepEqual(calls.map(row => row.sourceId), retained.map(row => row.id), 'Every retained source record is used exactly once, in original execution order');
   } };
 }
 
@@ -91,13 +119,13 @@ function originalUnchanged(result, fixture) {
   output.semantics.lifecycle = fixture.original.output.semantics.lifecycle;
   assert.deepEqual(output, fixture.original.output);
   assert.deepEqual(result.original.changes, fixture.original.changes);
-  assert.deepEqual(result.original.inputs, fixture.original.inputs);
+  assert.deepEqual(result.original.inputs, fixture.expectedInputs);
   assertReadsWithCleanup(result.original.stateReads, fixture.original.stateReads, fixture.original.output.trace);
   assert.equal(result.original.inputUsage.status, 'available');
-  assert.equal(result.original.inputUsage.calls, fixture.original.transport.length);
-  assert.equal(result.original.inputEvidence.length, fixture.original.inputEvidence.length);
+  assert.equal(result.original.inputUsage.calls, fixture.retained.length);
+  assert.equal(result.original.inputEvidence.length, fixture.expectedEvidence.length);
   const omitDuration = rows => rows.map(({ durationMs, ...row }) => row);
-  assert.deepEqual(omitDuration(result.original.inputEvidence), omitDuration(fixture.original.inputEvidence));
+  assert.deepEqual(omitDuration(result.original.inputEvidence), omitDuration(fixture.expectedEvidence));
   assert.deepEqual(result.headerVerification, fixture.original.headerVerification);
   // These assertions independently bind each successful probe to its root,
   // exact return word and complete overlay. The post-query sender increment
@@ -156,7 +184,7 @@ test('recorded proof packets and their archived local source/header inputs retai
 });
 
 test('Aave three scalar queries derive exact before/after values from saved proof/code only', async () => {
-  const f = playback(AAVE);
+  const f = await playback(AAVE);
   const result = await executeEthereumPreview({ request: AAVE.request, header: AAVE.header, rpc: f.rpc, queries: aaveQueries });
   f.verifyCalls(); assert.deepEqual(f.missed, []);
   assert.equal(result.status, 'complete'); originalUnchanged(result, f);
@@ -181,7 +209,7 @@ test('Morpho eight queries retain wrapper/vault/fee identities and exact indepen
     [balance(USDC, VAULT), balanceIdentity(USDC, VAULT), '6011', '6011'],
     [balance(VAULT, FEE_ACCOUNT), balanceIdentity(VAULT, FEE_ACCOUNT), '34363220714011809188525', '34390568084318171872187'],
   ];
-  const f = playback(MORPHO);
+  const f = await playback(MORPHO);
   const result = await executeEthereumPreview({ request: MORPHO.request, header: MORPHO.header, rpc: f.rpc, queries: rows.map(row => row[0]) });
   f.verifyCalls(); assert.deepEqual(f.missed, []);
   assert.equal(result.status, 'complete'); originalUnchanged(result, f);
@@ -193,7 +221,7 @@ test('Morpho eight queries retain wrapper/vault/fee identities and exact indepen
 });
 
 test('missing aToken proof last retains original and earlier measurements without invented amount', async () => {
-  const f = playback(AAVE, { expectedMissing: [missingATokenProof] });
+  const f = await playback(AAVE, { expectedMissing: [missingATokenProof] });
   const result = await executeEthereumPreview({ request: AAVE.request, header: AAVE.header, rpc: f.rpc, queries: [...aaveQueries, aTokenQuery] });
   f.verifyCalls(); assert.deepEqual(f.missed, [missingATokenProof]);
   assert.equal(result.status, 'partial'); originalUnchanged(result, f);
@@ -208,7 +236,7 @@ test('missing aToken proof last retains original and earlier measurements withou
 });
 
 test('missing proof poisons shared collector and prevents later known query instead of retrying or zero-filling', async () => {
-  const f = playback(AAVE, { expectedMissing: [missingATokenProof] });
+  const f = await playback(AAVE, { expectedMissing: [missingATokenProof] });
   const result = await executeEthereumPreview({ request: AAVE.request, header: AAVE.header, rpc: f.rpc, queries: [aaveQueries[0], aTokenQuery, aaveQueries[1]] });
   f.verifyCalls(); assert.deepEqual(f.missed, [missingATokenProof]);
   assert.equal(result.status, 'partial'); originalUnchanged(result, f);

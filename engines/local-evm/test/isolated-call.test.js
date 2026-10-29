@@ -8,6 +8,7 @@ import { PassThrough } from 'node:stream';
 import { RLP } from '@ethereumjs/rlp';
 import { keccak_256 } from '@noble/hashes/sha3.js';
 import { executeIsolatedEthereumCall } from '../isolated-call.js';
+import { EMPTY_CODE_HASH, verifyStateProof } from '../verified-state-proof.js';
 import { proofFixture, A, B, word } from './proof-fixture.js';
 import { assertReadsWithCleanup } from './cleanup-read-regression.js';
 
@@ -43,27 +44,69 @@ async function fixture(code = '0x602a600055602a60005260206000f3', mutate) {
 const run = ({ calls, ...options }, changes = {}) => executeIsolatedEthereumCall({ ...options, ...changes });
 
 test('real saved proof/code wire replays in an actual fixed worker with exact observed execution and changes', async () => {
+  // Omit only an archived empty-code response whose preceding account proof
+  // independently authenticates that code. Preserve every other read in order;
+  // only provenance IDs and the explicit derivation label may differ afterward.
+  const playback = [], ids = new Map(), proofs = new Map(), latestProof = new Map(), derivations = new Map();
+  for (const [index, row] of recorded.transport.entries()) {
+    const oldId = index + 1, { method, params } = row.request;
+    assert.deepEqual(params.at(-1), { blockHash: plan.header.hash, requireCanonical: true });
+    if (method === 'eth_getProof') {
+      const args = { stateRoot: plan.header.stateRoot, address: params[0], storageKeys: params[1], proof: row.parsed.result };
+      const verified = await verifyStateProof(args);
+      proofs.set(oldId, verified); latestProof.set(params[0], { args, oldId });
+    } else {
+      assert.equal(method, 'eth_getCode');
+      const preceding = latestProof.get(params[0]); assert(preceding, 'Code must follow its authenticated account proof');
+      const verified = await verifyStateProof({ ...preceding.args, code: row.parsed.result });
+      if (verified.account.codeHash === EMPTY_CODE_HASH) {
+        assert.equal(row.parsed.result, '0x');
+        derivations.set(oldId, { proofId: preceding.oldId, label: verified.account.exists ? 'verified_account_empty_code_hash' : 'verified_account_absence' });
+        continue;
+      }
+    }
+    ids.set(oldId, playback.length + 1); playback.push(row);
+  }
+  assert.equal(recorded.transport.length, 11); assert.equal(playback.length, 10);
+  assert.deepEqual([...derivations.keys()], [2], 'Only the proven-empty sender code read is removed');
   let at = 0, mismatch = null;
   const result = await executeIsolatedEthereumCall({ request: plan.request, header: plan.header, limits: { calls: 64, inputs: { wallMs: 120000 } }, rpc: { async call(method, params) {
-    const row = recorded.transport[at++];
+    const row = playback[at++];
     try { assert(row); assert.deepEqual({ method, params }, { method: row.request.method, params: row.request.params }); }
     catch (error) { mismatch = error; throw error; }
     return structuredClone(row.parsed.result); // Proof/code only; no expected output enters the child.
   } } });
-  assert.equal(mismatch, null); assert.equal(at, 11); assert.equal(result.status, 'completed'); assert.equal(result.error, null);
+  assert.equal(mismatch, null); assert.equal(at, 10); assert.equal(result.status, 'completed'); assert.equal(result.error, null);
   const normalized = structuredClone(result.output);
   // 0.17 changes only this descriptive label for ordinary Ethereum calls.
   assert.equal(normalized.semantics.lifecycle, 'no_lifecycle_operation_encountered');
   assert.equal(recorded.output.semantics.lifecycle, 'CREATE_CREATE2_SELFDESTRUCT_unsupported');
   normalized.semantics.lifecycle = recorded.output.semantics.lifecycle;
-  assert.deepEqual(normalized, recorded.output); assert.deepEqual(result.inputs, recorded.inputs);
+  assert.deepEqual(normalized, recorded.output);
+  const expectedInputs = structuredClone(recorded.inputs);
+  const remap = id => { assert(ids.has(id), 'A retained proof/code ID must identify a real dispatched row'); return ids.get(id); };
+  for (const item of expectedInputs.provenance) {
+    const proofId = item.proofEvidenceId, derivation = derivations.get(item.codeEvidenceId);
+    assert.deepEqual(item.accountProof, proofs.get(proofId).account);
+    item.proofEvidenceId = remap(proofId);
+    if (derivation) { assert.equal(derivation.proofId, proofId); item.codeEvidenceId = null; item.codeDerivation = derivation.label; }
+    else item.codeEvidenceId = remap(item.codeEvidenceId);
+    for (const slot of item.storage) slot.evidenceId = remap(slot.evidenceId);
+  }
+  assert.deepEqual(expectedInputs.accounts, recorded.inputs.accounts);
+  assert.deepEqual(result.inputs, expectedInputs);
+  for (const [index, row] of result.broker.records.entries()) {
+    assert.equal(row.id, index + 1); assert.equal(row.status, 'received');
+    assert.deepEqual(row.request, { method: playback[index].request.method, params: playback[index].request.params });
+    assert.equal(row.resultSha256, createHash('sha256').update(JSON.stringify(playback[index].parsed.result)).digest('hex'));
+  }
   assert.deepEqual(result.changes, recorded.changes); assertReadsWithCleanup(result.stateReads, recorded.stateReads, recorded.output.trace);
   assert.deepEqual(result.headerVerification, recorded.headerVerification);
   assert.equal(result.isolation.processSeparated, true); assert.notEqual(result.isolation.childPid, process.pid);
   assert.equal(result.isolation.processClosed, true); assert.equal(result.isolation.exitCode, 0); assert.equal(result.isolation.v8OldSpaceMiB, 256);
   assert.equal(result.isolation.hardTotalRssCap, false); assert.equal(result.isolation.osNetworkSandbox, false); assert.equal(result.isolation.osFilesystemSandbox, false);
   assert.equal(result.isolation.sourceImplementationBound, false); assert.equal(result.broker.rawWireCaptured, false);
-  assert.equal(result.broker.calls, 11); assert.equal(result.broker.dispatches, 11); assert.equal(result.broker.pendingAtReturn, 0);
+  assert.equal(result.broker.records.length, 10); assert.equal(result.broker.calls, 10); assert.equal(result.broker.dispatches, 10); assert.equal(result.broker.pendingAtReturn, 0);
 });
 
 test('synthetic proven inputs execute real SSTORE/return and native value in the separate worker', async () => {
@@ -169,7 +212,8 @@ test('N-1 BLOCKHASH uses the verified source header commitment without another p
   assert.equal(result.status, 'completed'); assert.equal(result.output.execution.status, 'success');
   assert.equal(result.output.execution.returnData, f.header.parentHash);
   assert.equal(result.inputs.ancestry.headers.length, 0);
-  assert.equal(f.calls.length, 4);
+  assert.equal(f.calls.length, 3);
+  assert.deepEqual(f.calls.map(row => [row.method, row.params[0]]), [['eth_getProof', B], ['eth_getProof', A], ['eth_getCode', A]]);
   assert.equal(result.broker.inRangeBlockhash, 'authenticated_parent_hash_chain_with_shared_input_limits');
 });
 
@@ -233,7 +277,7 @@ test('actual child executes non-blob BLOBHASH from proof-only inputs with no blo
   assert.equal(r.output.gasAccounting.gasUsed, '21021'); assert.equal(Object.hasOwn(r.output.profile, 'blobVersionedHashes'), false);
   assert.equal(Object.hasOwn(r.output.profile, 'executionBlobBaseFee'), false);
   assert.deepEqual(r.changes.accounts, [{ address: B, nonce: { before: '0x1', after: '0x2' } }]);
-  assert.equal(r.broker.calls, 4); assert.equal(r.broker.pendingAtReturn, 0);
-  assert.deepEqual(f.calls.map(x => x.method), ['eth_getProof', 'eth_getCode', 'eth_getProof', 'eth_getCode']);
+  assert.equal(r.broker.calls, 3); assert.equal(r.broker.pendingAtReturn, 0);
+  assert.deepEqual(f.calls.map(x => [x.method, x.params[0]]), [['eth_getProof', B], ['eth_getProof', A], ['eth_getCode', A]]);
   assert.equal(r.isolation.processSeparated, true); assert.notEqual(r.isolation.childPid, process.pid); assert.equal(r.isolation.processClosed, true);
 });

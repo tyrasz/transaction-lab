@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { isDeepStrictEqual, types } from 'node:util';
 import { decode, encode, fields } from './isolated-protocol.js';
-import { verifyStateProof } from './verified-state-proof.js';
+import { EMPTY_CODE_HASH, verifyStateProof } from './verified-state-proof.js';
 
 const ADDRESS = /^0x[0-9a-f]{40}$/, WORD = /^0x[0-9a-f]{64}$/;
 const ZERO = '0x' + '00'.repeat(32);
@@ -75,12 +75,26 @@ export async function validateInputFacts(options) {
   }
   const accounts = {}, seen = new Set(); let slots = 0;
   for (const item of inputs.provenance) {
-    check(); record(item, ['account', 'accountProof', 'proofEvidenceId', 'codeEvidenceId', 'storage']);
+    check();
+    const derived = item !== null && typeof item === 'object' && Object.hasOwn(item, 'codeDerivation');
+    record(item, ['account', 'accountProof', 'proofEvidenceId', 'codeEvidenceId', 'storage', ...(derived ? ['codeDerivation'] : [])]);
     const account = item.account;
     need(typeof account === 'string' && ADDRESS.test(account) && !seen.has(account)); seen.add(account);
-    const code = evidence(item.codeEvidenceId, 'eth_getCode', account);
-    need(item.codeEvidenceId > item.proofEvidenceId);
-    const initial = await verified(item.proofEvidenceId, account, code.result);
+    let code;
+    if (derived) {
+      need(item.codeEvidenceId === null && ['verified_account_absence', 'verified_account_empty_code_hash'].includes(item.codeDerivation));
+      code = '0x';
+    } else {
+      code = evidence(item.codeEvidenceId, 'eth_getCode', account).result;
+      need(item.codeEvidenceId > item.proofEvidenceId);
+    }
+    // Derivation never bypasses verification: explicit empty runtime must hash
+    // to the authenticated account, and absence must be cryptographically proven.
+    const initial = await verified(item.proofEvidenceId, account, code);
+    if (derived) {
+      need(initial.account.codeHash === EMPTY_CODE_HASH);
+      need(item.codeDerivation === (initial.account.exists ? 'verified_account_empty_code_hash' : 'verified_account_absence'));
+    }
     same(item.accountProof, initial.account);
     need(initial.code.status === 'verified' && typeof initial.code.bytes === 'string');
     need(Array.isArray(item.storage) && item.storage.length <= 1024);
@@ -94,7 +108,7 @@ export async function validateInputFacts(options) {
         // independently zero by the same exclusion, without an extra RPC.
         expected = { value: ZERO, exists: false };
       } else {
-        const proof = slot.evidenceId === item.proofEvidenceId ? initial : await verified(slot.evidenceId, account, code.result);
+        const proof = slot.evidenceId === item.proofEvidenceId ? initial : await verified(slot.evidenceId, account, code);
         same(proof.account, initial.account);
         const found = proof.storage.find(row => row.key === slot.key);
         need(found !== undefined); expected = { value: found.valueWord, exists: found.exists };

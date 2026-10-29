@@ -1,0 +1,88 @@
+TAP version 13
+# Subtest: an empty-code commitment establishes exact code while nonempty storage remains separately proven
+ok 1 - an empty-code commitment establishes exact code while nonempty storage remains separately proven
+  ---
+  duration_ms: 10.935958
+  type: 'test'
+  ...
+# Subtest: account exclusion proves empty code and demanded zeros with either canonical absent-hash representation
+ok 2 - account exclusion proves empty code and demanded zeros with either canonical absent-hash representation
+  ---
+  duration_ms: 3.108625
+  type: 'test'
+  ...
+# Subtest: a first storage demand and concurrent code/account reads share one genuine empty-code proof
+ok 3 - a first storage demand and concurrent code/account reads share one genuine empty-code proof
+  ---
+  duration_ms: 1.411334
+  type: 'test'
+  ...
+# Subtest: missing or altered proofs cannot turn claimed empty code into an accepted account
+ok 4 - missing or altered proofs cannot turn claimed empty code into an accepted account
+  ---
+  duration_ms: 5.105625
+  type: 'test'
+  ...
+# Subtest: nonempty code still requires its real hash-checked read and cannot fall back after a transport failure
+ok 5 - nonempty code still requires its real hash-checked read and cannot fall back after a transport failure
+  ---
+  duration_ms: 3.245
+  type: 'test'
+  ...
+# Subtest: proof-derived code consumes real RPC/account budgets without a synthetic evidence row
+ok 6 - proof-derived code consumes real RPC/account budgets without a synthetic evidence row
+  ---
+  duration_ms: 1.199125
+  type: 'test'
+  ...
+# Subtest: lazy collection uses only canonical proof/code reads and preserves exact proven zero versus unknown slots
+ok 7 - lazy collection uses only canonical proof/code reads and preserves exact proven zero versus unknown slots
+  ---
+  duration_ms: 12.67025
+  type: 'test'
+  ...
+# Subtest: first storage demand collects only that slot; concurrent demands cannot duplicate provider reads
+ok 8 - first storage demand collects only that slot; concurrent demands cannot duplicate provider reads
+  ---
+  duration_ms: 1.784625
+  type: 'test'
+  ...
+# Subtest: account nonexistence is proven, and its empty code/storage are not inferred from missing data
+ok 9 - account nonexistence is proven, and its empty code/storage are not inferred from missing data
+  ---
+  duration_ms: 3.23775
+  type: 'test'
+  ...
+# Subtest: invalid proof/code or missing storage fails closed with no retries and no trace-derived repair
+ok 10 - invalid proof/code or missing storage fails closed with no retries and no trace-derived repair
+  ---
+  duration_ms: 4.228208
+  type: 'test'
+  ...
+# Subtest: provider exceptions are sanitized; timeout completion cannot mutate evidence or facts later
+ok 11 - provider exceptions are sanitized; timeout completion cannot mutate evidence or facts later
+  ---
+  duration_ms: 32.814167
+  type: 'test'
+  ...
+# Subtest: budgets include calls, slots, accounts, read count, result bytes and wall time without raising defaults
+ok 12 - budgets include calls, slots, accounts, read count, result bytes and wall time without raising defaults
+  ---
+  duration_ms: 5.178334
+  type: 'test'
+  ...
+# Subtest: trace, poststate, overrides and mismatched header inputs are rejected before any reads
+ok 13 - trace, poststate, overrides and mismatched header inputs are rejected before any reads
+  ---
+  duration_ms: 0.869708
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 161.958125

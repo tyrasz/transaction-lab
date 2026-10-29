@@ -48,7 +48,7 @@ test('first storage demand collects only that slot; concurrent demands cannot du
 test('account nonexistence is proven, and its empty code/storage are not inferred from missing data', async () => {
   const h = await fixture(); assert.equal((await h.inputs.getAccount(C)).exists, false);
   assert.equal(await h.inputs.getStorage(C, word(0)), word(0)); assert.equal(await h.inputs.getCode(C), '0x');
-  assert.equal(h.records.length, 2); assert.deepEqual(h.inputs.snapshotInputs().accounts[C], { exists: false });
+  assert.equal(h.records.length, 1); assert.deepEqual(h.inputs.snapshotInputs().accounts[C], { exists: false });
   assert.equal((await h.inputs.getAccount(B)).exists, true);
   assert.equal(await h.inputs.getStorage(B, word(7)), word(0));
   const absent = await fixture({ change: ({ method, value }) => method === 'eth_getProof' ? null : value });

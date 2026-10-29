@@ -74,7 +74,8 @@ test('real HTTP handler/core/child serialize native fee transfer and cached unus
   const expected=[[TX_SENDER,1000000000000n,1000000000000n-123n-BigInt(fees.gasCharge)],[TARGET,9n,132n],[COINBASE,0n,BigInt(fees.coinbaseTip)],[UNUSED,77n,77n],[ABSENT,0n,0n]];
   expected.forEach(([address,before,after],i)=>{assertNativeMeasurement(report.measurements[i],address,before,after);assertNativeMeasurement(core.measurements[i],address,before,after,core.original.changes);});
   assert.equal(core.usage.executions,1);assert.equal(core.scope.nativeBalanceCoverage,'explicit_accounts_only');
-  for(const address of [UNUSED,ABSENT])assert.deepEqual(p.wires.filter(r=>r.params[0]===address).map(r=>r.method),['eth_getProof','eth_getCode']);
+  assert.deepEqual(p.wires.filter(r=>r.params[0]===UNUSED).map(r=>r.method),['eth_getProof','eth_getCode'],'A nonempty unused contract still needs hash-checked code');
+  for(const address of [TX_SENDER,TARGET,COINBASE,ABSENT])assert.deepEqual(p.wires.filter(r=>r.params[0]===address).map(r=>r.method),['eth_getProof'],'Proven empty or absent accounts require no code RPC');
 });
 
 test('mixed native and declared scalar queries stay distinct and only CALL queries use VM executions',async()=>{

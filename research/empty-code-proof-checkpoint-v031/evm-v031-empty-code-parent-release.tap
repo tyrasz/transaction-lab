@@ -1,0 +1,386 @@
+TAP version 13
+# Subtest: an empty-code commitment establishes exact code while nonempty storage remains separately proven
+ok 1 - an empty-code commitment establishes exact code while nonempty storage remains separately proven
+  ---
+  duration_ms: 15.1595
+  type: 'test'
+  ...
+# Subtest: account exclusion proves empty code and demanded zeros with either canonical absent-hash representation
+ok 2 - account exclusion proves empty code and demanded zeros with either canonical absent-hash representation
+  ---
+  duration_ms: 2.358666
+  type: 'test'
+  ...
+# Subtest: a first storage demand and concurrent code/account reads share one genuine empty-code proof
+ok 3 - a first storage demand and concurrent code/account reads share one genuine empty-code proof
+  ---
+  duration_ms: 1.433791
+  type: 'test'
+  ...
+# Subtest: missing or altered proofs cannot turn claimed empty code into an accepted account
+ok 4 - missing or altered proofs cannot turn claimed empty code into an accepted account
+  ---
+  duration_ms: 8.338167
+  type: 'test'
+  ...
+# Subtest: nonempty code still requires its real hash-checked read and cannot fall back after a transport failure
+ok 5 - nonempty code still requires its real hash-checked read and cannot fall back after a transport failure
+  ---
+  duration_ms: 6.167292
+  type: 'test'
+  ...
+# Subtest: proof-derived code consumes real RPC/account budgets without a synthetic evidence row
+ok 6 - proof-derived code consumes real RPC/account budgets without a synthetic evidence row
+  ---
+  duration_ms: 2.752667
+  type: 'test'
+  ...
+# Subtest: actual Sepolia native previews use only proven-empty or exclusion proofs, with exact priced/unpriced balances
+ok 7 - actual Sepolia native previews use only proven-empty or exclusion proofs, with exact priced/unpriced balances
+  ---
+  duration_ms: 519.560042
+  type: 'test'
+  ...
+# Subtest: nonempty contract runtime still requires one real hash-checked code response
+ok 8 - nonempty contract runtime still requires one real hash-checked code response
+  ---
+  duration_ms: 123.291
+  type: 'test'
+  ...
+# Subtest: missing or hash-mismatched nonempty runtime withholds native measurements and rolls back nonce and fees
+ok 9 - missing or hash-mismatched nonempty runtime withholds native measurements and rolls back nonce and fees
+  ---
+  duration_ms: 246.653792
+  type: 'test'
+  ...
+# Subtest: proof-only absent and existing-empty facts require no invented code evidence
+ok 10 - proof-only absent and existing-empty facts require no invented code evidence
+  ---
+  duration_ms: 17.847417
+  type: 'test'
+  ...
+# Subtest: empty-code account can retain hidden nonempty storage and separately authenticated slots
+ok 11 - empty-code account can retain hidden nonempty storage and separately authenticated slots
+  ---
+  duration_ms: 3.196125
+  type: 'test'
+  ...
+# Subtest: legacy later numeric code evidence remains accepted without a derivation key
+ok 12 - legacy later numeric code evidence remains accepted without a derivation key
+  ---
+  duration_ms: 3.671625
+  type: 'test'
+  ...
+# Subtest: nonempty or corrupted proofs cannot be turned into empty runtime by coordinated claims
+ok 13 - nonempty or corrupted proofs cannot be turned into empty runtime by coordinated claims
+  ---
+  duration_ms: 6.263792
+  type: 'test'
+  ...
+# Subtest: derived labels, null code IDs and exact provenance shapes are strict
+ok 14 - derived labels, null code IDs and exact provenance shapes are strict
+  ---
+  duration_ms: 4.138209
+  type: 'test'
+  ...
+# Subtest: derived proof IDs bind exact method, address, keys, selector and trusted network
+ok 15 - derived proof IDs bind exact method, address, keys, selector and trusted network
+  ---
+  duration_ms: 4.115375
+  type: 'test'
+  ...
+# Subtest: cache never authorizes changed derivation, proof or explicit runtime claims
+ok 16 - cache never authorizes changed derivation, proof or explicit runtime claims
+  ---
+  duration_ms: 2.130292
+  type: 'test'
+  ...
+# Subtest: derived provenance rejects accessors and snapshots input before proof awaits
+ok 17 - derived provenance rejects accessors and snapshots input before proof awaits
+  ---
+  duration_ms: 1.2845
+  type: 'test'
+  ...
+# Subtest: actual parent rejects a forged derived label from a real successful child
+ok 18 - actual parent rejects a forged derived label from a real successful child
+  ---
+  duration_ms: 130.306208
+  type: 'test'
+  ...
+# Subtest: initial facts reconstruct exact existing, missing-slot and absent-account provenance
+ok 19 - initial facts reconstruct exact existing, missing-slot and absent-account provenance
+  ---
+  duration_ms: 20.046083
+  type: 'test'
+  ...
+# Subtest: coordinated normalized account and provenance substitutions cannot replace the actual proof
+ok 20 - coordinated normalized account and provenance substitutions cannot replace the actual proof
+  ---
+  duration_ms: 16.727917
+  type: 'test'
+  ...
+# Subtest: proof and code IDs bind method, address, ordered keys and exact canonical selector
+ok 21 - proof and code IDs bind method, address, ordered keys and exact canonical selector
+  ---
+  duration_ms: 4.734792
+  type: 'test'
+  ...
+# Subtest: storage facts cannot substitute values, existence, evidence, keys or initial requested inventory
+ok 22 - storage facts cannot substitute values, existence, evidence, keys or initial requested inventory
+  ---
+  duration_ms: 11.952416
+  type: 'test'
+  ...
+# Subtest: failed incomplete loads remain empty facts instead of becoming zero accounts
+ok 23 - failed incomplete loads remain empty facts instead of becoming zero accounts
+  ---
+  duration_ms: 2.116292
+  type: 'test'
+  ...
+# Subtest: cached results cannot authorize a changed proof or code and external cache entries are ignored
+ok 24 - cached results cannot authorize a changed proof or code and external cache entries are ignored
+  ---
+  duration_ms: 7.747583
+  type: 'test'
+  ...
+# Subtest: parent cancellation is checked across proof awaits and input mutation cannot race verification
+ok 25 - parent cancellation is checked across proof awaits and input mutation cannot race verification
+  ---
+  duration_ms: 4.352583
+  type: 'test'
+  ...
+# Subtest: descriptors, proxies and malformed provenance cannot invoke caller input traps
+ok 26 - descriptors, proxies and malformed provenance cannot invoke caller input traps
+  ---
+  duration_ms: 2.401541
+  type: 'test'
+  ...
+# Subtest: real saved proof/code wire replays in an actual fixed worker with exact observed execution and changes
+not ok 27 - real saved proof/code wire replays in an actual fixed worker with exact observed execution and changes
+  ---
+  duration_ms: 160.728208
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/isolated-call.test.js:45:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+    + + actual - expected
+    + 
+    +   {
+    + +   method: 'eth_getProof',
+    + -   method: 'eth_getCode',
+    +     params: [
+    + +     '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+    + +     [],
+    + -     '0x28c6c06298d514db089934071355e5743bf21d60',
+    +       {
+    +         blockHash: '0xd5c5a3ba092484a5e1b3b54a054de8d1b1df7e24e60717f92517adccb0d6ce9e',
+    +         requireCanonical: true
+    +       }
+    +     ]
+    + 
+    +     at Object.call (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/isolated-call.test.js:49:31)
+    +     at file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/isolated-call.js:105:18
+    +     at process.processTicksAndRejections (node:internal/process/task_queues:103:5) {
+    +   actual: {
+    +     method: 'eth_getProof',
+    +     params: [
+    +       '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+    +       [],
+    +       {
+    +         blockHash: '0xd5c5a3ba092484a5e1b3b54a054de8d1b1df7e24e60717f92517adccb0d6ce9e',
+    +         requireCanonical: true
+    +       }
+    +     ]
+    +   },
+    +   code: 'ERR_ASSERTION',
+    +   diff: 'simple',
+    +   expected: {
+    +     method: 'eth_getCode',
+    +     params: [
+    +       '0x28c6c06298d514db089934071355e5743bf21d60',
+    +       {
+    +         blockHash: '0xd5c5a3ba092484a5e1b3b54a054de8d1b1df7e24e60717f92517adccb0d6ce9e',
+    +         requireCanonical: true
+    +       }
+    +     ]
+    +   },
+    +   generatedMessage: true,
+    +   operator: 'deepStrictEqual'
+    + }
+    - null
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: ~
+  actual:
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      {
+    +   method: 'eth_getProof',
+    -   method: 'eth_getCode',
+        params: [
+    +     '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+    +     [],
+    -     '0x28c6c06298d514db089934071355e5743bf21d60',
+          {
+            blockHash: '0xd5c5a3ba092484a5e1b3b54a054de8d1b1df7e24e60717f92517adccb0d6ce9e',
+            requireCanonical: true
+          }
+        ]
+    
+  stack: |-
+    Object.call (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/isolated-call.test.js:49:31)
+    file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/isolated-call.js:105:18
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/isolated-call.test.js:53:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: synthetic proven inputs execute real SSTORE/return and native value in the separate worker
+ok 28 - synthetic proven inputs execute real SSTORE/return and native value in the separate worker
+  ---
+  duration_ms: 124.778917
+  type: 'test'
+  ...
+# Subtest: real REVERT rolls back value/storage and retains only the unsigned sender nonce
+ok 29 - real REVERT rolls back value/storage and retains only the unsigned sender nonce
+  ---
+  duration_ms: 122.544416
+  type: 'test'
+  ...
+# Subtest: invalid proof after a local write causes rollback; provider exception details are never copied
+ok 30 - invalid proof after a local write causes rollback; provider exception details are never copied
+  ---
+  duration_ms: 239.831542
+  type: 'test'
+  ...
+# Subtest: parent rejects unbound headers, widened limits and non-call fields before forking or dispatch
+ok 31 - parent rejects unbound headers, widened limits and non-call fields before forking or dispatch
+  ---
+  duration_ms: 1.603583
+  type: 'test'
+  ...
+# Subtest: hard process wall timer kills a nonresponsive actual child independently of cooperative EVM checks
+ok 32 - hard process wall timer kills a nonresponsive actual child independently of cooperative EVM checks
+  ---
+  duration_ms: 102.327583
+  type: 'test'
+  ...
+# Subtest: a child crash is unavailable, not an empty successful execution
+ok 33 - a child crash is unavailable, not an empty successful execution
+  ---
+  duration_ms: 13.355666
+  type: 'test'
+  ...
+# Subtest: cancellation aborts and drains cooperative parent reads before returning
+ok 34 - cancellation aborts and drains cooperative parent reads before returning
+  ---
+  duration_ms: 131.017958
+  type: 'test'
+  ...
+# Subtest: uncooperative late adapter replies cannot restore success or mutate sealed failure evidence
+ok 35 - uncooperative late adapter replies cannot restore success or mutate sealed failure evidence
+  ---
+  duration_ms: 159.070791
+  type: 'test'
+  ...
+# Subtest: RPC deadline, response byte limit and output limit withhold incomplete process results
+ok 36 - RPC deadline, response byte limit and output limit withhold incomplete process results
+  ---
+  duration_ms: 374.567541
+  type: 'test'
+  ...
+# Subtest: call and cumulative byte ceilings do not create replacement reads; pre-aborted calls never fork
+ok 37 - call and cumulative byte ceilings do not create replacement reads; pre-aborted calls never fork
+  ---
+  duration_ms: 218.910083
+  type: 'test'
+  ...
+# Subtest: N-1 BLOCKHASH uses the verified source header commitment without another provider read
+not ok 38 - N-1 BLOCKHASH uses the verified source header commitment without another provider read
+  ---
+  duration_ms: 114.40675
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/isolated-call.test.js:165:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    3 !== 4
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 4
+  actual: 3
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/isolated-call.test.js:172:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: parent IPC rejects wrong method, block, IDs, concurrent reads and malformed results without extra dispatch
+ok 39 - parent IPC rejects wrong method, block, IDs, concurrent reads and malformed results without extra dispatch
+  ---
+  duration_ms: 4.425167
+  type: 'test'
+  ...
+# Subtest: diagnostic output is discarded, bounded, and never copied into a result
+ok 40 - diagnostic output is discarded, bounded, and never copied into a result
+  ---
+  duration_ms: 1.156375
+  type: 'test'
+  ...
+# Subtest: actual child preserves access-list occurrence gas and declared blob context without new input kinds
+ok 41 - actual child preserves access-list occurrence gas and declared blob context without new input kinds
+  ---
+  duration_ms: 118.4185
+  type: 'test'
+  ...
+# Subtest: parent rejects actual-child substitutions of optional context, intrinsic gas and gas accounting
+ok 42 - parent rejects actual-child substitutions of optional context, intrinsic gas and gas accounting
+  ---
+  duration_ms: 693.452125
+  type: 'test'
+  ...
+# Subtest: actual child executes non-blob BLOBHASH from proof-only inputs with no blob metadata or extra RPC kinds
+not ok 43 - actual child executes non-blob BLOBHASH from proof-only inputs with no blob metadata or extra RPC kinds
+  ---
+  duration_ms: 115.177959
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/isolated-call.test.js:228:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    3 !== 4
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 4
+  actual: 3
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/isolated-call.test.js:236:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..43
+# tests 43
+# suites 0
+# pass 40
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2819.606208

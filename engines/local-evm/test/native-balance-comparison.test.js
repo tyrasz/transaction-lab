@@ -12,10 +12,13 @@ test('real child native fee-transfer balances match signed fullVM and independen
   assertNativeMeasurement(p.measurements[1],TARGET,9n,132n,p.original.changes);
   assertNativeMeasurement(p.measurements[3],UNUSED,77n,77n,p.original.changes);
   assertNativeMeasurement(p.measurements[4],ABSENT,0n,0n,p.original.changes);
-  assert.equal(p.original.inputEvidence.some(e=>[UNUSED,ABSENT].includes(e.params?.[0])),false,'Unused query facts must not be invented as original reads');
+  assert.equal(p.original.inputEvidence.some(e=>[UNUSED,ABSENT].includes(e.request.params[0])),false,'Unused query facts must not be invented as original reads');
   for(const address of [UNUSED,ABSENT]){
-    const calls=f.calls.filter(c=>c.params[0]===address);assert.deepEqual(calls.map(c=>c.method),['eth_getProof','eth_getCode']);assert.deepEqual(calls[0].params[1],[]);
-    const row=p.measurements.find(r=>r.identity.account===address);assert.equal(row.before.inputEvidenceIds.length,2);assert.deepEqual(row.after.inputEvidenceIds,[],'After-state reads reuse the same proven initial facts');
+    const methods=address===ABSENT?['eth_getProof']:['eth_getProof','eth_getCode'];
+    const calls=f.calls.filter(c=>c.params[0]===address);assert.deepEqual(calls.map(c=>c.method),methods);assert.deepEqual(calls[0].params[1],[]);
+    const row=p.measurements.find(r=>r.identity.account===address);assert.equal(row.before.inputEvidenceIds.length,methods.length);
+    assert.deepEqual(row.before.inputEvidenceIds.map(id=>p.inputEvidence[id-1].request.method),methods);
+    assert.deepEqual(row.after.inputEvidenceIds,[],'After-state reads reuse the same proven initial facts');
   }
   assert.equal(p.original.changes.accounts.some(r=>[UNUSED,ABSENT].includes(r.address)),false);
 });

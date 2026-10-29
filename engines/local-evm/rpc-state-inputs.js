@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { performance } from 'node:perf_hooks';
 import { isDeepStrictEqual } from 'node:util';
-import { verifyStateProof } from './verified-state-proof.js';
+import { EMPTY_CODE_HASH, verifyStateProof } from './verified-state-proof.js';
 import { createAuthenticatedAncestry } from './authenticated-ancestry.js';
 
 const ADDRESS = /^0x[0-9a-f]{40}$/i, WORD = /^0x[0-9a-f]{64}$/i;
@@ -120,17 +120,30 @@ export function createRpcStateInputs(options) {
   async function load(account, slots = []) {
     if (facts.has(account)) return facts.get(account);
     if (facts.size >= limits.accounts) fail('RPC_STATE_INPUT_LIMIT', 'Input-state account budget was exhausted.');
-    const initial = await proof(account, slots), codeRead = await call('eth_getCode', [account, context.selector]);
-    if (typeof codeRead.result !== 'string' || !/^0x(?:[0-9a-f]{2})*$/i.test(codeRead.result) || codeRead.result.length > limits.codeBytes * 2 + 2) {
-      delete evidence[codeRead.evidenceId - 1].result; fail('RPC_STATE_INPUT_UNAVAILABLE', 'Pinned account code is missing, malformed or too large.');
+    const initial = await proof(account, slots);
+    // These facts come from the verified trie path, never the RPC's unverified
+    // codeHash claim. Exclusion or the empty-code commitment is sufficient to
+    // establish the exact bytes. Do not invent a code transport observation.
+    const codeDerivation = !initial.verified.account.exists ? 'verified_account_absence'
+      : initial.verified.account.codeHash === EMPTY_CODE_HASH ? 'verified_account_empty_code_hash' : null;
+    const codeRead = codeDerivation ? null : await call('eth_getCode', [account, context.selector]);
+    const code = codeDerivation ? '0x' : codeRead.result;
+    if (typeof code !== 'string' || !/^0x(?:[0-9a-f]{2})*$/i.test(code) || code.length > limits.codeBytes * 2 + 2) {
+      if (codeRead) delete evidence[codeRead.evidenceId - 1].result;
+      fail('RPC_STATE_INPUT_UNAVAILABLE', 'Pinned account code is missing, malformed or too large.');
     }
     let verified;
-    try { verified = await verifyStateProof({ stateRoot, address: account, storageKeys: slots, proof: initial.read.result, code: codeRead.result }); }
-    catch { evidence[codeRead.evidenceId - 1].verification = 'rejected'; delete evidence[codeRead.evidenceId - 1].result; fail('RPC_STATE_INPUT_INVALID_PROOF', 'Pinned code does not match its verified account proof.'); }
-    live(); evidence[codeRead.evidenceId - 1].verification = 'verified';
+    try { verified = await verifyStateProof({ stateRoot, address: account, storageKeys: slots, proof: initial.read.result, code }); }
+    catch {
+      const rejected = evidence[(codeRead?.evidenceId ?? initial.read.evidenceId) - 1];
+      rejected.verification = 'rejected'; delete rejected.result;
+      fail('RPC_STATE_INPUT_INVALID_PROOF', 'Pinned code does not match its verified account proof.');
+    }
+    live(); if (codeRead) evidence[codeRead.evidenceId - 1].verification = 'verified';
     const entry = { account: structuredClone(verified.account), code: verified.code.bytes,
       storage: new Map(verified.storage.map(row => [row.key, { value: row.valueWord, exists: row.exists, evidenceId: initial.read.evidenceId }])),
-      proofEvidenceId: initial.read.evidenceId, codeEvidenceId: codeRead.evidenceId };
+      proofEvidenceId: initial.read.evidenceId, codeEvidenceId: codeRead?.evidenceId ?? null,
+      ...(codeDerivation ? { codeDerivation } : {}) };
     if (verified.status !== 'verified' || verified.code.status !== 'verified' || typeof entry.code !== 'string') fail('RPC_STATE_INPUT_INVALID_PROOF', 'Verified account code was not established.');
     facts.set(account, entry); return entry;
   }
@@ -179,7 +192,8 @@ export function createRpcStateInputs(options) {
       return { status: failure ? 'unavailable' : 'available', context: structuredClone(context), accounts,
         ...(ancestry ? { ancestry: ancestry.snapshot() } : {}),
         provenance: [...facts].map(([account, entry]) => ({ account, accountProof: structuredClone(entry.account), proofEvidenceId: entry.proofEvidenceId,
-          codeEvidenceId: entry.codeEvidenceId, storage: [...entry.storage].map(([key, value]) => ({ key, ...value })) })),
+          codeEvidenceId: entry.codeEvidenceId, ...(entry.codeDerivation ? { codeDerivation: entry.codeDerivation } : {}),
+          storage: [...entry.storage].map(([key, value]) => ({ key, ...value })) })),
         coverage: 'Only demanded, proof-verified initial accounts and storage keys; unrequested storage is unknown.', ...(failure ? { failure: structuredClone(failure) } : {}) };
     },
     snapshotEvidence() { return structuredClone(evidence); },

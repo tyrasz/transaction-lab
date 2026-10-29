@@ -1,0 +1,64 @@
+TAP version 13
+# Subtest: actual isolated child executes original Aave once then returns three proof-backed before/after pairs
+ok 1 - actual isolated child executes original Aave once then returns three proof-backed before/after pairs
+  ---
+  duration_ms: 286.556
+  type: 'test'
+  ...
+# Subtest: actual child handles eight Morpho queries with 229 required proof/code calls and exact account identities
+ok 2 - actual child handles eight Morpho queries with 229 required proof/code calls and exact account identities
+  ---
+  duration_ms: 991.980458
+  type: 'test'
+  ...
+# Subtest: actual child preserves a partial preview when an explicitly missing proof poisons later queries
+ok 3 - actual child preserves a partial preview when an explicitly missing proof poisons later queries
+  ---
+  duration_ms: 255.413542
+  type: 'test'
+  ...
+# Subtest: parent rejects bad queries and unbound inputs before fork or any provider dispatch
+ok 4 - parent rejects bad queries and unbound inputs before fork or any provider dispatch
+  ---
+  duration_ms: 1.335375
+  type: 'test'
+  ...
+# Subtest: hard deadline kills an actual stopped child and withholds the entire preview
+ok 5 - hard deadline kills an actual stopped child and withholds the entire preview
+  ---
+  duration_ms: 102.112542
+  type: 'test'
+  ...
+# Subtest: cancellation aborts and drains the actual child proof read before returning no preview
+ok 6 - cancellation aborts and drains the actual child proof read before returning no preview
+  ---
+  duration_ms: 142.684
+  type: 'test'
+  ...
+# Subtest: late uncooperative read cannot revive measurements or mutate sealed unavailable preview evidence
+ok 7 - late uncooperative read cannot revive measurements or mutate sealed unavailable preview evidence
+  ---
+  duration_ms: 161.690125
+  type: 'test'
+  ...
+# Subtest: actual child IPC mutations cannot substitute query identities, amounts, return words or original evidence
+ok 8 - actual child IPC mutations cannot substitute query identities, amounts, return words or original evidence
+  ---
+  duration_ms: 1841.528625
+  type: 'test'
+  ...
+# Subtest: synthetic fake child cannot invent a complete preview without parent proof evidence
+ok 9 - synthetic fake child cannot invent a complete preview without parent proof evidence
+  ---
+  duration_ms: 0.855792
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3912.703208

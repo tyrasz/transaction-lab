@@ -1,0 +1,106 @@
+TAP version 13
+# Subtest: actual worker resolves repeated N-2 from one hash-selected ancestor and preserves proof-only facts
+ok 1 - actual worker resolves repeated N-2 from one hash-selected ancestor and preserves proof-only facts
+  ---
+  duration_ms: 136.326583
+  type: 'test'
+  ...
+# Subtest: actual before/after preview shares authenticated ancestry without using outputs as state
+ok 2 - actual before/after preview shares authenticated ancestry without using outputs as state
+  ---
+  duration_ms: 132.667292
+  type: 'test'
+  ...
+# Subtest: actual worker ancestor substitution is rejected by the parent before delivery and no output survives
+ok 3 - actual worker ancestor substitution is rejected by the parent before delivery and no output survives
+  ---
+  duration_ms: 360.279042
+  type: 'test'
+  ...
+# Subtest: actual worker cannot bypass parent ancestry evidence and hash-only RPC binding
+ok 4 - actual worker cannot bypass parent ancestry evidence and hash-only RPC binding
+  ---
+  duration_ms: 725.922417
+  type: 'test'
+  ...
+# Subtest: ancestor reads cannot exceed the shared proof call budget and missing ancestry rolls back the message
+ok 5 - ancestor reads cannot exceed the shared proof call budget and missing ancestry rolls back the message
+  ---
+  duration_ms: 124.907083
+  type: 'test'
+  ...
+# Subtest: ancestor cancellation drains and late replies cannot restore results
+ok 6 - ancestor cancellation drains and late replies cannot restore results
+  ---
+  duration_ms: 143.701542
+  type: 'test'
+  ...
+# Subtest: public local adapter plus production proof transport executes authenticated ancestry and final source recheck
+ok 7 - public local adapter plus production proof transport executes authenticated ancestry and final source recheck
+  ---
+  duration_ms: 156.374125
+  type: 'test'
+  ...
+# Subtest: real child native fee-transfer balances match signed fullVM and independent third-MPT deltas
+ok 8 - real child native fee-transfer balances match signed fullVM and independent third-MPT deltas
+  ---
+  duration_ms: 173.934583
+  type: 'test'
+  ...
+# Subtest: sender equal to coinbase reports net base-fee debit once, without double-counting the tip
+ok 9 - sender equal to coinbase reports net base-fee debit once, without double-counting the tip
+  ---
+  duration_ms: 132.198792
+  type: 'test'
+  ...
+# Subtest: native measurements remain available after completed REVERT and OOG and include only retained fees
+ok 10 - native measurements remain available after completed REVERT and OOG and include only retained fees
+  ---
+  duration_ms: 274.169125
+  type: 'test'
+  ...
+# Subtest: priced blob calls retain blob burn in native deltas on both success and REVERT
+ok 11 - priced blob calls retain blob burn in native deltas on both success and REVERT
+  ---
+  duration_ms: 267.332084
+  type: 'test'
+  ...
+# Subtest: native poststate reads follow Shanghai deletion and Cancun retention after miner settlement
+ok 12 - native poststate reads follow Shanghai deletion and Cancun retention after miner settlement
+  ---
+  duration_ms: 262.115334
+  type: 'test'
+  ...
+# Subtest: native reads distinguish surviving creation funding from same-invocation creation/deletion
+ok 13 - native reads distinguish surviving creation funding from same-invocation creation/deletion
+  ---
+  duration_ms: 275.320209
+  type: 'test'
+  ...
+# Subtest: missing newly requested native proof preserves earlier measured pairs and withholds later queries
+ok 14 - missing newly requested native proof preserves earlier measured pairs and withholds later queries
+  ---
+  duration_ms: 126.85575
+  type: 'test'
+  ...
+# Subtest: native reads remain available when the completed original exhausts the shared VM-step allowance
+ok 15 - native reads remain available when the completed original exhausts the shared VM-step allowance
+  ---
+  duration_ms: 126.712792
+  type: 'test'
+  ...
+# Subtest: cancellation during an extra native proof withholds the entire child preview and drains the read
+ok 16 - cancellation during an extra native proof withholds the entire child preview and drains the read
+  ---
+  duration_ms: 123.233041
+  type: 'test'
+  ...
+1..16
+# tests 16
+# suites 0
+# pass 16
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1930.468333

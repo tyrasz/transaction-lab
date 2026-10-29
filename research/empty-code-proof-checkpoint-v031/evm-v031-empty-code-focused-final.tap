@@ -1,0 +1,166 @@
+TAP version 13
+# Subtest: an empty-code commitment establishes exact code while nonempty storage remains separately proven
+ok 1 - an empty-code commitment establishes exact code while nonempty storage remains separately proven
+  ---
+  duration_ms: 14.098167
+  type: 'test'
+  ...
+# Subtest: account exclusion proves empty code and demanded zeros with either canonical absent-hash representation
+ok 2 - account exclusion proves empty code and demanded zeros with either canonical absent-hash representation
+  ---
+  duration_ms: 2.289917
+  type: 'test'
+  ...
+# Subtest: a first storage demand and concurrent code/account reads share one genuine empty-code proof
+ok 3 - a first storage demand and concurrent code/account reads share one genuine empty-code proof
+  ---
+  duration_ms: 1.488666
+  type: 'test'
+  ...
+# Subtest: missing or altered proofs cannot turn claimed empty code into an accepted account
+ok 4 - missing or altered proofs cannot turn claimed empty code into an accepted account
+  ---
+  duration_ms: 7.138
+  type: 'test'
+  ...
+# Subtest: nonempty code still requires its real hash-checked read and cannot fall back after a transport failure
+ok 5 - nonempty code still requires its real hash-checked read and cannot fall back after a transport failure
+  ---
+  duration_ms: 4.457708
+  type: 'test'
+  ...
+# Subtest: proof-derived code consumes real RPC/account budgets without a synthetic evidence row
+ok 6 - proof-derived code consumes real RPC/account budgets without a synthetic evidence row
+  ---
+  duration_ms: 1.53925
+  type: 'test'
+  ...
+# Subtest: actual Sepolia native previews use only proven-empty or exclusion proofs, with exact priced/unpriced balances
+ok 7 - actual Sepolia native previews use only proven-empty or exclusion proofs, with exact priced/unpriced balances
+  ---
+  duration_ms: 495.205333
+  type: 'test'
+  ...
+# Subtest: nonempty contract runtime still requires one real hash-checked code response
+ok 8 - nonempty contract runtime still requires one real hash-checked code response
+  ---
+  duration_ms: 117.761334
+  type: 'test'
+  ...
+# Subtest: missing or hash-mismatched nonempty runtime withholds native measurements and rolls back nonce and fees
+ok 9 - missing or hash-mismatched nonempty runtime withholds native measurements and rolls back nonce and fees
+  ---
+  duration_ms: 231.358042
+  type: 'test'
+  ...
+# Subtest: proof-only absent and existing-empty facts require no invented code evidence
+ok 10 - proof-only absent and existing-empty facts require no invented code evidence
+  ---
+  duration_ms: 12.937
+  type: 'test'
+  ...
+# Subtest: empty-code account can retain hidden nonempty storage and separately authenticated slots
+ok 11 - empty-code account can retain hidden nonempty storage and separately authenticated slots
+  ---
+  duration_ms: 3.17275
+  type: 'test'
+  ...
+# Subtest: legacy later numeric code evidence remains accepted without a derivation key
+ok 12 - legacy later numeric code evidence remains accepted without a derivation key
+  ---
+  duration_ms: 1.850959
+  type: 'test'
+  ...
+# Subtest: nonempty or corrupted proofs cannot be turned into empty runtime by coordinated claims
+ok 13 - nonempty or corrupted proofs cannot be turned into empty runtime by coordinated claims
+  ---
+  duration_ms: 4.5885
+  type: 'test'
+  ...
+# Subtest: derived labels, null code IDs and exact provenance shapes are strict
+ok 14 - derived labels, null code IDs and exact provenance shapes are strict
+  ---
+  duration_ms: 4.821041
+  type: 'test'
+  ...
+# Subtest: derived proof IDs bind exact method, address, keys, selector and trusted network
+ok 15 - derived proof IDs bind exact method, address, keys, selector and trusted network
+  ---
+  duration_ms: 4.691875
+  type: 'test'
+  ...
+# Subtest: cache never authorizes changed derivation, proof or explicit runtime claims
+ok 16 - cache never authorizes changed derivation, proof or explicit runtime claims
+  ---
+  duration_ms: 1.034041
+  type: 'test'
+  ...
+# Subtest: derived provenance rejects accessors and snapshots input before proof awaits
+ok 17 - derived provenance rejects accessors and snapshots input before proof awaits
+  ---
+  duration_ms: 0.693542
+  type: 'test'
+  ...
+# Subtest: actual parent rejects a forged derived label from a real successful child
+ok 18 - actual parent rejects a forged derived label from a real successful child
+  ---
+  duration_ms: 127.771375
+  type: 'test'
+  ...
+# Subtest: initial facts reconstruct exact existing, missing-slot and absent-account provenance
+ok 19 - initial facts reconstruct exact existing, missing-slot and absent-account provenance
+  ---
+  duration_ms: 18.287583
+  type: 'test'
+  ...
+# Subtest: coordinated normalized account and provenance substitutions cannot replace the actual proof
+ok 20 - coordinated normalized account and provenance substitutions cannot replace the actual proof
+  ---
+  duration_ms: 14.427333
+  type: 'test'
+  ...
+# Subtest: proof and code IDs bind method, address, ordered keys and exact canonical selector
+ok 21 - proof and code IDs bind method, address, ordered keys and exact canonical selector
+  ---
+  duration_ms: 5.121541
+  type: 'test'
+  ...
+# Subtest: storage facts cannot substitute values, existence, evidence, keys or initial requested inventory
+ok 22 - storage facts cannot substitute values, existence, evidence, keys or initial requested inventory
+  ---
+  duration_ms: 6.863708
+  type: 'test'
+  ...
+# Subtest: failed incomplete loads remain empty facts instead of becoming zero accounts
+ok 23 - failed incomplete loads remain empty facts instead of becoming zero accounts
+  ---
+  duration_ms: 6.396625
+  type: 'test'
+  ...
+# Subtest: cached results cannot authorize a changed proof or code and external cache entries are ignored
+ok 24 - cached results cannot authorize a changed proof or code and external cache entries are ignored
+  ---
+  duration_ms: 3.561416
+  type: 'test'
+  ...
+# Subtest: parent cancellation is checked across proof awaits and input mutation cannot race verification
+ok 25 - parent cancellation is checked across proof awaits and input mutation cannot race verification
+  ---
+  duration_ms: 4.133209
+  type: 'test'
+  ...
+# Subtest: descriptors, proxies and malformed provenance cannot invoke caller input traps
+ok 26 - descriptors, proxies and malformed provenance cannot invoke caller input traps
+  ---
+  duration_ms: 2.118625
+  type: 'test'
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1026.381125
