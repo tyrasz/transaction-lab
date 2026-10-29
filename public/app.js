@@ -1,9 +1,11 @@
 const $ = (id) => document.getElementById(id);
 const state = { config: null, example: null, result: null, busy: false, benchmarkLoaded: false, sequenceDrafts: [], sequenceControls: [], nextCallKey: 1 };
-const requestFieldIds = ['chain', 'ethereum-engine', 'ethereum-call-mode', 'local-operation', 'local-gas', 'local-fees-enabled', 'local-max-fee', 'local-priority-fee', 'local-max-blob-fee', 'from', 'to', 'data', 'value', 'block', 'standard-manual-queries', 'standard-queries', 'transaction-context'];
+const requestFieldIds = ['chain', 'ethereum-engine', 'ethereum-call-mode', 'local-operation', 'local-gas', 'arbitrum-gas', 'local-fees-enabled', 'local-max-fee', 'local-priority-fee', 'local-max-blob-fee', 'from', 'to', 'data', 'value', 'block', 'standard-manual-queries', 'standard-queries', 'transaction-context'];
 const DEFAULT_LOCAL_GAS = '5000000';
 const LOCAL_FEE_PROFILE = 'unsigned_eip1559_block_end';
 const LOCAL_BLOB_FEE_PROFILE = 'unsigned_eip4844_block_end';
+const arbitrumMode = () => $('chain').value === '42161';
+const arbitrumAvailable = () => state.config?.arbitrumEvm?.available === true;
 const ethereumMode = () => $('chain').value === '1';
 const localMode = () => ethereumMode() && $('ethereum-engine').value === 'local';
 const creationMode = () => localMode() && $('local-operation').value === 'create';
@@ -28,7 +30,7 @@ function formatTime(value) { if (value === null || value === undefined || value 
 
 async function request(url, body) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), url === '/api/evm/simulate-sequence' ? 300000 : ['/api/evm/simulate', '/api/evm/local-preview'].includes(url) ? 180000 : 65000);
+  const timer = setTimeout(() => controller.abort(), url === '/api/evm/simulate-sequence' ? 300000 : ['/api/evm/simulate', '/api/evm/local-preview', '/api/arbitrum/simulate'].includes(url) ? 180000 : 65000);
   try {
     const response = await fetch(url, { method: body ? 'POST' : 'GET', headers: body ? { 'Content-Type': 'application/json' } : undefined, body: body ? JSON.stringify(body) : undefined, signal: controller.signal });
     const result = await response.json();
@@ -47,7 +49,7 @@ async function request(url, body) {
 
 function setBusy(busy, mode) {
   state.busy = busy;
-  $('simulate-button').disabled = busy || (ethereumMode() && !(localMode() ? localAvailable() : standardAvailable())) || (sequenceMode() && !sequenceAvailable());
+  $('simulate-button').disabled = busy || (arbitrumMode() && !arbitrumAvailable()) || (ethereumMode() && !(localMode() ? localAvailable() : standardAvailable())) || (sequenceMode() && !sequenceAvailable());
   $('replay-button').disabled = busy;
   $('example').disabled = busy;
   for (const id of requestFieldIds) $(id).disabled = busy;
@@ -55,6 +57,7 @@ function setBusy(busy, mode) {
   document.querySelector('.results-panel').setAttribute('aria-busy', String(busy));
   $('run-status').classList.toggle('loading', busy);
   $('run-status').textContent = busy ? sequenceMode() ? 'Evaluating the calls in order and checking the state after each step. This can take several minutes…' : mode === 'historical_trace' ? 'Retrieving the original execution trace and checking available historical balance evidence…' : ethereumMode() ? manualQueries() ? 'Running the unsigned call, checking the manual query list and measuring selected ETH accounts. This can take a few minutes…' : 'Running the unsigned call and measuring selected ETH accounts, token balances and allowances. This can take a few minutes…' : 'Pinning the block, executing the call, and decoding token events…' : '';
+  if (busy && arbitrumMode()) $('run-status').textContent = 'Running the provider simulation and checking discovered asset balances. Coverage remains incomplete; this may take two minutes…';
   if (busy && localMode()) $('run-status').textContent = 'Running the local engine with verified state inputs and your requested queries. This can take a few minutes…';
 }
 
@@ -95,6 +98,20 @@ function resetLocalGas(value = '') {
   $('local-gas-settings').open = false; updateLocalGasSelection();
 }
 
+function readArbitrumGas() {
+  const value = $('arbitrum-gas').value.trim();
+  if (!value) return undefined;
+  if (!/^[1-9][0-9]{4,6}$/.test(value) || BigInt(value) < 21000n || BigInt(value) > 5000000n) throw new Error('Enter a whole gas limit from 21000 to 5000000 without commas or leading zeros, or leave blank for 2000000.');
+  return value;
+}
+function updateArbitrumGasSelection() {
+  try { const gas = readArbitrumGas(); $('arbitrum-gas-selection').textContent = gas === undefined ? 'Using the default limit: 2,000,000 gas.' : `Selected limit: ${numberLabel(gas)} gas.`; }
+  catch { $('arbitrum-gas-selection').textContent = 'Enter a valid limit, or leave blank to use 2,000,000 gas.'; }
+}
+function resetArbitrumGas(value = '') {
+  $('arbitrum-gas').value = value; $('arbitrum-gas').setCustomValidity(''); $('arbitrum-gas-settings').open = false; updateArbitrumGasSelection();
+}
+
 function decimalWei(value) { return typeof value === 'string' && /^(?:0|[1-9][0-9]{0,77})$/.test(value) && BigInt(value) < (1n << 256n); }
 function readLocalFees(context) {
   if (!$('local-fees-enabled').checked) return undefined;
@@ -120,7 +137,7 @@ function resetLocalFees(request = {}) {
 }
 
 function currentExamples() {
-  return sequenceMode() ? state.config?.standardEvm?.sequenceExamples || [] : ethereumMode() ? state.config?.standardEvm?.examples || []
+  return arbitrumMode() ? state.config?.arbitrumEvm?.examples || [] : sequenceMode() ? state.config?.standardEvm?.sequenceExamples || [] : ethereumMode() ? state.config?.standardEvm?.examples || []
     : (state.config?.examples || []).filter(example => String(example.request?.chainId) === $('chain').value);
 }
 
@@ -210,11 +227,13 @@ function updateSequenceControls() {
 function selectExample({ initial = false } = {}) {
   clearTransactionContexts();
   resetLocalGas();
+  resetArbitrumGas();
   resetLocalFees();
   state.example = currentExamples().find((example) => example.id === $('example').value) || null;
   const example = state.example;
   if (example) {
-    const transaction = (ethereumMode() ? example.input : example.request) || {};
+    const transaction = (ethereumMode() ? example.input : arbitrumMode() ? example.request || example.input : example.request) || {};
+    if (arbitrumMode() && typeof transaction.gas === 'string') resetArbitrumGas(transaction.gas);
     if (localMode() && typeof transaction.gas === 'string') resetLocalGas(transaction.gas);
     if (localMode()) resetLocalFees(transaction);
     $('local-operation').value = localMode() && transaction.to === null ? 'create' : 'call';
@@ -227,9 +246,9 @@ function selectExample({ initial = false } = {}) {
     }
   }
   $('example-description').textContent = example?.description || (example ? 'Original public transaction inputs. Simulating uses the requested state block.' : 'Enter public transaction inputs to inspect an unsigned call.');
-  $('replay-button').hidden = ethereumMode() || !example?.transactionHash;
-  $('historical-help').hidden = ethereumMode() ? !example : !example?.transactionHash;
-  $('historical-help').textContent = ethereumMode() && example
+  $('replay-button').hidden = arbitrumMode() || ethereumMode() || !example?.transactionHash;
+  $('historical-help').hidden = arbitrumMode() ? !example : ethereumMode() ? !example : !example?.transactionHash;
+  $('historical-help').textContent = arbitrumMode() ? 'The example uses these public inputs at the selected block. Previous outcomes are not reused; a fresh preview may succeed, revert or be unavailable.' : ethereumMode() && example
     ? sequenceMode() ? 'This example uses the selected block-end state, then applies each successful simulated call before evaluating the next. It is not a historical transaction-position replay.' : 'This example starts at the end of the block before the original deposit. It runs the same calldata against that state; it does not replay the original transaction at its exact position.'
     : example?.transactionHash ? `Historical inspection uses the original transaction ${example.transactionHash.slice(0, 12)}… and its original block, independent of the fields above.` : '';
   $('standard-queries').setCustomValidity('');
@@ -239,7 +258,15 @@ function selectExample({ initial = false } = {}) {
 }
 
 function updateQueryMode() {
-  const standard = ethereumMode(), local = localMode(), sequence = sequenceMode(), manual = manualQueries();
+  const standard = ethereumMode(), arbitrum = arbitrumMode(), local = localMode(), sequence = sequenceMode(), manual = manualQueries();
+  $('arbitrum-help').hidden = !arbitrum;
+  $('arbitrum-gas-settings').hidden = !arbitrum; $('arbitrum-gas').disabled = state.busy || !arbitrum;
+  if (!arbitrum) $('arbitrum-gas').setCustomValidity('');
+  updateArbitrumGasSelection();
+  if (arbitrum) {
+    $('network-help').hidden = false; $('network-help').textContent = arbitrumAvailable() ? 'Provider simulation on Arbitrum One. Single call only; asset coverage is incomplete.' : state.config?.arbitrumEvm?.reason || 'Arbitrum provider previews are unavailable in this workspace.';
+    $('network-help').classList.toggle('unavailable-note', !arbitrumAvailable());
+  }
   $('ethereum-engine-field').hidden = !standard;
   $('ethereum-engine').disabled = state.busy || !standard;
   $('local-engine-option').disabled = !localAvailable();
@@ -305,7 +332,7 @@ function updateQueryMode() {
 }
 
 function selectNetwork({ initial = false } = {}) {
-  const standard = ethereumMode();
+  const standard = ethereumMode(), arbitrum = arbitrumMode();
   $('ethereum-engine').value = 'provider';
   $('ethereum-call-mode').value = 'single';
   $('local-operation').value = 'call';
@@ -320,15 +347,16 @@ function selectNetwork({ initial = false } = {}) {
   $('standard-query-settings').hidden = !standard;
   $('standard-query-settings').open = false;
   $('value').readOnly = false;
-  $('value').pattern = standard ? '0|[1-9][0-9]*' : '[0-9]+';
-  $('value-help').classList.toggle('sr-only', !standard);
+  $('value').pattern = standard || arbitrum ? '0|[1-9][0-9]*' : '[0-9]+';
+  $('value-help').classList.toggle('sr-only', !standard && !arbitrum);
   $('value-help').textContent = standard ? 'ETH sent with the call, in whole wei. 1 ETH = 1000000000000000000 wei. Use 0 for none; network fees are excluded.' : 'Native token amount as an integer number of wei.';
   $('block-help').textContent = standard
     ? 'Use latest, a hexadecimal block number, or a block hash. Execution starts at the end of that block with a fixed gas limit and no transaction fee settlement.'
     : 'Use latest or a hexadecimal block number. The result records the state used.';
-  $('network-heading').textContent = standard ? 'ETHEREUM · CHAIN 1 · EXPERIMENTAL' : 'HYPEREVM · CHAIN 999';
-  $('page-description').textContent = standard ? 'Preview an unsigned call and check the selected accounts’ balances and allowances.' : 'Simulate an unsigned call or inspect a historical execution. See the evidence behind each result.';
-  $('empty-description').textContent = standard ? 'Choose an example or enter your own inputs. The preview shows which ETH balances, token balances and allowances could be measured for the selected accounts.' : 'Choose an example or enter a transaction. The preview separates execution, token events, and coverage limits.';
+  if (arbitrum) { $('value-help').textContent = 'ETH sent with the call, in whole wei. Network fees are excluded.'; $('block-help').textContent = 'Use latest or a hexadecimal block number. The provider simulates successor blocks; the selected header is checked again afterward.'; }
+  $('network-heading').textContent = arbitrum ? 'ARBITRUM ONE · CHAIN 42161 · PROVIDER' : standard ? 'ETHEREUM · CHAIN 1 · EXPERIMENTAL' : 'HYPEREVM · CHAIN 999';
+  $('page-description').textContent = arbitrum ? 'Preview a single call through the provider and review the limits of its asset observations.' : standard ? 'Preview an unsigned call and check the selected accounts’ balances and allowances.' : 'Simulate an unsigned call or inspect a historical execution. See the evidence behind each result.';
+  $('empty-description').textContent = arbitrum ? 'Use the original public CCTP example or enter a call. Execution and incomplete asset observations are reported separately; destination credit is not verified.' : standard ? 'Choose an example or enter your own inputs. The preview shows which ETH balances, token balances and allowances could be measured for the selected accounts.' : 'Choose an example or enter a transaction. The preview separates execution, token events, and coverage limits.';
   $('network-help').hidden = !standard;
   $('network-help').textContent = standardAvailable() ? 'Experimental Ethereum previews. No connected wallet or signature needed.' : state.config?.standardEvm?.reason || 'Ethereum previews are unavailable in this workspace.';
   $('network-help').classList.toggle('unavailable-note', standard && !standardAvailable());
@@ -952,6 +980,8 @@ function beginResult(result, standard = false) {
   $('hyper-result').hidden = standard;
   $('standard-result').hidden = !standard;
   $('local-result').hidden = true;
+  $('arbitrum-result').hidden = true;
+  $('raw-response-label').textContent = 'Full trace included';
   $('sequence-result').hidden = !result.sequence;
   $('execution-label').textContent = 'Execution';
   state.renderStep = null;
@@ -1356,6 +1386,93 @@ function localFeeAccounting(result) {
   } catch { return null; }
 }
 
+function arbitrumText(value, fallback = 'Not available') {
+  return typeof value === 'string' && value ? value.slice(0, 4096) : fallback;
+}
+function arbitrumAmount(raw, token = {}) {
+  const negative = raw.startsWith('-'), digits = negative ? raw.slice(1) : raw;
+  const decimals = token.decimals, symbol = typeof token.symbol === 'string' ? token.symbol.slice(0, 64) : '';
+  if (!Number.isInteger(decimals) || decimals < 0 || decimals > 36) return `${raw} raw units`;
+  const padded = digits.padStart(decimals + 1, '0');
+  const fraction = decimals ? padded.slice(-decimals).replace(/0+$/, '') : '';
+  const amount = `${negative ? '-' : ''}${decimals ? padded.slice(0, -decimals) : padded}${fraction ? '.' + fraction : ''}`;
+  return `${amount}${symbol ? ' ' + symbol : ''}`;
+}
+function arbitrumMeasured(row, result) {
+  if (!row || row.status !== 'measured' || result.source?.chainId !== 42161 || result.source?.headerConfirmed !== true || result.source?.twoPassConsistent !== true
+    || !['completed', 'partial'].includes(result.status) || !['success', 'reverted', 'failed'].includes(result.execution?.status)) return false;
+  const address = value => typeof value === 'string' && /^0x[0-9a-f]{40}$/i.test(value);
+  if (!address(row.owner) || !address(row.token?.address) || !decimalWei(row.beforeRaw) || !decimalWei(row.afterRaw)
+    || typeof row.deltaRaw !== 'string' || !/^(?:0|[1-9][0-9]{0,77}|-[1-9][0-9]{0,77})$/.test(row.deltaRaw)) return false;
+  return BigInt(row.afterRaw) - BigInt(row.beforeRaw) === BigInt(row.deltaRaw);
+}
+function renderArbitrumResult(result) {
+  beginResult(result, true);
+  $('hyper-result').hidden = true; $('standard-result').hidden = true; $('local-result').hidden = true; $('sequence-result').hidden = true; $('arbitrum-result').hidden = false;
+  $('raw-response-label').textContent = 'Provider evidence included';
+  $('result-label').textContent = 'Arbitrum provider simulation';
+  const execution = result.execution || {}, source = result.source || {};
+  const executionStatus = ['success', 'reverted', 'failed'].includes(execution.status) ? execution.status : 'unavailable';
+  $('execution-status').textContent = titleCase(executionStatus);
+  $('execution-status').className = executionStatus === 'success' ? 'success' : executionStatus === 'unavailable' ? 'partial' : 'failed';
+  $('gas-used').textContent = decimalWei(execution.gasUsed) ? `${numberLabel(execution.gasUsed)} gas used · network fees excluded` : 'Gas usage unavailable · network fees excluded';
+  $('coverage-label').textContent = 'Asset coverage'; $('coverage-status').textContent = 'Incomplete'; $('coverage-status').className = 'partial';
+  $('coverage-detail').textContent = 'Provider observations only · missing values are unknown';
+  const error = execution.error?.message || (typeof execution.error === 'string' ? execution.error : null) || result.error?.message;
+  $('execution-error').hidden = !error; $('execution-error').textContent = error ? arbitrumText(error) : '';
+  $('contract-revert').hidden = true; $('contract-revert').textContent = '';
+  $('arbitrum-state-description').textContent = source.headerConfirmed === true
+    ? 'The provider returned the same selected header before and after the preview. Calls run in synthetic successor blocks. This is not independent state verification or a replay of an original transaction position.'
+    : 'The selected header could not be confirmed. Asset amounts are unavailable. Retained provider output remains in the JSON response.';
+  const stateDetails = $('arbitrum-state-details'); stateDetails.replaceChildren();
+  for (const [label, value] of [['Requested block', source.requestedBlock], ['Selected block', source.blockNumber], ['Block hash', source.blockHash], ['Header check', source.headerConfirmed === true ? 'Same header returned' : 'Unconfirmed'], ['Provider', source.provider]]) addDefinition(stateDetails, label, value);
+  const rows = Array.isArray(result.assetChanges) ? result.assetChanges : [], measured = rows.filter(row => arbitrumMeasured(row, result)).length;
+  $('arbitrum-assets-count').textContent = `${measured} observed · incomplete inventory`;
+  $('arbitrum-assets').replaceChildren(...rows.slice(0, 64).map(row => {
+    const valid = arbitrumMeasured(row, result), token = row?.token || {}, card = node('article', `standard-query-card${valid ? '' : ' query-unavailable'}`);
+    const heading = node('div', 'permission-heading'); heading.append(node('h4', '', arbitrumText(token.symbol, 'Unknown asset').slice(0, 64)), node('span', 'query-status', valid ? 'Provider-observed balances' : 'Unknown / unavailable'));
+    const details = node('dl', 'permission-details'); addDefinition(details, 'Token', arbitrumText(token.address)); addDefinition(details, 'Account', arbitrumText(row?.owner));
+    card.append(heading, details);
+    if (valid) {
+      const table = node('table', 'measurement-table'), head = node('thead'), columns = node('tr'), body = node('tbody'), values = node('tr');
+      for (const [label, key] of [['Before', 'beforeRaw'], ['After', 'afterRaw'], ['Change', 'deltaRaw']]) {
+        const th = node('th', '', label); th.scope = 'col'; columns.append(th);
+        const td = node('td'); td.append(node('strong', '', arbitrumAmount(row[key], token)), node('span', 'position-unit', `${row[key]} raw units`)); values.append(td);
+      }
+      head.append(columns); body.append(values); table.append(head, body); card.append(table);
+      card.append(node('p', 'query-reference', 'Provider-reported balances. Token metadata and complete asset coverage are not verified.'));
+    } else card.append(node('p', 'query-note', row?.status === 'measured' ? 'Returned values or block context are inconsistent. Amounts are withheld.' : arbitrumText(row?.reason, 'This balance was not established. Missing values are unknown, not zero.')));
+    return card;
+  }));
+  if (!rows.length) $('arbitrum-assets').append(node('p', 'query-note', 'No asset balances were established. This is unknown coverage, not proof of no asset changes.'));
+  if (rows.length > 64) $('arbitrum-assets').append(node('p', 'query-note', 'Additional provider rows are retained in the JSON response.'));
+  const protocol = result.protocol, intent = protocol?.status === 'recognized_intent' && protocol.intent?.kind === 'cctp_v2_hypercore_forwarding' ? protocol.intent : null;
+  $('arbitrum-protocol').hidden = !intent; $('arbitrum-protocol-details').replaceChildren(); $('arbitrum-protocol-limits').replaceChildren(); $('arbitrum-routing').textContent = '';
+  if (intent) {
+    const destination = intent.destination || {}, burn = intent.requestedBurn || {}, token = { symbol: 'USDC', decimals: burn.decimals };
+    $('arbitrum-routing').textContent = destination.requestedBalance === 'perps' ? 'Requested perps routing. Destination configuration may route a disabled dex to spot. Destination credit is unverified.' : 'Requested HyperCore routing. Destination credit is unverified.';
+    const details = $('arbitrum-protocol-details');
+    addDefinition(details, 'Requested burn', decimalWei(burn.amountRaw) ? arbitrumAmount(burn.amountRaw, token) : 'Not available');
+    addDefinition(details, 'Requested burn · raw units', decimalWei(burn.amountRaw) ? burn.amountRaw : 'Not available');
+    addDefinition(details, 'Maximum destination fee · cap, not quote', intent.maxFee?.kind === 'cap_not_quote' && decimalWei(intent.maxFee.raw) ? arbitrumAmount(intent.maxFee.raw, token) : 'Not available');
+    addDefinition(details, 'Requested recipient', destination.hypercoreRecipient); addDefinition(details, 'Requested destination dex', destination.destinationDex);
+    addDefinition(details, 'Measured outgoing amount', 'Not established by calldata intent'); addDefinition(details, 'Destination credit', 'Unverified');
+    $('arbitrum-protocol-limits').append(node('li', '', 'The requested amount and fee cap are separate from measured source-chain balances. No attestation, mint, relay completion or destination balance is verified.'));
+    for (const limit of Array.isArray(intent.limitations) ? intent.limitations.slice(0, 16) : []) $('arbitrum-protocol-limits').append(node('li', '', arbitrumText(limit)));
+  }
+  $('warnings-section').hidden = false;
+  $('warnings-list').replaceChildren(...[
+    'Provider simulation only. Execution success does not establish complete asset effects, contract safety or destination credit.',
+    'Coverage is incomplete. A missing asset row, a failed probe or a zero observed change is not proof of no other effects.',
+    'Network fees and outer transaction validation are excluded. Token symbols and decimals are untrusted provider metadata.',
+    'The selected block is checked by number and header reread. State proofs, consensus finality and independent local execution are not verified.',
+  ].map(text => node('li', '', text)));
+  for (const limit of Array.isArray(result.coverage?.limitations) ? result.coverage.limitations.slice(0, 16) : []) $('warnings-list').append(node('li', '', arbitrumText(limit)));
+  const details = $('source-details'); details.replaceChildren();
+  for (const [label, value] of [['Engine', 'Arbitrum provider simulation'], ['Preview status', result.status], ['Profile', source.profile], ['Header binding', source.blockBinding], ['Network fees', 'Excluded'], ['Asset inventory', 'Incomplete'], ['Destination credit', 'Unverified'], ['Run ID', result.id]]) addDefinition(details, label, value);
+  $('timing').textContent = Number.isFinite(result.timing?.totalMs) && result.timing.totalMs >= 0 ? `${(result.timing.totalMs / 1000).toFixed(2)}s total` : '';
+}
+
 function renderLocalResult(result) {
   beginResult(result, true);
   $('standard-result').hidden = true; $('hyper-result').hidden = true; $('sequence-result').hidden = true; $('local-result').hidden = false;
@@ -1655,15 +1772,21 @@ function renderResult(result) {
 
 async function run(mode) {
   if (state.busy) return;
-  const standard = ethereumMode();
+  const standard = ethereumMode(), arbitrum = arbitrumMode();
   const sequence = sequenceMode();
+  if (arbitrum && (!arbitrumAvailable() || mode === 'historical_trace')) return;
   if (standard && (!(localMode() ? localAvailable() : standardAvailable()) || mode === 'historical_trace')) return;
   if (sequence && !sequenceAvailable()) return;
   if (mode === 'historical_trace' && !state.example?.transactionHash) return;
-  if (standard && !sequence) validateWeiField($('value'));
+  if ((standard || arbitrum) && !sequence) validateWeiField($('value'));
   const calls = sequence ? readSequenceCalls() : undefined;
   if (sequence && !calls) return;
   let queries, context, gas, feeContext;
+  if (arbitrum) {
+    $('arbitrum-gas').setCustomValidity('');
+    try { gas = readArbitrumGas(); }
+    catch (error) { $('arbitrum-gas-settings').open = true; $('arbitrum-gas').setCustomValidity(error.message); $('arbitrum-gas').reportValidity(); return; }
+  }
   if (localMode()) {
     $('local-gas').setCustomValidity('');
     try { gas = readLocalGas(); }
@@ -1700,21 +1823,22 @@ async function run(mode) {
     const body = sequence ? { chainId: 1, from: $('from').value.trim(), block: $('block').value.trim(), calls }
       : mode === 'historical_trace' ? { chainId: Number(state.example.request.chainId), transactionHash: state.example.transactionHash } : { chainId: Number($('chain').value), from: $('from').value.trim(), to: creationMode() ? null : $('to').value.trim(), data: $('data').value.trim(), value: $('value').value.trim(), block: $('block').value.trim() };
     if (standard && queries !== undefined) body.queries = queries;
-    if (localMode() && gas !== undefined) body.gas = gas;
+    if ((localMode() || arbitrum) && gas !== undefined) body.gas = gas;
     if (localMode() && feeContext) Object.assign(body, feeContext);
     if (context !== undefined) Object.assign(body, context);
-    const result = await request(localMode() ? '/api/evm/local-preview' : sequence ? '/api/evm/simulate-sequence' : standard ? '/api/evm/simulate' : mode === 'historical_trace' ? '/api/replay' : '/api/simulate', body);
+    const result = await request(arbitrum ? '/api/arbitrum/simulate' : localMode() ? '/api/evm/local-preview' : sequence ? '/api/evm/simulate-sequence' : standard ? '/api/evm/simulate' : mode === 'historical_trace' ? '/api/replay' : '/api/simulate', body);
     if (fingerprint !== requestFingerprint()) {
       setBusy(false);
       clearResult({ inputsChanged: true });
       return;
     }
-    if (localMode()) renderLocalResult(result);
+    if (arbitrum) renderArbitrumResult(result);
+    else if (localMode()) renderLocalResult(result);
     else if (sequence) renderSequenceResult(result);
     else if (standard) renderStandardResult(result);
     else renderResult(result);
     setBusy(false);
-    $('run-status').textContent = localMode() ? 'Local preview returned. Review execution and each requested check separately; unavailable values are not zero.' : sequence
+    $('run-status').textContent = arbitrum ? 'Provider preview returned. Review execution separately from incomplete asset observations. Destination credit and network fees are not verified.' : localMode() ? 'Local preview returned. Review execution and each requested check separately; unavailable values are not zero.' : sequence
       ? result.sequence?.status === 'completed' ? 'Sequence completed. Select each step to review its balances and allowances. Network fees are excluded.'
         : 'The sequence stopped or could not be established. Review the attempted steps and explicitly skipped calls below.'
       : standard
@@ -1826,7 +1950,7 @@ function setView(view) {
 }
 
 $('simulation-form').addEventListener('submit', (event) => { event.preventDefault(); run('simulation'); });
-$('simulation-form').addEventListener('reset', () => { clearTransactionContexts(); resetLocalGas(); resetLocalFees(); updateQueryMode(); clearResult({ inputsChanged: true }); });
+$('simulation-form').addEventListener('reset', () => { clearTransactionContexts(); resetLocalGas(); resetArbitrumGas(); resetLocalFees(); updateQueryMode(); clearResult({ inputsChanged: true }); });
 $('replay-button').addEventListener('click', () => run('historical_trace'));
 $('example').addEventListener('change', selectExample);
 $('chain').addEventListener('change', selectNetwork);
@@ -1861,6 +1985,7 @@ for (const id of requestFieldIds) {
       for (const feeId of ['local-max-fee', 'local-priority-fee', 'local-max-blob-fee']) $(feeId).setCustomValidity('');
     }
     if (id === 'value') $('value').setCustomValidity('');
+    if (id === 'arbitrum-gas') { $('arbitrum-gas').setCustomValidity(''); updateArbitrumGasSelection(); }
     if (id === 'local-gas') { $('local-gas').setCustomValidity(''); updateLocalGasSelection(); }
     if (['local-fees-enabled', 'local-max-fee', 'local-priority-fee', 'local-max-blob-fee'].includes(id)) {
       for (const feeId of ['local-max-fee', 'local-priority-fee', 'local-max-blob-fee']) $(feeId).setCustomValidity('');
@@ -1898,6 +2023,7 @@ async function initialize() {
     const chains = state.config.chains || [];
     const choices = chains.length ? [...chains] : [{ name: 'HyperEVM', chainId: 999 }];
     if ((state.config.standardEvm || state.config.localEvm) && !choices.some(chain => Number(chain.chainId) === 1)) choices.push({ name: 'Ethereum · experimental', chainId: 1 });
+    if (state.config.arbitrumEvm && !choices.some(chain => Number(chain.chainId) === 42161)) choices.push({ name: 'Arbitrum One · provider', chainId: 42161 });
     $('chain').replaceChildren(...choices.map((chain) => { const option = node('option', '', `${chain.name} · ${chain.chainId}`); option.value = chain.chainId; return option; }));
     selectNetwork({ initial: true });
     if (typeof state.config.projectStatus === 'string') $('project-status').textContent = state.config.projectStatus;

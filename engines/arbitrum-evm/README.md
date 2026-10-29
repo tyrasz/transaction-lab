@@ -1,0 +1,15 @@
+# Bounded Arbitrum provider preview
+
+`index.js` exports `validateArbitrumCall`, `ArbitrumInputError`, `ARBITRUM_CAPABILITIES` and `simulateArbitrumCall(input, { fetchImpl, signal })`. It accepts one unsigned Arbitrum One call with a non-null destination, decimal value/gas, calldata and latest or a hexadecimal block number. The default original gas limit is 2,000,000; the maximum is 5,000,000. Unsupported context fields are rejected before I/O.
+
+The exact viem 2.57.13 package, lock and installed dependencies were copied offline from the retained research installation. The copied package retains its original research name to preserve those bytes. `pinned-library.json` records entry identities; `dependency-inventory.json` records the complete copied tree. No production dependency was fetched or upgraded during integration.
+
+The fixed public endpoint is Arbitrum's `https://arb1.arbitrum.io/rpc`. The transport permits only the declared selection, sender observation, pinned viem discovery/measurement and final-header calls. There are no caller state overrides, sender replacements, funding/approval changes, retry or fallback endpoints. Only the library's exact scratch helper code may be installed for its own probes. The complete sender code is observed and left intact.
+
+Both original simulations must agree on status, return/error data, gas and ordered semantic logs. Each simulated block must have the expected number, parent hash and call count. Full selected-header equality is required after work stops. This is consistency checking of provider statements, not consensus, proof, signed-admission or Nitro verification.
+
+Every discovered balance candidate remains visible. A measured row requires successful exact 32-byte responses before and after execution with the same owner/query/token identities. Failed/missing/empty responses are unverified, including viem's empty-pre-read zero inference. Token symbols and decimals remain untrusted metadata. `completed` means all discovered balance observations were measurable, never complete economic coverage. A coherent revert remains a reported execution outcome; missing token probes can make the preview partial. Inconsistent passes/header, budget/cancellation or undrained work withhold all projected execution and amounts while preserving raw audit evidence.
+
+The default 120-second shared budget reserves the last 10 seconds and one request for the final header. Requests are bounded at 20 total, 25 seconds each, 128 KiB request, 4 MiB response and 16 MiB aggregate response bodies. Outstanding adapters that ignore cancellation are counted; returned evidence cannot mutate when they later settle. Return values, gas, source logs and balance differences remain provider observations. No real Arbitrum fee, destination settlement/credit, security verdict or full asset inventory is established.
+
+Offline controls: `node --test engines/arbitrum-evm/test/*.test.js`. The retained CCTP revert fixtures are byte-bound saved provider replies. Synthetic success/negative replies test admission and decoding, not EVM accuracy. These tests make no network calls and execute no VM or transaction.

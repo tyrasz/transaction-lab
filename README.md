@@ -1,5 +1,7 @@
 # Transaction Lab
 
+Version 0.27 adds an experimental Arbitrum One provider preview at `POST /api/arbitrum/simulate`, using pinned viem 2.57.13 and the public Arbitrum RPC. It separates source execution, measured sender balances, and a narrowly decoded CCTP/HyperCore deposit intent. Missing or failed probes stay unknown; a requested burn never becomes a measured debit or destination credit. The original zero-balance example remains available alongside an explicitly labeled contract-account example. Calls are unsigned, use zero gas price and synthetic successor blocks, and do not establish transaction admission, contract authorization, actual network fees, complete asset coverage or destination settlement. See [engine scope and limits](engines/arbitrum-evm/README.md).
+
 Version 0.26 adds Ethereum point-evaluation execution at precompile `0x0a` on the pinned Cancun-through-BPO2 forks. It verifies each supplied single-point KZG proof using the pinned mainnet setup and existing cryptographic dependency. Calls do not need transaction blob hashes or a priced profile. Before Cancun the address remains an ordinary account; the legacy HyperEVM development profile still rejects this operation. This verifies executed point-evaluation inputs, not blob sidecars, entire blobs or inclusion. The [preserved upstream vectors](engines/local-evm/test/fixtures/kzg-point-evaluation/provenance.json) and execution regression controls are separate from the [180 unchanged official state fixtures](research/evm-conformance/kzg-controls/NOTES.md). All 180 fixtures have a fork-context mismatch with the public profile, and 174 also exceed its gas limit; they remain unsupported and unexecuted in that corpus. A separate [fixed sixteen-case synthetic Geth comparison](research/delegated-sender-geth-v1/kzg-controls/NOTES.md) matched all sixteen poststate roots and internal log-hash assertions, including invalid proofs and failure/rollback cases. Its offline artifact audit passed thirteen tamper and relocation controls. These bounded comparisons do not establish a population accuracy rate.
 
 Version 0.25 adds an explicit unsigned blob-fee profile to the independent Ethereum engine. It derives exact blob pricing from the selected header and pinned fork schedule, accounts for blob burn separately from execution fees, and exposes the same inputs in the local browser preview. The default unpriced and provider-backed profiles retain their existing behavior. The [fixed twelve-case Geth comparison](research/delegated-sender-geth-v1/blob-controls/NOTES.md) matched all twelve poststate-root/log assertions; this selected synthetic corpus does not establish general accuracy.
@@ -10,16 +12,19 @@ The long-term objective is to outperform commercial simulation/security provider
 
 ## Run
 
-Requires Node.js 22 or later. Starting the HyperEVM service does not require external runtime packages. Ethereum previews use the optional, isolated pinned dependency under `engines/standard-evm`; install it before running the full main test suite or enabling Ethereum previews. The separate local executor has its own dependencies.
+Requires Node.js 22 or later. Starting the HyperEVM service does not require external runtime packages. Ethereum previews use the optional, isolated pinned dependency under `engines/standard-evm`; install it before running the full main test suite or enabling Ethereum previews. The separate local executor and Arbitrum provider adapter have their own locked dependencies. Install the Arbitrum dependencies for its preview and application controls.
 
 ```sh
 npm ci --prefix engines/standard-evm --ignore-scripts --no-audit --no-fund
+npm ci --prefix engines/arbitrum-evm --ignore-scripts --no-audit --no-fund
 npm test
 npm run benchmark
 npm start
 ```
 
 Open http://127.0.0.1:5174/. The existing Dynamic comparison demo remains separate on port 5173.
+
+Choose **Arbitrum** for a single unsigned provider call. Input is `{chainId:42161,from,to,data,value,gas?,block?}`; the default gas limit is 2,000,000, maximum 5,000,000, and block is `latest` or a hexadecimal number. Custom state overrides, fee contexts and deployments are rejected. Each response retains raw viem output and provider exchanges. Successful source execution does not confirm a cross-chain deposit.
 
 Choose **Ethereum** in the Network selector for single-call Aave/Morpho examples or the ordered-call mode with the constructed Aave approve→supply example. Custom inputs remain available. Automatic checks are the default: the call's observed token events and calls supply candidates for up to eight balance or allowance queries. Advanced offers **Use a manual query list**; examples preload their recorded lists, but those lists are sent only when manual mode is enabled. The examples start at explicit historical parent-block hashes. Native ETH balances are shown separately, with outer transaction fees excluded. Token balances and allowances are displayed separately for each queried account; unavailable values are never shown as zero. The preview identifies omitted candidates and incomplete scans. Token names and decimal units are historical reference metadata, not newly verified contract identities.
 

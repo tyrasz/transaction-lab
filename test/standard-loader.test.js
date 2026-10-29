@@ -20,6 +20,7 @@ const files = [
     'permissions', 'query-validation', 'revert', 'rpc', 'server', 'standard-loader',
     'standard-rpc', 'standard-simulation', 'state-diff', 'state', 'validate',
     'local-loader', 'local-simulation', 'proof-rpc',
+    'arbitrum-loader',
   ].map(name => `src/${name}.js`),
   ...['package.json', 'package-lock.json', 'unsigned-call.js', 'position-queries.js', 'provider-state-diff.js', 'discovery.js', 'native-effects.js', 'sequence-state.js'].map(name => `engines/standard-evm/${name}`),
   ...['package.json', 'sha3.js', '_u64.js', 'utils.js'].map(name => `engines/standard-evm/node_modules/@noble/hashes/${name}`),
@@ -70,7 +71,7 @@ test('independent inventory covers static server imports and the optional engine
   // server reproduction; its dependency closure has its own local loader.
   const runtime = files.filter(file => file.endsWith('.js') && file !== 'src/local-simulation.js');
   assert.deepEqual([...visited].sort(), runtime);
-  assert.equal(files.length, 38);
+  assert.equal(files.length, 39);
 });
 
 test('stable startup loads the real adapter once with the complete immutable disk identity', async t => {

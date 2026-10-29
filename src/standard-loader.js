@@ -6,6 +6,7 @@ import { VERSION } from './config.js';
 // evaluated at startup even when their exported HyperEVM functions are unused.
 const files = Object.freeze([
   'package.json', 'src/config.js', 'src/server.js', 'src/validate.js',
+  'src/arbitrum-loader.js',
   'src/account-effects.js', 'src/affected-balances.js', 'src/allowances.js',
   'src/analyze.js', 'src/balances.js', 'src/current-state.js',
   'src/historical-state.js', 'src/lending-balances.js', 'src/lending.js',

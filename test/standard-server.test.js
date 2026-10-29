@@ -39,7 +39,7 @@ async function expectedImplementation() {
     'src/local-loader.js', 'src/local-simulation.js', 'src/proof-rpc.js',
     'engines/evm-context.js',
     'src/rpc.js', 'src/state.js', 'src/state-diff.js', 'src/query-validation.js',
-    'src/account-effects.js', 'src/affected-balances.js', 'src/allowances.js', 'src/analyze.js', 'src/balances.js', 'src/current-state.js',
+    'src/account-effects.js', 'src/affected-balances.js', 'src/allowances.js', 'src/analyze.js', 'src/arbitrum-loader.js', 'src/balances.js', 'src/current-state.js',
     'src/historical-state.js', 'src/lending-balances.js', 'src/lending.js', 'src/permissions.js', 'src/revert.js',
     'engines/standard-evm/package.json', 'engines/standard-evm/package-lock.json', 'engines/standard-evm/unsigned-call.js', 'engines/standard-evm/position-queries.js', 'engines/standard-evm/provider-state-diff.js', 'engines/standard-evm/discovery.js', 'engines/standard-evm/native-effects.js', 'engines/standard-evm/sequence-state.js',
     ...['package.json', 'sha3.js', '_u64.js', 'utils.js'].map(name => 'engines/standard-evm/node_modules/@noble/hashes/' + name),
@@ -60,11 +60,11 @@ test('configuration exposes experimental Ethereum separately and binds its compl
   assert.deepEqual(config.standardEvm.sequenceCapabilities, api.STANDARD_SEQUENCE_CAPABILITIES);
   assert.deepEqual(config.standardEvm.sequenceExamples, api.STANDARD_SEQUENCE_EXAMPLES);
   assert.deepEqual(config.examples, EXAMPLES);
-  assert.deepEqual(config.chains, [{ chainId: 999, name: 'HyperEVM' }, { chainId: 1, name: 'Ethereum', experimental: true }]);
+  assert.deepEqual(config.chains, [{ chainId: 999, name: 'HyperEVM' }, { chainId: 1, name: 'Ethereum', experimental: true }, { chainId: 42161, name: 'Arbitrum', experimental: true }]);
   assert.deepEqual(api.implementation, await expectedImplementation());
   assert.equal(await loadStandardApi(), api, 'The loaded implementation identity is stable for this process.');
   assert.ok(api.implementation.sourceFiles.includes('src/standard-rpc.js'));
-  assert.equal(api.implementation.sourceFiles.length, 38);
+  assert.equal(api.implementation.sourceFiles.length, 39);
   assert.ok(api.implementation.sourceFiles.includes('src/analyze.js'), 'Transitive server imports belong to the standard API identity.');
   assert.ok(api.implementation.sourceFiles.includes('src/historical-state.js'));
   assert.ok(api.implementation.sourceFiles.includes('engines/standard-evm/unsigned-call.js'));
