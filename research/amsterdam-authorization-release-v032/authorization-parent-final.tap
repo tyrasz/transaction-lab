@@ -1,0 +1,64 @@
+TAP version 13
+# Subtest: Amsterdam parent binds successful ordered decisions, preparation costs, nonce and code
+ok 1 - Amsterdam parent binds successful ordered decisions, preparation costs, nonce and code
+  ---
+  duration_ms: 991.989667
+  type: 'test'
+  ...
+# Subtest: authorization preparation OOG cannot acquire an invented entered frame, dropped phase or retained write
+ok 2 - authorization preparation OOG cannot acquire an invented entered frame, dropped phase or retained write
+  ---
+  duration_ms: 865.430584
+  type: 'test'
+  ...
+# Subtest: recipient preparation OOG binds the separate authorization and entered-root gas debits
+ok 3 - recipient preparation OOG binds the separate authorization and entered-root gas debits
+  ---
+  duration_ms: 837.2465
+  type: 'test'
+  ...
+# Subtest: entered message REVERT retains authorization state and its nonrefundable state-gas charge
+ok 4 - entered message REVERT retains authorization state and its nonrefundable state-gas charge
+  ---
+  duration_ms: 609.702084
+  type: 'test'
+  ...
+# Subtest: self-authorization creator chronology cannot absorb an extra prepared or committed sender nonce
+ok 5 - self-authorization creator chronology cannot absorb an extra prepared or committed sender nonce
+  ---
+  duration_ms: 609.880417
+  type: 'test'
+  ...
+# Subtest: absent sender self-authorization retains its materialization basis only after preparation completes
+ok 6 - absent sender self-authorization retains its materialization basis only after preparation completes
+  ---
+  duration_ms: 699.681125
+  type: 'test'
+  ...
+# Subtest: prepared self-authorization supplies code and nonce once for CREATE2 followed by collision
+ok 7 - prepared self-authorization supplies code and nonce once for CREATE2 followed by collision
+  ---
+  duration_ms: 29.614125
+  type: 'test'
+  ...
+# Subtest: prepared chronology rejects altered nonce/code snapshots and fee-bearing overlays
+ok 8 - prepared chronology rejects altered nonce/code snapshots and fee-bearing overlays
+  ---
+  duration_ms: 0.420625
+  type: 'test'
+  ...
+# Subtest: prepared chronology debits fees once before creator affordability checks
+ok 9 - prepared chronology debits fees once before creator affordability checks
+  ---
+  duration_ms: 12.193
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4895.912042

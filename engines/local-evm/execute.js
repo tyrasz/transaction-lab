@@ -17,6 +17,7 @@ import { createGuardedBls } from './bls-runtime.js';
 import { P256_ADDRESS, createP256Precompile } from './p256-runtime.js';
 import { ethereumStateGasBudget, settleEthereumStateGas } from './ethereum-state-gas.js';
 import { createCreationAttemptObserver } from './creation-attempt-observer.js';
+import { applyAmsterdamAuthorizations, amsterdamPreparationHalt } from './amsterdam-authorization.js';
 
 export const EXECUTION_LIMITS = Object.freeze({ gas: 5000000, steps: 1000000, frames: 1000, depth: 32, logs: 2000, memoryBytes: 1048576, returnBytes: 1048576, calldataBytes: 32768, traceBytes: 8388608, wallMs: 10000 });
 export const ETHEREUM_EXECUTION_LIMITS = Object.freeze({ ...EXECUTION_LIMITS, wallMs: 120000 });
@@ -117,7 +118,6 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     const canFinalizeShanghai = ethereumProfile && typeof stateManager.finalizeShanghaiContractDeletion === 'function';
     const canCleanupEmpty = ethereumProfile && typeof stateManager.beginEmptyAccountCleanup === 'function' && typeof stateManager.endEmptyAccountCleanup === 'function';
     const amsterdam = common.isActivatedEIP(8037);
-    if (amsterdam && authorizationList !== undefined) reject('LOCAL_AUTHORIZATION_UNSUPPORTED', 'Amsterdam authorization preparation and parent validation are not yet integrated.', 'unsupported');
     if (amsterdam && (quantity(block.slotNumber) === null || quantity(block.slotNumber) >= 1n << 64n)) reject('LOCAL_INVALID_INPUT', 'Amsterdam execution requires an explicit uint64 slot number.', 'invalid');
     if (feeContext.executionProfile || amsterdam) {
       if (feeContext.executionProfile && !canCleanupEmpty) reject('LOCAL_STATE_UNSUPPORTED', 'Fee settlement requires transaction-end empty-account cleanup.', 'unsupported');
@@ -331,45 +331,92 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       const sender = createAddressFromString(from), account = await guarded.getAccount(sender) ?? new Account();
       account.balance -= feePlan.totalUpfrontDebit ?? feePlan.upfrontGasDebit; await evm.journal.putAccount(sender, account);
     }
+    if (stateGasBudget) {
+      evm.stateGasReservoir = stateGasBudget.stateGasReservoirInitial; evm.executionStateGasUsed = 0n;
+      evm.eip7928CallPostTargetOog = false; evm.eip2780PrepOog = false;
+    }
+    let authorizationAttempt = null, messageGasLimit = gasLimit, preparationOpen = false;
     if (authorizationList !== undefined) {
       const sender = createAddressFromString(from), account = await guarded.getAccount(sender) ?? new Account();
       account.nonce++; await evm.journal.putAccount(sender, account);
-      const entries = []; let gasRefund = 0n;
-      for (let index = 0; index < authorizationList.length; index++) {
-        clockCheck(); const tuple = authorizationList[index], recovered = recoverAuthorization(tuple, common.chainId());
-        let reason = recovered.reason;
-        if (reason === null) {
-          const authority = createAddressFromString(recovered.authority);
-          // Warming survives a later nonce/code rejection, and message revert.
-          evm.journal.addAlwaysWarmAddress(recovered.authority);
-          const prior = await guarded.getAccount(authority), code = bytesToHex(await guarded.getCode(authority));
-          const decision = authorizationStateDecision(tuple, { exists: prior !== undefined, nonce: prior?.nonce ?? 0n, code });
-          reason = decision.reason;
-          if (reason === null) {
-            await guarded.applyAuthorization(authority, BigInt(tuple.nonce), tuple.address);
-            gasRefund += decision.gasRefund;
-            if (recovered.authority === from) authorizationSenderIncrements++;
-          }
+      if (amsterdam) {
+        const bal = evm.blockLevelAccessList;
+        bal.addNonceChange(from, account.nonce, bal.blockAccessIndex);
+        // Only the authorization and recipient-preparation region is reverted
+        // on preparation OOG. The outer nonce and fee debit survive it.
+        await evm.journal.checkpoint(); bal.checkpoint(); preparationOpen = true;
+        authorizationAttempt = await applyAmsterdamAuthorizations({ request: { ...request, from, to, value: value.toString() },
+          common, stateManager: guarded, gasLimit, stateGasReservoir: evm.stateGasReservoir, check: clockCheck });
+        for (const access of authorizationAttempt.accesses) {
+          evm.journal.addAlwaysWarmAddress(access.authority); bal.addAddress(access.authority);
         }
-        entries.push({ index, authority: recovered.authority, status: reason === null ? 'applied' : 'skipped', reason }); retain(256);
+        for (const write of authorizationAttempt.writes) {
+          bal.addNonceChange(write.authority, write.nonceAfter, bal.blockAccessIndex);
+          bal.addCodeChange(write.authority, hexToBytes(write.codeAfter), bal.blockAccessIndex, hexToBytes(write.codeBefore));
+        }
+        retain(256 * authorizationAttempt.entries.length);
+        messageGasLimit = authorizationAttempt.gasLimit;
+        evm.stateGasReservoir = authorizationAttempt.stateGasReservoir;
+        evm.executionStateGasUsed = authorizationAttempt.executionStateGasUsed;
+        authorizationSenderIncrements = Number(authorizationAttempt.senderAuthorizationIncrements);
+      } else {
+        const entries = []; let gasRefund = 0n;
+        for (let index = 0; index < authorizationList.length; index++) {
+          clockCheck(); const tuple = authorizationList[index], recovered = recoverAuthorization(tuple, common.chainId());
+          let reason = recovered.reason;
+          if (reason === null) {
+            const authority = createAddressFromString(recovered.authority);
+            // Warming survives a later nonce/code rejection, and message revert.
+            evm.journal.addAlwaysWarmAddress(recovered.authority);
+            const prior = await guarded.getAccount(authority), code = bytesToHex(await guarded.getCode(authority));
+            const decision = authorizationStateDecision(tuple, { exists: prior !== undefined, nonce: prior?.nonce ?? 0n, code });
+            reason = decision.reason;
+            if (reason === null) {
+              await guarded.applyAuthorization(authority, BigInt(tuple.nonce), tuple.address);
+              gasRefund += decision.gasRefund;
+              if (recovered.authority === from) authorizationSenderIncrements++;
+            }
+          }
+          entries.push({ index, authority: recovered.authority, status: reason === null ? 'applied' : 'skipped', reason }); retain(256);
+        }
+        authorizationProcessing = { entries, gasRefundCounter: gasRefund.toString() };
       }
-      authorizationProcessing = { entries, gasRefundCounter: gasRefund.toString() };
-      const effective = existingDelegationTarget(bytesToHex(await guarded.getCode(sender)), common);
+    }
+    // An authorization halt never enters a message. Keep trace null instead
+    // of manufacturing a call solely to obtain an EVM failure result.
+    const result = authorizationAttempt?.outOfGas ? { execResult: { executionGasUsed: 0n,
+      returnValue: new Uint8Array(), exceptionError: new EVMError(EVMError.errorMessages.OUT_OF_GAS) } }
+      : await evm.runCall({ caller: createAddressFromString(from), origin: createAddressFromString(from), ...(to ? { to: createAddressFromString(to) } : {}), data: hexToBytes(request.data), value, gasLimit: messageGasLimit, gasPrice: feePlan?.effectiveGasPrice ?? 0n, ...(authorizationList !== undefined ? { skipNonceIncrement: true } : {}), ...(context.blobVersionedHashes ? { blobVersionedHashes: [...context.blobVersionedHashes] } : {}), block: { header: { ...(amsterdam ? { slotNumber: quantity(block.slotNumber) } : {}), number: quantity(block.number), timestamp: quantity(block.timestamp), gasLimit: quantity(block.gasLimit), baseFeePerGas: quantity(block.baseFeePerGas), difficulty: 0n, prevRandao: hexToBytes(block.mixHash), coinbase: createAddressFromString(address(block.miner)), getBlobGasPrice() { if (feePlan?.blobContext) return feePlan.blobContext.blobBaseFeePerGas; if (context.blobVersionedHashes) return 0n; reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is unsupported.', 'unsupported'); } } } });
+    if (preparationOpen) {
+      const halt = authorizationAttempt.outOfGas ? 'authorization' : evm.eip2780PrepOog === true ? 'recipient' : null;
+      let counters = authorizationAttempt;
+      if (halt) {
+        await evm.journal.revert(); evm.blockLevelAccessList.revert();
+        counters = amsterdamPreparationHalt({ gasLimit, stateGasReservoir: stateGasBudget.stateGasReservoirInitial }, halt);
+        // Recipient preparation has an actual entered root whose remaining
+        // gas is burned. Count that debit once, in the message dimension.
+        if (halt === 'recipient') counters = { ...counters, authorizationGasUsed: authorizationAttempt.authorizationGasUsed };
+        evm.stateGasReservoir = counters.stateGasReservoir; evm.executionStateGasUsed = 0n;
+        authorizationSenderIncrements = 0;
+      } else { await evm.journal.commit(); evm.blockLevelAccessList.commit(); }
+      preparationOpen = false;
+      authorizationProcessing = { entries: authorizationAttempt.entries, gasRefundCounter: '0', preparation: {
+        phase: halt ? halt + '_out_of_gas' : 'message', retained: halt === null, failedIndex: authorizationAttempt.failedIndex,
+        ...Object.fromEntries(['authorizationGasUsed', 'stateGasReservoir', 'executionStateGasUsed', 'stateGasSpilled', 'senderAuthorizationIncrements'].map(key => [key, counters[key].toString()])),
+      } };
+    }
+    if (authorizationList !== undefined) {
+      const effective = existingDelegationTarget(bytesToHex(await guarded.getCode(createAddressFromString(from))), common);
       delete semantics.senderDelegation;
       if (effective !== null) semantics.senderDelegation = { address: effective, authorizationListProcessed: true };
       semantics.callerNonce = 'outer_increment_authorizations_and_committed_sender_creation_attempts';
       semantics.warmAddresses += '_and_recovered_authorities';
     }
-    if (stateGasBudget) {
-      evm.stateGasReservoir = stateGasBudget.stateGasReservoirInitial; evm.executionStateGasUsed = 0n;
-      evm.eip7928CallPostTargetOog = false; evm.eip2780PrepOog = false;
-    }
-    const result = await evm.runCall({ caller: createAddressFromString(from), origin: createAddressFromString(from), ...(to ? { to: createAddressFromString(to) } : {}), data: hexToBytes(request.data), value, gasLimit, gasPrice: feePlan?.effectiveGasPrice ?? 0n, ...(authorizationList !== undefined ? { skipNonceIncrement: true } : {}), ...(context.blobVersionedHashes ? { blobVersionedHashes: [...context.blobVersionedHashes] } : {}), block: { header: { ...(amsterdam ? { slotNumber: quantity(block.slotNumber) } : {}), number: quantity(block.number), timestamp: quantity(block.timestamp), gasLimit: quantity(block.gasLimit), baseFeePerGas: quantity(block.baseFeePerGas), difficulty: 0n, prevRandao: hexToBytes(block.mixHash), coinbase: createAddressFromString(address(block.miner)), getBlobGasPrice() { if (feePlan?.blobContext) return feePlan.blobContext.blobBaseFeePerGas; if (context.blobVersionedHashes) return 0n; reject('LOCAL_BLOB_UNSUPPORTED', 'Blob transaction context is unsupported.', 'unsupported'); } } } });
     clockCheck();
     if (stack.length || checkpointDepth !== 1) reject('LOCAL_TRACE_INVALID', 'Local call-tree or checkpoint completion is inconsistent.');
     creationObserver?.finish();
     if (stateGasBudget) {
-      const counters = { messageGasUsed: result.execResult.executionGasUsed, authorizationGasUsed: 0n,
+      const counters = { messageGasUsed: result.execResult.executionGasUsed, authorizationGasUsed: BigInt(authorizationProcessing?.preparation?.authorizationGasUsed ?? '0'),
         stateGasReservoir: evm.stateGasReservoir, executionStateGasUsed: evm.executionStateGasUsed,
         messageRefundCounter: result.execResult.gasRefund ?? 0n, authorizationRefundCounter: 0n,
         postTargetOutOfGas: result.execResult.exceptionError?.error === 'out of gas' && evm.eip7928CallPostTargetOog === true };
@@ -428,7 +475,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     const logs = (result.execResult.logs ?? []).map(([emitter, topics, data]) => ({ address: bytesToHex(emitter), topics: topics.map(bytesToHex), data: bytesToHex(data) }));
     bound('logs', logs.length); bound('returnBytes', result.execResult.returnValue.length);
     usage.retainedTraceBytes = Buffer.byteLength(JSON.stringify({ trace: root, logs, ...(lifecycle ? { lifecycle } : {}), ...(authorizationProcessing ? { authorizationProcessing } : {}), ...(feeAccounting ? { feeAccounting } : {}), ...(stateGasAccounting ? { stateGasAccounting } : {}) }), 'utf8'); bound('traceBytes', usage.retainedTraceBytes);
-    const error = root.error, status = !error ? 'success' : error === 'revert' ? 'reverted' : 'failed';
+    const error = root?.error ?? result.execResult.exceptionError?.error ?? null, status = !error ? 'success' : error === 'revert' ? 'reverted' : 'failed';
     const report = { execution: { status, executionGasUsed: result.execResult.executionGasUsed.toString(), gasRefundCounter: (result.execResult.gasRefund ?? 0n).toString(), ...(stateGasAccounting ? { executionStateGasUsed: evm.executionStateGasUsed.toString() } : {}), returnData: bytesToHex(result.execResult.returnValue), error }, trace: root, logs, environment, semantics, limits, usage, ...(lifecycle ? { lifecycle } : {}), ...(authorizationProcessing ? { authorizationProcessing } : {}), ...(feeAccounting ? { feeAccounting } : {}), ...(stateGasAccounting ? { stateGasAccounting } : {}), stateDisposition: 'message_result_retained_in_supplied_manager' };
     // Transient writes in reverted subtrees are gone now. Any remaining whole
     // namespace reset must be representable before the invocation is retained,

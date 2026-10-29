@@ -34,7 +34,7 @@ const clone=map=>new Map([...map].map(([key,value])=>[key,{...value}]));
 
 export function validateCreationAttempts({output,inputs,startingChanges,rootNoncePrepared=false,fees=null,common}) {
   need(common?.isActivatedEIP(7928)===true&&[1n,11155111n].includes(common.chainId()));
-  need(rootNoncePrepared===false); // Amsterdam authorization preparation remains closed.
+  need(typeof rootNoncePrepared==='boolean');
   const root=read(output,'trace'), sender=address(read(root,'from'));
   const prior=new Map(startingChanges?canonicalStateChanges(startingChanges).accounts.map(row=>[row.address,row]):[]);
   const proofs=new Map((inputs.provenance??[]).map(row=>[row.account,row.accountProof]));
@@ -143,7 +143,18 @@ export function validateCreationAttempts({output,inputs,startingChanges,rootNonc
       }
     }else{state=saved;counts=savedCounts;}
   }
-  const caller=account(sender);need(caller.nonce<UINT64);caller.nonce++;caller.exists=true;
+  const caller=account(sender);
+  if(rootNoncePrepared){
+    // Only the enclosing parent's independently reconstructed authorization
+    // preparation may select this path. Its overlay contains nonce/code
+    // preparation, never fee debits or message writes. Fees remain applied
+    // exactly once below, and the prepared outer nonce must not advance again.
+    const row=prior.get(sender),initial=inputs.accounts[sender];
+    const initialNonce=initial.exists?BigInt(initial.nonce):0n;
+    need(row?.nonce&&initialNonce<UINT64&&BigInt(row.nonce.before)===initialNonce&&
+      caller.exists&&caller.nonce>initialNonce&&BigInt(row.nonce.after)===caller.nonce);
+    need([...prior.values()].every(item=>item.balance===undefined&&item.storage===undefined&&item.reset===undefined));
+  }else{need(caller.nonce<UINT64);caller.nonce++;caller.exists=true;}
   if(fees){const debit=fees.plan.totalUpfrontDebit??fees.plan.upfrontGasDebit;need(caller.balance>=debit);caller.balance-=debit;}
   walk(root);
   return counts;

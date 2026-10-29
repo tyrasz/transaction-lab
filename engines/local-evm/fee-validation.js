@@ -15,7 +15,7 @@ export function deriveVerifiedFees({ request, header, inputs, output, chainId = 
   need(fact && typeof fact.exists === 'boolean');
   const balance = fact.exists ? BigInt(fact.balance) : 0n;
   need(balance >= plan.maximumRequiredBalance);
-  const gas = deriveVerifiedGas({ request, header, output, chainId });
+  const gas = deriveVerifiedGas({ request, header, inputs, output, chainId });
   const accounting = settleEthereumFees(plan, { gasUsed: gas.gasUsed });
   need(isDeepStrictEqual(output.feeAccounting, accounting));
   need(inputs.accounts[plan.coinbase] && typeof inputs.accounts[plan.coinbase].exists === 'boolean');

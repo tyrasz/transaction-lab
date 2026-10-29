@@ -3,6 +3,7 @@
 import { isDeepStrictEqual, types } from 'node:util';
 import { ethereumCallGas, ethereumCommon, ethereumQuantity, ethereumUsedGas } from './ethereum-profile.js';
 import { ethereumStateGasBudget, settleEthereumStateGas } from './ethereum-state-gas.js';
+import { deriveAuthorizationPreparation } from './authorization-validation.js';
 
 const BUDGET = ['gasLimit', 'intrinsicRegular', 'floor', 'intrinsicState', 'regularGasLimit', 'messageGasLimit', 'stateGasReservoirInitial'];
 const COUNTERS = ['messageGasUsed', 'authorizationGasUsed', 'stateGasReservoir', 'executionStateGasUsed', 'messageRefundCounter', 'authorizationRefundCounter', 'postTargetOutOfGas'];
@@ -35,7 +36,7 @@ function quantities(value, keys, signed = [], boolean = []) {
 
 /** Bind fork-selected gas accounting to the admitted total gas and retained
  * execution fields. Old forks retain their existing scalar output shape. */
-export function deriveVerifiedGas({ request, header, output, chainId = 1 }) {
+export function deriveVerifiedGas({ request, header, inputs, output, chainId = 1 }) {
   const common = ethereumCommon(header, chainId), amsterdam = common.isActivatedEIP(8037);
   const complete = ['success', 'reverted', 'failed'].includes(output?.execution?.status);
   if (!complete) {
@@ -53,9 +54,8 @@ export function deriveVerifiedGas({ request, header, output, chainId = 1 }) {
     need(isDeepStrictEqual(output.gasAccounting, strings(settled)));
     return settled;
   }
-  // Authorization preparation is deliberately closed on Amsterdam until its
-  // state-gas and effective sender preparation are separately integrated.
-  need(request.authorizationList === undefined && output.authorizationProcessing === undefined);
+  const authorization = deriveAuthorizationPreparation({ request, header, inputs, common });
+  need(isDeepStrictEqual(output.authorizationProcessing, authorization?.processing));
   const accounting = record(output.stateGasAccounting, ['budget', 'counters', 'settled']);
   const budget = quantities(accounting.budget, BUDGET);
   const expectedBudget = ethereumStateGasBudget({ gasLimit, intrinsicRegular: costs.intrinsic, floor: costs.floor }, common);
@@ -64,7 +64,17 @@ export function deriveVerifiedGas({ request, header, output, chainId = 1 }) {
   need(counters.messageGasUsed === decimal(output.execution.executionGasUsed));
   need(counters.executionStateGasUsed === decimal(output.execution.executionStateGasUsed, true));
   need(counters.messageRefundCounter === decimal(output.execution.gasRefundCounter));
-  need(counters.authorizationGasUsed === 0n && counters.authorizationRefundCounter === 0n);
+  const preparation = authorization?.processing.preparation;
+  need(counters.authorizationGasUsed === BigInt(preparation?.authorizationGasUsed ?? '0') && counters.authorizationRefundCounter === 0n);
+  if (preparation && preparation.phase !== 'message') {
+    need(output.execution.status === 'failed' && output.execution.error === 'out of gas' && output.execution.returnData === '0x');
+    need(counters.messageRefundCounter === 0n && counters.executionStateGasUsed === 0n && counters.stateGasReservoir === expectedBudget.stateGasReservoirInitial && !counters.postTargetOutOfGas);
+    need(counters.messageGasUsed === (preparation.phase === 'authorization_out_of_gas' ? 0n : expectedBudget.messageGasLimit - counters.authorizationGasUsed));
+    need(Array.isArray(output.logs) && output.logs.length === 0);
+  } else if (preparation && output.execution.status !== 'success') {
+    // An entered-message failure restores its post-authorization snapshot.
+    need(counters.executionStateGasUsed === BigInt(preparation.executionStateGasUsed) && counters.stateGasReservoir === BigInt(preparation.stateGasReservoir));
+  }
   if (counters.postTargetOutOfGas) need(output.execution.status === 'failed' && output.execution.error === 'out of gas');
   const settled = settleEthereumStateGas(expectedBudget, counters);
   need(isDeepStrictEqual(quantities(accounting.settled, SETTLED, ['reservoirDelta', 'stateGasUsedRaw']), settled));

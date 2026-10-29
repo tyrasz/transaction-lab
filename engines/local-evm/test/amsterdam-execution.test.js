@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { executeEthereumCall } from '../ethereum-call.js';
 import { ethereumStateGasBudget, settleEthereumStateGas } from '../ethereum-state-gas.js';
-import { amsterdamExecutionFixture as fixture, compareAmsterdamFullVM, TX_SENDER, TARGET, account, code, slot, word, signAuthorization } from './amsterdam-execution-fixture.js';
+import { amsterdamExecutionFixture as fixture, compareAmsterdamFullVM, TX_SENDER, TARGET, account, code, slot, word } from './amsterdam-execution-fixture.js';
 import { factoryCode, initcode, createdAddress } from './lifecycle-fixture.js';
 import { callCode } from './state-gas-fixture.js';
 const run = f => executeEthereumCall({ request: f.request, header: f.header, chainId: f.chainId, stateManager: f.stateManager, blockchain: f.inputs.blockchain });
@@ -105,14 +105,11 @@ test('created self-beneficiary clearing preserves endowment and residual prefund
   }
 });
 
-test('unknown slot or unsupported Amsterdam preparation does not retain execution state', async () => {
+test('unknown or out-of-range Amsterdam slot does not retain execution state', async () => {
   for (const patch of [{ slotNumber: undefined }, { slotNumber: '-1' }, { slotNumber: (1n << 64n).toString() }]) {
     const f = await fixture(); Object.assign(f.header, patch);
     const output = await run(f); assert.equal(output.execution.status, 'invalid'); assert.equal(f.calls.length, 0);
   }
-  const f = await fixture({ authorizationList: [signAuthorization({ chainId: 11155111n })] });
-  const output = await run(f); assert.equal(output.execution.status, 'unsupported');
-  assert.equal(output.execution.error.code, 'LOCAL_AUTHORIZATION_UNSUPPORTED'); assert.deepEqual(f.stateManager.snapshotChanges().accounts, []);
 });
 
 test('raw restored reservoir settles to retained independent Geth outcome and force-drained counters fail', async () => {

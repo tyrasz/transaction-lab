@@ -1,0 +1,338 @@
+[
+  {
+    "name": "absent_sender_selfauth_stop",
+    "execution": {
+      "status": "success",
+      "executionGasUsed": "3000",
+      "gasRefundCounter": "0",
+      "executionStateGasUsed": "35190",
+      "returnData": "0x",
+      "error": null
+    },
+    "phase": {
+      "phase": "message",
+      "retained": true,
+      "failedIndex": null,
+      "authorizationGasUsed": "35190",
+      "stateGasReservoir": "0",
+      "executionStateGasUsed": "35190",
+      "stateGasSpilled": "35190",
+      "senderAuthorizationIncrements": "1"
+    },
+    "changes": {
+      "scope": "Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.",
+      "accounts": [
+        {
+          "address": "0x5050a4f4b3f9338c3472dcc01a87c76a144b3c9c",
+          "existence": {
+            "before": false,
+            "after": true,
+            "basis": "eip7702_authorization_materialization"
+          },
+          "nonce": {
+            "before": "0x0",
+            "after": "0x2"
+          },
+          "code": {
+            "before": "0x",
+            "after": "0xef01006666666666666666666666666666666666666666"
+          }
+        }
+      ]
+    },
+    "isolated": {
+      "status": "unavailable",
+      "error": {
+        "code": "LOCAL_ISOLATED_PROTOCOL",
+        "message": "The isolated worker protocol was invalid."
+      },
+      "changes": null
+    }
+  },
+  {
+    "name": "absent_sender_selfauth_revert",
+    "execution": {
+      "status": "reverted",
+      "executionGasUsed": "3006",
+      "gasRefundCounter": "0",
+      "executionStateGasUsed": "35190",
+      "returnData": "0x",
+      "error": "revert"
+    },
+    "phase": {
+      "phase": "message",
+      "retained": true,
+      "failedIndex": null,
+      "authorizationGasUsed": "35190",
+      "stateGasReservoir": "0",
+      "executionStateGasUsed": "35190",
+      "stateGasSpilled": "35190",
+      "senderAuthorizationIncrements": "1"
+    },
+    "changes": {
+      "scope": "Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.",
+      "accounts": [
+        {
+          "address": "0x5050a4f4b3f9338c3472dcc01a87c76a144b3c9c",
+          "existence": {
+            "before": false,
+            "after": true,
+            "basis": "eip7702_authorization_materialization"
+          },
+          "nonce": {
+            "before": "0x0",
+            "after": "0x2"
+          },
+          "code": {
+            "before": "0x",
+            "after": "0xef01006666666666666666666666666666666666666666"
+          }
+        }
+      ]
+    },
+    "isolated": {
+      "status": "unavailable",
+      "error": {
+        "code": "LOCAL_ISOLATED_PROTOCOL",
+        "message": "The isolated worker protocol was invalid."
+      },
+      "changes": null
+    }
+  },
+  {
+    "name": "value_recipient_preparation_oog",
+    "execution": {
+      "status": "failed",
+      "executionGasUsed": "183599",
+      "gasRefundCounter": "0",
+      "executionStateGasUsed": "0",
+      "returnData": "0x",
+      "error": "out of gas"
+    },
+    "phase": {
+      "phase": "recipient_out_of_gas",
+      "retained": false,
+      "failedIndex": null,
+      "authorizationGasUsed": "44190",
+      "stateGasReservoir": "0",
+      "executionStateGasUsed": "0",
+      "stateGasSpilled": "0",
+      "senderAuthorizationIncrements": "0"
+    },
+    "changes": {
+      "scope": "Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.",
+      "accounts": [
+        {
+          "address": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+          "nonce": {
+            "before": "0x1",
+            "after": "0x2"
+          },
+          "balance": {
+            "before": "0xe8d4a51000",
+            "after": "0xe8d47de85e"
+          }
+        },
+        {
+          "address": "0x9999999999999999999999999999999999999999",
+          "existence": {
+            "before": false,
+            "after": true,
+            "basis": "positive_native_funding_of_proof_absent_account"
+          },
+          "balance": {
+            "before": "0x0",
+            "after": "0xbbf17"
+          }
+        }
+      ]
+    },
+    "isolated": {
+      "status": "completed",
+      "error": null,
+      "execution": {
+        "status": "failed",
+        "executionGasUsed": "183599",
+        "gasRefundCounter": "0",
+        "executionStateGasUsed": "0",
+        "returnData": "0x",
+        "error": "out of gas"
+      },
+      "changes": {
+        "scope": "Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.",
+        "accounts": [
+          {
+            "address": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+            "nonce": {
+              "before": "0x1",
+              "after": "0x2"
+            },
+            "balance": {
+              "before": "0xe8d4a51000",
+              "after": "0xe8d47de85e"
+            }
+          },
+          {
+            "address": "0x9999999999999999999999999999999999999999",
+            "existence": {
+              "before": false,
+              "after": true,
+              "basis": "positive_native_funding_of_proof_absent_account"
+            },
+            "balance": {
+              "before": "0x0",
+              "after": "0xbbf17"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "no_frame_zero_tip_hidden_coinbase",
+    "execution": {
+      "status": "failed",
+      "executionGasUsed": "0",
+      "gasRefundCounter": "0",
+      "executionStateGasUsed": "0",
+      "returnData": "0x",
+      "error": "out of gas"
+    },
+    "phase": {
+      "phase": "authorization_out_of_gas",
+      "retained": false,
+      "failedIndex": 0,
+      "authorizationGasUsed": "44189",
+      "stateGasReservoir": "0",
+      "executionStateGasUsed": "0",
+      "stateGasSpilled": "0",
+      "senderAuthorizationIncrements": "0"
+    },
+    "changes": {
+      "scope": "Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.",
+      "accounts": [
+        {
+          "address": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+          "nonce": {
+            "before": "0x1",
+            "after": "0x2"
+          },
+          "balance": {
+            "before": "0xe8d4a51000",
+            "after": "0xe8d49de7d5"
+          }
+        },
+        {
+          "address": "0x9999999999999999999999999999999999999999",
+          "existence": {
+            "before": true,
+            "after": false,
+            "basis": "eip161_empty_account_cleanup"
+          }
+        }
+      ]
+    },
+    "isolated": {
+      "status": "completed",
+      "error": null,
+      "execution": {
+        "status": "failed",
+        "executionGasUsed": "0",
+        "gasRefundCounter": "0",
+        "executionStateGasUsed": "0",
+        "returnData": "0x",
+        "error": "out of gas"
+      },
+      "changes": {
+        "scope": "Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.",
+        "accounts": [
+          {
+            "address": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+            "nonce": {
+              "before": "0x1",
+              "after": "0x2"
+            },
+            "balance": {
+              "before": "0xe8d4a51000",
+              "after": "0xe8d49de7d5"
+            }
+          },
+          {
+            "address": "0x9999999999999999999999999999999999999999",
+            "existence": {
+              "before": true,
+              "after": false,
+              "basis": "eip161_empty_account_cleanup"
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "malformed_designation_22",
+    "execution": {
+      "status": "unavailable",
+      "error": {
+        "code": "LOCAL_EXECUTION_FAILED",
+        "message": "Local execution could not complete; arbitrary host error details are omitted."
+      },
+      "executionGasUsed": null,
+      "returnData": null
+    },
+    "changes": {
+      "scope": "Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.",
+      "accounts": []
+    },
+    "isolated": {
+      "status": "completed",
+      "error": null,
+      "execution": {
+        "status": "unavailable",
+        "error": {
+          "code": "LOCAL_EXECUTION_FAILED",
+          "message": "Local execution could not complete; arbitrary host error details are omitted."
+        },
+        "executionGasUsed": null,
+        "returnData": null
+      },
+      "changes": {
+        "scope": "Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.",
+        "accounts": []
+      }
+    }
+  },
+  {
+    "name": "malformed_designation_24",
+    "execution": {
+      "status": "unavailable",
+      "error": {
+        "code": "LOCAL_EXECUTION_FAILED",
+        "message": "Local execution could not complete; arbitrary host error details are omitted."
+      },
+      "executionGasUsed": null,
+      "returnData": null
+    },
+    "changes": {
+      "scope": "Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.",
+      "accounts": []
+    },
+    "isolated": {
+      "status": "completed",
+      "error": null,
+      "execution": {
+        "status": "unavailable",
+        "error": {
+          "code": "LOCAL_EXECUTION_FAILED",
+          "message": "Local execution could not complete; arbitrary host error details are omitted."
+        },
+        "executionGasUsed": null,
+        "returnData": null
+      },
+      "changes": {
+        "scope": "Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.",
+        "accounts": []
+      }
+    }
+  }
+]

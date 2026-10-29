@@ -158,14 +158,13 @@ async function executeIsolated(options, previewMode) {
     const initial = inputs?.accounts?.[call.from.toLowerCase()];
     const prior = startingChanges?.accounts?.find(row => row.address === call.from.toLowerCase());
     let code = prior?.existence?.after === false ? '0x' : prior?.code?.after ?? (initial?.exists === true ? initial.code : initial?.exists === false ? '0x' : null);
-    const preparation = complete ? deriveAuthorizationPreparation({ request: call, inputs, common }) : null;
+    const preparation = complete ? deriveAuthorizationPreparation({ request: call, header, inputs, common }) : null;
     if (preparation) {
       need(isDeepStrictEqual(output.authorizationProcessing, preparation.processing));
       code = preparation.accounts.get(call.from.toLowerCase()).current.code;
     } else need(output.authorizationProcessing === undefined);
     const delegation = existingDelegationTarget(code, common), advertised = output.semantics?.senderDelegation;
     if (complete) need(code === '0x' || delegation !== null);
-    if (complete && common.isActivatedEIP(8037)) need(preparation === null);
     if (preparation) {
       need(output.semantics?.callerNonce === 'outer_increment_authorizations_and_committed_sender_creation_attempts');
       need(isDeepStrictEqual(advertised, delegation === null ? undefined : { address: delegation, authorizationListProcessed: true }));
@@ -208,17 +207,28 @@ async function executeIsolated(options, previewMode) {
       need(error === null || (typeof error === 'string' && error.length > 0));
       need(output.execution.status === (error === null ? 'success' : error === 'revert' ? 'reverted' : 'failed'));
     }
-    deriveVerifiedGas({ request: call, header, output, chainId });
+    deriveVerifiedGas({ request: call, header, inputs, output, chainId });
     deriveVerifiedFees({ request: call, header, inputs, output, chainId });
     if (complete || output.semantics !== undefined) {
       need(output.semantics?.gasPrice === (feePlan?.effectiveGasPrice.toString() ?? '0'));
       need(output.semantics?.feeSettlement === Boolean(feePlan && complete));
     }
-    if (complete || output.trace !== null) {
+    const authorizationHalt = preparation?.processing.preparation?.phase === 'authorization_out_of_gas';
+    if (authorizationHalt) {
+      need(complete && output.trace === null && output.usage?.frames === 0 && output.usage?.steps === 0 && output.usage?.maxDepth === 0 && output.usage?.logOpcodes === 0);
+    } else if (complete || output.trace !== null) {
       const trace = output.trace;
-      need(trace?.type === (call.to === null ? 'CREATE' : 'CALL') && trace.from === call.from.toLowerCase() && trace.caller === call.from.toLowerCase() && trace.input === call.data.toLowerCase() && trace.value === '0x' + ethereumQuantity(call.value).toString(16) && trace.gas === '0x' + (gas - costs.intrinsic).toString(16));
+      const preparedGas = preparation?.processing.preparation?.authorizationGasUsed ?? '0';
+      need(trace?.type === (call.to === null ? 'CREATE' : 'CALL') && trace.from === call.from.toLowerCase() && trace.caller === call.from.toLowerCase() && trace.input === call.data.toLowerCase() && trace.value === '0x' + ethereumQuantity(call.value).toString(16) && trace.gas === '0x' + (gas - costs.intrinsic - BigInt(preparedGas)).toString(16));
       if (call.to !== null) need(trace.to === call.to.toLowerCase() && trace.executionAddress === call.to.toLowerCase());
       if (complete) need(trace.output === output.execution.returnData && trace.error === output.execution.error && ethereumQuantity(trace.gasUsed) === ethereumQuantity(output.execution.executionGasUsed));
+      if (preparation?.processing.preparation?.phase === 'recipient_out_of_gas') {
+        // Recipient setup entered the root but could not execute an opcode.
+        // An invented failed descendant must not become execution evidence.
+        need(output.usage?.frames === 1 && output.usage?.steps === 0 && output.usage?.maxDepth === 0 && output.usage?.logOpcodes === 0);
+        need(Array.isArray(trace.calls) && trace.calls.length === 0 && Array.isArray(trace.creationAttempts) && trace.creationAttempts.length === 0);
+        need(trace.selfdestruct === undefined && trace.incomplete === undefined);
+      }
     }
   }
 

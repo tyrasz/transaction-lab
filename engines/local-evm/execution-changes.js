@@ -53,7 +53,7 @@ function emptyFact(inputs, address) {
 /** Check invocation-local lifecycle evidence without assuming a query starts
  * from the immutable base. Net query effects are validated separately. This is
  * trace/result consistency, not an independent replay or post-state-root proof. */
-export function validateExecutionLifecycle({ output, inputs, destination, changes, startingChanges, selfdestructOnlyCreated = true, fees = null, common, rootNoncePrepared = false }) {
+export function validateExecutionLifecycle({ output, inputs, destination, changes, startingChanges, selfdestructOnlyCreated = true, fees = null, common, rootNoncePrepared = false, authorizationHaltSender = null }) {
   need(typeof selfdestructOnlyCreated === 'boolean');
   const clearsCreated = common?.isActivatedEIP(8246) === true;
   const amsterdamAttempts = common?.isActivatedEIP(7928) === true;
@@ -165,8 +165,17 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     const before = balance(fees.sender), debit = fees.plan.totalUpfrontDebit ?? fees.plan.upfrontGasDebit;
     need(before >= debit); balances.set(fees.sender, before - debit);
   }
-  walk(output.trace, true, 0);
-  if (amsterdamAttempts) creationAttempts = validateCreationAttempts({ output, inputs, startingChanges, rootNoncePrepared, fees, common });
+  if (authorizationHaltSender !== null) {
+    // This exception is supplied only after the parent derives an actual
+    // authorization OOG from verified facts, never from a child phase claim.
+    need(amsterdamAttempts && rootNoncePrepared && ADDRESS.test(authorizationHaltSender) && output.trace === null);
+    need(output.execution.status === 'failed' && output.execution.error === 'out of gas');
+    need(output.execution.executionGasUsed === '0' && output.execution.returnData === '0x' && output.logs.length === 0);
+    justifiedTouches.add(authorizationHaltSender);
+  } else {
+    walk(output.trace, true, 0);
+    if (amsterdamAttempts) creationAttempts = validateCreationAttempts({ output, inputs, startingChanges, rootNoncePrepared, fees, common });
+  }
   if (fees) {
     // Refund and tip are sequential account updates before lifecycle deletion.
     // A pending-deletion coinbase receives its credit and then burns it.
@@ -245,7 +254,7 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     if (!emptyFact(inputs, address) || deleted.has(address) || cleared.has(address) || created.has(address)) continue;
     const prior = priorRows.get(address), after = rows.get(address);
     if (prior?.existence?.after === false || (prior?.nonce && BigInt(prior.nonce.after) > 0n) || prior?.code) continue;
-    if (address === output.trace.from) {
+    if (address === (authorizationHaltSender ?? output.trace.from)) {
       // The one permitted non-creation nonce is the exact root caller nonce.
       const before = prior?.nonce ? BigInt(prior.nonce.after) : 0n;
       need(after?.nonce?.after === hex(before + 1n)); continue;
@@ -309,7 +318,7 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
   // provenance, but the public single-call host must never accept it as input.
   need(snapshot.accounts.every(row => row.reset === undefined));
   const topCreation = destination === null, senderAddress = sender.toLowerCase(), senderInitial = inputs?.accounts?.[senderAddress];
-  const preparation = complete && request ? deriveAuthorizationPreparation({ request, inputs, common }) : null;
+  const preparation = complete && request ? deriveAuthorizationPreparation({ request, header, inputs, common }) : null;
   if (preparation) need(isDeepStrictEqual(output.authorizationProcessing, preparation.processing));
   else need(output?.authorizationProcessing === undefined);
   const chainId = common ? Number(common.chainId()) : 1; need(chainId === 1 || chainId === 11155111);
@@ -328,10 +337,11 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
       need(root.to === createContractAddress(createAddressFromString(senderAddress), nonce).toString());
     }
   }
-  const { created, creationAttempts, deleted, cleared, emptyDeleted } = validateExecutionLifecycle({ output, inputs, destination, changes: snapshot, startingChanges: preparation?.snapshot, selfdestructOnlyCreated, fees, common, rootNoncePrepared: Boolean(preparation) });
+  const authorizationHaltSender = preparation?.processing.preparation?.phase === 'authorization_out_of_gas' ? senderAddress : null;
+  const { created, creationAttempts, deleted, cleared, emptyDeleted } = validateExecutionLifecycle({ output, inputs, destination, changes: snapshot, startingChanges: preparation?.snapshot, selfdestructOnlyCreated, fees, common, rootNoncePrepared: Boolean(preparation), authorizationHaltSender });
   if (!complete) { need(snapshot.accounts.length === 0); return; }
   need(senderInitial && typeof senderInitial.exists === 'boolean');
-  need(output.trace.from === senderAddress && output.trace.caller === senderAddress);
+  if (authorizationHaltSender === null) need(output.trace.from === senderAddress && output.trace.caller === senderAddress);
   const senderCode = senderInitial.exists ? senderInitial.code : '0x';
   const delegated = common && existingDelegationTarget(senderCode, common) !== null;
   need(senderCode === '0x' || delegated);

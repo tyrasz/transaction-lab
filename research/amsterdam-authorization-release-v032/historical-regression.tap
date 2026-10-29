@@ -1,0 +1,298 @@
+TAP version 13
+# Subtest: canonical Amsterdam arithmetic preserves signed reservoir refills and independently rejects impossible final counters
+ok 1 - canonical Amsterdam arithmetic preserves signed reservoir refills and independently rejects impossible final counters
+  ---
+  duration_ms: 12.239583
+  type: 'test'
+  ...
+# Subtest: accounting rejects noncanonical values, extra keys, hidden fields and hostile objects before coercion
+ok 2 - accounting rejects noncanonical values, extra keys, hidden fields and hostile objects before coercion
+  ---
+  duration_ms: 5.271917
+  type: 'test'
+  ...
+# Subtest: actual Sepolia child binds native transfer, CHAINID, slot number and complete split gas dimensions
+ok 3 - actual Sepolia child binds native transfer, CHAINID, slot number and complete split gas dimensions
+  ---
+  duration_ms: 455.99425
+  type: 'test'
+  ...
+# Subtest: actual Amsterdam storage allocation/refund and revert retain their separately recomputed gas and fee effects
+ok 4 - actual Amsterdam storage allocation/refund and revert retain their separately recomputed gas and fee effects
+  ---
+  duration_ms: 606.890917
+  type: 'test'
+  ...
+# Subtest: actual cross-frame storage refill retains a negative reservoir delta without inventing negative final state usage
+ok 5 - actual cross-frame storage refill retains a negative reservoir delta without inventing negative final state usage
+  ---
+  duration_ms: 130.392666
+  type: 'test'
+  ...
+# Subtest: parent rejects changed budgets, counter bindings, settlement, trace accounting and priced charges from actual children
+ok 6 - parent rejects changed budgets, counter bindings, settlement, trace accounting and priced charges from actual children
+  ---
+  duration_ms: 1907.743042
+  type: 'test'
+  ...
+# Subtest: Sepolia native and disposable CALL queries retain chain identity and fresh unpriced Amsterdam gas accounting
+ok 7 - Sepolia native and disposable CALL queries retain chain identity and fresh unpriced Amsterdam gas accounting
+  ---
+  duration_ms: 139.748458
+  type: 'test'
+  ...
+# Subtest: install, replace and clear retain exact authority storage and full signed type-4 postroots
+ok 8 - install, replace and clear retain exact authority storage and full signed type-4 postroots
+  ---
+  duration_ms: 106.976958
+  type: 'test'
+  ...
+# Subtest: proof-absent and existing empty authorities differ by the existence refund
+ok 9 - proof-absent and existing empty authorities differ by the existence refund
+  ---
+  duration_ms: 35.404458
+  type: 'test'
+  ...
+# Subtest: ordered duplicate authorizations consume sequential nonces and keep skipped tuples in place
+ok 10 - ordered duplicate authorizations consume sequential nonces and keep skipped tuples in place
+  ---
+  duration_ms: 24.222041
+  type: 'test'
+  ...
+# Subtest: self-authorization reads the sender nonce after its outer increment and executes the new code
+ok 11 - self-authorization reads the sender nonce after its outer increment and executes the new code
+  ---
+  duration_ms: 28.648791
+  type: 'test'
+  ...
+# Subtest: wrong chain, max nonce, invalid parity, high-s and zero-r are protocol skips, not dropped inputs
+ok 12 - wrong chain, max nonce, invalid parity, high-s and zero-r are protocol skips, not dropped inputs
+  ---
+  duration_ms: 13.767875
+  type: 'test'
+  ...
+# Subtest: code and nonce guards skip recoverable authorities without mutating them
+ok 13 - code and nonce guards skip recoverable authorities without mutating them
+  ---
+  duration_ms: 20.077209
+  type: 'test'
+  ...
+# Subtest: recoverable skipped authorities are warm even though their authorization was not applied
+ok 14 - recoverable skipped authorities are warm even though their authorization was not applied
+  ---
+  duration_ms: 10.890416
+  type: 'test'
+  ...
+# Subtest: REVERT and out of gas roll back message writes but retain preceding authorization state and refunds
+ok 15 - REVERT and out of gas roll back message writes but retain preceding authorization state and refunds
+  ---
+  duration_ms: 35.994959
+  type: 'test'
+  ...
+# Subtest: successful delegated message storage writes use authority context and preserve old unknown slots
+ok 16 - successful delegated message storage writes use authority context and preserve old unknown slots
+  ---
+  duration_ms: 20.962125
+  type: 'test'
+  ...
+# Subtest: a newly materialized authority may write storage without being marked as a constructor creation
+ok 17 - a newly materialized authority may write storage without being marked as a constructor creation
+  ---
+  duration_ms: 13.7375
+  type: 'test'
+  ...
+# Subtest: authorization materialization is not EIP-6780 creation and SELFDESTRUCT keeps its designation
+ok 18 - authorization materialization is not EIP-6780 creation and SELFDESTRUCT keeps its designation
+  ---
+  duration_ms: 11.473541
+  type: 'test'
+  ...
+# Subtest: message storage-clear refund is separate from the authorization existence refund
+ok 19 - message storage-clear refund is separate from the authorization existence refund
+  ---
+  duration_ms: 13.384667
+  type: 'test'
+  ...
+# Subtest: authorization nonce precedes CREATE and only committed message ancestry retains creator increments
+ok 20 - authorization nonce precedes CREATE and only committed message ancestry retains creator increments
+  ---
+  duration_ms: 29.993625
+  type: 'test'
+  ...
+# Subtest: self-authorization and committed sender creation attempts each consume their distinct nonce
+ok 21 - self-authorization and committed sender creation attempts each consume their distinct nonce
+  ---
+  duration_ms: 21.897542
+  type: 'test'
+  ...
+# Subtest: Prague activates authorization processing and uses the same signed transaction behavior
+ok 22 - Prague activates authorization processing and uses the same signed transaction behavior
+  ---
+  duration_ms: 11.125167
+  type: 'test'
+  ...
+# Subtest: a proof failure after authorization and a post-authorization deadline restore the complete attempt
+ok 23 - a proof failure after authorization and a post-authorization deadline restore the complete attempt
+  ---
+  duration_ms: 6.450917
+  type: 'test'
+  ...
+# Subtest: failure inside a caller checkpoint restores that checkpoint without retaining authorization provenance
+ok 24 - failure inside a caller checkpoint restores that checkpoint without retaining authorization provenance
+  ---
+  duration_ms: 3.426333
+  type: 'test'
+  ...
+# Subtest: real isolated child retains signature decisions, complete changes and five full-VM channels
+ok 25 - real isolated child retains signature decisions, complete changes and five full-VM channels
+  ---
+  duration_ms: 171.8295
+  type: 'test'
+  ...
+# Subtest: real isolated before/after queries see old/new code without replaying original authorizations
+ok 26 - real isolated before/after queries see old/new code without replaying original authorizations
+  ---
+  duration_ms: 199.683584
+  type: 'test'
+  ...
+# Subtest: authorization normalization preserves ordered duplicates, detaches, and freezes canonical values
+ok 27 - authorization normalization preserves ordered duplicates, detaches, and freezes canonical values
+  ---
+  duration_ms: 0.756584
+  type: 'test'
+  ...
+# Subtest: structural bounds reject ambiguous encodings, extra fields, sparse/getter/proxy values without evaluating them
+ok 28 - structural bounds reject ambiguous encodings, extra fields, sparse/getter/proxy values without evaluating them
+  ---
+  duration_ms: 0.603042
+  type: 'test'
+  ...
+# Subtest: recover known offline signer and chain-zero domain; malformed signatures are skipped not admitted as recovered authorities
+ok 29 - recover known offline signer and chain-zero domain; malformed signatures are skipped not admitted as recovered authorities
+  ---
+  duration_ms: 47.344
+  type: 'test'
+  ...
+# Subtest: state decisions distinguish existence from emptiness and enforce exact delegation code before nonce matching
+ok 30 - state decisions distinguish existence from emptiness and enforce exact delegation code before nonce matching
+  ---
+  duration_ms: 0.133
+  type: 'test'
+  ...
+# Subtest: parent independently derives every ordered authority decision and refund
+ok 31 - parent independently derives every ordered authority decision and refund
+  ---
+  duration_ms: 1228.980583
+  type: 'test'
+  ...
+# Subtest: parent requires exact retained code, nonce and materialization for authenticated absent authorities
+ok 32 - parent requires exact retained code, nonce and materialization for authenticated absent authorities
+  ---
+  duration_ms: 774.080916
+  type: 'test'
+  ...
+# Subtest: message REVERT cannot discard preceding authorization state or retain message writes
+ok 33 - message REVERT cannot discard preceding authorization state or retain message writes
+  ---
+  duration_ms: 531.42675
+  type: 'test'
+  ...
+# Subtest: parent checks repeated self-authorization before committed sender creation attempts
+ok 34 - parent checks repeated self-authorization before committed sender creation attempts
+  ---
+  duration_ms: 797.462917
+  type: 'test'
+  ...
+# Subtest: skipped signatures cannot authorize extra code or nonce changes
+ok 35 - skipped signatures cannot authorize extra code or nonce changes
+  ---
+  duration_ms: 488.317541
+  type: 'test'
+  ...
+# Subtest: before/after query sender semantics use original and prepared code separately
+ok 36 - before/after query sender semantics use original and prepared code separately
+  ---
+  duration_ms: 815.886375
+  type: 'test'
+  ...
+# Subtest: absent authorization context preserves legacy cost and profile shape
+ok 37 - absent authorization context preserves legacy cost and profile shape
+  ---
+  duration_ms: 4.235
+  type: 'test'
+  ...
+# Subtest: every declared tuple occurrence pays 25000 intrinsic even when protocol-skippable
+ok 38 - every declared tuple occurrence pays 25000 intrinsic even when protocol-skippable
+  ---
+  duration_ms: 0.950584
+  type: 'test'
+  ...
+# Subtest: authorization admission starts at Prague and excludes creation and blob context
+ok 39 - authorization admission starts at Prague and excludes creation and blob context
+  ---
+  duration_ms: 2.580792
+  type: 'test'
+  ...
+# Subtest: authorization intrinsic participates in admission, refund cap and unchanged calldata floor
+ok 40 - authorization intrinsic participates in admission, refund cap and unchanged calldata floor
+  ---
+  duration_ms: 0.512625
+  type: 'test'
+  ...
+# Subtest: malformed authorization structures fail before any state or query input read
+ok 41 - malformed authorization structures fail before any state or query input read
+  ---
+  duration_ms: 1.012084
+  type: 'test'
+  ...
+# Subtest: authorization installation/replacement/clear preserve authenticated balance and nonempty storage
+ok 42 - authorization installation/replacement/clear preserve authenticated balance and nonempty storage
+  ---
+  duration_ms: 15.18175
+  type: 'test'
+  ...
+# Subtest: absent authorized account and demanded storage carry through settled copies without altering immutable proofs
+ok 43 - absent authorized account and demanded storage carry through settled copies without altering immutable proofs
+  ---
+  duration_ms: 1.56
+  type: 'test'
+  ...
+# Subtest: outer rollback removes authorization materialization, code, nonce, slots and provenance
+ok 44 - outer rollback removes authorization materialization, code, nonce, slots and provenance
+  ---
+  duration_ms: 1.325292
+  type: 'test'
+  ...
+# Subtest: authorization setter refuses no checkpoint, nonce mismatch, malformed designation and generic runtime replacement
+ok 45 - authorization setter refuses no checkpoint, nonce mismatch, malformed designation and generic runtime replacement
+  ---
+  duration_ms: 2.046
+  type: 'test'
+  ...
+# Subtest: historical Sepolia root and actual parent bind tuples to11155111; mainnet skips and wildcard applies
+ok 46 - historical Sepolia root and actual parent bind tuples to11155111; mainnet skips and wildcard applies
+  ---
+  duration_ms: 589.696667
+  type: 'test'
+  ...
+# Subtest: historical Sepolia self-authorization and fresh delegated query semantics pass actual parent independently
+ok 47 - historical Sepolia self-authorization and fresh delegated query semantics pass actual parent independently
+  ---
+  duration_ms: 339.836
+  type: 'test'
+  ...
+# Subtest: authorization parent fold rejects unsupported chains and never infers chain from tuple or input labels
+ok 48 - authorization parent fold rejects unsupported chains and never infers chain from tuple or input labels
+  ---
+  duration_ms: 6.372166
+  type: 'test'
+  ...
+1..48
+# tests 48
+# suites 0
+# pass 48
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4911.113625

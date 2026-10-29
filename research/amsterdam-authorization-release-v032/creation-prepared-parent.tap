@@ -1,0 +1,88 @@
+TAP version 13
+# Subtest: parent requires exact canonical attempt and target records without invoking accessors
+ok 1 - parent requires exact canonical attempt and target records without invoking accessors
+  ---
+  duration_ms: 28.753417
+  type: 'test'
+  ...
+# Subtest: parent binds attempts to opcode, target derivation, current target state and child result
+ok 2 - parent binds attempts to opcode, target derivation, current target state and child result
+  ---
+  duration_ms: 3.363875
+  type: 'test'
+  ...
+# Subtest: each entered creation has one ledger join and every entered frame has an explicit array
+ok 3 - each entered creation has one ledger join and every entered frame has an explicit array
+  ---
+  duration_ms: 1.615917
+  type: 'test'
+  ...
+# Subtest: reentrant creation must observe intermediate nonce updates at its declared child position
+ok 4 - reentrant creation must observe intermediate nonce updates at its declared child position
+  ---
+  duration_ms: 12.361625
+  type: 'test'
+  ...
+# Subtest: delegated creation inherits its parent value as well as caller and execution address
+ok 5 - delegated creation inherits its parent value as well as caller and execution address
+  ---
+  duration_ms: 6.395334
+  type: 'test'
+  ...
+# Subtest: CALLCODE requires affordable value without transferring it, including an immediately failed child
+ok 6 - CALLCODE requires affordable value without transferring it, including an immediately failed child
+  ---
+  duration_ms: 8.961917
+  type: 'test'
+  ...
+# Subtest: enclosing rollback discards descendant attempts and inherited static cannot acquire them
+ok 7 - enclosing rollback discards descendant attempts and inherited static cannot acquire them
+  ---
+  duration_ms: 9.561416
+  type: 'test'
+  ...
+# Subtest: root construction starts target nonce at one without counting outer sender preparation twice
+ok 8 - root construction starts target nonce at one without counting outer sender preparation twice
+  ---
+  duration_ms: 3.625459
+  type: 'test'
+  ...
+# Subtest: query chronology starts from carried nonce/code state and separately increments its caller
+ok 9 - query chronology starts from carried nonce/code state and separately increments its caller
+  ---
+  duration_ms: 4.043375
+  type: 'test'
+  ...
+# Subtest: actual child target-state forgery is withheld even after recounting trace bytes
+ok 10 - actual child target-state forgery is withheld even after recounting trace bytes
+  ---
+  duration_ms: 120.199458
+  type: 'test'
+  ...
+# Subtest: prepared self-authorization supplies code and nonce once for CREATE2 followed by collision
+ok 11 - prepared self-authorization supplies code and nonce once for CREATE2 followed by collision
+  ---
+  duration_ms: 27.867417
+  type: 'test'
+  ...
+# Subtest: prepared chronology rejects altered nonce/code snapshots and fee-bearing overlays
+ok 12 - prepared chronology rejects altered nonce/code snapshots and fee-bearing overlays
+  ---
+  duration_ms: 0.4215
+  type: 'test'
+  ...
+# Subtest: prepared chronology debits fees once before creator affordability checks
+ok 13 - prepared chronology debits fees once before creator affordability checks
+  ---
+  duration_ms: 12.271916
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 383.698625

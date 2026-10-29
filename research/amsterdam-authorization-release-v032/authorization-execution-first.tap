@@ -1,0 +1,88 @@
+TAP version 13
+# Subtest: priced and unpriced install, replacement and clearing preserve ordered authorization and exact signed settlement
+ok 1 - priced and unpriced install, replacement and clearing preserve ordered authorization and exact signed settlement
+  ---
+  duration_ms: 823.72975
+  type: 'test'
+  ...
+# Subtest: sequential duplicates, clear and reinstall charge a single first write and indicator allocation
+ok 2 - sequential duplicates, clear and reinstall charge a single first write and indicator allocation
+  ---
+  duration_ms: 306.886875
+  type: 'test'
+  ...
+# Subtest: ordered wrong-chain, overflow, parity, high-S and nonce skips do not charge a valid authorization twice
+ok 3 - ordered wrong-chain, overflow, parity, high-S and nonce skips do not charge a valid authorization twice
+  ---
+  duration_ms: 269.642833
+  type: 'test'
+  ...
+# Subtest: absent and existing-empty authorities pay identical state gas; pinned fullVM empty-leaf undercharge stays an explicit divergence
+ok 4 - absent and existing-empty authorities pay identical state gas; pinned fullVM empty-leaf undercharge stays an explicit divergence
+  ---
+  duration_ms: 515.823833
+  type: 'test'
+  ...
+# Subtest: authorized runtime uses authority storage while preserving authenticated old untouched slots
+ok 5 - authorized runtime uses authority storage while preserving authenticated old untouched slots
+  ---
+  duration_ms: 133.410375
+  type: 'test'
+  ...
+# Subtest: self-authorization precedes callback CREATE2 attempts; root or ancestor rollback retains only the authorization increment
+ok 6 - self-authorization precedes callback CREATE2 attempts; root or ancestor rollback retains only the authorization increment
+  ---
+  duration_ms: 421.501708
+  type: 'test'
+  ...
+# Subtest: regular, state and late-list preparation OOG discard every tuple write while retaining sender nonce and paid gas
+ok 7 - regular, state and late-list preparation OOG discard every tuple write while retaining sender nonce and paid gas
+  ---
+  duration_ms: 397.323792
+  type: 'test'
+  ...
+# Subtest: recipient delegation-access OOG rolls previously applied authorization back before message execution
+ok 8 - recipient delegation-access OOG rolls previously applied authorization back before message execution
+  ---
+  duration_ms: 127.339292
+  type: 'test'
+  ...
+# Subtest: entered message REVERT and INVALID preserve authorization state while discarding message storage
+ok 9 - entered message REVERT and INVALID preserve authorization state while discarding message storage
+  ---
+  duration_ms: 265.97
+  type: 'test'
+  ...
+# Subtest: value-bearing authorization recipient prepays its first write and preserves exact native transfer logs
+ok 10 - value-bearing authorization recipient prepays its first write and preserves exact native transfer logs
+  ---
+  duration_ms: 129.125541
+  type: 'test'
+  ...
+# Subtest: post-authorization proof and deadline failures roll the entire attempt back without publishing preparation
+ok 11 - post-authorization proof and deadline failures roll the entire attempt back without publishing preparation
+  ---
+  duration_ms: 8.775
+  type: 'test'
+  ...
+# Subtest: before/after getters execute old/new authorized code without replay and retain exact sender/authority balances
+ok 12 - before/after getters execute old/new authorized code without replay and retain exact sender/authority balances
+  ---
+  duration_ms: 147.285959
+  type: 'test'
+  ...
+# Subtest: query callback creation after self-authorization is withheld without poisoning later native observations
+ok 13 - query callback creation after self-authorization is withheld without poisoning later native observations
+  ---
+  duration_ms: 141.635584
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3867.4825

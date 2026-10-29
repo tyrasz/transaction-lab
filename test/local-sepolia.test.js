@@ -13,6 +13,7 @@ import { loadLocalApi } from '../src/local-loader.js';
 import { InputError } from '../src/validate.js';
 import { TX_SENDER, TARGET, COINBASE, word, signAuthorization } from '../engines/local-evm/test/amsterdam-execution-fixture.js';
 import { factoryCode, initcode, createdAddress } from '../engines/local-evm/test/lifecycle-fixture.js';
+import { TEST_KEY } from '../engines/local-evm/test/authorization-fixture.js';
 
 import { CHAIN, native, sepoliaApiInput as inputFor, sepoliaApiFixture as fixture, sepoliaApiTransport as transport } from './local-sepolia-fixture.js';
 
@@ -102,15 +103,37 @@ test('priced Sepolia execution and unpriced disposable CHAINID queries keep thei
   }
 });
 
-test('Amsterdam authorization lists remain unavailable without measurements', async () => {
-  assert.equal(LOCAL_CAPABILITIES.amsterdam.authorizationList, false);
-  const f = await fixture({ gas: '5000000', authorizationList: [signAuthorization({ chainId: BigInt(CHAIN) })] });
+test('Amsterdam self-authorization reaches the API with retained delegation and exact native measurements', async () => {
+  assert.equal(LOCAL_CAPABILITIES.amsterdam.authorizationList, true);
+  const authorizationList = [signAuthorization({ chainId: BigInt(CHAIN), key: TEST_KEY, nonce: 2n, address: TARGET })];
+  for (const priced of [false, true]) {
+    const f = await fixture({ priced, gas: '5000000', authorizationList });
+    const p = transport(f), report = await simulateLocal(inputFor(f), p.rpc); p.check(report); complete(report, f);
+    const original = report.attempt.preview.original, output = original.output;
+    assert.equal(output.authorizationProcessing.preparation.phase, 'message');
+    assert.equal(output.authorizationProcessing.preparation.retained, true);
+    assert.equal(output.authorizationProcessing.preparation.senderAuthorizationIncrements, '1');
+    assert.deepEqual(original.changes.accounts.find(row => row.address === TX_SENDER).nonce, { before: '0x1', after: '0x3' });
+    assert.equal(original.changes.accounts.find(row => row.address === TX_SENDER).code.after, '0xef0100' + TARGET.slice(2));
+    amount(report.measurements[0], TX_SENDER, 1000000000000n, 1000000000000n - 17n - BigInt(output.feeAccounting?.gasCharge ?? '0'));
+    amount(report.measurements[1], TARGET, 9n, 26n);
+  }
+});
+
+test('authorization preparation OOG is a completed failed simulation with no call frame or value transfer', async () => {
+  const authorizationList = [signAuthorization({ chainId: BigInt(CHAIN), key: TEST_KEY, nonce: 2n, address: TARGET })];
+  const f = await fixture({ gas: '64005', authorizationList });
+  // A value-bearing root pays an extra6000 intrinsic; the remaining35189 is
+  // one gas short of the new delegation indicator, before any message enters.
   const p = transport(f), report = await simulateLocal(inputFor(f), p.rpc); p.check(report);
-  assert.equal(report.status, 'unavailable'); assert.equal(report.execution.status, 'unsupported');
-  assert.equal(report.execution.error.code, 'LOCAL_AUTHORIZATION_UNSUPPORTED');
-  assert(report.measurements.every(row => row.values === null));
-  assert.deepEqual(report.attempt.preview.original.changes.accounts, []);
-  assert.equal(report.attempt.preview.original.output.feeAccounting, undefined);
+  assert.equal(report.status, 'complete'); assert.equal(report.execution.status, 'failed');
+  const original = report.attempt.preview.original, output = original.output;
+  assert.equal(output.execution.error, 'out of gas'); assert.equal(output.trace, null);
+  assert.equal(output.authorizationProcessing.preparation.phase, 'authorization_out_of_gas');
+  assert.equal(output.authorizationProcessing.preparation.retained, false);
+  assert.deepEqual(original.changes.accounts, [{ address: TX_SENDER, nonce: { before: '0x1', after: '0x2' } }]);
+  amount(report.measurements[0], TX_SENDER, 1000000000000n, 1000000000000n);
+  amount(report.measurements[1], TARGET, 9n, 9n);
 });
 
 test('existing Amsterdam sender delegation survives API admission, self-call and disposable query validation', async () => {

@@ -1,0 +1,148 @@
+TAP version 13
+# Subtest: priced and unpriced install, replacement and clearing preserve ordered authorization and exact signed settlement
+ok 1 - priced and unpriced install, replacement and clearing preserve ordered authorization and exact signed settlement
+  ---
+  duration_ms: 856.023792
+  type: 'test'
+  ...
+# Subtest: sequential duplicates, clear and reinstall charge a single first write and indicator allocation
+ok 2 - sequential duplicates, clear and reinstall charge a single first write and indicator allocation
+  ---
+  duration_ms: 359.420666
+  type: 'test'
+  ...
+# Subtest: ordered wrong-chain, overflow, parity, high-S and nonce skips do not charge a valid authorization twice
+ok 3 - ordered wrong-chain, overflow, parity, high-S and nonce skips do not charge a valid authorization twice
+  ---
+  duration_ms: 272.681959
+  type: 'test'
+  ...
+# Subtest: absent and existing-empty authorities pay identical state gas; pinned fullVM empty-leaf undercharge stays an explicit divergence
+ok 4 - absent and existing-empty authorities pay identical state gas; pinned fullVM empty-leaf undercharge stays an explicit divergence
+  ---
+  duration_ms: 524.395417
+  type: 'test'
+  ...
+# Subtest: authorized runtime uses authority storage while preserving authenticated old untouched slots
+ok 5 - authorized runtime uses authority storage while preserving authenticated old untouched slots
+  ---
+  duration_ms: 134.809167
+  type: 'test'
+  ...
+# Subtest: self-authorization precedes callback CREATE2 attempts; root or ancestor rollback retains only the authorization increment
+ok 6 - self-authorization precedes callback CREATE2 attempts; root or ancestor rollback retains only the authorization increment
+  ---
+  duration_ms: 429.365959
+  type: 'test'
+  ...
+# Subtest: regular, state and late-list preparation OOG discard every tuple write while retaining sender nonce and paid gas
+ok 7 - regular, state and late-list preparation OOG discard every tuple write while retaining sender nonce and paid gas
+  ---
+  duration_ms: 418.764042
+  type: 'test'
+  ...
+# Subtest: recipient delegation-access OOG rolls previously applied authorization back before message execution
+ok 8 - recipient delegation-access OOG rolls previously applied authorization back before message execution
+  ---
+  duration_ms: 129.605
+  type: 'test'
+  ...
+# Subtest: entered message REVERT and INVALID preserve authorization state while discarding message storage
+ok 9 - entered message REVERT and INVALID preserve authorization state while discarding message storage
+  ---
+  duration_ms: 265.963458
+  type: 'test'
+  ...
+# Subtest: value-bearing authorization recipient prepays its first write and preserves exact native transfer logs
+ok 10 - value-bearing authorization recipient prepays its first write and preserves exact native transfer logs
+  ---
+  duration_ms: 130.841083
+  type: 'test'
+  ...
+# Subtest: post-authorization proof and deadline failures roll the entire attempt back without publishing preparation
+ok 11 - post-authorization proof and deadline failures roll the entire attempt back without publishing preparation
+  ---
+  duration_ms: 8.776875
+  type: 'test'
+  ...
+# Subtest: before/after getters execute old/new authorized code without replay and retain exact sender/authority balances
+ok 12 - before/after getters execute old/new authorized code without replay and retain exact sender/authority balances
+  ---
+  duration_ms: 147.195333
+  type: 'test'
+  ...
+# Subtest: query callback creation after self-authorization is withheld without poisoning later native observations
+ok 13 - query callback creation after self-authorization is withheld without poisoning later native observations
+  ---
+  duration_ms: 140.677833
+  type: 'test'
+  ...
+# Subtest: Amsterdam transfers distinguish existing, absent, empty and self while preserving exact fees and native logs
+ok 14 - Amsterdam transfers distinguish existing, absent, empty and self while preserving exact fees and native logs
+  ---
+  duration_ms: 116.966833
+  type: 'test'
+  ...
+# Subtest: SLOTNUM and CHAINID use the explicit Sepolia execution context
+ok 15 - SLOTNUM and CHAINID use the explicit Sepolia execution context
+  ---
+  duration_ms: 7.702334
+  type: 'test'
+  ...
+# Subtest: state allocation, clearing, refund floor and root rollback match signed transaction settlement
+ok 16 - state allocation, clearing, refund floor and root rollback match signed transaction settlement
+  ---
+  duration_ms: 39.526875
+  type: 'test'
+  ...
+# Subtest: root creation charges runtime state once and rolls failed constructors back
+ok 17 - root creation charges runtime state once and rolls failed constructors back
+  ---
+  duration_ms: 27.67025
+  type: 'test'
+  ...
+# Subtest: root creation into a prefunded empty address preserves funds without a new-account charge
+ok 18 - root creation into a prefunded empty address preserves funds without a new-account charge
+  ---
+  duration_ms: 6.976833
+  type: 'test'
+  ...
+# Subtest: a delegated child clears its caller storage with a signed reservoir refill and exact settlement
+ok 19 - a delegated child clears its caller storage with a signed reservoir refill and exact settlement
+  ---
+  duration_ms: 9.291542
+  type: 'test'
+  ...
+# Subtest: post-target out-of-gas consumes root regular gas but a caught child latch does not consume its caller budget
+ok 20 - post-target out-of-gas consumes root regular gas but a caught child latch does not consume its caller budget
+  ---
+  duration_ms: 20.021
+  type: 'test'
+  ...
+# Subtest: created self-beneficiary clearing preserves endowment and residual prefunding
+ok 21 - created self-beneficiary clearing preserves endowment and residual prefunding
+  ---
+  duration_ms: 19.855666
+  type: 'test'
+  ...
+# Subtest: unknown or out-of-range Amsterdam slot does not retain execution state
+ok 22 - unknown or out-of-range Amsterdam slot does not retain execution state
+  ---
+  duration_ms: 2.242417
+  type: 'test'
+  ...
+# Subtest: raw restored reservoir settles to retained independent Geth outcome and force-drained counters fail
+ok 23 - raw restored reservoir settles to retained independent Geth outcome and force-drained counters fail
+  ---
+  duration_ms: 0.936541
+  type: 'test'
+  ...
+1..23
+# tests 23
+# suites 0
+# pass 23
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4016.892458

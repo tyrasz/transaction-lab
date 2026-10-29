@@ -2,14 +2,16 @@
 // state overlay, claimed authority, after-code or refund supplies these inputs.
 import { normalizeAuthorizationList, recoverAuthorization, authorizationStateDecision } from './authorization-list.js';
 import { existingDelegationTarget } from './sender-delegation.js';
+import { deriveAmsterdamAuthorizationPreparation } from './amsterdam-authorization-validation.js';
 
 const need = value => { if (!value) throw new Error('Authorization preparation does not match verified starting facts.'); };
 const hex = value => '0x' + value.toString(16);
 const SCOPE = 'Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.';
 
-export function deriveAuthorizationPreparation({ request, inputs, common }) {
+export function deriveAuthorizationPreparation({ request, header, inputs, common }) {
   const list = normalizeAuthorizationList(request);
   if (list === undefined) return null;
+  if (common?.isActivatedEIP(8037)) return deriveAmsterdamAuthorizationPreparation({ request, header, inputs, common });
   need([1n, 11155111n].includes(common?.chainId()) && common.isActivatedEIP(7702) && !common.isActivatedEIP(7928) && request.to !== null && request.blobVersionedHashes === undefined);
   const accounts = new Map(), applied = new Set(), entries = [];
   const sender = request.from.toLowerCase();
