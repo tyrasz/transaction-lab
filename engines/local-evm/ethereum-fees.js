@@ -50,7 +50,8 @@ export function normalizeEthereumFees(request) {
 
 /** Derive admission and prepayment from a total-gas envelope and header. No
  * state or claimed execution outcome enters this calculation. */
-export function ethereumFeePlan(request, header) {
+export function ethereumFeePlan(request, header, chainId = 1) {
+  if (chainId !== 1 && chainId !== 11155111) throw Object.assign(new Error('Fee planning requires a trusted mainnet or Sepolia chain selector.'), { code: 'LOCAL_ETHEREUM_CHAIN_UNSUPPORTED' });
   const normalized = normalizeEthereumFees(request);
   if (!normalized.executionProfile) return null;
   plain(header);
@@ -58,11 +59,15 @@ export function ethereumFeePlan(request, header) {
   const baseFeePerGas = quantity(own(header, 'baseFeePerGas')), blockGasLimit = quantity(own(header, 'gasLimit'));
   const coinbase = own(header, 'miner'); need(typeof coinbase === 'string' && /^0x[0-9a-f]{40}$/i.test(coinbase));
   const maxFeePerGas = BigInt(normalized.fees.maxFeePerGas), maxPriorityFeePerGas = BigInt(normalized.fees.maxPriorityFeePerGas);
-  need(maxFeePerGas >= baseFeePerGas && gasLimit >= 21000n && gasLimit <= 5000000n && gasLimit <= blockGasLimit);
+  const blobContext = ethereumBlobContext(header, chainId), blob = normalized.executionProfile === ETHEREUM_BLOB_FEE_PROFILE;
+  // This is only the envelope's preliminary base bound. The call layer must
+  // independently enforce max(intrinsic, calldata floor) for the exact request;
+  // Amsterdam's recipient/value/data/access/auth charges can raise it further.
+  const minimumBaseGas = blobContext?.hardfork === 'amsterdam' ? 12000n : 21000n;
+  need(maxFeePerGas >= baseFeePerGas && gasLimit >= minimumBaseGas && gasLimit <= 5000000n && gasLimit <= blockGasLimit);
   // Avoid an overflowing base+tip intermediate: cap-base bounds the tip first.
   const priorityFeePerGas = maxPriorityFeePerGas < maxFeePerGas - baseFeePerGas ? maxPriorityFeePerGas : maxFeePerGas - baseFeePerGas;
   const effectiveGasPrice = baseFeePerGas + priorityFeePerGas;
-  const blobContext = ethereumBlobContext(header), blob = normalized.executionProfile === ETHEREUM_BLOB_FEE_PROFILE;
   let extra = {}, maximumRequiredBalance = bounded(gasLimit * maxFeePerGas + value);
   const upfrontGasDebit = bounded(gasLimit * effectiveGasPrice);
   if (blob) {

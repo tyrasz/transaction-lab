@@ -1,0 +1,118 @@
+TAP version 13
+# Subtest: blob fork selection independently agrees with ethereumCommon at every pinned transition
+ok 1 - blob fork selection independently agrees with ethereumCommon at every pinned transition
+  ---
+  duration_ms: 4.963833
+  type: 'test'
+  ...
+# Subtest: current excess determines the exact integer fee without a base-fee reserve clamp
+ok 2 - current excess determines the exact integer fee without a base-fee reserve clamp
+  ---
+  duration_ms: 1.8725
+  type: 'test'
+  ...
+# Subtest: uint64 hostile excess and the uint256 price boundary never produce an approximation
+ok 3 - uint64 hostile excess and the uint256 price boundary never produce an approximation
+  ---
+  duration_ms: 0.98575
+  type: 'test'
+  ...
+# Subtest: header inputs require canonical uint64 data and fork-valid blob usage without executing accessors
+ok 4 - header inputs require canonical uint64 data and fork-valid blob usage without executing accessors
+  ---
+  duration_ms: 1.356334
+  type: 'test'
+  ...
+# Subtest: blob profile is explicit with exact caps, bounded hashes and no creation or authorization list
+ok 5 - blob profile is explicit with exact caps, bounded hashes and no creation or authorization list
+  ---
+  duration_ms: 0.429375
+  type: 'test'
+  ...
+# Subtest: fork transaction count is distinct from block capacity and does not subtract used block blobs
+ok 6 - fork transaction count is distinct from block capacity and does not subtract used block blobs
+  ---
+  duration_ms: 0.671417
+  type: 'test'
+  ...
+# Subtest: blob affordability, burn and totals are separate from execution refunds and beneficiary tips
+ok 7 - blob affordability, burn and totals are separate from execution refunds and beneficiary tips
+  ---
+  duration_ms: 0.380792
+  type: 'test'
+  ...
+# Subtest: retained authenticated Sepolia header uses Amsterdam inherited BPO2 prices and a six-blob transaction cap
+ok 8 - retained authenticated Sepolia header uses Amsterdam inherited BPO2 prices and a six-blob transaction cap
+  ---
+  duration_ms: 6.052166
+  type: 'test'
+  ...
+# Subtest: every pinned network boundary selects the exact finite schedule before, at and after activation
+ok 9 - every pinned network boundary selects the exact finite schedule before, at and after activation
+  ---
+  duration_ms: 3.699
+  type: 'test'
+  ...
+# Subtest: trusted numeric selector is independent of request/header claims and rejects without coercion
+ok 10 - trusted numeric selector is independent of request/header claims and rejects without coercion
+  ---
+  duration_ms: 0.431958
+  type: 'test'
+  ...
+# Subtest: block blob capacity never raises the transaction cap and header/resource bounds remain strict
+ok 11 - block blob capacity never raises the transaction cap and header/resource bounds remain strict
+  ---
+  duration_ms: 2.4865
+  type: 'test'
+  ...
+# Subtest: Amsterdam blob burn, cap affordability, execution refunds and tips remain distinct exact integers
+ok 12 - Amsterdam blob burn, cap affordability, execution refunds and tips remain distinct exact integers
+  ---
+  duration_ms: 0.512125
+  type: 'test'
+  ...
+# Subtest: Amsterdam 12k fee base is preliminary; full request intrinsic/floor and public 5M bound are separate
+ok 13 - Amsterdam 12k fee base is preliminary; full request intrinsic/floor and public 5M bound are separate
+  ---
+  duration_ms: 0.833334
+  type: 'test'
+  ...
+# Subtest: default mainnet plans and context retain their complete prior output shape
+ok 14 - default mainnet plans and context retain their complete prior output shape
+  ---
+  duration_ms: 1.106791
+  type: 'test'
+  ...
+# Subtest: fee admission is explicit, detached and canonical while the default adds nothing
+ok 15 - fee admission is explicit, detached and canonical while the default adds nothing
+  ---
+  duration_ms: 1.428958
+  type: 'test'
+  ...
+# Subtest: normalization and plan reads never invoke proxy or accessor code
+ok 16 - normalization and plan reads never invoke proxy or accessor code
+  ---
+  duration_ms: 0.161584
+  type: 'test'
+  ...
+# Subtest: cap affordability differs from actual prepayment and final settlement remains exact
+ok 17 - cap affordability differs from actual prepayment and final settlement remains exact
+  ---
+  duration_ms: 1.241333
+  type: 'test'
+  ...
+# Subtest: header cap, block gas and uint256 affordability overflow fail before any state is supplied
+ok 18 - header cap, block gas and uint256 affordability overflow fail before any state is supplied
+  ---
+  duration_ms: 1.659625
+  type: 'test'
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 18
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 100.396667

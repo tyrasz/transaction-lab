@@ -1,0 +1,196 @@
+{
+  "schemaVersion": 1,
+  "sourceRoot": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031",
+  "baseCommit": "5614d2571a58b344d839e0c8c23c02d991e5ea43",
+  "scope": "Standalone fee/header helpers and pure controls; no execution/API integration.",
+  "publicSepoliaExecutionEnabled": false,
+  "callerIntegrationPerformed": false,
+  "dependencyVersion": "EthereumJS 10.1.3",
+  "gethSourceCommit": "1df30b18d9ed35ee9d28ffd4648442c2204554ad",
+  "files": [
+    {
+      "path": "engines/local-evm/ethereum-blob-fees.js",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/ethereum-blob-fees.js",
+      "bytes": 3805,
+      "sha256": "26ee611c10e1af5ec09d92946af117ba4e4e25864d77ce22f59bb4b2d0a21b80"
+    },
+    {
+      "path": "engines/local-evm/ethereum-fees.js",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/ethereum-fees.js",
+      "bytes": 7514,
+      "sha256": "f58903effa7e79210db4c72036558930e0afafe528d6f83ae2f25c496c1ff618"
+    },
+    {
+      "path": "engines/local-evm/test/ethereum-fee-network.test.js",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/ethereum-fee-network.test.js",
+      "bytes": 11164,
+      "sha256": "8eff3c022b42468c0df3e06b633c13eedfa2225bc29d8ec7fc24ed38619f08d8"
+    }
+  ],
+  "references": [
+    {
+      "pathRelativeToSourceRoot": "../evm-toolchains/geth-v1.17.10/source/params/chainspecs/sepolia.json",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source/params/chainspecs/sepolia.json",
+      "bytes": 1128,
+      "sha256": "a5917e237e111dc392018ca6a2221ae67fd31b2745a1f55137a3586543705807",
+      "lines": "19-46",
+      "purpose": "Exact Sepolia activation times and Cancun/Prague/BPO1/BPO2 blob parameters."
+    },
+    {
+      "pathRelativeToSourceRoot": "../evm-toolchains/geth-v1.17.10/source/params/config.go",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source/params/config.go",
+      "bytes": 53348,
+      "sha256": "2995638ab6f8b596dc4f01587fc2d39171b6883904209b956d8236e7a110e6ba",
+      "lines": "591-603",
+      "purpose": "Named Osaka/Amsterdam forks inherit the most recent configured BPO entry."
+    },
+    {
+      "pathRelativeToSourceRoot": "../evm-toolchains/geth-v1.17.10/source/params/protocol_params.go",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source/params/protocol_params.go",
+      "bytes": 23593,
+      "sha256": "94657cdf80d2f0b136ff6d89003326f496d3b1ba1abcb1a855b7b98c941e9e28",
+      "lines": "31-32,108-125,203-207",
+      "purpose": "Gas caps, Amsterdam intrinsic constants, blob gas/minimum price and six-blob transaction limit."
+    },
+    {
+      "pathRelativeToSourceRoot": "../evm-toolchains/geth-v1.17.10/source/consensus/misc/eip4844/eip4844.go",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source/consensus/misc/eip4844/eip4844.go",
+      "bytes": 7463,
+      "sha256": "c8b68e4f32cef33e9420648344edc8fa3bb5d5cb42de22fbf0b34bea5dbdf63c",
+      "lines": "45-88,111-124,153-177",
+      "purpose": "Blob schedule selection, current-excess exact price, block usage bounds and separate EIP-7918 excess transition."
+    },
+    {
+      "pathRelativeToSourceRoot": "../evm-toolchains/geth-v1.17.10/source/core/state_transition.go",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source/core/state_transition.go",
+      "bytes": 48808,
+      "sha256": "b85812dfd250889b4c9f63b1f752281fbcce08cc9e4dd43946aed4c01f7bdb94",
+      "lines": "162-193,196-255,457-518,590-665,729-753",
+      "purpose": "Amsterdam intrinsic/floor, fee caps, affordability, blob transaction restrictions and minimum gas checks."
+    },
+    {
+      "pathRelativeToSourceRoot": "engines/local-evm/node_modules/@ethereumjs/common/src/chains.ts",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/node_modules/@ethereumjs/common/src/chains.ts",
+      "bytes": 14425,
+      "sha256": "b0f42bdcf20ad561b3cdfb3b6b0918ea266aa6bf2df12acf58ced63a812875dd",
+      "lines": "270-308",
+      "purpose": "Pinned Sepolia schedule through BPO2; Amsterdam has no timestamp before the reviewed network overlay."
+    },
+    {
+      "pathRelativeToSourceRoot": "engines/local-evm/node_modules/@ethereumjs/common/src/hardforks.ts",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/node_modules/@ethereumjs/common/src/hardforks.ts",
+      "bytes": 6048,
+      "sha256": "055d1bbc3812d951fe3c2f187a1c04ef89a8013be4e9625008c88be5ccc4ba20",
+      "lines": "169-204",
+      "purpose": "Osaka EIP-7594, BPO parameter values and inherited Amsterdam EIPs."
+    },
+    {
+      "pathRelativeToSourceRoot": "engines/local-evm/node_modules/@ethereumjs/common/src/common.ts",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/node_modules/@ethereumjs/common/src/common.ts",
+      "bytes": 29430,
+      "sha256": "06fb8333be8f9993c9d52a60d68d1541c932b61f629c4fc6f240be0e02459b81",
+      "lines": "454-470",
+      "purpose": "Inherited blob gas schedule selection."
+    },
+    {
+      "pathRelativeToSourceRoot": "engines/fixture-evm/node_modules/@ethereumjs/tx/src/4844/tx.ts",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/fixture-evm/node_modules/@ethereumjs/tx/src/4844/tx.ts",
+      "bytes": 21846,
+      "sha256": "0126f8b6e60ddd76df94139ec6886aaa47b51f3a5f5de383d52e5cd180a73671",
+      "lines": "240-272",
+      "purpose": "Blob count bounds, EIP-7594 six-blob maximum, nonempty list and no creation."
+    },
+    {
+      "pathRelativeToSourceRoot": "engines/fixture-evm/node_modules/@ethereumjs/tx/src/util/intrinsic.ts",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/fixture-evm/node_modules/@ethereumjs/tx/src/util/intrinsic.ts",
+      "bytes": 5602,
+      "sha256": "d3199dfd9dc610f2db79442ba531f3ee7a870a75f010c969051b540375b932f6",
+      "lines": "47-147",
+      "purpose": "Sender-aware Amsterdam intrinsic additions, floor and full minimum gas semantics."
+    },
+    {
+      "pathRelativeToSourceRoot": "engines/fixture-evm/node_modules/@ethereumjs/vm/src/runTx.ts",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/fixture-evm/node_modules/@ethereumjs/vm/src/runTx.ts",
+      "bytes": 52439,
+      "sha256": "cde51189c8c8473c7531bb74cfc49209d332edf73b9454c02b8c15584cc17145",
+      "lines": "674-730,828-859",
+      "purpose": "Pinned full transaction admission and blob fee affordability; read only, not executed by this packet."
+    },
+    {
+      "pathRelativeToSourceRoot": "engines/fixture-evm/node_modules/@ethereumjs/block/src/header/header.ts",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/fixture-evm/node_modules/@ethereumjs/block/src/header/header.ts",
+      "bytes": 31834,
+      "sha256": "cfa19f2ebbb927d83952c52125d5b6d707924ef0e8551aae7446a866cfaf5419",
+      "lines": "578-586",
+      "purpose": "Current-header blob fee derivation."
+    },
+    {
+      "pathRelativeToSourceRoot": "engines/fixture-evm/node_modules/@ethereumjs/block/src/helpers.ts",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/fixture-evm/node_modules/@ethereumjs/block/src/helpers.ts",
+      "bytes": 6560,
+      "sha256": "36788d43959f510eadbfff689e006c5bd28be1c13cef90f5576d5f362ab028f1",
+      "lines": "139-160",
+      "purpose": "Pinned integer fake exponential."
+    },
+    {
+      "pathRelativeToSourceRoot": "engines/local-evm/ethereum-network.js",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/ethereum-network.js",
+      "bytes": 2910,
+      "sha256": "c7ea778b685cd4f03dc3ffb4ec09a6251e6bdd915e64ef20bb05d51433f19c12",
+      "lines": "1-49",
+      "purpose": "Reviewed trusted chain selector and detached Sepolia Amsterdam timestamp overlay."
+    },
+    {
+      "pathRelativeToSourceRoot": "engines/local-evm/test/fixtures/sepolia-network/header-12018196.json",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/fixtures/sepolia-network/header-12018196.json",
+      "bytes": 12304,
+      "sha256": "dd7eb647ef6be190561896eb8bcef58750cc08ed940081d539fdc592708faceb",
+      "lines": null,
+      "purpose": "Unchanged saved Sepolia header, independently rehashed by the pure test."
+    },
+    {
+      "pathRelativeToSourceRoot": "engines/local-evm/test/fixtures/sepolia-network/geth-sepolia.json",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/fixtures/sepolia-network/geth-sepolia.json",
+      "bytes": 1128,
+      "sha256": "a5917e237e111dc392018ca6a2221ae67fd31b2745a1f55137a3586543705807",
+      "lines": "19-46",
+      "purpose": "Retained exact official chain specification used by the pure controls."
+    },
+    {
+      "pathRelativeToSourceRoot": "engines/local-evm/test/fixtures/sepolia-network/provenance.json",
+      "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/fixtures/sepolia-network/provenance.json",
+      "bytes": 1237,
+      "sha256": "04804d6b25ba218178e2b158b455541c17de09027ea0bcfb484d81e83394875a",
+      "lines": null,
+      "purpose": "Original public header capture and official schedule provenance."
+    }
+  ],
+  "entrypoints": {
+    "ethereumBlobContext": "(header, chainId = 1)",
+    "ethereumFeePlan": "(request, header, chainId = 1)"
+  },
+  "allowedTrustedChainIds": [
+    1,
+    11155111
+  ],
+  "amsterdamBlobParameters": {
+    "targetBlobsPerBlock": 14,
+    "maxBlobsPerBlock": 21,
+    "maxBlobsPerTransaction": 6,
+    "gasPerBlob": "131072",
+    "minimumBlobBaseFee": "1",
+    "baseFeeUpdateFraction": "11684671"
+  },
+  "gasAdmission": {
+    "amsterdamPreliminaryBase": "12000",
+    "legacyPreliminaryBase": "21000",
+    "localMaximum": "5000000",
+    "fullIntrinsicAndFloorEnforcedHere": false,
+    "fullIntrinsicAndFloorResponsibility": "Existing call layer; future Sepolia integration must pass the same trusted chain and enforce exact request minimum."
+  },
+  "captureAndExecution": {
+    "freshRpcCalls": 0,
+    "freshVmExecutions": 0,
+    "gethExecutions": 0
+  }
+}

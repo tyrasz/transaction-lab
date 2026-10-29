@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "status": "clear",
+  "reviewer": "/root/build_benchmarks",
+  "reviewType": "Independent read-only source review; no separate tests launched during root full suite.",
+  "productionSourceHashes": {
+    "engines/local-evm/ethereum-blob-fees.js": "26ee611c10e1af5ec09d92946af117ba4e4e25864d77ce22f59bb4b2d0a21b80",
+    "engines/local-evm/ethereum-fees.js": "f58903effa7e79210db4c72036558930e0afafe528d6f83ae2f25c496c1ff618",
+    "engines/local-evm/test/ethereum-fee-network.test.js": "8eff3c022b42468c0df3e06b633c13eedfa2225bc29d8ec7fc24ed38619f08d8"
+  },
+  "reviewed": [
+    "Pinned Geth Sepolia schedule and BPO inheritance",
+    "Strict trusted selector binding; header/request claims do not choose chain",
+    "Canonical uint64 fields and bounded exact blob pricing",
+    "Separate transaction and block blob caps",
+    "No new EIP-7918 current-price clamp",
+    "12k bound is preliminary, not the full intrinsic/floor requirement",
+    "Unchanged mainnet output shapes and existing default callers"
+  ],
+  "findings": [],
+  "requestedEdits": [],
+  "reviewerRpcCalls": 0,
+  "reviewerVmExecutions": 0,
+  "producerPureControls": [
+    {
+      "path": "fee-controls.tap",
+      "copiedFrom": "/tmp/evm-v031-fee-network-first.log",
+      "bytes": 4601,
+      "sha256": "0645217f79d088b6f36fba2a4d32eb41d0fd7a77ab2ce4d86a5b1a3b49f650b8",
+      "tests": 18,
+      "passed": 18,
+      "failed": 0,
+      "durationMs": 100.396667
+    },
+    {
+      "path": "network-header.tap",
+      "copiedFrom": "/tmp/evm-v031-fee-network-header-regression.log",
+      "bytes": 1331,
+      "sha256": "05c0b6fdb6aa90f8f066cb30304103b5e60570932a9836f5c4714fdcc0c4cbad",
+      "tests": 5,
+      "passed": 5,
+      "failed": 0,
+      "durationMs": 90.855
+    }
+  ],
+  "rootReportedCheckpoint": {
+    "engine": {
+      "passed": 798,
+      "failed": 0,
+      "durationSeconds": 18.115
+    },
+    "application": {
+      "passed": 701,
+      "failed": 0,
+      "durationSeconds": 43.114
+    },
+    "provenance": "Parent message; full-suite logs are retained by root separately and not independently rerun in this packet."
+  }
+}
