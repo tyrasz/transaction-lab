@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "kind": "independent_saved_artifact_verification",
+  "verified": true,
+  "performed": {
+    "rpcCalls": 0,
+    "evmExecutions": 0,
+    "providerReplays": 0
+  },
+  "pins": {
+    "capture": "51076d500e9176482cd530780d8077e7de57d1e689f3907122bd9e4061b086ab",
+    "plan": "125fa912c2763114aa4dc16dd44179435d5685d59514ec035980482af81628ce",
+    "library": "90888b21c1fc0cd5a13761781fe1ff7422467039018cabb1a1cebf4069b08f52",
+    "protocol": "707e8b22dcae36093585994fe807c71b27b73fbda0881573f6483192629b928b",
+    "selection": "fc3733e901257af80399bb98a26f34a02ab82694cecb15aae6d2c48d901ef16e"
+  },
+  "inventory": {
+    "captureFiles": 92,
+    "runtimeFiles": 12768,
+    "archivedSourceFiles": 53,
+    "dependencyFiles": 12715,
+    "dependencyBytes": 44055784,
+    "dependencyArchive": "research/arbitrum-viem-deposit-v1",
+    "node": {
+      "version": "v22.23.2",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.2/bin/node",
+      "sha256": "1f72236fcbfc84855d7c884fbcba0f6a7c635d600d7e493b823e77c467f2ae95"
+    },
+    "staticClosureFiles": 36,
+    "loaderFiles": 12753,
+    "loaderSourceSha256": "7cfec62d10578310364c880cbd51d031e721829eea4af33b901e03ebbfb1732e",
+    "missingStaticClosure": []
+  },
+  "request": {
+    "from": "0xa95d9c1f655341597c94393fddc30cf3c08e4fce",
+    "to": "0x28b5a0e9c621a5badaa536219b3a228c8168cf5d",
+    "value": "0",
+    "gas": "2000000",
+    "calldataBytes": 356,
+    "calldataSha256": "0fb9dcbad71b6d7d716e552e07b17ef35334dc89b67e025058fe43c50681541f",
+    "qualificationBlock": "0x1ef304eb",
+    "qualificationHash": "0xe3b3f7387a3f6f75cd9165fd34b3988033c1c7544c5c985aebe6bd7cff30ca38",
+    "senderCodeBytes": 6630,
+    "senderCodeSha256": "cea7ab761813fb44bb27b0b404d5ad710f1d59722a5f9cd4c5e4a31c2981baaf",
+    "senderKind": "contract"
+  },
+  "observation": {
+    "status": "partial",
+    "execution": "success",
+    "gasUsed": "116393",
+    "originalCalls": 2,
+    "rpcCalls": 10,
+    "rpcResponseBytes": 41389,
+    "logs": [
+      {
+        "event": "Transfer",
+        "args": {
+          "from": "0xA95d9c1F655341597C94393fDdc30cf3c08E4fcE",
+          "to": "0xfd78EE919681417d192449715b2594ab58f5D002",
+          "value": "100000000"
+        }
+      },
+      {
+        "event": "Burn",
+        "args": {
+          "burner": "0xfd78EE919681417d192449715b2594ab58f5D002",
+          "amount": "100000000"
+        }
+      },
+      {
+        "event": "Transfer",
+        "args": {
+          "from": "0xfd78EE919681417d192449715b2594ab58f5D002",
+          "to": "0x0000000000000000000000000000000000000000",
+          "value": "100000000"
+        }
+      },
+      {
+        "event": "MessageSent",
+        "args": {
+          "message": "0x000000010000000300000013000000000000000000000000000000000000000000000000000000000000000000000000000000000000000028b5a0e9c621a5badaa536219b3a228c8168cf5d00000000000000000000000028b5a0e9c621a5badaa536219b3a228c8168cf5d000000000000000000000000b21d281dedb17ae5b501f6aa8256fe38c4e45757000003e80000000000000001000000000000000000000000af88d065e77c8cc2239327c5edb3a432268e5831000000000000000000000000b21d281dedb17ae5b501f6aa8256fe38c4e457570000000000000000000000000000000000000000000000000000000005f5e100000000000000000000000000a95d9c1f655341597c94393fddc30cf3c08e4fce0000000000000000000000000000000000000000000000000000000000030d4000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000636374702d666f72776172640000000000000000000000000000000000000018a95d9c1f655341597c94393fddc30cf3c08e4fce00000000"
+        }
+      },
+      {
+        "event": "DepositForBurn",
+        "args": {
+          "burnToken": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "depositor": "0xA95d9c1F655341597C94393fDdc30cf3c08E4fcE",
+          "minFinalityThreshold": 1000,
+          "amount": "100000000",
+          "mintRecipient": "0x000000000000000000000000b21d281dedb17ae5b501f6aa8256fe38c4e45757",
+          "destinationDomain": 19,
+          "destinationTokenMessenger": "0x00000000000000000000000028b5a0e9c621a5badaa536219b3a228c8168cf5d",
+          "destinationCaller": "0x000000000000000000000000b21d281dedb17ae5b501f6aa8256fe38c4e45757",
+          "maxFee": "200000",
+          "hookData": "0x636374702d666f72776172640000000000000000000000000000000000000018a95d9c1f655341597c94393fddc30cf3c08e4fce00000000"
+        }
+      }
+    ],
+    "balances": {
+      "USDC": {
+        "beforeRaw": "13162457912",
+        "afterRaw": "13062457912",
+        "deltaRaw": "-100000000",
+        "decimals": 6
+      },
+      "ETH": {
+        "beforeRaw": "0",
+        "afterRaw": "0",
+        "deltaRaw": "0"
+      },
+      "messenger": {
+        "status": "unverified",
+        "reason": "failed_pre_balance",
+        "beforeRaw": null,
+        "afterRaw": null,
+        "deltaRaw": null
+      }
+    },
+    "sourceBurnRaw": "100000000",
+    "minter": "0xfd78ee919681417d192449715b2594ab58f5d002",
+    "maximumFeeRaw": "200000",
+    "sourceDomain": 3,
+    "destinationDomain": 19,
+    "hookRecipient": "0xa95d9c1f655341597c94393fddc30cf3c08e4fce",
+    "requestedDex": 0,
+    "messageBytes": 432
+  },
+  "limitations": [
+    "Provider observations, not independent Arbitrum/Nitro execution, consensus or state proof verification.",
+    "Two matching original simulations within one adapter attempt; measurements use synthetic successor blocks and exact retained code-only helper overrides.",
+    "Contract sender: EOA admission, contract authorization and ability to submit a real transaction were not established. Zero ETH and gasPrice zero do not demonstrate a funded transaction.",
+    "USDC symbol/decimals are provider metadata; amount100000000 corresponds to100USDC under the pinned six-decimal token declaration. Failed messenger balance probe remains unknown.",
+    "No bridge attestation, destination transaction, HyperEVM/HyperCore credit, actual fee or security conclusion. Message nonce/finalityExecuted/feeExecuted/expiration placeholders are zero and do not prove settlement.",
+    "Runtime snapshot is not standalone: exact dependencies are retained in the separately pinned prior viem archive; Node binary is identified and checked locally, not embedded.",
+    "The reconstructed Arbitrum loader static closure is complete. Unused dynamically loaded Ethereum local/provider engines are outside this packet and were not executed."
+  ],
+  "sourceChecks": {
+    "capturedRunner": "6b36870d0d55deb324cba108f20f1cd9691f75a49500b92e6a55db22501588f4",
+    "runtimeManifest": "06341f43ae37623077b51bd47ecd76d0725a866afa5a58e42b8c27fa76da4151",
+    "sourceUnchangedReported": true,
+    "qualificationHeaderConfirmed": true,
+    "allCapturedBytesVerified": true,
+    "allDependencyBytesVerified": true,
+    "loaderIdentityReconstructed": true
+  }
+}
