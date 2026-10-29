@@ -1,0 +1,946 @@
+{
+  "schema": 1,
+  "scope": "Single KZG proof verification only; original upstream bytes, not blob/sidecar validation. No transcript verification claim.",
+  "sources": {
+    "go-ethereum": {
+      "repository": "https://github.com/ethereum/go-ethereum",
+      "tag": "v1.17.10",
+      "commit": "1df30b18d9ed35ee9d28ffd4648442c2204554ad",
+      "licenseFiles": [
+        "upstream/COPYING.go-ethereum",
+        "upstream/COPYING.LESSER.go-ethereum"
+      ]
+    },
+    "go-eth-kzg": {
+      "repository": "https://github.com/crate-crypto/go-eth-kzg",
+      "version": "v1.5.0",
+      "goSum": [
+        "github.com/crate-crypto/go-eth-kzg v1.5.0 h1:FYRiJMJG2iv+2Dy3fi14SVGjcPteZ5HAAUe4YWlJygc=",
+        "github.com/crate-crypto/go-eth-kzg v1.5.0/go.mod h1:J9/u5sWfznSObptgfa92Jq8rTswn6ahQWEuiLHOjCUI="
+      ],
+      "consensusSpecsCommitDeclaredByReadme": "017a8495f7671f5fff2075a9bfc9238c1a0982f8",
+      "licenseFiles": [
+        "upstream/LICENSE.go-eth-kzg"
+      ],
+      "corpusSource": "tests/verify_kzg_proof/kzg-mainnet/*/data.yaml; all 122 locally bundled consensus test vectors, without selection by outcome"
+    }
+  },
+  "counts": {
+    "verifyKzgProof": 122,
+    "outputs": {
+      "true": 54,
+      "false": 48,
+      "null": 20
+    },
+    "gethPointEvaluation": 1
+  },
+  "runtimeSetup": {
+    "sourcePath": "upstream/trusted_setup.json",
+    "sha256": "f8e44a31ebf0a6d0734dcb301b0716e2c77f3ae18ed0cab0870fbcc2ca55616f",
+    "selectedG2MonomialIndex": 1,
+    "selectedG2Monomial": "0xb5bfd7dd8cdeb128843bc287230af38926187075cbfbefa81009a2ce615ac53d2914e5870cb452d2afaaab24f3499f72185cbfee53492714734429b7b38608e23926c911cceceac9a36851477ba4c60b087041de621000edc98edada20c1def2",
+    "trust": "Pinned Geth mainnet ceremony setup bytes. Reusing the published setup assumes its ceremony trust condition; this fixture does not independently validate the ceremony transcript."
+  },
+  "dependencies": {
+    "@noble/curves": "2.4.0",
+    "@noble/hashes": "2.4.0"
+  },
+  "files": [
+    {
+      "path": "upstream/COPYING.LESSER.go-ethereum",
+      "bytes": 7651,
+      "sha256": "da7eabb7bafdf7d3ae5e9f223aa5bdc1eece45ac569dc21b3b037520b4464768",
+      "source": "go-ethereum",
+      "sourcePath": "COPYING.LESSER"
+    },
+    {
+      "path": "upstream/COPYING.go-ethereum",
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "source": "go-ethereum",
+      "sourcePath": "COPYING"
+    },
+    {
+      "path": "upstream/LICENSE.go-eth-kzg",
+      "bytes": 11357,
+      "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+      "source": "go-eth-kzg",
+      "sourcePath": "LICENSE"
+    },
+    {
+      "path": "upstream/README.go-eth-kzg.md",
+      "bytes": 2095,
+      "sha256": "b87e46213b80f8bdcdbad73718d6543bdcf63fda30f772f6d97f6003294d72fe",
+      "source": "go-eth-kzg",
+      "sourcePath": "README.md"
+    },
+    {
+      "path": "upstream/pointEvaluation.json",
+      "bytes": 636,
+      "sha256": "e831a6e4b7c848ae012e75adfe7724caeb95e2ecb79af7e853e26ccdbe5cdc9d",
+      "source": "go-ethereum",
+      "sourcePath": "core/vm/testdata/precompiles/pointEvaluation.json"
+    },
+    {
+      "path": "upstream/trusted_setup.json",
+      "bytes": 881553,
+      "sha256": "f8e44a31ebf0a6d0734dcb301b0716e2c77f3ae18ed0cab0870fbcc2ca55616f",
+      "source": "go-ethereum",
+      "sourcePath": "crypto/kzg4844/trusted_setup.json"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_02e696ada7d4631d/data.yaml",
+      "bytes": 394,
+      "sha256": "1c01e933515212e15a17a4d8b6138aea3b3996eb7116e91b75eb4908bf5c10e9",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_02e696ada7d4631d/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_05c1f3685f3393f0/data.yaml",
+      "bytes": 394,
+      "sha256": "5f27918e562b5722c09b5ebff54320e0bad3451aba23a769646bb144b8d2bc96",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_05c1f3685f3393f0/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_08f9e2f1cb3d39db/data.yaml",
+      "bytes": 394,
+      "sha256": "87191f54c3d235364168faa8f24fb69b5ac747ddded641002a8cd5d23f0a2adb",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_08f9e2f1cb3d39db/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_0cf79b17cb5f4ea2/data.yaml",
+      "bytes": 394,
+      "sha256": "698b5141ab5159d491e38670cd7f8cf165ca1ad858b5f7437857596e9b58e1c7",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_0cf79b17cb5f4ea2/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_177b58dc7a46b08f/data.yaml",
+      "bytes": 394,
+      "sha256": "98f85dadd71d1a1a2b6908cc3be75a5876cc9ef94b3b86dc0cc60523e120f748",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_177b58dc7a46b08f/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_1ce8e4f69d5df899/data.yaml",
+      "bytes": 394,
+      "sha256": "d78c76f880b135e9414704cf312e819549b6f9406bd5381cddd3d69a5e48591e",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_1ce8e4f69d5df899/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_26b753dec0560daa/data.yaml",
+      "bytes": 394,
+      "sha256": "851eebe4c4be4b31a9fe028cfe1522261c5db12f0c85748c0579cc055ca3b8f9",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_26b753dec0560daa/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_2b76dc9e3abf42f3/data.yaml",
+      "bytes": 394,
+      "sha256": "a7999f51ba92aaa6445d29f44aab6bcf72592c9050f969c6121a3d98d1b8b725",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_2b76dc9e3abf42f3/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_31ebd010e6098750/data.yaml",
+      "bytes": 394,
+      "sha256": "e9946f243dbeabf090375db7348f03687adbf661279c897b6d756cdf60cb7cd7",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_31ebd010e6098750/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_3208425794224c3f/data.yaml",
+      "bytes": 394,
+      "sha256": "cdd6e5e282ab5a3168b45d65d95ab4813a1b6b76bf6b6c2a9676e409a325c205",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_3208425794224c3f/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_36817bfd67de97a8/data.yaml",
+      "bytes": 394,
+      "sha256": "84c22e7f81ac4c0eb1cc848cd58ec309a31efd83bee7fd4af9d0d2dbde091c17",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_36817bfd67de97a8/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_392169c16a2e5ef6/data.yaml",
+      "bytes": 394,
+      "sha256": "8e6532e95b7ecda7db2682d0fcf74355213aee64d6e2d8476c8ee2097a7a5d74",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_392169c16a2e5ef6/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_395cf6d697d1a743/data.yaml",
+      "bytes": 394,
+      "sha256": "8e597372e039642331d89a893498c99a18a905feea1a613b428d469a2cf22b25",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_395cf6d697d1a743/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_3ac8dc31e9aa6a70/data.yaml",
+      "bytes": 394,
+      "sha256": "64f5d620b2e6d31c4ff0cf59bbed908c627a471035cb4e80d4227249bbbd264a",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_3ac8dc31e9aa6a70/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_3c1e8b38219e3e12/data.yaml",
+      "bytes": 394,
+      "sha256": "d0ad87dc598b305e7babaa0887ec61e17ef395146800c88c3c8557b78c954b4a",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_3c1e8b38219e3e12/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_3c87ec986c2656c2/data.yaml",
+      "bytes": 394,
+      "sha256": "459488ed7195b37e6ccb11626921691a6bc4e59219b2ad8bb1646a01b6355ff9",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_3c87ec986c2656c2/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_3cd183d0bab85fb7/data.yaml",
+      "bytes": 394,
+      "sha256": "c06fa250784fc68ae27bd84b4261106f306fc5aa306aeafd2d7e5789c7d07f68",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_3cd183d0bab85fb7/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_420f2a187ce77035/data.yaml",
+      "bytes": 394,
+      "sha256": "efd28ab156284e9be4609c61438b38f45cf1fcd477eaed1518b1687368ec603e",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_420f2a187ce77035/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_444b73ff54a19b44/data.yaml",
+      "bytes": 394,
+      "sha256": "4088c3feba99fadaccdacb55b827413d36d578226e359be1d223f3f152013fca",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_444b73ff54a19b44/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_53a9bdf4f75196da/data.yaml",
+      "bytes": 394,
+      "sha256": "a640b782b8c1351142e5aeac591a467351c635b7d77d7eddb6d0d856ffcc2429",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_53a9bdf4f75196da/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_585454b31673dd62/data.yaml",
+      "bytes": 394,
+      "sha256": "51b6a7f053c29cf156ec7f05171746e472fca77d085b6836b3f4a309bd577ced",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_585454b31673dd62/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_7db4f140a955dd1a/data.yaml",
+      "bytes": 394,
+      "sha256": "ef4255b61aaf525c90d86640d1a354614aaf3b03142475143192015086dbff49",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_7db4f140a955dd1a/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_83e53423a2dd93fe/data.yaml",
+      "bytes": 394,
+      "sha256": "8ba1f590a7d80e0d10c5a3368734176ba3cbb1554097df12817ac4ba41c51404",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_83e53423a2dd93fe/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_9b24f8997145435c/data.yaml",
+      "bytes": 394,
+      "sha256": "fc5d23111eaa45ceb34a05da240ec9127fb36117aaa89277f2a2314c803c4785",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_9b24f8997145435c/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_9b754afb690c47e1/data.yaml",
+      "bytes": 394,
+      "sha256": "40943989598171b2a8784ecf06553b316df2c3882cd6d299645bc2e6535b6bcc",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_9b754afb690c47e1/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_a0be66af9a97ea52/data.yaml",
+      "bytes": 394,
+      "sha256": "6a881be8f22eb37666cfa0b2b8aa087801b28a14a4bbf791253a0a9b5e1f0aee",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_a0be66af9a97ea52/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_af669445747d2585/data.yaml",
+      "bytes": 394,
+      "sha256": "702b24f7a7468130ce9b75ddd09f193b7468588806bcfdc53f9188b558566112",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_af669445747d2585/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_af8b75f664ed7d43/data.yaml",
+      "bytes": 394,
+      "sha256": "bb2cdc6c64f8744e47f665c641b34bcb9f648eabb36d9e62d707677499c1af11",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_af8b75f664ed7d43/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_b6cb6698327d9835/data.yaml",
+      "bytes": 394,
+      "sha256": "4a984fb8a5ef6a880e25d1f8ba80740590180c418586e20ee52a8f7dc285c979",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_b6cb6698327d9835/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_b6ec3736f9ff2c62/data.yaml",
+      "bytes": 394,
+      "sha256": "5f6990a01d452fa2e72b1f37f07a283bceb626baf608be8b96dff1e39896c76f",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_b6ec3736f9ff2c62/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_becf2e1641bbd4e6/data.yaml",
+      "bytes": 394,
+      "sha256": "8e5fcfaadcc069d89a6588d80b27515d436ec63a4628f0af4f1895d5dd11b305",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_becf2e1641bbd4e6/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_c3d4322ec17fe7cd/data.yaml",
+      "bytes": 394,
+      "sha256": "d95d4673dfd703ed1fac032330533673cab4988e4eebaf0d345b4d72885a589b",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_c3d4322ec17fe7cd/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_c5e1490d672d026d/data.yaml",
+      "bytes": 394,
+      "sha256": "069b06e7f98284ae71d28180ab228dc0dbbe355b3635b0d260d6383d497be4c7",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_c5e1490d672d026d/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_cae5d3491190b777/data.yaml",
+      "bytes": 394,
+      "sha256": "937decf1fb9888aac5116b6fd26503dd5973246f3af7afdec44639d816ac2fc5",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_cae5d3491190b777/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_d0992bc0387790a4/data.yaml",
+      "bytes": 394,
+      "sha256": "41726f1fffc778e3dc47130daf2afb96c6e6c928aa92aae30d4cc9d8f4a7acdc",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_d0992bc0387790a4/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_d736268229bd87ec/data.yaml",
+      "bytes": 394,
+      "sha256": "5b5bca0bcb135272896dd4a12afd87210ae01356906170b8a4d7c6f42e2e429e",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_d736268229bd87ec/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_e68d7111a2364a49/data.yaml",
+      "bytes": 394,
+      "sha256": "c5696672610272e6b758cb20dede6bc9780008ece28301270460614f4bfe3977",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_e68d7111a2364a49/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_ed6b180ec759bcf6/data.yaml",
+      "bytes": 394,
+      "sha256": "60ff5b91df485210d8945588b9323054bd72c09afbff074bd6ee71acf5f1df76",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_ed6b180ec759bcf6/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_f0ed3dc11cdeb130/data.yaml",
+      "bytes": 394,
+      "sha256": "e7fa4e260125a52fee2366d06f706457c0ce597800a171dcafc21c9e4b2c0369",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_f0ed3dc11cdeb130/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_f47eb9fc139f6bfd/data.yaml",
+      "bytes": 394,
+      "sha256": "59464b725f7661d4ee9833e0c4a586f466378700968bd15088a1381382136f9c",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_f47eb9fc139f6bfd/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_f7f44e1e864aa967/data.yaml",
+      "bytes": 394,
+      "sha256": "90faeffc118b42ff4a3b91b4d79d0a7857335302a502e856b7f7bca54133e2bc",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_f7f44e1e864aa967/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_ffa6e97b97146517/data.yaml",
+      "bytes": 394,
+      "sha256": "e5a292bc46939cadabcdc34e882ae3336d76a254dfa89d0464fe0a55e917d47f",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_ffa6e97b97146517/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_05c1f3685f3393f0/data.yaml",
+      "bytes": 394,
+      "sha256": "5f27918e562b5722c09b5ebff54320e0bad3451aba23a769646bb144b8d2bc96",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_05c1f3685f3393f0/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_177b58dc7a46b08f/data.yaml",
+      "bytes": 394,
+      "sha256": "98f85dadd71d1a1a2b6908cc3be75a5876cc9ef94b3b86dc0cc60523e120f748",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_177b58dc7a46b08f/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_2b76dc9e3abf42f3/data.yaml",
+      "bytes": 394,
+      "sha256": "a7999f51ba92aaa6445d29f44aab6bcf72592c9050f969c6121a3d98d1b8b725",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_2b76dc9e3abf42f3/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_395cf6d697d1a743/data.yaml",
+      "bytes": 394,
+      "sha256": "8e597372e039642331d89a893498c99a18a905feea1a613b428d469a2cf22b25",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_395cf6d697d1a743/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_585454b31673dd62/data.yaml",
+      "bytes": 394,
+      "sha256": "51b6a7f053c29cf156ec7f05171746e472fca77d085b6836b3f4a309bd577ced",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_585454b31673dd62/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_a0be66af9a97ea52/data.yaml",
+      "bytes": 394,
+      "sha256": "6a881be8f22eb37666cfa0b2b8aa087801b28a14a4bbf791253a0a9b5e1f0aee",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_point_at_infinity_for_twos_poly_a0be66af9a97ea52/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_02e696ada7d4631d/data.yaml",
+      "bytes": 394,
+      "sha256": "1c01e933515212e15a17a4d8b6138aea3b3996eb7116e91b75eb4908bf5c10e9",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_02e696ada7d4631d/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_0cf79b17cb5f4ea2/data.yaml",
+      "bytes": 394,
+      "sha256": "698b5141ab5159d491e38670cd7f8cf165ca1ad858b5f7437857596e9b58e1c7",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_0cf79b17cb5f4ea2/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_3208425794224c3f/data.yaml",
+      "bytes": 394,
+      "sha256": "cdd6e5e282ab5a3168b45d65d95ab4813a1b6b76bf6b6c2a9676e409a325c205",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_3208425794224c3f/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_3ac8dc31e9aa6a70/data.yaml",
+      "bytes": 394,
+      "sha256": "64f5d620b2e6d31c4ff0cf59bbed908c627a471035cb4e80d4227249bbbd264a",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_3ac8dc31e9aa6a70/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_c3d4322ec17fe7cd/data.yaml",
+      "bytes": 394,
+      "sha256": "d95d4673dfd703ed1fac032330533673cab4988e4eebaf0d345b4d72885a589b",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_c3d4322ec17fe7cd/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_ffa6e97b97146517/data.yaml",
+      "bytes": 394,
+      "sha256": "e5a292bc46939cadabcdc34e882ae3336d76a254dfa89d0464fe0a55e917d47f",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_correct_proof_point_at_infinity_for_zero_poly_ffa6e97b97146517/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_02e696ada7d4631d/data.yaml",
+      "bytes": 395,
+      "sha256": "b146be88053e4fefcf7405962bac30cf3233cfc2c8ca186b1f21dc1183916ba1",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_02e696ada7d4631d/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_05c1f3685f3393f0/data.yaml",
+      "bytes": 395,
+      "sha256": "32b797fa74adb58fd758741a29bbc3f5a6ed4f565e5c8156784035d3c7b023d4",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_05c1f3685f3393f0/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_08f9e2f1cb3d39db/data.yaml",
+      "bytes": 395,
+      "sha256": "bd9bfc3dac15ee5d1003c15a5ea7f041e982c8e30870b74a81ee84b9b7a87d11",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_08f9e2f1cb3d39db/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_0cf79b17cb5f4ea2/data.yaml",
+      "bytes": 395,
+      "sha256": "51519769df01e8d6bb83c676be10a93e6c6df1d504b70633ae2c66fa9111ef68",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_0cf79b17cb5f4ea2/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_177b58dc7a46b08f/data.yaml",
+      "bytes": 395,
+      "sha256": "d15a4df1d681a88bc9821dd96c1e710b799db7d55b80559692ae7145cbb93848",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_177b58dc7a46b08f/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_1ce8e4f69d5df899/data.yaml",
+      "bytes": 395,
+      "sha256": "49fb5a5852c92fdac3582ca5270b0321e19e0b0412934fc03214f3d2966481a1",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_1ce8e4f69d5df899/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_26b753dec0560daa/data.yaml",
+      "bytes": 395,
+      "sha256": "e95a7ede6e1795b9a4f8c7990ac69b553e02651ced56367b42d505d764b891e0",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_26b753dec0560daa/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_2b76dc9e3abf42f3/data.yaml",
+      "bytes": 395,
+      "sha256": "ab9010870e353b29f8fc0870f563bf4b215b42770885e934d475691e4a5d5f2b",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_2b76dc9e3abf42f3/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_31ebd010e6098750/data.yaml",
+      "bytes": 395,
+      "sha256": "c70fc40696fd51535da09cd73dceef9608c27c5b924d0e31badcab083f93332b",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_31ebd010e6098750/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_3208425794224c3f/data.yaml",
+      "bytes": 395,
+      "sha256": "6dcc7743cbdbbb5ed85a4d383217fb55270238cb736a85b61d0e1feb32cac220",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_3208425794224c3f/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_36817bfd67de97a8/data.yaml",
+      "bytes": 395,
+      "sha256": "98f7f82c060d8a6c7405c84d5feee942605b62208a867c53534afa399955e32a",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_36817bfd67de97a8/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_392169c16a2e5ef6/data.yaml",
+      "bytes": 395,
+      "sha256": "c4c08853efd354be66b625dcbe4ba5a651942180c332f0432b9b75b0efc33b4e",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_392169c16a2e5ef6/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_395cf6d697d1a743/data.yaml",
+      "bytes": 395,
+      "sha256": "01a95d91969262e74935f0d44ab9de7a04b24e8149a526c86b8b3014dab60e60",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_395cf6d697d1a743/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_3ac8dc31e9aa6a70/data.yaml",
+      "bytes": 395,
+      "sha256": "fa30ab018e43685e2db0fdaeab27987b7d87094ea3c3807cf59955c839fa5d05",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_3ac8dc31e9aa6a70/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_3c1e8b38219e3e12/data.yaml",
+      "bytes": 395,
+      "sha256": "6babb88abfa269594f0c427c32a616d036d7365a764234647940ea967b3b923d",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_3c1e8b38219e3e12/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_3c87ec986c2656c2/data.yaml",
+      "bytes": 395,
+      "sha256": "3725d89793943e49f53acf593da64cd12a302eed017f0baf30773e4676fd74d4",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_3c87ec986c2656c2/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_3cd183d0bab85fb7/data.yaml",
+      "bytes": 395,
+      "sha256": "661dbe38b4cacf0532007cfa1b7d9b353c60fc7265f099dff27b540f2e462221",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_3cd183d0bab85fb7/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_420f2a187ce77035/data.yaml",
+      "bytes": 395,
+      "sha256": "60cc006fdac39ae87c3db2e0d43a1d2fd4ee6c7884eeb9e9875d8e8244bcdadc",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_420f2a187ce77035/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_444b73ff54a19b44/data.yaml",
+      "bytes": 395,
+      "sha256": "c683e1a76cc0522b8940fd0a3b8a60affd49fab7bfa2cec9923f0cd5a1c0dd16",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_444b73ff54a19b44/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_53a9bdf4f75196da/data.yaml",
+      "bytes": 395,
+      "sha256": "7d9eefa638303a751a5ab33e6864f9cf566aed1734e3386dd44e46d9fe1e64a7",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_53a9bdf4f75196da/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_585454b31673dd62/data.yaml",
+      "bytes": 395,
+      "sha256": "94f06c870be485a9e01c974a7d7cd5bf86d114873a75f9eab336db7d38651705",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_585454b31673dd62/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_7db4f140a955dd1a/data.yaml",
+      "bytes": 395,
+      "sha256": "18a0c07d7c7056dece4c36fabb8c22e11c5260b26f5245c4413cddc637ed343e",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_7db4f140a955dd1a/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_83e53423a2dd93fe/data.yaml",
+      "bytes": 395,
+      "sha256": "ed14daf2be5acf6f1e9e73c302aa77102dc871ef171ac2e9357b4931663311f9",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_83e53423a2dd93fe/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_9b24f8997145435c/data.yaml",
+      "bytes": 395,
+      "sha256": "b30e7d3dc4a43eccd7dcdb10229627a7569163a827641b269799e2adcfbd89a3",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_9b24f8997145435c/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_9b754afb690c47e1/data.yaml",
+      "bytes": 395,
+      "sha256": "5cb2a1fbab49c44c507ab5a3193e5c57bf8557e109a00ce7bd3f586b2f8c030a",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_9b754afb690c47e1/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_a0be66af9a97ea52/data.yaml",
+      "bytes": 395,
+      "sha256": "0b04ec242c1a42cd84ff81f6ac8d47ad939a6e9bfba014a12502f44c92e90cfe",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_a0be66af9a97ea52/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_af669445747d2585/data.yaml",
+      "bytes": 395,
+      "sha256": "9ae69954eb2c11ec418b8da1a2cff43554a29c1c5bacde3a52da1b7433f36f8f",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_af669445747d2585/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_af8b75f664ed7d43/data.yaml",
+      "bytes": 395,
+      "sha256": "c9f55ebfd745855b1e09ac82fd67b99f2aa2eb9e1862b8cfe7ccde7467485fe0",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_af8b75f664ed7d43/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_b6cb6698327d9835/data.yaml",
+      "bytes": 395,
+      "sha256": "a41d34cda45c849bb92a3e54c892b1b079c4a4bf56068ee3273a4d441a9b7473",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_b6cb6698327d9835/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_b6ec3736f9ff2c62/data.yaml",
+      "bytes": 395,
+      "sha256": "62a484c3837b3fb4677fc3a86f3e2f5c76b454150d080a1be5647f5cca61ea97",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_b6ec3736f9ff2c62/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_becf2e1641bbd4e6/data.yaml",
+      "bytes": 395,
+      "sha256": "b98c9d7862351bd13e534aa1dbc06912dc39cd23d893f51ebe356c8e4fe37a4c",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_becf2e1641bbd4e6/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_c3d4322ec17fe7cd/data.yaml",
+      "bytes": 395,
+      "sha256": "9b59c056f041c784699d2b6274a6eb790cd5bbbeb63a82373eb3b0741fbc6df0",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_c3d4322ec17fe7cd/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_c5e1490d672d026d/data.yaml",
+      "bytes": 395,
+      "sha256": "0e79f74c0acec1ce5f488d4824b9162516374b4f2f37c459ef5b292660a2d463",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_c5e1490d672d026d/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_cae5d3491190b777/data.yaml",
+      "bytes": 395,
+      "sha256": "69b51a3993d7e7eca3fbb8e81f32b7e2dcfda1a5cdc1bf2d1b2afe3304a10b1c",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_cae5d3491190b777/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_d0992bc0387790a4/data.yaml",
+      "bytes": 395,
+      "sha256": "9b5824905000ed5e49b24c67377cc55b4ebd9d00f47cdea0dfa8f066da1e9bab",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_d0992bc0387790a4/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_d736268229bd87ec/data.yaml",
+      "bytes": 395,
+      "sha256": "8138b8d4c73489c3b3a65bafe28c964ed3accf61e75df257c3066c8289f3f2c6",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_d736268229bd87ec/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_e68d7111a2364a49/data.yaml",
+      "bytes": 395,
+      "sha256": "d1e95d3441b6e5e76cdf00a8c6dd028bd19ec6874a7ed9ad1880133e584b9f02",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_e68d7111a2364a49/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_ed6b180ec759bcf6/data.yaml",
+      "bytes": 395,
+      "sha256": "f78565abf69cb735dca7d5b9dc66f3a5b71ea18af5fce3848454cc1189c6fafe",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_ed6b180ec759bcf6/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_f0ed3dc11cdeb130/data.yaml",
+      "bytes": 395,
+      "sha256": "bc7c5906ff2348992c096b38cd33db7431132070d03fa6ce8deaf3437944b728",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_f0ed3dc11cdeb130/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_f47eb9fc139f6bfd/data.yaml",
+      "bytes": 395,
+      "sha256": "c0cb53a8e93103758db5fb899759f1b0d0aac4deb2925af3b3ee3d48e618ee98",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_f47eb9fc139f6bfd/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_f7f44e1e864aa967/data.yaml",
+      "bytes": 395,
+      "sha256": "427ae14e074e7e79655b8924a98550781de79e99e171ba53dc50d144205f896a",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_f7f44e1e864aa967/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_ffa6e97b97146517/data.yaml",
+      "bytes": 395,
+      "sha256": "96efae80ac8f40e3fa021c226fc72c2bd28f6b8775a4f43131301bdcceb4b51f",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_ffa6e97b97146517/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_point_at_infinity_392169c16a2e5ef6/data.yaml",
+      "bytes": 395,
+      "sha256": "35de58945df0ed66c4fd85bdc4049b2d125941cd54df3d12c64328c1cba0a552",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_point_at_infinity_392169c16a2e5ef6/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_point_at_infinity_3c1e8b38219e3e12/data.yaml",
+      "bytes": 395,
+      "sha256": "9e6777bf43e2389d8cb7e87954718551e51642a6ae84479975c71b8e743d5d3b",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_point_at_infinity_3c1e8b38219e3e12/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_point_at_infinity_3c87ec986c2656c2/data.yaml",
+      "bytes": 395,
+      "sha256": "cd8a0d4866f32a34a2d1d55c42c679c58a344ac84331c30af70683ed27d266b8",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_point_at_infinity_3c87ec986c2656c2/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_point_at_infinity_420f2a187ce77035/data.yaml",
+      "bytes": 395,
+      "sha256": "157d3d5ae0e88352e168b4a1f691a817d66b8c68cb2822120a452e844b5410e4",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_point_at_infinity_420f2a187ce77035/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_point_at_infinity_83e53423a2dd93fe/data.yaml",
+      "bytes": 395,
+      "sha256": "bcfaf17eaeaa6c4fee3a849629beeaca9bb4461e700ba0a3c7d94ac4ed20fa19",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_point_at_infinity_83e53423a2dd93fe/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_incorrect_proof_point_at_infinity_ed6b180ec759bcf6/data.yaml",
+      "bytes": 395,
+      "sha256": "9f6f00a8593ce45a3e09fe0a4565d17311c20415812d32fe320c1da25873b410",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_incorrect_proof_point_at_infinity_ed6b180ec759bcf6/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_commitment_1b44e341d56c757d/data.yaml",
+      "bytes": 392,
+      "sha256": "61be914a5d7f90d0519b06da660c5a63f35302b51232f7b7f5e07c3fb63d3c04",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_commitment_1b44e341d56c757d/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_commitment_32afa9561a4b3b91/data.yaml",
+      "bytes": 394,
+      "sha256": "82a20d22d6f9b95fcd3c5babb982ac7fcc518752e9abf18ba8b3397b5cb82983",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_commitment_32afa9561a4b3b91/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_commitment_3e55802a5ed3c757/data.yaml",
+      "bytes": 396,
+      "sha256": "55ccd0123eb52c7feabc5f47716ffdf10df754dc6088bed82d686ed5d47fb0c5",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_commitment_3e55802a5ed3c757/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_commitment_e9d3e9ec16fbc15f/data.yaml",
+      "bytes": 394,
+      "sha256": "f21d2c67291b501c9216dc117f51dfb3f4c35391f3f015f56636836b8bc664ba",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_commitment_e9d3e9ec16fbc15f/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_proof_1b44e341d56c757d/data.yaml",
+      "bytes": 392,
+      "sha256": "fc3977eedc10cc7e704aa7ae1203a5ed598e11cb93c7c6c76de3460f4e3e31c2",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_proof_1b44e341d56c757d/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_proof_32afa9561a4b3b91/data.yaml",
+      "bytes": 394,
+      "sha256": "3fbbf14310c3e26203c0801beb2ce34bf1f597c18a550cba1f388d3389ec808a",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_proof_32afa9561a4b3b91/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_proof_3e55802a5ed3c757/data.yaml",
+      "bytes": 396,
+      "sha256": "538f0e8b24d9fb5c1d319d26364bb3e81b2b64caaa8333c5e1176e2b83e94093",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_proof_3e55802a5ed3c757/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_proof_e9d3e9ec16fbc15f/data.yaml",
+      "bytes": 394,
+      "sha256": "332e1103d780390cb54ea7c46450ad9210c149a5db77a0cd0c0b5c2a194b6965",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_proof_e9d3e9ec16fbc15f/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_y_35d08d612aad2197/data.yaml",
+      "bytes": 394,
+      "sha256": "699c87174cddeed8b8b5b14984f249c45e21f189b6fb292b0ab9eba22bf95b92",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_y_35d08d612aad2197/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_y_4aa6def8c35c9097/data.yaml",
+      "bytes": 394,
+      "sha256": "aa48295674679f198efa10d4180947916d5f37065d9cd927d155fb9b60d06235",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_y_4aa6def8c35c9097/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_y_4e51cef08a61606f/data.yaml",
+      "bytes": 392,
+      "sha256": "cb0fbdff902657472a34f5e00339bf2f87de95f598def4f2c21c67a1f9018d02",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_y_4e51cef08a61606f/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_y_64b9ff2b8f7dddee/data.yaml",
+      "bytes": 394,
+      "sha256": "e939a23e3e39f51c4abb8215de237256b056de88f368051afd279aa55614fbe6",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_y_64b9ff2b8f7dddee/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_y_b358a2e763727b70/data.yaml",
+      "bytes": 396,
+      "sha256": "d5692bf541cef7c3e6d54abe8b79009f31990349b4b7a18e7172c80de9c62566",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_y_b358a2e763727b70/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_y_eb0601fec84cc5e9/data.yaml",
+      "bytes": 394,
+      "sha256": "f26e51155f1fa09d6bc0f163bb5dbce8ef2b94fb9439a2d403816389e69f9a50",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_y_eb0601fec84cc5e9/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_z_35d08d612aad2197/data.yaml",
+      "bytes": 394,
+      "sha256": "30b060529eeadbb6e5800763a222bf43acb2c6222a01d786898cdb1980ac965a",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_z_35d08d612aad2197/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_z_4aa6def8c35c9097/data.yaml",
+      "bytes": 394,
+      "sha256": "e148d42abf4b0746e943ff996f090ef10e8908a25ccaa4dd37f27e6d175f45c0",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_z_4aa6def8c35c9097/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_z_4e51cef08a61606f/data.yaml",
+      "bytes": 392,
+      "sha256": "836f064769404c5221d98817c06bea5a4afa763f4ed9ecadab30f50bf68d638b",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_z_4e51cef08a61606f/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_z_64b9ff2b8f7dddee/data.yaml",
+      "bytes": 394,
+      "sha256": "e18b9289bbc94eedd9834ec87237a8175215a7d2793e87f6e781c0b8ea8325a9",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_z_64b9ff2b8f7dddee/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_z_b358a2e763727b70/data.yaml",
+      "bytes": 396,
+      "sha256": "b1898910ec4b036f1def67a550d3514f267bfa48683dcc030c69f96e7620af5d",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_z_b358a2e763727b70/data.yaml"
+    },
+    {
+      "path": "upstream/verify_kzg_proof/verify_kzg_proof_case_invalid_z_eb0601fec84cc5e9/data.yaml",
+      "bytes": 394,
+      "sha256": "7a4e9bd24eb4d9ec3d95749d63c6ba9d9f92ed7c5c27e4bee96475955a9d4a69",
+      "source": "go-eth-kzg",
+      "sourcePath": "tests/verify_kzg_proof/kzg-mainnet/verify_kzg_proof_case_invalid_z_eb0601fec84cc5e9/data.yaml"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "transaction-lab",
+  "version": "0.26.0",
+  "private": true,
+  "type": "module",
+  "description": "Evidence-backed EVM transaction previews and benchmarks",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test test/*.test.js",
+    "benchmark": "node src/benchmark.js",
+    "check:live": "node src/live-check.js",
+    "compare:providers": "node src/compare-providers.js",
+    "check:historical": "node src/check-historical.js",
+    "check:permissions": "node src/check-permissions.js",
+    "check:coverage": "node src/evaluate-coverage.js --run",
+    "check:coverage:v2": "node src/evaluate-coverage-v2.js --run",
+    "test:local": "npm --prefix engines/local-evm test"
+  }
+}
