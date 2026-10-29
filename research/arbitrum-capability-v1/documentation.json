@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-29",
+  "scope": "Primary-source documentation and source review; these URLs are mutable and no exact viem release is installed or tested by this probe.",
+  "sources": [
+    {
+      "url": "https://docs.arbitrum.io/chain-info",
+      "finding": "Documents https://arb1.arbitrum.io/rpc as the public Arbitrum One endpoint, chain ID 42161; general-purpose low-volume use without uptime, latency or rate-limit guarantees. The separate sequencer endpoint is not used."
+    },
+    {
+      "url": "https://docs.arbitrum.io/arbitrum-essentials/arbitrum-vs-ethereum/rpc-methods",
+      "finding": "Most Ethereum RPC methods are available, with Arbitrum-specific transaction types, receipt fields and header fields. This general statement does not establish support for a particular public endpoint or prove equivalent Ethereum-mainnet execution rules."
+    },
+    {
+      "url": "https://viem.sh/docs/actions/public/simulateCalls",
+      "finding": "simulateCalls uses eth_simulateV1. Optional traceAssetChanges requires an account and reports source-chain asset changes; it is not a cross-chain settlement verifier."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/wevm/viem/main/src/actions/public/simulateCalls.ts",
+      "finding": "Reviewed main source resolves moving tags using block reads, discovers token candidates using a first simulation, reads pre-balances using eth_call, then performs another multiblock simulation with post-balance and metadata queries. It can use code/state overrides for static measurement helpers. createAccessList is not called by this workflow. The minimal probe does not exercise this complete workflow."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/wevm/viem/main/src/actions/public/simulateBlocks.ts",
+      "finding": "simulateBlocks formats calls and optional state/block overrides, then sends eth_simulateV1 with an explicit hexadecimal block number or block tag."
+    },
+    {
+      "url": "https://raw.githubusercontent.com/wevm/viem/main/src/actions/public/createAccessList.ts",
+      "finding": "createAccessList separately sends eth_createAccessList with the formatted call and selected number/tag. This probe tests it independently; success is not required by simulateCalls."
+    },
+    {
+      "url": "https://github.com/OffchainLabs/nitro/issues/3372",
+      "finding": "Historical primary-source issue reports eth_simulateV1 handler crashes and differing behavior across Nitro versions/providers. The issue is closed; it is not evidence that today's public endpoint fails. Actual errors must be retained and interpreted from this probe."
+    }
+  ],
+  "interpretationLimits": [
+    "A no-op method response is not a CCTP, bridge, token, or destination-credit test.",
+    "Arbitrum ETH deposits from Ethereum and USDC CCTP transfers from Arbitrum to Hyperliquid are distinct protocols.",
+    "Receipt/log decoding and source-chain simulation still require verified deployment, ABI, token, destination-domain and hook interpretation.",
+    "A source-chain burn or successful call does not establish attestation, relay completion, destination mint, or HyperCore credit.",
+    "Current Transaction Lab production supports chain 1 and chain 999 only. This experiment adds no product support or dependencies."
+  ]
+}

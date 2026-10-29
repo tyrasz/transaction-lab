@@ -1,0 +1,109 @@
+{
+  "schemaVersion": 1,
+  "declaredAt": "2026-10-29T01:56:57.102Z",
+  "endpoint": "https://arb1.arbitrum.io/rpc",
+  "expectedChainId": "0xa4b1",
+  "source": {
+    "runSha256": "1d2112fefa6f3c0195764d95c567edcc434f4e2a2c00caeaed28777a4df8a595",
+    "documentationSha256": "e5c4f4e25fdfa9f245d3349e308c3eed4b452043c379c2bc87c167788f732fec"
+  },
+  "runtime": {
+    "node": "v22.23.2",
+    "execPath": "/opt/homebrew/Cellar/node@22/22.23.2/bin/node"
+  },
+  "limits": {
+    "requests": 6,
+    "responseBytes": 1048576,
+    "requestMs": 25000,
+    "overallMs": 120000
+  },
+  "sequence": [
+    {
+      "id": 1,
+      "method": "eth_chainId",
+      "params": []
+    },
+    {
+      "id": 2,
+      "method": "eth_getBlockByNumber",
+      "params": [
+        "latest",
+        false
+      ]
+    },
+    {
+      "id": 3,
+      "method": "eth_call",
+      "params": [
+        {
+          "from": "0x0000000000000000000000000000000000000000",
+          "to": "0x0000000000000000000000000000000000000000",
+          "data": "0x",
+          "value": "0x0",
+          "gas": "0x186a0",
+          "gasPrice": "0x0"
+        },
+        "$selected.number"
+      ]
+    },
+    {
+      "id": 4,
+      "method": "eth_createAccessList",
+      "params": [
+        {
+          "from": "0x0000000000000000000000000000000000000000",
+          "to": "0x0000000000000000000000000000000000000000",
+          "data": "0x",
+          "value": "0x0",
+          "gas": "0x186a0",
+          "gasPrice": "0x0"
+        },
+        "$selected.number"
+      ]
+    },
+    {
+      "id": 5,
+      "method": "eth_simulateV1",
+      "params": [
+        {
+          "blockStateCalls": [
+            {
+              "calls": [
+                {
+                  "from": "0x0000000000000000000000000000000000000000",
+                  "to": "0x0000000000000000000000000000000000000000",
+                  "data": "0x",
+                  "value": "0x0",
+                  "gas": "0x186a0",
+                  "gasPrice": "0x0"
+                }
+              ]
+            }
+          ],
+          "validation": false,
+          "traceTransfers": true,
+          "returnFullTransactions": false
+        },
+        "$selected.number"
+      ]
+    },
+    {
+      "id": 6,
+      "method": "eth_getBlockByNumber",
+      "params": [
+        "$selected.number",
+        false
+      ]
+    }
+  ],
+  "scope": {
+    "purpose": "One provider capability observation, not deposit interpretation or accuracy evidence.",
+    "requests": "Six sequential JSON-RPC POSTs maximum, one endpoint, no retries or substitutions.",
+    "noOp": "Empty calldata and zero value to the zero address; address code and account state are not independently proven. A successful empty return alone does not prove absence of code.",
+    "blockBinding": "All three capability calls use the single observed latest block NUMBER. The final reread checks its hash. This is provider-reported number binding, not a block-hash state selector, proof, finality or consensus verification.",
+    "simulation": "eth_simulateV1 normally constructs synthetic successor block context from the selected base; it is not claimed equal to eth_call execution in that selected block.",
+    "capture": "Exact sent JSON request bytes and HTTP entity response bytes after native fetch content decoding; not TLS or compressed transport bytes.",
+    "dependencies": "Native Node.js only. No viem invocation, asset tracing workflow, contract discovery, CCTP/deposit transaction, funds, signing, broadcast, paid endpoint or credentials.",
+    "failures": "Every attempted response/error is retained. Failed chain/header preparation skips dependent calls; method-specific failures do not trigger retries. A timing/byte bound can skip remaining fixed slots."
+  }
+}
