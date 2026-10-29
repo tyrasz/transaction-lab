@@ -1,0 +1,262 @@
+TAP version 13
+# Subtest: authorization installation/replacement/clear preserve authenticated balance and nonempty storage
+ok 1 - authorization installation/replacement/clear preserve authenticated balance and nonempty storage
+  ---
+  duration_ms: 14.344625
+  type: 'test'
+  ...
+# Subtest: absent authorized account and demanded storage carry through settled copies without altering immutable proofs
+ok 2 - absent authorized account and demanded storage carry through settled copies without altering immutable proofs
+  ---
+  duration_ms: 1.560625
+  type: 'test'
+  ...
+# Subtest: outer rollback removes authorization materialization, code, nonce, slots and provenance
+ok 3 - outer rollback removes authorization materialization, code, nonce, slots and provenance
+  ---
+  duration_ms: 1.22725
+  type: 'test'
+  ...
+# Subtest: authorization setter refuses no checkpoint, nonce mismatch, malformed designation and generic runtime replacement
+ok 4 - authorization setter refuses no checkpoint, nonce mismatch, malformed designation and generic runtime replacement
+  ---
+  duration_ms: 1.979458
+  type: 'test'
+  ...
+# Subtest: a clean before-state query admits only the exact caller nonce increment and does not alter inputs
+ok 5 - a clean before-state query admits only the exact caller nonce increment and does not alter inputs
+  ---
+  duration_ms: 1.72625
+  type: 'test'
+  ...
+# Subtest: after-state query preserves original nonce, native balances and storage clears across account/slot reorder
+ok 6 - after-state query preserves original nonce, native balances and storage clears across account/slot reorder
+  ---
+  duration_ms: 0.252375
+  type: 'test'
+  ...
+# Subtest: query cannot clear an original write, restore its base value, change a cleared slot, or introduce another write
+ok 7 - query cannot clear an original write, restore its base value, change a cleared slot, or introduce another write
+  ---
+  duration_ms: 0.289125
+  type: 'test'
+  ...
+# Subtest: native changes on sender or other accounts are rejected while original unrelated changes remain valid
+ok 8 - native changes on sender or other accounts are rejected while original unrelated changes remain valid
+  ---
+  duration_ms: 0.176125
+  type: 'test'
+  ...
+# Subtest: proven absent sender admits only nonce materialization; fabricated presence and other changes are not normalized
+ok 9 - proven absent sender admits only nonce materialization; fabricated presence and other changes are not normalized
+  ---
+  duration_ms: 0.161375
+  type: 'test'
+  ...
+# Subtest: sender materialized by original execution preserves that existence change through the query
+ok 10 - sender materialized by original execution preserves that existence change through the query
+  ---
+  duration_ms: 0.0885
+  type: 'test'
+  ...
+# Subtest: current sender nonce must agree with the prior overlay, and other nonce changes cannot be hidden
+ok 11 - current sender nonce must agree with the prior overlay, and other nonce changes cannot be hidden
+  ---
+  duration_ms: 0.166583
+  type: 'test'
+  ...
+# Subtest: existence changes must describe supported materialization, with zero prior native state and no new storage
+ok 12 - existence changes must describe supported materialization, with zero prior native state and no new storage
+  ---
+  duration_ms: 0.155792
+  type: 'test'
+  ...
+# Subtest: malformed deltas, duplicate accounts/slots and unknown fields fail even when repeated on both snapshots
+ok 13 - malformed deltas, duplicate accounts/slots and unknown fields fail even when repeated on both snapshots
+  ---
+  duration_ms: 1.107292
+  type: 'test'
+  ...
+# Subtest: bounded snapshots reject excessive accounts/slots and do not execute supplied getters
+ok 14 - bounded snapshots reject excessive accounts/slots and do not execute supplied getters
+  ---
+  duration_ms: 0.716375
+  type: 'test'
+  ...
+# Subtest: identical net snapshots do not claim to rule out transient writes
+ok 15 - identical net snapshots do not claim to rule out transient writes
+  ---
+  duration_ms: 0.082042
+  type: 'test'
+  ...
+# Subtest: nested creation-shaped original rows and prefunded deployment carry unchanged through a disposable query
+ok 16 - nested creation-shaped original rows and prefunded deployment carry unchanged through a disposable query
+  ---
+  duration_ms: 0.903125
+  type: 'test'
+  ...
+# Subtest: empty-runtime creation and prefunded empty-runtime nonce/storage changes remain explicit deltas
+ok 17 - empty-runtime creation and prefunded empty-runtime nonce/storage changes remain explicit deltas
+  ---
+  duration_ms: 0.186292
+  type: 'test'
+  ...
+# Subtest: queries cannot introduce creation, change/remove deployed code or mutate carried creation state
+ok 18 - queries cannot introduce creation, change/remove deployed code or mutate carried creation state
+  ---
+  duration_ms: 0.42175
+  type: 'test'
+  ...
+# Subtest: deployment schema rejects unsupported replacement, impossible origin and nonzero initial storage
+ok 19 - deployment schema rejects unsupported replacement, impossible origin and nonzero initial storage
+  ---
+  duration_ms: 0.577875
+  type: 'test'
+  ...
+# Subtest: creation code and aggregate output slots obey fixed bounds without weakening duplicate checks
+ok 20 - creation code and aggregate output slots obey fixed bounds without weakening duplicate checks
+  ---
+  duration_ms: 8.822125
+  type: 'test'
+  ...
+# Subtest: new code and existence fields reject hostile nested descriptors without evaluating them
+ok 21 - new code and existence fields reject hostile nested descriptors without evaluating them
+  ---
+  duration_ms: 0.357291
+  type: 'test'
+  ...
+# Subtest: final deletion removes code and demanded and undemanded storage without loading more RPC inputs
+ok 22 - final deletion removes code and demanded and undemanded storage without loading more RPC inputs
+  ---
+  duration_ms: 11.827541
+  type: 'test'
+  ...
+# Subtest: nested deletion rollback restores the created account, code, storage and creation eligibility marker
+ok 23 - nested deletion rollback restores the created account, code, storage and creation eligibility marker
+  ---
+  duration_ms: 1.949166
+  type: 'test'
+  ...
+# Subtest: a copied deletion can be funded and recreated without restoring old code or storage in either overlay
+ok 24 - a copied deletion can be funded and recreated without restoring old code or storage in either overlay
+  ---
+  duration_ms: 3.734792
+  type: 'test'
+  ...
+# Subtest: zero-value touches after deletion stay absent and rollback preserves the deletion marker
+ok 25 - zero-value touches after deletion stay absent and rollback preserves the deletion marker
+  ---
+  duration_ms: 3.150958
+  type: 'test'
+  ...
+# Subtest: deletion requires a checkpoint and a retained authenticated creation marker
+ok 26 - deletion requires a checkpoint and a retained authenticated creation marker
+  ---
+  duration_ms: 6.234
+  type: 'test'
+  ...
+# Subtest: empty-account cleanup removes an authenticated nonempty storage trie without enumerating it
+ok 27 - empty-account cleanup removes an authenticated nonempty storage trie without enumerating it
+  ---
+  duration_ms: 12.305583
+  type: 'test'
+  ...
+# Subtest: cleanup rollback restores loaded storage and account existence without changing immutable facts
+ok 28 - cleanup rollback restores loaded storage and account existence without changing immutable facts
+  ---
+  duration_ms: 2.210334
+  type: 'test'
+  ...
+# Subtest: cleanup window rejects arbitrary deletion, nested activation and live accounts
+ok 29 - cleanup window rejects arbitrary deletion, nested activation and live accounts
+  ---
+  duration_ms: 1.577292
+  type: 'test'
+  ...
+# Subtest: positive funding preserves an existing empty account and its storage
+ok 30 - positive funding preserves an existing empty account and its storage
+  ---
+  duration_ms: 1.767
+  type: 'test'
+  ...
+# Subtest: rematerializing and recreating a cleaned nonempty trie uses explicit reset provenance
+ok 31 - rematerializing and recreating a cleaned nonempty trie uses explicit reset provenance
+  ---
+  duration_ms: 1.435208
+  type: 'test'
+  ...
+# Subtest: first reads and writes fetch proven prior account/storage values without zero-filling
+ok 32 - first reads and writes fetch proven prior account/storage values without zero-filling
+  ---
+  duration_ms: 14.555375
+  type: 'test'
+  ...
+# Subtest: facts first loaded inside nested checkpoints survive rollback while mutable writes do not
+ok 33 - facts first loaded inside nested checkpoints survive rollback while mutable writes do not
+  ---
+  duration_ms: 2.75225
+  type: 'test'
+  ...
+# Subtest: proof-absent zero-value touches remain absent; positive native funding and unsigned nonce materialization are explicit
+ok 34 - proof-absent zero-value touches remain absent; positive native funding and unsigned nonce materialization are explicit
+  ---
+  duration_ms: 1.797958
+  type: 'test'
+  ...
+# Subtest: returned objects, copied overlays and immutable proof facts cannot mutate one another
+ok 35 - returned objects, copied overlays and immutable proof facts cannot mutate one another
+  ---
+  duration_ms: 2.168916
+  type: 'test'
+  ...
+# Subtest: invalid storage proof blocks a write and prior overlay state remains available for rollback
+ok 36 - invalid storage proof blocks a write and prior overlay state remains available for rollback
+  ---
+  duration_ms: 2.979959
+  type: 'test'
+  ...
+# Subtest: proven existing empty accounts remain present until explicit transaction-end cleanup
+ok 37 - proven existing empty accounts remain present until explicit transaction-end cleanup
+  ---
+  duration_ms: 0.609042
+  type: 'test'
+  ...
+# Subtest: runtime code/lifecycle changes, fake collectors and unsettled copies stay unsupported
+ok 38 - runtime code/lifecycle changes, fake collectors and unsettled copies stay unsupported
+  ---
+  duration_ms: 4.516333
+  type: 'test'
+  ...
+# Subtest: live reset shape retains cleared namespace and exact old-to-new account fields
+ok 39 - live reset shape retains cleared namespace and exact old-to-new account fields
+  ---
+  duration_ms: 1.254542
+  type: 'test'
+  ...
+# Subtest: reset representation cannot masquerade as sparse old-storage differences or an existence transition
+ok 40 - reset representation cannot masquerade as sparse old-storage differences or an existence transition
+  ---
+  duration_ms: 0.352083
+  type: 'test'
+  ...
+# Subtest: query purity preserves inherited reset state but rejects introducing or dropping it
+ok 41 - query purity preserves inherited reset state but rejects introducing or dropping it
+  ---
+  duration_ms: 0.422333
+  type: 'test'
+  ...
+# Subtest: actual isolated parent rejects invented namespace reset even with authentic initial root and unchanged scalars
+ok 42 - actual isolated parent rejects invented namespace reset even with authentic initial root and unchanged scalars
+  ---
+  duration_ms: 127.498958
+  type: 'test'
+  ...
+1..42
+# tests 42
+# suites 0
+# pass 42
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 326.052041

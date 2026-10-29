@@ -12,7 +12,17 @@ The public single-call API gains a previously unsupported neutral after-state ge
 
 The full **737/737 local-engine controls pass** (72.643 seconds) and **701/701 application controls pass** (68.744 seconds). The initial application run retained 25 sandbox port-binding failures and twelve source-identity failures caused by changing the release version during that run; the final rerun used stable source and allowed localhost binding. The [two-case API packet](research/account-reset-v030-api/NOTES.md) retains both raw responses and all 32 synthetic proof-transport replies. Its saved-artifact consistency check passes independently of target execution.
 
-The independent Geth comparison is being collected for this release. These synthetic cases are development evidence, not a population accuracy percentage. Complete effect discovery, local API sequences and full HyperCore processing remain outside the supported scope.
+The first [independent Geth packet](research/account-reset-v030/NOTES.md) retains **5 matched, zero mismatched and 10 unavailable** prefix comparisons. All fifteen saved full state roots, log hashes, gas totals and receipt statuses agree. Geth's native call tracer left eighteen later transaction trace files empty, so ten complete return-data comparisons remain unavailable. The [independent artifact audit](research/account-reset-v030-review/NOTES.md) rebuilt all fifteen product and Geth state roots and rechecked the signed bodies, proofs and exact inventory; its nine controls pass.
+
+A separately frozen [JSON-trace correction](research/account-reset-v030/json-trace-followup/NOTES.md) matched **all 15 prefixes across all five comparison channels**, including exact return data and message gas. It ran the unchanged Geth binary against the original signed inputs and already-sealed product expectations, changing only trace collection. It performed no product rerun and preserves the first packet's 5/10 result. The separate [artifact audit](research/account-reset-v030-json-trace-review/NOTES.md) independently rechecked all 33 traces/receipts, fifteen allocation roots and inherited seals; its eight controls pass. These synthetic cases are development evidence, not a population accuracy percentage. Complete effect discovery, local API sequences and full HyperCore processing remain outside the supported scope.
+
+Version **0.30.0** is now running read-only at http://127.0.0.1:5174/, with all three optional engines available. The [release checks](research/account-reset-v030-release/NOTES.md) retain the regression logs and actual localhost health/configuration responses.
+
+## Live Sepolia test and remaining support gap
+
+The [retained live Sepolia test](research/sepolia-smoke-v2/NOTES.md) used a public funded EOA at a fixed block, without its private key or any broadcast. Viem and the public provider simulated a **0.001 test ETH** transfer successfully at **21,000 gas**, with the exact sender balance change recorded. The actual local endpoint returned HTTP 400 `UNSUPPORTED_CHAIN`; this provider success does not establish independent-engine Sepolia support. The first attempt's omitted `eth_call` allowlist entry and incomplete manifest are retained separately, and the corrected attempt reused the same address and block.
+
+Sepolia support is under development in an isolated worktree. The current public endpoint remains chain 1 only. Its current Amsterdam header fields, fork schedule, transaction gas setup and state behavior require explicit integration and independent validation before admission.
 
 ## Explicit native ETH balances — 0.29.0
 

@@ -1,0 +1,139 @@
+{
+  "scope": "Fixed synthetic API checks only",
+  "sourceUnchanged": true,
+  "results": [
+    {
+      "id": "neutral",
+      "httpStatus": 200,
+      "status": "complete",
+      "execution": "success",
+      "measurements": [
+        {
+          "index": 0,
+          "descriptor": {
+            "to": "0x0000000000000000000000000000000000009999",
+            "data": "0x70a082310000000000000000000000001a642f0e3c3af545e7acbd38b07251b3990914f1"
+          },
+          "query": {
+            "to": "0x0000000000000000000000000000000000009999",
+            "data": "0x70a082310000000000000000000000001a642f0e3c3af545e7acbd38b07251b3990914f1"
+          },
+          "identity": {
+            "kind": "balanceOf",
+            "chainId": "1",
+            "token": "0x0000000000000000000000000000000000009999",
+            "account": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+            "contractIdentityVerified": false
+          },
+          "returnBytes": 32,
+          "status": "measured",
+          "reason": null,
+          "values": [
+            {
+              "name": "balance",
+              "beforeRaw": "0",
+              "afterRaw": "43",
+              "deltaRaw": "43",
+              "unit": {
+                "kind": "token_raw_units",
+                "scale": null
+              }
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "descriptor": {
+            "kind": "native_balance",
+            "account": "0x419a2a66c16941330fc59951272f192743e29e44"
+          },
+          "query": null,
+          "identity": {
+            "kind": "native_balance",
+            "account": "0x419a2a66c16941330fc59951272f192743e29e44",
+            "chainId": "1"
+          },
+          "returnBytes": 0,
+          "status": "measured",
+          "reason": null,
+          "values": [
+            {
+              "name": "balance",
+              "beforeRaw": "17",
+              "afterRaw": "0",
+              "deltaRaw": "-17",
+              "unit": {
+                "kind": "native_wei",
+                "scale": "1000000000000000000"
+              }
+            }
+          ]
+        }
+      ],
+      "error": null,
+      "rpcCalls": 16,
+      "transportErrors": []
+    },
+    {
+      "id": "retaining",
+      "httpStatus": 200,
+      "status": "partial",
+      "execution": "success",
+      "measurements": [
+        {
+          "index": 0,
+          "descriptor": {
+            "to": "0x0000000000000000000000000000000000009999",
+            "data": "0x70a082310000000000000000000000001a642f0e3c3af545e7acbd38b07251b3990914f1"
+          },
+          "query": {
+            "to": "0x0000000000000000000000000000000000009999",
+            "data": "0x70a082310000000000000000000000001a642f0e3c3af545e7acbd38b07251b3990914f1"
+          },
+          "identity": {
+            "kind": "balanceOf",
+            "chainId": "1",
+            "token": "0x0000000000000000000000000000000000009999",
+            "account": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+            "contractIdentityVerified": false
+          },
+          "returnBytes": 32,
+          "status": "unavailable",
+          "reason": "After-state query unavailable; no before/after amount is reported.",
+          "values": null
+        },
+        {
+          "index": 1,
+          "descriptor": {
+            "kind": "native_balance",
+            "account": "0x419a2a66c16941330fc59951272f192743e29e44"
+          },
+          "query": null,
+          "identity": {
+            "kind": "native_balance",
+            "account": "0x419a2a66c16941330fc59951272f192743e29e44",
+            "chainId": "1"
+          },
+          "returnBytes": 0,
+          "status": "measured",
+          "reason": null,
+          "values": [
+            {
+              "name": "balance",
+              "beforeRaw": "17",
+              "afterRaw": "0",
+              "deltaRaw": "-17",
+              "unit": {
+                "kind": "native_wei",
+                "scale": "1000000000000000000"
+              }
+            }
+          ]
+        }
+      ],
+      "error": null,
+      "rpcCalls": 16,
+      "transportErrors": []
+    }
+  ]
+}

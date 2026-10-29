@@ -1,0 +1,304 @@
+TAP version 13
+# Subtest: root constructor SELFDESTRUCT transfers value and removes the whole new account only at finalization
+ok 1 - root constructor SELFDESTRUCT transfers value and removes the whole new account only at finalization
+  ---
+  duration_ms: 18.180459
+  type: 'test'
+  ...
+# Subtest: CREATE and CREATE2 remove prefunded targets with original balance loss and no surviving constructor state
+ok 2 - CREATE and CREATE2 remove prefunded targets with original balance loss and no surviving constructor state
+  ---
+  duration_ms: 12.714084
+  type: 'test'
+  ...
+# Subtest: self-beneficiary burns constructor value and prefunding without inventing a beneficiary credit
+ok 3 - self-beneficiary burns constructor value and prefunding without inventing a beneficiary credit
+  ---
+  duration_ms: 2.165875
+  type: 'test'
+  ...
+# Subtest: fresh runtime remains callable until finalization and repeated SELFDESTRUCT transfers are retained
+ok 4 - fresh runtime remains callable until finalization and repeated SELFDESTRUCT transfers are retained
+  ---
+  duration_ms: 5.400375
+  type: 'test'
+  ...
+# Subtest: funding a scheduled deletion again is burned at finalization rather than causing an unsupported outcome
+ok 5 - funding a scheduled deletion again is burned at finalization rather than causing an unsupported outcome
+  ---
+  duration_ms: 5.268084
+  type: 'test'
+  ...
+# Subtest: same-invocation CREATE2 collision remains until finalization, then a fresh invocation can recreate
+ok 6 - same-invocation CREATE2 collision remains until finalization, then a fresh invocation can recreate
+  ---
+  duration_ms: 4.258125
+  type: 'test'
+  ...
+# Subtest: root and caught ancestor reverts discard committed-child deletion plans and value changes
+ok 7 - root and caught ancestor reverts discard committed-child deletion plans and value changes
+  ---
+  duration_ms: 5.228083
+  type: 'test'
+  ...
+# Subtest: delegate SELFDESTRUCT deletes a new execution account but leaves old implementation intact
+ok 8 - delegate SELFDESTRUCT deletes a new execution account but leaves old implementation intact
+  ---
+  duration_ms: 3.124917
+  type: 'test'
+  ...
+# Subtest: failed STATICCALL and OOG SELFDESTRUCT instructions produce no successful opcode evidence or deletion
+ok 9 - failed STATICCALL and OOG SELFDESTRUCT instructions produce no successful opcode evidence or deletion
+  ---
+  duration_ms: 5.39575
+  type: 'test'
+  ...
+# Subtest: finalizer failure after a deletion rolls back every account and the sender nonce
+ok 10 - finalizer failure after a deletion rolls back every account and the sender nonce
+  ---
+  duration_ms: 2.6575
+  type: 'test'
+  ...
+# Subtest: deadline after deletion and missing finalizer fail closed with complete rollback
+ok 11 - deadline after deletion and missing finalizer fail closed with complete rollback
+  ---
+  duration_ms: 3.812833
+  type: 'test'
+  ...
+# Subtest: fresh after-query sees finalized absence and preserves the prefunded deletion overlay
+ok 12 - fresh after-query sees finalized absence and preserves the prefunded deletion overlay
+  ---
+  duration_ms: 9.304667
+  type: 'test'
+  ...
+# Subtest: funding a deleted nonempty account retains explicit reset provenance and no old namespace
+ok 13 - funding a deleted nonempty account retains explicit reset provenance and no old namespace
+  ---
+  duration_ms: 10.416541
+  type: 'test'
+  ...
+# Subtest: recreation writes use zero baselines, retain old-equal values, and never fetch old slot proofs
+ok 14 - recreation writes use zero baselines, retain old-equal values, and never fetch old slot proofs
+  ---
+  duration_ms: 2.821041
+  type: 'test'
+  ...
+# Subtest: a lazily discovered old proof seeds each rollback namespace independently
+ok 15 - a lazily discovered old proof seeds each rollback namespace independently
+  ---
+  duration_ms: 3.530916
+  type: 'test'
+  ...
+# Subtest: nested recreation commits roll back atomically and independent copies retain their own namespaces
+ok 16 - nested recreation commits roll back atomically and independent copies retain their own namespaces
+  ---
+  duration_ms: 1.594708
+  type: 'test'
+  ...
+# Subtest: repeated deletion clears new writes and records the original root when a recreated contract is deleted
+ok 17 - repeated deletion clears new writes and records the original root when a recreated contract is deleted
+  ---
+  duration_ms: 1.595167
+  type: 'test'
+  ...
+# Subtest: a reset removes stale authorization write authority and rollback restores the previous incarnation
+ok 18 - a reset removes stale authorization write authority and rollback restores the previous incarnation
+  ---
+  duration_ms: 2.427583
+  type: 'test'
+  ...
+# Subtest: empty-account cleanup authenticates an otherwise unknown nonempty trie reset before funding and creation
+ok 19 - empty-account cleanup authenticates an otherwise unknown nonempty trie reset before funding and creation
+  ---
+  duration_ms: 2.24375
+  type: 'test'
+  ...
+# Subtest: creation still rejects original nonempty state and unsupported root replacement
+ok 20 - creation still rejects original nonempty state and unsupported root replacement
+  ---
+  duration_ms: 1.905625
+  type: 'test'
+  ...
+# Subtest: each real execution refreshes SSTORE original-value gas caching after a namespace reset
+ok 21 - each real execution refreshes SSTORE original-value gas caching after a namespace reset
+  ---
+  duration_ms: 5.780792
+  type: 'test'
+  ...
+# Subtest: Shanghai whole-account reset masks both demanded and unknown storage and survives a query copy
+ok 22 - Shanghai whole-account reset masks both demanded and unknown storage and survives a query copy
+  ---
+  duration_ms: 11.778583
+  type: 'test'
+  ...
+# Subtest: Shanghai deletion rolls back code, account and lazily read storage through nested checkpoints
+ok 23 - Shanghai deletion rolls back code, account and lazily read storage through nested checkpoints
+  ---
+  duration_ms: 3.009542
+  type: 'test'
+  ...
+# Subtest: funding of deleted code commits only with explicit reset provenance and still rolls back exactly
+ok 24 - funding of deleted code commits only with explicit reset provenance and still rolls back exactly
+  ---
+  duration_ms: 3.701
+  type: 'test'
+  ...
+# Subtest: Shanghai deletion entrypoint requires a checkpoint and an execution-capable authenticated account
+ok 25 - Shanghai deletion entrypoint requires a checkpoint and an execution-capable authenticated account
+  ---
+  duration_ms: 2.865417
+  type: 'test'
+  ...
+# Subtest: Shanghai deletes preexisting code and the entire authenticated nonempty storage trie
+ok 26 - Shanghai deletes preexisting code and the entire authenticated nonempty storage trie
+  ---
+  duration_ms: 46.99625
+  type: 'test'
+  ...
+# Subtest: root SELFDESTRUCT preserves prior committed logs while removing its old code and storage
+ok 27 - root SELFDESTRUCT preserves prior committed logs while removing its old code and storage
+  ---
+  duration_ms: 9.897
+  type: 'test'
+  ...
+# Subtest: Shanghai self-beneficiary burns immediately, yet later funding remains until final deletion
+ok 28 - Shanghai self-beneficiary burns immediately, yet later funding remains until final deletion
+  ---
+  duration_ms: 15.09125
+  type: 'test'
+  ...
+# Subtest: scheduled deletion retains executable code/storage and transfers repeated balances to different beneficiaries
+ok 29 - scheduled deletion retains executable code/storage and transfers repeated balances to different beneficiaries
+  ---
+  duration_ms: 13.278042
+  type: 'test'
+  ...
+# Subtest: DELEGATECALL and CALLCODE delete their execution account while implementation remains intact
+ok 30 - DELEGATECALL and CALLCODE delete their execution account while implementation remains intact
+  ---
+  duration_ms: 17.315292
+  type: 'test'
+  ...
+# Subtest: Shanghai root constructors delete both absent and prefunded creation targets
+ok 31 - Shanghai root constructors delete both absent and prefunded creation targets
+  ---
+  duration_ms: 14.843167
+  type: 'test'
+  ...
+# Subtest: CREATE2 collision remains until transaction finalization even after a constructor SELFDESTRUCT
+ok 32 - CREATE2 collision remains until transaction finalization even after a constructor SELFDESTRUCT
+  ---
+  duration_ms: 8.461583
+  type: 'test'
+  ...
+# Subtest: root revert and caught ancestor revert discard child deletion and native transfers
+ok 33 - root revert and caught ancestor revert discard child deletion and native transfers
+  ---
+  duration_ms: 16.74975
+  type: 'test'
+  ...
+# Subtest: STATICCALL and opcode OOG do not record a successful SELFDESTRUCT or delete the target
+ok 34 - STATICCALL and opcode OOG do not record a successful SELFDESTRUCT or delete the target
+  ---
+  duration_ms: 12.876291
+  type: 'test'
+  ...
+# Subtest: zero-balance SELFDESTRUCT deletes its old account without materializing an absent beneficiary
+ok 35 - zero-balance SELFDESTRUCT deletes its old account without materializing an absent beneficiary
+  ---
+  duration_ms: 8.441541
+  type: 'test'
+  ...
+# Subtest: fresh after-query sees deletion without restoring unknown original storage or changing its overlay
+ok 36 - fresh after-query sees deletion without restoring unknown original storage or changing its overlay
+  ---
+  duration_ms: 6.185459
+  type: 'test'
+  ...
+# Subtest: fresh query deletion of an original-created contract is rejected as a net mutation
+ok 37 - fresh query deletion of an original-created contract is rejected as a net mutation
+  ---
+  duration_ms: 4.53575
+  type: 'test'
+  ...
+# Subtest: finalizer host failure after multiple deletions rolls back all code, slots, balances and sender nonce
+ok 38 - finalizer host failure after multiple deletions rolls back all code, slots, balances and sender nonce
+  ---
+  duration_ms: 4.136792
+  type: 'test'
+  ...
+# Subtest: deadline after partial finalization and missing Shanghai finalizer fail closed with rollback
+ok 39 - deadline after partial finalization and missing Shanghai finalizer fail closed with rollback
+  ---
+  duration_ms: 4.478458
+  type: 'test'
+  ...
+# Subtest: a later invocation explicitly represents rematerialization without restoring old code or storage
+ok 40 - a later invocation explicitly represents rematerialization without restoring old code or storage
+  ---
+  duration_ms: 2.313417
+  type: 'test'
+  ...
+# Subtest: generic manager failures in sender/recipient value writes cannot become successful or caught EVM results
+ok 41 - generic manager failures in sender/recipient value writes cannot become successful or caught EVM results
+  ---
+  duration_ms: 7.506375
+  type: 'test'
+  ...
+# Subtest: after-preview helper funding followed by REVERT is measured with unchanged deletion overlay; full VM agrees
+ok 42 - after-preview helper funding followed by REVERT is measured with unchanged deletion overlay; full VM agrees
+  ---
+  duration_ms: 60.732916
+  type: 'test'
+  ...
+# Subtest: real child and parent proof validation retain both measurements after reverted rematerialization
+ok 43 - real child and parent proof validation retain both measurements after reverted rematerialization
+  ---
+  duration_ms: 140.681792
+  type: 'test'
+  ...
+# Subtest: an ancestor REVERT permits nested successful commits, restores rematerialization, and agrees with full VM
+ok 44 - an ancestor REVERT permits nested successful commits, restores rematerialization, and agrees with full VM
+  ---
+  duration_ms: 15.229625
+  type: 'test'
+  ...
+# Subtest: root helper REVERT restores temporary funding without classifying it as a host failure
+ok 45 - root helper REVERT restores temporary funding without classifying it as a host failure
+  ---
+  duration_ms: 12.205208
+  type: 'test'
+  ...
+# Subtest: surviving direct and nested rematerialization has explicit reset provenance and matches full-VM execution
+ok 46 - surviving direct and nested rematerialization has explicit reset provenance and matches full-VM execution
+  ---
+  duration_ms: 21.760958
+  type: 'test'
+  ...
+# Subtest: a caller-owned outer checkpoint can revert the entire successful rematerializing invocation
+ok 47 - a caller-owned outer checkpoint can revert the entire successful rematerializing invocation
+  ---
+  duration_ms: 3.004583
+  type: 'test'
+  ...
+# Subtest: unknown old slots and code stay masked during actual transient funding and across a copied rollback
+ok 48 - unknown old slots and code stay masked during actual transient funding and across a copied rollback
+  ---
+  duration_ms: 4.682125
+  type: 'test'
+  ...
+# Subtest: direct rematerialization needs a checkpoint and defensive snapshots/commits reject invalid reset provenance
+ok 49 - direct rematerialization needs a checkpoint and defensive snapshots/commits reject invalid reset provenance
+  ---
+  duration_ms: 2.762333
+  type: 'test'
+  ...
+1..49
+# tests 49
+# suites 0
+# pass 49
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 478.86525

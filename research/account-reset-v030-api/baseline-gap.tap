@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: a caught recreated-contract subtree makes a neutral after-query available through the real child
+not ok 1 - a caught recreated-contract subtree makes a neutral after-query available through the real child
+  ---
+  duration_ms: 139.351667
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v030/engines/local-evm/test/reset-preview.test.js:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    {"error":null,"before":null,"after":"The declared query did not complete successfully.","execution":{"status":"unsupported","error":{"code":"LOCAL_STATE_UNSUPPORTED","message":"The supplied sparse state adapter does not support this state change."},"executionGasUsed":null,"returnData":null}}
+    + actual - expected
+    
+    + 'partial'
+    - 'complete'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'complete'
+  actual: 'partial'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v030/engines/local-evm/test/reset-preview.test.js:13:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: a successful getter that leaves recreation behind remains an unavailable measurement
+ok 2 - a successful getter that leaves recreation behind remains an unavailable measurement
+  ---
+  duration_ms: 123.549042
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 1
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 368.308167

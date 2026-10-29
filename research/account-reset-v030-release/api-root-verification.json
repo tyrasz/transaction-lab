@@ -1,0 +1,59 @@
+{
+  "status": "verified",
+  "scope": "Artifact-only consistency of synthetic in-process HTTP-handler captures; no independent EVM/client or public-chain claim",
+  "manifestSha256": "ac76e782d425895f5ea237a35ea069a88edde4c3c5ac21ffaecfb68ca95fd500",
+  "implementation": "ea26e7722f41544341f38f282492917fd1425d8ed9ecf250314d06f052b0d4e0",
+  "results": [
+    {
+      "id": "neutral",
+      "status": "complete",
+      "execution": "success",
+      "queryStatus": "measured",
+      "queryValues": [
+        {
+          "name": "balance",
+          "beforeRaw": "0",
+          "afterRaw": "43",
+          "deltaRaw": "43",
+          "unit": {
+            "kind": "token_raw_units",
+            "scale": null
+          }
+        }
+      ],
+      "nativeValues": [
+        {
+          "name": "balance",
+          "beforeRaw": "17",
+          "afterRaw": "0",
+          "deltaRaw": "-17",
+          "unit": {
+            "kind": "native_wei",
+            "scale": "1000000000000000000"
+          }
+        }
+      ],
+      "rpcCalls": 16
+    },
+    {
+      "id": "retaining",
+      "status": "partial",
+      "execution": "success",
+      "queryStatus": "unavailable",
+      "queryValues": null,
+      "nativeValues": [
+        {
+          "name": "balance",
+          "beforeRaw": "17",
+          "afterRaw": "0",
+          "deltaRaw": "-17",
+          "unit": {
+            "kind": "native_wei",
+            "scale": "1000000000000000000"
+          }
+        }
+      ],
+      "rpcCalls": 16
+    }
+  ]
+}
