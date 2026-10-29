@@ -1,0 +1,19 @@
+{
+  "review": "independent_read_only_agent_saved_artifact_audit",
+  "result": "pass",
+  "networkCalls": 0,
+  "targetReruns": 0,
+  "verifiedFiles": 19,
+  "verifiedRawRpcRecords": 10,
+  "checks": [
+    "Exact inventory and every file/request/response hash",
+    "Pinned chain11155111 and public empty-code account with actual funded balance",
+    "Full selected header unchanged on final reread",
+    "Both original simulation passes have identical sender, recipient, calldata, value, gas and zero gas price",
+    "Matching success, return, gas and native transfer log payloads across both passes",
+    "Exact sender native balance difference -1000000000000000 wei",
+    "No balance, nonce or storage overrides; six code-only helper overrides",
+    "Actual application HTTP400 UNSUPPORTED_CHAIN retained"
+  ],
+  "priorFailure": "V1 original manifest omits late rpc-07.json; preserved unchanged and excluded as incomplete evidence"
+}
