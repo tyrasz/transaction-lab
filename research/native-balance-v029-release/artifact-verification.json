@@ -1,0 +1,352 @@
+{
+  "status": "verified_artifact_only",
+  "pins": {
+    "manifest": "ff3fc44eb75b62cbc787a75beee23a9b7e256220d83b79d258e2d8c6f8b33b18",
+    "plan": "3dd48496b5388bece2ac5130f8a0f6ceb560ade61048eaa079613049f1e27b92",
+    "source": "6ea577ca6785966b830de594b34e2c3e2c120c4c2400a127ed3aa5da274bf6ae"
+  },
+  "cases": 6,
+  "nativePairs": 20,
+  "inputRecords": 42,
+  "proofCalls": 21,
+  "inputResultBytes": 16882,
+  "evidenceFiles": 34,
+  "runtimeEntries": 4019,
+  "runtimeSymlinks": 1,
+  "runtimeBytes": 24893647,
+  "phaseBytes": 565606,
+  "originalTiming": {
+    "wallMs": 4107,
+    "monotonicMs": 4107.0905,
+    "valid": true
+  },
+  "runtimeIdentity": {
+    "sourceRoot": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v029",
+    "recordedGitHead": "38b63a54c4855ba870daaf7bc44a0eacf2ef06a7",
+    "node": {
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.2/bin/node",
+      "version": "v22.23.2",
+      "platform": "darwin",
+      "arch": "arm64",
+      "sha256": "1f72236fcbfc84855d7c884fbcba0f6a7c635d600d7e493b823e77c467f2ae95"
+    },
+    "sourceBytesArchived": false
+  },
+  "scope": {
+    "captureReexecuted": false,
+    "evmExecuted": false,
+    "rpc": false,
+    "independentClient": false,
+    "sharedEthereumJS": true,
+    "proofVerification": true,
+    "freshMptDeltaApplication": true,
+    "populationAccuracy": false,
+    "phaseInputIdTimingIndependentlyAuthenticated": false
+  },
+  "rows": [
+    {
+      "id": "fee_transfer_unused_accounts",
+      "status": "matched",
+      "fork": "osaka",
+      "signedType": 2,
+      "execution": "success",
+      "gasUsed": "21000",
+      "feeAccounting": {
+        "kind": "eip1559",
+        "gasLimit": "5000000",
+        "effectiveGasPrice": "10",
+        "baseFeePerGas": "7",
+        "priorityFeePerGas": "3",
+        "maximumRequiredBalance": "65000123",
+        "upfrontGasDebit": "50000000",
+        "chargedGas": "21000",
+        "gasCharge": "210000",
+        "senderRefund": "49790000",
+        "baseFeeBurn": "147000",
+        "coinbaseTip": "63000",
+        "coinbase": "0x9999999999999999999999999999999999999999"
+      },
+      "amounts": [
+        {
+          "account": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+          "before": "1000000000000",
+          "after": "999999789877",
+          "delta": "-210123",
+          "unit": "wei"
+        },
+        {
+          "account": "0x4444444444444444444444444444444444444444",
+          "before": "9",
+          "after": "132",
+          "delta": "123",
+          "unit": "wei"
+        },
+        {
+          "account": "0x9999999999999999999999999999999999999999",
+          "before": "0",
+          "after": "63000",
+          "delta": "63000",
+          "unit": "wei"
+        },
+        {
+          "account": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "before": "77",
+          "after": "77",
+          "delta": "0",
+          "unit": "wei"
+        },
+        {
+          "account": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "before": "0",
+          "after": "0",
+          "delta": "0",
+          "unit": "wei"
+        }
+      ],
+      "stateRoot": "0x3fe9820cde4346142be2fc8f5195a6342b22e01e68c2f9218889bcf0ba3fefa1"
+    },
+    {
+      "id": "sender_is_coinbase",
+      "status": "matched",
+      "fork": "osaka",
+      "signedType": 2,
+      "execution": "success",
+      "gasUsed": "21000",
+      "feeAccounting": {
+        "kind": "eip1559",
+        "gasLimit": "5000000",
+        "effectiveGasPrice": "10",
+        "baseFeePerGas": "7",
+        "priorityFeePerGas": "3",
+        "maximumRequiredBalance": "65000007",
+        "upfrontGasDebit": "50000000",
+        "chargedGas": "21000",
+        "gasCharge": "210000",
+        "senderRefund": "49790000",
+        "baseFeeBurn": "147000",
+        "coinbaseTip": "63000",
+        "coinbase": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1"
+      },
+      "amounts": [
+        {
+          "account": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+          "before": "1000000000000",
+          "after": "999999852993",
+          "delta": "-147007",
+          "unit": "wei"
+        },
+        {
+          "account": "0x4444444444444444444444444444444444444444",
+          "before": "0",
+          "after": "7",
+          "delta": "7",
+          "unit": "wei"
+        }
+      ],
+      "stateRoot": "0x33609c505eac210e1817b399ff895b36f918e3edd4dcb7262d4f549d1343753f"
+    },
+    {
+      "id": "completed_revert",
+      "status": "matched",
+      "fork": "osaka",
+      "signedType": 2,
+      "execution": "reverted",
+      "gasUsed": "21006",
+      "feeAccounting": {
+        "kind": "eip1559",
+        "gasLimit": "30000",
+        "effectiveGasPrice": "10",
+        "baseFeePerGas": "7",
+        "priorityFeePerGas": "3",
+        "maximumRequiredBalance": "390017",
+        "upfrontGasDebit": "300000",
+        "chargedGas": "21006",
+        "gasCharge": "210060",
+        "senderRefund": "89940",
+        "baseFeeBurn": "147042",
+        "coinbaseTip": "63018",
+        "coinbase": "0x9999999999999999999999999999999999999999"
+      },
+      "amounts": [
+        {
+          "account": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+          "before": "1000000000000",
+          "after": "999999789940",
+          "delta": "-210060",
+          "unit": "wei"
+        },
+        {
+          "account": "0x4444444444444444444444444444444444444444",
+          "before": "9",
+          "after": "9",
+          "delta": "0",
+          "unit": "wei"
+        },
+        {
+          "account": "0x9999999999999999999999999999999999999999",
+          "before": "0",
+          "after": "63018",
+          "delta": "63018",
+          "unit": "wei"
+        }
+      ],
+      "stateRoot": "0x6c27162b8e86403316cf94e2cd191e625350f2974686209ed2ee5e670bfcc784"
+    },
+    {
+      "id": "blob_completed_revert",
+      "status": "matched",
+      "fork": "osaka",
+      "signedType": 3,
+      "execution": "reverted",
+      "gasUsed": "21006",
+      "feeAccounting": {
+        "kind": "eip4844",
+        "gasLimit": "100000",
+        "effectiveGasPrice": "10",
+        "baseFeePerGas": "7",
+        "priorityFeePerGas": "3",
+        "maximumRequiredBalance": "27514423",
+        "upfrontGasDebit": "1000000",
+        "chargedGas": "21006",
+        "gasCharge": "210060",
+        "senderRefund": "789940",
+        "baseFeeBurn": "147042",
+        "coinbaseTip": "63018",
+        "blobCount": "2",
+        "blobGasUsed": "262144",
+        "maxFeePerBlobGas": "100",
+        "blobBaseFeePerGas": "7",
+        "blobFeeBurn": "1835008",
+        "totalUpfrontDebit": "2835008",
+        "totalFeeCharge": "2045068",
+        "totalFeeBurn": "1982050",
+        "coinbase": "0x9999999999999999999999999999999999999999"
+      },
+      "amounts": [
+        {
+          "account": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+          "before": "1000000000000",
+          "after": "999997954932",
+          "delta": "-2045068",
+          "unit": "wei"
+        },
+        {
+          "account": "0x4444444444444444444444444444444444444444",
+          "before": "5",
+          "after": "5",
+          "delta": "0",
+          "unit": "wei"
+        },
+        {
+          "account": "0x9999999999999999999999999999999999999999",
+          "before": "0",
+          "after": "63018",
+          "delta": "63018",
+          "unit": "wei"
+        }
+      ],
+      "stateRoot": "0xf518e3eff7d3d9baa831f0dab706c6d7cf3b2df6446a396a849703443f358896"
+    },
+    {
+      "id": "shanghai_miner_deletion",
+      "status": "matched",
+      "fork": "shanghai",
+      "signedType": 2,
+      "execution": "success",
+      "gasUsed": "53603",
+      "feeAccounting": {
+        "kind": "eip1559",
+        "gasLimit": "100000",
+        "effectiveGasPrice": "10",
+        "baseFeePerGas": "7",
+        "priorityFeePerGas": "3",
+        "maximumRequiredBalance": "1300000",
+        "upfrontGasDebit": "1000000",
+        "chargedGas": "53603",
+        "gasCharge": "536030",
+        "senderRefund": "463970",
+        "baseFeeBurn": "375221",
+        "coinbaseTip": "160809",
+        "coinbase": "0x4444444444444444444444444444444444444444"
+      },
+      "amounts": [
+        {
+          "account": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+          "before": "1000000000000",
+          "after": "999999463970",
+          "delta": "-536030",
+          "unit": "wei"
+        },
+        {
+          "account": "0x4444444444444444444444444444444444444444",
+          "before": "19",
+          "after": "0",
+          "delta": "-19",
+          "unit": "wei"
+        },
+        {
+          "account": "0x8888888888888888888888888888888888888888",
+          "before": "0",
+          "after": "19",
+          "delta": "19",
+          "unit": "wei"
+        }
+      ],
+      "stateRoot": "0x58b504497b513ee7e3a4868205d7b9081d5c4b1e07042eb2e66e64dc35991281"
+    },
+    {
+      "id": "created_account_deletion",
+      "status": "matched",
+      "fork": "cancun",
+      "signedType": 2,
+      "execution": "success",
+      "gasUsed": "85634",
+      "feeAccounting": {
+        "kind": "eip1559",
+        "gasLimit": "5000000",
+        "effectiveGasPrice": "10",
+        "baseFeePerGas": "7",
+        "priorityFeePerGas": "3",
+        "maximumRequiredBalance": "65000000",
+        "upfrontGasDebit": "50000000",
+        "chargedGas": "85634",
+        "gasCharge": "856340",
+        "senderRefund": "49143660",
+        "baseFeeBurn": "599438",
+        "coinbaseTip": "256902",
+        "coinbase": "0x9999999999999999999999999999999999999999"
+      },
+      "amounts": [
+        {
+          "account": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+          "before": "1000000000000",
+          "after": "999999143660",
+          "delta": "-856340",
+          "unit": "wei"
+        },
+        {
+          "account": "0x4444444444444444444444444444444444444444",
+          "before": "100",
+          "after": "95",
+          "delta": "-5",
+          "unit": "wei"
+        },
+        {
+          "account": "0x8e8149e630ed0e6d24ec34d667fd4351bc113ce0",
+          "before": "0",
+          "after": "0",
+          "delta": "0",
+          "unit": "wei"
+        },
+        {
+          "account": "0x8888888888888888888888888888888888888888",
+          "before": "0",
+          "after": "5",
+          "delta": "5",
+          "unit": "wei"
+        }
+      ],
+      "stateRoot": "0x2424b03589cacef1c71d8d41b4b93d43946efbebbf8dd2da06e1b0a8c4af3875"
+    }
+  ]
+}
