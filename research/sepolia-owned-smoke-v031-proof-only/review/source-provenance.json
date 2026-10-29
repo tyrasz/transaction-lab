@@ -1,0 +1,37 @@
+{
+  "scope": "Offline audit interpretation sources; no source/client execution",
+  "priorAudit": {
+    "path": "research/sepolia-owned-smoke-reviews-v031/second-audit.mjs",
+    "bytes": 13706,
+    "sha256": "f477a444077b22969783d9fa970e6e16d93bd803babc9db8aa099b825ca18e8f",
+    "reuse": "RLP/Keccak hashed-branch and compact-leaf walk adapted for fixed 9- and 8-node paths; no producer header import retained."
+  },
+  "headerOrderSources": [
+    {
+      "path": "../evm-toolchains/geth-v1.17.10/source/core/types/block.go",
+      "bytes": 18888,
+      "sha256": "f76e3bd2f3acc9488727419afce5c94a38beedb14c3ff2954ec0a9065a85502b",
+      "inventorySha256": "36e245fda711de52fe5e0b8c917d4bbbffd840ed7edfc0696f29cbb1f8b24dff",
+      "sourceCommit": "1df30b18d9ed35ee9d28ffd4648442c2204554ad"
+    },
+    {
+      "path": "../evm-toolchains/geth-v1.17.10/source/core/types/gen_header_rlp.go",
+      "bytes": 2570,
+      "sha256": "851b282b0f65a90f7f0b0226e68bb207a29d667e531090e8dcc9b43362256ea7",
+      "inventorySha256": "36e245fda711de52fe5e0b8c917d4bbbffd840ed7edfc0696f29cbb1f8b24dff",
+      "sourceCommit": "1df30b18d9ed35ee9d28ffd4648442c2204554ad"
+    }
+  ],
+  "auditPrimitiveImports": [
+    {
+      "path": "engines/local-evm/node_modules/@ethereumjs/rlp/dist/esm/index.js",
+      "bytes": 9761,
+      "sha256": "83d3eb4b7cc7d5dafd6824f728077d24ebe35ca2130b94c32ed2a658083323c4"
+    },
+    {
+      "path": "engines/local-evm/node_modules/@noble/hashes/sha3.js",
+      "bytes": 17469,
+      "sha256": "9a81e1edb24eae27b335533220167609cfb58008c5690e140ce478acdc669f32"
+    }
+  ]
+}

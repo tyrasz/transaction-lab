@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "policy": {
+    "endpoint": "https://rpc.sepolia.ethpandaops.io",
+    "chainId": 11155111,
+    "sender": "0x6efb29cee3b414272eb7a8f3ebabf873d36bc033",
+    "recipient": "0x000000000000000000000000000000000000dead",
+    "value": "1000000000000000",
+    "gas": "21000",
+    "calls": 12,
+    "responseBytes": 2097152,
+    "totalBytes": 8388608,
+    "requestMs": 25000,
+    "selectionMs": 30000,
+    "productEndMs": 85000,
+    "productMs": 55000,
+    "finalHeaderMs": 110000,
+    "loopbackEndMs": 115000,
+    "drainMs": 5000,
+    "totalMs": 120000,
+    "retries": 0,
+    "loopback": "http://127.0.0.1:5174/api/evm/local-preview"
+  },
+  "request": {
+    "from": "0x6efb29cee3b414272eb7a8f3ebabf873d36bc033",
+    "to": "0x000000000000000000000000000000000000dead",
+    "value": "1000000000000000",
+    "gas": "21000",
+    "data": "0x"
+  },
+  "queries": [
+    {
+      "kind": "native_balance",
+      "account": "0x6efb29cee3b414272eb7a8f3ebabf873d36bc033"
+    },
+    {
+      "kind": "native_balance",
+      "account": "0x000000000000000000000000000000000000dead"
+    }
+  ],
+  "sourceSha256": "f96d702e470a86aef5de91c818d39b06d17dbfb312af172b4ee60bb0ab544e41",
+  "priorV2ManifestSha256": "ed60aad67ef1a2656a08b3d3ff5228fcd5492d576d78eac6a76c6044e99a460c",
+  "execution": "owned_internal_isolated_engine",
+  "publicHttpSupportClaim": false
+}
