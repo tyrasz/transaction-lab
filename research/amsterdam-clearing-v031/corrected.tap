@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: explicit Amsterdam clearing preserves exact residual native balance or removes the zero empty account
+ok 1 - explicit Amsterdam clearing preserves exact residual native balance or removes the zero empty account
+  ---
+  duration_ms: 18.767959
+  type: 'test'
+  ...
+# Subtest: clearing and nested commits remain atomically reversible, including creation/write eligibility
+ok 2 - clearing and nested commits remain atomically reversible, including creation/write eligibility
+  ---
+  duration_ms: 1.626709
+  type: 'test'
+  ...
+# Subtest: settled copies preserve balance-only clearing and can recreate without stale code or storage
+ok 3 - settled copies preserve balance-only clearing and can recreate without stale code or storage
+  ---
+  duration_ms: 0.968541
+  type: 'test'
+  ...
+# Subtest: old nonempty namespaces retain immutable reset provenance and old-equal writes never resurrect after clearing
+ok 4 - old nonempty namespaces retain immutable reset provenance and old-equal writes never resurrect after clearing
+  ---
+  duration_ms: 0.871541
+  type: 'test'
+  ...
+# Subtest: invalid modes, ineligible accounts and repeated marker consumption cannot mutate the overlay
+ok 5 - invalid modes, ineligible accounts and repeated marker consumption cannot mutate the overlay
+  ---
+  duration_ms: 1.48325
+  type: 'test'
+  ...
+# Subtest: real Amsterdam constructor self-beneficiary keeps prefunding and endowment while finalization clears its state
+ok 6 - real Amsterdam constructor self-beneficiary keeps prefunding and endowment while finalization clears its state
+  ---
+  duration_ms: 7.23075
+  type: 'test'
+  ...
+# Subtest: real Amsterdam SELFDESTRUCT transfers and later refills preserve exact residual value at finalization
+ok 7 - real Amsterdam SELFDESTRUCT transfers and later refills preserve exact residual value at finalization
+  ---
+  duration_ms: 8.113792
+  type: 'test'
+  ...
+# Subtest: real root rollback discards clearing eligibility; later CREATE2 can reuse a settled balance-only account
+ok 8 - real root rollback discards clearing eligibility; later CREATE2 can reuse a settled balance-only account
+  ---
+  duration_ms: 5.732833
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 263.553292

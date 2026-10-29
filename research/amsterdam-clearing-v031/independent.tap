@@ -1,0 +1,184 @@
+TAP version 13
+# Subtest: funding a deleted nonempty account retains explicit reset provenance and no old namespace
+ok 1 - funding a deleted nonempty account retains explicit reset provenance and no old namespace
+  ---
+  duration_ms: 10.793125
+  type: 'test'
+  ...
+# Subtest: recreation writes use zero baselines, retain old-equal values, and never fetch old slot proofs
+ok 2 - recreation writes use zero baselines, retain old-equal values, and never fetch old slot proofs
+  ---
+  duration_ms: 1.789416
+  type: 'test'
+  ...
+# Subtest: a lazily discovered old proof seeds each rollback namespace independently
+ok 3 - a lazily discovered old proof seeds each rollback namespace independently
+  ---
+  duration_ms: 3.369709
+  type: 'test'
+  ...
+# Subtest: nested recreation commits roll back atomically and independent copies retain their own namespaces
+ok 4 - nested recreation commits roll back atomically and independent copies retain their own namespaces
+  ---
+  duration_ms: 2.672834
+  type: 'test'
+  ...
+# Subtest: repeated deletion clears new writes and records the original root when a recreated contract is deleted
+ok 5 - repeated deletion clears new writes and records the original root when a recreated contract is deleted
+  ---
+  duration_ms: 1.258041
+  type: 'test'
+  ...
+# Subtest: a reset removes stale authorization write authority and rollback restores the previous incarnation
+ok 6 - a reset removes stale authorization write authority and rollback restores the previous incarnation
+  ---
+  duration_ms: 1.201
+  type: 'test'
+  ...
+# Subtest: empty-account cleanup authenticates an otherwise unknown nonempty trie reset before funding and creation
+ok 7 - empty-account cleanup authenticates an otherwise unknown nonempty trie reset before funding and creation
+  ---
+  duration_ms: 1.015834
+  type: 'test'
+  ...
+# Subtest: creation still rejects original nonempty state and unsupported root replacement
+ok 8 - creation still rejects original nonempty state and unsupported root replacement
+  ---
+  duration_ms: 0.951542
+  type: 'test'
+  ...
+# Subtest: each real execution refreshes SSTORE original-value gas caching after a namespace reset
+ok 9 - each real execution refreshes SSTORE original-value gas caching after a namespace reset
+  ---
+  duration_ms: 6.160833
+  type: 'test'
+  ...
+# Subtest: explicit Amsterdam clearing preserves exact residual native balance or removes the zero empty account
+ok 10 - explicit Amsterdam clearing preserves exact residual native balance or removes the zero empty account
+  ---
+  duration_ms: 19.343166
+  type: 'test'
+  ...
+# Subtest: clearing and nested commits remain atomically reversible, including creation/write eligibility
+ok 11 - clearing and nested commits remain atomically reversible, including creation/write eligibility
+  ---
+  duration_ms: 1.454417
+  type: 'test'
+  ...
+# Subtest: settled copies preserve balance-only clearing and can recreate without stale code or storage
+ok 12 - settled copies preserve balance-only clearing and can recreate without stale code or storage
+  ---
+  duration_ms: 0.966958
+  type: 'test'
+  ...
+# Subtest: old nonempty namespaces retain immutable reset provenance and old-equal writes never resurrect after clearing
+ok 13 - old nonempty namespaces retain immutable reset provenance and old-equal writes never resurrect after clearing
+  ---
+  duration_ms: 0.861292
+  type: 'test'
+  ...
+# Subtest: invalid modes, ineligible accounts and repeated marker consumption cannot mutate the overlay
+ok 14 - invalid modes, ineligible accounts and repeated marker consumption cannot mutate the overlay
+  ---
+  duration_ms: 1.670042
+  type: 'test'
+  ...
+# Subtest: real Amsterdam constructor self-beneficiary keeps prefunding and endowment while finalization clears its state
+ok 15 - real Amsterdam constructor self-beneficiary keeps prefunding and endowment while finalization clears its state
+  ---
+  duration_ms: 7.429542
+  type: 'test'
+  ...
+# Subtest: real Amsterdam SELFDESTRUCT transfers and later refills preserve exact residual value at finalization
+ok 16 - real Amsterdam SELFDESTRUCT transfers and later refills preserve exact residual value at finalization
+  ---
+  duration_ms: 8.165708
+  type: 'test'
+  ...
+# Subtest: real root rollback discards clearing eligibility; later CREATE2 can reuse a settled balance-only account
+ok 17 - real root rollback discards clearing eligibility; later CREATE2 can reuse a settled balance-only account
+  ---
+  duration_ms: 5.649791
+  type: 'test'
+  ...
+# Subtest: final deletion removes code and demanded and undemanded storage without loading more RPC inputs
+ok 18 - final deletion removes code and demanded and undemanded storage without loading more RPC inputs
+  ---
+  duration_ms: 12.955708
+  type: 'test'
+  ...
+# Subtest: nested deletion rollback restores the created account, code, storage and creation eligibility marker
+ok 19 - nested deletion rollback restores the created account, code, storage and creation eligibility marker
+  ---
+  duration_ms: 2.142375
+  type: 'test'
+  ...
+# Subtest: a copied deletion can be funded and recreated without restoring old code or storage in either overlay
+ok 20 - a copied deletion can be funded and recreated without restoring old code or storage in either overlay
+  ---
+  duration_ms: 4.478834
+  type: 'test'
+  ...
+# Subtest: zero-value touches after deletion stay absent and rollback preserves the deletion marker
+ok 21 - zero-value touches after deletion stay absent and rollback preserves the deletion marker
+  ---
+  duration_ms: 3.772959
+  type: 'test'
+  ...
+# Subtest: deletion requires a checkpoint and a retained authenticated creation marker
+ok 22 - deletion requires a checkpoint and a retained authenticated creation marker
+  ---
+  duration_ms: 5.06275
+  type: 'test'
+  ...
+# Subtest: first reads and writes fetch proven prior account/storage values without zero-filling
+ok 23 - first reads and writes fetch proven prior account/storage values without zero-filling
+  ---
+  duration_ms: 13.882959
+  type: 'test'
+  ...
+# Subtest: facts first loaded inside nested checkpoints survive rollback while mutable writes do not
+ok 24 - facts first loaded inside nested checkpoints survive rollback while mutable writes do not
+  ---
+  duration_ms: 4.508459
+  type: 'test'
+  ...
+# Subtest: proof-absent zero-value touches remain absent; positive native funding and unsigned nonce materialization are explicit
+ok 25 - proof-absent zero-value touches remain absent; positive native funding and unsigned nonce materialization are explicit
+  ---
+  duration_ms: 2.198875
+  type: 'test'
+  ...
+# Subtest: returned objects, copied overlays and immutable proof facts cannot mutate one another
+ok 26 - returned objects, copied overlays and immutable proof facts cannot mutate one another
+  ---
+  duration_ms: 3.193125
+  type: 'test'
+  ...
+# Subtest: invalid storage proof blocks a write and prior overlay state remains available for rollback
+ok 27 - invalid storage proof blocks a write and prior overlay state remains available for rollback
+  ---
+  duration_ms: 4.219666
+  type: 'test'
+  ...
+# Subtest: proven existing empty accounts remain present until explicit transaction-end cleanup
+ok 28 - proven existing empty accounts remain present until explicit transaction-end cleanup
+  ---
+  duration_ms: 3.452667
+  type: 'test'
+  ...
+# Subtest: runtime code/lifecycle changes, fake collectors and unsettled copies stay unsupported
+ok 29 - runtime code/lifecycle changes, fake collectors and unsettled copies stay unsupported
+  ---
+  duration_ms: 3.040833
+  type: 'test'
+  ...
+1..29
+# tests 29
+# suites 0
+# pass 29
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 223.211667

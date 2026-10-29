@@ -1,0 +1,105 @@
+TAP version 13
+# Subtest: explicit Amsterdam clearing preserves exact residual native balance or removes the zero empty account
+not ok 1 - explicit Amsterdam clearing preserves exact residual native balance or removes the zero empty account
+  ---
+  duration_ms: 6.649667
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/proof-amsterdam-finalization.test.js:39:1'
+  failureType: 'testCodeFailure'
+  error: 'Only native funding or the unsigned sender nonce may materialize a proof-absent account.'
+  code: 'LOCAL_STATE_UNSUPPORTED'
+  stack: |-
+    fail (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/proof-state.js:17:52)
+    ProofStateManager.putAccount (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/proof-state.js:100:9)
+    async create (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/proof-amsterdam-finalization.test.js:27:3)
+    async TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/proof-amsterdam-finalization.test.js:42:27)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: clearing and nested commits remain atomically reversible, including creation/write eligibility
+ok 2 - clearing and nested commits remain atomically reversible, including creation/write eligibility
+  ---
+  duration_ms: 3.477167
+  type: 'test'
+  ...
+# Subtest: settled copies preserve balance-only clearing and can recreate without stale code or storage
+ok 3 - settled copies preserve balance-only clearing and can recreate without stale code or storage
+  ---
+  duration_ms: 1.651291
+  type: 'test'
+  ...
+# Subtest: old nonempty namespaces retain immutable reset provenance and old-equal writes never resurrect after clearing
+ok 4 - old nonempty namespaces retain immutable reset provenance and old-equal writes never resurrect after clearing
+  ---
+  duration_ms: 3.154875
+  type: 'test'
+  ...
+# Subtest: invalid modes, ineligible accounts and repeated marker consumption cannot mutate the overlay
+ok 5 - invalid modes, ineligible accounts and repeated marker consumption cannot mutate the overlay
+  ---
+  duration_ms: 2.283292
+  type: 'test'
+  ...
+# Subtest: real Amsterdam constructor self-beneficiary keeps prefunding and endowment while finalization clears its state
+not ok 6 - real Amsterdam constructor self-beneficiary keeps prefunding and endowment while finalization clears its state
+  ---
+  duration_ms: 2.412167
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/proof-amsterdam-finalization.test.js:142:1'
+  failureType: 'testCodeFailure'
+  error: 'Header byte field has an invalid encoding or width.'
+  code: 'LOCAL_HEADER_INVALID'
+  stack: |-
+    fail (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/ethereum-header.js:12:47)
+    data (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/ethereum-header.js:15:116)
+    verifyEthereumHeader (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/ethereum-header.js:39:3)
+    amsterdamFixture (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/proof-amsterdam-finalization.test.js:122:58)
+    async TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/proof-amsterdam-finalization.test.js:144:13)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: real Amsterdam SELFDESTRUCT transfers and later refills preserve exact residual value at finalization
+not ok 7 - real Amsterdam SELFDESTRUCT transfers and later refills preserve exact residual value at finalization
+  ---
+  duration_ms: 1.076125
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/proof-amsterdam-finalization.test.js:152:1'
+  failureType: 'testCodeFailure'
+  error: 'Header byte field has an invalid encoding or width.'
+  code: 'LOCAL_HEADER_INVALID'
+  stack: |-
+    fail (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/ethereum-header.js:12:47)
+    data (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/ethereum-header.js:15:116)
+    verifyEthereumHeader (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/ethereum-header.js:39:3)
+    amsterdamFixture (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/proof-amsterdam-finalization.test.js:122:58)
+    async TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/proof-amsterdam-finalization.test.js:154:13)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: real root rollback discards clearing eligibility; later CREATE2 can reuse a settled balance-only account
+not ok 8 - real root rollback discards clearing eligibility; later CREATE2 can reuse a settled balance-only account
+  ---
+  duration_ms: 0.911334
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/proof-amsterdam-finalization.test.js:165:1'
+  failureType: 'testCodeFailure'
+  error: 'Header byte field has an invalid encoding or width.'
+  code: 'LOCAL_HEADER_INVALID'
+  stack: |-
+    fail (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/ethereum-header.js:12:47)
+    data (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/ethereum-header.js:15:116)
+    verifyEthereumHeader (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/ethereum-header.js:39:3)
+    amsterdamFixture (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/proof-amsterdam-finalization.test.js:122:58)
+    async TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/proof-amsterdam-finalization.test.js:167:20)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 4
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 158.4785

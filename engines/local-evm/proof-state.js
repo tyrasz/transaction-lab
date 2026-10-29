@@ -1,6 +1,7 @@
 import { SimpleStateManager } from '@ethereumjs/statemanager';
 import { Account, bytesToHex, createAccountFromRLP, hexToBytes } from '@ethereumjs/util';
 import { keccak_256 } from '@noble/hashes/sha3.js';
+import { types } from 'node:util';
 import { isRpcStateInputs } from './rpc-state-inputs.js';
 import { EMPTY_CODE_HASH, EMPTY_STORAGE_ROOT } from './verified-state-proof.js';
 
@@ -8,7 +9,8 @@ const ADDRESS = /^0x[0-9a-f]{40}$/i;
 const MAX_UINT = (1n << 256n) - 1n, MAX_NONCE = (1n << 64n) - 1n;
 const LIMITS = Object.freeze({ reads: 200000, checkpoints: 128 });
 const ZERO_WORD = '0x' + '00'.repeat(32);
-const RESET_BASES = new Set(['same_invocation_created_contract_deletion', 'shanghai_selfdestruct_deletion', 'eip161_empty_account_cleanup']);
+const AMSTERDAM_CLEARING_BASIS = 'same_invocation_created_contract_clearing_eip8246';
+const RESET_BASES = new Set(['same_invocation_created_contract_deletion', 'shanghai_selfdestruct_deletion', 'eip161_empty_account_cleanup', AMSTERDAM_CLEARING_BASIS]);
 const copyAccount = account => account === undefined ? undefined : createAccountFromRLP(account.serialize());
 const quantity = value => '0x' + value.toString(16);
 const padded = bytes => '0x' + bytesToHex(bytes).slice(2).padStart(64, '0');
@@ -175,8 +177,8 @@ class ProofStateManager extends SimpleStateManager {
     const result = this.emptyCleanup; this.emptyCleanup = null;
     return result.sort((a, b) => a.address.localeCompare(b.address));
   }
-  #resetAccount(key, basis) {
-    this.topAccountStack().set(key, undefined);
+  #resetAccount(key, basis, preservedBalance = 0n) {
+    this.topAccountStack().set(key, preservedBalance === 0n ? undefined : new Account(0n, preservedBalance));
     this.topCodeStack().set(key, new Uint8Array());
     for (const slot of this.topStorageStack().keys()) if (slot.startsWith(key + '_')) this.topStorageStack().set(slot, new Uint8Array());
     this.creationStack.at(-1).delete(key);
@@ -191,6 +193,33 @@ class ProofStateManager extends SimpleStateManager {
     }
     this.#resetAccount(key, 'same_invocation_created_contract_deletion');
     return { address: key, scope: 'entire_account_including_code_and_storage', initialStorageRoot: base.storageRoot };
+  }
+  /** Standalone EIP-8246 state transition, deliberately not selected by the
+   * current executor/API. A trusted executor must select Amsterdam and bind
+   * the committed invocation-local created/selfdestruct intersection first;
+   * the manager's creation marker can also survive a copied query overlay.
+   * The new basis/metadata remains unsupported by parent validators until
+   * their clearing, native-value and query rules are explicitly integrated. */
+  async finalizeCreatedContractClearing(address, options) {
+    if (options === null || typeof options !== 'object' || types.isProxy(options) || Object.getPrototypeOf(options) !== Object.prototype) {
+      fail('LOCAL_STATE_INVALID', 'Created contract clearing requires an explicit trusted Amsterdam mode.');
+    }
+    const keys = Reflect.ownKeys(options), mode = Object.getOwnPropertyDescriptor(options, 'mode');
+    if (keys.length !== 1 || keys[0] !== 'mode' || !mode?.enumerable || !Object.hasOwn(mode, 'value') || mode.value !== 'amsterdam_eip8246') {
+      fail('LOCAL_STATE_INVALID', 'Created contract clearing requires an explicit trusted Amsterdam mode.');
+    }
+    if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'Contract clearing requires an active rollback checkpoint.');
+    const key = this.addressKey(address), base = await this.loadAccount(key), current = this.topAccountStack().get(key);
+    if (!this.created(key) || !current || current.nonce === 0n || (!this.resetStack.at(-1).has(key) && (base.nonceRaw !== '0' || base.code !== '0x' || base.storageRoot !== EMPTY_STORAGE_ROOT))) {
+      fail('LOCAL_STATE_UNSUPPORTED', 'Contract clearing requires an authenticated newly created contract or cleared creation namespace.');
+    }
+    const preservedBalance = current.balance;
+    // Clearing never enumerates the removed trie and never burns a later
+    // refill, sender refund or coinbase credit. A zero balance becomes absent
+    // because the cleared account is EIP-161 empty; a positive one survives.
+    this.#resetAccount(key, AMSTERDAM_CLEARING_BASIS, preservedBalance);
+    return { address: key, scope: 'code_nonce_and_entire_storage_preserving_balance', initialStorageRoot: base.storageRoot,
+      preservedBalance: quantity(preservedBalance) };
   }
   async finalizeShanghaiContractDeletion(address) {
     if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'Contract deletion requires an active rollback checkpoint.');
