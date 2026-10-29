@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "status": "verified_with_retained_discrepancy",
+  "pins": {
+    "manifest": "339bcd0951d66deec7f981d24e9bb14d04062a565256d4234b5aa731878a98e0",
+    "plan": "a32e63e57de64bfa4f97b6b7e17535a1d3e87bdaeaf077eda66c25f2f03b98b7",
+    "source": "66eb6a304a5eb0090119505568fbabf9176b07860d4e3b490f730b4847ccebb4",
+    "binary": "10385eddbfd76c3d05b9853f30f4372f2468f6a8c1ac64c445a7490694fc3521",
+    "toolchain": "791a91bca058b516b21a66097787f96959477958219eaee9dd20e73367b21333"
+  },
+  "captureEntries": 3906,
+  "runtimeEntries": 3857,
+  "runtimeSymlinks": 1,
+  "sourceCommit": "6a1c2eba56ca477389a9901b355bebf485bdbd98",
+  "rawProcesses": 4,
+  "traceRecords": 54,
+  "opcodeRecords": 44,
+  "frames": 5,
+  "rawOutputBytes": 22088,
+  "counts": {
+    "matched": 1,
+    "mismatched": 1,
+    "unavailable": 0,
+    "not_attempted": 0
+  },
+  "rows": [
+    {
+      "id": "stop_baseline",
+      "status": "matched",
+      "channels": {
+        "stateRoot": true,
+        "logsHash": true,
+        "receiptStatus": true,
+        "receiptGas": true,
+        "blockGas": true
+      },
+      "ethereumjsGas": "15000",
+      "gethGas": "15000",
+      "gasDifference": "0",
+      "ethereumjsRoot": "0xba1887ad27e7ed1a7fe18209193a3c5fb036efd9d983e813f9e5f95021daddae",
+      "gethRoot": "0xba1887ad27e7ed1a7fe18209193a3c5fb036efd9d983e813f9e5f95021daddae",
+      "feeOnlyRootsIndependentlyRebuilt": true,
+      "trace": {
+        "kind": "STOP",
+        "messageGasUsed": "0"
+      },
+      "authorityInGethBAL": null,
+      "implementationInGethBAL": null
+    },
+    {
+      "id": "post_target_call_oog",
+      "status": "mismatched",
+      "channels": {
+        "stateRoot": false,
+        "logsHash": true,
+        "receiptStatus": true,
+        "receiptGas": false,
+        "blockGas": false
+      },
+      "ethereumjsGas": "20000000",
+      "gethGas": "16777216",
+      "gasDifference": "3222784",
+      "ethereumjsRoot": "0x13a2dfa443aa711dc90c50f64f9df968e3c31b1c4df03da4c09a0d6045bd4b1b",
+      "gethRoot": "0xf1a7cc0fb505f09670bf06e1a98f95aac24268618e41618b7c6897b171505615",
+      "feeOnlyRootsIndependentlyRebuilt": true,
+      "trace": {
+        "kind": "delegated_CALL_cold_resolution_OOG",
+        "pc": 150,
+        "authority": "0x4444444444444444444444444444444444444444",
+        "implementation": "0x5555555555555555555555555555555555555555",
+        "gasBeforeOpcode": "4374",
+        "staticWarmCost": "100",
+        "additionalColdAuthorityCost": "2900",
+        "remainingBeforeDelegation": "1374",
+        "coldDelegationCost": "3000",
+        "requestedChildGas": "0",
+        "enteredChildren": 3,
+        "messageGasUsed": "16762216"
+      },
+      "authorityInGethBAL": true,
+      "implementationInGethBAL": false
+    }
+  ],
+  "scope": {
+    "artifactOnly": true,
+    "networkUsed": false,
+    "targetExecutions": 0,
+    "sourceBoundExecutionOrdering": true,
+    "independentHistoricalTimingAttestation": false,
+    "cryptographyAndMptPrimitivesSharedWithArchive": true,
+    "gasFeeStateArithmeticIndependentlyDerived": true,
+    "gethOpcodePathVerified": true,
+    "ethereumjsOpcodeTraceRecorded": false,
+    "ethereumjsLatchAndRootCountersRecorded": true,
+    "canonicalConsensusEstablished": false,
+    "publicSepoliaAdmissionEnabled": false,
+    "finalNegativeStateCounterTested": false
+  }
+}

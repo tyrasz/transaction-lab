@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "planSha256": "a32e63e57de64bfa4f97b6b7e17535a1d3e87bdaeaf077eda66c25f2f03b98b7",
+  "sourceManifestSha256": "66eb6a304a5eb0090119505568fbabf9176b07860d4e3b490f730b4847ccebb4",
+  "status": "complete",
+  "comparisonsUsable": true,
+  "sourceUnchanged": true,
+  "artifactsUnchanged": true,
+  "fatal": null,
+  "terminalTiming": {
+    "wallMs": 1310,
+    "monotonicMs": 1310.1216670000001,
+    "clockReversed": false,
+    "valid": true
+  },
+  "totalOutputBytes": 22088,
+  "artifactHashCoverageComplete": true,
+  "rows": [
+    {
+      "id": "stop_baseline",
+      "status": "matched",
+      "channels": {
+        "stateRoot": true,
+        "logsHash": true,
+        "receiptStatus": true,
+        "receiptGas": true,
+        "blockGas": true
+      },
+      "reason": null,
+      "observed": {
+        "stateRoot": "0xba1887ad27e7ed1a7fe18209193a3c5fb036efd9d983e813f9e5f95021daddae",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "receiptStatus": "1",
+        "receiptGas": "15000",
+        "blockGas": "15000"
+      }
+    },
+    {
+      "id": "post_target_call_oog",
+      "status": "mismatched",
+      "channels": {
+        "stateRoot": false,
+        "logsHash": true,
+        "receiptStatus": true,
+        "receiptGas": false,
+        "blockGas": false
+      },
+      "reason": null,
+      "observed": {
+        "stateRoot": "0xf1a7cc0fb505f09670bf06e1a98f95aac24268618e41618b7c6897b171505615",
+        "logsHash": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "receiptStatus": "0",
+        "receiptGas": "16777216",
+        "blockGas": "16777216"
+      }
+    }
+  ],
+  "counts": {
+    "matched": 1,
+    "mismatched": 1,
+    "unavailable": 0,
+    "not_attempted": 0
+  },
+  "scope": {
+    "classification": "two_predeclared_synthetic_runtime_discrepancy_diagnostics",
+    "publicApiEnabled": false,
+    "publicRpc": false,
+    "populationAccuracy": false,
+    "canonicalConsensusEstablished": false,
+    "finalNegativeStateGasTested": false,
+    "publicFiveMillionGasAdmission": false,
+    "signedType2": true,
+    "sameAmendedInitialAllocation": true,
+    "systemScaffolding": "four_disclosed_inert_STOP_accounts",
+    "ethereumjsSystemCallsExecuted": false,
+    "gethSystemCallsExecuted": true,
+    "gethReturnDataCompared": false,
+    "gethSeparateGasDimensionsObserved": false,
+    "gethBlockGasMeaning": "max(cumulative_execution_dimension,cumulative_state_dimension)",
+    "receiptGasComparedSeparately": true,
+    "allEthereumjsObservationsSealedBeforeGeth": true,
+    "rawOpcodeTraceRetained": true,
+    "automaticExecutionPathEquivalenceClaimed": false
+  }
+}

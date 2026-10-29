@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "reviewerRole": "independent_peer_read_only",
+  "reviewedHelperSha256": "a96b9b09cb90a54d6ba06b62a3145fad0c5a1130a882e19c4036b0e1b1ae562b",
+  "reviewedFixtureSha256": "04b92efee16d374c9a3e29856cee86c9d0c5a068c481654838828770ba734a6b",
+  "reviewedTestSha256": "7c60b7cd907e461486f5b993873a0e9519df415a5f6539dab6fbf324f88bc1ee",
+  "command": "node --test engines/local-evm/test/ethereum-state-gas.test.js",
+  "observedControlRun": { "exitCode": 0, "tests": 13, "passed": 13, "failed": 0, "durationMs": 276.84325 },
+  "rawTapRetention": "tool_output_only_no_standalone_TAP_file",
+  "implementationAssessment": "No concrete blocker in the explicitly pinned-runtime standalone arithmetic and hostile-input bounds; no public integration approved.",
+  "canonicalSemanticConflicts": [
+    "Pinned EthereumJS force-drains the state reservoir after its root post-target OOG latch; pinned Geth exceptional halt preserves it and drains execution only.",
+    "Signed per-frame/refill counters are legitimate, but a reachable negative FINAL transaction state counter has not been established. Pinned Geth rejects one; this helper mirrors EthereumJS clamping it to zero."
+  ],
+  "publicIntegrationRecommendation": "Keep both disputed final cases unsupported pending separately reviewed evidence and interpretation.",
+  "newDiagnosticTargetsExecutedByReview": false
+}
