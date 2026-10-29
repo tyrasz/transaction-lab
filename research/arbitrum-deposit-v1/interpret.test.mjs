@@ -21,7 +21,8 @@ const status = (input, expected, reason) => {
 
 test('actual scenario and declared deployment/source/ABI bindings are unchanged', () => {
   assert.equal(sha(raw), '5674c7568a54d5832ee76af440bda85c88621645637b2a24283b23843da430fa');
-  assert.equal(sha(read('./deployment-metadata.json')), '5fcf1f1e92ad0c08a73c8f6f78f9f8047cc9b6dbf7ece38ed445745db948b630');
+  assert.equal(sha(read('./deployment-metadata.json')), '739687651c2a98ad5801e3d5a869e0626e383e8cf1a06c2ddd4959bbc74c60fa');
+  assert.equal(sha(read('./history/manifest-cf9ad44e.json')), 'cf9ad44e9dc2de9afc81742c705d9e387ec5d2ae6fc283f1a77f4e60e5307246');
   for (const row of JSON.parse(read('./source-provenance.json')).files) {
     const bytes = read('./' + row.path); assert.equal(bytes.length, row.bytes); assert.equal(sha(bytes), row.sha256);
     if (row.gitBlobSha1) assert.equal(createHash('sha1').update(Buffer.concat([Buffer.from(`blob ${bytes.length}\0`), bytes])).digest('hex'), row.gitBlobSha1);
@@ -92,12 +93,10 @@ test('changed recipient remains explicit and cannot silently retain sender ident
   assert.equal(changedSender.intent.destination.hypercoreRecipient, scenario.from);
   assert.equal(changedSender.intent.destination.recipientIsSender, false);
   for (const recipient of ['0x' + '0'.repeat(40), metadata.coreDepositWallet]) status(alterHook(32, recipient.slice(2)), 'unsupported', 'invalid_hypercore_recipient');
-  const managedTokenRecipient = decode(alterHook(32, metadata.destinationToken.slice(2)));
-  assert.equal(managedTokenRecipient.status, 'recognized_intent');
-  assert.equal(managedTokenRecipient.intent.destination.hypercoreRecipient, metadata.destinationToken);
-  assert.equal(managedTokenRecipient.intent.basis.destinationRecipientValidationVerified, false);
-  assert(managedTokenRecipient.intent.limitations.some(x => x.includes('tokenSystemAddress')));
-  assert.equal(managedTokenRecipient.intent.destinationSettlement, null);
+  status(alterHook(32, metadata.destinationToken.slice(2)), 'unsupported', 'declared_forwarder_token_recipient');
+  assert.equal(r.intent.basis.destinationRecipientValidationVerified, false);
+  assert(r.intent.limitations.some(x => x.includes('tokenSystemAddress')));
+  assert(metadata.sources.some(x => x.path === 'sources/hyperevm-circle-contracts/src/CctpForwarder.sol'));
 });
 
 test('only declared perps and spot dex identities are labeled', () => {

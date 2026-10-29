@@ -56,8 +56,10 @@ export function decodeCctpHypercoreIntent(input) {
   if (hook.slice(0, 48) !== '636374702d666f7277617264'.padEnd(48, '0') ||
       hook.slice(48, 56) !== '00000000' || hook.slice(56, 64) !== '00000018') return result('unsupported', 'forwarding_hook_format');
   const recipient = '0x' + hook.slice(64, 104), dex = BigInt('0x' + hook.slice(104, 112)).toString();
-  // The managed token and configured tokenSystemAddress are distinct. Only the
-  // zero address and declared wallet identity are excluded without live state.
+  // CctpForwarder.mintAndForward excludes its mapped localToken, separately
+  // from CoreDepositWallet's configured tokenSystemAddress. This token identity
+  // comes from declared metadata; the live mapping and deployed code are unverified.
+  if (recipient === DEPLOYMENT_METADATA.destinationToken) return result('unsupported', 'declared_forwarder_token_recipient');
   if ([ZERO, DEPLOYMENT_METADATA.coreDepositWallet].includes(recipient)) return result('unsupported', 'invalid_hypercore_recipient');
   if (!Object.hasOwn(DEPLOYMENT_METADATA.recognizedDestinationDexes, dex)) return result('unsupported', 'unknown_destination_dex');
   return freeze({ status: 'recognized_intent', reason: null, intent: {
@@ -74,7 +76,7 @@ export function decodeCctpHypercoreIntent(input) {
       destinationRecipientValidationVerified: false },
     sourceExecution: null, measuredOutgoingAmount: null, destinationSettlement: null, destinationCreditAmount: null,
     limitations: ['Requested perps routing can fall back to spot under destination configuration.',
-      'Configured tokenSystemAddress and recipient blacklist state are unobserved; recipient eligibility is not established.',
+      'Live local-token/forwarding mappings, configured tokenSystemAddress and recipient blacklist state are unobserved; recipient eligibility is not established.',
       'Current fees, account charges, liquidity, attestation and forwarding state are not observed.',
       'No chain balance, approval sufficiency, execution result or destination credit is inferred.'],
   } });
