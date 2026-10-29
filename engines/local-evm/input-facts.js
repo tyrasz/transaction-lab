@@ -23,10 +23,13 @@ const same = (a, b) => need(isDeepStrictEqual(a, b));
  * The parent must first join each evidence result to its actual transport
  * reply and bind the context/header. This independently verifies all referenced
  * account/storage proofs and code hashes; execution outputs never enter here.
- * Unreferenced failed/incomplete reads remain evidence, not invented facts. */
+ * Unreferenced failed/incomplete reads remain evidence, not invented facts.
+ * chainId is the parent's expected network, never a value selected from the
+ * worker's claimed context. State-root proofs alone do not attest a network. */
 export async function validateInputFacts(options) {
-  fields(options, ['inputs', 'inputEvidence', 'stateRoot', 'cache', 'check'], ['inputs', 'inputEvidence', 'stateRoot']);
-  let { inputs, inputEvidence, stateRoot, cache = new Map(), check = () => {} } = options;
+  fields(options, ['inputs', 'inputEvidence', 'stateRoot', 'cache', 'check', 'chainId'], ['inputs', 'inputEvidence', 'stateRoot']);
+  let { inputs, inputEvidence, stateRoot, cache = new Map(), check = () => {}, chainId = 1 } = options;
+  need(chainId === 1 || chainId === 11155111);
   need(typeof check === 'function'); check();
   need(cache !== null && typeof cache === 'object' && !types.isProxy(cache) && Object.getPrototypeOf(cache) === Map.prototype);
   // Snapshot all caller-controlled JSON before the first await. Encoding also
@@ -34,7 +37,7 @@ export async function validateInputFacts(options) {
   const copy = decode(encode({ inputs, inputEvidence, stateRoot }, MAX_BYTES), MAX_BYTES);
   ({ inputs, inputEvidence, stateRoot } = copy);
   need(typeof stateRoot === 'string' && WORD.test(stateRoot));
-  need(inputs && typeof inputs === 'object' && inputs.context?.chainId === 1);
+  need(inputs && typeof inputs === 'object' && inputs.context?.chainId === chainId);
   need(inputs.context.stateRoot === stateRoot && typeof inputs.context.blockHash === 'string' && WORD.test(inputs.context.blockHash));
   const selector = { blockHash: inputs.context.blockHash, requireCanonical: true };
   same(inputs.context.selector, selector);

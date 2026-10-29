@@ -138,9 +138,9 @@ export function createRpcStateInputs(options) {
     context: freeze(structuredClone(context)),
     blockchain: Object.freeze({ getBlock(number) { return schedule(async () => {
       if (typeof number === 'number' && Number.isSafeInteger(number) && number >= 0) number = BigInt(number);
-      if (chainId !== 1 || typeof number !== 'bigint' || BigInt(context.header.number) > BigInt(Number.MAX_SAFE_INTEGER)) fail('RPC_STATE_INPUT_INVALID', 'Authenticated ancestry requires an exact Ethereum block number.');
+      if (![1, 11155111].includes(chainId) || typeof number !== 'bigint' || BigInt(context.header.number) > BigInt(Number.MAX_SAFE_INTEGER)) fail('RPC_STATE_INPUT_INVALID', 'Authenticated ancestry requires an exact supported Ethereum network and block number.');
       demand('blockhash', number.toString());
-      ancestry ??= createAuthenticatedAncestry(context.header);
+      ancestry ??= createAuthenticatedAncestry(context.header, chainId);
       while (ancestry.peek(number) === null) {
         const nextHash = ancestry.nextHash();
         if (nextHash === null) fail('RPC_STATE_INPUT_LIMIT', 'The authenticated ancestry bound was exhausted.');

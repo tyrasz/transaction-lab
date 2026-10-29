@@ -1,0 +1,166 @@
+TAP version 13
+# Subtest: source commitment supplies N-1; N-256 follows exactly255 authenticated hash links and caches
+ok 1 - source commitment supplies N-1; N-256 follows exactly255 authenticated hash links and caches
+  ---
+  duration_ms: 194.720875
+  type: 'test'
+  ...
+# Subtest: current/future/older-than256 return zero without adapter dispatch or retained ancestry lookups
+ok 2 - current/future/older-than256 return zero without adapter dispatch or retained ancestry lookups
+  ---
+  duration_ms: 0.487417
+  type: 'test'
+  ...
+# Subtest: hash substitution, changed fields, number gaps and nondecreasing timestamp cannot extend ancestry
+ok 3 - hash substitution, changed fields, number gaps and nondecreasing timestamp cannot extend ancestry
+  ---
+  duration_ms: 2.119583
+  type: 'test'
+  ...
+# Subtest: snapshots cannot add unsupported lookups, omit received header proof or invent provenance
+ok 4 - snapshots cannot add unsupported lookups, omit received header proof or invent provenance
+  ---
+  duration_ms: 2.050916
+  type: 'test'
+  ...
+# Subtest: ancestor reads share call/byte/time budgets and poison subsequent reads on failure
+ok 5 - ancestor reads share call/byte/time budgets and poison subsequent reads on failure
+  ---
+  duration_ms: 18.91325
+  type: 'test'
+  ...
+# Subtest: invalid ancestors retain rejected evidence and do not become valid cached facts
+ok 6 - invalid ancestors retain rejected evidence and do not become valid cached facts
+  ---
+  duration_ms: 0.946709
+  type: 'test'
+  ...
+# Subtest: initial facts reconstruct exact existing, missing-slot and absent-account provenance
+ok 7 - initial facts reconstruct exact existing, missing-slot and absent-account provenance
+  ---
+  duration_ms: 22.997417
+  type: 'test'
+  ...
+# Subtest: coordinated normalized account and provenance substitutions cannot replace the actual proof
+ok 8 - coordinated normalized account and provenance substitutions cannot replace the actual proof
+  ---
+  duration_ms: 13.81
+  type: 'test'
+  ...
+# Subtest: proof and code IDs bind method, address, ordered keys and exact canonical selector
+ok 9 - proof and code IDs bind method, address, ordered keys and exact canonical selector
+  ---
+  duration_ms: 5.820625
+  type: 'test'
+  ...
+# Subtest: storage facts cannot substitute values, existence, evidence, keys or initial requested inventory
+ok 10 - storage facts cannot substitute values, existence, evidence, keys or initial requested inventory
+  ---
+  duration_ms: 9.500167
+  type: 'test'
+  ...
+# Subtest: failed incomplete loads remain empty facts instead of becoming zero accounts
+ok 11 - failed incomplete loads remain empty facts instead of becoming zero accounts
+  ---
+  duration_ms: 2.539917
+  type: 'test'
+  ...
+# Subtest: cached results cannot authorize a changed proof or code and external cache entries are ignored
+ok 12 - cached results cannot authorize a changed proof or code and external cache entries are ignored
+  ---
+  duration_ms: 3.633125
+  type: 'test'
+  ...
+# Subtest: parent cancellation is checked across proof awaits and input mutation cannot race verification
+ok 13 - parent cancellation is checked across proof awaits and input mutation cannot race verification
+  ---
+  duration_ms: 3.932
+  type: 'test'
+  ...
+# Subtest: descriptors, proxies and malformed provenance cannot invoke caller input traps
+ok 14 - descriptors, proxies and malformed provenance cannot invoke caller input traps
+  ---
+  duration_ms: 4.152667
+  type: 'test'
+  ...
+# Subtest: lazy collection uses only canonical proof/code reads and preserves exact proven zero versus unknown slots
+ok 15 - lazy collection uses only canonical proof/code reads and preserves exact proven zero versus unknown slots
+  ---
+  duration_ms: 17.545375
+  type: 'test'
+  ...
+# Subtest: first storage demand collects only that slot; concurrent demands cannot duplicate provider reads
+ok 16 - first storage demand collects only that slot; concurrent demands cannot duplicate provider reads
+  ---
+  duration_ms: 2.656542
+  type: 'test'
+  ...
+# Subtest: account nonexistence is proven, and its empty code/storage are not inferred from missing data
+ok 17 - account nonexistence is proven, and its empty code/storage are not inferred from missing data
+  ---
+  duration_ms: 6.485375
+  type: 'test'
+  ...
+# Subtest: invalid proof/code or missing storage fails closed with no retries and no trace-derived repair
+ok 18 - invalid proof/code or missing storage fails closed with no retries and no trace-derived repair
+  ---
+  duration_ms: 9.995667
+  type: 'test'
+  ...
+# Subtest: provider exceptions are sanitized; timeout completion cannot mutate evidence or facts later
+ok 19 - provider exceptions are sanitized; timeout completion cannot mutate evidence or facts later
+  ---
+  duration_ms: 34.264416
+  type: 'test'
+  ...
+# Subtest: budgets include calls, slots, accounts, read count, result bytes and wall time without raising defaults
+ok 20 - budgets include calls, slots, accounts, read count, result bytes and wall time without raising defaults
+  ---
+  duration_ms: 5.243792
+  type: 'test'
+  ...
+# Subtest: trace, poststate, overrides and mismatched header inputs are rejected before any reads
+ok 21 - trace, poststate, overrides and mismatched header inputs are rejected before any reads
+  ---
+  duration_ms: 0.898791
+  type: 'test'
+  ...
+# Subtest: Sepolia sparse facts require an explicit parent-selected chain even when the proof cache is warm
+ok 22 - Sepolia sparse facts require an explicit parent-selected chain even when the proof cache is warm
+  ---
+  duration_ms: 21.785333
+  type: 'test'
+  ...
+# Subtest: Sepolia authenticated ancestry selects each ancestor fork across the Amsterdam boundary
+ok 23 - Sepolia authenticated ancestry selects each ancestor fork across the Amsterdam boundary
+  ---
+  duration_ms: 3.985333
+  type: 'test'
+  ...
+# Subtest: network labels, ancestor fork claims and committed fields cannot replace parent-selected verification
+ok 24 - network labels, ancestor fork claims and committed fields cannot replace parent-selected verification
+  ---
+  duration_ms: 6.628083
+  type: 'test'
+  ...
+# Subtest: wrong or unsupported ancestry network rejects before transport dispatch
+ok 25 - wrong or unsupported ancestry network rejects before transport dispatch
+  ---
+  duration_ms: 2.145833
+  type: 'test'
+  ...
+# Subtest: Sepolia BLOCKHASH range rules need no extra RPC outside the committed 256-block window
+ok 26 - Sepolia BLOCKHASH range rules need no extra RPC outside the committed 256-block window
+  ---
+  duration_ms: 1.975834
+  type: 'test'
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 325.528542

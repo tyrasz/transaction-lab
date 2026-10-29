@@ -11,10 +11,12 @@ const need = condition => { if (!condition) throw new AncestryError(); };
 /** Hash commitments only: this verifies execution-header ancestry, not consensus,
  * finality, bodies or the source header's external chain identity. No number RPC
  * is used. N-1 is already committed by the source header; N-256 needs at most
- * 255 intermediate headers. Call/byte/time budgets belong to the collector. */
-export function createAuthenticatedAncestry(header) {
+ * 255 intermediate headers. Call/byte/time budgets belong to the collector.
+ * The trusted caller selects chainId once; each ancestor selects that network's
+ * own fork at its timestamp, including ancestry across an activation boundary. */
+export function createAuthenticatedAncestry(header, chainId = 1) {
   const source = decode(encode(header, 128 * 1024), 128 * 1024);
-  const anchor = verifyEthereumHeader({ header: source, expectedHash: source.hash });
+  const anchor = verifyEthereumHeader({ header: source, expectedHash: source.hash, chainId });
   const height = BigInt(anchor.number), known = new Map(), headers = [], lookups = new Map();
   let frontier = anchor;
   if (height > 0n) known.set((height - 1n).toString(), anchor.parentHash);
@@ -31,7 +33,7 @@ export function createAuthenticatedAncestry(header) {
       need(Number.isSafeInteger(evidenceId) && evidenceId > 0 && (headers.length === 0 || evidenceId > headers.at(-1).evidenceId));
       need(headers.length < 255 && BigInt(frontier.number) > 0n);
       const copy = decode(encode(result, 128 * 1024), 128 * 1024);
-      const verified = verifyEthereumHeader({ header: copy, expectedHash: frontier.parentHash });
+      const verified = verifyEthereumHeader({ header: copy, expectedHash: frontier.parentHash, chainId });
       need(BigInt(verified.number) === BigInt(frontier.number) - 1n);
       need(BigInt(verified.timestamp) < BigInt(frontier.timestamp));
       headers.push({ evidenceId, ...verified }); frontier = verified;
@@ -45,16 +47,18 @@ export function createAuthenticatedAncestry(header) {
     },
     snapshot() { return { basis: 'execution_header_parent_hash_chain', anchorBlockHash: anchor.blockHash,
       anchorNumber: anchor.number, maxAncestors: 256, consensusVerified: false, finalityVerified: false,
+      ...(chainId === 1 ? {} : { chainId, forkSchedule: anchor.forkSchedule }),
       headers: structuredClone(headers), lookups: [...lookups].map(([number, hash]) => ({ number, hash })) }; },
   });
 }
 
 /** Rebuild claimed ancestry solely from the actual joined input RPC evidence.
  * Used by the parent for full snapshots and the original-execution prefix. */
-export function validateAncestryEvidence(header, snapshot, evidence) {
+export function validateAncestryEvidence(header, snapshot, evidence, chainId = 1) {
+  need(chainId === 1 || chainId === 11155111);
   const rows = evidence.filter(row => row.request.method === 'eth_getBlockByHash');
   if (snapshot === undefined) { need(rows.length === 0); return; }
-  const cursor = createAuthenticatedAncestry(header);
+  const cursor = createAuthenticatedAncestry(header, chainId);
   for (const row of rows) {
     need(isDeepStrictEqual(row.request.params, [cursor.nextHash(), false]));
     if (row.status === 'received' && row.verification === 'verified') {
