@@ -1,0 +1,14 @@
+{
+  "manifestSha256": "80af9842a37426970a3cd681b759edafb83dda1cb805a64fa9d8fba764d4a565",
+  "planSha256": "4444a446f6d611a624dc14fdfa4f8fdd0e385c2ffb58e73440ec13f87387deae",
+  "sourceManifestSha256": "3299dcd7bd86825ae2a18a672f0791cdd74d00975016c92080400d15c46e8582",
+  "counts": {
+    "matched": 0,
+    "mismatched": 0,
+    "unavailable": 1838,
+    "unsupported": 18,
+    "not_attempted": 0
+  },
+  "diagnosis": "All1838 admitted cases failed before executeEthereumCall: createRecordedStateManager requires {accounts: input.accounts}; the first worker supplied input.accounts directly. No EVM execution occurred.",
+  "correction": "Only wrap accounts correctly; retain exact original selection, expected bytes/gas and bounds. New capture-v2 is separately declared; original capture remains immutable."
+}

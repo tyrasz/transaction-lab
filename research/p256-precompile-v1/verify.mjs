@@ -1,0 +1,16 @@
+// Artifact-only verification: never imports or executes the adapter/VM/Geth.
+import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {createHash} from 'node:crypto';import {fileURLToPath} from 'node:url';
+const HERE=path.dirname(fileURLToPath(import.meta.url)),CAP=path.join(HERE,'capture'),sha=b=>createHash('sha256').update(b).digest('hex'),read=n=>JSON.parse(fs.readFileSync(path.join(CAP,n)));
+const manifestBytes=fs.readFileSync(path.join(CAP,'manifest.json'));assert.equal(sha(manifestBytes),'6cd83b286bd21383582f36a2b8e30daa6645c7a1c3e5d4678524aaec8a192faa');
+const manifest=JSON.parse(manifestBytes),names=new Set();
+for(const f of manifest.files){assert(!names.has(f.path));names.add(f.path);assert(!path.isAbsolute(f.path)&&!f.path.includes('\\')&&path.posix.normalize(f.path)===f.path&&!f.path.split('/').includes('..'));const p=path.join(CAP,f.path),s=fs.lstatSync(p);if(f.kind==='symlink'){assert(s.isSymbolicLink());assert.equal(fs.readlinkSync(p),f.target);assert(fs.realpathSync(p).startsWith(CAP+'/'));}else{assert(s.isFile()&&!s.isSymbolicLink());const b=fs.readFileSync(p);assert.equal(b.length,f.bytes);assert.equal(sha(b),f.sha256);assert.equal(s.mode&0o777,f.mode);}}
+function walk(root,prefix=''){return fs.readdirSync(path.join(root,prefix),{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(root,path.posix.join(prefix,e.name)):[path.posix.join(prefix,e.name)]).sort();}
+assert.deepEqual(walk(CAP),[...names,'manifest.json'].sort());
+const plan=read('PLAN.json'),sources=read('source-manifest.json'),vectors=read('vectors.json'),results=read('results.json');
+assert.equal(sha(fs.readFileSync(path.join(CAP,'PLAN.json'))),'50deae81d1cb3496620b4e3ac7b857e2ed0d5ef750dc4a2cacc18ffcda0088bc');assert.equal(results.planSha256,manifest.planSha256);assert.equal(plan.sourceManifestSha256,sha(fs.readFileSync(path.join(CAP,'source-manifest.json'))));assert.equal(plan.provenanceSha256,sha(fs.readFileSync(path.join(CAP,'provenance.json'))));
+assert.equal(sha(fs.readFileSync(path.join(CAP,'vectors.json'))),'72be71957c3e4292d874b3e2a6a2fc2142524433b01cb9a9552b9bb2528c214d');
+assert.deepEqual(sources.files.map(f=>({...f,path:'runtime/'+f.path})),manifest.files.filter(f=>f.path.startsWith('runtime/')));
+assert.equal(results.rows.length,782);assert.equal(vectors.length,782);assert.equal(plan.cases.length,782);
+for(let i=0;i<782;i++){const v=vectors[i],r=results.rows[i],p=plan.cases[i];assert.equal(p.index,i);assert.equal(r.index,i);assert.equal(p.name,v.Name);assert.equal(r.name,v.Name);assert.equal(p.inputSha256,sha(Buffer.from(v.Input,'hex')));assert.equal(p.expected,v.Expected);assert.equal(r.expected,v.Expected);assert.equal(p.gas,v.Gas);assert.equal(r.gasUsed,'6900');assert.equal(r.exceptionError,null);assert.equal(r.status,r.actual===v.Expected?'matched':'mismatched');}
+assert.equal(results.status,'complete');assert.equal(results.fatal,null);assert.equal(results.sourceUnchanged,true);assert.equal(results.comparisonsUsable,true);assert(results.elapsedMs>=0&&results.elapsedMs<60000);assert.deepEqual(results.counts,{matched:782,mismatched:0,unavailable:0,unattempted:0});
+console.log(JSON.stringify({verified:true,cases:782,evidenceEntries:manifest.files.length,runtimeEntries:sources.files.length,adapterExecutions:0,rpcCalls:0}));

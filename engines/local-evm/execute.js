@@ -14,6 +14,8 @@ import { normalizeAuthorizationList, recoverAuthorization, authorizationStateDec
 import { normalizeEthereumFees, ethereumFeePlan, settleEthereumFees } from './ethereum-fees.js';
 import { verifyKzgProof } from './kzg-point-evaluation.js';
 import { guardKzgVerifier } from './kzg-runtime.js';
+import { createGuardedBls } from './bls-runtime.js';
+import { P256_ADDRESS, createP256Precompile } from './p256-runtime.js';
 
 export const EXECUTION_LIMITS = Object.freeze({ gas: 5000000, steps: 1000000, frames: 1000, depth: 32, logs: 2000, memoryBytes: 1048576, returnBytes: 1048576, calldataBytes: 32768, traceBytes: 8388608, wallMs: 10000 });
 export const ETHEREUM_EXECUTION_LIMITS = Object.freeze({ ...EXECUTION_LIMITS, wallMs: 120000 });
@@ -71,6 +73,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
   let authorizationProcessing = null, authorizationSenderIncrements = 0, authorizationBaseline = null;
   let feePlan = null, feeCosts = null, feeAccounting = null;
   const stack = [];
+  function latchHostFailure(error) { if (!hostFailed) { hostFailed = true; hostError = error; } }
   const reserved = value => supportedAddress(value, chainId);
   function bound(name, value) { if (value > limits[name]) reject('LOCAL_RESOURCE_LIMIT', `Local execution exceeded its ${name} limit.`); }
   function clockCheck() {
@@ -101,9 +104,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
     if (!block || ['number', 'timestamp', 'gasLimit', 'baseFeePerGas'].some(field => quantity(block[field]) === null) || quantity(block.gasLimit) === 0n || typeof block.mixHash !== 'string' || !WORD.test(block.mixHash) || !address(block.miner) || ['hash', 'parentHash'].some(field => block[field] !== undefined && (typeof block[field] !== 'string' || !WORD.test(block[field])))) reject('LOCAL_INVALID_INPUT', 'Explicit block number, timestamp, gas limit, base fee, prevRandao and coinbase are required.');
     const common = chainId === 1 ? ethereumCommon(block) : createCustomCommon({ chainId: 999, name: 'experimental-hyperevm-message' }, Mainnet, { hardfork: Hardfork.Cancun });
     if (chainId === 1 && common.isActivatedEIP(4844)) {
-      common.customCrypto.kzg = guardKzgVerifier(verifyKzgProof, clockCheck, error => {
-        if (!hostFailed) { hostFailed = true; hostError = error; }
-      });
+      common.customCrypto.kzg = guardKzgVerifier(verifyKzgProof, clockCheck, latchHostFailure);
     }
     if (authorizationList !== undefined && (!common.isActivatedEIP(7702) || topLevelCreation || context.blobVersionedHashes !== undefined)) reject('LOCAL_INVALID_INPUT', 'Authorization lists require a Prague-or-later Ethereum call without blob context.', 'invalid');
     if (authorizationList !== undefined && typeof stateManager.applyAuthorization !== 'function') reject('LOCAL_STATE_UNSUPPORTED', 'Authorization lists require an authenticated authorization-capable state manager.', 'unsupported');
@@ -158,7 +159,7 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
           clockCheck();
           return result;
         } catch (error) {
-          if (!hostFailed) { hostFailed = true; hostError = error; }
+          latchHostFailure(error);
           throw error;
         }
       });
@@ -176,7 +177,11 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       async putBlock() { reject('LOCAL_BLOCKCHAIN_WRITE_UNSUPPORTED', 'Block writes are unsupported.', 'unsupported'); },
       shallowCopy() { return this; },
     };
-    evm = await createEVM({ common, stateManager: guarded, blockchain: hashes });
+    evm = await createEVM({ common, stateManager: guarded, blockchain: hashes,
+      ...(chainId === 1 && common.isActivatedEIP(2537) ? { bls: createGuardedBls(clockCheck, latchHostFailure) } : {}),
+      ...(chainId === 1 && common.isActivatedEIP(7951) ? { customPrecompiles: [{ address: P256_ADDRESS,
+        function: createP256Precompile(clockCheck, latchHostFailure) }] } : {}),
+    });
     // Each invocation is a fresh message/transaction-context boundary for
     // SSTORE refund accounting, even when the caller retains the same manager.
     stateManager.originalStorageCache?.clear();
