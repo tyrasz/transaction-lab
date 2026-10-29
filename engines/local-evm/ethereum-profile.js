@@ -1,8 +1,8 @@
-import { Common, Mainnet } from '@ethereumjs/common';
 import { normalizeEvmContext } from '../evm-context.js';
 import { normalizeAuthorizationList } from './authorization-list.js';
 import { normalizeEthereumFees } from './ethereum-fees.js';
 import { ethereumBlobContext } from './ethereum-blob-fees.js';
+import { ethereumNetworkCommon } from './ethereum-network.js';
 
 const SUPPORTED = new Set(['shanghai', 'cancun', 'prague', 'osaka', 'bpo1', 'bpo2']);
 const BYTES = /^0x(?:[0-9a-f]{2})*$/i;
@@ -15,12 +15,17 @@ export function ethereumQuantity(value) {
   return n;
 }
 
-/** Fork rules are the explicitly pinned EthereumJS mainnet schedule. Header
- * authenticity and finality must be established by the caller, not this helper. */
-export function ethereumCommon(header) {
-  const common = new Common({ chain: Mainnet });
-  const hardfork = common.setHardforkBy({ blockNumber: ethereumQuantity(header?.number), timestamp: ethereumQuantity(header?.timestamp) });
-  if (!SUPPORTED.has(hardfork)) throw profileError('LOCAL_ETHEREUM_FORK_UNSUPPORTED', 'This execution reference supports the pinned Shanghai through BPO2 mainnet schedule.');
+/** Execution admission is deliberately separate from header/network support.
+ * Only the reviewed mainnet fork set is currently admitted. A valid Sepolia
+ * header or query identity cannot enable execution; the trusted caller must
+ * pass chainId explicitly when it differs from the legacy mainnet default.
+ * Header authenticity and finality remain the caller's responsibility. */
+export function ethereumCommon(header, chainId = 1) {
+  const unavailable = () => profileError('LOCAL_ETHEREUM_FORK_UNSUPPORTED', 'This execution reference supports the pinned Shanghai through BPO2 mainnet schedule.');
+  let common;
+  try { common = ethereumNetworkCommon(header, chainId); }
+  catch (error) { if (error?.code === 'LOCAL_ETHEREUM_FORK_UNSUPPORTED') throw unavailable(); throw error; }
+  if (chainId !== 1 || !SUPPORTED.has(common.hardfork())) throw unavailable();
   return common;
 }
 
