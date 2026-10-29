@@ -1,6 +1,6 @@
 # Sepolia API and browser release checks
 
-Candidate version 0.31.0. These are development/regression checks, not a representative transaction sample or a universal accuracy result.
+Released version 0.31.0. These are development/regression checks, not a representative transaction sample or a universal accuracy result.
 
 The full local engine suite passed 922/922 tests in 46.763 seconds. The full application suite passed 717/717 tests in 60.166 seconds with temporary localhost listeners allowed. The suites ran against stable production sources; their raw logs are retained. Twelve new delegated-sender groups cover 26 original scenarios and four disposable query counterparts, with signed full-VM and independently applied MPT roots. Those references share EthereumJS; the separate Geth packet supplies independent-client evidence for six fixed cases.
 
@@ -16,4 +16,8 @@ The single live API attempt succeeded at Sepolia block 12,020,571 (hash 0x564581
 
 The separate six-case delegated-sender Geth packet matched all nine comparison fields. Its artifact review reconstructs 24 MPT roots and reproduces those comparisons; the retained review source states its shared-parser and proof-walk limitations. The earlier internal live attempts and unavailable provider outcomes remain unchanged in their original packets.
 
-Promotion is recorded below when complete.
+The local app was fast-forwarded to implementation/evidence commit `bcda933b` and restarted on its existing port 5174. `installed-http.json` records three read-only local requests: health, configuration and the served interface source. Health reports version 0.31.0 and read-only mode; all three optional engines are available and Sepolia is explicitly enabled. All 1,722 local-loader inventory entries and the Node runtime identity match the live-tested candidate exactly. Served `public/app.js` also matches its tracked source (SHA-256 63dbfcc3d4289630f30b2795eb11114e047e025e55806f5dec7476489c93e65a).
+
+The saved live packet and Geth artifact review passed from the installed main checkout, exercising the relative archived-dependency references without any target or public network rerun. Their raw reports are included. Root inspected the actual port-5174 browser and left Sepolia selected with the public transfer example and its two explicit balance queries. No second live simulation was submitted. The temporary port-5175 candidate is stopped after verification.
+
+Amsterdam authorization-list preparation, storage-only creation collisions, complete economic-effect discovery, local API sequences and universal transaction accuracy remain outside the supported or established scope.
