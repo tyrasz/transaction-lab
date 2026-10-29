@@ -1,0 +1,33 @@
+{
+  "request": {
+    "chainId": 11155111,
+    "from": "0x6efb29cee3b414272eb7a8f3ebabf873d36bc033",
+    "to": "0x000000000000000000000000000000000000dead",
+    "value": "1000000000000000",
+    "gas": "21000",
+    "data": "0x",
+    "block": "0x5a663e4c38b7e3f1e4f6b52c3ae929cd28195a3108b5e1038fd59e6a5b286c83",
+    "queries": [
+      {
+        "kind": "native_balance",
+        "account": "0x6efb29cee3b414272eb7a8f3ebabf873d36bc033"
+      },
+      {
+        "kind": "native_balance",
+        "account": "0x000000000000000000000000000000000000dead"
+      }
+    ]
+  },
+  "error": {
+    "name": "AssertionError",
+    "message": "HTTP_status\n\n400 !== 200\n",
+    "code": "ERR_ASSERTION"
+  },
+  "httpStatus": 400,
+  "response": {
+    "error": {
+      "code": "UNSUPPORTED_CHAIN",
+      "message": "Only Ethereum chain 1 is supported."
+    }
+  }
+}
