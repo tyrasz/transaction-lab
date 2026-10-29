@@ -14,3 +14,5 @@ The [independent BLS review](../bls-precompile-v1-review/NOTES.md) separately ch
 These fixed development corpora provide component evidence. They do not constitute a representative accuracy estimate, a Geth execution comparison, full signed-transaction conformance, complete asset discovery or cross-chain settlement verification. BLS corpus accounts/headers are synthetic and not proof-validated; the P-256 corpus directly invokes the pure adapter. The separate API tests supply synthetic authenticated proofs.
 
 The independent regression suites and corpus executions made no public RPC request, signed no real transaction and broadcast nothing.
+
+The app was restarted from release code commit `3cee6f1b` at its existing loopback port. `release-health.json` confirms version 0.28.0, read-only mode, available local/Ethereum-provider/Arbitrum-provider engines, and the new capability fields. This check used only the local health/config endpoints. The root independently repeated the BLS artifact verifier and all six tamper/relocation groups; those six groups passed in 2.118 seconds without cryptographic target execution.

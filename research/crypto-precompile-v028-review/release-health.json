@@ -1,0 +1,163 @@
+{
+  "health": {
+    "status": "ok",
+    "version": "0.28.0",
+    "readOnly": true
+  },
+  "localEvm": {
+    "available": true,
+    "capabilities": {
+      "available": true,
+      "chainId": 1,
+      "status": "experimental",
+      "operation": "isolated_proof_backed_unsigned_call",
+      "profile": "unsigned_unpriced_block_end",
+      "blockSelection": [
+        "latest",
+        "canonical_hex_number",
+        "block_hash"
+      ],
+      "transactionContext": {
+        "optionalFields": [
+          "accessList",
+          "blobVersionedHashes",
+          "authorizationList"
+        ],
+        "limits": {
+          "accessListEntries": 128,
+          "storageKeys": 1024,
+          "blobVersionedHashes": 32,
+          "authorizations": 16
+        },
+        "blobFeeScope": "default_synthetic_zero_or_explicit_fork_priced_blob_fees_without_sidecar_validation"
+      },
+      "senderCode": "empty_or_exact_existing_EIP7702_delegation_on_Prague_or_later",
+      "authorizations": "ordered_EIP7702_signed_tuples_on_Prague_or_later_before_unsigned_message_no_outer_signature_validation",
+      "internalCreation": "CREATE_CREATE2_with_proven_empty_deployable_targets",
+      "topLevelCreation": "explicit_null_destination_CREATE_with_proven_empty_deployable_target",
+      "selfdestruct": "fork_selected_Shanghai_whole_account_deletion_and_Cancun_created_only_deletion",
+      "emptyAccountCleanup": "EIP161_retained_unsigned_message_touches_including_RIPEMD160_exception",
+      "historicalBlockHashes": "authenticated_parent_hash_chain_with_shared_input_limits",
+      "pointEvaluation": {
+        "address": "0x000000000000000000000000000000000000000a",
+        "activationFork": "cancun",
+        "supportedForks": [
+          "cancun",
+          "prague",
+          "osaka",
+          "bpo1",
+          "bpo2"
+        ],
+        "scope": "executed_EIP4844_single_point_KZG_proofs",
+        "blobSidecarsVerified": false,
+        "wholeBlobValidityVerified": false,
+        "inclusionVerified": false
+      },
+      "cryptographicPrecompiles": {
+        "bls12_381": {
+          "addresses": [
+            "0x0b",
+            "0x0c",
+            "0x0d",
+            "0x0e",
+            "0x0f",
+            "0x10",
+            "0x11"
+          ],
+          "activationFork": "prague",
+          "supportedForks": [
+            "prague",
+            "osaka",
+            "bpo1",
+            "bpo2"
+          ],
+          "scope": "EIP2537_curve_operations"
+        },
+        "p256": {
+          "address": "0x0000000000000000000000000000000000000100",
+          "activationFork": "osaka",
+          "supportedForks": [
+            "osaka",
+            "bpo1",
+            "bpo2"
+          ],
+          "gas": "6900",
+          "scope": "EIP7951_signature_verification"
+        },
+        "hostFailure": "unavailable_with_whole_attempt_rollback"
+      },
+      "querySelection": "explicit_only",
+      "queryTypes": [
+        "balanceOf",
+        "allowance",
+        "aave_v3_user_account_data",
+        "morpho_blue_position"
+      ],
+      "gasSelection": {
+        "field": "gas",
+        "encoding": "canonical_decimal_string",
+        "default": "5000000",
+        "minimum": "21000",
+        "maximum": "5000000",
+        "scope": "total_transaction_gas_including_intrinsic",
+        "selectedForkMinimumRequired": true,
+        "queryGas": "1000000"
+      },
+      "feeSelection": {
+        "executionProfile": "unsigned_eip1559_block_end",
+        "requiredFields": [
+          "maxFeePerGas",
+          "maxPriorityFeePerGas"
+        ],
+        "encoding": "canonical_decimal_uint256_wei_strings",
+        "default": "unsigned_unpriced_block_end",
+        "blobContext": false,
+        "blobProfile": {
+          "executionProfile": "unsigned_eip4844_block_end",
+          "requiredFields": [
+            "maxFeePerGas",
+            "maxPriorityFeePerGas",
+            "maxFeePerBlobGas"
+          ],
+          "requiredContext": "nonempty_blobVersionedHashes",
+          "forkSpecificCountMaximum": true,
+          "sidecarsVerified": false
+        },
+        "scope": "original_execution_only",
+        "queryProfile": "unsigned_unpriced_block_end",
+        "settlementRequiresCompleteValidatedOutput": true
+      },
+      "limits": {
+        "queries": 8,
+        "calldataBytes": 32768,
+        "gas": 5000000,
+        "proofRpcCalls": 256,
+        "totalRpcCalls": 260,
+        "responseBytes": 8388608,
+        "wireBytes": 33554432,
+        "wallMs": 145000,
+        "drainMs": 25000,
+        "apiOutputBytes": 100663296
+      },
+      "limitations": [
+        "Only explicit query pairs are measured; automatic token discovery, native-effect summaries and sequences are not provided by this endpoint.",
+        "Proofs and runtime code are checked against the selected header, whose hash is recomputed. Consensus, finality and contract identity are not independently established.",
+        "The default unsigned profile uses zero gas price and BASEFEE without fee settlement. Explicit EIP-1559 and EIP-4844 profiles use the selected block fee context and caller caps; settlement is reported only for a complete validated execution. No profile validates an outer transaction signature. Contract signature checks still execute.",
+        "Optional gas selects the original transaction gas limit within 21,000–5,000,000; the selected fork also requires sufficient intrinsic gas and calldata floor. Each measurement query retains a separate 1,000,000 gas limit.",
+        "Explicit to:null deploys initcode with CREATE; internal CREATE and CREATE2 require a proven deployable target with empty initial code/storage and zero nonce. Shanghai SELFDESTRUCT removes every committed execution account at transaction end. Cancun-or-later transfers preexisting balances while deleting only contracts created in that invocation.",
+        "Transaction-end EIP-161 cleanup removes touched empty accounts and their entire storage, including the retained RIPEMD160 touch exception. The default profile adds no fee-related coinbase touch. Rematerializing a deleted account with original code, nonzero nonce or nonempty storage remains unsupported.",
+        "Optional fees require maxFeePerGas and maxPriorityFeePerGas as raw wei strings. The explicit EIP-4844 profile also requires maxFeePerBlobGas and nonempty versioned hashes; its actual blob charge is burned without refund or beneficiary tip. Measurement queries stay unpriced, receive no blob hashes, do not repeat fees and still do not support BLOBBASEFEE.",
+        "Sender code must initially be empty or an exact existing EIP-7702 delegation on Prague or later. Up to sixteen signed authorization tuples may install, replace or clear delegations before a call; their changes survive message failure. Authorization lists cannot accompany deployment or blob context. Other coded senders remain unsupported. Default blob calls use zero blob base fee. Explicit priced calls derive BLOBBASEFEE from the verified current header and pinned fork parameters; parent excess evolution, sidecars and inclusion remain unverified.",
+        "On Cancun through BPO2, executed calls to the 0x0a point-evaluation precompile check EIP-4844 single-point KZG proofs. This does not validate blob sidecars, whole-blob validity or inclusion, and supplying blob hashes alone performs no point-evaluation check.",
+        "BLS12-381 operations use the Prague-or-later rules and P-256 signature verification uses Osaka-or-later rules. Unexpected cryptographic runtime failures withhold execution rather than becoming an invalid signature or catchable EVM failure. Before activation, these addresses keep ordinary account behavior.",
+        "In-range BLOCKHASH follows authenticated parent headers within the shared read and time budgets; missing ancestry is unavailable.",
+        "The pinned EthereumJS Shanghai-through-BPO2 schedule and fixed execution/state budgets bound supported execution.",
+        "Process separation and a V8 heap limit are not an OS network/filesystem sandbox or a hard total-RSS limit.",
+        "No security verdict, complete economic-effect coverage or accuracy percentage is established."
+      ]
+    }
+  },
+  "standardAvailable": true,
+  "arbitrumAvailable": true,
+  "publicRpcCalls": 0
+}
