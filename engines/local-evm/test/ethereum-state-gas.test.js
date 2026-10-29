@@ -23,22 +23,35 @@ test('Amsterdam budget split has exact regular/total boundaries and does not ena
   assert.throws(() => ethereumStateGasBudget({ gasLimit: 5000000n, intrinsicRegular: 21000n, floor: 21000n }, new Common({ chain: Sepolia, hardfork: Hardfork.Osaka })));
 });
 
-test('signed state/refill counters retain negative values; ordinary refunds and floor remain separate', () => {
-  const s = settleEthereumStateGas(budget(), counters({ stateGasReservoir: 500n, executionStateGasUsed: -200n,
+test('reservoir refills retain a negative delta; ordinary refunds and floor remain separate', () => {
+  const s = settleEthereumStateGas(budget(), counters({ stateGasReservoir: 500n, executionStateGasUsed: 0n,
     messageRefundCounter: 30000n, authorizationRefundCounter: 1n }));
-  assert.equal(s.reservoirDelta, -500n); assert.equal(s.stateGasUsedRaw, -200n); assert.equal(s.stateGasUsed, 0n);
-  assert.equal(s.beforeRefund, 114500n); assert.equal(s.executionRegularGasUsed, 99700n);
+  assert.equal(s.reservoirDelta, -500n); assert.equal(s.stateGasUsedRaw, 0n); assert.equal(s.stateGasUsed, 0n);
+  assert.equal(s.beforeRefund, 114500n); assert.equal(s.executionRegularGasUsed, 99500n);
   assert.equal(s.appliedRefund, 22900n); assert.equal(s.gasUsed, 91600n);
   assert.equal(s.regularGasUsed, 114500n); assert.equal(s.blockGasUsed, 114500n);
   const floor = settleEthereumStateGas(budget({ floor: 120000n }), counters({ messageRefundCounter: 1n }));
   assert.equal(floor.gasUsed, 120000n); assert.equal(floor.floorAdjustment, 5001n); assert.equal(floor.reportedRefundCounter, 0n);
 });
 
+test('disputed OOG paths and unestablished negative final state usage withhold settlement', () => {
+  for (const executionStateGasUsed of [-1n, -200n]) {
+    assert.throws(() => settleEthereumStateGas(budget(), counters({ executionStateGasUsed })), { code: 'LOCAL_ETHEREUM_STATE_GAS_UNSUPPORTED' });
+  }
+  const b = budget({ gasLimit: 20000000n });
+  // Both the captured drained reservoir and a preserved-reservoir alternative
+  // are refused. Choosing a client is not a resolution of the discrepancy.
+  for (const stateGasReservoir of [0n, b.stateGasReservoirInitial]) {
+    assert.throws(() => settleEthereumStateGas(b, counters({ messageGasUsed: b.messageGasLimit,
+      stateGasReservoir, postTargetOutOfGas: true })), { code: 'LOCAL_ETHEREUM_STATE_GAS_UNSUPPORTED' });
+  }
+});
+
 test('arithmetic rejects impossible budget/counter combinations and hostile records without invoking accessors', () => {
   for (const patch of [{ messageGasUsed: -1n }, { authorizationGasUsed: 5000000n }, { stateGasReservoir: -1n },
     { executionStateGasUsed: 100001n }, { executionStateGasUsed: -(1n << 40n) }, { stateGasReservoir: 200000n },
     { messageRefundCounter: -1n }, { messageRefundCounter: 1n << 256n }, { messageGasUsed: '100000' }, { extra: 0n },
-    { postTargetOutOfGas: true }, { postTargetOutOfGas: 0n }]) {
+    { postTargetOutOfGas: 0n }]) {
     assert.throws(() => settleEthereumStateGas(budget(), counters(patch)), /malformed or inconsistent/);
   }
   assert.throws(() => settleEthereumStateGas({ ...budget(), messageGasLimit: 5000000n }, counters()));
@@ -178,7 +191,7 @@ test('signed calldata floor changes sender gas and refund reporting without eras
   assert.equal(f.settled.stateGasUsed, 0n);
 });
 
-test('observed pinned post-target CALL OOG drains reservoir; its above-cap regular dimension is explicitly exceptional', async () => {
+test('observed pinned post-target CALL OOG remains reproducible but local settlement refuses its result', async () => {
   const delegated = '0x' + '44'.repeat(20), implementation = '0x' + '55'.repeat(20);
   // Three caught INVALID child calls consume regular gas cheaply. The final
   // delegated target passes its first address check then OOGs resolving code.
@@ -186,14 +199,14 @@ test('observed pinned post-target CALL OOG drains reservoir; its above-cap regul
   const third = '6000600060006000600073' + CHILD.slice(2) + '6111945a03f150';
   const bytecode = '0x' + callCode(CHILD, { gas: 16000000 }) + callCode(CHILD, { gas: 600000 })
     + third + callCode(delegated, { gas: 0 }) + '00';
-  const f = await signedStateGasCase({ gasLimit: 20000000n, target: { nonce: 1n, code: bytecode }, accounts: {
+  const f = await signedStateGasCase({ gasLimit: 20000000n, expectSettlementUnsupported: true, target: { nonce: 1n, code: bytecode }, accounts: {
     [CHILD]: { nonce: 1n, code: '0xfe' }, [delegated]: { nonce: 1n, code: '0xef0100' + implementation.slice(2) },
     [implementation]: { nonce: 1n, code: '0x00' },
   } });
   assert.equal(f.result.execResult.exceptionError.error, 'out of gas'); assert.equal(f.counters.postTargetOutOfGas, true);
   assert.equal(f.counters.messageGasUsed, 16762216n); assert.equal(f.counters.stateGasReservoir, 0n);
-  assert.equal(f.settled.stateGasUsed, 0n); assert.equal(f.settled.gasUsed, 20000000n);
-  assert.equal(f.settled.regularGasUsed, 20000000n); assert.equal(f.settled.blockGasUsed, 20000000n);
+  assert.equal(f.settled, null); assert.equal(f.result.txStateGas, 0n); assert.equal(f.result.totalGasSpent, 20000000n);
+  assert.equal(f.result.txRegularGas, 20000000n); assert.equal(f.result.blockGasSpent, 20000000n);
   assert.throws(() => settleEthereumStateGas(f.budget, { ...f.counters, postTargetOutOfGas: false }));
   assert.throws(() => settleEthereumStateGas(f.budget, { ...f.counters, messageGasUsed: f.counters.messageGasUsed - 1n }));
   assert.throws(() => settleEthereumStateGas(f.budget, { ...f.counters, stateGasReservoir: 1n }));

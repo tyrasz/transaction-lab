@@ -20,6 +20,9 @@ const COUNTER_KEYS = ['messageGasUsed', 'authorizationGasUsed', 'stateGasReservo
 function need(ok) {
   if (!ok) throw Object.assign(new Error('Amsterdam state-gas accounting is malformed or inconsistent.'), { code: 'LOCAL_ETHEREUM_STATE_GAS_INVALID' });
 }
+function unsupported(message) {
+  throw Object.assign(new Error(message), { code: 'LOCAL_ETHEREUM_STATE_GAS_UNSUPPORTED' });
+}
 function record(value, keys, booleanKeys = []) {
   need(value !== null && typeof value === 'object' && !types.isProxy(value) && !Array.isArray(value));
   need([Object.prototype, null].includes(Object.getPrototypeOf(value)));
@@ -57,19 +60,20 @@ export function ethereumStateGasBudget(input, common) {
   return split(input);
 }
 
-/** Settle FINAL transaction counters after frame rollback/preparation rollback
- * and any EIP-7928 post-target-OOG force-drain. authorizationGasUsed is the
+/** Settle FINAL transaction counters after frame rollback/preparation rollback.
+ * authorizationGasUsed is the
  * regular-pool debit before runCall, including spilled authorization state gas;
  * it is not intrinsic gas and must not be included in messageGasUsed again.
- * executionStateGasUsed and reservoirDelta are signed. In particular a refill
- * can make the remaining reservoir exceed its initial size. Clamping either
- * before computing the paid total would overcharge legitimate refills.
+ * A frame's state counter and reservoirDelta can be signed. In particular a refill
+ * can make the remaining reservoir exceed its initial size. Clamping that
+ * delta before computing the paid total would overcharge legitimate refills.
  *
  * postTargetOutOfGas must be the conjunction of the final root OUT_OF_GAS error
  * and the EVM's eip7928CallPostTargetOog latch, retained before runTx clears it.
- * Pinned runTx force-drains the reservoir in this case. Its regular dimension
- * can then exceed the 16M regular cap. This is an observed pinned behavior, NOT
- * a claim that this exceptional rule is independently established as canonical.
+ * Pinned runTx force-drains the reservoir in this case, whereas the independently
+ * captured Geth transition preserves it. Until resolved, this helper refuses
+ * settlement for that path. A negative FINAL state counter is also unsupported;
+ * a signed frame counter does not establish that it is valid at transaction end.
  *
  * These are arithmetic consistency checks, not proof of the execution or of
  * authorization/refund eligibility. A parent must bind the counters separately.
@@ -87,12 +91,12 @@ export function settleEthereumStateGas(budget, counters) {
   const reservoirDelta = plan.stateGasReservoirInitial - c.stateGasReservoir;
   const beforeRefund = plan.intrinsicRegular + regularPoolUsed + reservoirDelta;
   need(beforeRefund >= 0n && beforeRefund <= plan.gasLimit);
-  if (c.postTargetOutOfGas) need(regularPoolUsed === plan.messageGasLimit && c.stateGasReservoir === 0n && beforeRefund === plan.gasLimit);
+  if (c.postTargetOutOfGas) unsupported('Post-target out-of-gas settlement differs between the pinned execution clients.');
+  if (c.executionStateGasUsed < 0n) unsupported('Negative final transaction state-gas usage has not been independently established.');
   // State drawn from gas_left is already included in regularPoolUsed. Remove
   // it once to recover actual non-state work; do not charge that spill twice.
   const executionRegularGasUsed = regularPoolUsed + reservoirDelta - c.executionStateGasUsed;
-  const regularCounterBound = plan.messageGasLimit + (c.postTargetOutOfGas ? plan.stateGasReservoirInitial : 0n);
-  need(executionRegularGasUsed >= 0n && executionRegularGasUsed <= regularCounterBound);
+  need(executionRegularGasUsed >= 0n && executionRegularGasUsed <= plan.messageGasLimit);
   const refundCounter = c.messageRefundCounter + c.authorizationRefundCounter;
   need(refundCounter <= MAX_UINT256);
   const appliedRefund = min(refundCounter, beforeRefund / ETHEREUM_STATE_GAS_LIMITS.refundQuotient);
@@ -100,7 +104,7 @@ export function settleEthereumStateGas(budget, counters) {
   const floorAdjustment = max(plan.floor - afterRefund, 0n);
   const gasUsed = afterRefund + floorAdjustment;
   need(gasUsed <= plan.gasLimit);
-  const stateGasUsedRaw = c.executionStateGasUsed, stateGasUsed = max(stateGasUsedRaw, 0n);
+  const stateGasUsedRaw = c.executionStateGasUsed, stateGasUsed = stateGasUsedRaw;
   // Block dimensions intentionally do not subtract the ordinary refund. Their
   // sum need not equal sender-charged gas, nor the scalar 7778 blockGasUsed.
   return Object.freeze({ beforeRefund, refundCounter, appliedRefund, floorAdjustment, gasUsed,

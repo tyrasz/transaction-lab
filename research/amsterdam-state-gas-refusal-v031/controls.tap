@@ -1,0 +1,94 @@
+TAP version 13
+# Subtest: Amsterdam budget split has exact regular/total boundaries and does not enable older forks
+ok 1 - Amsterdam budget split has exact regular/total boundaries and does not enable older forks
+  ---
+  duration_ms: 1.314125
+  type: 'test'
+  ...
+# Subtest: reservoir refills retain a negative delta; ordinary refunds and floor remain separate
+ok 2 - reservoir refills retain a negative delta; ordinary refunds and floor remain separate
+  ---
+  duration_ms: 0.234959
+  type: 'test'
+  ...
+# Subtest: disputed OOG paths and unestablished negative final state usage withhold settlement
+ok 3 - disputed OOG paths and unestablished negative final state usage withhold settlement
+  ---
+  duration_ms: 0.593833
+  type: 'test'
+  ...
+# Subtest: arithmetic rejects impossible budget/counter combinations and hostile records without invoking accessors
+ok 4 - arithmetic rejects impossible budget/counter combinations and hostile records without invoking accessors
+  ---
+  duration_ms: 0.742375
+  type: 'test'
+  ...
+# Subtest: signed native transfers distinguish existing, absent and self recipients at transaction-level setup
+ok 5 - signed native transfers distinguish existing, absent and self recipients at transaction-level setup
+  ---
+  duration_ms: 41.145666
+  type: 'test'
+  ...
+# Subtest: signed root creation pays account/code state gas only when committed and preserves prefunding distinction
+ok 6 - signed root creation pays account/code state gas only when committed and preserves prefunding distinction
+  ---
+  duration_ms: 11.806958
+  type: 'test'
+  ...
+# Subtest: signed SSTORE allocation/clear and original-slot refund separate state refills from the refund cap
+ok 7 - signed SSTORE allocation/clear and original-slot refund separate state refills from the refund cap
+  ---
+  duration_ms: 12.259792
+  type: 'test'
+  ...
+# Subtest: signed frame revert and exceptional halt roll state gas back but preserve their distinct regular charges
+ok 8 - signed frame revert and exceptional halt roll state gas back but preserve their distinct regular charges
+  ---
+  duration_ms: 7.666583
+  type: 'test'
+  ...
+# Subtest: signed transactions use a nonzero reservoir for state while returning unused reservoir on revert
+ok 9 - signed transactions use a nonzero reservoir for state while returning unused reservoir on revert
+  ---
+  duration_ms: 7.396166
+  type: 'test'
+  ...
+# Subtest: signed nested calls preserve successful state and discard reverted allocation/refill across frames
+ok 10 - signed nested calls preserve successful state and discard reverted allocation/refill across frames
+  ---
+  duration_ms: 9.928792
+  type: 'test'
+  ...
+# Subtest: signed type-4 preparation debits are counted once and survive only ordinary message rollback
+ok 11 - signed type-4 preparation debits are counted once and survive only ordinary message rollback
+  ---
+  duration_ms: 10.653125
+  type: 'test'
+  ...
+# Subtest: signed preparation OOG rolls authorization state back while retaining sender nonce and spent regular gas
+ok 12 - signed preparation OOG rolls authorization state back while retaining sender nonce and spent regular gas
+  ---
+  duration_ms: 8.0645
+  type: 'test'
+  ...
+# Subtest: signed calldata floor changes sender gas and refund reporting without erasing raw message refund
+ok 13 - signed calldata floor changes sender gas and refund reporting without erasing raw message refund
+  ---
+  duration_ms: 3.916209
+  type: 'test'
+  ...
+# Subtest: observed pinned post-target CALL OOG remains reproducible but local settlement refuses its result
+ok 14 - observed pinned post-target CALL OOG remains reproducible but local settlement refuses its result
+  ---
+  duration_ms: 3.400291
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 313.859041
