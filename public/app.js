@@ -171,7 +171,7 @@ function renderSequenceEditor() {
       controls[key] = input; wrapper.append(caption, input); return wrapper;
     }
     card.append(field('to', 'Contract / recipient'), field('data', 'Calldata', true), field('value', 'Value · wei'));
-    const advanced = node('details', 'query-settings'), summary = node('summary', '', 'Advanced: token & position checks');
+    const advanced = node('details', 'query-settings'), summary = node('summary', '', 'Advanced: balance & position checks');
     const choice = node('label', 'manual-query-choice'), manual = node('input');
     manual.type = 'checkbox'; manual.checked = draft.manual; manual.id = `sequence-${draft.key}-manual`;
     choice.htmlFor = manual.id; choice.append(manual, document.createTextNode('Use a manual query list'));
@@ -320,13 +320,14 @@ function updateQueryMode() {
   $('standard-queries').disabled = state.busy || !manual;
   $('standard-manual-queries').disabled = state.busy || !standard || sequence || local;
   if (local) { $('standard-manual-queries').checked = true; $('standard-query-settings').open = true; }
-  $('query-mode-help').textContent = local ? 'A manual list of one to eight token or position queries is required. There is no automatic token selection or ETH balance summary.' : 'Automatic token checks use observed events and calls. Choose a manual list for specific token or position checks instead. ETH account selection remains automatic.';
+  $('query-mode-help').textContent = local ? 'A manual list of one to eight ETH balance, token or position queries combined is required. There is no automatic token selection or ETH balance summary.' : 'Automatic token checks use observed events and calls. Choose a manual list for specific token or position checks instead. ETH account selection remains automatic.';
+  $('local-native-query-help').hidden = !local;
   $('standard-checks-help').hidden = !standard;
   $('standard-checks-help').textContent = sequence ? 'Each step checks up to eight observed ETH accounts and eight queries. Automatic queries cover tokens only; position checks require a manual entry. Before and after refer to that step, not the entire sequence.' : manual
     ? 'Your manual list controls token and position checks, up to eight combined. Up to eight observed ETH accounts are still selected automatically; network fees are excluded.'
     : 'Automatically check up to eight observed ETH accounts and eight token balance or allowance queries. Other changes may be missed; network fees are excluded.';
   if (!manual) $('standard-queries').setCustomValidity('');
-  if (local) $('standard-checks-help').textContent = `Checks only the listed accounts and contracts, in raw units. ${feesEnabled ? 'Measurement queries do not repeat transaction fees. ' : 'Network fees are excluded. '}Contract identity and complete economic effects are not established.`;
+  if (local) $('standard-checks-help').textContent = `Checks only the explicitly listed accounts and contracts. ETH balances use exact ETH and wei; token and position values stay raw. ${feesEnabled ? 'ETH changes include simulated transaction fees; measurement queries do not repeat fees. ' : 'ETH changes exclude transaction fees. '}There is no automatic account selection or complete effect coverage.`;
   if (standard) $('value-help').textContent = `ETH sent with the call, in whole wei. 1 ETH = 1000000000000000000 wei. Use 0 for none; ${feesEnabled ? 'transaction fees are separate from this value.' : 'network fees are excluded.'}`;
   updateSequenceControls();
 }
@@ -380,13 +381,20 @@ function positionQueryHelp() {
 function readStandardQueries(text = $('standard-queries').value) {
   let queries;
   try { queries = JSON.parse(text); }
-  catch { throw new Error('Enter a valid JSON query list in Advanced: token & position checks.'); }
-  if (!Array.isArray(queries) || queries.length < 1 || queries.length > 8) throw new Error('Add between one and eight token or position queries combined.');
+  catch { throw new Error('Enter a valid JSON query list in Advanced: balance & position checks.'); }
+  if (!Array.isArray(queries) || queries.length < 1 || queries.length > 8) throw new Error(localMode() ? 'Add between one and eight ETH balance, token or position queries combined.' : 'Add between one and eight token or position queries combined.');
+  const nativeAccounts = new Set();
   for (const query of queries) {
     const address = value => typeof value === 'string' && /^0x[0-9a-f]{40}$/i.test(value);
     if (!query || typeof query !== 'object' || Array.isArray(query)) throw new Error('Each query must be a JSON object in one of the listed formats.');
     const keys = Object.keys(query).sort().join();
-    if (query.kind === 'aave_v3_user_account_data' || query.kind === 'morpho_blue_position') {
+    if (query.kind === 'native_balance') {
+      if (!localMode()) throw new Error('Explicit ETH balance queries require the independent local engine.');
+      if (keys !== 'account,kind' || !address(query.account)) throw new Error('An ETH balance query needs only kind: native_balance and a full account address.');
+      const account = query.account.toLowerCase();
+      if (nativeAccounts.has(account)) throw new Error('List each ETH account only once.');
+      nativeAccounts.add(account);
+    } else if (query.kind === 'aave_v3_user_account_data' || query.kind === 'morpho_blue_position') {
       const morpho = query.kind === 'morpho_blue_position';
       if (keys !== (morpho ? 'contract,kind,marketId,user' : 'contract,kind,user') || !address(query.contract) || !address(query.user)
         || (morpho && (typeof query.marketId !== 'string' || !/^0x[0-9a-f]{64}$/i.test(query.marketId)))) {
@@ -1277,6 +1285,7 @@ function renderDiscovery(discovery, queries) {
 }
 
 function localQueryIdentity(descriptor = {}) {
+  if (!descriptor || typeof descriptor !== 'object' || Array.isArray(descriptor)) return { kind: 'unknown' };
   if (descriptor.kind) return descriptor;
   const data = descriptor.data || '';
   const account = data.length >= 74 ? '0x' + data.slice(34, 74) : null;
@@ -1288,18 +1297,32 @@ function localMeasurementRows(result) {
   const queries = Array.isArray(result.apiRequest?.queries) ? result.apiRequest.queries : [];
   return queries.map((descriptor, index) => {
     const row = result.measurements?.[index], identity = localQueryIdentity(descriptor);
-    const fields = identity.kind === 'balanceOf' ? [['balance', 256]] : identity.kind === 'allowance' ? [['allowance', 256]]
+    const native = identity.kind === 'native_balance';
+    const fields = identity.kind === 'balanceOf' || native ? [['balance', 256]] : identity.kind === 'allowance' ? [['allowance', 256]]
       : identity.kind === 'aave_v3_user_account_data' ? [['totalCollateralBase', 256], ['totalDebtBase', 256], ['availableBorrowsBase', 256], ['currentLiquidationThreshold', 256], ['ltv', 256], ['healthFactor', 256]]
         : identity.kind === 'morpho_blue_position' ? [['supplyShares', 256], ['borrowShares', 128], ['collateral', 128]] : [];
-    const matching = row?.descriptor && Object.keys(descriptor).length === Object.keys(row.descriptor).length && Object.entries(descriptor).every(([key, value]) => row.descriptor[key] === value);
+    const matching = descriptor && typeof descriptor === 'object' && !Array.isArray(descriptor) && row?.descriptor
+      && Object.keys(descriptor).length === Object.keys(row.descriptor).length && Object.entries(descriptor).every(([key, value]) => row.descriptor[key] === value);
     const contextValid = ['complete', 'partial'].includes(result.status) && result.source?.canonicalStatus === 'verified' && ['success', 'reverted', 'failed'].includes(result.execution?.status);
-    const measured = contextValid && matching && row.status === 'measured' && fields.length > 0 && Array.isArray(row.values) && row.values.length === fields.length && fields.every(([name, bits], i) => {
+    const nativeIdentityValid = !native || (Object.keys(descriptor).sort().join() === 'account,kind'
+      && typeof descriptor.account === 'string' && /^0x[0-9a-f]{40}$/i.test(descriptor.account)
+      && row?.identity && Object.keys(row.identity).sort().join() === 'account,chainId,kind'
+      && row.identity.kind === 'native_balance' && row.identity.chainId === '1' && row.identity.account === descriptor.account.toLowerCase()
+      && row.query === null && row.returnBytes === 0 && result.apiRequest.chainId === 1);
+    const measured = contextValid && matching && nativeIdentityValid && row.status === 'measured' && fields.length > 0 && Array.isArray(row.values) && row.values.length === fields.length && fields.every(([name, bits], i) => {
       const value = row.values[i], raw = n => typeof n === 'string' && /^(?:0|[1-9][0-9]{0,77})$/.test(n) && BigInt(n) < (1n << BigInt(bits));
       return value?.name === name && raw(value.beforeRaw) && raw(value.afterRaw) && typeof value.deltaRaw === 'string'
-        && /^(?:0|-?[1-9][0-9]{0,77})$/.test(value.deltaRaw) && BigInt(value.deltaRaw) === BigInt(value.afterRaw) - BigInt(value.beforeRaw);
+        && /^(?:0|-?[1-9][0-9]{0,77})$/.test(value.deltaRaw) && BigInt(value.deltaRaw) === BigInt(value.afterRaw) - BigInt(value.beforeRaw)
+        && (!native || (value.unit?.kind === 'native_wei' && value.unit.scale === '1000000000000000000' && Object.keys(value.unit).sort().join() === 'kind,scale'));
     });
     return { index, identity, measured, values: measured ? row.values : [], reason: contextValid && matching ? row.reason || 'This query was not completely measured. Missing values are not zero.' : 'The query result or verified state context is unavailable. Values are withheld.' };
   });
+}
+
+function localEthAmount(raw) {
+  const value = BigInt(raw), negative = value < 0n, absolute = negative ? -value : value;
+  const fraction = (absolute % 1000000000000000000n).toString().padStart(18, '0').replace(/0+$/, '');
+  return `${negative ? '-' : ''}${absolute / 1000000000000000000n}${fraction ? '.' + fraction : ''} ETH`;
 }
 
 // Keep the finite schedule and bounded integer series aligned with
@@ -1488,22 +1511,25 @@ function renderLocalResult(result) {
   $('gas-used').textContent = `Gas limit: ${gasLabel} · ${fee ? fee.kind === 'eip4844' ? `execution fee: ${numberLabel(fee.gasCharge)} wei · blob burn: ${numberLabel(fee.blobFeeBurn)} wei · total fee: ${numberLabel(fee.totalFeeCharge)} wei` : `simulated fee: ${numberLabel(fee.gasCharge)} wei` : feeRequested ? 'fee result unavailable' : 'network fees excluded'}`;
   $('coverage-label').textContent = 'Requested checks'; $('coverage-status').textContent = `${measured} / ${rows.length} measured`;
   $('coverage-status').className = rows.length > 0 && measured === rows.length ? 'success' : 'partial';
-  $('coverage-detail').textContent = 'Explicit query list only · raw units';
+  $('coverage-detail').textContent = 'Explicit query list only · ETH/wei and raw contract values';
   $('execution-error').hidden = !result.error && !result.execution?.error;
   $('execution-error').textContent = result.error ? display(result.error.message || result.error) : display(result.execution?.error?.message || result.execution?.error || '');
   $('contract-revert').hidden = true;
   $('local-measurements').replaceChildren(...rows.map(row => {
     const card = node('article', `standard-query-card${row.measured ? '' : ' query-unavailable'}`), heading = node('div', 'permission-heading');
-    heading.append(node('h4', '', `Query ${row.index + 1} · ${titleCase(row.identity.kind)}`), node('span', 'query-status', row.measured ? 'Measured raw values' : 'Unavailable'));
+    const native = row.identity.kind === 'native_balance';
+    heading.append(node('h4', '', `Query ${row.index + 1} · ${native ? 'ETH balance' : titleCase(row.identity.kind)}`), node('span', 'query-status', row.measured ? native ? 'Measured ETH balance' : 'Measured raw values' : 'Unavailable'));
     const details = node('dl', 'permission-details');
     for (const key of ['token', 'contract', 'account', 'owner', 'spender', 'user', 'marketId']) if (row.identity[key]) addDefinition(details, readableKey(key), row.identity[key]);
-    card.append(heading, details, node('p', 'query-reference', 'Each query refers to the named account. Contract identity and token units are not verified.'));
+    card.append(heading, details, node('p', 'query-reference', native
+      ? `Only this account’s ETH balance is checked. ${fee ? 'Balances include the simulated transaction fees.' : feeRequested ? 'Fee inclusion is unavailable; review the retained execution context.' : 'Transaction fees are excluded.'} No price or complete effect inventory is inferred.`
+      : 'Each query refers to the named account. Contract identity and token units are not verified.'));
     if (row.measured) {
       const table = node('table', 'measurement-table position-measurement-table'), head = node('thead'), header = node('tr'), body = node('tbody');
       for (const label of ['Field / units', 'Before', 'After', 'Change']) { const cell = node('th', '', label); cell.scope = 'col'; header.append(cell); } head.append(header);
       for (const value of row.values) {
-        const tr = node('tr'), name = node('th'); name.scope = 'row'; name.append(node('span', 'position-field-name', value.name), node('span', 'position-unit', positionUnitLabel(value.unit))); tr.append(name);
-        for (const key of ['beforeRaw', 'afterRaw', 'deltaRaw']) { const cell = node('td'); cell.append(node('strong', '', value[key])); tr.append(cell); } body.append(tr);
+        const tr = node('tr'), name = node('th'); name.scope = 'row'; name.append(node('span', 'position-field-name', value.name), node('span', 'position-unit', native ? 'ETH · 1 ETH = 1000000000000000000 wei' : positionUnitLabel(value.unit))); tr.append(name);
+        for (const key of ['beforeRaw', 'afterRaw', 'deltaRaw']) { const cell = node('td'); cell.append(node('strong', '', native ? localEthAmount(value[key]) : value[key])); if (native) cell.append(node('span', 'raw-amount', `${value[key]} wei`)); tr.append(cell); } body.append(tr);
       }
       table.append(head, body); card.append(table);
     } else card.append(node('p', 'query-note', row.reason));

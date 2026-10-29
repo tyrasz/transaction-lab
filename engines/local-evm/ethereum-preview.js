@@ -12,7 +12,7 @@ import { executeEthereumCall } from './ethereum-call.js';
 import { verifyEthereumHeader } from './ethereum-header.js';
 import { ethereumCallGas, ethereumCommon, ethereumContextProfile, ethereumQuantity } from './ethereum-profile.js';
 import { encode, decode, fields, need } from './isolated-protocol.js';
-import { compilePreviewQueries, decodePreviewValues } from './preview-queries.js';
+import { compilePreviewQueries, decodePreviewValues, nativeBalanceValues } from './preview-queries.js';
 import { validateQueryMutation } from './preview-mutations.js';
 
 export const ETHEREUM_PREVIEW_LIMITS = Object.freeze({ wallMs: 145000, requestMs: 25000, calls: 256,
@@ -72,8 +72,8 @@ export async function executeEthereumPreview(options) {
   const measurements = queries.map(compiled => ({ ...compiled, status: 'not_attempted', reason: 'Original execution has no complete retained state.', before: null, after: null, values: null }));
   let inputs, state, original = null, sharedFailure = null;
   const elapsed = () => Math.max(0, now() - began);
-  function available() {
-    return elapsed() < limits.wallMs && EXECUTION_COUNTS.every(key => counters[key] < limits[key]) && inputs.snapshotUsage().status === 'available';
+  function available(execution = true) {
+    return elapsed() < limits.wallMs && (!execution || EXECUTION_COUNTS.every(key => counters[key] < limits[key])) && inputs.snapshotUsage().status === 'available';
   }
   async function execute(call, manager) {
     if (!available()) return null;
@@ -111,6 +111,22 @@ export async function executeEthereumPreview(options) {
         inputEvidenceIds: Array.from({ length: inputs.snapshotUsage().calls - firstInput }, (_, i) => firstInput + i + 1), stateReads: manager.snapshotReads() };
     }
   }
+  async function nativeProbe(compiled, manager) {
+    const firstInput = inputs.snapshotUsage().calls;
+    let before = null, after = null, result;
+    try {
+      need(available(false));
+      before = manager.snapshotChanges();
+      const account = await manager.getAccount(createAddressFromString(compiled.descriptor.account));
+      after = manager.snapshotChanges();
+      need(available(false) && equal(before, after));
+      result = { status: 'measured', reason: null, output: null, values: nativeBalanceValues(compiled, account?.balance ?? 0n) };
+    } catch {
+      result = unavailable('The native balance or its verified input state could not be established.');
+    }
+    return { ...result, readMethod: 'proof_state_account_balance', changesBefore: before, changesAfter: after,
+      inputEvidenceIds: Array.from({ length: inputs.snapshotUsage().calls - firstInput }, (_, i) => firstInput + i + 1), stateReads: manager.snapshotReads() };
+  }
   try {
     inputs = createRpcStateInputs({ chainId: 1, blockHash: header.hash, header, rpc, now, limits: {
       wallMs: limits.wallMs, calls: limits.calls, requestMs: limits.requestMs, responseBytes: limits.responseBytes, totalBytes: limits.totalBytes,
@@ -123,15 +139,16 @@ export async function executeEthereumPreview(options) {
     if (output && COMPLETE.includes(output.execution.status) && output.stateDisposition === 'message_result_retained_in_supplied_manager') {
       for (let index = 0; index < measurements.length; index++) {
         const measurement = measurements[index], compiled = queries[index];
-        if (!available()) { measurement.reason = 'Shared preview budget or verified input collection is unavailable.'; continue; }
+        const native = compiled.query === null, measure = native ? nativeProbe : probe;
+        if (!available(!native)) { measurement.reason = 'Shared preview budget or verified input collection is unavailable.'; continue; }
         // Before probes use only immutable proven initial facts. After probes
         // copy the entire original overlay; no changed slot is reconstructed
         // from events, expected values or a provider-supplied state diff.
-        measurement.before = await probe(compiled, createProofStateManager({ inputs }));
+        measurement.before = await measure(compiled, createProofStateManager({ inputs }));
         if (measurement.before.status !== 'measured') {
           measurement.status = 'unavailable'; measurement.reason = 'Before-state query unavailable; no before/after amount is reported.';
         } else {
-          measurement.after = await probe(compiled, state.shallowCopy());
+          measurement.after = await measure(compiled, state.shallowCopy());
           if (measurement.after.status !== 'measured') {
             measurement.status = 'unavailable'; measurement.reason = 'After-state query unavailable; no before/after amount is reported.';
           } else {
@@ -155,11 +172,17 @@ export async function executeEthereumPreview(options) {
     }
   }
   const completeOriginal = original?.output && COMPLETE.includes(original.output.execution.status);
+  const nativeScope = queries.some(query => query.query === null) ? {
+    queries: 'explicit_calls_and_native_account_balance_reads', queryGasScope: 'CALL_only',
+    queryPurity: 'CALL_net_changes_except_expected_sender_nonce_no_committed_logs_native_reads_no_changes',
+    nativeBalanceCoverage: 'explicit_accounts_only',
+    nativeEffectsMeasured: measurements.some(row => row.query === null && row.status === 'measured'),
+  } : {};
   const result = { status: sharedFailure || !completeOriginal ? 'unavailable' : measurements.every(row => row.status === 'measured') ? 'complete' : 'partial',
     error: sharedFailure, headerVerification, original, measurements,
     inputs: inputs?.snapshotInputs() ?? null, inputEvidence: inputs?.snapshotEvidence() ?? [], inputUsage: inputs?.snapshotUsage() ?? null,
     inputReads: inputs?.snapshotReads() ?? null, usage: { ...counters, wallMs: elapsed(), limits },
-    scope: request.executionProfile ? { ...SCOPE, execution: request.executionProfile, feesSettled: Boolean(completeOriginal) } : SCOPE };
+    scope: { ...SCOPE, ...(request.executionProfile ? { execution: request.executionProfile, feesSettled: Boolean(completeOriginal) } : {}), ...nativeScope } };
   // The isolated host applies the same bound to IPC. The internal core also
   // refuses a result too large to retain, without presenting a partial success.
   try { encode(result, 64 * 1024 * 1024); return result; }

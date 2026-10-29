@@ -1,4 +1,4 @@
-// ABI compilation only. Query identities are caller declarations, not verified
+// Explicit ABI/native-read compilation only. Query identities are declarations, not verified
 // deployments. Raw words establish neither call success nor state provenance.
 // Reference interfaces: EIP-20 balanceOf/allowance; Aave V3 IPool.getUserAccountData;
 // Morpho Blue IMorpho.position. No provider/standard-engine imports or I/O.
@@ -76,8 +76,14 @@ function compileOne(input) {
     fields = [{ name: balance ? 'balance' : 'allowance', bits: 256, unit: { kind: 'token_raw_units', scale: null } }];
   } else {
     const kindDescriptor = Object.getOwnPropertyDescriptor(input, 'kind');
-    need(kindDescriptor && kindDescriptor.enumerable && own(kindDescriptor, 'value') && typeof kindDescriptor.value === 'string' && own(SCHEMAS, kindDescriptor.value), 'Unsupported position query kind.');
+    need(kindDescriptor && kindDescriptor.enumerable && own(kindDescriptor, 'value') && typeof kindDescriptor.value === 'string' && (own(SCHEMAS, kindDescriptor.value) || kindDescriptor.value === 'native_balance'), 'Unsupported preview query kind.');
     const kind = kindDescriptor.value;
+    if (kind === 'native_balance') {
+      record(input, ['kind', 'account']);
+      descriptor = { kind, account: address(input.account) };
+      return freeze({ descriptor, query: null, identity: { ...descriptor, chainId: '1' }, returnBytes: 0,
+        fields: [{ name: 'balance', bits: 256, unit: { kind: 'native_wei', scale: '1000000000000000000' } }] });
+    }
     record(input, kind === 'morpho_blue_position' ? ['kind', 'contract', 'user', 'marketId'] : ['kind', 'contract', 'user']);
     descriptor = { kind, contract: address(input.contract), user: address(input.user) };
     if (kind === 'morpho_blue_position') {
@@ -98,7 +104,7 @@ export function compilePreviewQueries(queries) {
   list(queries, 1, 8);
   const compiled = [], seen = new Set();
   for (const input of queries) {
-    const entry = compileOne(input), key = entry.query.to + ':' + entry.query.data;
+    const entry = compileOne(input), key = entry.query === null ? 'native:' + entry.descriptor.account : entry.query.to + ':' + entry.query.data;
     need(!seen.has(key), 'Duplicate canonical preview query.'); seen.add(key); compiled.push(entry);
   }
   return freeze(compiled);
@@ -119,10 +125,21 @@ function sameTree(actual, expected) {
 export function decodePreviewValues(compiled, returnData) {
   record(compiled, ['descriptor', 'query', 'identity', 'returnBytes', 'fields']);
   const canonical = compileOne(compiled.descriptor); sameTree(compiled, canonical);
+  need(canonical.query !== null, 'A native balance is an account-state read, not ABI return data.');
   need(typeof returnData === 'string' && returnData.length === 2 + canonical.returnBytes * 2 && /^0x[0-9a-fA-F]+$/.test(returnData), 'Return data must contain exactly the declared static ABI words.');
   return canonical.fields.map((field, index) => {
     const value = BigInt('0x' + returnData.slice(2 + index * 64, 2 + (index + 1) * 64));
     need(value < (1n << BigInt(field.bits)), 'Return data has noncanonical high bits for its integer type.');
     return { name: field.name, raw: value.toString(), unit: structuredClone(field.unit) };
   });
+}
+
+/** Format only an explicitly observed native account balance. Provenance,
+ * execution completion and state immutability are checked by the core/parent.
+ * This helper accepts no ABI bytes or Number conversion. */
+export function nativeBalanceValues(compiled, balance) {
+  record(compiled, ['descriptor', 'query', 'identity', 'returnBytes', 'fields']);
+  const canonical = compileOne(compiled.descriptor); sameTree(compiled, canonical);
+  need(canonical.query === null && typeof balance === 'bigint' && balance >= 0n && balance < (1n << 256n), 'A native read requires an exact uint256 balance.');
+  return [{ name: 'balance', raw: balance.toString(), unit: structuredClone(canonical.fields[0].unit) }];
 }

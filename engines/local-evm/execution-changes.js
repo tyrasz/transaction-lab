@@ -228,15 +228,16 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     }
   }
   need(isDeepStrictEqual([...emptyDeleted].sort(), [...requiredCleanup].sort()));
-  if (fees) {
-    // Bind every declared balance delta, and every account reached by the value
-    // ledger, so a worker cannot omit or invent either side of fee settlement.
-    for (const address of new Set([...balances.keys(), ...[...rows.values()].filter(row => row.balance).map(row => row.address)])) {
-      const fact = inputs.accounts[address]; need(fact && typeof fact.exists === 'boolean');
-      const before = fact.exists ? BigInt(fact.balance) : 0n;
-      const after = deleted.has(address) || emptyDeleted.has(address) ? 0n : balance(address);
-      need(isDeepStrictEqual(rows.get(address)?.balance, before === after ? undefined : { before: hex(before), after: hex(after) }));
-    }
+  // Bind unpriced transfers as well as fee settlement. Snapshots are relative
+  // to the immutable proof state, so also retain prior balance rows which a
+  // disposable query never visits; omitting such a row must not erase an
+  // original effect. A proven deletion is already masked by balance().
+  const balanceRows = map => [...map.values()].filter(row => row.balance).map(row => row.address);
+  for (const address of new Set([...balances.keys(), ...balanceRows(rows), ...balanceRows(priorRows)])) {
+    const fact = inputs.accounts[address]; need(fact && typeof fact.exists === 'boolean');
+    const before = fact.exists ? BigInt(fact.balance) : 0n;
+    const after = deleted.has(address) || emptyDeleted.has(address) ? 0n : balance(address);
+    need(isDeepStrictEqual(rows.get(address)?.balance, before === after ? undefined : { before: hex(before), after: hex(after) }));
   }
   return { created, creationAttempts, deleted, emptyDeleted };
 }

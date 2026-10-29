@@ -9,8 +9,8 @@ import { isDeepStrictEqual } from 'node:util';
 import { createAuthenticatedAncestry, validateAncestryEvidence } from './authenticated-ancestry.js';
 import { verifyEthereumHeader } from './ethereum-header.js';
 import { ethereumQuantity, ethereumCallGas, ethereumCommon, ethereumContextProfile, ethereumUsedGas } from './ethereum-profile.js';
-import { compilePreviewQueries, decodePreviewValues } from './preview-queries.js';
-import { validateQueryMutation } from './preview-mutations.js';
+import { compilePreviewQueries, decodePreviewValues, nativeBalanceValues } from './preview-queries.js';
+import { validateQueryMutation, canonicalStateChanges } from './preview-mutations.js';
 import { validateExecutionChanges, validateExecutionLifecycle } from './execution-changes.js';
 import { validateInputFacts } from './input-facts.js';
 import { existingDelegationTarget } from './sender-delegation.js';
@@ -237,8 +237,13 @@ async function executeIsolated(options, previewMode) {
     need(value.original && Number.isSafeInteger(value.original.inputUsage?.calls) && value.original.inputUsage.calls <= records.length);
     validateCallResult(value.original, value.original.inputUsage.calls, true);
     need(isDeepStrictEqual(value.original.inputEvidence, value.inputEvidence.slice(0, value.original.inputEvidence.length)));
-    need(value.scope?.chainId === 1 && value.scope.queries === 'explicit_only_same_sender_zero_value_disposable_CALLs' && value.scope.queryGas === '1000000' && value.scope.processIsolation === false);
-    need(['consensusVerified', 'contractIdentityVerified', 'nativeEffectsMeasured', 'originalTransactionReplay'].every(key => value.scope[key] === false));
+    const hasNative = compiledQueries.some(query => query.query === null);
+    need(value.scope?.chainId === 1 && value.scope.queries === (hasNative ? 'explicit_calls_and_native_account_balance_reads' : 'explicit_only_same_sender_zero_value_disposable_CALLs') && value.scope.queryGas === '1000000' && value.scope.processIsolation === false);
+    need(['consensusVerified', 'contractIdentityVerified', 'originalTransactionReplay'].every(key => value.scope[key] === false));
+    if (hasNative) {
+      need(value.scope.nativeBalanceCoverage === 'explicit_accounts_only' && value.scope.queryGasScope === 'CALL_only');
+      need(value.scope.queryPurity === 'CALL_net_changes_except_expected_sender_nonce_no_committed_logs_native_reads_no_changes');
+    } else need(value.scope.nativeBalanceCoverage === undefined && value.scope.queryGasScope === undefined && value.scope.nativeEffectsMeasured === false);
     need(value.usage && isDeepStrictEqual(value.usage.limits, previewLimits));
     need(Array.isArray(value.measurements) && value.measurements.length === compiledQueries.length);
     const originalComplete = ['success', 'reverted', 'failed'].includes(value.original.output?.execution?.status);
@@ -246,10 +251,31 @@ async function executeIsolated(options, previewMode) {
     need(value.scope.feesSettled === Boolean(request.executionProfile && originalComplete));
     function sideQuery(side, compiled, phase) {
       need(side && ['measured', 'unavailable'].includes(side.status));
-      fields(side, ['status', 'reason', 'output', 'values', 'changesBefore', 'changesAfter', 'mutationValidation', 'inputEvidenceIds', 'stateReads'], ['status', 'reason', 'output', 'values']);
+      const native = compiled.query === null;
+      fields(side, ['status', 'reason', 'output', 'values', 'changesBefore', 'changesAfter', ...(native ? ['readMethod'] : ['mutationValidation']), 'inputEvidenceIds', 'stateReads'], ['status', 'reason', 'output', 'values', ...(native ? ['readMethod'] : [])]);
       if (side.inputEvidenceIds !== undefined) need(Array.isArray(side.inputEvidenceIds) && side.inputEvidenceIds.length <= records.length && side.inputEvidenceIds.every((id, i, ids) => Number.isSafeInteger(id) && id > value.original.inputEvidence.length && id <= records.length && (i === 0 || id === ids[i - 1] + 1)));
       if (side.stateReads !== undefined) validateReads(side.stateReads);
+      if (native) need(side.readMethod === 'proof_state_account_balance' && side.output === null);
       if (side.status === 'unavailable') { need(side.values === null && typeof side.reason === 'string'); return; }
+      if (native) {
+        need(originalComplete && side.reason === null && Array.isArray(side.inputEvidenceIds));
+        const account = compiled.descriptor.account, initial = value.inputs.accounts?.[account];
+        need(initial && typeof initial.exists === 'boolean');
+        // These facts are independently re-proven against the pinned state root
+        // before the broker releases any result. Absence is never a default.
+        const before = initial.exists ? BigInt(initial.balance) : 0n;
+        const change = phase === 'after' ? value.original.changes.accounts.find(row => row.address === account) : undefined;
+        // Original deltas were already checked against the complete native
+        // transfer/fee/deletion ledger by validateCallResult, including omitted
+        // deltas. A fresh read cannot supply or modify that poststate.
+        const balance = change?.existence?.after === false ? 0n : change?.balance ? BigInt(change.balance.after) : before;
+        need(isDeepStrictEqual(side.values, nativeBalanceValues(compiled, balance)));
+        need(isDeepStrictEqual(side.changesBefore, side.changesAfter));
+        if (phase === 'before') need(canonicalStateChanges(side.changesBefore).accounts.length === 0);
+        else need(isDeepStrictEqual(side.changesBefore, value.original.changes));
+        need(isDeepStrictEqual(side.stateReads, { total: 1, distinct: 1, reads: [{ kind: 'account', address: account }] }));
+        return;
+      }
       need(originalComplete && side.reason === null && side.output?.execution?.status === 'success' && side.output.stateDisposition === 'message_result_retained_in_supplied_manager' && Array.isArray(side.output.logs) && side.output.logs.length === 0);
       const trace = side.output.trace, queryRequest = { from: request.from.toLowerCase(), ...compiled.query, value: '0', gas: '1000000' };
       executionContext(side.output, queryRequest, true, value.inputs, side.changesBefore); need(trace.error === null);
@@ -280,6 +306,7 @@ async function executeIsolated(options, previewMode) {
         if (row.status === 'not_attempted') need(row.before === null && row.after === null);
       }
     }
+    need(value.scope.nativeEffectsMeasured === value.measurements.some(row => row.query === null && row.status === 'measured'));
     if (value.error !== null) {
       fields(value.error, ['code', 'message']); need(value.error.code === 'LOCAL_PREVIEW_INTEGRITY' && value.status === 'unavailable');
       need(value.measurements.every(row => row.status === 'unavailable' && row.values === null && ['before', 'after'].every(side => row[side] === null || row[side].values === null)));

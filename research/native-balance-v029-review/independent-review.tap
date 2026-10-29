@@ -1,0 +1,173 @@
+TAP version 13
+# Subtest: unpriced actual transfers reject omitted, invented and conserved-but-wrong balance deltas
+ok 1 - unpriced actual transfers reject omitted, invented and conserved-but-wrong balance deltas
+  ---
+  duration_ms: 25.699125
+  type: 'test'
+  ...
+# Subtest: actual parent rejects unpriced balance-only IPC forgery with authentic proofs and unchanged trace
+ok 2 - actual parent rejects unpriced balance-only IPC forgery with authentic proofs and unchanged trace
+  ---
+  duration_ms: 124.232042
+  type: 'test'
+  ...
+# Subtest: successful descendants of a reverted child never credit the committed native ledger
+ok 3 - successful descendants of a reverted child never credit the committed native ledger
+  ---
+  duration_ms: 4.816209
+  type: 'test'
+  ...
+# Subtest: CALLCODE and DELEGATECALL inherit execution context without transferring to the code account
+ok 4 - CALLCODE and DELEGATECALL inherit execution context without transferring to the code account
+  ---
+  duration_ms: 7.550875
+  type: 'test'
+  ...
+# Subtest: SELFDESTRUCT binds beneficiary credits across retained Cancun and deleted Shanghai accounts
+ok 5 - SELFDESTRUCT binds beneficiary credits across retained Cancun and deleted Shanghai accounts
+  ---
+  duration_ms: 7.171708
+  type: 'test'
+  ...
+# Subtest: created-then-deleted accounts bind prefunded balance and end-of-transaction refill burn
+ok 6 - created-then-deleted accounts bind prefunded balance and end-of-transaction refill burn
+  ---
+  duration_ms: 4.958083
+  type: 'test'
+  ...
+# Subtest: disposable queries retain unvisited prior balance rows and reject their omission or reinvention
+ok 7 - disposable queries retain unvisited prior balance rows and reject their omission or reinvention
+  ---
+  duration_ms: 128.740875
+  type: 'test'
+  ...
+# Subtest: root REVERT retains only nonce and cannot resurrect a successful descendant transfer
+ok 8 - root REVERT retains only nonce and cannot resurrect a successful descendant transfer
+  ---
+  duration_ms: 2.998417
+  type: 'test'
+  ...
+# Subtest: parent binds native rows to authentic initial proofs and exact validated poststate
+    # Subtest: before amount
+    ok 1 - before amount
+      ---
+      duration_ms: 139.548042
+      type: 'test'
+      ...
+    # Subtest: after amount
+    ok 2 - after amount
+      ---
+      duration_ms: 128
+      type: 'test'
+      ...
+    # Subtest: invented ABI execution
+    ok 3 - invented ABI execution
+      ---
+      duration_ms: 120.639875
+      type: 'test'
+      ...
+    # Subtest: wrong read method
+    ok 4 - wrong read method
+      ---
+      duration_ms: 125.016833
+      type: 'test'
+      ...
+    # Subtest: different account read
+    ok 5 - different account read
+      ---
+      duration_ms: 122.245875
+      type: 'test'
+      ...
+    # Subtest: missing read evidence
+    ok 6 - missing read evidence
+      ---
+      duration_ms: 118.729958
+      type: 'test'
+      ...
+    # Subtest: query mutated nonce
+    ok 7 - query mutated nonce
+      ---
+      duration_ms: 122.302625
+      type: 'test'
+      ...
+    # Subtest: changed before overlay
+    ok 8 - changed before overlay
+      ---
+      duration_ms: 127.210458
+      type: 'test'
+      ...
+    # Subtest: false native scope
+    ok 9 - false native scope
+      ---
+      duration_ms: 121.163041
+      type: 'test'
+      ...
+    # Subtest: invented complete coverage
+    ok 10 - invented complete coverage
+      ---
+      duration_ms: 121.617458
+      type: 'test'
+      ...
+    # Subtest: changed declared identity
+    ok 11 - changed declared identity
+      ---
+      duration_ms: 125.273292
+      type: 'test'
+      ...
+    # Subtest: changed units
+    ok 12 - changed units
+      ---
+      duration_ms: 188.219125
+      type: 'test'
+      ...
+    # Subtest: omitted transfer deltas
+    ok 13 - omitted transfer deltas
+      ---
+      duration_ms: 315.968792
+      type: 'test'
+      ...
+    1..13
+ok 9 - parent binds native rows to authentic initial proofs and exact validated poststate
+  ---
+  duration_ms: 1877.5795
+  type: 'test'
+  ...
+# Subtest: native cached proofs keep exact read provenance without charging query executions
+ok 10 - native cached proofs keep exact read provenance without charging query executions
+  ---
+  duration_ms: 364.092625
+  type: 'test'
+  ...
+# Subtest: native query is an immutable explicit account read with exact wei units, not ABI calldata
+ok 11 - native query is an immutable explicit account read with exact wei units, not ABI calldata
+  ---
+  duration_ms: 1.764791
+  type: 'test'
+  ...
+# Subtest: native identity cannot be widened with execution fields or duplicate normalized addresses
+ok 12 - native identity cannot be widened with execution fields or duplicate normalized addresses
+  ---
+  duration_ms: 0.284208
+  type: 'test'
+  ...
+# Subtest: native compilation and formatting never execute supplied accessors or trust edited compiled metadata
+ok 13 - native compilation and formatting never execute supplied accessors or trust edited compiled metadata
+  ---
+  duration_ms: 0.221667
+  type: 'test'
+  ...
+# Subtest: native reads remain possible when the completed original exhausted its VM-step/frame allowance
+ok 14 - native reads remain possible when the completed original exhausted its VM-step/frame allowance
+  ---
+  duration_ms: 15.725625
+  type: 'test'
+  ...
+1..14
+# tests 27
+# suites 0
+# pass 27
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2437.764334

@@ -50,6 +50,110 @@ function sample() {
 const nodes = element => [element, ...element.children.flatMap(nodes)];
 function chooseLocal(ui) { ui.elements.get('ethereum-engine').value = 'local'; ui.elements.get('ethereum-engine').dispatch('change'); }
 
+const nativeQuery = { kind: 'native_balance', account: A };
+function nativeSample({ priced = false, before = '9007199254740993', after = '1009007199254740993' } = {}) {
+  const result = priced ? feeSample() : sample();
+  result.apiRequest.queries = [nativeQuery];
+  result.measurements = [{ index: 0, descriptor: nativeQuery, query: null, returnBytes: 0,
+    identity: { kind: 'native_balance', account: A, chainId: '1' }, status: 'measured', values: [
+      { name: 'balance', beforeRaw: before, afterRaw: after, deltaRaw: (BigInt(after) - BigInt(before)).toString(), unit: { kind: 'native_wei', scale: '1000000000000000000' } },
+    ] }];
+  return result;
+}
+
+test('explicit native queries submit only to the local endpoint and count toward the combined eight-query cap', async () => {
+  const ui = setup(); chooseLocal(ui);
+  assert.equal(ui.elements.get('local-native-query-help').hidden, false);
+  const queries = [...Array.from({ length: 7 }, (_, i) => ({ kind: 'native_balance', account: '0x' + (i + 1).toString(16).padStart(40, '0') })), query];
+  ui.elements.get('standard-queries').value = JSON.stringify(queries); await ui.context.run('simulation');
+  assert.equal(ui.requests[0].url, '/api/evm/local-preview'); assert.deepEqual(JSON.parse(ui.requests[0].options.body).queries, queries);
+  const tooMany = setup(); chooseLocal(tooMany); tooMany.elements.get('standard-queries').value = JSON.stringify([...queries, nativeQuery]);
+  await tooMany.context.run('simulation'); assert.equal(tooMany.requests.length, 0);
+  assert.match(tooMany.elements.get('standard-queries').validationMessage, /one and eight/);
+  for (const engine of ['provider', 'sequence']) {
+    const provider = setup(); provider.elements.get('standard-manual-queries').checked = true;
+    if (engine === 'sequence') {
+      provider.elements.get('ethereum-call-mode').value = 'sequence';
+      provider.state.sequenceDrafts = [provider.context.newSequenceDraft({ to: T, queries: [nativeQuery] }), provider.context.newSequenceDraft({ to: A })];
+      provider.state.sequenceDrafts[0].manual = true;
+      provider.context.renderSequenceEditor();
+    } else provider.elements.get('standard-queries').value = JSON.stringify([nativeQuery]);
+    provider.context.updateQueryMode(); assert.equal(provider.elements.get('local-native-query-help').hidden, true);
+    await provider.context.run('simulation'); assert.equal(provider.requests.length, 0, engine);
+    assert.throws(() => provider.context.readStandardQueries(JSON.stringify([nativeQuery])), /independent local engine/);
+  }
+});
+
+test('native query validation rejects malformed addresses, extra fields and duplicate normalized accounts before dispatch', async () => {
+  for (const queries of [[{ kind: 'native_balance' }], [{ kind: 'native_balance', account: '0x123' }],
+    [{ ...nativeQuery, chainId: '1' }], [{ ...nativeQuery, to: T }], [{ ...nativeQuery, account: null }],
+    [{ ...nativeQuery, account: '0x' + 'ab'.repeat(20) }, { ...nativeQuery, account: '0x' + 'AB'.repeat(20) }]]) {
+    const ui = setup(); chooseLocal(ui); ui.elements.get('standard-queries').value = JSON.stringify(queries);
+    await ui.context.run('simulation'); assert.equal(ui.requests.length, 0);
+    assert.notEqual(ui.elements.get('standard-queries').validationMessage, '');
+  }
+});
+
+test('native balances retain exact large ETH and wei values, including uint256 maximum and negative one wei', () => {
+  const ui = setup(); ui.context.renderLocalResult(nativeSample());
+  let text = ui.elements.get('local-measurements').textContent;
+  assert.match(text, /0\.009007199254740993 ETH/); assert.match(text, /1\.009007199254740993 ETH/);
+  assert.match(text, /9007199254740993 wei/); assert.match(text, /1000000000000000000 wei/);
+  assert.match(text, /ETH balance/); assert.equal(ui.elements.get('coverage-status').textContent, '1 / 1 measured');
+  const max = ((1n << 256n) - 1n).toString(), result = nativeSample({ before: max, after: '0' }); ui.context.renderLocalResult(result);
+  text = ui.elements.get('local-measurements').textContent;
+  assert(text.includes('115792089237316195423570985008687907853269984665640564039457.584007913129639935 ETH'));
+  assert(text.includes('-115792089237316195423570985008687907853269984665640564039457.584007913129639935 ETH'));
+  assert(text.includes(max + ' wei')); assert.doesNotMatch(text, /USD|\$/);
+  assert.deepEqual(JSON.parse(ui.elements.get('raw-json').textContent), result);
+  ui.context.renderLocalResult(nativeSample({ before: '1', after: '0' }));
+  assert.match(ui.elements.get('local-measurements').textContent, /-0\.000000000000000001 ETH/);
+});
+
+test('native amount display rejects mismatched identity, unit, encoding, bounds and unverified context', () => {
+  const changes = [r => r.measurements[0].identity.kind = 'balanceOf', r => r.measurements[0].identity.account = T,
+    r => r.measurements[0].identity.chainId = 1, r => r.measurements[0].identity.chainId = '42161', r => delete r.measurements[0].identity,
+    r => r.measurements[0].identity.token = T, r => r.measurements[0].query = query, r => r.measurements[0].returnBytes = 32,
+    r => r.measurements[0].values[0].unit.kind = 'token_raw_units', r => r.measurements[0].values[0].unit.scale = '1',
+    r => r.measurements[0].values[0].unit.scale = 1e18, r => r.measurements[0].values[0].unit = null,
+    r => r.measurements[0].values[0].beforeRaw = (1n << 256n).toString(), r => r.measurements[0].values[0].beforeRaw = '01',
+    r => r.measurements[0].values[0].beforeRaw = 1, r => r.measurements[0].values[0].afterRaw = '-1',
+    r => r.measurements[0].values[0].deltaRaw = '0', r => r.measurements[0].values[0].name = 'allowance',
+    r => r.source.canonicalStatus = 'unverified', r => r.execution.status = 'unavailable', r => r.status = 'unavailable',
+    r => r.apiRequest.chainId = 42161, r => r.measurements[0].status = 'unavailable', r => r.measurements[0].values = null];
+  for (const change of changes) {
+    const result = structuredClone(nativeSample()), ui = setup(); change(result); ui.context.renderLocalResult(result);
+    assert.equal(ui.elements.get('coverage-status').textContent, '0 / 1 measured');
+    assert.equal(nodes(ui.elements.get('local-measurements')).filter(node => node.tagName === 'TABLE').length, 0);
+  }
+  const unsafe = structuredClone(nativeSample()); unsafe.apiRequest.queries[0].account = '<img src=x onerror=alert(1)>';
+  const ui = setup(); ui.context.renderLocalResult(unsafe); assert.equal(ui.elements.get('coverage-status').textContent, '0 / 1 measured');
+  assert.equal(nodes(ui.elements.get('local-measurements')).filter(node => node.tagName === 'IMG').length, 0);
+});
+
+test('native fee wording follows retained validated results rather than the current fee checkbox', () => {
+  const ui = setup(); chooseLocal(ui); enableFees(ui); ui.context.renderLocalResult(nativeSample());
+  assert.match(ui.elements.get('local-measurements').textContent, /Transaction fees are excluded/);
+  ui.elements.get('local-fees-enabled').checked = false; ui.context.renderLocalResult(nativeSample({ priced: true }));
+  assert.match(ui.elements.get('local-measurements').textContent, /include the simulated transaction fees/);
+  const malformed = nativeSample({ priced: true }); malformed.attempt.preview.original.output.feeAccounting.gasCharge = '0';
+  ui.context.renderLocalResult(malformed); assert.match(ui.elements.get('local-measurements').textContent, /Fee inclusion is unavailable/);
+});
+
+test('editing native accounts or switching engines clears retained and pending results', async () => {
+  const ui = setup(); chooseLocal(ui); ui.elements.get('standard-queries').value = JSON.stringify([nativeQuery]);
+  ui.context.renderLocalResult(nativeSample()); const before = ui.context.requestFingerprint();
+  ui.elements.get('standard-queries').value = JSON.stringify([{ ...nativeQuery, account: T }]); ui.elements.get('standard-queries').dispatch('input');
+  assert.notEqual(ui.context.requestFingerprint(), before); assert.equal(ui.state.result, null); assert.equal(ui.elements.get('download-json').disabled, true);
+  let finish; const pending = setup(() => new Promise(resolve => { finish = resolve; })); chooseLocal(pending);
+  pending.elements.get('standard-queries').value = JSON.stringify([nativeQuery]); const run = pending.context.run('simulation');
+  assert.equal(pending.elements.get('standard-queries').disabled, true); pending.elements.get('standard-queries').value = JSON.stringify([{ ...nativeQuery, account: T }]);
+  finish({ ok: true, json: async () => nativeSample() }); await run;
+  assert.equal(pending.state.result, null); assert.equal(pending.elements.get('download-json').disabled, true);
+  ui.context.renderLocalResult(nativeSample()); ui.elements.get('ethereum-engine').value = 'provider'; ui.elements.get('ethereum-engine').dispatch('change');
+  assert.equal(ui.state.result, null); assert.equal(ui.elements.get('local-native-query-help').hidden, true);
+});
+
 test('provider stays default; config gates local independently and local requires a manual single call', () => {
   const ui = setup(); ui.context.selectNetwork();
   assert.equal(ui.elements.get('ethereum-engine').value, 'provider');
@@ -199,7 +303,7 @@ test('advanced local gas defaults to omission and forwards exact bounded decimal
     await ui.context.run('simulation'); assert.equal(ui.requests[0].url, '/api/evm/local-preview');
     const body = JSON.parse(ui.requests[0].options.body); assert.equal(body.gas, gas); assert.deepEqual(body.queries, [query]);
   }
-  assert.match(html, /Each measurement query keeps a separate 1,000,000 gas limit/);
+  assert.match(html, /Each token or position query keeps a separate 1,000,000 gas limit; ETH balance reads use no query gas/);
 });
 
 test('malformed or out-of-range local gas blocks dispatch and opens the field', async () => {
