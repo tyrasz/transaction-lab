@@ -76,3 +76,9 @@ The frozen seven-case packet matched **7/7** on all nine comparison channels: fi
 The type-4 case entered its malformed recipient with 100 gas, retained its successful authorization, and matched Geth at 67,106 charged gas and 35,190 single-transaction block gas. These selected synthetic cases do not establish population accuracy.
 
 Capture plan: `1b5baf0830d6e1b0eafcce793256a595308e688387e90abad62e1e8f80c32ff2`. Capture manifest: `9f28743de55b3e66d24aa61aa6184ccc79ebafdeb4a715b9e71a03ee1ec7d4aa`. The candidate has a 1,725-file local API identity, `2dcd852867697a0f64e2787187fa16b16df6270a0e7e873d19aed7a80f6dde25`, and discloses the exact two corrected dependency hashes. The browser interface bytes are unchanged.
+
+## Installed check
+
+The clean main checkout fast-forwarded to implementation/evidence commit `18a5075c`. With the old service stopped, the explicit utility applied the same pinned correction to the main local dependency. The fixture dependency and earlier archives were not patched. Version **0.34.0** is running read-only at http://127.0.0.1:5174/. The three saved localhost checks confirm all optional engines, the candidate's exact 1,725-file local identity and byte-identical interface source. These checks made no public RPC requests and ran no transaction. The temporary candidate on port 5175 was stopped.
+
+The bounded saved-artifact verifier also passed against the installed archive without target execution. It checked 4,024 artifact entries, 14 process records, 35 saved input replies and seven signed envelopes/headers, and independently rebuilt 28 full state roots. The nine-channel comparison reuses the archived parser; individual proof paths were not independently re-walked. Its installed result is `installed-geth-artifact-review.json`. All original capture bytes and classifications remain unchanged.
