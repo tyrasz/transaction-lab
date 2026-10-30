@@ -1,0 +1,140 @@
+{
+  "outcome": {
+    "transactionHash": "0x1052d648d7c7155ae1789630a18131fd2aa8b65875696a5c51015fc3cc500d7b",
+    "execution": "success",
+    "comparison": "match"
+  },
+  "channels": {
+    "executionStatus": {
+      "status": "match",
+      "product": {
+        "status": "success",
+        "exception": null
+      },
+      "oracle": {
+        "status": "success",
+        "exception": null
+      }
+    },
+    "returnData": {
+      "status": "match",
+      "product": "0x",
+      "oracle": "0x"
+    },
+    "committedLogs": {
+      "status": "match",
+      "product": [
+        {
+          "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x00000000000000000000000023ab273a115548346a73d565465283e09e90afba",
+            "0x00000000000000000000000022bd4deba7f910df9dc739cd543d226641b994ac"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000007c05518"
+        }
+      ],
+      "oracle": [
+        {
+          "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x00000000000000000000000023ab273a115548346a73d565465283e09e90afba",
+            "0x00000000000000000000000022bd4deba7f910df9dc739cd543d226641b994ac"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000000000000007c05518"
+        }
+      ]
+    },
+    "gasAccounting": {
+      "status": "match",
+      "product": "41309",
+      "oracle": "41309"
+    },
+    "fullObservedStateChanges": {
+      "status": "match",
+      "product": [
+        {
+          "address": "0x23ab273a115548346a73d565465283e09e90afba",
+          "nonce": {
+            "before": "0x0",
+            "after": "0x1"
+          }
+        },
+        {
+          "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "storage": [
+            {
+              "slot": "0x70f6aaa4f5b47b6e07551bad240221048f4d3e4e44b7455afe0ff801bff545dc",
+              "before": "0x0000000000000000000000000000000000000000000000000000000007c05518",
+              "after": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            {
+              "slot": "0x8262688d3e5790465bb354d64fd85e5b91e5b95b0d0fe02f43a79ec857561be1",
+              "before": "0x0000000000000000000000000000000000000000000000000000001cdc7059d8",
+              "after": "0x0000000000000000000000000000000000000000000000000000001ce430aef0"
+            }
+          ]
+        }
+      ],
+      "oracle": [
+        {
+          "address": "0x23ab273a115548346a73d565465283e09e90afba",
+          "nonce": {
+            "before": "0x0",
+            "after": "0x1"
+          }
+        },
+        {
+          "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "storage": [
+            {
+              "slot": "0x70f6aaa4f5b47b6e07551bad240221048f4d3e4e44b7455afe0ff801bff545dc",
+              "before": "0x0000000000000000000000000000000000000000000000000000000007c05518",
+              "after": "0x0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            {
+              "slot": "0x8262688d3e5790465bb354d64fd85e5b91e5b95b0d0fe02f43a79ec857561be1",
+              "before": "0x0000000000000000000000000000000000000000000000000000001cdc7059d8",
+              "after": "0x0000000000000000000000000000000000000000000000000000001ce430aef0"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "reasons": [],
+  "allChannelsComplete": true,
+  "evidence": {
+    "local": {
+      "sourceSha256": "cb3be33a6e4c8d020c7e03fb12c00b28a7b745abd259d8c5c05f38bc68854bab",
+      "blockHash": "0x76516d0ebf05c784bafe1dfacbca651b54d0062c06a9b2cdc2a1b0cb4b0d8228",
+      "stateRoot": "0xf6a6cbc24ff9bdd1ccbf742b41f6f74f6008fc9908f0cf0fec8900cee39cec29",
+      "inputEvidenceCount": 10,
+      "rawExecutionError": null
+    },
+    "oracle": {
+      "wireIds": [
+        172,
+        173,
+        174,
+        175
+      ],
+      "rawExecutionError": null
+    }
+  },
+  "limitations": {
+    "evaluatedProduct": "current_isolated_local_kernel",
+    "oracle": "remote_native_trace_and_sparse_diff",
+    "artifactHashesBound": false,
+    "sourceIdentityAuthenticityVerified": false,
+    "providerContextExecutionAttested": false,
+    "headerConsensusOrFinalityVerified": false,
+    "fullPoststateRootCompared": false,
+    "fullCallTreeEquality": false,
+    "originalTransactionReplay": false,
+    "feeSettlement": false,
+    "completeEconomicInventory": false,
+    "securityScore": false
+  }
+}
