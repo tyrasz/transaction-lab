@@ -91,3 +91,9 @@ seven recorded channels. The storage-only root case is unsupported in the
 product and differs between EthereumJS and Geth on all seven channels. The
 original unavailable rows remain in their original packet. Three input-only
 controls and the supplement's artifact-only verification passed.
+
+The root supplement also passed its artifact-only verifier after relocation to
+the main checkout; `installed-root-artifact-review.json` retains the result.
+Saved process arguments remain bound to the original execution directory while
+all source and input bytes are rechecked from the installed location. No target
+was rerun for this portability check.
