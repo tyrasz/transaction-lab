@@ -1,0 +1,149 @@
+TAP version 13
+# {"index":0,"id":"case_0","kind":"product","status":"observed","prepareOnly":false}
+# {"index":1,"id":"case_1","kind":"product","status":"observed","prepareOnly":false}
+# {"index":2,"id":"case_2","kind":"product","status":"observed","prepareOnly":false}
+# {"index":3,"id":"case_3","kind":"product","status":"observed","prepareOnly":false}
+# {"index":4,"id":"case_4","kind":"product","status":"observed","prepareOnly":false}
+# {"index":5,"id":"case_5","kind":"product","status":"observed","prepareOnly":false}
+# {"index":6,"id":"case_6","kind":"product","status":"observed","prepareOnly":false}
+# {"index":7,"id":"case_7","kind":"product","status":"observed","prepareOnly":false}
+# {"index":0,"id":"case_0","kind":"eels","status":"observed","prepareOnly":false}
+# {"index":1,"id":"case_1","kind":"eels","status":"observed","prepareOnly":false}
+# {"index":2,"id":"case_2","kind":"eels","status":"observed","prepareOnly":false}
+# {"index":3,"id":"case_3","kind":"eels","status":"observed","prepareOnly":false}
+# {"index":4,"id":"case_4","kind":"eels","status":"observed","prepareOnly":false}
+# {"index":5,"id":"case_5","kind":"eels","status":"observed","prepareOnly":false}
+# {"index":6,"id":"case_6","kind":"eels","status":"observed","prepareOnly":false}
+# {"index":7,"id":"case_7","kind":"eels","status":"observed","prepareOnly":false}
+# Subtest: eight-case fixed process arguments distinguish preparation from execution
+ok 1 - eight-case fixed process arguments distinguish preparation from execution
+  ---
+  duration_ms: 4.67475
+  type: 'test'
+  ...
+# Subtest: execution gate rejects missing or altered flag before opening a capture
+ok 2 - execution gate rejects missing or altered flag before opening a capture
+  ---
+  duration_ms: 0.58525
+  type: 'test'
+  ...
+# Subtest: archived driver resolves the sole capture while the working driver remains preparation-only
+ok 3 - archived driver resolves the sole capture while the working driver remains preparation-only
+  ---
+  duration_ms: 0.07025
+  type: 'test'
+  ...
+# Subtest: prepared reports bind arguments, byte hashes, identity and no-execution status
+ok 4 - prepared reports bind arguments, byte hashes, identity and no-execution status
+  ---
+  duration_ms: 1.428291
+  type: 'test'
+  ...
+# Subtest: timeouts, stderr, process failures, failed closure and malformed report stay unavailable
+ok 5 - timeouts, stderr, process failures, failed closure and malformed report stay unavailable
+  ---
+  duration_ms: 0.479959
+  type: 'test'
+  ...
+# Subtest: completed product must include successful isolation and distinct closed child
+ok 6 - completed product must include successful isolation and distinct closed child
+  ---
+  duration_ms: 0.248
+  type: 'test'
+  ...
+# Subtest: timeout, maxBuffer overflow, failed group cleanup and strict elapsed caps invalidate the packet
+ok 7 - timeout, maxBuffer overflow, failed group cleanup and strict elapsed caps invalidate the packet
+  ---
+  duration_ms: 0.118875
+  type: 'test'
+  ...
+# Subtest: actual product child closure failures invalidate even a clean outer process
+ok 8 - actual product child closure failures invalidate even a clean outer process
+  ---
+  duration_ms: 0.18325
+  type: 'test'
+  ...
+# Subtest: unreadable actual product reports cannot establish child closure from outer exit alone
+ok 9 - unreadable actual product reports cannot establish child closure from outer exit alone
+  ---
+  duration_ms: 1.09525
+  type: 'test'
+  ...
+# Subtest: original-write ledger rejects coherent old-output resealing and exact membership changes
+ok 10 - original-write ledger rejects coherent old-output resealing and exact membership changes
+  ---
+  duration_ms: 8.049791
+  type: 'test'
+  ...
+# Subtest: ledger seals retain original written identities and preexisting freeze identities
+ok 11 - ledger seals retain original written identities and preexisting freeze identities
+  ---
+  duration_ms: 1.483416
+  type: 'test'
+  ...
+# Subtest: pure driver controls stop after an unbounded first attempt and retain all sixteen positions
+ok 12 - pure driver controls stop after an unbounded first attempt and retain all sixteen positions
+  ---
+  duration_ms: 2.7785
+  type: 'test'
+  ...
+# Subtest: pure driver checks the original-write ledger before another dispatch and at termination
+ok 13 - pure driver checks the original-write ledger before another dispatch and at termination
+  ---
+  duration_ms: 0.600792
+  type: 'test'
+  ...
+# Subtest: all eight product raw records and seals precede the first EELS dispatch
+ok 14 - all eight product raw records and seals precede the first EELS dispatch
+  ---
+  duration_ms: 26.336417
+  type: 'test'
+  ...
+# Subtest: missing original observation retains every declared query channel as unavailable
+ok 15 - missing original observation retains every declared query channel as unavailable
+  ---
+  duration_ms: 0.377292
+  type: 'test'
+  ...
+# Subtest: comparison distinguishes missing dimensions and disagreements
+ok 16 - comparison distinguishes missing dimensions and disagreements
+  ---
+  duration_ms: 0.077083
+  type: 'test'
+  ...
+# Subtest: prepare-only forces original input validation and query signing then returns before targets
+ok 17 - prepare-only forces original input validation and query signing then returns before targets
+  ---
+  duration_ms: 0.217583
+  type: 'test'
+  ...
+# Subtest: fixed source closure includes query interpretation and unchanged original adapter dependencies
+not ok 18 - fixed source closure includes query interpretation and unchanged original adapter dependencies
+  ---
+  duration_ms: 237.50025
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-lifecycle-v035/run.test.mjs:154:1'
+  failureType: 'testCodeFailure'
+  error: "ENOENT: no such file or directory, lstat '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-lifecycle-v035/preparation.test.mjs'"
+  code: 'ENOENT'
+  stack: |-
+    Object.lstatSync (node:fs:1722:25)
+    entry (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-lifecycle-v035/run.mjs:23:116)
+    file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-lifecycle-v035/run.mjs:30:48
+    Array.map (<anonymous>)
+    sourceRows (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-lifecycle-v035/run.mjs:30:41)
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-lifecycle-v035/run.test.mjs:156:14)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+  ...
+1..18
+# tests 18
+# suites 0
+# pass 17
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 374.157625
