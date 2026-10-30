@@ -1,0 +1,328 @@
+TAP version 13
+# Subtest: Amsterdam clearing binds created/selfdestruct intersection and preserves absent or prefunded native balances
+ok 1 - Amsterdam clearing binds created/selfdestruct intersection and preserves absent or prefunded native balances
+  ---
+  duration_ms: 30.127708
+  type: 'test'
+  ...
+# Subtest: zero residual clearing has exact whole-account removal only for an originally existing target
+ok 2 - zero residual clearing has exact whole-account removal only for an originally existing target
+  ---
+  duration_ms: 19.157166
+  type: 'test'
+  ...
+# Subtest: SELFDESTRUCT followed by a later refill preserves only the reconstructed residual balance
+ok 3 - SELFDESTRUCT followed by a later refill preserves only the reconstructed residual balance
+  ---
+  duration_ms: 9.199792
+  type: 'test'
+  ...
+# Subtest: preexisting self-beneficiary has no burn or clearing and cannot borrow a creation marker
+ok 4 - preexisting self-beneficiary has no burn or clearing and cannot borrow a creation marker
+  ---
+  duration_ms: 2.451
+  type: 'test'
+  ...
+# Subtest: a pending cleared coinbase retains its fee credit after all native transfers and settlement
+ok 5 - a pending cleared coinbase retains its fee credit after all native transfers and settlement
+  ---
+  duration_ms: 23.480625
+  type: 'test'
+  ...
+# Subtest: missing, duplicated, fabricated or old-fork clearing evidence and surviving namespace fields fail closed
+ok 6 - missing, duplicated, fabricated or old-fork clearing evidence and surviving namespace fields fail closed
+  ---
+  duration_ms: 7.498792
+  type: 'test'
+  ...
+# Subtest: root revert retains observed SELFDESTRUCT but cannot fabricate committed clearing
+ok 7 - root revert retains observed SELFDESTRUCT but cannot fabricate committed clearing
+  ---
+  duration_ms: 3.908667
+  type: 'test'
+  ...
+# Subtest: balance-only and zero-empty clearing rows carry through neutral query copies without new lifecycle claims
+ok 8 - balance-only and zero-empty clearing rows carry through neutral query copies without new lifecycle claims
+  ---
+  duration_ms: 11.149958
+  type: 'test'
+  ...
+# Subtest: reset namespace shapes preserve immutable roots and remain neutral only when carried unchanged
+ok 9 - reset namespace shapes preserve immutable roots and remain neutral only when carried unchanged
+  ---
+  duration_ms: 0.266833
+  type: 'test'
+  ...
+# Subtest: actual isolated parent admits clearing and native queries observe preserved balance with no query mutation
+ok 10 - actual isolated parent admits clearing and native queries observe preserved balance with no query mutation
+  ---
+  duration_ms: 340.004708
+  type: 'test'
+  ...
+# Subtest: an original creation is not newly created by a disposable query, even when it selfdestructs there
+ok 11 - an original creation is not newly created by a disposable query, even when it selfdestructs there
+  ---
+  duration_ms: 139.790125
+  type: 'test'
+  ...
+# Subtest: actual worker reply cannot erase the clearing or replace its residual with a mutually forged balance
+ok 12 - actual worker reply cannot erase the clearing or replace its residual with a mutually forged balance
+  ---
+  duration_ms: 254.515792
+  type: 'test'
+  ...
+# Subtest: inherited static mode rejects the reproduced delegated SELFDESTRUCT clearing forgery in an actual worker reply
+ok 13 - inherited static mode rejects the reproduced delegated SELFDESTRUCT clearing forgery in an actual worker reply
+  ---
+  duration_ms: 132.210833
+  type: 'test'
+  ...
+# Subtest: static ancestry cannot acquire entered CREATE/CREATE2 or a value-bearing CALL by relabeling a normal ancestor
+ok 14 - static ancestry cannot acquire entered CREATE/CREATE2 or a value-bearing CALL by relabeling a normal ancestor
+  ---
+  duration_ms: 9.262833
+  type: 'test'
+  ...
+# Subtest: inherited static mode still permits zero-value CALL and nonzero CALLCODE without balance transfer
+ok 15 - inherited static mode still permits zero-value CALL and nonzero CALLCODE without balance transfer
+  ---
+  duration_ms: 5.364792
+  type: 'test'
+  ...
+# Subtest: parent requires exact canonical attempt and target records without invoking accessors
+ok 16 - parent requires exact canonical attempt and target records without invoking accessors
+  ---
+  duration_ms: 56.397209
+  type: 'test'
+  ...
+# Subtest: parent binds attempts to opcode, target derivation, current target state and child result
+ok 17 - parent binds attempts to opcode, target derivation, current target state and child result
+  ---
+  duration_ms: 7.111209
+  type: 'test'
+  ...
+# Subtest: each entered creation has one ledger join and every entered frame has an explicit array
+ok 18 - each entered creation has one ledger join and every entered frame has an explicit array
+  ---
+  duration_ms: 5.023333
+  type: 'test'
+  ...
+# Subtest: reentrant creation must observe intermediate nonce updates at its declared child position
+ok 19 - reentrant creation must observe intermediate nonce updates at its declared child position
+  ---
+  duration_ms: 17.630708
+  type: 'test'
+  ...
+# Subtest: delegated creation inherits its parent value as well as caller and execution address
+ok 20 - delegated creation inherits its parent value as well as caller and execution address
+  ---
+  duration_ms: 11.459125
+  type: 'test'
+  ...
+# Subtest: CALLCODE requires affordable value without transferring it, including an immediately failed child
+ok 21 - CALLCODE requires affordable value without transferring it, including an immediately failed child
+  ---
+  duration_ms: 10.570042
+  type: 'test'
+  ...
+# Subtest: enclosing rollback discards descendant attempts and inherited static cannot acquire them
+ok 22 - enclosing rollback discards descendant attempts and inherited static cannot acquire them
+  ---
+  duration_ms: 18.318166
+  type: 'test'
+  ...
+# Subtest: root construction starts target nonce at one without counting outer sender preparation twice
+ok 23 - root construction starts target nonce at one without counting outer sender preparation twice
+  ---
+  duration_ms: 7.296584
+  type: 'test'
+  ...
+# Subtest: query chronology starts from carried nonce/code state and separately increments its caller
+ok 24 - query chronology starts from carried nonce/code state and separately increments its caller
+  ---
+  duration_ms: 5.1335
+  type: 'test'
+  ...
+# Subtest: actual child target-state forgery is withheld even after recounting trace bytes
+ok 25 - actual child target-state forgery is withheld even after recounting trace bytes
+  ---
+  duration_ms: 151.493208
+  type: 'test'
+  ...
+# Subtest: actual isolated worker retains authenticated CREATE code, storage and balances
+ok 26 - actual isolated worker retains authenticated CREATE code, storage and balances
+  ---
+  duration_ms: 207.72025
+  type: 'test'
+  ...
+# Subtest: actual isolated worker retains authenticated CREATE2 code, storage and balances
+ok 27 - actual isolated worker retains authenticated CREATE2 code, storage and balances
+  ---
+  duration_ms: 154.539167
+  type: 'test'
+  ...
+# Subtest: actual isolated worker retains only the sender nonce after creation then root revert
+ok 28 - actual isolated worker retains only the sender nonce after creation then root revert
+  ---
+  duration_ms: 135.002833
+  type: 'test'
+  ...
+# Subtest: disposable preview queries preserve original deployments and do not invent an absent pre-deployment balance
+ok 29 - disposable preview queries preserve original deployments and do not invent an absent pre-deployment balance
+  ---
+  duration_ms: 136.903583
+  type: 'test'
+  ...
+# Subtest: parent rejects substituted code, initial values, creation ancestry and missing deployment rows
+ok 30 - parent rejects substituted code, initial values, creation ancestry and missing deployment rows
+  ---
+  duration_ms: 868.3485
+  type: 'test'
+  ...
+# Subtest: a clean before-state query admits only the exact caller nonce increment and does not alter inputs
+ok 31 - a clean before-state query admits only the exact caller nonce increment and does not alter inputs
+  ---
+  duration_ms: 1.816542
+  type: 'test'
+  ...
+# Subtest: after-state query preserves original nonce, native balances and storage clears across account/slot reorder
+ok 32 - after-state query preserves original nonce, native balances and storage clears across account/slot reorder
+  ---
+  duration_ms: 0.260292
+  type: 'test'
+  ...
+# Subtest: query cannot clear an original write, restore its base value, change a cleared slot, or introduce another write
+ok 33 - query cannot clear an original write, restore its base value, change a cleared slot, or introduce another write
+  ---
+  duration_ms: 0.325
+  type: 'test'
+  ...
+# Subtest: native changes on sender or other accounts are rejected while original unrelated changes remain valid
+ok 34 - native changes on sender or other accounts are rejected while original unrelated changes remain valid
+  ---
+  duration_ms: 0.167083
+  type: 'test'
+  ...
+# Subtest: proven absent sender admits only nonce materialization; fabricated presence and other changes are not normalized
+ok 35 - proven absent sender admits only nonce materialization; fabricated presence and other changes are not normalized
+  ---
+  duration_ms: 0.16525
+  type: 'test'
+  ...
+# Subtest: sender materialized by original execution preserves that existence change through the query
+ok 36 - sender materialized by original execution preserves that existence change through the query
+  ---
+  duration_ms: 0.088
+  type: 'test'
+  ...
+# Subtest: current sender nonce must agree with the prior overlay, and other nonce changes cannot be hidden
+ok 37 - current sender nonce must agree with the prior overlay, and other nonce changes cannot be hidden
+  ---
+  duration_ms: 0.1725
+  type: 'test'
+  ...
+# Subtest: existence changes must describe supported materialization, with zero prior native state and no new storage
+ok 38 - existence changes must describe supported materialization, with zero prior native state and no new storage
+  ---
+  duration_ms: 0.160375
+  type: 'test'
+  ...
+# Subtest: malformed deltas, duplicate accounts/slots and unknown fields fail even when repeated on both snapshots
+ok 39 - malformed deltas, duplicate accounts/slots and unknown fields fail even when repeated on both snapshots
+  ---
+  duration_ms: 1.170708
+  type: 'test'
+  ...
+# Subtest: bounded snapshots reject excessive accounts/slots and do not execute supplied getters
+ok 40 - bounded snapshots reject excessive accounts/slots and do not execute supplied getters
+  ---
+  duration_ms: 1.646
+  type: 'test'
+  ...
+# Subtest: identical net snapshots do not claim to rule out transient writes
+ok 41 - identical net snapshots do not claim to rule out transient writes
+  ---
+  duration_ms: 0.194375
+  type: 'test'
+  ...
+# Subtest: nested creation-shaped original rows and prefunded deployment carry unchanged through a disposable query
+ok 42 - nested creation-shaped original rows and prefunded deployment carry unchanged through a disposable query
+  ---
+  duration_ms: 1.858666
+  type: 'test'
+  ...
+# Subtest: empty-runtime creation and prefunded empty-runtime nonce/storage changes remain explicit deltas
+ok 43 - empty-runtime creation and prefunded empty-runtime nonce/storage changes remain explicit deltas
+  ---
+  duration_ms: 0.173667
+  type: 'test'
+  ...
+# Subtest: queries cannot introduce creation, change/remove deployed code or mutate carried creation state
+ok 44 - queries cannot introduce creation, change/remove deployed code or mutate carried creation state
+  ---
+  duration_ms: 0.431042
+  type: 'test'
+  ...
+# Subtest: deployment schema rejects unsupported replacement, impossible origin and nonzero initial storage
+ok 45 - deployment schema rejects unsupported replacement, impossible origin and nonzero initial storage
+  ---
+  duration_ms: 0.607083
+  type: 'test'
+  ...
+# Subtest: creation code and aggregate output slots obey fixed bounds without weakening duplicate checks
+ok 46 - creation code and aggregate output slots obey fixed bounds without weakening duplicate checks
+  ---
+  duration_ms: 5.5525
+  type: 'test'
+  ...
+# Subtest: new code and existence fields reject hostile nested descriptors without evaluating them
+ok 47 - new code and existence fields reject hostile nested descriptors without evaluating them
+  ---
+  duration_ms: 0.206417
+  type: 'test'
+  ...
+# Subtest: a caught recreated-contract subtree makes a neutral after-query available through the real child
+ok 48 - a caught recreated-contract subtree makes a neutral after-query available through the real child
+  ---
+  duration_ms: 228.383583
+  type: 'test'
+  ...
+# Subtest: a successful getter that leaves recreation behind remains an unavailable measurement
+ok 49 - a successful getter that leaves recreation behind remains an unavailable measurement
+  ---
+  duration_ms: 172.606042
+  type: 'test'
+  ...
+# Subtest: live reset shape retains cleared namespace and exact old-to-new account fields
+ok 50 - live reset shape retains cleared namespace and exact old-to-new account fields
+  ---
+  duration_ms: 1.342083
+  type: 'test'
+  ...
+# Subtest: reset representation cannot masquerade as sparse old-storage differences or an existence transition
+ok 51 - reset representation cannot masquerade as sparse old-storage differences or an existence transition
+  ---
+  duration_ms: 0.374125
+  type: 'test'
+  ...
+# Subtest: query purity preserves inherited reset state but rejects introducing or dropping it
+ok 52 - query purity preserves inherited reset state but rejects introducing or dropping it
+  ---
+  duration_ms: 0.501
+  type: 'test'
+  ...
+# Subtest: actual isolated parent rejects invented namespace reset even with authentic initial root and unchanged scalars
+ok 53 - actual isolated parent rejects invented namespace reset even with authentic initial root and unchanged scalars
+  ---
+  duration_ms: 197.086166
+  type: 'test'
+  ...
+1..53
+# tests 53
+# suites 0
+# pass 53
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1657.041791

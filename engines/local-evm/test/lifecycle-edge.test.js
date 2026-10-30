@@ -7,7 +7,10 @@ import { lifecycleFixture, createdAddress, factoryCode, initcode, RUNTIME, FACTO
 // These are synthetic authenticated inputs executed as real EVM bytecode.
 // Expected addresses use the independent RLP/Keccak fixture derivation.
 const address = createAddressFromString;
-const storage = async (f, account, slot = 0) => BigInt(bytesToHex(await f.stateManager.getStorage(address(account), bytes(word(slot)))));
+const storage = async (f, account, slot = 0) => {
+  const value = await f.stateManager.getStorage(address(account), bytes(word(slot)));
+  return value.length ? BigInt(bytesToHex(value)) : 0n;
+};
 const account = (f, value) => f.stateManager.getAccount(address(value));
 
 test('a constructor can create a second contract while preserving both initial absence proofs', async () => {
@@ -86,24 +89,47 @@ test('an outer step limit removes a previously committed child deployment and al
   await assert.rejects(f.stateManager.putCode(address(target), bytes('0x00')), { code: 'LOCAL_STATE_UNSUPPORTED' });
 });
 
-test('CREATE2 at a storage-only target is unsupported and restores the whole invocation', async () => {
+test('CREATE2 clears a storage-only target while retaining its prefunding and new constructor storage', async () => {
   const init = initcode(), target = createdAddress({ kind: 'CREATE2', init });
   const f = await lifecycleFixture({
     code: factoryCode(init, { kind: 'CREATE2' }),
-    accounts: { [target]: { nonce: 0n, balance: 17n, code: '0x', storage: { [word(0)]: 9n } } },
+    accounts: { [target]: { nonce: 0n, balance: 17n, code: '0x', storage: { [word(0)]: 9n, [word(991)]: 123n } } },
   });
   const result = await executeEthereumCall(f);
-  assert.equal(result.execution.status, 'unsupported');
-  assert.equal(result.execution.error.code, 'LOCAL_CREATION_STORAGE_UNSUPPORTED');
-  assert.equal(result.stateDisposition, 'rolled_back');
-  assert.deepEqual(f.stateManager.snapshotChanges().accounts, []);
-  assert.equal((await account(f, FACTORY)).nonce, 7n);
-  assert.equal((await account(f, FACTORY)).balance, 1000n);
-  assert.equal((await account(f, target)).nonce, 0n);
-  assert.equal((await account(f, target)).balance, 17n);
-  assert.equal(await storage(f, target), 9n);
-  assert.equal(bytesToHex(await f.stateManager.getCode(address(target))), '0x');
-  assert.equal(f.stateManager.snapshotChanges().accounts.some(row => row.address === target), false);
+  assert.equal(result.execution.status, 'success', JSON.stringify(result.execution));
+  assert.equal((await account(f, FACTORY)).nonce, 8n);
+  assert.equal((await account(f, FACTORY)).balance, 995n);
+  assert.equal((await account(f, target)).nonce, 1n);
+  assert.equal((await account(f, target)).balance, 22n);
+  assert.equal(await storage(f, target), 42n); assert.equal(await storage(f, target, 991), 0n);
+  assert.equal(bytesToHex(await f.stateManager.getCode(address(target))), '0x' + RUNTIME);
+  const row = f.stateManager.snapshotChanges().accounts.find(row => row.address === target);
+  assert.equal(row.reset.basis, 'contract_creation_storage_clear');
+  assert.equal(row.reset.initialStorageRoot, f.stateManager.snapshotInputs().provenance.find(p => p.account === target).accountProof.storageRoot);
+  assert.deepEqual(row.storage, [{ slot: word(0), before: word(0), after: word(42) }]);
+  assert(f.calls.filter(call => call.method === 'eth_getProof' && call.params[0] === target).every(call => call.params[1].length === 0));
+});
+
+test('constructor or ancestor REVERT restores the old storage-only namespace and prefunding', async () => {
+  for (const constructorReverts of [true, false]) {
+    const init = constructorReverts ? '602a60005560006000fd' : initcode();
+    const target = createdAddress({ kind: 'CREATE2', init });
+    const f = await lifecycleFixture({
+      code: factoryCode(init, { kind: 'CREATE2', tail: constructorReverts ? '60005260206000f3' : '5060006000fd' }),
+      accounts: { [target]: { nonce: 0n, balance: 17n, code: '0x', storage: { [word(0)]: 9n, [word(991)]: 123n } } },
+    });
+    const result = await executeEthereumCall(f);
+    assert.equal(result.execution.status, constructorReverts ? 'success' : 'reverted', JSON.stringify(result.execution));
+    assert.equal(result.trace.calls[0].error, constructorReverts ? 'revert' : null);
+    assert.equal((await account(f, FACTORY)).nonce, constructorReverts ? 8n : 7n);
+    assert.equal((await account(f, FACTORY)).balance, 1000n);
+    assert.equal((await account(f, SENDER)).nonce, 2n);
+    assert.equal((await account(f, target)).nonce, 0n); assert.equal((await account(f, target)).balance, 17n);
+    assert.equal(bytesToHex(await f.stateManager.getCode(address(target))), '0x');
+    assert.equal(f.stateManager.snapshotChanges().accounts.some(row => row.address === target), false);
+    assert(f.calls.filter(call => call.method === 'eth_getProof' && call.params[0] === target).every(call => call.params[1].length === 0));
+    assert.equal(await storage(f, target), 9n); assert.equal(await storage(f, target, 991), 123n);
+  }
 });
 
 test('CREATE reached in STATICCALL remains an ordinary child fault with no creation or creator nonce change', async () => {

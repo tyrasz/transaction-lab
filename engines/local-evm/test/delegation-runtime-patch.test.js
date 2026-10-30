@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { DELEGATION_RUNTIME_PATCH as patch, applyDelegationRuntimePatch, assertDelegationRuntimePatched } from '../delegation-runtime-patch.js';
+import { LOCAL_RUNTIME_PATCH as patch, applyLocalRuntimePatch as applyDelegationRuntimePatch, assertLocalRuntimePatched as assertDelegationRuntimePatched } from '../delegation-runtime-patch.js';
 
 const installed = fileURLToPath(new URL('../node_modules/@ethereumjs/evm/', import.meta.url));
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
@@ -13,9 +13,10 @@ const errorCode = { code: 'LOCAL_EVM_RUNTIME_UNVERIFIED' };
 function originalBytes(spec) {
   const bytes = fs.readFileSync(path.join(installed, spec.path));
   if (sha(bytes) === spec.originalSha256) return bytes;
-  assert.equal(sha(bytes), spec.patchedSha256, 'test inputs must be exact stock or corrected dependency bytes');
+  assert([spec.patchedSha256, spec.previousSha256].includes(sha(bytes)), 'test inputs must be exact stock, previous or corrected dependency bytes');
   let text = bytes.toString();
-  for (const { before, after } of spec.replacements) text = text.replace(after, before);
+  const replacements = sha(bytes) === spec.previousSha256 ? spec.replacements.slice(0, spec.previousReplacementCount) : spec.replacements;
+  for (const { before, after } of replacements) text = text.replace(after, before);
   const original = Buffer.from(text); assert.equal(sha(original), spec.originalSha256); return original;
 }
 function fixture(t) {
@@ -30,13 +31,13 @@ function fixture(t) {
 }
 const snapshot = directory => patch.files.map(spec => fs.readFileSync(path.join(directory, spec.path)));
 
-test('exact three length checks are the only byte changes and retain existing slice indexes', t => {
+test('three delegation guards and two collision predicates are the only executable changes', t => {
   const directory = fixture(t), before = snapshot(directory);
   assert.throws(() => assertDelegationRuntimePatched(directory), errorCode);
   assert.deepEqual(snapshot(directory), before, 'read-only check must not patch');
   const result = applyDelegationRuntimePatch(directory);
-  assert.deepEqual(result.changed, ['dist/esm/evm.js', 'dist/esm/opcodes/gas.js']);
-  assert.equal(patch.files.reduce((n, spec) => n + spec.replacements.length, 0), 3);
+  assert.deepEqual(result.changed, ['dist/esm/evm.js', 'dist/esm/opcodes/gas.js', 'dist/esm/interpreter.js']);
+  assert.equal(patch.files.reduce((n, spec) => n + spec.replacements.length, 0), 6); // Includes one comment-only replacement.
   for (const [i, spec] of patch.files.entries()) {
     const after = fs.readFileSync(path.join(directory, spec.path));
     assert.equal(sha(before[i]), spec.originalSha256); assert.equal(sha(after), spec.patchedSha256);
@@ -52,7 +53,32 @@ test('exact three length checks are the only byte changes and retain existing sl
   assert(evm.includes('recipientCode.length === 23 && equalsBytes(recipientCode.slice(0, 3)'));
   assert(evm.includes('message.code.length === 23 && equalsBytes(message.code.slice(0, 3)'));
   assert(fs.readFileSync(path.join(directory, patch.files[1].path), 'utf8').includes('code.length === 23 && equalsBytes(code.slice(0, 3)'));
+  assert(!evm.includes('equalsBytes(toAccount.storageRoot, KECCAK256_RLP)'));
+  const interpreter = fs.readFileSync(path.join(directory, patch.files[2].path), 'utf8');
+  assert(!interpreter.includes('equalsBytes(toAccount.storageRoot, KECCAK256_RLP)'));
+  assert(evm.includes('toAccount.nonce && toAccount.nonce > BIGINT_0'));
+  assert(interpreter.includes('toAccount.nonce > BIGINT_0'));
+  assert.deepEqual(result.patches, ['eip7702-exact-designation-length-v1', 'nonce-code-creation-collision-v1']);
   assert.deepEqual(result.files, patch.files.map(spec => ({ path: spec.path, sha256: spec.patchedSha256 })));
+});
+
+test('the exact v034 runtime upgrades without rewriting the unchanged delegation gas file', t => {
+  const directory = fixture(t), evm = patch.files[0], gas = patch.files[1];
+  let oldEvm = originalBytes(evm).toString();
+  for (const { before, after } of evm.replacements.slice(0, evm.previousReplacementCount)) oldEvm = oldEvm.replace(before, after);
+  assert.equal(sha(oldEvm), evm.previousSha256);
+  fs.writeFileSync(path.join(directory, evm.path), oldEvm);
+  let oldGas = originalBytes(gas).toString();
+  for (const { before, after } of gas.replacements) oldGas = oldGas.replace(before, after);
+  assert.equal(sha(oldGas), gas.patchedSha256);
+  fs.writeFileSync(path.join(directory, gas.path), oldGas);
+  const unchanged = fs.statSync(path.join(directory, gas.path));
+  assert.throws(() => assertDelegationRuntimePatched(directory), errorCode);
+  const result = applyDelegationRuntimePatch(directory);
+  assert.deepEqual(result.changed, [evm.path, patch.files[2].path]);
+  assert.equal(fs.statSync(path.join(directory, gas.path)).ino, unchanged.ino);
+  assert.equal(fs.statSync(path.join(directory, gas.path)).mtimeMs, unchanged.mtimeMs);
+  assertDelegationRuntimePatched(directory);
 });
 
 test('already corrected bytes are verified without rewriting; explicit apply is idempotent', t => {

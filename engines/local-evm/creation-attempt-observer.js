@@ -4,7 +4,6 @@
 // This is a consistency ledger, not an independently verified execution proof.
 import { EVMError } from '@ethereumjs/evm';
 import { Account, bigIntToBytes, bytesToHex, createAddressFromString, generateAddress, generateAddress2, KECCAK256_NULL, KECCAK256_RLP } from '@ethereumjs/util';
-import { storageOnlyCreationAccount, unsupportedStorageCreation } from './creation-support.js';
 
 const MAX_WORD = (1n << 256n) - 1n;
 const MAX_NONCE = (1n << 64n) - 1n;
@@ -31,7 +30,7 @@ function snapshot(account) {
   if (result.nonce > MAX_NONCE || !/^0x[0-9a-f]{64}$/.test(result.codeHash) || !/^0x[0-9a-f]{64}$/.test(result.storageRoot)) invalid('invalid account facts');
   return result;
 }
-function collision(facts) { return facts.exists && (facts.nonce !== 0n || facts.codeHash !== EMPTY_CODE || facts.storageRoot !== EMPTY_STORAGE); }
+function collision(facts) { return facts.exists && (facts.nonce !== 0n || facts.codeHash !== EMPTY_CODE); }
 function sameStackPrefix(actual, expected) {
   return Array.isArray(actual) && actual.length === expected.length + 1 && expected.every((n, i) => actual[i] === n);
 }
@@ -153,7 +152,6 @@ export function createCreationAttemptObserver({ common, getAccount, check, bound
       if (!candidate?.written || candidate.targetFacts) return;
       if (address(accountAddress) !== candidate.target) invalid('creator write was not followed by its target read');
       candidate.targetFacts = snapshot(account);
-      if (storageOnlyCreationAccount(account)) throw unsupportedStorageCreation();
     },
     exitFrame(frame, result) {
       check(); const ctx = context(frame);

@@ -9,6 +9,7 @@ const CREATION_BASES = ['internal_contract_creation', 'top_level_contract_creati
 const DELETION_BASIS = 'same_invocation_created_contract_deletion';
 const SHANGHAI_DELETION_BASIS = 'shanghai_selfdestruct_deletion';
 const AMSTERDAM_CLEARING_BASIS = 'same_invocation_created_contract_clearing_eip8246';
+const CREATION_STORAGE_CLEAR_BASIS = 'contract_creation_storage_clear';
 const EMPTY_CLEANUP_BASIS = 'eip161_empty_account_cleanup';
 const AUTHORIZATION_BASIS = 'eip7702_authorization_materialization';
 const EXISTENCE_BASES = ['unsigned_sender_nonce_materialization', 'positive_native_funding_of_proof_absent_account', AUTHORIZATION_BASIS, ...CREATION_BASES];
@@ -56,7 +57,7 @@ function canonical(snapshot) {
     const row = { address: account.address };
     if (Object.hasOwn(account, 'reset')) {
       const value = account.reset; fields(value, ['basis', 'initialStorageRoot']);
-      need([DELETION_BASIS, SHANGHAI_DELETION_BASIS, EMPTY_CLEANUP_BASIS, AMSTERDAM_CLEARING_BASIS].includes(value.basis) && matches(value.initialStorageRoot, WORD));
+      need([DELETION_BASIS, SHANGHAI_DELETION_BASIS, EMPTY_CLEANUP_BASIS, AMSTERDAM_CLEARING_BASIS, CREATION_STORAGE_CLEAR_BASIS].includes(value.basis) && matches(value.initialStorageRoot, WORD));
       // A surviving replacement of an originally existing account retains the
       // whole cleared namespace. This is shape only: execution provenance must
       // establish the prior finalized deletion before accepting such a row.
@@ -94,6 +95,12 @@ function canonical(snapshot) {
       // These slots are the nonzero contents of the new namespace, not a sparse
       // diff against the deleted trie. Even an old equal value must be retained.
       need(!row.storage || row.storage.every(value => value.before === ZERO_WORD));
+      if (row.reset.basis === CREATION_STORAGE_CLEAR_BASIS) {
+        // Shape only: the parent must prove a committed creation into this
+        // original namespace. A reset alone cannot authorize deployment.
+        need(row.nonce?.before === '0x0' && BigInt(row.nonce.after) > 0n);
+        need(!row.code || row.code.before === '0x');
+      }
     } else if (creation || (row.code && !delegationCode)) {
       // Deployment starts from nonce0 and a proven empty code/storage state.
       // A prefunded deployable target already existed, so has no existence row.

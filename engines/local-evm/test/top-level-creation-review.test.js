@@ -80,14 +80,20 @@ test('nested constructors preserve top-level versus internal origin and discard 
   }
 });
 
-test('CREATE collision and resource failure retain their distinct rollback semantics', async () => {
+test('CREATE collision, storage-only clearing and resource failure retain distinct outcomes', async () => {
   const collision = await run(await fixture({ accounts: { [target]: { nonce: 1n, balance: 17n, storage: { [word(0)]: word(1) } } } }));
   assert.equal(collision.status, 'completed'); assert.equal(collision.output.execution.status, 'failed');
   assert.equal(collision.output.trace.to, target); assert.deepEqual(collision.changes.accounts, senderOnly);
-  const unsupported = await run(await fixture({ accounts: { [target]: { balance: 17n, storage: { [word(0)]: word(1) } } } }));
-  assert.equal(unsupported.status, 'completed'); assert.equal(unsupported.output.execution.status, 'unsupported');
-  assert.equal(unsupported.output.execution.error.code, 'LOCAL_CREATION_STORAGE_UNSUPPORTED');
-  assert.equal(unsupported.output.stateDisposition, 'rolled_back'); assert.deepEqual(unsupported.changes.accounts, []);
+  const cleared = await run(await fixture({ accounts: { [target]: { balance: 17n, storage: { [word(0)]: word(1), [word(991)]: word(9) } } } }));
+  assert.equal(cleared.status, 'completed', JSON.stringify(cleared.error)); assert.equal(cleared.output.execution.status, 'success');
+  const row = cleared.changes.accounts.find(row => row.address === target);
+  const proof = cleared.inputs.provenance.find(p => p.account === target);
+  assert.deepEqual(row.reset, { basis: 'contract_creation_storage_clear', initialStorageRoot: proof.accountProof.storageRoot });
+  assert.deepEqual(row.storage, [{ slot: word(0), before: word(0), after: word(42) }]);
+  assert.deepEqual(row.balance, { before: '0x11', after: '0x16' });
+  assert.deepEqual(row.nonce, { before: '0x0', after: '0x1' });
+  assert.equal(row.code.after, '0x' + RUNTIME); assert.equal(row.existence, undefined);
+  assert.deepEqual(proof.storage, [], 'Creation must not demand hidden old storage slots');
   const limited = await run(await fixture({ init: '602a6000555b600556' }), { execution: { steps: 100 } });
   assert.equal(limited.status, 'completed'); assert.equal(limited.output.execution.status, 'unavailable');
   assert.equal(limited.output.trace.to, target); assert.equal(limited.output.stateDisposition, 'rolled_back');

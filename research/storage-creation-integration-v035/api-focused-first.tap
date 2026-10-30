@@ -1,0 +1,136 @@
+TAP version 13
+# Subtest: local loader binds full static closure, worker entry, entire dependencies, symlink target and Node bytes
+ok 1 - local loader binds full static closure, worker entry, entire dependencies, symlink target and Node bytes
+  ---
+  duration_ms: 103.376
+  type: 'test'
+  ...
+# Subtest: stock EVM bytes before loader startup refuse availability; explicitly patched copies pass with bound metadata
+ok 2 - stock EVM bytes before loader startup refuse availability; explicitly patched copies pass with bound metadata
+  ---
+  duration_ms: 180.11
+  type: 'test'
+  ...
+# Subtest: missing optional worker at startup stays unavailable until a new process
+ok 3 - missing optional worker at startup stays unavailable until a new process
+  ---
+  duration_ms: 137.79025
+  type: 'test'
+  ...
+# Subtest: changed source between startup and lazy import rejects, rather than relabeling cached modules
+ok 4 - changed source between startup and lazy import rejects, rather than relabeling cached modules
+  ---
+  duration_ms: 75.913084
+  type: 'test'
+  ...
+# Subtest: changed source during lazy import is rejected
+ok 5 - changed source during lazy import is rejected
+  ---
+  duration_ms: 86.5535
+  type: 'test'
+  ...
+# Subtest: every simulation rechecks added dependency files before invoking its adapter
+ok 6 - every simulation rechecks added dependency files before invoking its adapter
+  ---
+  duration_ms: 92.249208
+  type: 'test'
+  ...
+# Subtest: source changes during a simulation remove all nested preview amounts afterward
+ok 7 - source changes during a simulation remove all nested preview amounts afterward
+  ---
+  duration_ms: 99.454834
+  type: 'test'
+  ...
+# Subtest: escaping dependency symlinks are rejected before import
+ok 8 - escaping dependency symlinks are rejected before import
+  ---
+  duration_ms: 90.202209
+  type: 'test'
+  ...
+# Subtest: cancellation or exhausted deadline after execution is rechecked after final source verification
+ok 9 - cancellation or exhausted deadline after execution is rechecked after final source verification
+  ---
+  duration_ms: 124.721875
+  type: 'test'
+  ...
+# Subtest: real installed closure contains all current local runtime and complete pinned dependency tree without copying it
+ok 10 - real installed closure contains all current local runtime and complete pinned dependency tree without copying it
+  ---
+  duration_ms: 1553.821333
+  type: 'test'
+  ...
+# Subtest: local chain selection is finite and detached, with explicit current Sepolia example queries
+ok 11 - local chain selection is finite and detached, with explicit current Sepolia example queries
+  ---
+  duration_ms: 9.5285
+  type: 'test'
+  ...
+# Subtest: latest, exact number and exact hash produce proof-bound Sepolia native measurements through real children
+ok 12 - latest, exact number and exact hash produce proof-bound Sepolia native measurements through real children
+  ---
+  duration_ms: 380.7185
+  type: 'test'
+  ...
+# Subtest: wrong endpoint chain, selected number, hash and Amsterdam header suffix fail before any child state read
+ok 13 - wrong endpoint chain, selected number, hash and Amsterdam header suffix fail before any child state read
+  ---
+  duration_ms: 8.054709
+  type: 'test'
+  ...
+# Subtest: a changed final header withholds all native amounts while retaining labeled execution evidence
+ok 14 - a changed final header withholds all native amounts while retaining labeled execution evidence
+  ---
+  duration_ms: 247.254875
+  type: 'test'
+  ...
+# Subtest: priced Sepolia execution and unpriced disposable CHAINID queries keep their distinct chain-bound accounting
+ok 15 - priced Sepolia execution and unpriced disposable CHAINID queries keep their distinct chain-bound accounting
+  ---
+  duration_ms: 130.36875
+  type: 'test'
+  ...
+# Subtest: Amsterdam self-authorization reaches the API with retained delegation and exact native measurements
+ok 16 - Amsterdam self-authorization reaches the API with retained delegation and exact native measurements
+  ---
+  duration_ms: 265.634375
+  type: 'test'
+  ...
+# Subtest: authorization preparation OOG is a completed failed simulation with no call frame or value transfer
+ok 17 - authorization preparation OOG is a completed failed simulation with no call frame or value transfer
+  ---
+  duration_ms: 124.255375
+  type: 'test'
+  ...
+# Subtest: existing Amsterdam sender delegation survives API admission, self-call and disposable query validation
+ok 18 - existing Amsterdam sender delegation survives API admission, self-call and disposable query validation
+  ---
+  duration_ms: 258.054791
+  type: 'test'
+  ...
+# Subtest: an Amsterdam storage-only creation clears the old namespace through the API with retained proof evidence
+ok 19 - an Amsterdam storage-only creation clears the old namespace through the API with retained proof evidence
+  ---
+  duration_ms: 127.460583
+  type: 'test'
+  ...
+# Subtest: malformed delegation runtime is an API-visible EVM failure with measured fees and retained authorization
+ok 20 - malformed delegation runtime is an API-visible EVM failure with measured fees and retained authorization
+  ---
+  duration_ms: 384.466042
+  type: 'test'
+  ...
+# Subtest: real HTTP route/loader selects normalized Sepolia transport, persists exact results and leaves provider routes closed
+ok 21 - real HTTP route/loader selects normalized Sepolia transport, persists exact results and leaves provider routes closed
+  ---
+  duration_ms: 7584.044583
+  type: 'test'
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 21
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 13484.027041

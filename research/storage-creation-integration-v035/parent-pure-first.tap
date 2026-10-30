@@ -1,0 +1,100 @@
+TAP version 13
+# Subtest: committed root CREATE and internal CREATE/CREATE2 bind nonempty original roots and zero-before writes on all supported fork families
+ok 1 - committed root CREATE and internal CREATE/CREATE2 bind nonempty original roots and zero-before writes on all supported fork families
+  ---
+  duration_ms: 69.66025
+  type: 'test'
+  ...
+# Subtest: missing/wrong reset root, wrong basis/target, nonzero baselines and invented state fail closed
+ok 2 - missing/wrong reset root, wrong basis/target, nonzero baselines and invented state fail closed
+  ---
+  duration_ms: 9.688333
+  type: 'test'
+  ...
+# Subtest: target derivation binds historical CREATE2 salt and CREATE creator nonce instead of trusting matching forged rows
+ok 3 - target derivation binds historical CREATE2 salt and CREATE creator nonce instead of trusting matching forged rows
+  ---
+  duration_ms: 11.104458
+  type: 'test'
+  ...
+# Subtest: constructor failure and ancestor rollback retain no reset; forged retained reset remains invalid
+ok 4 - constructor failure and ancestor rollback retain no reset; forged retained reset remains invalid
+  ---
+  duration_ms: 9.560292
+  type: 'test'
+  ...
+# Subtest: Amsterdam target chronology changes to empty only after entry and rolls back on failed creation
+ok 5 - Amsterdam target chronology changes to empty only after entry and rolls back on failed creation
+  ---
+  duration_ms: 4.672792
+  type: 'test'
+  ...
+# Subtest: created SELFDESTRUCT composes with the immutable nonempty root using each fork finalizer basis
+ok 6 - created SELFDESTRUCT composes with the immutable nonempty root using each fork finalizer basis
+  ---
+  duration_ms: 9.370375
+  type: 'test'
+  ...
+# Subtest: carried original creation-clear rows stay neutral, while new retained query clears remain mutations
+ok 7 - carried original creation-clear rows stay neutral, while new retained query clears remain mutations
+  ---
+  duration_ms: 2.251042
+  type: 'test'
+  ...
+# Subtest: creation-clear canonical shape never authorizes a reset on its own
+ok 8 - creation-clear canonical shape never authorizes a reset on its own
+  ---
+  duration_ms: 1.897125
+  type: 'test'
+  ...
+# Subtest: storage-only target facts are proof-bound even when every storage slot is undemanded
+ok 9 - storage-only target facts are proof-bound even when every storage slot is undemanded
+  ---
+  duration_ms: 17.248333
+  type: 'test'
+  ...
+# Subtest: root CREATE storage-only collision cannot pass the empty-frame shortcut on historical or Amsterdam forks
+ok 10 - root CREATE storage-only collision cannot pass the empty-frame shortcut on historical or Amsterdam forks
+  ---
+  duration_ms: 18.630458
+  type: 'test'
+  ...
+# Subtest: historical internal CREATE and CREATE2 storage-only collisions are rejected even under root rollback
+ok 11 - historical internal CREATE and CREATE2 storage-only collisions are rejected even under root rollback
+  ---
+  duration_ms: 16.6645
+  type: 'test'
+  ...
+# Subtest: genuine nonce or code collision predicates remain accepted with nonempty storage
+ok 12 - genuine nonce or code collision predicates remain accepted with nonempty storage
+  ---
+  duration_ms: 15.392125
+  type: 'test'
+  ...
+# Subtest: absent and prefunded empty targets retain accepted successful root creation
+ok 13 - absent and prefunded empty targets retain accepted successful root creation
+  ---
+  duration_ms: 9.002959
+  type: 'test'
+  ...
+# Subtest: Amsterdam no-child ledger cannot authorize storage-only collision with a genuine creator nonce increment
+ok 14 - Amsterdam no-child ledger cannot authorize storage-only collision with a genuine creator nonce increment
+  ---
+  duration_ms: 4.294542
+  type: 'test'
+  ...
+# Subtest: query starting reset masks the old storage root, while carried authorization nonce or code still collides
+ok 15 - query starting reset masks the old storage root, while carried authorization nonce or code still collides
+  ---
+  duration_ms: 4.543958
+  type: 'test'
+  ...
+1..15
+# tests 15
+# suites 0
+# pass 15
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 372.504666

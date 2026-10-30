@@ -17,12 +17,12 @@ import { createGuardedBls } from './bls-runtime.js';
 import { P256_ADDRESS, createP256Precompile } from './p256-runtime.js';
 import { ethereumStateGasBudget, settleEthereumStateGas } from './ethereum-state-gas.js';
 import { createCreationAttemptObserver } from './creation-attempt-observer.js';
-import { storageOnlyCreationAccount, unsupportedStorageCreation } from './creation-support.js';
+import { storageOnlyCreationAccount } from './creation-support.js';
 import { applyAmsterdamAuthorizations, amsterdamPreparationHalt } from './amsterdam-authorization.js';
 import { assertDelegationRuntimePatched } from './delegation-runtime-patch.js';
 
-// The pinned dependency needs three exact EIP-7702 length gates. Verify the
-// explicit preparation step before accepting execution in this process; never
+// The pinned dependency needs the exact, declared runtime corrections. Verify
+// the explicit preparation step before accepting execution in this process; never
 // rewrite dependencies while serving a request. Archived older runtimes remain
 // independent and the source inventory includes the corrected dependency bytes.
 assertDelegationRuntimePatched();
@@ -57,7 +57,6 @@ function safeFailure(error) {
   if (error instanceof ExecutionError) return { status: error.status, error: { code: error.code, message: error.message } };
   if (error?.code === 'LOCAL_STATE_MISSING') return { status: 'unavailable', error: { code: 'LOCAL_STATE_MISSING', message: 'Required local input state was not supplied.' } };
   if (['LOCAL_ETHEREUM_STATE_GAS_UNSUPPORTED', 'LOCAL_ETHEREUM_FORK_UNSUPPORTED'].includes(error?.code)) return { status: 'unsupported', error: { code: error.code, message: error.message } };
-  if (error?.code === 'LOCAL_CREATION_STORAGE_UNSUPPORTED') return { status: 'unsupported', error: { code: error.code, message: error.message } };
   if (error?.code === 'LOCAL_STATE_UNSUPPORTED') return { status: 'unsupported', error: { code: 'LOCAL_STATE_UNSUPPORTED', message: 'The supplied sparse state adapter does not support this state change.' } };
   return { status: 'unavailable', error: { code: 'LOCAL_EXECUTION_FAILED', message: 'Local execution could not complete; arbitrary host error details are omitted.' } };
 }
@@ -191,18 +190,30 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       if (!methods.has(property)) methods.set(property, async (...args) => {
         try {
           clockCheck();
-          if (['getAccount', 'putAccount', 'deleteAccount', 'modifyAccountFields', 'getCode', 'putCode', 'getCodeSize', 'getStorage', 'putStorage', 'clearStorage', 'beginContractCreation', 'finalizeCreatedContractDeletion', 'finalizeCreatedContractClearing', 'finalizeShanghaiContractDeletion', 'applyAuthorization'].includes(property)) reserved(args[0]);
+          if (['getAccount', 'putAccount', 'deleteAccount', 'modifyAccountFields', 'getCode', 'putCode', 'getCodeSize', 'getStorage', 'putStorage', 'clearStorage', 'clearStorageForContractCreation', 'beginContractCreation', 'finalizeCreatedContractDeletion', 'finalizeCreatedContractClearing', 'finalizeShanghaiContractDeletion', 'applyAuthorization'].includes(property)) reserved(args[0]);
           const creationWrite = property === 'putAccount' && creationObserver
             ? await creationObserver.beforePutAccount(stack.at(-1)?.frame, args[0], args[1]) : null;
-          const result = await member.apply(target, args);
+          let result;
+          if (property === 'clearStorage') {
+            const active = stack.at(-1), destination = args[0]?.toString();
+            // The patched EVM reaches this only after its real collision check
+            // and target write. Bind the authenticated clear to that exact
+            // entered creation; do not move it into a speculative precheck.
+            if (!canCreate || !active || !['CREATE', 'CREATE2'].includes(active.frame.type) || active.frame.to !== null || active.creationClearTarget !== null || !active.creationTargetReads?.has(destination)) reject('LOCAL_TRACE_INVALID', 'Storage clear does not match an authenticated creation target read.');
+            if (active.creationTargetReads.get(destination)) {
+              if (typeof target.clearStorageForContractCreation !== 'function') reject('LOCAL_STATE_UNSUPPORTED', 'Storage-bearing creation requires an authenticated namespace-clear adapter.', 'unsupported');
+              result = await target.clearStorageForContractCreation(args[0], { mode: 'ethereum_nonce_code_collision' });
+            } else result = await member.apply(target, args);
+            active.creationClearTarget = destination;
+          } else result = await member.apply(target, args);
           if (creationWrite) creationObserver.afterPutAccount(creationWrite);
           if (property === 'getAccount') {
             const active = stack.at(-1);
             creationObserver?.afterGetAccount(active?.frame, args[0], result);
             // Record only actual reads in the pre-constructor creation frame.
             // This adds no speculative proof fetch and leaves ordinary reads
-            // and pre-access CREATE failures unaffected. The library checks
-            // collisions before newContract, so that event cannot guard them.
+            // and pre-access CREATE failures unaffected. clearStorage uses the
+            // current target facts after the runtime collision check.
             if (active?.creationTargetReads) active.creationTargetReads.set(args[0].toString(), storageOnlyCreationAccount(result));
           }
           if (property === 'checkpoint') checkpointDepth++;
@@ -251,6 +262,11 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       const parent = stack.at(-1), type = parent ? parent.pendingCall ?? (creation ? 'CREATE' : message.delegatecall ? 'DELEGATECALL' : message.isStatic ? 'STATICCALL' : 'CALL') : creation ? 'CREATE' : 'CALL';
       if (creation) { observedCreation = true; describeLifecycle(); }
       const frame = { type, from: parent?.frame.executionAddress ?? message.caller.toString(), to: creation ? null : message.codeAddress.toString(), executionAddress: creation ? null : message.to.toString(), caller: message.caller.toString(), value: hex(message.value), input: bytesToHex(message.data), gas: hex(message.gasLimit), gasUsed: null, output: null, error: null, depth: message.depth, calls: [] };
+      if ((type === 'CREATE2') !== (message.salt !== undefined) || (message.salt !== undefined && (!(message.salt instanceof Uint8Array) || message.salt.length !== 32))) reject('LOCAL_TRACE_INVALID', 'Creation type and salt are inconsistent.');
+      if (!amsterdam && type === 'CREATE2') {
+        frame.creationSalt = bytesToHex(message.salt);
+        retain(Buffer.byteLength(JSON.stringify({ creationSalt: frame.creationSalt })) - 1);
+      }
       if (parent) parent.frame.calls.push(frame); else root = frame;
       creationObserver?.enterFrame(frame, message, parent?.frame ?? null);
       // CREATE increments the creator before the child's checkpoint. A failed
@@ -262,11 +278,11 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       // This is the EVM's invocation-local creation set. The state manager's
       // creation marker deliberately survives copied after-state query forks.
       stack.push({ frame, pendingCall: null, createdAddresses: message.createdAddresses, senderCreations: 0,
-        creationTargetReads: creation ? new Map() : null });
+        creationTargetReads: creation ? new Map() : null, creationClearTarget: null });
     });
     evm.events.on('newContract', event => {
       clockCheck(); const active = stack.at(-1), target = event.address.toString();
-      if (!canCreate || !active || !['CREATE', 'CREATE2'].includes(active.frame.type) || active.frame.to !== null) reject('LOCAL_TRACE_INVALID', 'Creation event does not match the entered creation frame.');
+      if (!canCreate || !active || !['CREATE', 'CREATE2'].includes(active.frame.type) || active.frame.to !== null || active.creationClearTarget !== target) reject('LOCAL_TRACE_INVALID', 'Creation event does not match the entered creation frame and storage clear.');
       // EthereumJS does not await one-argument event listeners. The manager's
       // marker is synchronous over facts already loaded by clearStorage.
       reserved(target); stateManager.beginContractCreation(event.address, active.frame.depth === 0 ? 'top_level_contract_creation' : 'internal_contract_creation');
@@ -317,13 +333,10 @@ export async function executeUnsignedCall({ request, block, stateManager, blockc
       active.frame.gasUsed = hex(result.execResult.executionGasUsed); active.frame.output = bytesToHex(output);
       const error = result.execResult.exceptionError?.error;
       if (error === EVMError.errorMessages.CREATE_COLLISION && ['CREATE', 'CREATE2'].includes(active.frame.type)) {
-        // Bind the disputed outcome to the target actually read by this
-        // creation frame. Throwing a host failure also prevents a parent CALL
-        // or REVERT from converting this unsupported execution into a result.
+        // A nonce/code collision must have been read by this exact frame.
+        // A storage-only collision would contradict the pinned runtime patch.
         if (!active.creationTargetReads?.has(active.frame.to)) reject('LOCAL_TRACE_INVALID', 'Creation collision lacks its actual target account read.');
-        if (active.creationTargetReads.get(active.frame.to)) {
-          const failure = unsupportedStorageCreation(); latchHostFailure(failure); throw failure;
-        }
+        if (active.creationTargetReads.get(active.frame.to)) reject('LOCAL_TRACE_INVALID', 'Storage-only target incorrectly produced a creation collision.');
       }
       active.frame.error = error === undefined ? null : evmErrors.has(error) ? error : 'unrecognized EVM exception';
       creationObserver?.exitFrame(active.frame, result);

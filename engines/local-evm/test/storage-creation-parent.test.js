@@ -44,7 +44,7 @@ function frame(f, { type = 'CREATE', from = TX_SENDER, to = f.target, depth = 0,
   error = 'create collision', output = '0x', calls = [], attempts = [], input = init } = {}) {
   return { type, from, caller: from, to, executionAddress: to, value: '0x0', input,
     output, error, gas: '0x10000', gasUsed: error === null ? '0x1' : '0x10000', depth, calls,
-    ...(f.common.isActivatedEIP(7928) ? { creationAttempts: attempts } : {}) };
+    ...(f.common.isActivatedEIP(7928) ? { creationAttempts: attempts } : type === 'CREATE2' ? { creationSalt: salt } : {}) };
 }
 function rootPacket(f, success = false) {
   const trace = frame(f, { error: success ? null : 'create collision', output: success ? '0x00' : '0x' });
@@ -140,7 +140,8 @@ test('query starting reset masks the old storage root, while carried authorizati
   const startingChanges = snapshot([{ address: f.target,
     reset: { basis: 'same_invocation_created_contract_clearing_eip8246', initialStorageRoot: proof.storageRoot } }]);
   assert.doesNotThrow(() => validateCreationAttempts({ ...success, startingChanges }));
-  assert.throws(() => validateCreationAttempts(success), 'The immutable uncleared namespace is not deployable');
+  assert.doesNotThrow(() => validateCreationAttempts(success), 'Entered creation clears a storage-only namespace in chronology');
+  assert.throws(() => validateExecutionChanges(success), 'A surviving storage clear still requires the exact proof-bound reset row');
   const wrong = structuredClone(startingChanges); wrong.accounts[0].reset.initialStorageRoot = word(987);
   assert.throws(() => validateCreationAttempts({ ...success, startingChanges: wrong }));
   const failed = rootPacket(f);

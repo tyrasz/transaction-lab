@@ -1,0 +1,160 @@
+TAP version 13
+# Subtest: observer binds successful CREATE/CREATE2 writes, detached target facts and terminal result stacks
+ok 1 - observer binds successful CREATE/CREATE2 writes, detached target facts and terminal result stacks
+  ---
+  duration_ms: 3.066041
+  type: 'test'
+  ...
+# Subtest: only acknowledged nonce writes produce attempts; zero-write huge-memory and underflow candidates disappear
+ok 2 - only acknowledged nonce writes produce attempts; zero-write huge-memory and underflow candidates disappear
+  ---
+  duration_ms: 1.110333
+  type: 'test'
+  ...
+# Subtest: nonce/code collisions retain storage facts; repeated collisions share the unconsumed child position
+ok 3 - nonce/code collisions retain storage facts; repeated collisions share the unconsumed child position
+  ---
+  duration_ms: 1.440333
+  type: 'test'
+  ...
+# Subtest: an actually accessed storage-only creation target is an unsupported host outcome
+not ok 4 - an actually accessed storage-only creation target is an unsupported host outcome
+  ---
+  duration_ms: 0.74275
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/creation-attempt-observer.test.js:79:1'
+  failureType: 'testCodeFailure'
+  error: 'Missing expected exception.'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    code: 'LOCAL_CREATION_STORAGE_UNSUPPORTED'
+  operator: 'throws'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/creation-attempt-observer.test.js:81:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: constructor faults retain the own-parent attempt and bind zero; pinned code-store exception binds address
+ok 5 - constructor faults retain the own-parent attempt and bind zero; pinned code-store exception binds address
+  ---
+  duration_ms: 1.186333
+  type: 'test'
+  ...
+# Subtest: creator reads are limited to armed matching writes, and every unchanged account field is bound
+ok 6 - creator reads are limited to armed matching writes, and every unchanged account field is bound
+  ---
+  duration_ms: 0.558875
+  type: 'test'
+  ...
+# Subtest: zero-length initcode ignores huge offset, and short pre-op memory supplies zero-padded initcode
+ok 7 - zero-length initcode ignores huge offset, and short pre-op memory supplies zero-padded initcode
+  ---
+  duration_ms: 0.217917
+  type: 'test'
+  ...
+# Subtest: wrong target, missing target, orphan creation and colliding child are rejected
+ok 8 - wrong target, missing target, orphan creation and colliding child are rejected
+  ---
+  duration_ms: 0.227083
+  type: 'test'
+  ...
+# Subtest: child joins reject altered type, input, value, sender, depth, salt and returned address
+ok 9 - child joins reject altered type, input, value, sender, depth, salt and returned address
+  ---
+  duration_ms: 0.584417
+  type: 'test'
+  ...
+# Subtest: resolution rejects wrong result, changed stack prefix, missing terminal stack and unfinished child
+ok 10 - resolution rejects wrong result, changed stack prefix, missing terminal stack and unfinished child
+  ---
+  duration_ms: 0.4705
+  type: 'test'
+  ...
+# Subtest: attempt count, pending bytes, final trace bytes, memory and calldata obey supplied ceilings
+ok 11 - attempt count, pending bytes, final trace bytes, memory and calldata obey supplied ceilings
+  ---
+  duration_ms: 0.322625
+  type: 'test'
+  ...
+# Subtest: host errors and nullish throws propagate unchanged through reads and budget hooks
+ok 12 - host errors and nullish throws propagate unchanged through reads and budget hooks
+  ---
+  duration_ms: 0.178458
+  type: 'test'
+  ...
+# Subtest: Amsterdam root CREATE and internal CREATE/CREATE2 clear authenticated storage and preserve prefunding
+ok 13 - Amsterdam root CREATE and internal CREATE/CREATE2 clear authenticated storage and preserve prefunding
+  ---
+  duration_ms: 44.369292
+  type: 'test'
+  ...
+# Subtest: Shanghai through Osaka use the same clear route and bind historical CREATE2 salt only to its frame
+ok 14 - Shanghai through Osaka use the same clear route and bind historical CREATE2 salt only to its frame
+  ---
+  duration_ms: 35.749375
+  type: 'test'
+  ...
+# Subtest: empty and absent targets keep the ordinary clear method without reset provenance
+ok 15 - empty and absent targets keep the ordinary clear method without reset provenance
+  ---
+  duration_ms: 13.066208
+  type: 'test'
+  ...
+# Subtest: a previously deleted target keeps its authenticated reset namespace and uses the ordinary clear route
+ok 16 - a previously deleted target keeps its authenticated reset namespace and uses the ordinary clear route
+  ---
+  duration_ms: 3.667875
+  type: 'test'
+  ...
+# Subtest: constructor failure restores the old namespace while retaining only the caller creation increment
+ok 17 - constructor failure restores the old namespace while retaining only the caller creation increment
+  ---
+  duration_ms: 22.160292
+  type: 'test'
+  ...
+# Subtest: an enclosing REVERT restores cleared storage, code, endowment and creator nonce even when caught
+ok 18 - an enclosing REVERT restores cleared storage, code, endowment and creator nonce even when caught
+  ---
+  duration_ms: 13.796625
+  type: 'test'
+  ...
+# Subtest: nonce and code collisions still fail before clear, without transferring endowment
+ok 19 - nonce and code collisions still fail before clear, without transferring endowment
+  ---
+  duration_ms: 17.973875
+  type: 'test'
+  ...
+# Subtest: proof/code host failure before or after clear is uncatchable and rolls back nonce, fees and namespace
+not ok 20 - proof/code host failure before or after clear is uncatchable and rolls back nonce, fees and namespace
+  ---
+  duration_ms: 2.121875
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/creation-storage-clear-worker.test.js:162:1'
+  failureType: 'testCodeFailure'
+  error: 'The input collector is unavailable; partial facts cannot continue execution.'
+  code: 'LOCAL_STATE_MISSING'
+  stack: |-
+    fail (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/proof-state.js:18:52)
+    ProofStateManager.loadAccount (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/proof-state.js:56:63)
+    ProofStateManager.getAccount (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/proof-state.js:87:81)
+    account (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/authorization-fixture.js:27:49)
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/creation-storage-clear-worker.test.js:178:25)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: adapter rejection after a completed clear is latched and unwinds the pending creation binding
+ok 21 - adapter rejection after a completed clear is latched and unwinds the pending creation binding
+  ---
+  duration_ms: 3.151541
+  type: 'test'
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 19
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 352.743083

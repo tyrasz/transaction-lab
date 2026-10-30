@@ -1,0 +1,221 @@
+TAP version 13
+# Subtest: self-authorized creation proof failure retains independently derived root entry gas but no preparation or settlement
+ok 1 - self-authorized creation proof failure retains independently derived root entry gas but no preparation or settlement
+  ---
+  duration_ms: 170.33625
+  type: 'test'
+  ...
+# Subtest: actual incomplete child cannot substitute preauthorization gas or either adjacent gas value
+ok 2 - actual incomplete child cannot substitute preauthorization gas or either adjacent gas value
+  ---
+  duration_ms: 410.208083
+  type: 'test'
+  ...
+# Subtest: actual incomplete child cannot retain authorization, fee, lifecycle or state-change claims
+ok 3 - actual incomplete child cannot retain authorization, fee, lifecycle or state-change claims
+  ---
+  duration_ms: 685.037542
+  type: 'test'
+  ...
+# Subtest: missing recipient proof after valid preparation preserves unavailable output and its postauthorization root gas
+ok 4 - missing recipient proof after valid preparation preserves unavailable output and its postauthorization root gas
+  ---
+  duration_ms: 135.678042
+  type: 'test'
+  ...
+# Subtest: pure entry derivation needs every reached authority proof but not recipient-only facts, and rejects preparation OOG
+ok 5 - pure entry derivation needs every reached authority proof but not recipient-only facts, and rejects preparation OOG
+  ---
+  duration_ms: 12.368208
+  type: 'test'
+  ...
+# Subtest: priced/unpriced internal CREATE and CREATE2 clear storage-only targets and retain new creation effects
+ok 6 - priced/unpriced internal CREATE and CREATE2 clear storage-only targets and retain new creation effects
+  ---
+  duration_ms: 613.981042
+  type: 'test'
+  ...
+# Subtest: zero-balance hidden-storage targets deploy with a complete cleared namespace
+ok 7 - zero-balance hidden-storage targets deploy with a complete cleared namespace
+  ---
+  duration_ms: 287.923209
+  type: 'test'
+  ...
+# Subtest: ancestor REVERT restores cleared storage while a caught successful child retains its deployment
+ok 8 - ancestor REVERT restores cleared storage while a caught successful child retains its deployment
+  ---
+  duration_ms: 458.700625
+  type: 'test'
+  ...
+# Subtest: root CREATE clears hidden storage before constructor reads and writes
+ok 9 - root CREATE clears hidden storage before constructor reads and writes
+  ---
+  duration_ms: 262.880917
+  type: 'test'
+  ...
+# Subtest: Shanghai through Osaka root CREATE and internal CREATE/CREATE2 clear storage-only targets
+ok 10 - Shanghai through Osaka root CREATE and internal CREATE/CREATE2 clear storage-only targets
+  ---
+  duration_ms: 1573.554792
+  type: 'test'
+  ...
+# Subtest: delegated sender and self-authorization retain preparation through successful clearing and a subsequent real collision
+ok 11 - delegated sender and self-authorization retain preparation through successful clearing and a subsequent real collision
+  ---
+  duration_ms: 273.35325
+  type: 'test'
+  ...
+# Subtest: absent and empty-storage targets still deploy through root CREATE and internal CREATE2 with signed/full-MPT agreement
+ok 12 - absent and empty-storage targets still deploy through root CREATE and internal CREATE2 with signed/full-MPT agreement
+  ---
+  duration_ms: 567.518292
+  type: 'test'
+  ...
+# Subtest: creation queries are measured when reverted and withheld when they retain cleared storage, without poisoning later overlays
+ok 13 - creation queries are measured when reverted and withheld when they retain cleared storage, without poisoning later overlays
+  ---
+  duration_ms: 273.017625
+  type: 'test'
+  ...
+# Subtest: a reverted deployment into empty storage remains a neutral measured query contrast
+ok 14 - a reverted deployment into empty storage remains a neutral measured query contrast
+  ---
+  duration_ms: 147.579625
+  type: 'test'
+  ...
+# Subtest: ordinary CALL and creation fail-fast leave a storage-only target unchanged after state-gas precharge
+ok 15 - ordinary CALL and creation fail-fast leave a storage-only target unchanged after state-gas precharge
+  ---
+  duration_ms: 385.488
+  type: 'test'
+  ...
+# Subtest: after-state query newly routed through authorization withholds retained creation mutations without erasing preparation
+ok 16 - after-state query newly routed through authorization withholds retained creation mutations without erasing preparation
+  ---
+  duration_ms: 148.056375
+  type: 'test'
+  ...
+# Subtest: a wrapper getter measures zero before creation and the fresh value after clearing while preserving the original overlay
+ok 17 - a wrapper getter measures zero before creation and the fresh value after clearing while preserving the original overlay
+  ---
+  duration_ms: 133.957375
+  type: 'test'
+  ...
+# Subtest: a creation-target proof host failure cannot be caught by an ancestor or retain earlier writes
+not ok 18 - a creation-target proof host failure cannot be caught by an ancestor or retain earlier writes
+  ---
+  duration_ms: 127.837209
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/amsterdam-storage-collision.test.js:233:1'
+  failureType: 'testCodeFailure'
+  error: 'The input collector is unavailable; partial facts cannot continue execution.'
+  code: 'LOCAL_STATE_MISSING'
+  stack: |-
+    fail (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/proof-state.js:18:52)
+    ProofStateManager.loadAccount (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/proof-state.js:56:63)
+    ProofStateManager.getAccount (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/proof-state.js:87:81)
+    account (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/authorization-fixture.js:27:49)
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/amsterdam-storage-collision.test.js:252:23)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a constructor can create a second contract while preserving both initial absence proofs
+ok 19 - a constructor can create a second contract while preserving both initial absence proofs
+  ---
+  duration_ms: 23.07725
+  type: 'test'
+  ...
+# Subtest: a constructor executes the freshly deployed child runtime and reads its constructor storage
+ok 20 - a constructor executes the freshly deployed child runtime and reads its constructor storage
+  ---
+  duration_ms: 5.251708
+  type: 'test'
+  ...
+# Subtest: an outer step limit removes a previously committed child deployment and all outer nonce changes
+ok 21 - an outer step limit removes a previously committed child deployment and all outer nonce changes
+  ---
+  duration_ms: 6.588583
+  type: 'test'
+  ...
+# Subtest: CREATE2 clears a storage-only target while retaining its prefunding and new constructor storage
+ok 22 - CREATE2 clears a storage-only target while retaining its prefunding and new constructor storage
+  ---
+  duration_ms: 5.393792
+  type: 'test'
+  ...
+# Subtest: constructor or ancestor REVERT restores the old storage-only namespace and prefunding
+ok 23 - constructor or ancestor REVERT restores the old storage-only namespace and prefunding
+  ---
+  duration_ms: 8.38325
+  type: 'test'
+  ...
+# Subtest: CREATE reached in STATICCALL remains an ordinary child fault with no creation or creator nonce change
+ok 24 - CREATE reached in STATICCALL remains an ordinary child fault with no creation or creator nonce change
+  ---
+  duration_ms: 3.369833
+  type: 'test'
+  ...
+# Subtest: parent accepts absent/prefunded top-level CREATE including empty initcode and runtime
+ok 25 - parent accepts absent/prefunded top-level CREATE including empty initcode and runtime
+  ---
+  duration_ms: 549.022625
+  type: 'test'
+  ...
+# Subtest: root CREATE derivation uses authenticated original nonce with canonical RLP boundary encoding
+ok 26 - root CREATE derivation uses authenticated original nonce with canonical RLP boundary encoding
+  ---
+  duration_ms: 395.257292
+  type: 'test'
+  ...
+# Subtest: nested constructors preserve top-level versus internal origin and discard all creations on root revert
+ok 27 - nested constructors preserve top-level versus internal origin and discard all creations on root revert
+  ---
+  duration_ms: 271.244041
+  type: 'test'
+  ...
+# Subtest: CREATE collision, storage-only clearing and resource failure retain distinct outcomes
+ok 28 - CREATE collision, storage-only clearing and resource failure retain distinct outcomes
+  ---
+  duration_ms: 386.215042
+  type: 'test'
+  ...
+# Subtest: root CREATE destination is independently derived even if all creation rows/facts are coherently relabelled
+ok 29 - root CREATE destination is independently derived even if all creation rows/facts are coherently relabelled
+  ---
+  duration_ms: 124.882541
+  type: 'test'
+  ...
+# Subtest: actual parent rejects CREATE identity, runtime, provenance, gas and nonce substitutions
+ok 30 - actual parent rejects CREATE identity, runtime, provenance, gas and nonce substitutions
+  ---
+  duration_ms: 1605.62475
+  type: 'test'
+  ...
+# Subtest: a reverted constructor cannot retain fabricated creation effects or successful nested effects
+ok 31 - a reverted constructor cannot retain fabricated creation effects or successful nested effects
+  ---
+  duration_ms: 124.171375
+  type: 'test'
+  ...
+# Subtest: actual constructor revert, invalid opcode and success cannot be relabelled inconsistently
+ok 32 - actual constructor revert, invalid opcode and success cannot be relabelled inconsistently
+  ---
+  duration_ms: 365.971792
+  type: 'test'
+  ...
+# Subtest: disposable CALL getters preserve creation origin and original deployment state
+ok 33 - disposable CALL getters preserve creation origin and original deployment state
+  ---
+  duration_ms: 272.090125
+  type: 'test'
+  ...
+1..33
+# tests 33
+# suites 0
+# pass 32
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5481.402042

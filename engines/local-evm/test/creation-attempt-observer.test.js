@@ -76,10 +76,14 @@ test('nonce/code collisions retain storage facts; repeated collisions share the 
   assert.deepEqual(f.frame.creationAttempts.map(r => [r.position, r.nonceBefore, r.result, r.disposition]), [[0, '0x7', '0x0', 'collision'], [0, '0x8', '0x0', 'collision'], [0, '0x9', '0x0', 'collision']]);
 });
 
-test('an actually accessed storage-only creation target is an unsupported host outcome', async () => {
-  const f = fixture(), a = arm(f); await write(f);
-  assert.throws(() => targetRead(f, a, new Account(0n, 0n, new Uint8Array(32).fill(2))), {code:'LOCAL_CREATION_STORAGE_UNSUPPORTED'});
-  assert.deepEqual(f.frame.creationAttempts, []);
+test('storage-only target enters a constructor and retains the immutable pre-clear root', async () => {
+  const f = fixture(), a = arm(f), root = new Uint8Array(32).fill(2); await write(f);
+  targetRead(f, a, new Account(0n, 17n, root));
+  targetRead(f, a, new Account(1n, 20n)); // Later cleared facts cannot replace the first read.
+  child(f, a); finish(f, [...a.prefix, BigInt(a.target)]);
+  assert.equal(f.frame.creationAttempts[0].disposition, 'entered');
+  assert.equal(f.frame.creationAttempts[0].targetBefore.storageRoot, bytesToHex(root));
+  assert.equal(f.frame.creationAttempts[0].result, hex(BigInt(a.target)));
 });
 
 test('constructor faults retain the own-parent attempt and bind zero; pinned code-store exception binds address', async () => {

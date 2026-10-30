@@ -160,20 +160,25 @@ test('existing Amsterdam sender delegation survives API admission, self-call and
   }
 });
 
-test('an Amsterdam storage-only creation result is explicitly unsupported with retained proof evidence', async () => {
-  const init = initcode('00', ''), target = createdAddress({ creator: TARGET, nonce: 7n, init });
+test('an Amsterdam storage-only creation clears the old namespace through the API with retained proof evidence', async () => {
+  const init = initcode('00', '602a600255'), target = createdAddress({ creator: TARGET, nonce: 7n, init });
   const f = await fixture({ gas: '5000000', value: '0', target: { nonce: 7n, balance: 1000n, code: factoryCode(init, { value: 0 }) },
     accounts: { [target]: { nonce: 0n, balance: 17n, code: '0x', storage: { [word(0)]: 7n } } } });
   const p = transport(f), report = await simulateLocal(inputFor(f), p.rpc); p.check(report);
   assert.equal(LOCAL_CAPABILITIES.amsterdam.storageOnlyCreationCollision, false);
-  assert.equal(report.status, 'unavailable'); assert.equal(report.error, null);
-  assert.equal(report.execution.status, 'unsupported'); assert.equal(report.execution.error.code, 'LOCAL_CREATION_STORAGE_UNSUPPORTED');
+  assert.equal(LOCAL_CAPABILITIES.creationStorage, 'clear_existing_target_storage_before_initcode_preserve_balance_rollback_with_creation');
+  complete(report, f); assert.equal(report.error, null);
   assert.equal(report.measurements.length, inputFor(f).queries.length);
-  assert(report.measurements.every(row => row.status === 'not_attempted' && row.values === null));
-  assert.equal(report.attempt.preview.original.output.stateDisposition, 'rolled_back');
-  assert.deepEqual(report.attempt.preview.original.changes.accounts, []);
-  assert.equal(report.source.canonicalStatus, 'verified');
-  assert.equal(report.attempt.isolation.processClosed, true); assert.equal(report.attempt.broker.pendingAtReturn, 0);
+  amount(report.measurements[0], TX_SENDER, 1000000000000n, 1000000000000n);
+  amount(report.measurements[1], TARGET, 1000n, 1000n);
+  const row = report.attempt.preview.original.changes.accounts.find(row => row.address === target);
+  const proof = p.wires.find(row => row.method === 'eth_getProof' && row.params[0] === target);
+  assert(proof);
+  const initial = await f.rpc.call('eth_getProof', [target, [], { blockHash: f.header.hash, requireCanonical: true }]);
+  assert.deepEqual(row.reset, { basis: 'contract_creation_storage_clear', initialStorageRoot: initial.storageHash });
+  assert.deepEqual(row.nonce, { before: '0x0', after: '0x1' });
+  assert.deepEqual(row.code, { before: '0x', after: '0x00' });
+  assert.deepEqual(row.storage, [{ slot: word(2), before: word(0), after: word(42) }]);
 });
 
 test('malformed delegation runtime is an API-visible EVM failure with measured fees and retained authorization', async () => {
@@ -228,9 +233,10 @@ test('real HTTP route/loader selects normalized Sepolia transport, persists exac
   assert.deepEqual(factories, [{ chainId: CHAIN }]);
   assert.equal(report.implementation.sourceFiles.includes('src/proof-rpc.js'), true);
   assert.equal(report.implementation.sourceFiles.includes('engines/local-evm/creation-attempt-validation.js'), true);
-  assert.equal(report.implementation.runtimePatches[0].id, 'eip7702-exact-designation-length-v1');
+  assert.equal(report.implementation.runtimePatches[0].id, 'local-evm-runtime-fixes-v2');
   assert.equal(report.implementation.runtimePatches[0].package, '@ethereumjs/evm');
   assert.equal(report.implementation.runtimePatches[0].version, '10.1.3');
-  assert.deepEqual(report.implementation.runtimePatches[0].files.map(row => row.path), ['dist/esm/evm.js', 'dist/esm/opcodes/gas.js']);
+  assert.deepEqual(report.implementation.runtimePatches[0].patches, ['eip7702-exact-designation-length-v1', 'nonce-code-creation-collision-v1']);
+  assert.deepEqual(report.implementation.runtimePatches[0].files.map(row => row.path), ['dist/esm/evm.js', 'dist/esm/opcodes/gas.js', 'dist/esm/interpreter.js']);
   assert.deepEqual(JSON.parse(await readFile(path.join(directory, 'simulations', report.id + '.json'), 'utf8')), report);
 });

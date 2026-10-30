@@ -1,0 +1,112 @@
+TAP version 13
+# Subtest: all six frozen inputs reconstruct ordinary creation while only storage cases clear hidden slots
+ok 1 - all six frozen inputs reconstruct ordinary creation while only storage cases clear hidden slots
+  ---
+  duration_ms: 27.395917
+  type: 'test'
+  ...
+# Subtest: reset retains old-equal writes, removes unmentioned slots and preserves prefunding when balance has no delta
+ok 2 - reset retains old-equal writes, removes unmentioned slots and preserves prefunding when balance has no delta
+  ---
+  duration_ms: 2.515125
+  type: 'test'
+  ...
+# Subtest: independently reconstructed initial and target roots reject swapped roots and modified hidden storage
+ok 3 - independently reconstructed initial and target roots reject swapped roots and modified hidden storage
+  ---
+  duration_ms: 5.33825
+  type: 'test'
+  ...
+# Subtest: reset authorization is limited to the two declared storage-only targets and the creation-clear basis
+ok 4 - reset authorization is limited to the two declared storage-only targets and the creation-clear basis
+  ---
+  duration_ms: 12.264417
+  type: 'test'
+  ...
+# Subtest: reset before-values remain original for nonce balance code but zero for new storage
+ok 5 - reset before-values remain original for nonce balance code but zero for new storage
+  ---
+  duration_ms: 12.202167
+  type: 'test'
+  ...
+# Subtest: ordinary storage deltas use original values and may delete individual slots without clearing the account
+ok 6 - ordinary storage deltas use original values and may delete individual slots without clearing the account
+  ---
+  duration_ms: 1.253709
+  type: 'test'
+  ...
+# Subtest: ordinary absent-account creation and fee recipient funding require precise existence provenance
+ok 7 - ordinary absent-account creation and fee recipient funding require precise existence provenance
+  ---
+  duration_ms: 2.737208
+  type: 'test'
+  ...
+# Subtest: whole-account deletion and all SELFDESTRUCT reset families are outside this six-case helper
+ok 8 - whole-account deletion and all SELFDESTRUCT reset families are outside this six-case helper
+  ---
+  duration_ms: 22.517333
+  type: 'test'
+  ...
+# Subtest: all six fixed positions admit completed success/revert/failure reports without dropping the denominator
+ok 9 - all six fixed positions admit completed success/revert/failure reports without dropping the denominator
+  ---
+  duration_ms: 2.651209
+  type: 'test'
+  ...
+# Subtest: argv executable input position and raw stream identities are exact, including byte-preserving substitutions
+ok 10 - argv executable input position and raw stream identities are exact, including byte-preserving substitutions
+  ---
+  duration_ms: 5.766
+  type: 'test'
+  ...
+# Subtest: rehashed report identity and expected-output flags cannot manufacture an observed case
+ok 11 - rehashed report identity and expected-output flags cannot manufacture an observed case
+  ---
+  duration_ms: 0.3415
+  type: 'test'
+  ...
+# Subtest: closure is rederived from broker and distinct actual worker/child identities, not a self-label
+ok 12 - closure is rederived from broker and distinct actual worker/child identities, not a self-label
+  ---
+  duration_ms: 0.599875
+  type: 'test'
+  ...
+# Subtest: unavailable, incomplete and unsupported executions stay unavailable even with process exit zero
+ok 13 - unavailable, incomplete and unsupported executions stay unavailable even with process exit zero
+  ---
+  duration_ms: 0.497041
+  type: 'test'
+  ...
+# Subtest: malformed JSON, UTF-8, missing reports and unexpected stderr retain unavailable outcomes
+ok 14 - malformed JSON, UTF-8, missing reports and unexpected stderr retain unavailable outcomes
+  ---
+  duration_ms: 0.212125
+  type: 'test'
+  ...
+# Subtest: both elapsed clocks and combined output bytes enforce finite process bounds
+ok 15 - both elapsed clocks and combined output bytes enforce finite process bounds
+  ---
+  duration_ms: 6.434209
+  type: 'test'
+  ...
+# Subtest: exit, signal and spawn errors remain unavailable without changing the six fixed slots
+ok 16 - exit, signal and spawn errors remain unavailable without changing the six fixed slots
+  ---
+  duration_ms: 0.18125
+  type: 'test'
+  ...
+# Subtest: the actual Node subprocess adapter terminates harmless timeout and output-overflow scripts
+ok 17 - the actual Node subprocess adapter terminates harmless timeout and output-overflow scripts
+  ---
+  duration_ms: 145.0695
+  type: 'test'
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 221.80825

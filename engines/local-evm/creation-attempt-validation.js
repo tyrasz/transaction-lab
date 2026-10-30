@@ -106,8 +106,10 @@ export function validateCreationAttempts({output,inputs,startingChanges,rootNonc
     // loaded its destination, transferred value, or initialized a constructor.
     if(frame.error!==null&&frame.creationAttempts.length===0&&frame.calls.length===0)return;
     if(creation){
-      const target=account(frame.executionAddress);need(target.nonce===0n&&target.code==='0x'&&target.storageRoot===EMPTY_STORAGE_ROOT);
-      target.exists=true;target.nonce=1n;
+      const target=account(frame.executionAddress);need(target.nonce===0n&&target.code==='0x');
+      // The entered constructor starts from an empty namespace. The saved
+      // checkpoint restores the prior root if this frame or an ancestor fails.
+      target.exists=true;target.nonce=1n;target.storageRoot=EMPTY_STORAGE_ROOT;
     }
     if(!['DELEGATECALL','CALLCODE','STATICCALL'].includes(frame.type))transfer(frame.from,frame.executionAddress,value);
     // Runtime is fixed when this frame enters, including delegated execution.
@@ -130,11 +132,10 @@ export function validateCreationAttempts({output,inputs,startingChanges,rootNonc
       const current=account(target);
       need(isDeepStrictEqual(entry.targetBefore,{exists:current.exists,nonce:hex(current.nonce),codeHash:codeHash(current.code),storageRoot:current.storageRoot}));
       if(entry.disposition==='collision'){
-        // A known current nonce/code suffices. A storage-root-only collision
-        // remains outside this bounded observation contract.
+        // Storage alone is deployable; only nonce/code justifies collision.
         need(current.exists&&(current.nonce>0n||current.code!=='0x')&&result===0n);
       } else {
-        need(current.nonce===0n&&current.code==='0x'&&current.storageRoot===EMPTY_STORAGE_ROOT&&cursor<frame.calls.length);
+        need(current.nonce===0n&&current.code==='0x'&&cursor<frame.calls.length);
         const child=frame.calls[cursor++];
         for(const key of ['type','from','input','value','to','executionAddress','error'])read(child,key);
         need(child.type===entry.type&&child.from===frame.executionAddress&&child.input===entry.input&&child.value===entry.value);

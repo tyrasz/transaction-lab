@@ -24,12 +24,20 @@ function recount(output) {
     ...(output.feeAccounting ? { feeAccounting: output.feeAccounting } : {}),
     ...(output.stateGasAccounting ? { stateGasAccounting: output.stateGasAccounting } : {}) }));
 }
-async function storageSelfAuthorization() {
+async function selfAuthorizationWithMissingCreationProof() {
   const init = initcode('00', ''), target = createdAddress({ creator: TX_SENDER, kind: 'CREATE2', init });
-  return fixture({ to: TX_SENDER, gas: '500000',
+  const f = await fixture({ to: TX_SENDER, gas: '500000',
     authorizationList: [authorization({ key: TEST_KEY, nonce: 2n })],
     delegateCode: factoryCode(init, { kind: 'CREATE2', value: 0 }),
     accounts: { [target]: { nonce: 0n, balance: 17n, code: '0x', storage: { [word(991)]: 11n } } } });
+  const original = f.rpc, failed = [];
+  f.rpc = { async call(method, params) {
+    if (method === 'eth_getProof' && params[0] === target) {
+      failed.push(structuredClone(params)); throw Error('Synthetic creation target proof unavailable');
+    }
+    return original.call(method, params);
+  } };
+  return { ...f, failed, missingCreationTarget: target };
 }
 function rolledBack(result, status, gas) {
   assert.equal(result.status, 'completed', JSON.stringify(result.error));
@@ -55,8 +63,9 @@ async function tamper(t, f, mutate) {
       if (event === 'message' && typeof values[0] === 'string') {
         const message = JSON.parse(values[0]);
         if (message.type === 'result') {
-          assert.equal(message.result.output.execution.status, 'unsupported');
-          assert.equal(message.result.output.execution.error.code, 'LOCAL_CREATION_STORAGE_UNSUPPORTED');
+          assert.equal(message.result.output.execution.status, 'unavailable');
+          assert.equal(message.result.output.execution.error.code, 'LOCAL_EXECUTION_FAILED');
+          assert.equal(message.result.inputs.failure.code, 'RPC_STATE_INPUT_UNAVAILABLE');
           mutate(message.result); recount(message.result.output); changed = true;
           values[0] = JSON.stringify(message);
         }
@@ -75,11 +84,13 @@ async function tamper(t, f, mutate) {
   } finally { mock.mock.restore(); }
 }
 
-test('unsupported self-authorized creation retains independently derived root entry gas but no preparation or settlement', async () => {
-  const f = await storageSelfAuthorization(), result = await run(f);
+test('self-authorized creation proof failure retains independently derived root entry gas but no preparation or settlement', async () => {
+  const f = await selfAuthorizationWithMissingCreationProof(), result = await run(f);
   const expected = preauthGas(f) - INDICATOR;
-  rolledBack(result, 'unsupported', expected);
-  assert.equal(result.output.execution.error.code, 'LOCAL_CREATION_STORAGE_UNSUPPORTED');
+  rolledBack(result, 'unavailable', expected);
+  assert.equal(result.output.execution.error.code, 'LOCAL_EXECUTION_FAILED');
+  assert.equal(result.inputs.failure.code, 'RPC_STATE_INPUT_UNAVAILABLE');
+  assert.equal(f.failed.length, 1); assert.equal(result.inputs.accounts[f.missingCreationTarget], undefined);
   assert(result.output.usage.steps > 0);
   assert.equal(result.inputs.accounts[TX_SENDER].nonce, '1');
   assert.equal(result.inputs.accounts[TX_SENDER].code, '0x');
@@ -88,14 +99,14 @@ test('unsupported self-authorized creation retains independently derived root en
 });
 
 test('actual incomplete child cannot substitute preauthorization gas or either adjacent gas value', async t => {
-  const f = await storageSelfAuthorization(), expected = preauthGas(f) - INDICATOR;
+  const f = await selfAuthorizationWithMissingCreationProof(), expected = preauthGas(f) - INDICATOR;
   for (const gas of [preauthGas(f), expected - 1n, expected + 1n]) {
     await tamper(t, f, result => { result.output.trace.gas = hex(gas); });
   }
 });
 
 test('actual incomplete child cannot retain authorization, fee, lifecycle or state-change claims', async t => {
-  const f = await storageSelfAuthorization();
+  const f = await selfAuthorizationWithMissingCreationProof();
   for (const mutate of [
     result => { result.output.authorizationProcessing = preparation(args(f, result.inputs)).processing; },
     result => { result.output.feeAccounting = settleEthereumFees(ethereumFeePlan(f.request, f.header, CHAIN), { gasUsed: 21000n }); },

@@ -1,7 +1,7 @@
 import { canonicalStateChanges } from './preview-mutations.js';
 import { EMPTY_CODE_HASH, EMPTY_STORAGE_ROOT } from './verified-state-proof.js';
 import { isDeepStrictEqual, types } from 'node:util';
-import { createAddressFromString, createContractAddress } from '@ethereumjs/util';
+import { createAddressFromString, createContractAddress, createContractAddress2 } from '@ethereumjs/util';
 import { existingDelegationTarget } from './sender-delegation.js';
 import { deriveAuthorizationPreparation } from './authorization-validation.js';
 import { deriveVerifiedFees, revertedFeeRows } from './fee-validation.js';
@@ -15,6 +15,7 @@ const hex = value => '0x' + BigInt(value).toString(16);
 const DELETION_BASIS = 'same_invocation_created_contract_deletion';
 const SHANGHAI_DELETION_BASIS = 'shanghai_selfdestruct_deletion';
 const AMSTERDAM_CLEARING_BASIS = 'same_invocation_created_contract_clearing_eip8246';
+const CREATION_STORAGE_CLEAR_BASIS = 'contract_creation_storage_clear';
 const EMPTY_CLEANUP_BASIS = 'eip161_empty_account_cleanup';
 const RIPEMD160 = '0x0000000000000000000000000000000000000003';
 const cleanupRow = address => ({ address, existence: { before: true, after: false, basis: EMPTY_CLEANUP_BASIS } });
@@ -36,10 +37,12 @@ function ownData(value, key) {
   if (descriptor) need(descriptor.enumerable && Object.hasOwn(descriptor, 'value'));
   return descriptor?.value;
 }
-function deployableFact(inputs, address) {
+function deployableFact(inputs, address, storageClear = false) {
   const initial = inputs.accounts?.[address], proof = inputs.provenance?.find(item => item.account === address)?.accountProof;
-  need(initial && typeof initial.exists === 'boolean' && proof && proof.exists === initial.exists && proof.storageRoot === EMPTY_STORAGE_ROOT && proof.codeHash === EMPTY_CODE_HASH && proof.nonceRaw === '0');
-  if (initial.exists) need(initial.nonce === '0' && initial.code === '0x' && BigInt(initial.balance) >= 0n && Object.values(initial.storage).every(value => value === ZERO));
+  need(initial && typeof initial.exists === 'boolean' && proof && proof.exists === initial.exists &&
+    typeof proof.storageRoot === 'string' && WORD.test(proof.storageRoot) && (storageClear || proof.storageRoot === EMPTY_STORAGE_ROOT) && proof.codeHash === EMPTY_CODE_HASH && proof.nonceRaw === '0');
+  if (initial.exists) need(initial.nonce === '0' && initial.code === '0x' && BigInt(initial.balance) >= 0n && (storageClear || Object.values(initial.storage).every(value => value === ZERO)));
+  else need(proof.storageRoot === EMPTY_STORAGE_ROOT);
   return initial;
 }
 function emptyFact(inputs, address) {
@@ -57,6 +60,8 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
   need(typeof selfdestructOnlyCreated === 'boolean');
   const clearsCreated = common?.isActivatedEIP(8246) === true;
   const amsterdamAttempts = common?.isActivatedEIP(7928) === true;
+  const canClearCreationStorage = common && [1n, 11155111n].includes(common.chainId()) &&
+    ['shanghai', 'cancun', 'prague', 'osaka', 'bpo1', 'bpo2', 'amsterdam'].includes(common.hardfork());
   let creationAttempts = new Map();
   const created = new Map(), destructed = new Set(), eligibleTouches = new Set(), justifiedTouches = new Set(); let frames = 0;
   const lifecycle = output === null ? undefined : ownData(output, 'lifecycle');
@@ -64,6 +69,35 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
   if (!complete) { need(lifecycle === undefined); return { created, creationAttempts, deleted: new Set(), cleared: new Set(), emptyDeleted: new Set() }; }
   const rows = new Map(changes ? canonicalStateChanges(changes).accounts.map(row => [row.address, row]) : []);
   const priorRows = new Map(startingChanges ? canonicalStateChanges(startingChanges).accounts.map(row => [row.address, row]) : []);
+  const storageCleared = new Set();
+  function creationNamespace(address) {
+    const initial = inputs.accounts?.[address], proof = inputs.provenance?.find(item => item.account === address)?.accountProof, prior = priorRows.get(address);
+    need(initial && proof && proof.exists === initial.exists && typeof proof.storageRoot === 'string' && WORD.test(proof.storageRoot));
+    if (prior?.existence?.after === false) return false;
+    if (prior?.reset) {
+      need(prior.reset.initialStorageRoot === proof.storageRoot && !prior.storage &&
+        (prior.nonce?.after ?? hex(initial.exists ? initial.nonce : '0')) === '0x0' &&
+        (prior.code?.after ?? (initial.exists ? initial.code : '0x')) === '0x');
+      return false;
+    }
+    const needsClear = proof.storageRoot !== EMPTY_STORAGE_ROOT;
+    need(!needsClear || canClearCreationStorage);
+    deployableFact(inputs, address, needsClear);
+    need(!prior?.nonce || prior.nonce.after === '0x0'); need(!prior?.code || prior.code.after === '0x');
+    return needsClear;
+  }
+  // Historical CREATE enters a child after the creator increment. Track those
+  // increments through every frame, including reverted ancestors, to derive
+  // targets independently of child-reported addresses. CREATE2 additionally
+  // binds the actual message salt retained by the worker.
+  let historicalNonces = new Map();
+  function historicalNonce(address) {
+    if (!historicalNonces.has(address)) {
+      const initial = inputs.accounts?.[address], prior = priorRows.get(address); need(initial && typeof initial.exists === 'boolean');
+      historicalNonces.set(address, prior?.existence?.after === false ? 0n : BigInt(prior?.nonce?.after ?? (initial.exists ? initial.nonce : '0')));
+    }
+    return historicalNonces.get(address);
+  }
   // Only value transfers are reconstructed, from the already-bound complete
   // trace and authenticated starting balances. This is a consistency check,
   // not a second EVM. It prevents invented positive balances hiding cleanup.
@@ -81,9 +115,12 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
   }
   function walk(frame, retained, depth, parent = null, inheritedStatic = false) {
     need(frame && !types.isProxy(frame) && ++frames <= 1000 && depth <= 32);
-    for (const key of ['calls', 'type', 'error', 'output', 'to', 'executionAddress', 'from', 'caller', 'depth', 'value']) ownData(frame, key);
+    for (const key of ['calls', 'type', 'error', 'input', 'output', 'to', 'executionAddress', 'from', 'caller', 'depth', 'value']) ownData(frame, key);
     boundedArray(frame.calls, 1000);
     if (!amsterdamAttempts) need(ownData(frame, 'creationAttempts') === undefined);
+    const creationSalt = ownData(frame, 'creationSalt');
+    if (!amsterdamAttempts && frame.type === 'CREATE2') need(typeof creationSalt === 'string' && WORD.test(creationSalt));
+    else need(creationSalt === undefined);
     need(['CALL', 'CALLCODE', 'DELEGATECALL', 'STATICCALL', 'CREATE', 'CREATE2'].includes(frame.type));
     const isStatic = inheritedStatic || frame.type === 'STATICCALL';
     // Static mode propagates through every descendant, including delegated
@@ -95,6 +132,7 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     }
     need(frame.error === null || (typeof frame.error === 'string' && frame.error.length > 0));
     need(typeof frame.output === 'string' && DATA.test(frame.output));
+    need(typeof frame.input === 'string' && DATA.test(frame.input));
     need(frame.depth === depth && typeof frame.from === 'string' && ADDRESS.test(frame.from) && typeof frame.caller === 'string' && ADDRESS.test(frame.caller));
     // Bind every ancestor, not only frames carrying SELFDESTRUCT. Otherwise a
     // forged middle CALL could launder its descendant's execution address.
@@ -106,6 +144,17 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     if (['CREATE', 'CREATE2'].includes(frame.type)) {
       need(frame.to === frame.executionAddress);
       need((typeof frame.to === 'string' && ADDRESS.test(frame.to)) || (frame.to === null && frame.error !== null));
+      if (!amsterdamAttempts) {
+        let nonce = historicalNonce(frame.from);
+        if (depth > 0) { need(nonce < (1n << 64n) - 1n); historicalNonces.set(frame.from, nonce + 1n); }
+        else { need(nonce > 0n); nonce--; }
+        if (frame.to !== null) {
+          const target = frame.type === 'CREATE'
+            ? createContractAddress(createAddressFromString(frame.from), nonce).toString()
+            : createContractAddress2(createAddressFromString(frame.from), Uint8Array.from(Buffer.from(creationSalt.slice(2), 'hex')), Uint8Array.from(Buffer.from(frame.input.slice(2), 'hex'))).toString();
+          need(frame.to === target);
+        }
+      }
       if (!amsterdamAttempts && frame.error === 'create collision') {
         // Historical creation enters a frame before the collision check. Its
         // initial authenticated namespace and bound starting overlay must not
@@ -115,10 +164,9 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
         const initial = inputs.accounts?.[frame.to], prior = priorRows.get(frame.to);
         const proof = inputs.provenance?.find(item => item.account === frame.to)?.accountProof;
         need(initial && proof && proof.exists === initial.exists);
-        const reset = prior?.existence?.after === false || prior?.reset !== undefined;
-        const nonce = prior?.existence?.after === false ? 0n : BigInt(prior?.nonce?.after ?? (initial.exists ? initial.nonce : '0'));
+        const nonce = historicalNonce(frame.to);
         const code = prior?.existence?.after === false ? '0x' : prior?.code?.after ?? (initial.exists ? initial.code : '0x');
-        need(reset || nonce > 0n || code !== '0x' || created.has(frame.to) || frame.to === output.trace.from || proof.storageRoot === EMPTY_STORAGE_ROOT);
+        need(nonce > 0n || code !== '0x');
       }
     } else {
       need(typeof frame.to === 'string' && ADDRESS.test(frame.to));
@@ -126,6 +174,8 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
       else need(frame.executionAddress === frame.to);
     }
     const commits = retained && frame.error === null;
+    const savedNonces = !amsterdamAttempts ? new Map(historicalNonces) : null;
+    if (!amsterdamAttempts && ['CREATE', 'CREATE2'].includes(frame.type) && frame.to !== null && (frame.error === null || frame.calls.length > 0)) historicalNonces.set(frame.to, 1n);
     // CREATE increments its creator before entering the constructor. A child
     // revert or collision retains that increment when its parent commits;
     // a reverted parent discards it. Do not count the root transaction CREATE.
@@ -174,6 +224,7 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
       if (selfdestruct.beneficiary !== frame.executionAddress) transfer(frame.executionAddress, selfdestruct.beneficiary, balance(frame.executionAddress));
       else if (!clearsCreated && (!selfdestructOnlyCreated || created.has(frame.executionAddress))) balances.set(frame.executionAddress, 0n);
     }
+    if (!amsterdamAttempts && frame.error !== null) historicalNonces = savedNonces;
   }
   if (fees) {
     const before = balance(fees.sender), debit = fees.plan.totalUpfrontDebit ?? fees.plan.upfrontGasDebit;
@@ -187,8 +238,13 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     need(output.execution.executionGasUsed === '0' && output.execution.returnData === '0x' && output.logs.length === 0);
     justifiedTouches.add(authorizationHaltSender);
   } else {
+    if (!amsterdamAttempts) {
+      const sender = output.trace.from, nonce = historicalNonce(sender);
+      if (!rootNoncePrepared) { need(nonce < (1n << 64n) - 1n); historicalNonces.set(sender, nonce + 1n); }
+    }
     walk(output.trace, true, 0);
     if (amsterdamAttempts) creationAttempts = validateCreationAttempts({ output, inputs, startingChanges, rootNoncePrepared, fees, common });
+    for (const address of created.keys()) if (creationNamespace(address)) storageCleared.add(address);
   }
   if (fees) {
     // Refund and tip are sequential account updates before lifecycle deletion.
@@ -220,7 +276,7 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
         prior.reset.initialStorageRoot === proof.storageRoot && !prior.storage &&
         (prior.nonce?.after ?? hex(initial.exists ? initial.nonce : '0')) === '0x0' &&
         (prior.code?.after ?? (initial.exists ? initial.code : '0x')) === '0x');
-      if (!clearedNamespace) deployableFact(inputs, address);
+      if (!clearedNamespace) deployableFact(inputs, address, storageCleared.has(address));
       const before = initial.exists ? BigInt(initial.balance) : 0n;
       const expected = { address };
       if (preserved === 0n) {
@@ -244,7 +300,7 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
       const initial = inputs.accounts?.[address], proof = inputs.provenance?.find(item => item.account === address)?.accountProof;
       need(initial && proof && proof.exists === initial.exists && typeof proof.storageRoot === 'string' && WORD.test(proof.storageRoot));
       need(row.address === address && row.scope === 'entire_account_including_code_and_storage' && row.initialStorageRoot === proof.storageRoot);
-      if (selfdestructOnlyCreated) deployableFact(inputs, address);
+      if (selfdestructOnlyCreated) { if (!priorRows.has(address)) deployableFact(inputs, address, storageCleared.has(address)); else creationNamespace(address); }
       else {
         const prior = priorRows.get(address);
         // A disposable after-query can start with a creation made by the
@@ -253,7 +309,12 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
         const priorCreation = prior?.existence?.after !== false && prior?.nonce?.before === '0x0' && BigInt(prior.nonce.after) > 0n &&
           (['internal_contract_creation', 'top_level_contract_creation'].includes(prior.existence?.basis) || Boolean(prior.code));
         need(created.has(address) || priorCreation || (initial.exists && initial.code !== '0x' && prior?.existence?.after !== false));
-        if (created.has(address) || priorCreation) deployableFact(inputs, address);
+        if (created.has(address)) creationNamespace(address);
+        else if (priorCreation) {
+          if (prior?.reset?.basis === CREATION_STORAGE_CLEAR_BASIS) {
+            need(canClearCreationStorage && prior.reset.initialStorageRoot === proof.storageRoot); deployableFact(inputs, address, true);
+          } else deployableFact(inputs, address);
+        }
       }
       // Snapshots remain relative to the immutable base, including in queries.
       // Absent -> created -> deleted leaves no net row; existing deletion
@@ -318,7 +379,19 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
   for (const row of rows.values()) if (row.reset?.basis === AMSTERDAM_CLEARING_BASIS || row.existence?.basis === AMSTERDAM_CLEARING_BASIS) {
     need(clearsCreated && (cleared.has(row.address) || isDeepStrictEqual(row, priorRows.get(row.address))));
   }
-  return { created, creationAttempts, deleted, cleared, emptyDeleted };
+  for (const address of storageCleared) {
+    if (deleted.has(address) || cleared.has(address)) continue;
+    const row = rows.get(address), frame = created.get(address).frame;
+    const proof = inputs.provenance.find(item => item.account === address).accountProof;
+    need(isDeepStrictEqual(row?.reset, { basis: CREATION_STORAGE_CLEAR_BASIS, initialStorageRoot: proof.storageRoot }));
+    need(row.nonce?.before === '0x0' && BigInt(row.nonce.after) > 0n);
+    need(isDeepStrictEqual(row.code, frame.output === '0x' ? undefined : { before: '0x', after: frame.output }));
+    need(!row.storage || row.storage.every(slot => slot.before === ZERO));
+  }
+  for (const row of rows.values()) if (row.reset?.basis === CREATION_STORAGE_CLEAR_BASIS) {
+    need(canClearCreationStorage && (storageCleared.has(row.address) && !deleted.has(row.address) && !cleared.has(row.address) || isDeepStrictEqual(row, priorRows.get(row.address))));
+  }
+  return { created, creationAttempts, deleted, cleared, emptyDeleted, storageCleared };
 }
 
 /** Bind the bounded overlay schema to the worker's immutable input facts and
@@ -327,10 +400,10 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
 export function validateExecutionChanges({ changes, inputs, output, sender, destination, selfdestructOnlyCreated = true, common, request, header }) {
   const snapshot = canonicalStateChanges(changes), complete = ['success', 'reverted', 'failed'].includes(output?.execution?.status);
   // This entrypoint validates the first invocation over immutable proven state.
-  // Finalized deletion occurs only at transaction end, so no surviving later
-  // incarnation can be justified here. Internal state continuations carry reset
-  // provenance, but the public single-call host must never accept it as input.
-  need(snapshot.accounts.every(row => row.reset === undefined));
+  // Only a committed creation can replace an original storage-only namespace;
+  // finalization can then clear it with Amsterdam's distinct terminal basis.
+  // Other prior-deletion incarnations still cannot be invented in one call.
+  need(snapshot.accounts.every(row => row.reset === undefined || [CREATION_STORAGE_CLEAR_BASIS, AMSTERDAM_CLEARING_BASIS].includes(row.reset.basis)));
   const topCreation = destination === null, senderAddress = sender.toLowerCase(), senderInitial = inputs?.accounts?.[senderAddress];
   const preparation = complete && request ? deriveAuthorizationPreparation({ request, header, inputs, common }) : null;
   if (preparation) need(isDeepStrictEqual(output.authorizationProcessing, preparation.processing));
@@ -352,7 +425,7 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
     }
   }
   const authorizationHaltSender = preparation?.processing.preparation?.phase === 'authorization_out_of_gas' ? senderAddress : null;
-  const { created, creationAttempts, deleted, cleared, emptyDeleted } = validateExecutionLifecycle({ output, inputs, destination, changes: snapshot, startingChanges: preparation?.snapshot, selfdestructOnlyCreated, fees, common, rootNoncePrepared: Boolean(preparation), authorizationHaltSender });
+  const { created, creationAttempts, deleted, cleared, emptyDeleted, storageCleared } = validateExecutionLifecycle({ output, inputs, destination, changes: snapshot, startingChanges: preparation?.snapshot, selfdestructOnlyCreated, fees, common, rootNoncePrepared: Boolean(preparation), authorizationHaltSender });
   if (!complete) { need(snapshot.accounts.length === 0); return; }
   need(senderInitial && typeof senderInitial.exists === 'boolean');
   if (authorizationHaltSender === null) need(output.trace.from === senderAddress && output.trace.caller === senderAddress);
@@ -412,7 +485,7 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
       else need(created.has(row.address) && row.code.after === created.get(row.address).frame.output && (!initial.exists || initial.code === '0x'));
     }
     for (const slot of row.storage ?? []) {
-      need(slot.before === (initial.exists ? initial.storage?.[slot.slot] : ZERO));
+      need(slot.before === (storageCleared.has(row.address) || !initial.exists ? ZERO : initial.storage?.[slot.slot]));
       if (!initial.exists) need(created.has(row.address) || preparation?.applied.has(row.address));
     }
   }
@@ -427,7 +500,7 @@ export function validateExecutionChanges({ changes, inputs, output, sender, dest
     else need(row.existence === undefined);
   }
   for (const [address, { frame, basis }] of created) {
-    const initial = deployableFact(inputs, address), row = rows.get(address);
+    const initial = deployableFact(inputs, address, storageCleared.has(address)), row = rows.get(address);
     if (deleted.has(address) || cleared.has(address)) {
       // Its exact whole-account row was checked with the fork-specific basis.
       continue;

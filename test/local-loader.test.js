@@ -6,7 +6,7 @@ import { promisify } from 'node:util';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
 import os from 'node:os';
-import { DELEGATION_RUNTIME_PATCH } from '../engines/local-evm/delegation-runtime-patch.js';
+import { LOCAL_RUNTIME_PATCH } from '../engines/local-evm/delegation-runtime-patch.js';
 
 const execute = promisify(execFile), project = fileURLToPath(new URL('../', import.meta.url));
 const runtime = ['ethereum-call.js', 'ethereum-header.js', 'ethereum-preview.js', 'ethereum-profile.js', 'execute.js',
@@ -41,7 +41,7 @@ async function fixture(t, { escaped = false, importDrift = false } = {}) {
   // adapter does not execute these dependency modules or bypass their guard.
   for (const name of ['engines/local-evm/delegation-runtime-patch.js',
     'engines/local-evm/node_modules/@ethereumjs/evm/package.json',
-    ...DELEGATION_RUNTIME_PATCH.files.map(file => 'engines/local-evm/node_modules/@ethereumjs/evm/' + file.path)]) {
+    ...LOCAL_RUNTIME_PATCH.files.map(file => 'engines/local-evm/node_modules/@ethereumjs/evm/' + file.path)]) {
     await put(name, await readFile(path.join(project, name)));
   }
   for (const [name, content] of Object.entries({ 'package.json': '{"type":"module","version":"1.0.0"}', 'index.js': '// dependency\n', 'index.js.map': '{}', 'LICENSE': 'fixture license', 'test/control.js': '// complete dependency tree includes tests\n' })) await put(dep + '/' + name, content);
@@ -73,10 +73,10 @@ test('local loader binds full static closure, worker entry, entire dependencies,
   `);
   for (const name of ['src/server.js', 'src/rpc.js', 'src/validate.js', 'src/local-loader.js', 'engines/local-evm/delegation-runtime-patch.js', ...runtime.map(name => 'engines/local-evm/' + name), dep + '/LICENSE', dep + '/test/control.js', dep + '/index.js.map']) assert.ok(result.sourceFiles.includes(name), name);
   assert.deepEqual(result.inventory.find(row => row.kind === 'symlink'), { path: 'engines/local-evm/node_modules/.bin/example', kind: 'symlink', target: '../example/index.js' });
-  assert.deepEqual(result.runtimePatches, [{ id: 'eip7702-exact-designation-length-v1',
-    package: DELEGATION_RUNTIME_PATCH.package, version: DELEGATION_RUNTIME_PATCH.version,
-    files: DELEGATION_RUNTIME_PATCH.files.map(file => ({ path: file.path, sha256: file.patchedSha256 })) }]);
-  for (const file of DELEGATION_RUNTIME_PATCH.files) {
+  assert.deepEqual(result.runtimePatches, [{ id: 'local-evm-runtime-fixes-v2',
+    package: LOCAL_RUNTIME_PATCH.package, version: LOCAL_RUNTIME_PATCH.version, patches: LOCAL_RUNTIME_PATCH.patches,
+    files: LOCAL_RUNTIME_PATCH.files.map(file => ({ path: file.path, sha256: file.patchedSha256 })) }]);
+  for (const file of LOCAL_RUNTIME_PATCH.files) {
     assert.equal(result.inventory.find(row => row.path === 'engines/local-evm/node_modules/@ethereumjs/evm/' + file.path).sha256, file.patchedSha256);
   }
 });
@@ -85,7 +85,7 @@ test('stock EVM bytes before loader startup refuse availability; explicitly patc
   const directory = await fixture(t);
   await run(directory, `
     const patchUrl=new URL('../engines/local-evm/delegation-runtime-patch.js',loaderUrl);
-    const {DELEGATION_RUNTIME_PATCH:patch}=await import(patchUrl);
+    const {LOCAL_RUNTIME_PATCH:patch}=await import(patchUrl);
     for(const spec of patch.files){
       const file='engines/local-evm/node_modules/@ethereumjs/evm/'+spec.path;
       let text=await readFile(file,'utf8');assert.equal(createHash('sha256').update(text).digest('hex'),spec.patchedSha256);
@@ -99,16 +99,16 @@ test('stock EVM bytes before loader startup refuse availability; explicitly patc
   `);
   const result = await run(directory, `
     const patchUrl=new URL('../engines/local-evm/delegation-runtime-patch.js',loaderUrl);
-    const {DELEGATION_RUNTIME_PATCH:patch,applyDelegationRuntimePatch}=await import(patchUrl);
-    assert.equal(applyDelegationRuntimePatch().changed.length,2);
+    const {LOCAL_RUNTIME_PATCH:patch,applyLocalRuntimePatch}=await import(patchUrl);
+    assert.equal(applyLocalRuntimePatch().changed.length,3);
     const {loadLocalApi}=await import(loaderUrl),api=await loadLocalApi();assert.ok(api);await api.assertSourcesUnchanged();
     for(const spec of patch.files)assert.equal(api.implementation.inventory.find(row=>row.path==='engines/local-evm/node_modules/@ethereumjs/evm/'+spec.path).sha256,spec.patchedSha256);
     assert(Object.isFrozen(api.implementation.runtimePatches));assert(Object.isFrozen(api.implementation.runtimePatches[0].files));
     console.log(JSON.stringify(api.implementation.runtimePatches));
   `);
-  assert.deepEqual(result, [{ id: 'eip7702-exact-designation-length-v1',
-    package: DELEGATION_RUNTIME_PATCH.package, version: DELEGATION_RUNTIME_PATCH.version,
-    files: DELEGATION_RUNTIME_PATCH.files.map(file => ({ path: file.path, sha256: file.patchedSha256 })) }]);
+  assert.deepEqual(result, [{ id: 'local-evm-runtime-fixes-v2',
+    package: LOCAL_RUNTIME_PATCH.package, version: LOCAL_RUNTIME_PATCH.version, patches: LOCAL_RUNTIME_PATCH.patches,
+    files: LOCAL_RUNTIME_PATCH.files.map(file => ({ path: file.path, sha256: file.patchedSha256 })) }]);
 });
 
 test('missing optional worker at startup stays unavailable until a new process', async t => {

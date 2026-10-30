@@ -1,0 +1,2512 @@
+{
+  "kind": "saved_artifact_comparison",
+  "pins": {
+    "plan": "0e74b7cf84737bb47e750404a8dd67cc12153dda5e95a2fda32f9fde5166f591",
+    "manifest": "0e56b466ed87ee7eeaf2d656598df87123d08c0ff588f89131e06f7eb881b390",
+    "toolchain": "5e67873833811992160173737d5c6f229dad327281e7e915ecce206cac4cb005"
+  },
+  "oldPins": {
+    "manifest": "0de3a42d8fc949ffe1a3b65f99b9d7bbee677a5c205cf45b696b9e2ca19403b9",
+    "plan": "f5ce939bf9238d1ff52e5a22ff2596459e82faa67da053f6758c864f68ed69fe",
+    "source": "8d5c2e8dfa1ab8229a194ad5fc616f1bbf68cacc863cd36c46234476ba705444"
+  },
+  "supplementPins": {
+    "manifest": "0280a9e08de06a13ab163f8f7eaec07c65a05b3036058e4095c5a59f1ab0efbd",
+    "plan": "5b122fd04fc426f4f8cca9ae279fd182993ec21ed587ce7208497c8a92e1fcc9",
+    "source": "9ee836216994116e571a9f6535ac2f30f2a4f5d3ffc5c12242439be34607b466"
+  },
+  "comparatorSha256": "655ee2e0da330fedbf00ded12944abc01c15f978359ab94464f397a7f556bd96",
+  "sourceReviewPins": {
+    "research/amsterdam-storage-creation-v033/review.mjs": "1f8f2cc7ccff3672136a42cc074faecd81e43ca33904cfde880366d87ae67183",
+    "research/amsterdam-root-creation-v033/verify.mjs": "f00da79b9cfc2ca51c7b17879abcc338a9a62a805f6b07b186bb2ff1bdab25e0",
+    "research/amsterdam-root-creation-v033/protocol.mjs": "a87d157b22d1216435a44c90004240cf3a8fd1c218a8234f17323b8291292ba3"
+  },
+  "checks": {
+    "eelsEvidenceFiles": 31,
+    "toolchainEntries": 5080,
+    "oldReview": {
+      "manifestEntries": 180,
+      "runtimeEntries": 64,
+      "referencedDependencies": 3841,
+      "processRecords": 18,
+      "rawBytes": 272689,
+      "signedInputs": 6,
+      "headerHashes": 6,
+      "reconstructedFullMptRoots": 24,
+      "joinedInputReplies": 17,
+      "allSavedClassificationsReproduced": true
+    },
+    "supplementProcesses": 6,
+    "eelsReconstructedStateRoots": 6,
+    "rawBytes": 35448
+  },
+  "evidenceUsable": true,
+  "channels": [
+    "executionStatus",
+    "returnData",
+    "chargedGas",
+    "singleTransactionBlockGasUsed",
+    "stateRoot",
+    "target",
+    "logs"
+  ],
+  "aggregate": {
+    "product": {
+      "matchedCases": 4,
+      "mismatchedCases": 0,
+      "unavailableCases": 2,
+      "partialCases": 0,
+      "channels": {
+        "matched": 28,
+        "mismatched": 0,
+        "unavailable": 14
+      }
+    },
+    "ethereumjs": {
+      "matchedCases": 4,
+      "mismatchedCases": 2,
+      "unavailableCases": 0,
+      "partialCases": 0,
+      "channels": {
+        "matched": 29,
+        "mismatched": 13,
+        "unavailable": 0
+      }
+    },
+    "geth": {
+      "matchedCases": 4,
+      "mismatchedCases": 2,
+      "unavailableCases": 0,
+      "partialCases": 0,
+      "channels": {
+        "matched": 34,
+        "mismatched": 8,
+        "unavailable": 0
+      }
+    }
+  },
+  "rows": [
+    {
+      "index": 0,
+      "id": "root_create_storage_only",
+      "priorPacket": "research/amsterdam-root-creation-v033",
+      "originalStatuses": {
+        "product": "unavailable",
+        "ethereumjs": "unavailable",
+        "geth": "observed"
+      },
+      "selectedPriorStatuses": {
+        "product": "unsupported",
+        "ethereumjs": "observed",
+        "geth": "observed"
+      },
+      "eels": {
+        "status": "observed",
+        "observation": {
+          "completedExecution": true,
+          "executionStatus": "success",
+          "returnData": "0x6001546000526002546020526103df5460405260606000f3",
+          "chargedGas": "175718",
+          "singleTransactionBlockGasUsed": "134640",
+          "stateRoot": "0xb22f3da8240ddbe044d4efc2621a0dfced1eb164177bd74db5c1ccf77284a401",
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "22",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000001a642f0e3c3af545e7acbd38b07251b3990914f1",
+                "0x000000000000000000000000248e85939e48ca12a20cdf80e60d9e3d380ca7f9"
+              ]
+            }
+          ],
+          "targetBehavior": "deployed_clearing_initial_storage",
+          "blockExecutionGasUsed": "41078",
+          "blockStateGasUsed": "134640",
+          "transactionEnd": {
+            "error": null,
+            "gasUsed": "150982",
+            "returnData": "0x6001546000526002546020526103df5460405260606000f3"
+          }
+        },
+        "process": {
+          "argv": [
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/venv/bin/python",
+            "-I",
+            "-B",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-v035/eels-comparison/capture/worker.py",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-v035/eels-comparison/capture/inputs/001.json",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7"
+          ],
+          "bounded": true,
+          "elapsed": {
+            "monotonicSeconds": 0.32483312499243766,
+            "wallSeconds": 0.32483625411987305
+          },
+          "error": null,
+          "limitTerminated": false,
+          "returncode": 0,
+          "stderr": {
+            "bytes": 0,
+            "kind": "file",
+            "mode": 420,
+            "path": "001.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stdout": {
+            "bytes": 5779,
+            "kind": "file",
+            "mode": 420,
+            "path": "001.stdout",
+            "sha256": "dbf2c9192dae38fa8c350dbfa7efd3a3a69168cb68c0039ff48dd2a2c4448101"
+          },
+          "timeoutSeconds": 15
+        }
+      },
+      "peers": {
+        "product": null,
+        "ethereumjs": {
+          "completedExecution": true,
+          "stateRoot": "0x41a186708cd7c6a3acbb98cc296e14d17a35911f0f65131b1223a426c22417b3",
+          "executionStatus": "failed",
+          "executionError": "create collision",
+          "returnData": "0x",
+          "gasUsed": "5000000",
+          "executionGasUsed": "4975264",
+          "preRefundGasWithFloor": "5000000",
+          "singleTransactionBlockGasUsed": "5000000",
+          "regularGasUsed": "5000000",
+          "stateGasUsed": "0",
+          "logs": [],
+          "allocation": {
+            "0x1111111111111111111111111111111111111111": {
+              "nonce": "0x7",
+              "balance": "0x3e8",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x2222222222222222222222222222222222222222": {
+              "nonce": "0x1",
+              "balance": "0xf4240",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+              "nonce": "0x2",
+              "balance": "0xe8d1aa1f80",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x4444444444444444444444444444444444444444": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x248e85939e48ca12a20cdf80e60d9e3d380ca7f9": {
+              "nonce": "0x0",
+              "balance": "0x11",
+              "code": "0x",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000000": "0x00000000000000000000000000000000000000000000000000000000000003e7",
+                "0x00000000000000000000000000000000000000000000000000000000000003df": "0x000000000000000000000000000000000000000000000000000000000001e240"
+              }
+            },
+            "0x00000961ef480eb55e80d19ad83579a64c007002": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bbddc7ce488642fb579f8b00f3a590007251": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bff46984e3725691fa540a8c7589300d8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x000064d678505ad48f8ccb093bc65613800e8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x9999999999999999999999999999999999999999": {
+              "nonce": "0x0",
+              "balance": "0xe4e1c0",
+              "code": "0x",
+              "storage": {}
+            }
+          },
+          "target": {
+            "exists": true,
+            "nonce": "0",
+            "balance": "17",
+            "code": "0x",
+            "slots": {
+              "0": "999",
+              "1": "0",
+              "2": "0",
+              "991": "123456"
+            }
+          },
+          "targetBehavior": "not_deployed",
+          "chargedGas": "5000000"
+        },
+        "geth": {
+          "completedExecution": true,
+          "allocation": {
+            "0x000064d678505ad48f8ccb093bc65613800e8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bbddc7ce488642fb579f8b00f3a590007251": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x2222222222222222222222222222222222222222": {
+              "nonce": "0x1",
+              "balance": "0xf4240",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x9999999999999999999999999999999999999999": {
+              "nonce": "0x0",
+              "balance": "0xcfbe2",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x4444444444444444444444444444444444444444": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+              "nonce": "0x2",
+              "balance": "0xe8d479c85f",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x248e85939e48ca12a20cdf80e60d9e3d380ca7f9": {
+              "nonce": "0x1",
+              "balance": "0x16",
+              "code": "0x6001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000000": "0x00000000000000000000000000000000000000000000000000000000000003e7",
+                "0x0000000000000000000000000000000000000000000000000000000000000001": "0x000000000000000000000000000000000000000000000000000000000001e240",
+                "0x0000000000000000000000000000000000000000000000000000000000000002": "0x000000000000000000000000000000000000000000000000000000000000002a",
+                "0x00000000000000000000000000000000000000000000000000000000000003df": "0x000000000000000000000000000000000000000000000000000000000001e240"
+              }
+            },
+            "0x0000bff46984e3725691fa540a8c7589300d8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x00000961ef480eb55e80d19ad83579a64c007002": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x1111111111111111111111111111111111111111": {
+              "nonce": "0x7",
+              "balance": "0x3e8",
+              "code": "0x00",
+              "storage": {}
+            }
+          },
+          "stateRoot": "0x36ee271d204bafc9c7fbd09a582599a1d2247642d7ed3d0516e582e334f80aaf",
+          "executionStatus": "success",
+          "executionError": null,
+          "returnData": "0x6001546000526002546020526103df5460405260606000f3",
+          "gasUsed": "283638",
+          "executionGasUsed": "258902",
+          "preRefundGasWithFloor": null,
+          "singleTransactionBlockGasUsed": "232560",
+          "regularGasUsed": null,
+          "stateGasUsed": null,
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "22",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "999",
+              "1": "123456",
+              "2": "42",
+              "991": "123456"
+            }
+          },
+          "targetBehavior": "deployed_preserving_initial_storage",
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000001a642f0e3c3af545e7acbd38b07251b3990914f1",
+                "0x000000000000000000000000248e85939e48ca12a20cdf80e60d9e3d380ca7f9"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005"
+            }
+          ],
+          "trace": {
+            "returnData": "0x6001546000526002546020526103df5460405260606000f3",
+            "executionGasUsed": "258902",
+            "error": null,
+            "rootGas": "4975264",
+            "frames": 1,
+            "steps": 14
+          },
+          "chargedGas": "283638"
+        }
+      },
+      "comparisons": {
+        "eels_product": {
+          "executionStatus": null,
+          "returnData": null,
+          "chargedGas": null,
+          "singleTransactionBlockGasUsed": null,
+          "stateRoot": null,
+          "target": null,
+          "logs": null
+        },
+        "eels_ethereumjs": {
+          "executionStatus": false,
+          "returnData": false,
+          "chargedGas": false,
+          "singleTransactionBlockGasUsed": false,
+          "stateRoot": false,
+          "target": false,
+          "logs": false
+        },
+        "eels_geth": {
+          "executionStatus": true,
+          "returnData": true,
+          "chargedGas": false,
+          "singleTransactionBlockGasUsed": false,
+          "stateRoot": false,
+          "target": false,
+          "logs": true
+        }
+      }
+    },
+    {
+      "index": 1,
+      "id": "internal_create2_storage_only",
+      "priorPacket": "research/amsterdam-storage-creation-v033",
+      "originalStatuses": {
+        "product": "unsupported",
+        "ethereumjs": "observed",
+        "geth": "observed"
+      },
+      "selectedPriorStatuses": {
+        "product": "unsupported",
+        "ethereumjs": "observed",
+        "geth": "observed"
+      },
+      "eels": {
+        "status": "observed",
+        "observation": {
+          "completedExecution": true,
+          "executionStatus": "success",
+          "returnData": "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b",
+          "chargedGas": "178046",
+          "singleTransactionBlockGasUsed": "134640",
+          "stateRoot": "0x8431782e6ed2d9b9c37b37f6d6d793c05d8a594de01c3de79ba898e1bbb5dc44",
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "22",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000004444444444444444444444444444444444444444",
+                "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b"
+              ]
+            }
+          ],
+          "targetBehavior": "deployed_clearing_initial_storage",
+          "blockExecutionGasUsed": "43406",
+          "blockStateGasUsed": "134640",
+          "transactionEnd": {
+            "error": null,
+            "gasUsed": "163046",
+            "returnData": "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b"
+          }
+        },
+        "process": {
+          "argv": [
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/venv/bin/python",
+            "-I",
+            "-B",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-v035/eels-comparison/capture/worker.py",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-v035/eels-comparison/capture/inputs/002.json",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7"
+          ],
+          "bounded": true,
+          "elapsed": {
+            "monotonicSeconds": 0.3163923749816604,
+            "wallSeconds": 0.3163950443267822
+          },
+          "error": null,
+          "limitTerminated": false,
+          "returncode": 0,
+          "stderr": {
+            "bytes": 0,
+            "kind": "file",
+            "mode": 420,
+            "path": "002.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stdout": {
+            "bytes": 6041,
+            "kind": "file",
+            "mode": 420,
+            "path": "002.stdout",
+            "sha256": "1b2206de330a8aba8f7dcc02d7c96896ea9dfe468de8fcdc6a976cf916b2c554"
+          },
+          "timeoutSeconds": 15
+        }
+      },
+      "peers": {
+        "product": null,
+        "ethereumjs": {
+          "completedExecution": true,
+          "stateRoot": "0x3514f1b167da092a83a33ed319fe349283ab278b82e50ed14b1a664bfff1cb27",
+          "executionStatus": "success",
+          "executionError": null,
+          "returnData": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "gasUsed": "4922310",
+          "executionGasUsed": "4907310",
+          "preRefundGasWithFloor": "4922310",
+          "singleTransactionBlockGasUsed": "4922310",
+          "regularGasUsed": "4922310",
+          "stateGasUsed": "0",
+          "logs": [],
+          "allocation": {
+            "0x1111111111111111111111111111111111111111": {
+              "nonce": "0x7",
+              "balance": "0x3e8",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x2222222222222222222222222222222222222222": {
+              "nonce": "0x1",
+              "balance": "0xf4240",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+              "nonce": "0x2",
+              "balance": "0xe8d1b5fa44",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x4444444444444444444444444444444444444444": {
+              "nonce": "0x8",
+              "balance": "0x3e8",
+              "code": "0x61003361003a6000397f000000000000000000000000000000000000000000000000000000000000007b61003360006005f560005260206000f36103df54600155602a60025561001861001b6000396100186000f36001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000001": "0x0000000000000000000000000000000000000000000000000000000000000005"
+              }
+            },
+            "0xa7fc60456bdcfd520bf333dbc0da893ec4a7988b": {
+              "nonce": "0x0",
+              "balance": "0x11",
+              "code": "0x",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000000": "0x00000000000000000000000000000000000000000000000000000000000003e7",
+                "0x00000000000000000000000000000000000000000000000000000000000003df": "0x000000000000000000000000000000000000000000000000000000000001e240"
+              }
+            },
+            "0x00000961ef480eb55e80d19ad83579a64c007002": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bbddc7ce488642fb579f8b00f3a590007251": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bff46984e3725691fa540a8c7589300d8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x000064d678505ad48f8ccb093bc65613800e8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x9999999999999999999999999999999999999999": {
+              "nonce": "0x0",
+              "balance": "0xe15352",
+              "code": "0x",
+              "storage": {}
+            }
+          },
+          "target": {
+            "exists": true,
+            "nonce": "0",
+            "balance": "17",
+            "code": "0x",
+            "slots": {
+              "0": "999",
+              "1": "0",
+              "2": "0",
+              "991": "123456"
+            }
+          },
+          "targetBehavior": "not_deployed",
+          "chargedGas": "4922310"
+        },
+        "geth": {
+          "completedExecution": true,
+          "allocation": {
+            "0x000064d678505ad48f8ccb093bc65613800e8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bbddc7ce488642fb579f8b00f3a590007251": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x2222222222222222222222222222222222222222": {
+              "nonce": "0x1",
+              "balance": "0xf4240",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x9999999999999999999999999999999999999999": {
+              "nonce": "0x0",
+              "balance": "0xd172a",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x4444444444444444444444444444444444444444": {
+              "nonce": "0x8",
+              "balance": "0x3e3",
+              "code": "0x61003361003a6000397f000000000000000000000000000000000000000000000000000000000000007b61003360006005f560005260206000f36103df54600155602a60025561001861001b6000396100186000f36001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000001": "0x0000000000000000000000000000000000000000000000000000000000000005"
+              }
+            },
+            "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+              "nonce": "0x2",
+              "balance": "0xe8d4796d74",
+              "code": "0x",
+              "storage": {}
+            },
+            "0xa7fc60456bdcfd520bf333dbc0da893ec4a7988b": {
+              "nonce": "0x1",
+              "balance": "0x16",
+              "code": "0x6001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000000": "0x00000000000000000000000000000000000000000000000000000000000003e7",
+                "0x0000000000000000000000000000000000000000000000000000000000000001": "0x000000000000000000000000000000000000000000000000000000000001e240",
+                "0x0000000000000000000000000000000000000000000000000000000000000002": "0x000000000000000000000000000000000000000000000000000000000000002a",
+                "0x00000000000000000000000000000000000000000000000000000000000003df": "0x000000000000000000000000000000000000000000000000000000000001e240"
+              }
+            },
+            "0x0000bff46984e3725691fa540a8c7589300d8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x00000961ef480eb55e80d19ad83579a64c007002": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x1111111111111111111111111111111111111111": {
+              "nonce": "0x7",
+              "balance": "0x3e8",
+              "code": "0x00",
+              "storage": {}
+            }
+          },
+          "stateRoot": "0x7e17837643da6072afed4a88d020c0e14b418b1fa993e886c4c76304d8da22f2",
+          "executionStatus": "success",
+          "executionError": null,
+          "returnData": "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b",
+          "gasUsed": "285966",
+          "executionGasUsed": "270966",
+          "preRefundGasWithFloor": null,
+          "singleTransactionBlockGasUsed": "232560",
+          "regularGasUsed": null,
+          "stateGasUsed": null,
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "22",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "999",
+              "1": "123456",
+              "2": "42",
+              "991": "123456"
+            }
+          },
+          "targetBehavior": "deployed_preserving_initial_storage",
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000004444444444444444444444444444444444444444",
+                "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005"
+            }
+          ],
+          "trace": {
+            "returnData": "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b",
+            "executionGasUsed": "270966",
+            "error": null,
+            "rootGas": "4985000",
+            "frames": 2,
+            "steps": 28
+          },
+          "chargedGas": "285966"
+        }
+      },
+      "comparisons": {
+        "eels_product": {
+          "executionStatus": null,
+          "returnData": null,
+          "chargedGas": null,
+          "singleTransactionBlockGasUsed": null,
+          "stateRoot": null,
+          "target": null,
+          "logs": null
+        },
+        "eels_ethereumjs": {
+          "executionStatus": true,
+          "returnData": false,
+          "chargedGas": false,
+          "singleTransactionBlockGasUsed": false,
+          "stateRoot": false,
+          "target": false,
+          "logs": false
+        },
+        "eels_geth": {
+          "executionStatus": true,
+          "returnData": true,
+          "chargedGas": false,
+          "singleTransactionBlockGasUsed": false,
+          "stateRoot": false,
+          "target": false,
+          "logs": true
+        }
+      }
+    },
+    {
+      "index": 2,
+      "id": "root_create_absent",
+      "priorPacket": "research/amsterdam-root-creation-v033",
+      "originalStatuses": {
+        "product": "unavailable",
+        "ethereumjs": "unavailable",
+        "geth": "observed"
+      },
+      "selectedPriorStatuses": {
+        "product": "observed",
+        "ethereumjs": "observed",
+        "geth": "observed"
+      },
+      "eels": {
+        "status": "observed",
+        "observation": {
+          "completedExecution": true,
+          "executionStatus": "success",
+          "returnData": "0x6001546000526002546020526103df5460405260606000f3",
+          "chargedGas": "359318",
+          "singleTransactionBlockGasUsed": "318240",
+          "stateRoot": "0x11f3a305c92ad1fc12f8c1c3b6f93e553e6e043d3c3b02b35a96596eff4feb82",
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "5",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000001a642f0e3c3af545e7acbd38b07251b3990914f1",
+                "0x000000000000000000000000248e85939e48ca12a20cdf80e60d9e3d380ca7f9"
+              ]
+            }
+          ],
+          "targetBehavior": "deployed_control",
+          "blockExecutionGasUsed": "41078",
+          "blockStateGasUsed": "318240",
+          "transactionEnd": {
+            "error": null,
+            "gasUsed": "334582",
+            "returnData": "0x6001546000526002546020526103df5460405260606000f3"
+          }
+        },
+        "process": {
+          "argv": [
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/venv/bin/python",
+            "-I",
+            "-B",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-v035/eels-comparison/capture/worker.py",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-v035/eels-comparison/capture/inputs/003.json",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7"
+          ],
+          "bounded": true,
+          "elapsed": {
+            "monotonicSeconds": 0.30271820799680427,
+            "wallSeconds": 0.3027210235595703
+          },
+          "error": null,
+          "limitTerminated": false,
+          "returncode": 0,
+          "stderr": {
+            "bytes": 0,
+            "kind": "file",
+            "mode": 420,
+            "path": "003.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stdout": {
+            "bytes": 5772,
+            "kind": "file",
+            "mode": 420,
+            "path": "003.stdout",
+            "sha256": "a580d2fd96458a9dbee83e80595a45e64b63521dec280a20b826062814abf52d"
+          },
+          "timeoutSeconds": 15
+        }
+      },
+      "peers": {
+        "product": {
+          "completedExecution": true,
+          "stateRoot": "0x11f3a305c92ad1fc12f8c1c3b6f93e553e6e043d3c3b02b35a96596eff4feb82",
+          "executionStatus": "success",
+          "executionError": null,
+          "returnData": "0x6001546000526002546020526103df5460405260606000f3",
+          "gasUsed": "359318",
+          "executionGasUsed": "334582",
+          "preRefundGasWithFloor": "359318",
+          "singleTransactionBlockGasUsed": "318240",
+          "regularGasUsed": "41078",
+          "stateGasUsed": "318240",
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000001a642f0e3c3af545e7acbd38b07251b3990914f1",
+                "0x000000000000000000000000248e85939e48ca12a20cdf80e60d9e3d380ca7f9"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005"
+            }
+          ],
+          "allocation": {
+            "0x1111111111111111111111111111111111111111": {
+              "nonce": "0x7",
+              "balance": "0x3e8",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x2222222222222222222222222222222222222222": {
+              "nonce": "0x1",
+              "balance": "0xf4240",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+              "nonce": "0x2",
+              "balance": "0xe8d46e3c1f",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x4444444444444444444444444444444444444444": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x00000961ef480eb55e80d19ad83579a64c007002": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bbddc7ce488642fb579f8b00f3a590007251": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bff46984e3725691fa540a8c7589300d8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x000064d678505ad48f8ccb093bc65613800e8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x248e85939e48ca12a20cdf80e60d9e3d380ca7f9": {
+              "nonce": "0x1",
+              "balance": "0x5",
+              "code": "0x6001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000002": "0x000000000000000000000000000000000000000000000000000000000000002a"
+              }
+            },
+            "0x9999999999999999999999999999999999999999": {
+              "nonce": "0x0",
+              "balance": "0x1072c2",
+              "code": "0x",
+              "storage": {}
+            }
+          },
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "5",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "targetBehavior": "deployed_control",
+          "chargedGas": "359318"
+        },
+        "ethereumjs": {
+          "completedExecution": true,
+          "stateRoot": "0x11f3a305c92ad1fc12f8c1c3b6f93e553e6e043d3c3b02b35a96596eff4feb82",
+          "executionStatus": "success",
+          "executionError": null,
+          "returnData": "0x6001546000526002546020526103df5460405260606000f3",
+          "gasUsed": "359318",
+          "executionGasUsed": "334582",
+          "preRefundGasWithFloor": "359318",
+          "singleTransactionBlockGasUsed": "318240",
+          "regularGasUsed": "41078",
+          "stateGasUsed": "318240",
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000001a642f0e3c3af545e7acbd38b07251b3990914f1",
+                "0x000000000000000000000000248e85939e48ca12a20cdf80e60d9e3d380ca7f9"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005"
+            }
+          ],
+          "allocation": {
+            "0x1111111111111111111111111111111111111111": {
+              "nonce": "0x7",
+              "balance": "0x3e8",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x2222222222222222222222222222222222222222": {
+              "nonce": "0x1",
+              "balance": "0xf4240",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+              "nonce": "0x2",
+              "balance": "0xe8d46e3c1f",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x4444444444444444444444444444444444444444": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x00000961ef480eb55e80d19ad83579a64c007002": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bbddc7ce488642fb579f8b00f3a590007251": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bff46984e3725691fa540a8c7589300d8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x000064d678505ad48f8ccb093bc65613800e8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x248e85939e48ca12a20cdf80e60d9e3d380ca7f9": {
+              "nonce": "0x1",
+              "balance": "0x5",
+              "code": "0x6001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000002": "0x000000000000000000000000000000000000000000000000000000000000002a"
+              }
+            },
+            "0x9999999999999999999999999999999999999999": {
+              "nonce": "0x0",
+              "balance": "0x1072c2",
+              "code": "0x",
+              "storage": {}
+            }
+          },
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "5",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "targetBehavior": "deployed_control",
+          "chargedGas": "359318"
+        },
+        "geth": {
+          "completedExecution": true,
+          "allocation": {
+            "0x000064d678505ad48f8ccb093bc65613800e8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bbddc7ce488642fb579f8b00f3a590007251": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x2222222222222222222222222222222222222222": {
+              "nonce": "0x1",
+              "balance": "0xf4240",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x9999999999999999999999999999999999999999": {
+              "nonce": "0x0",
+              "balance": "0x1072c2",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x4444444444444444444444444444444444444444": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+              "nonce": "0x2",
+              "balance": "0xe8d46e3c1f",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x248e85939e48ca12a20cdf80e60d9e3d380ca7f9": {
+              "nonce": "0x1",
+              "balance": "0x5",
+              "code": "0x6001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000002": "0x000000000000000000000000000000000000000000000000000000000000002a"
+              }
+            },
+            "0x0000bff46984e3725691fa540a8c7589300d8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x00000961ef480eb55e80d19ad83579a64c007002": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x1111111111111111111111111111111111111111": {
+              "nonce": "0x7",
+              "balance": "0x3e8",
+              "code": "0x00",
+              "storage": {}
+            }
+          },
+          "stateRoot": "0x11f3a305c92ad1fc12f8c1c3b6f93e553e6e043d3c3b02b35a96596eff4feb82",
+          "executionStatus": "success",
+          "executionError": null,
+          "returnData": "0x6001546000526002546020526103df5460405260606000f3",
+          "gasUsed": "359318",
+          "executionGasUsed": "150982",
+          "preRefundGasWithFloor": null,
+          "singleTransactionBlockGasUsed": "318240",
+          "regularGasUsed": null,
+          "stateGasUsed": null,
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "5",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "targetBehavior": "deployed_control",
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000001a642f0e3c3af545e7acbd38b07251b3990914f1",
+                "0x000000000000000000000000248e85939e48ca12a20cdf80e60d9e3d380ca7f9"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005"
+            }
+          ],
+          "trace": {
+            "returnData": "0x6001546000526002546020526103df5460405260606000f3",
+            "executionGasUsed": "150982",
+            "error": null,
+            "rootGas": "4791664",
+            "frames": 1,
+            "steps": 14
+          },
+          "chargedGas": "359318"
+        }
+      },
+      "comparisons": {
+        "eels_product": {
+          "executionStatus": true,
+          "returnData": true,
+          "chargedGas": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        },
+        "eels_ethereumjs": {
+          "executionStatus": true,
+          "returnData": true,
+          "chargedGas": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        },
+        "eels_geth": {
+          "executionStatus": true,
+          "returnData": true,
+          "chargedGas": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        }
+      }
+    },
+    {
+      "index": 3,
+      "id": "internal_create2_absent",
+      "priorPacket": "research/amsterdam-storage-creation-v033",
+      "originalStatuses": {
+        "product": "observed",
+        "ethereumjs": "observed",
+        "geth": "observed"
+      },
+      "selectedPriorStatuses": {
+        "product": "observed",
+        "ethereumjs": "observed",
+        "geth": "observed"
+      },
+      "eels": {
+        "status": "observed",
+        "observation": {
+          "completedExecution": true,
+          "executionStatus": "success",
+          "returnData": "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b",
+          "chargedGas": "361646",
+          "singleTransactionBlockGasUsed": "318240",
+          "stateRoot": "0x1228358586d36589332080b9f6a78418527dcfaed41d8fe5f3612262bc973855",
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "5",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000004444444444444444444444444444444444444444",
+                "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b"
+              ]
+            }
+          ],
+          "targetBehavior": "deployed_control",
+          "blockExecutionGasUsed": "43406",
+          "blockStateGasUsed": "318240",
+          "transactionEnd": {
+            "error": null,
+            "gasUsed": "346646",
+            "returnData": "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b"
+          }
+        },
+        "process": {
+          "argv": [
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/venv/bin/python",
+            "-I",
+            "-B",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-v035/eels-comparison/capture/worker.py",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-v035/eels-comparison/capture/inputs/004.json",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7"
+          ],
+          "bounded": true,
+          "elapsed": {
+            "monotonicSeconds": 0.31917487501050346,
+            "wallSeconds": 0.31917595863342285
+          },
+          "error": null,
+          "limitTerminated": false,
+          "returncode": 0,
+          "stderr": {
+            "bytes": 0,
+            "kind": "file",
+            "mode": 420,
+            "path": "004.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stdout": {
+            "bytes": 6034,
+            "kind": "file",
+            "mode": 420,
+            "path": "004.stdout",
+            "sha256": "3dfe070a39f1504b2c99cb898a3627d8cfb25eb372831ad64847d6dd1e82ae12"
+          },
+          "timeoutSeconds": 15
+        }
+      },
+      "peers": {
+        "product": {
+          "completedExecution": true,
+          "stateRoot": "0x1228358586d36589332080b9f6a78418527dcfaed41d8fe5f3612262bc973855",
+          "executionStatus": "success",
+          "executionError": null,
+          "returnData": "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b",
+          "gasUsed": "361646",
+          "executionGasUsed": "346646",
+          "preRefundGasWithFloor": "361646",
+          "singleTransactionBlockGasUsed": "318240",
+          "regularGasUsed": "43406",
+          "stateGasUsed": "318240",
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000004444444444444444444444444444444444444444",
+                "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005"
+            }
+          ],
+          "allocation": {
+            "0x1111111111111111111111111111111111111111": {
+              "nonce": "0x7",
+              "balance": "0x3e8",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x2222222222222222222222222222222222222222": {
+              "nonce": "0x1",
+              "balance": "0xf4240",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+              "nonce": "0x2",
+              "balance": "0xe8d46de134",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x4444444444444444444444444444444444444444": {
+              "nonce": "0x8",
+              "balance": "0x3e3",
+              "code": "0x61003361003a6000397f000000000000000000000000000000000000000000000000000000000000007b61003360006005f560005260206000f36103df54600155602a60025561001861001b6000396100186000f36001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000001": "0x0000000000000000000000000000000000000000000000000000000000000005"
+              }
+            },
+            "0x00000961ef480eb55e80d19ad83579a64c007002": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bbddc7ce488642fb579f8b00f3a590007251": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bff46984e3725691fa540a8c7589300d8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x000064d678505ad48f8ccb093bc65613800e8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0xa7fc60456bdcfd520bf333dbc0da893ec4a7988b": {
+              "nonce": "0x1",
+              "balance": "0x5",
+              "code": "0x6001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000002": "0x000000000000000000000000000000000000000000000000000000000000002a"
+              }
+            },
+            "0x9999999999999999999999999999999999999999": {
+              "nonce": "0x0",
+              "balance": "0x108e0a",
+              "code": "0x",
+              "storage": {}
+            }
+          },
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "5",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "targetBehavior": "deployed_control",
+          "chargedGas": "361646"
+        },
+        "ethereumjs": {
+          "completedExecution": true,
+          "stateRoot": "0x1228358586d36589332080b9f6a78418527dcfaed41d8fe5f3612262bc973855",
+          "executionStatus": "success",
+          "executionError": null,
+          "returnData": "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b",
+          "gasUsed": "361646",
+          "executionGasUsed": "346646",
+          "preRefundGasWithFloor": "361646",
+          "singleTransactionBlockGasUsed": "318240",
+          "regularGasUsed": "43406",
+          "stateGasUsed": "318240",
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000004444444444444444444444444444444444444444",
+                "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005"
+            }
+          ],
+          "allocation": {
+            "0x1111111111111111111111111111111111111111": {
+              "nonce": "0x7",
+              "balance": "0x3e8",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x2222222222222222222222222222222222222222": {
+              "nonce": "0x1",
+              "balance": "0xf4240",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+              "nonce": "0x2",
+              "balance": "0xe8d46de134",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x4444444444444444444444444444444444444444": {
+              "nonce": "0x8",
+              "balance": "0x3e3",
+              "code": "0x61003361003a6000397f000000000000000000000000000000000000000000000000000000000000007b61003360006005f560005260206000f36103df54600155602a60025561001861001b6000396100186000f36001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000001": "0x0000000000000000000000000000000000000000000000000000000000000005"
+              }
+            },
+            "0x00000961ef480eb55e80d19ad83579a64c007002": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bbddc7ce488642fb579f8b00f3a590007251": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bff46984e3725691fa540a8c7589300d8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x000064d678505ad48f8ccb093bc65613800e8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0xa7fc60456bdcfd520bf333dbc0da893ec4a7988b": {
+              "nonce": "0x1",
+              "balance": "0x5",
+              "code": "0x6001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000002": "0x000000000000000000000000000000000000000000000000000000000000002a"
+              }
+            },
+            "0x9999999999999999999999999999999999999999": {
+              "nonce": "0x0",
+              "balance": "0x108e0a",
+              "code": "0x",
+              "storage": {}
+            }
+          },
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "5",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "targetBehavior": "deployed_control",
+          "chargedGas": "361646"
+        },
+        "geth": {
+          "completedExecution": true,
+          "allocation": {
+            "0x000064d678505ad48f8ccb093bc65613800e8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bbddc7ce488642fb579f8b00f3a590007251": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x2222222222222222222222222222222222222222": {
+              "nonce": "0x1",
+              "balance": "0xf4240",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x9999999999999999999999999999999999999999": {
+              "nonce": "0x0",
+              "balance": "0x108e0a",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x4444444444444444444444444444444444444444": {
+              "nonce": "0x8",
+              "balance": "0x3e3",
+              "code": "0x61003361003a6000397f000000000000000000000000000000000000000000000000000000000000007b61003360006005f560005260206000f36103df54600155602a60025561001861001b6000396100186000f36001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000001": "0x0000000000000000000000000000000000000000000000000000000000000005"
+              }
+            },
+            "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+              "nonce": "0x2",
+              "balance": "0xe8d46de134",
+              "code": "0x",
+              "storage": {}
+            },
+            "0xa7fc60456bdcfd520bf333dbc0da893ec4a7988b": {
+              "nonce": "0x1",
+              "balance": "0x5",
+              "code": "0x6001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000002": "0x000000000000000000000000000000000000000000000000000000000000002a"
+              }
+            },
+            "0x0000bff46984e3725691fa540a8c7589300d8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x00000961ef480eb55e80d19ad83579a64c007002": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x1111111111111111111111111111111111111111": {
+              "nonce": "0x7",
+              "balance": "0x3e8",
+              "code": "0x00",
+              "storage": {}
+            }
+          },
+          "stateRoot": "0x1228358586d36589332080b9f6a78418527dcfaed41d8fe5f3612262bc973855",
+          "executionStatus": "success",
+          "executionError": null,
+          "returnData": "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b",
+          "gasUsed": "361646",
+          "executionGasUsed": "346646",
+          "preRefundGasWithFloor": null,
+          "singleTransactionBlockGasUsed": "318240",
+          "regularGasUsed": null,
+          "stateGasUsed": null,
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "5",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "targetBehavior": "deployed_control",
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000004444444444444444444444444444444444444444",
+                "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005"
+            }
+          ],
+          "trace": {
+            "returnData": "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b",
+            "executionGasUsed": "346646",
+            "error": null,
+            "rootGas": "4985000",
+            "frames": 2,
+            "steps": 28
+          },
+          "chargedGas": "361646"
+        }
+      },
+      "comparisons": {
+        "eels_product": {
+          "executionStatus": true,
+          "returnData": true,
+          "chargedGas": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        },
+        "eels_ethereumjs": {
+          "executionStatus": true,
+          "returnData": true,
+          "chargedGas": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        },
+        "eels_geth": {
+          "executionStatus": true,
+          "returnData": true,
+          "chargedGas": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        }
+      }
+    },
+    {
+      "index": 4,
+      "id": "root_create_empty_storage",
+      "priorPacket": "research/amsterdam-root-creation-v033",
+      "originalStatuses": {
+        "product": "unavailable",
+        "ethereumjs": "unavailable",
+        "geth": "observed"
+      },
+      "selectedPriorStatuses": {
+        "product": "observed",
+        "ethereumjs": "observed",
+        "geth": "observed"
+      },
+      "eels": {
+        "status": "observed",
+        "observation": {
+          "completedExecution": true,
+          "executionStatus": "success",
+          "returnData": "0x6001546000526002546020526103df5460405260606000f3",
+          "chargedGas": "175718",
+          "singleTransactionBlockGasUsed": "134640",
+          "stateRoot": "0xb22f3da8240ddbe044d4efc2621a0dfced1eb164177bd74db5c1ccf77284a401",
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "22",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000001a642f0e3c3af545e7acbd38b07251b3990914f1",
+                "0x000000000000000000000000248e85939e48ca12a20cdf80e60d9e3d380ca7f9"
+              ]
+            }
+          ],
+          "targetBehavior": "deployed_control",
+          "blockExecutionGasUsed": "41078",
+          "blockStateGasUsed": "134640",
+          "transactionEnd": {
+            "error": null,
+            "gasUsed": "150982",
+            "returnData": "0x6001546000526002546020526103df5460405260606000f3"
+          }
+        },
+        "process": {
+          "argv": [
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/venv/bin/python",
+            "-I",
+            "-B",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-v035/eels-comparison/capture/worker.py",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-v035/eels-comparison/capture/inputs/005.json",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7"
+          ],
+          "bounded": true,
+          "elapsed": {
+            "monotonicSeconds": 0.265296458004741,
+            "wallSeconds": 0.26529884338378906
+          },
+          "error": null,
+          "limitTerminated": false,
+          "returncode": 0,
+          "stderr": {
+            "bytes": 0,
+            "kind": "file",
+            "mode": 420,
+            "path": "005.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stdout": {
+            "bytes": 5780,
+            "kind": "file",
+            "mode": 420,
+            "path": "005.stdout",
+            "sha256": "1a942ed2d1248d5865d203bd17d153f7d3f6cade48a51e39c8a03b024f7f1a30"
+          },
+          "timeoutSeconds": 15
+        }
+      },
+      "peers": {
+        "product": {
+          "completedExecution": true,
+          "stateRoot": "0xb22f3da8240ddbe044d4efc2621a0dfced1eb164177bd74db5c1ccf77284a401",
+          "executionStatus": "success",
+          "executionError": null,
+          "returnData": "0x6001546000526002546020526103df5460405260606000f3",
+          "gasUsed": "175718",
+          "executionGasUsed": "150982",
+          "preRefundGasWithFloor": "175718",
+          "singleTransactionBlockGasUsed": "134640",
+          "regularGasUsed": "41078",
+          "stateGasUsed": "134640",
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000001a642f0e3c3af545e7acbd38b07251b3990914f1",
+                "0x000000000000000000000000248e85939e48ca12a20cdf80e60d9e3d380ca7f9"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005"
+            }
+          ],
+          "allocation": {
+            "0x1111111111111111111111111111111111111111": {
+              "nonce": "0x7",
+              "balance": "0x3e8",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x2222222222222222222222222222222222222222": {
+              "nonce": "0x1",
+              "balance": "0xf4240",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+              "nonce": "0x2",
+              "balance": "0xe8d48a3fff",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x4444444444444444444444444444444444444444": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x248e85939e48ca12a20cdf80e60d9e3d380ca7f9": {
+              "nonce": "0x1",
+              "balance": "0x16",
+              "code": "0x6001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000002": "0x000000000000000000000000000000000000000000000000000000000000002a"
+              }
+            },
+            "0x00000961ef480eb55e80d19ad83579a64c007002": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bbddc7ce488642fb579f8b00f3a590007251": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bff46984e3725691fa540a8c7589300d8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x000064d678505ad48f8ccb093bc65613800e8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x9999999999999999999999999999999999999999": {
+              "nonce": "0x0",
+              "balance": "0x80b32",
+              "code": "0x",
+              "storage": {}
+            }
+          },
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "22",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "targetBehavior": "deployed_control",
+          "chargedGas": "175718"
+        },
+        "ethereumjs": {
+          "completedExecution": true,
+          "stateRoot": "0xb22f3da8240ddbe044d4efc2621a0dfced1eb164177bd74db5c1ccf77284a401",
+          "executionStatus": "success",
+          "executionError": null,
+          "returnData": "0x6001546000526002546020526103df5460405260606000f3",
+          "gasUsed": "175718",
+          "executionGasUsed": "150982",
+          "preRefundGasWithFloor": "175718",
+          "singleTransactionBlockGasUsed": "134640",
+          "regularGasUsed": "41078",
+          "stateGasUsed": "134640",
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000001a642f0e3c3af545e7acbd38b07251b3990914f1",
+                "0x000000000000000000000000248e85939e48ca12a20cdf80e60d9e3d380ca7f9"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005"
+            }
+          ],
+          "allocation": {
+            "0x1111111111111111111111111111111111111111": {
+              "nonce": "0x7",
+              "balance": "0x3e8",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x2222222222222222222222222222222222222222": {
+              "nonce": "0x1",
+              "balance": "0xf4240",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+              "nonce": "0x2",
+              "balance": "0xe8d48a3fff",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x4444444444444444444444444444444444444444": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x248e85939e48ca12a20cdf80e60d9e3d380ca7f9": {
+              "nonce": "0x1",
+              "balance": "0x16",
+              "code": "0x6001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000002": "0x000000000000000000000000000000000000000000000000000000000000002a"
+              }
+            },
+            "0x00000961ef480eb55e80d19ad83579a64c007002": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bbddc7ce488642fb579f8b00f3a590007251": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bff46984e3725691fa540a8c7589300d8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x000064d678505ad48f8ccb093bc65613800e8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x9999999999999999999999999999999999999999": {
+              "nonce": "0x0",
+              "balance": "0x80b32",
+              "code": "0x",
+              "storage": {}
+            }
+          },
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "22",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "targetBehavior": "deployed_control",
+          "chargedGas": "175718"
+        },
+        "geth": {
+          "completedExecution": true,
+          "allocation": {
+            "0x000064d678505ad48f8ccb093bc65613800e8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bbddc7ce488642fb579f8b00f3a590007251": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x2222222222222222222222222222222222222222": {
+              "nonce": "0x1",
+              "balance": "0xf4240",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x9999999999999999999999999999999999999999": {
+              "nonce": "0x0",
+              "balance": "0x80b32",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x4444444444444444444444444444444444444444": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+              "nonce": "0x2",
+              "balance": "0xe8d48a3fff",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x248e85939e48ca12a20cdf80e60d9e3d380ca7f9": {
+              "nonce": "0x1",
+              "balance": "0x16",
+              "code": "0x6001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000002": "0x000000000000000000000000000000000000000000000000000000000000002a"
+              }
+            },
+            "0x0000bff46984e3725691fa540a8c7589300d8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x00000961ef480eb55e80d19ad83579a64c007002": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x1111111111111111111111111111111111111111": {
+              "nonce": "0x7",
+              "balance": "0x3e8",
+              "code": "0x00",
+              "storage": {}
+            }
+          },
+          "stateRoot": "0xb22f3da8240ddbe044d4efc2621a0dfced1eb164177bd74db5c1ccf77284a401",
+          "executionStatus": "success",
+          "executionError": null,
+          "returnData": "0x6001546000526002546020526103df5460405260606000f3",
+          "gasUsed": "175718",
+          "executionGasUsed": "150982",
+          "preRefundGasWithFloor": null,
+          "singleTransactionBlockGasUsed": "134640",
+          "regularGasUsed": null,
+          "stateGasUsed": null,
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "22",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "targetBehavior": "deployed_control",
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000001a642f0e3c3af545e7acbd38b07251b3990914f1",
+                "0x000000000000000000000000248e85939e48ca12a20cdf80e60d9e3d380ca7f9"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005"
+            }
+          ],
+          "trace": {
+            "returnData": "0x6001546000526002546020526103df5460405260606000f3",
+            "executionGasUsed": "150982",
+            "error": null,
+            "rootGas": "4975264",
+            "frames": 1,
+            "steps": 14
+          },
+          "chargedGas": "175718"
+        }
+      },
+      "comparisons": {
+        "eels_product": {
+          "executionStatus": true,
+          "returnData": true,
+          "chargedGas": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        },
+        "eels_ethereumjs": {
+          "executionStatus": true,
+          "returnData": true,
+          "chargedGas": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        },
+        "eels_geth": {
+          "executionStatus": true,
+          "returnData": true,
+          "chargedGas": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        }
+      }
+    },
+    {
+      "index": 5,
+      "id": "internal_create2_empty_storage",
+      "priorPacket": "research/amsterdam-storage-creation-v033",
+      "originalStatuses": {
+        "product": "observed",
+        "ethereumjs": "observed",
+        "geth": "observed"
+      },
+      "selectedPriorStatuses": {
+        "product": "observed",
+        "ethereumjs": "observed",
+        "geth": "observed"
+      },
+      "eels": {
+        "status": "observed",
+        "observation": {
+          "completedExecution": true,
+          "executionStatus": "success",
+          "returnData": "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b",
+          "chargedGas": "178046",
+          "singleTransactionBlockGasUsed": "134640",
+          "stateRoot": "0x8431782e6ed2d9b9c37b37f6d6d793c05d8a594de01c3de79ba898e1bbb5dc44",
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "22",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000004444444444444444444444444444444444444444",
+                "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b"
+              ]
+            }
+          ],
+          "targetBehavior": "deployed_control",
+          "blockExecutionGasUsed": "43406",
+          "blockStateGasUsed": "134640",
+          "transactionEnd": {
+            "error": null,
+            "gasUsed": "163046",
+            "returnData": "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b"
+          }
+        },
+        "process": {
+          "argv": [
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/venv/bin/python",
+            "-I",
+            "-B",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-v035/eels-comparison/capture/worker.py",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/storage-creation-v035/eels-comparison/capture/inputs/006.json",
+            "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7"
+          ],
+          "bounded": true,
+          "elapsed": {
+            "monotonicSeconds": 0.30962600000202656,
+            "wallSeconds": 0.309628963470459
+          },
+          "error": null,
+          "limitTerminated": false,
+          "returncode": 0,
+          "stderr": {
+            "bytes": 0,
+            "kind": "file",
+            "mode": 420,
+            "path": "006.stderr",
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stdout": {
+            "bytes": 6042,
+            "kind": "file",
+            "mode": 420,
+            "path": "006.stdout",
+            "sha256": "45ce135521a5edde5d00579403e102644d9a21455364209f0c962d9f58534d9f"
+          },
+          "timeoutSeconds": 15
+        }
+      },
+      "peers": {
+        "product": {
+          "completedExecution": true,
+          "stateRoot": "0x8431782e6ed2d9b9c37b37f6d6d793c05d8a594de01c3de79ba898e1bbb5dc44",
+          "executionStatus": "success",
+          "executionError": null,
+          "returnData": "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b",
+          "gasUsed": "178046",
+          "executionGasUsed": "163046",
+          "preRefundGasWithFloor": "178046",
+          "singleTransactionBlockGasUsed": "134640",
+          "regularGasUsed": "43406",
+          "stateGasUsed": "134640",
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000004444444444444444444444444444444444444444",
+                "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005"
+            }
+          ],
+          "allocation": {
+            "0x1111111111111111111111111111111111111111": {
+              "nonce": "0x7",
+              "balance": "0x3e8",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x2222222222222222222222222222222222222222": {
+              "nonce": "0x1",
+              "balance": "0xf4240",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+              "nonce": "0x2",
+              "balance": "0xe8d489e514",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x4444444444444444444444444444444444444444": {
+              "nonce": "0x8",
+              "balance": "0x3e3",
+              "code": "0x61003361003a6000397f000000000000000000000000000000000000000000000000000000000000007b61003360006005f560005260206000f36103df54600155602a60025561001861001b6000396100186000f36001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000001": "0x0000000000000000000000000000000000000000000000000000000000000005"
+              }
+            },
+            "0xa7fc60456bdcfd520bf333dbc0da893ec4a7988b": {
+              "nonce": "0x1",
+              "balance": "0x16",
+              "code": "0x6001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000002": "0x000000000000000000000000000000000000000000000000000000000000002a"
+              }
+            },
+            "0x00000961ef480eb55e80d19ad83579a64c007002": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bbddc7ce488642fb579f8b00f3a590007251": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bff46984e3725691fa540a8c7589300d8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x000064d678505ad48f8ccb093bc65613800e8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x9999999999999999999999999999999999999999": {
+              "nonce": "0x0",
+              "balance": "0x8267a",
+              "code": "0x",
+              "storage": {}
+            }
+          },
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "22",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "targetBehavior": "deployed_control",
+          "chargedGas": "178046"
+        },
+        "ethereumjs": {
+          "completedExecution": true,
+          "stateRoot": "0x8431782e6ed2d9b9c37b37f6d6d793c05d8a594de01c3de79ba898e1bbb5dc44",
+          "executionStatus": "success",
+          "executionError": null,
+          "returnData": "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b",
+          "gasUsed": "178046",
+          "executionGasUsed": "163046",
+          "preRefundGasWithFloor": "178046",
+          "singleTransactionBlockGasUsed": "134640",
+          "regularGasUsed": "43406",
+          "stateGasUsed": "134640",
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000004444444444444444444444444444444444444444",
+                "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005"
+            }
+          ],
+          "allocation": {
+            "0x1111111111111111111111111111111111111111": {
+              "nonce": "0x7",
+              "balance": "0x3e8",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x2222222222222222222222222222222222222222": {
+              "nonce": "0x1",
+              "balance": "0xf4240",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+              "nonce": "0x2",
+              "balance": "0xe8d489e514",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x4444444444444444444444444444444444444444": {
+              "nonce": "0x8",
+              "balance": "0x3e3",
+              "code": "0x61003361003a6000397f000000000000000000000000000000000000000000000000000000000000007b61003360006005f560005260206000f36103df54600155602a60025561001861001b6000396100186000f36001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000001": "0x0000000000000000000000000000000000000000000000000000000000000005"
+              }
+            },
+            "0xa7fc60456bdcfd520bf333dbc0da893ec4a7988b": {
+              "nonce": "0x1",
+              "balance": "0x16",
+              "code": "0x6001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000002": "0x000000000000000000000000000000000000000000000000000000000000002a"
+              }
+            },
+            "0x00000961ef480eb55e80d19ad83579a64c007002": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bbddc7ce488642fb579f8b00f3a590007251": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bff46984e3725691fa540a8c7589300d8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x000064d678505ad48f8ccb093bc65613800e8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x9999999999999999999999999999999999999999": {
+              "nonce": "0x0",
+              "balance": "0x8267a",
+              "code": "0x",
+              "storage": {}
+            }
+          },
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "22",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "targetBehavior": "deployed_control",
+          "chargedGas": "178046"
+        },
+        "geth": {
+          "completedExecution": true,
+          "allocation": {
+            "0x000064d678505ad48f8ccb093bc65613800e8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x0000bbddc7ce488642fb579f8b00f3a590007251": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x2222222222222222222222222222222222222222": {
+              "nonce": "0x1",
+              "balance": "0xf4240",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x9999999999999999999999999999999999999999": {
+              "nonce": "0x0",
+              "balance": "0x8267a",
+              "code": "0x",
+              "storage": {}
+            },
+            "0x4444444444444444444444444444444444444444": {
+              "nonce": "0x8",
+              "balance": "0x3e3",
+              "code": "0x61003361003a6000397f000000000000000000000000000000000000000000000000000000000000007b61003360006005f560005260206000f36103df54600155602a60025561001861001b6000396100186000f36001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000001": "0x0000000000000000000000000000000000000000000000000000000000000005"
+              }
+            },
+            "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+              "nonce": "0x2",
+              "balance": "0xe8d489e514",
+              "code": "0x",
+              "storage": {}
+            },
+            "0xa7fc60456bdcfd520bf333dbc0da893ec4a7988b": {
+              "nonce": "0x1",
+              "balance": "0x16",
+              "code": "0x6001546000526002546020526103df5460405260606000f3",
+              "storage": {
+                "0x0000000000000000000000000000000000000000000000000000000000000002": "0x000000000000000000000000000000000000000000000000000000000000002a"
+              }
+            },
+            "0x0000bff46984e3725691fa540a8c7589300d8282": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x00000961ef480eb55e80d19ad83579a64c007002": {
+              "nonce": "0x1",
+              "balance": "0x0",
+              "code": "0x00",
+              "storage": {}
+            },
+            "0x1111111111111111111111111111111111111111": {
+              "nonce": "0x7",
+              "balance": "0x3e8",
+              "code": "0x00",
+              "storage": {}
+            }
+          },
+          "stateRoot": "0x8431782e6ed2d9b9c37b37f6d6d793c05d8a594de01c3de79ba898e1bbb5dc44",
+          "executionStatus": "success",
+          "executionError": null,
+          "returnData": "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b",
+          "gasUsed": "178046",
+          "executionGasUsed": "163046",
+          "preRefundGasWithFloor": null,
+          "singleTransactionBlockGasUsed": "134640",
+          "regularGasUsed": null,
+          "stateGasUsed": null,
+          "target": {
+            "exists": true,
+            "nonce": "1",
+            "balance": "22",
+            "code": "0x6001546000526002546020526103df5460405260606000f3",
+            "slots": {
+              "0": "0",
+              "1": "0",
+              "2": "42",
+              "991": "0"
+            }
+          },
+          "targetBehavior": "deployed_control",
+          "logs": [
+            {
+              "address": "0xfffffffffffffffffffffffffffffffffffffffe",
+              "topics": [
+                "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                "0x0000000000000000000000004444444444444444444444444444444444444444",
+                "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b"
+              ],
+              "data": "0x0000000000000000000000000000000000000000000000000000000000000005"
+            }
+          ],
+          "trace": {
+            "returnData": "0x000000000000000000000000a7fc60456bdcfd520bf333dbc0da893ec4a7988b",
+            "executionGasUsed": "163046",
+            "error": null,
+            "rootGas": "4985000",
+            "frames": 2,
+            "steps": 28
+          },
+          "chargedGas": "178046"
+        }
+      },
+      "comparisons": {
+        "eels_product": {
+          "executionStatus": true,
+          "returnData": true,
+          "chargedGas": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        },
+        "eels_ethereumjs": {
+          "executionStatus": true,
+          "returnData": true,
+          "chargedGas": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        },
+        "eels_geth": {
+          "executionStatus": true,
+          "returnData": true,
+          "chargedGas": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "No target execution, subprocess or network occurred in this comparison.",
+    "Old artifact verifiers and archived JSONL parser/MPT/RLP primitives are reused; this is not an independent execution or wholly independent parser.",
+    "Old proof replies are joined to raw collector records and full initial allocation facts by the retained verifier, not independently re-walked here.",
+    "EELS source, venv, stdlib and Python files are external inventoried dependencies, checked at these recorded paths; OS libraries are not archived.",
+    "Root Node failures in the original capture remain preserved; only the explicitly separate root-wrapper observations supply root product/EthereumJS comparisons.",
+    "Unsupported product rollback roots are not execution predictions and all product comparison channels remain null for those cases.",
+    "TransactionEnd gas includes preparation/spill and is not compared to Geth root-frame gas. Charged gas and max(block execution gas, block state gas) are distinct channels.",
+    "Six known synthetic development inputs do not establish a canonical winner, all-fork coverage, deployed-chain reachability or population accuracy."
+  ]
+}
