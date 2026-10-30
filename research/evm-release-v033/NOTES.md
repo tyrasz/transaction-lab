@@ -62,3 +62,32 @@ available. Its 1,724-file production/dependency identity is
 The [fresh live Sepolia observation](../sepolia-api-live-v033/NOTES.md) succeeded
 for exactly 0.001 test ETH with 21,000 gas. It uses a public address without a
 signature or broadcast and does not establish a general EVM accuracy percentage.
+
+The clean main checkout fast-forwarded to implementation/evidence commit
+`f17ea0ed` and the existing local server restarted on port 5174.
+`installed-http.json` records three read-only requests confirming version
+0.33.0, the same 1,724-file implementation identity, all optional engines and
+byte-identical interface source. The temporary port 5175 server was stopped.
+The live Sepolia packet also passed its artifact-only verifier from the
+installed checkout; `installed-sepolia-artifact-review.json` retains that result.
+These installation checks made no new public RPC calls or transaction runs.
+
+The original six-case [creation diagnostic](../amsterdam-storage-creation-v033/NOTES.md)
+retains a real EthereumJS/Geth disagreement and three unavailable root workers
+per Node path caused by a JSON declaration assertion before target entry.
+Its artifact-only review reproduces all available observations and unavailable
+classifications, including 24 full state roots and 18 process records. Six
+fabricated tamper controls passed. Neither source inspection nor agreement on
+the two observed internal controls establishes a canonical winner.
+The same verifier also passed against the installed checkout, rechecking the
+relative archived dependency links without executing any transaction target;
+its output is `installed-creation-artifact-review.json`.
+
+A separately frozen [root-only supplement](../amsterdam-root-creation-v033/NOTES.md)
+corrected the declaration serialization check and ran exactly three product and
+three EthereumJS cases. It reused the original Geth outputs without rerunning
+Geth. Both deployable root controls agree across all three implementations on
+seven recorded channels. The storage-only root case is unsupported in the
+product and differs between EthereumJS and Geth on all seven channels. The
+original unavailable rows remain in their original packet. Three input-only
+controls and the supplement's artifact-only verification passed.

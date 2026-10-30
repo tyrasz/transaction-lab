@@ -45,3 +45,19 @@ EELS was not installed or executed. Source findings and their limitations are
 retained in [SOURCES.md](SOURCES.md), including the unavailable pinned
 state-tracker fetch and the explicitly unpinned source inspection. No client is
 selected as the consensus winner by this diagnostic.
+
+The [artifact review](review-NOTES.md) reproduces all saved classifications,
+including the unavailable workers. It verifies 180 capture entries, 64 runtime
+entries, 3,841 dependencies, all 18 process records, six signed inputs and
+headers, 24 full state roots and 17 joined input replies. The final report is
+[review-final.json](review-final.json); six fabricated tamper controls passed.
+The earlier reviewer schema failure remains separately retained. This review
+made no network requests and executed none of the transaction targets.
+
+The separately frozen [root supplement](../amsterdam-root-creation-v033/NOTES.md)
+ran only the three missing root inputs after correcting the declaration
+serialization assertion. It reused these original Geth observations without a
+Geth rerun. The two root controls agree on all channels; the storage-only root
+case remains unsupported in the product and differs between EthereumJS and
+Geth on all seven channels. Those supplemental results do not replace this
+packet's original unavailable classifications.

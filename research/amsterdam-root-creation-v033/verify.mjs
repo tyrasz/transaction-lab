@@ -1,0 +1,27 @@
+// Artifact-only recheck. Shares the archived pure parser; never dispatches clients.
+import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {fileURLToPath} from 'node:url';
+import {HOME,ORIGINAL,CAPTURE,INDICES,LIMITS,PINS,number,sha,read,walk,match,original,checkOwn,report,projected,validTime} from './protocol.mjs';
+export async function verify(){
+ const o=await original(),manifestBytes=fs.readFileSync(path.join(CAPTURE,'manifest.json')),manifest=JSON.parse(manifestBytes),plan=read(path.join(CAPTURE,'plan.json')),results=read(path.join(CAPTURE,'results.json'));
+ assert.equal(manifest.planSha256,sha(fs.readFileSync(path.join(CAPTURE,'plan.json'))));assert.equal(results.planSha256,manifest.planSha256);assert.equal(sha(fs.readFileSync(path.join(CAPTURE,'source-manifest.json'))),plan.sourceSha256);checkOwn(plan);
+ assert.deepEqual(walk(CAPTURE),[...manifest.files.map(f=>f.path),'manifest.json'].sort());for(const f of manifest.files)match(CAPTURE,f);
+ assert.deepEqual(results.original,PINS);assert.deepEqual(results.originalCounts,o.results.counts);assert.deepEqual(results.indices,INDICES);assert.deepEqual(results.rows.map(r=>r.index),INDICES);
+ let rawProcesses=0,totalBytes=0;const verifiedRows=[],productSeal=read(path.join(CAPTURE,'PRODUCTS_SEALED.json'));assert.deepEqual(productSeal.files.map(f=>f.path),INDICES.map(i=>'product/'+number(i)+'.json'));for(const f of productSeal.files)match(CAPTURE,f);
+ for(const row of results.rows){const n=number(row.index),input=read(path.join(CAPTURE,'inputs/'+n+'.json'));assert.equal(row.id,input.id);const seen={};
+  for(const mode of ['product','ethereumjs']){const p=mode+'/'+n+'.json',raw=read(path.join(CAPTURE,p)),seal=read(path.join(CAPTURE,p+'.seal.json'));assert.equal(seal.sha256,sha(fs.readFileSync(path.join(CAPTURE,p))));assert.equal(seal.bytes,fs.statSync(path.join(CAPTURE,p)).size);rawProcesses++;totalBytes+=raw.stdout.bytes+raw.stderr.bytes;
+   const out=report(raw);assert.equal(out.id,row.id);assert.equal(out.mode,mode);assert.deepEqual(row[mode],projected(out));seen[mode]=out.observation;
+   assert(path.isAbsolute(plan.executionDirectory));assert.equal(raw.process.executable,o.source.node.executable);assert.equal(raw.process.args.length,4);assert.equal(raw.process.args[0],'--max-old-space-size=256');assert.equal(raw.process.args[1],path.join(plan.executionDirectory,'worker.mjs'));assert.equal(raw.process.args[2],mode);assert.equal(raw.process.args[3],path.join(plan.executionDirectory,'capture/inputs/'+n+'.json'));
+   if(mode==='product'){assert.equal(out.processClosureValid,true);const allocation=o.observations.applyDelta(input.allocation,out.attempt.changes),root=await o.observations.allocationRoot(allocation);
+    if(out.observation){assert.deepEqual(out.observation.allocation,allocation);assert.equal(out.observation.stateRoot,root);assert.equal(out.observation.executionStatus,out.attempt.output.execution.status);assert.equal(out.observation.returnData,out.attempt.output.execution.returnData);assert.equal(out.observation.gasUsed,out.attempt.output.gasAccounting.gasUsed);assert.equal(out.observation.singleTransactionBlockGasUsed,out.attempt.output.gasAccounting.singleTransactionBlockGasUsed);assert.deepEqual(out.observation.logs,out.attempt.output.logs);}
+    else{assert.equal(out.withheldState.rollbackStateRoot,root);assert.equal(root,input.initialStateRoot);}
+   }else{assert(Date.parse(seal.at)>=Date.parse(productSeal.at));assert.equal(out.observation.stateRoot,await o.observations.allocationRoot(out.observation.allocation));assert.equal(out.observation.gasUsed,out.rawResult.totalGasSpent);assert.equal(out.observation.returnData,out.rawResult.execResult.returnValue);assert.deepEqual(out.observation.logs,out.rawResult.execResult.logs);}
+   if(out.observation)assert.deepEqual(out.observation.target,o.observations.targetObservation(input,out.observation.allocation));
+  }
+  const dir=path.join(ORIGINAL,'geth',n),geth=await o.observations.gethObservation(input,{allocation:read(path.join(dir,'alloc.json')),body:read(path.join(dir,'body.rlp')),result:read(path.join(dir,'result.json')),trace:fs.readFileSync(path.join(dir,'trace-0-'+input.transactionHash+'.jsonl'))});
+  assert.deepEqual(geth,o.results.rows[row.index].geth.observation);assert.deepEqual(row.geth,o.results.rows[row.index].geth);seen.geth=geth;
+  const comparisons=o.observations.compareObservations(seen);assert.deepEqual(row.comparisons,comparisons);verifiedRows.push({index:row.index,id:row.id,productStatus:row.product.status,ethereumjsStatus:row.ethereumjs.status,targetBehavior:Object.fromEntries(Object.entries(seen).map(([k,v])=>[k,v?.targetBehavior??null])),comparisons});
+ }
+ assert.equal(rawProcesses,6);assert.equal(totalBytes,results.totalBytes);assert(totalBytes<=LIMITS.totalBytes);assert.equal(results.fatal,null);assert.equal(results.sourceUnchanged,true);assert.equal(results.observationsUsable,true);assert.equal(results.terminalTiming.reversed,false);assert(validTime(results.terminalTiming.wallMs,results.terminalTiming.monotonicMs,LIMITS.totalMs));
+ return{schemaVersion:1,manifestSha256:sha(manifestBytes),original:PINS,rawProcesses,rows:verifiedRows,originalCounts:results.originalCounts,supplementCounts:results.counts,scope:{artifactOnly:true,targetReexecution:false,originalUnavailableRowsPreserved:true,archivedPureParserReused:true,independentClientWinner:false}};
+}
+if(process.argv[1]===fileURLToPath(import.meta.url))console.log(JSON.stringify(await verify(),null,2));
