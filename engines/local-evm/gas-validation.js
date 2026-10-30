@@ -7,7 +7,7 @@ import { deriveAuthorizationPreparation } from './authorization-validation.js';
 
 const BUDGET = ['gasLimit', 'intrinsicRegular', 'floor', 'intrinsicState', 'regularGasLimit', 'messageGasLimit', 'stateGasReservoirInitial'];
 const COUNTERS = ['messageGasUsed', 'authorizationGasUsed', 'stateGasReservoir', 'executionStateGasUsed', 'messageRefundCounter', 'authorizationRefundCounter', 'postTargetOutOfGas'];
-const SETTLED = ['beforeRefund', 'refundCounter', 'appliedRefund', 'floorAdjustment', 'gasUsed', 'reportedRefundCounter', 'reservoirDelta', 'stateGasUsedRaw', 'executionRegularGasUsed', 'stateGasUsed', 'regularGasUsed', 'blockGasUsed'];
+const SETTLED = ['beforeRefund', 'refundCounter', 'appliedRefund', 'floorAdjustment', 'gasUsed', 'reportedRefundCounter', 'reservoirDelta', 'stateGasUsedRaw', 'executionRegularGasUsed', 'stateGasUsed', 'regularGasUsed', 'preRefundGasWithFloor', 'singleTransactionBlockGasUsed'];
 const MAX = (1n << 256n) - 1n;
 const need = value => { if (!value) throw new Error('Gas accounting does not match the verified transaction context.'); };
 const strings = values => Object.fromEntries(Object.entries(values).map(([key, value]) => [key, typeof value === 'bigint' ? value.toString() : value]));

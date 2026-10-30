@@ -106,6 +106,20 @@ export function validateExecutionLifecycle({ output, inputs, destination, change
     if (['CREATE', 'CREATE2'].includes(frame.type)) {
       need(frame.to === frame.executionAddress);
       need((typeof frame.to === 'string' && ADDRESS.test(frame.to)) || (frame.to === null && frame.error !== null));
+      if (!amsterdamAttempts && frame.error === 'create collision') {
+        // Historical creation enters a frame before the collision check. Its
+        // initial authenticated namespace and bound starting overlay must not
+        // authorize a storage-only collision either. A previously successful
+        // creation, authorization, or the outer sender nonce can independently
+        // supply a genuine nonce/code collision.
+        const initial = inputs.accounts?.[frame.to], prior = priorRows.get(frame.to);
+        const proof = inputs.provenance?.find(item => item.account === frame.to)?.accountProof;
+        need(initial && proof && proof.exists === initial.exists);
+        const reset = prior?.existence?.after === false || prior?.reset !== undefined;
+        const nonce = prior?.existence?.after === false ? 0n : BigInt(prior?.nonce?.after ?? (initial.exists ? initial.nonce : '0'));
+        const code = prior?.existence?.after === false ? '0x' : prior?.code?.after ?? (initial.exists ? initial.code : '0x');
+        need(reset || nonce > 0n || code !== '0x' || created.has(frame.to) || frame.to === output.trace.from || proof.storageRoot === EMPTY_STORAGE_ROOT);
+      }
     } else {
       need(typeof frame.to === 'string' && ADDRESS.test(frame.to));
       if (['DELEGATECALL', 'CALLCODE'].includes(frame.type)) need(parent && frame.executionAddress === parent.executionAddress);

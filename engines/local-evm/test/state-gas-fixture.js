@@ -78,7 +78,10 @@ export async function signedStateGasCase({ target = { nonce: 1n, code: '0x00' },
   }
   const settled = settleEthereumStateGas(budget, counters);
   assert.equal(settled.gasUsed, result.totalGasSpent, 'sender/receipt gas');
-  assert.equal(settled.blockGasUsed, result.blockGasSpent, 'pre-refund scalar block gas');
+  // Pinned EthereumJS calls this scalar blockGasSpent. It is not Amsterdam's
+  // max of cumulative regular/state dimensions; keep its meaning explicit.
+  assert.equal(settled.preRefundGasWithFloor, result.blockGasSpent, 'pre-refund scalar with floor');
+  assert.equal(settled.singleTransactionBlockGasUsed, result.txRegularGas > result.txStateGas ? result.txRegularGas : result.txStateGas);
   assert.equal(settled.regularGasUsed, result.txRegularGas, '8037 regular block dimension');
   assert.equal(settled.stateGasUsed, result.txStateGas, '8037 state block dimension');
   assert.equal(settled.reportedRefundCounter, result.gasRefund, 'pinned refund reporting after floor');

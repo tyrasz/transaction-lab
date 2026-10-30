@@ -94,6 +94,14 @@ export function validateCreationAttempts({output,inputs,startingChanges,rootNonc
     // retains the parent's execution account and transfers no native value.
     if(frame.type==='CALLCODE')need(value<=account(frame.executionAddress).balance);
     const saved=clone(state),savedCounts=new Map(counts);
+    // A root CREATE can fail before entering constructor instructions. Do not
+    // let the empty-frame shortcut admit the library's disputed storage-only
+    // collision. Internal Amsterdam collisions are checked below from their
+    // actual nonce-write observations and current chronological target facts.
+    if(creation&&frame.error==='create collision'){
+      const target=account(frame.executionAddress);
+      need(target.nonce>0n||target.code!=='0x');
+    }
     // No entered body or descendants: a pre-execution failure need not have
     // loaded its destination, transferred value, or initialized a constructor.
     if(frame.error!==null&&frame.creationAttempts.length===0&&frame.calls.length===0)return;

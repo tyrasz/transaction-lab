@@ -1,0 +1,549 @@
+{
+  "scope": {
+    "purpose": "storage_creation_client_semantics_diagnostic",
+    "selectedSyntheticCases": true,
+    "populationCoverage": false,
+    "canonicalWinnerSelected": false,
+    "publicApiTested": false,
+    "publicRpc": false,
+    "product": "owned_isolated_unsigned_priced_call",
+    "ethereumjs": "signed_type2_shared_dependency_full_VM",
+    "geth": "independent_pinned_signed_type2_transition_tool",
+    "eels": "source_only_no_runner_executed",
+    "allInputsPredeclared": true,
+    "productBeforeOtherClients": true,
+    "expectedPoststateConsumed": false,
+    "sameAmendedInitialAllocation": true,
+    "systemScaffolding": "four_inert_STOP_accounts_geth_postblock_only",
+    "separateGethGasDimensionsExposed": false,
+    "productUnavailableRemainsNull": true
+  },
+  "observationsUsable": true,
+  "counts": {
+    "product": {
+      "unavailable": 3,
+      "unsupported": 1,
+      "observed": 2
+    },
+    "ethereumjs": {
+      "unavailable": 3,
+      "observed": 3
+    },
+    "geth": {
+      "observed": 6
+    }
+  },
+  "rows": [
+    {
+      "id": "root_create_storage_only",
+      "product": {
+        "status": "unavailable",
+        "executionStatus": null,
+        "error": "dispatch_started",
+        "stateRoot": null,
+        "rollbackStateRoot": null,
+        "targetBehavior": null,
+        "target": null,
+        "gasUsed": null,
+        "singleTransactionBlockGasUsed": null
+      },
+      "ethereumjs": {
+        "status": "unavailable",
+        "executionStatus": null,
+        "error": "dispatch_started",
+        "stateRoot": null,
+        "rollbackStateRoot": null,
+        "targetBehavior": null,
+        "target": null,
+        "gasUsed": null,
+        "singleTransactionBlockGasUsed": null
+      },
+      "geth": {
+        "status": "observed",
+        "executionStatus": "success",
+        "error": null,
+        "stateRoot": "0x36ee271d204bafc9c7fbd09a582599a1d2247642d7ed3d0516e582e334f80aaf",
+        "rollbackStateRoot": null,
+        "targetBehavior": "deployed_preserving_initial_storage",
+        "target": {
+          "exists": true,
+          "nonce": "1",
+          "balance": "22",
+          "code": "0x6001546000526002546020526103df5460405260606000f3",
+          "slots": {
+            "0": "999",
+            "1": "123456",
+            "2": "42",
+            "991": "123456"
+          }
+        },
+        "gasUsed": "283638",
+        "singleTransactionBlockGasUsed": "232560"
+      },
+      "comparisons": {
+        "product_ethereumjs": {
+          "executionStatus": null,
+          "returnData": null,
+          "gasUsed": null,
+          "singleTransactionBlockGasUsed": null,
+          "stateRoot": null,
+          "target": null,
+          "logs": null
+        },
+        "product_geth": {
+          "executionStatus": null,
+          "returnData": null,
+          "gasUsed": null,
+          "singleTransactionBlockGasUsed": null,
+          "stateRoot": null,
+          "target": null,
+          "logs": null
+        },
+        "ethereumjs_geth": {
+          "executionStatus": null,
+          "returnData": null,
+          "gasUsed": null,
+          "singleTransactionBlockGasUsed": null,
+          "stateRoot": null,
+          "target": null,
+          "logs": null
+        }
+      }
+    },
+    {
+      "id": "internal_create2_storage_only",
+      "product": {
+        "status": "unsupported",
+        "executionStatus": "unsupported",
+        "error": null,
+        "stateRoot": null,
+        "rollbackStateRoot": "0x6d1ceebcefcb0926b1347547c2a2899efd0d1c9d862388f877b08139e66164d4",
+        "targetBehavior": null,
+        "target": null,
+        "gasUsed": null,
+        "singleTransactionBlockGasUsed": null
+      },
+      "ethereumjs": {
+        "status": "observed",
+        "executionStatus": "success",
+        "error": null,
+        "stateRoot": "0x3514f1b167da092a83a33ed319fe349283ab278b82e50ed14b1a664bfff1cb27",
+        "rollbackStateRoot": null,
+        "targetBehavior": "not_deployed",
+        "target": {
+          "exists": true,
+          "nonce": "0",
+          "balance": "17",
+          "code": "0x",
+          "slots": {
+            "0": "999",
+            "1": "0",
+            "2": "0",
+            "991": "123456"
+          }
+        },
+        "gasUsed": "4922310",
+        "singleTransactionBlockGasUsed": "4922310"
+      },
+      "geth": {
+        "status": "observed",
+        "executionStatus": "success",
+        "error": null,
+        "stateRoot": "0x7e17837643da6072afed4a88d020c0e14b418b1fa993e886c4c76304d8da22f2",
+        "rollbackStateRoot": null,
+        "targetBehavior": "deployed_preserving_initial_storage",
+        "target": {
+          "exists": true,
+          "nonce": "1",
+          "balance": "22",
+          "code": "0x6001546000526002546020526103df5460405260606000f3",
+          "slots": {
+            "0": "999",
+            "1": "123456",
+            "2": "42",
+            "991": "123456"
+          }
+        },
+        "gasUsed": "285966",
+        "singleTransactionBlockGasUsed": "232560"
+      },
+      "comparisons": {
+        "product_ethereumjs": {
+          "executionStatus": null,
+          "returnData": null,
+          "gasUsed": null,
+          "singleTransactionBlockGasUsed": null,
+          "stateRoot": null,
+          "target": null,
+          "logs": null
+        },
+        "product_geth": {
+          "executionStatus": null,
+          "returnData": null,
+          "gasUsed": null,
+          "singleTransactionBlockGasUsed": null,
+          "stateRoot": null,
+          "target": null,
+          "logs": null
+        },
+        "ethereumjs_geth": {
+          "executionStatus": true,
+          "returnData": false,
+          "gasUsed": false,
+          "singleTransactionBlockGasUsed": false,
+          "stateRoot": false,
+          "target": false,
+          "logs": false
+        }
+      }
+    },
+    {
+      "id": "root_create_absent",
+      "product": {
+        "status": "unavailable",
+        "executionStatus": null,
+        "error": "dispatch_started",
+        "stateRoot": null,
+        "rollbackStateRoot": null,
+        "targetBehavior": null,
+        "target": null,
+        "gasUsed": null,
+        "singleTransactionBlockGasUsed": null
+      },
+      "ethereumjs": {
+        "status": "unavailable",
+        "executionStatus": null,
+        "error": "dispatch_started",
+        "stateRoot": null,
+        "rollbackStateRoot": null,
+        "targetBehavior": null,
+        "target": null,
+        "gasUsed": null,
+        "singleTransactionBlockGasUsed": null
+      },
+      "geth": {
+        "status": "observed",
+        "executionStatus": "success",
+        "error": null,
+        "stateRoot": "0x11f3a305c92ad1fc12f8c1c3b6f93e553e6e043d3c3b02b35a96596eff4feb82",
+        "rollbackStateRoot": null,
+        "targetBehavior": "deployed_control",
+        "target": {
+          "exists": true,
+          "nonce": "1",
+          "balance": "5",
+          "code": "0x6001546000526002546020526103df5460405260606000f3",
+          "slots": {
+            "0": "0",
+            "1": "0",
+            "2": "42",
+            "991": "0"
+          }
+        },
+        "gasUsed": "359318",
+        "singleTransactionBlockGasUsed": "318240"
+      },
+      "comparisons": {
+        "product_ethereumjs": {
+          "executionStatus": null,
+          "returnData": null,
+          "gasUsed": null,
+          "singleTransactionBlockGasUsed": null,
+          "stateRoot": null,
+          "target": null,
+          "logs": null
+        },
+        "product_geth": {
+          "executionStatus": null,
+          "returnData": null,
+          "gasUsed": null,
+          "singleTransactionBlockGasUsed": null,
+          "stateRoot": null,
+          "target": null,
+          "logs": null
+        },
+        "ethereumjs_geth": {
+          "executionStatus": null,
+          "returnData": null,
+          "gasUsed": null,
+          "singleTransactionBlockGasUsed": null,
+          "stateRoot": null,
+          "target": null,
+          "logs": null
+        }
+      }
+    },
+    {
+      "id": "internal_create2_absent",
+      "product": {
+        "status": "observed",
+        "executionStatus": "success",
+        "error": null,
+        "stateRoot": "0x1228358586d36589332080b9f6a78418527dcfaed41d8fe5f3612262bc973855",
+        "rollbackStateRoot": null,
+        "targetBehavior": "deployed_control",
+        "target": {
+          "exists": true,
+          "nonce": "1",
+          "balance": "5",
+          "code": "0x6001546000526002546020526103df5460405260606000f3",
+          "slots": {
+            "0": "0",
+            "1": "0",
+            "2": "42",
+            "991": "0"
+          }
+        },
+        "gasUsed": "361646",
+        "singleTransactionBlockGasUsed": "318240"
+      },
+      "ethereumjs": {
+        "status": "observed",
+        "executionStatus": "success",
+        "error": null,
+        "stateRoot": "0x1228358586d36589332080b9f6a78418527dcfaed41d8fe5f3612262bc973855",
+        "rollbackStateRoot": null,
+        "targetBehavior": "deployed_control",
+        "target": {
+          "exists": true,
+          "nonce": "1",
+          "balance": "5",
+          "code": "0x6001546000526002546020526103df5460405260606000f3",
+          "slots": {
+            "0": "0",
+            "1": "0",
+            "2": "42",
+            "991": "0"
+          }
+        },
+        "gasUsed": "361646",
+        "singleTransactionBlockGasUsed": "318240"
+      },
+      "geth": {
+        "status": "observed",
+        "executionStatus": "success",
+        "error": null,
+        "stateRoot": "0x1228358586d36589332080b9f6a78418527dcfaed41d8fe5f3612262bc973855",
+        "rollbackStateRoot": null,
+        "targetBehavior": "deployed_control",
+        "target": {
+          "exists": true,
+          "nonce": "1",
+          "balance": "5",
+          "code": "0x6001546000526002546020526103df5460405260606000f3",
+          "slots": {
+            "0": "0",
+            "1": "0",
+            "2": "42",
+            "991": "0"
+          }
+        },
+        "gasUsed": "361646",
+        "singleTransactionBlockGasUsed": "318240"
+      },
+      "comparisons": {
+        "product_ethereumjs": {
+          "executionStatus": true,
+          "returnData": true,
+          "gasUsed": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        },
+        "product_geth": {
+          "executionStatus": true,
+          "returnData": true,
+          "gasUsed": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        },
+        "ethereumjs_geth": {
+          "executionStatus": true,
+          "returnData": true,
+          "gasUsed": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        }
+      }
+    },
+    {
+      "id": "root_create_empty_storage",
+      "product": {
+        "status": "unavailable",
+        "executionStatus": null,
+        "error": "dispatch_started",
+        "stateRoot": null,
+        "rollbackStateRoot": null,
+        "targetBehavior": null,
+        "target": null,
+        "gasUsed": null,
+        "singleTransactionBlockGasUsed": null
+      },
+      "ethereumjs": {
+        "status": "unavailable",
+        "executionStatus": null,
+        "error": "dispatch_started",
+        "stateRoot": null,
+        "rollbackStateRoot": null,
+        "targetBehavior": null,
+        "target": null,
+        "gasUsed": null,
+        "singleTransactionBlockGasUsed": null
+      },
+      "geth": {
+        "status": "observed",
+        "executionStatus": "success",
+        "error": null,
+        "stateRoot": "0xb22f3da8240ddbe044d4efc2621a0dfced1eb164177bd74db5c1ccf77284a401",
+        "rollbackStateRoot": null,
+        "targetBehavior": "deployed_control",
+        "target": {
+          "exists": true,
+          "nonce": "1",
+          "balance": "22",
+          "code": "0x6001546000526002546020526103df5460405260606000f3",
+          "slots": {
+            "0": "0",
+            "1": "0",
+            "2": "42",
+            "991": "0"
+          }
+        },
+        "gasUsed": "175718",
+        "singleTransactionBlockGasUsed": "134640"
+      },
+      "comparisons": {
+        "product_ethereumjs": {
+          "executionStatus": null,
+          "returnData": null,
+          "gasUsed": null,
+          "singleTransactionBlockGasUsed": null,
+          "stateRoot": null,
+          "target": null,
+          "logs": null
+        },
+        "product_geth": {
+          "executionStatus": null,
+          "returnData": null,
+          "gasUsed": null,
+          "singleTransactionBlockGasUsed": null,
+          "stateRoot": null,
+          "target": null,
+          "logs": null
+        },
+        "ethereumjs_geth": {
+          "executionStatus": null,
+          "returnData": null,
+          "gasUsed": null,
+          "singleTransactionBlockGasUsed": null,
+          "stateRoot": null,
+          "target": null,
+          "logs": null
+        }
+      }
+    },
+    {
+      "id": "internal_create2_empty_storage",
+      "product": {
+        "status": "observed",
+        "executionStatus": "success",
+        "error": null,
+        "stateRoot": "0x8431782e6ed2d9b9c37b37f6d6d793c05d8a594de01c3de79ba898e1bbb5dc44",
+        "rollbackStateRoot": null,
+        "targetBehavior": "deployed_control",
+        "target": {
+          "exists": true,
+          "nonce": "1",
+          "balance": "22",
+          "code": "0x6001546000526002546020526103df5460405260606000f3",
+          "slots": {
+            "0": "0",
+            "1": "0",
+            "2": "42",
+            "991": "0"
+          }
+        },
+        "gasUsed": "178046",
+        "singleTransactionBlockGasUsed": "134640"
+      },
+      "ethereumjs": {
+        "status": "observed",
+        "executionStatus": "success",
+        "error": null,
+        "stateRoot": "0x8431782e6ed2d9b9c37b37f6d6d793c05d8a594de01c3de79ba898e1bbb5dc44",
+        "rollbackStateRoot": null,
+        "targetBehavior": "deployed_control",
+        "target": {
+          "exists": true,
+          "nonce": "1",
+          "balance": "22",
+          "code": "0x6001546000526002546020526103df5460405260606000f3",
+          "slots": {
+            "0": "0",
+            "1": "0",
+            "2": "42",
+            "991": "0"
+          }
+        },
+        "gasUsed": "178046",
+        "singleTransactionBlockGasUsed": "134640"
+      },
+      "geth": {
+        "status": "observed",
+        "executionStatus": "success",
+        "error": null,
+        "stateRoot": "0x8431782e6ed2d9b9c37b37f6d6d793c05d8a594de01c3de79ba898e1bbb5dc44",
+        "rollbackStateRoot": null,
+        "targetBehavior": "deployed_control",
+        "target": {
+          "exists": true,
+          "nonce": "1",
+          "balance": "22",
+          "code": "0x6001546000526002546020526103df5460405260606000f3",
+          "slots": {
+            "0": "0",
+            "1": "0",
+            "2": "42",
+            "991": "0"
+          }
+        },
+        "gasUsed": "178046",
+        "singleTransactionBlockGasUsed": "134640"
+      },
+      "comparisons": {
+        "product_ethereumjs": {
+          "executionStatus": true,
+          "returnData": true,
+          "gasUsed": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        },
+        "product_geth": {
+          "executionStatus": true,
+          "returnData": true,
+          "gasUsed": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        },
+        "ethereumjs_geth": {
+          "executionStatus": true,
+          "returnData": true,
+          "gasUsed": true,
+          "singleTransactionBlockGasUsed": true,
+          "stateRoot": true,
+          "target": true,
+          "logs": true
+        }
+      }
+    }
+  ]
+}

@@ -29,7 +29,8 @@ test('reservoir refills retain a negative delta; ordinary refunds and floor rema
   assert.equal(s.reservoirDelta, -500n); assert.equal(s.stateGasUsedRaw, 0n); assert.equal(s.stateGasUsed, 0n);
   assert.equal(s.beforeRefund, 114500n); assert.equal(s.executionRegularGasUsed, 99500n);
   assert.equal(s.appliedRefund, 22900n); assert.equal(s.gasUsed, 91600n);
-  assert.equal(s.regularGasUsed, 114500n); assert.equal(s.blockGasUsed, 114500n);
+  assert.equal(s.regularGasUsed, 114500n); assert.equal(s.preRefundGasWithFloor, 114500n);
+  assert.equal(s.singleTransactionBlockGasUsed, 114500n); assert.equal(Object.hasOwn(s, 'blockGasUsed'), false);
   const floor = settleEthereumStateGas(budget({ floor: 120000n }), counters({ messageRefundCounter: 1n }));
   assert.equal(floor.gasUsed, 120000n); assert.equal(floor.floorAdjustment, 5001n); assert.equal(floor.reportedRefundCounter, 0n);
 });
@@ -108,7 +109,7 @@ test('signed SSTORE allocation/clear and original-slot refund separate state ref
     assert.equal(f.settled.stateGasUsed, stateGas);
     if (storage['0'] && after === 0n) {
       assert(f.settled.refundCounter > 0n); assert(f.settled.appliedRefund > 0n);
-      assert(f.settled.blockGasUsed > f.settled.gasUsed);
+      assert(f.settled.preRefundGasWithFloor > f.settled.gasUsed);
     }
   }
 });

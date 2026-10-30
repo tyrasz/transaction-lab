@@ -64,9 +64,9 @@ test('only acknowledged nonce writes produce attempts; zero-write huge-memory an
   assert.throws(() => finish(g, [42n, 0n]), /not acknowledged/);
 });
 
-test('collision facts cover nonce, code and storage; repeated collisions share the unconsumed child position', async () => {
+test('nonce/code collisions retain storage facts; repeated collisions share the unconsumed child position', async () => {
   const f = fixture();
-  for (const target of [new Account(1n), new Account(0n, 0n, KECCAK256_RLP, new Uint8Array(32).fill(1)), new Account(0n, 0n, new Uint8Array(32).fill(2))]) {
+  for (const target of [new Account(1n), new Account(0n, 0n, KECCAK256_RLP, new Uint8Array(32).fill(1)), new Account(1n, 0n, new Uint8Array(32).fill(2))]) {
     const a = arm(f); await write(f); targetRead(f, a, target);
     // Subsequent reads must never replace the actual first collision snapshot.
     targetRead(f, a, undefined);
@@ -74,6 +74,12 @@ test('collision facts cover nonce, code and storage; repeated collisions share t
   }
   finish(f, []); assert.equal(f.frame.calls.length, 0); assert.equal(f.frame.creationAttempts.length, 3);
   assert.deepEqual(f.frame.creationAttempts.map(r => [r.position, r.nonceBefore, r.result, r.disposition]), [[0, '0x7', '0x0', 'collision'], [0, '0x8', '0x0', 'collision'], [0, '0x9', '0x0', 'collision']]);
+});
+
+test('an actually accessed storage-only creation target is an unsupported host outcome', async () => {
+  const f = fixture(), a = arm(f); await write(f);
+  assert.throws(() => targetRead(f, a, new Account(0n, 0n, new Uint8Array(32).fill(2))), {code:'LOCAL_CREATION_STORAGE_UNSUPPORTED'});
+  assert.deepEqual(f.frame.creationAttempts, []);
 });
 
 test('constructor faults retain the own-parent attempt and bind zero; pinned code-store exception binds address', async () => {

@@ -1,0 +1,107 @@
+TAP version 13
+# Subtest: priced/unpriced internal CREATE and CREATE2 with storage-only target are unsupported and roll back all transaction effects
+ok 1 - priced/unpriced internal CREATE and CREATE2 with storage-only target are unsupported and roll back all transaction effects
+  ---
+  duration_ms: 518.22375
+  type: 'test'
+  ...
+# Subtest: zero-balance hidden-storage targets cannot evade the boundary through EIP161 emptiness or state-precharge refund
+ok 2 - zero-balance hidden-storage targets cannot evade the boundary through EIP161 emptiness or state-precharge refund
+  ---
+  duration_ms: 244.317333
+  type: 'test'
+  ...
+# Subtest: ancestor catch or REVERT cannot swallow the unsupported creation boundary or retain earlier writes
+ok 3 - ancestor catch or REVERT cannot swallow the unsupported creation boundary or retain earlier writes
+  ---
+  duration_ms: 382.873333
+  type: 'test'
+  ...
+# Subtest: root CREATE with hidden storage is withheld before it can be reported as a completed collision
+ok 4 - root CREATE with hidden storage is withheld before it can be reported as a completed collision
+  ---
+  duration_ms: 238.180458
+  type: 'test'
+  ...
+# Subtest: historical Osaka root CREATE and internal CREATE/CREATE2 also withhold the disputed storage-only outcome
+ok 5 - historical Osaka root CREATE and internal CREATE/CREATE2 also withhold the disputed storage-only outcome
+  ---
+  duration_ms: 363.979625
+  type: 'test'
+  ...
+# Subtest: existing delegated sender and self-authorization preparation cannot retain nonce/code/fees after disputed creation
+not ok 6 - existing delegated sender and self-authorization preparation cannot retain nonce/code/fees after disputed creation
+  ---
+  duration_ms: 264.094708
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/amsterdam-storage-collision.test.js:89:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    {"code":"LOCAL_ISOLATED_PROTOCOL","message":"The isolated worker protocol was invalid."}
+    + actual - expected
+    
+    + 'unavailable'
+    - 'completed'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'completed'
+  actual: 'unavailable'
+  operator: 'strictEqual'
+  stack: |-
+    withheld (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/amsterdam-storage-collision.test.js:29:9)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/amsterdam-storage-collision.test.js:94:7)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: absent and empty-storage targets still deploy through root CREATE and internal CREATE2 with signed/full-MPT agreement
+ok 7 - absent and empty-storage targets still deploy through root CREATE and internal CREATE2 with signed/full-MPT agreement
+  ---
+  duration_ms: 533.380834
+  type: 'test'
+  ...
+# Subtest: unsupported before-query creation remains unavailable even under a reverted helper, without poisoning later native overlays
+ok 8 - unsupported before-query creation remains unavailable even under a reverted helper, without poisoning later native overlays
+  ---
+  duration_ms: 263.815375
+  type: 'test'
+  ...
+# Subtest: a reverted deployment into empty storage remains a neutral measured query contrast
+ok 9 - a reverted deployment into empty storage remains a neutral measured query contrast
+  ---
+  duration_ms: 146.660084
+  type: 'test'
+  ...
+# Subtest: ordinary CALL to storage-only account is allowed, and creation fail-fast never demands its target
+not ok 10 - ordinary CALL to storage-only account is allowed, and creation fail-fast never demands its target
+  ---
+  duration_ms: 246.200875
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/amsterdam-storage-collision.test.js:144:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    true !== false
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: false
+  actual: true
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/amsterdam-storage-collision.test.js:157:87)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 8
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3383.086125

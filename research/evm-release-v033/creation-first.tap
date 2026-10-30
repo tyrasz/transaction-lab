@@ -1,0 +1,436 @@
+TAP version 13
+# Subtest: repeated CREATE2 records two increments with one constructor and no second endowment
+ok 1 - repeated CREATE2 records two increments with one constructor and no second endowment
+  ---
+  duration_ms: 222.259625
+  type: 'test'
+  ...
+# Subtest: initial nonce/code collisions for both creation opcodes retain nonce but never transfer endowment
+ok 2 - initial nonce/code collisions for both creation opcodes retain nonce but never transfer endowment
+  ---
+  duration_ms: 581.836333
+  type: 'test'
+  ...
+# Subtest: constructor REVERT/INVALID retain creator nonce but roll back value/code/storage
+ok 3 - constructor REVERT/INVALID retain creator nonce but roll back value/code/storage
+  ---
+  duration_ms: 288.048291
+  type: 'test'
+  ...
+# Subtest: root and caught enclosing rollback discard observed collision increments and deployments
+ok 4 - root and caught enclosing rollback discard observed collision increments and deployments
+  ---
+  duration_ms: 300.409167
+  type: 'test'
+  ...
+# Subtest: constructor-created child has separate nonce-one baseline and distinct attempt ancestry
+ok 5 - constructor-created child has separate nonce-one baseline and distinct attempt ancestry
+  ---
+  duration_ms: 138.478833
+  type: 'test'
+  ...
+# Subtest: DELEGATECALL creations increment execution address, never implementation address
+ok 6 - DELEGATECALL creations increment execution address, never implementation address
+  ---
+  duration_ms: 136.128333
+  type: 'test'
+  ...
+# Subtest: reentrant creation observes chronological nonce changes and resumed-parent positions
+ok 7 - reentrant creation observes chronological nonce changes and resumed-parent positions
+  ---
+  duration_ms: 144.311125
+  type: 'test'
+  ...
+# Subtest: balance/nonce fail-fast and inherited static creation produce no nonce-write attempts
+ok 8 - balance/nonce fail-fast and inherited static creation produce no nonce-write attempts
+  ---
+  duration_ms: 398.156375
+  type: 'test'
+  ...
+# Subtest: pre-target and account-state-charge OOG cannot be counted as nonce writes
+ok 9 - pre-target and account-state-charge OOG cannot be counted as nonce writes
+  ---
+  duration_ms: 260.027416
+  type: 'test'
+  ...
+# Subtest: CREATE as final opcode resolves success and no-child collision from terminal stack
+ok 10 - CREATE as final opcode resolves success and no-child collision from terminal stack
+  ---
+  duration_ms: 263.395292
+  type: 'test'
+  ...
+# Subtest: failed creator writes before and after mutation roll back nonce, upfront fees and value
+ok 11 - failed creator writes before and after mutation roll back nonce, upfront fees and value
+  ---
+  duration_ms: 39.530959
+  type: 'test'
+  ...
+# Subtest: failed post-increment collision-state read cannot retain a creator write
+ok 12 - failed post-increment collision-state read cannot retain a creator write
+  ---
+  duration_ms: 8.783834
+  type: 'test'
+  ...
+# Subtest: no-child attempts consume the existing frame evidence budget and roll back on exhaustion
+ok 13 - no-child attempts consume the existing frame evidence budget and roll back on exhaustion
+  ---
+  duration_ms: 13.640375
+  type: 'test'
+  ...
+# Subtest: observer binds successful CREATE/CREATE2 writes, detached target facts and terminal result stacks
+ok 14 - observer binds successful CREATE/CREATE2 writes, detached target facts and terminal result stacks
+  ---
+  duration_ms: 2.786708
+  type: 'test'
+  ...
+# Subtest: only acknowledged nonce writes produce attempts; zero-write huge-memory and underflow candidates disappear
+ok 15 - only acknowledged nonce writes produce attempts; zero-write huge-memory and underflow candidates disappear
+  ---
+  duration_ms: 1.069166
+  type: 'test'
+  ...
+# Subtest: collision facts cover nonce, code and storage; repeated collisions share the unconsumed child position
+not ok 16 - collision facts cover nonce, code and storage; repeated collisions share the unconsumed child position
+  ---
+  duration_ms: 3.067333
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/creation-attempt-observer.test.js:67:1'
+  failureType: 'testCodeFailure'
+  error: 'Creation at an account with empty code, zero nonce and nonempty storage is not supported by the verified execution profile.'
+  code: 'LOCAL_CREATION_STORAGE_UNSUPPORTED'
+  stack: |-
+    unsupportedStorageCreation (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/creation-support.js:15:17)
+    Object.afterGetAccount (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/creation-attempt-observer.js:156:54)
+    targetRead (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/creation-attempt-observer.test.js:36:55)
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/creation-attempt-observer.test.js:70:39)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: constructor faults retain the own-parent attempt and bind zero; pinned code-store exception binds address
+ok 17 - constructor faults retain the own-parent attempt and bind zero; pinned code-store exception binds address
+  ---
+  duration_ms: 3.800416
+  type: 'test'
+  ...
+# Subtest: creator reads are limited to armed matching writes, and every unchanged account field is bound
+ok 18 - creator reads are limited to armed matching writes, and every unchanged account field is bound
+  ---
+  duration_ms: 0.757459
+  type: 'test'
+  ...
+# Subtest: zero-length initcode ignores huge offset, and short pre-op memory supplies zero-padded initcode
+ok 19 - zero-length initcode ignores huge offset, and short pre-op memory supplies zero-padded initcode
+  ---
+  duration_ms: 0.240375
+  type: 'test'
+  ...
+# Subtest: wrong target, missing target, orphan creation and colliding child are rejected
+ok 20 - wrong target, missing target, orphan creation and colliding child are rejected
+  ---
+  duration_ms: 2.785
+  type: 'test'
+  ...
+# Subtest: child joins reject altered type, input, value, sender, depth, salt and returned address
+ok 21 - child joins reject altered type, input, value, sender, depth, salt and returned address
+  ---
+  duration_ms: 1.3065
+  type: 'test'
+  ...
+# Subtest: resolution rejects wrong result, changed stack prefix, missing terminal stack and unfinished child
+ok 22 - resolution rejects wrong result, changed stack prefix, missing terminal stack and unfinished child
+  ---
+  duration_ms: 1.237458
+  type: 'test'
+  ...
+# Subtest: attempt count, pending bytes, final trace bytes, memory and calldata obey supplied ceilings
+ok 23 - attempt count, pending bytes, final trace bytes, memory and calldata obey supplied ceilings
+  ---
+  duration_ms: 0.531417
+  type: 'test'
+  ...
+# Subtest: host errors and nullish throws propagate unchanged through reads and budget hooks
+ok 24 - host errors and nullish throws propagate unchanged through reads and budget hooks
+  ---
+  duration_ms: 0.677667
+  type: 'test'
+  ...
+# Subtest: parent requires exact canonical attempt and target records without invoking accessors
+ok 25 - parent requires exact canonical attempt and target records without invoking accessors
+  ---
+  duration_ms: 34.584584
+  type: 'test'
+  ...
+# Subtest: parent binds attempts to opcode, target derivation, current target state and child result
+ok 26 - parent binds attempts to opcode, target derivation, current target state and child result
+  ---
+  duration_ms: 7.470917
+  type: 'test'
+  ...
+# Subtest: each entered creation has one ledger join and every entered frame has an explicit array
+ok 27 - each entered creation has one ledger join and every entered frame has an explicit array
+  ---
+  duration_ms: 2.314834
+  type: 'test'
+  ...
+# Subtest: reentrant creation must observe intermediate nonce updates at its declared child position
+ok 28 - reentrant creation must observe intermediate nonce updates at its declared child position
+  ---
+  duration_ms: 18.213125
+  type: 'test'
+  ...
+# Subtest: delegated creation inherits its parent value as well as caller and execution address
+ok 29 - delegated creation inherits its parent value as well as caller and execution address
+  ---
+  duration_ms: 8.30025
+  type: 'test'
+  ...
+# Subtest: CALLCODE requires affordable value without transferring it, including an immediately failed child
+ok 30 - CALLCODE requires affordable value without transferring it, including an immediately failed child
+  ---
+  duration_ms: 12.783084
+  type: 'test'
+  ...
+# Subtest: enclosing rollback discards descendant attempts and inherited static cannot acquire them
+ok 31 - enclosing rollback discards descendant attempts and inherited static cannot acquire them
+  ---
+  duration_ms: 11.010084
+  type: 'test'
+  ...
+# Subtest: root construction starts target nonce at one without counting outer sender preparation twice
+ok 32 - root construction starts target nonce at one without counting outer sender preparation twice
+  ---
+  duration_ms: 4.6505
+  type: 'test'
+  ...
+# Subtest: query chronology starts from carried nonce/code state and separately increments its caller
+ok 33 - query chronology starts from carried nonce/code state and separately increments its caller
+  ---
+  duration_ms: 5.612917
+  type: 'test'
+  ...
+# Subtest: actual child target-state forgery is withheld even after recounting trace bytes
+ok 34 - actual child target-state forgery is withheld even after recounting trace bytes
+  ---
+  duration_ms: 153.495083
+  type: 'test'
+  ...
+# Subtest: creation intrinsic charges exact initcode word boundaries, with unchanged legacy gas shape
+ok 35 - creation intrinsic charges exact initcode word boundaries, with unchanged legacy gas shape
+  ---
+  duration_ms: 23.795875
+  type: 'test'
+  ...
+# Subtest: creation charges duplicate access-list occurrences while the calldata floor stays independent
+ok 36 - creation charges duplicate access-list occurrences while the calldata floor stays independent
+  ---
+  duration_ms: 2.02775
+  type: 'test'
+  ...
+# Subtest: large initcode uses the active calldata floor without subtracting that floor from message gas
+ok 37 - large initcode uses the active calldata floor without subtracting that floor from message gas
+  ---
+  duration_ms: 12.63325
+  type: 'test'
+  ...
+# Subtest: empty initcode admits exactly 53000 gas and increments the proven sender nonce once
+ok 38 - empty initcode admits exactly 53000 gas and increments the proven sender nonce once
+  ---
+  duration_ms: 3.239334
+  type: 'test'
+  ...
+# Subtest: creation returns deployed runtime bytes and retains constructor writes without charging code deposit twice
+ok 39 - creation returns deployed runtime bytes and retains constructor writes without charging code deposit twice
+  ---
+  duration_ms: 8.153209
+  type: 'test'
+  ...
+# Subtest: the 32 KiB product initcode bound remains stricter than EIP-3860 and rejects before any proof read
+ok 40 - the 32 KiB product initcode bound remains stricter than EIP-3860 and rejects before any proof read
+  ---
+  duration_ms: 14.714084
+  type: 'test'
+  ...
+# Subtest: missing or malformed destinations, root salts, blob creation and insufficient gas never touch state
+ok 41 - missing or malformed destinations, root salts, blob creation and insufficient gas never touch state
+  ---
+  duration_ms: 3.340375
+  type: 'test'
+  ...
+# Subtest: creation preview retains explicit getter identities and never turns an absent before-contract into zero
+ok 42 - creation preview retains explicit getter identities and never turns an absent before-contract into zero
+  ---
+  duration_ms: 14.487208
+  type: 'test'
+  ...
+# Subtest: a genuine constructor revert remains completed while existing getters measure unchanged state
+ok 43 - a genuine constructor revert remains completed while existing getters measure unchanged state
+  ---
+  duration_ms: 7.376667
+  type: 'test'
+  ...
+# Subtest: preview rejects malformed creation envelopes and forbidden blob context before state transport
+ok 44 - preview rejects malformed creation envelopes and forbidden blob context before state transport
+  ---
+  duration_ms: 3.667959
+  type: 'test'
+  ...
+# Subtest: actual isolated worker retains authenticated CREATE code, storage and balances
+ok 45 - actual isolated worker retains authenticated CREATE code, storage and balances
+  ---
+  duration_ms: 239.80625
+  type: 'test'
+  ...
+# Subtest: actual isolated worker retains authenticated CREATE2 code, storage and balances
+ok 46 - actual isolated worker retains authenticated CREATE2 code, storage and balances
+  ---
+  duration_ms: 148.64175
+  type: 'test'
+  ...
+# Subtest: actual isolated worker retains only the sender nonce after creation then root revert
+ok 47 - actual isolated worker retains only the sender nonce after creation then root revert
+  ---
+  duration_ms: 143.787458
+  type: 'test'
+  ...
+# Subtest: disposable preview queries preserve original deployments and do not invent an absent pre-deployment balance
+ok 48 - disposable preview queries preserve original deployments and do not invent an absent pre-deployment balance
+  ---
+  duration_ms: 140.322
+  type: 'test'
+  ...
+# Subtest: parent rejects substituted code, initial values, creation ancestry and missing deployment rows
+ok 49 - parent rejects substituted code, initial values, creation ancestry and missing deployment rows
+  ---
+  duration_ms: 934.091291
+  type: 'test'
+  ...
+# Subtest: a constructor can create a second contract while preserving both initial absence proofs
+ok 50 - a constructor can create a second contract while preserving both initial absence proofs
+  ---
+  duration_ms: 22.373708
+  type: 'test'
+  ...
+# Subtest: a constructor executes the freshly deployed child runtime and reads its constructor storage
+ok 51 - a constructor executes the freshly deployed child runtime and reads its constructor storage
+  ---
+  duration_ms: 5.549458
+  type: 'test'
+  ...
+# Subtest: an outer step limit removes a previously committed child deployment and all outer nonce changes
+ok 52 - an outer step limit removes a previously committed child deployment and all outer nonce changes
+  ---
+  duration_ms: 8.756291
+  type: 'test'
+  ...
+# Subtest: CREATE2 collision with a nonempty initial storage root is an EVM failure without clearing that state
+not ok 53 - CREATE2 collision with a nonempty initial storage root is an EVM failure without clearing that state
+  ---
+  duration_ms: 5.980542
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/lifecycle-edge.test.js:89:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'unsupported'
+    - 'success'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'success'
+  actual: 'unsupported'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/lifecycle-edge.test.js:96:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: CREATE reached in STATICCALL remains an ordinary child fault with no creation or creator nonce change
+ok 54 - CREATE reached in STATICCALL remains an ordinary child fault with no creation or creator nonce change
+  ---
+  duration_ms: 3.974
+  type: 'test'
+  ...
+# Subtest: parent accepts absent/prefunded top-level CREATE including empty initcode and runtime
+ok 55 - parent accepts absent/prefunded top-level CREATE including empty initcode and runtime
+  ---
+  duration_ms: 590.309083
+  type: 'test'
+  ...
+# Subtest: root CREATE derivation uses authenticated original nonce with canonical RLP boundary encoding
+ok 56 - root CREATE derivation uses authenticated original nonce with canonical RLP boundary encoding
+  ---
+  duration_ms: 402.367875
+  type: 'test'
+  ...
+# Subtest: nested constructors preserve top-level versus internal origin and discard all creations on root revert
+ok 57 - nested constructors preserve top-level versus internal origin and discard all creations on root revert
+  ---
+  duration_ms: 270.734125
+  type: 'test'
+  ...
+# Subtest: CREATE collision and resource failure retain their distinct rollback semantics
+not ok 58 - CREATE collision and resource failure retain their distinct rollback semantics
+  ---
+  duration_ms: 132.280708
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/top-level-creation-review.test.js:83:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'unsupported'
+    - 'failed'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'failed'
+  actual: 'unsupported'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/top-level-creation-review.test.js:85:55)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: root CREATE destination is independently derived even if all creation rows/facts are coherently relabelled
+ok 59 - root CREATE destination is independently derived even if all creation rows/facts are coherently relabelled
+  ---
+  duration_ms: 128.409334
+  type: 'test'
+  ...
+# Subtest: actual parent rejects CREATE identity, runtime, provenance, gas and nonce substitutions
+ok 60 - actual parent rejects CREATE identity, runtime, provenance, gas and nonce substitutions
+  ---
+  duration_ms: 1565.27575
+  type: 'test'
+  ...
+# Subtest: a reverted constructor cannot retain fabricated creation effects or successful nested effects
+ok 61 - a reverted constructor cannot retain fabricated creation effects or successful nested effects
+  ---
+  duration_ms: 117.307875
+  type: 'test'
+  ...
+# Subtest: actual constructor revert, invalid opcode and success cannot be relabelled inconsistently
+ok 62 - actual constructor revert, invalid opcode and success cannot be relabelled inconsistently
+  ---
+  duration_ms: 343.922167
+  type: 'test'
+  ...
+# Subtest: disposable CALL getters preserve creation origin and original deployment state
+ok 63 - disposable CALL getters preserve creation origin and original deployment state
+  ---
+  duration_ms: 245.883
+  type: 'test'
+  ...
+1..63
+# tests 63
+# suites 0
+# pass 60
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4189.986625

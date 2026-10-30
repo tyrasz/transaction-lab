@@ -37,7 +37,7 @@ const copyAccounts = accounts => new Map([...accounts].map(([key,row]) => [key,{
  * fee balance deltas: the existing native/creation validators apply those once.
  * accounts.current includes prepayment only for eligibility and nonce/code use.
  * Attempted writes/entries and retained writes are intentionally distinct. */
-export function deriveAmsterdamAuthorizationPreparation({request,header,inputs,common}) {
+function derive({request,header,inputs,common}, entryGasOnly) {
   const list = normalizeAuthorizationList(request);
   if (list === undefined) return null;
   const r = record(request), h = record(header), chainId = common?.chainId();
@@ -97,6 +97,10 @@ export function deriveAmsterdamAuthorizationPreparation({request,header,inputs,c
   const attempt = {gasLimit:gas,authorizationGasUsed:budget.messageGasLimit-gas,stateGasReservoir:reservoir,
     executionStateGasUsed:stateUsed,stateGasSpilled:spilled,gasRefundCounter:0n,senderAuthorizationIncrements:senderIncrements,
     outOfGas:failedIndex!==null,failedIndex,entries,accesses,writes,accounts:copyAccounts(accounts),applied:new Set(applied),tracking:new Map(tracking)};
+  // A host failure can occur after authorization processing but before the
+  // recipient proof is available. Validate that incomplete root's entry gas
+  // without asserting recipient preparation, retained writes or fee settlement.
+  if (entryGasOnly) { need(!attempt.outOfGas); return attempt.gasLimit; }
   let phase = failedIndex === null ? 'message' : 'authorization_out_of_gas';
   let recipient = null;
   if (failedIndex === null) {
@@ -140,6 +144,13 @@ export function deriveAmsterdamAuthorizationPreparation({request,header,inputs,c
     recipientPreparationGasLimit:phase==='authorization_out_of_gas'?null:gas,
     processing:{entries,gasRefundCounter:'0',preparation:strings(preparation)}};
 }
+
+export function deriveAmsterdamAuthorizationPreparation(args) { return derive(args, false); }
+
+/** For an entered but incomplete root only. This independently folds every
+ * tuple over authenticated initial facts, and needs no recipient-only read.
+ * It authorizes a trace gas value, never a completed preparation or poststate. */
+export function deriveAmsterdamAuthorizationEntryGas(args) { return derive(args, true); }
 
 /** Exact shape comparison without invoking claimed getters. This binds a child
  * metadata record to the independent derivation, not vice versa. */

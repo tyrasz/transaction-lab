@@ -86,18 +86,18 @@ test('an outer step limit removes a previously committed child deployment and al
   await assert.rejects(f.stateManager.putCode(address(target), bytes('0x00')), { code: 'LOCAL_STATE_UNSUPPORTED' });
 });
 
-test('CREATE2 collision with a nonempty initial storage root is an EVM failure without clearing that state', async () => {
+test('CREATE2 at a storage-only target is unsupported and restores the whole invocation', async () => {
   const init = initcode(), target = createdAddress({ kind: 'CREATE2', init });
   const f = await lifecycleFixture({
     code: factoryCode(init, { kind: 'CREATE2' }),
     accounts: { [target]: { nonce: 0n, balance: 17n, code: '0x', storage: { [word(0)]: 9n } } },
   });
   const result = await executeEthereumCall(f);
-  assert.equal(result.execution.status, 'success');
-  assert.equal(result.execution.returnData, word(0));
-  assert.equal(result.trace.calls[0].error, 'create collision');
-  assert.equal(result.trace.calls[0].to, target);
-  assert.equal((await account(f, FACTORY)).nonce, 8n);
+  assert.equal(result.execution.status, 'unsupported');
+  assert.equal(result.execution.error.code, 'LOCAL_CREATION_STORAGE_UNSUPPORTED');
+  assert.equal(result.stateDisposition, 'rolled_back');
+  assert.deepEqual(f.stateManager.snapshotChanges().accounts, []);
+  assert.equal((await account(f, FACTORY)).nonce, 7n);
   assert.equal((await account(f, FACTORY)).balance, 1000n);
   assert.equal((await account(f, target)).nonce, 0n);
   assert.equal((await account(f, target)).balance, 17n);

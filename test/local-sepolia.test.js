@@ -160,14 +160,19 @@ test('existing Amsterdam sender delegation survives API admission, self-call and
   }
 });
 
-test('an Amsterdam storage-only creation collision remains withheld at the parent boundary', async () => {
+test('an Amsterdam storage-only creation result is explicitly unsupported with retained proof evidence', async () => {
   const init = initcode('00', ''), target = createdAddress({ creator: TARGET, nonce: 7n, init });
   const f = await fixture({ gas: '5000000', value: '0', target: { nonce: 7n, balance: 1000n, code: factoryCode(init, { value: 0 }) },
     accounts: { [target]: { nonce: 0n, balance: 17n, code: '0x', storage: { [word(0)]: 7n } } } });
   const p = transport(f), report = await simulateLocal(inputFor(f), p.rpc); p.check(report);
   assert.equal(LOCAL_CAPABILITIES.amsterdam.storageOnlyCreationCollision, false);
-  assert.equal(report.status, 'unavailable'); assert.equal(report.error.code, 'LOCAL_ISOLATED_PROTOCOL');
-  assert.deepEqual(report.measurements, []); assert.equal(report.attempt.preview, null);
+  assert.equal(report.status, 'unavailable'); assert.equal(report.error, null);
+  assert.equal(report.execution.status, 'unsupported'); assert.equal(report.execution.error.code, 'LOCAL_CREATION_STORAGE_UNSUPPORTED');
+  assert.equal(report.measurements.length, inputFor(f).queries.length);
+  assert(report.measurements.every(row => row.status === 'not_attempted' && row.values === null));
+  assert.equal(report.attempt.preview.original.output.stateDisposition, 'rolled_back');
+  assert.deepEqual(report.attempt.preview.original.changes.accounts, []);
+  assert.equal(report.source.canonicalStatus, 'verified');
   assert.equal(report.attempt.isolation.processClosed, true); assert.equal(report.attempt.broker.pendingAtReturn, 0);
 });
 

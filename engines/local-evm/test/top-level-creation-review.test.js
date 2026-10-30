@@ -81,9 +81,13 @@ test('nested constructors preserve top-level versus internal origin and discard 
 });
 
 test('CREATE collision and resource failure retain their distinct rollback semantics', async () => {
-  const collision = await run(await fixture({ accounts: { [target]: { balance: 17n, storage: { [word(0)]: word(1) } } } }));
+  const collision = await run(await fixture({ accounts: { [target]: { nonce: 1n, balance: 17n, storage: { [word(0)]: word(1) } } } }));
   assert.equal(collision.status, 'completed'); assert.equal(collision.output.execution.status, 'failed');
   assert.equal(collision.output.trace.to, target); assert.deepEqual(collision.changes.accounts, senderOnly);
+  const unsupported = await run(await fixture({ accounts: { [target]: { balance: 17n, storage: { [word(0)]: word(1) } } } }));
+  assert.equal(unsupported.status, 'completed'); assert.equal(unsupported.output.execution.status, 'unsupported');
+  assert.equal(unsupported.output.execution.error.code, 'LOCAL_CREATION_STORAGE_UNSUPPORTED');
+  assert.equal(unsupported.output.stateDisposition, 'rolled_back'); assert.deepEqual(unsupported.changes.accounts, []);
   const limited = await run(await fixture({ init: '602a6000555b600556' }), { execution: { steps: 100 } });
   assert.equal(limited.status, 'completed'); assert.equal(limited.output.execution.status, 'unavailable');
   assert.equal(limited.output.trace.to, target); assert.equal(limited.output.stateDisposition, 'rolled_back');

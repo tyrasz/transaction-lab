@@ -1,0 +1,186 @@
+TAP version 13
+# Subtest: retained independent Geth evidence separates 250606 receipt/scalar gas from 218790 single-transaction block gas
+ok 1 - retained independent Geth evidence separates 250606 receipt/scalar gas from 218790 single-transaction block gas
+  ---
+  duration_ms: 1.220792
+  type: 'test'
+  ...
+# Subtest: multi-transaction arithmetic accumulates regular/state dimensions before taking a block maximum
+ok 2 - multi-transaction arithmetic accumulates regular/state dimensions before taking a block maximum
+  ---
+  duration_ms: 1.08975
+  type: 'test'
+  ...
+# Subtest: actual historical mainnet child keeps its existing scalar gas accounting shape
+not ok 3 - actual historical mainnet child keeps its existing scalar gas accounting shape
+  ---
+  duration_ms: 139.5435
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/amsterdam-block-gas.test.js:73:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      [
+        'appliedRefund',
+        'beforeRefund',
+        'floorAdjustment',
+        'gasUsed',
+    -   'refundCounter'
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'appliedRefund'
+    1: 'beforeRefund'
+    2: 'floorAdjustment'
+    3: 'gasUsed'
+    4: 'refundCounter'
+  actual:
+    0: 'appliedRefund'
+    1: 'beforeRefund'
+    2: 'floorAdjustment'
+    3: 'gasUsed'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/amsterdam-block-gas.test.js:77:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: canonical Amsterdam arithmetic preserves signed reservoir refills and independently rejects impossible final counters
+ok 4 - canonical Amsterdam arithmetic preserves signed reservoir refills and independently rejects impossible final counters
+  ---
+  duration_ms: 11.485125
+  type: 'test'
+  ...
+# Subtest: accounting rejects noncanonical values, extra keys, hidden fields and hostile objects before coercion
+ok 5 - accounting rejects noncanonical values, extra keys, hidden fields and hostile objects before coercion
+  ---
+  duration_ms: 2.3705
+  type: 'test'
+  ...
+# Subtest: actual Sepolia child binds native transfer, CHAINID, slot number and complete split gas dimensions
+ok 6 - actual Sepolia child binds native transfer, CHAINID, slot number and complete split gas dimensions
+  ---
+  duration_ms: 351.4745
+  type: 'test'
+  ...
+# Subtest: actual Amsterdam storage allocation/refund and revert retain their separately recomputed gas and fee effects
+ok 7 - actual Amsterdam storage allocation/refund and revert retain their separately recomputed gas and fee effects
+  ---
+  duration_ms: 465.588125
+  type: 'test'
+  ...
+# Subtest: actual cross-frame storage refill retains a negative reservoir delta without inventing negative final state usage
+ok 8 - actual cross-frame storage refill retains a negative reservoir delta without inventing negative final state usage
+  ---
+  duration_ms: 116.249709
+  type: 'test'
+  ...
+# Subtest: parent rejects changed budgets, counter bindings, settlement, trace accounting and priced charges from actual children
+ok 9 - parent rejects changed budgets, counter bindings, settlement, trace accounting and priced charges from actual children
+  ---
+  duration_ms: 1892.629833
+  type: 'test'
+  ...
+# Subtest: Sepolia native and disposable CALL queries retain chain identity and fresh unpriced Amsterdam gas accounting
+ok 10 - Sepolia native and disposable CALL queries retain chain identity and fresh unpriced Amsterdam gas accounting
+  ---
+  duration_ms: 120.005292
+  type: 'test'
+  ...
+# Subtest: Amsterdam budget split has exact regular/total boundaries and does not enable older forks
+ok 11 - Amsterdam budget split has exact regular/total boundaries and does not enable older forks
+  ---
+  duration_ms: 1.341583
+  type: 'test'
+  ...
+# Subtest: reservoir refills retain a negative delta; ordinary refunds and floor remain separate
+ok 12 - reservoir refills retain a negative delta; ordinary refunds and floor remain separate
+  ---
+  duration_ms: 0.347958
+  type: 'test'
+  ...
+# Subtest: restored OOG reservoir settles, drained counters fail and negative final state usage is unsupported
+ok 13 - restored OOG reservoir settles, drained counters fail and negative final state usage is unsupported
+  ---
+  duration_ms: 0.719958
+  type: 'test'
+  ...
+# Subtest: arithmetic rejects impossible budget/counter combinations and hostile records without invoking accessors
+ok 14 - arithmetic rejects impossible budget/counter combinations and hostile records without invoking accessors
+  ---
+  duration_ms: 0.811708
+  type: 'test'
+  ...
+# Subtest: signed native transfers distinguish existing, absent and self recipients at transaction-level setup
+ok 15 - signed native transfers distinguish existing, absent and self recipients at transaction-level setup
+  ---
+  duration_ms: 43.243417
+  type: 'test'
+  ...
+# Subtest: signed root creation pays account/code state gas only when committed and preserves prefunding distinction
+ok 16 - signed root creation pays account/code state gas only when committed and preserves prefunding distinction
+  ---
+  duration_ms: 11.416833
+  type: 'test'
+  ...
+# Subtest: signed SSTORE allocation/clear and original-slot refund separate state refills from the refund cap
+ok 17 - signed SSTORE allocation/clear and original-slot refund separate state refills from the refund cap
+  ---
+  duration_ms: 12.300958
+  type: 'test'
+  ...
+# Subtest: signed frame revert and exceptional halt roll state gas back but preserve their distinct regular charges
+ok 18 - signed frame revert and exceptional halt roll state gas back but preserve their distinct regular charges
+  ---
+  duration_ms: 7.6505
+  type: 'test'
+  ...
+# Subtest: signed transactions use a nonzero reservoir for state while returning unused reservoir on revert
+ok 19 - signed transactions use a nonzero reservoir for state while returning unused reservoir on revert
+  ---
+  duration_ms: 7.327083
+  type: 'test'
+  ...
+# Subtest: signed nested calls preserve successful state and discard reverted allocation/refill across frames
+ok 20 - signed nested calls preserve successful state and discard reverted allocation/refill across frames
+  ---
+  duration_ms: 11.961167
+  type: 'test'
+  ...
+# Subtest: signed type-4 preparation debits are counted once and survive only ordinary message rollback
+ok 21 - signed type-4 preparation debits are counted once and survive only ordinary message rollback
+  ---
+  duration_ms: 13.733958
+  type: 'test'
+  ...
+# Subtest: signed preparation OOG rolls authorization state back while retaining sender nonce and spent regular gas
+ok 22 - signed preparation OOG rolls authorization state back while retaining sender nonce and spent regular gas
+  ---
+  duration_ms: 8.469042
+  type: 'test'
+  ...
+# Subtest: signed calldata floor changes sender gas and refund reporting without erasing raw message refund
+ok 23 - signed calldata floor changes sender gas and refund reporting without erasing raw message refund
+  ---
+  duration_ms: 4.343333
+  type: 'test'
+  ...
+# Subtest: observed pinned post-target CALL OOG remains reproducible but local settlement refuses its result
+ok 24 - observed pinned post-target CALL OOG remains reproducible but local settlement refuses its result
+  ---
+  duration_ms: 3.811208
+  type: 'test'
+  ...
+1..24
+# tests 24
+# suites 0
+# pass 23
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3159.650083

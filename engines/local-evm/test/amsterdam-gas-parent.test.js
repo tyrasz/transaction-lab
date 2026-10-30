@@ -107,6 +107,9 @@ test('actual Sepolia child binds native transfer, CHAINID, slot number and compl
     assert.equal(o.execution.executionStateGasUsed, target ? '0' : '183600');
     assert.equal(o.stateGasAccounting.counters.executionStateGasUsed, o.execution.executionStateGasUsed);
     assert.deepEqual(o.gasAccounting, o.stateGasAccounting.settled); assert.equal(o.gasAccounting.gasUsed, target ? '21000' : '204600');
+    assert.equal(o.gasAccounting.preRefundGasWithFloor, target ? '21000' : '204600');
+    assert.equal(o.gasAccounting.singleTransactionBlockGasUsed, target ? '21000' : '183600');
+    assert.equal(Object.hasOwn(o.gasAccounting, 'blockGasUsed'), false);
     assert.equal(result.changes.accounts.find(r => r.address === TARGET).balance.after, '0x11');
     assert.equal(result.inputs.context.chainId, CHAIN); assert.equal(result.headerVerification.chainId, CHAIN);
   }
@@ -150,7 +153,9 @@ test('parent rejects changed budgets, counter bindings, settlement, trace accoun
     o => { o.stateGasAccounting.counters.authorizationGasUsed = '1'; },
     o => { o.stateGasAccounting.counters.authorizationRefundCounter = '1'; },
     o => { o.stateGasAccounting.counters.postTargetOutOfGas = true; },
-    o => { o.stateGasAccounting.settled.blockGasUsed = '0'; },
+    o => { o.stateGasAccounting.settled.preRefundGasWithFloor = '0'; },
+    o => { o.stateGasAccounting.settled.singleTransactionBlockGasUsed = '0'; },
+    o => { o.stateGasAccounting.settled.blockGasUsed = o.stateGasAccounting.settled.preRefundGasWithFloor; },
     o => { o.gasAccounting.gasUsed = '0'; },
     o => { o.environment.slotNumber = '1'; },
     o => { o.profile.chainId = 1; },

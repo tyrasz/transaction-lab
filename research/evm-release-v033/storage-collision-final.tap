@@ -1,0 +1,76 @@
+TAP version 13
+# Subtest: priced/unpriced internal CREATE and CREATE2 with storage-only target are unsupported and roll back all transaction effects
+ok 1 - priced/unpriced internal CREATE and CREATE2 with storage-only target are unsupported and roll back all transaction effects
+  ---
+  duration_ms: 514.290416
+  type: 'test'
+  ...
+# Subtest: zero-balance hidden-storage targets cannot evade the boundary through EIP161 emptiness or state-precharge refund
+ok 2 - zero-balance hidden-storage targets cannot evade the boundary through EIP161 emptiness or state-precharge refund
+  ---
+  duration_ms: 243.393125
+  type: 'test'
+  ...
+# Subtest: ancestor catch or REVERT cannot swallow the unsupported creation boundary or retain earlier writes
+ok 3 - ancestor catch or REVERT cannot swallow the unsupported creation boundary or retain earlier writes
+  ---
+  duration_ms: 379.729166
+  type: 'test'
+  ...
+# Subtest: root CREATE with hidden storage is withheld before it can be reported as a completed collision
+ok 4 - root CREATE with hidden storage is withheld before it can be reported as a completed collision
+  ---
+  duration_ms: 238.689125
+  type: 'test'
+  ...
+# Subtest: historical Osaka root CREATE and internal CREATE/CREATE2 also withhold the disputed storage-only outcome
+ok 5 - historical Osaka root CREATE and internal CREATE/CREATE2 also withhold the disputed storage-only outcome
+  ---
+  duration_ms: 359.061833
+  type: 'test'
+  ...
+# Subtest: existing delegated sender and self-authorization preparation cannot retain nonce/code/fees after disputed creation
+ok 6 - existing delegated sender and self-authorization preparation cannot retain nonce/code/fees after disputed creation
+  ---
+  duration_ms: 243.940417
+  type: 'test'
+  ...
+# Subtest: absent and empty-storage targets still deploy through root CREATE and internal CREATE2 with signed/full-MPT agreement
+ok 7 - absent and empty-storage targets still deploy through root CREATE and internal CREATE2 with signed/full-MPT agreement
+  ---
+  duration_ms: 527.228917
+  type: 'test'
+  ...
+# Subtest: unsupported before-query creation remains unavailable even under a reverted helper, without poisoning later native overlays
+ok 8 - unsupported before-query creation remains unavailable even under a reverted helper, without poisoning later native overlays
+  ---
+  duration_ms: 260.878208
+  type: 'test'
+  ...
+# Subtest: a reverted deployment into empty storage remains a neutral measured query contrast
+ok 9 - a reverted deployment into empty storage remains a neutral measured query contrast
+  ---
+  duration_ms: 143.851416
+  type: 'test'
+  ...
+# Subtest: ordinary CALL and creation fail-fast stay supported despite a disputed target read for state-gas precharge
+ok 10 - ordinary CALL and creation fail-fast stay supported despite a disputed target read for state-gas precharge
+  ---
+  duration_ms: 369.600125
+  type: 'test'
+  ...
+# Subtest: after-state query newly routed through authorization withholds disputed creation without erasing original preparation
+ok 11 - after-state query newly routed through authorization withholds disputed creation without erasing original preparation
+  ---
+  duration_ms: 147.342625
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3610.004917

@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "policy": {
+    "origin": "http://127.0.0.1:5175",
+    "requests": 3,
+    "totalMs": 170000,
+    "setupMs": 10000,
+    "closeMs": 1000,
+    "setupBytes": 1048576,
+    "resultBytes": 100663296,
+    "totalBytes": 102760448
+  },
+  "request": {
+    "chainId": 11155111,
+    "from": "0x6efb29cee3b414272eb7a8f3ebabf873d36bc033",
+    "to": "0x000000000000000000000000000000000000dead",
+    "data": "0x",
+    "value": "1000000000000000",
+    "gas": "21000",
+    "block": "latest",
+    "queries": [
+      {
+        "kind": "native_balance",
+        "account": "0x6efb29cee3b414272eb7a8f3ebabf873d36bc033"
+      },
+      {
+        "kind": "native_balance",
+        "account": "0x000000000000000000000000000000000000dead"
+      }
+    ]
+  },
+  "sequence": [
+    {
+      "method": "GET",
+      "path": "/api/health"
+    },
+    {
+      "method": "GET",
+      "path": "/api/config"
+    },
+    {
+      "method": "POST",
+      "path": "/api/evm/local-preview"
+    }
+  ],
+  "sourceSha256": "8a09cd1224be642a76d6f9ae688f599b177468513d326355160463b03df15c6b",
+  "root": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031",
+  "sourceBytesArchived": false
+}

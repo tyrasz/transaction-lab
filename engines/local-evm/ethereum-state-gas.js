@@ -107,11 +107,14 @@ export function settleEthereumStateGas(budget, counters) {
   const gasUsed = afterRefund + floorAdjustment;
   need(gasUsed <= plan.gasLimit);
   const stateGasUsedRaw = c.executionStateGasUsed, stateGasUsed = stateGasUsedRaw;
-  // Block dimensions intentionally do not subtract the ordinary refund. Their
-  // sum need not equal sender-charged gas, nor the scalar 7778 blockGasUsed.
+  // These transaction dimensions do not subtract the ordinary refund. The
+  // 7778 pre-refund scalar is not the Amsterdam block's gas usage. A block
+  // accumulates each dimension first, then takes max(sum regular, sum state);
+  // even summing the single-transaction maxima below would be incorrect.
+  const regularGasUsed = max(beforeRefund - stateGasUsed, plan.floor);
   return Object.freeze({ beforeRefund, refundCounter, appliedRefund, floorAdjustment, gasUsed,
     reportedRefundCounter: floorAdjustment > 0n ? 0n : refundCounter,
     reservoirDelta, stateGasUsedRaw, executionRegularGasUsed, stateGasUsed,
-    regularGasUsed: max(beforeRefund - stateGasUsed, plan.floor),
-    blockGasUsed: max(beforeRefund, plan.floor) });
+    regularGasUsed, preRefundGasWithFloor: max(beforeRefund, plan.floor),
+    singleTransactionBlockGasUsed: max(regularGasUsed, stateGasUsed) });
 }

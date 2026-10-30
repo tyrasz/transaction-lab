@@ -1,0 +1,124 @@
+TAP version 13
+# Subtest: storage-only target facts are proof-bound even when every storage slot is undemanded
+not ok 1 - storage-only target facts are proof-bound even when every storage slot is undemanded
+  ---
+  duration_ms: 11.333209
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:67:1'
+  failureType: 'testCodeFailure'
+  error: 'Local initial facts do not match their joined proof and code evidence.'
+  code: 'LOCAL_INPUT_FACTS_INVALID'
+  name: 'InputFactsError'
+  stack: |-
+    need (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/input-facts.js:15:43)
+    validateInputFacts (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/input-facts.js:40:3)
+    facts (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:40:9)
+    async TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:68:13)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: root CREATE storage-only collision cannot pass the empty-frame shortcut on historical or Amsterdam forks
+not ok 2 - root CREATE storage-only collision cannot pass the empty-frame shortcut on historical or Amsterdam forks
+  ---
+  duration_ms: 12.8135
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:86:1'
+  failureType: 'testCodeFailure'
+  error: 'Local initial facts do not match their joined proof and code evidence.'
+  code: 'LOCAL_INPUT_FACTS_INVALID'
+  name: 'InputFactsError'
+  stack: |-
+    need (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/input-facts.js:15:43)
+    validateInputFacts (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/input-facts.js:40:3)
+    facts (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:40:9)
+    async TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:88:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: historical internal CREATE and CREATE2 storage-only collisions are rejected even under root rollback
+ok 3 - historical internal CREATE and CREATE2 storage-only collisions are rejected even under root rollback
+  ---
+  duration_ms: 14.674625
+  type: 'test'
+  ...
+# Subtest: genuine nonce or code collision predicates remain accepted with nonempty storage
+not ok 4 - genuine nonce or code collision predicates remain accepted with nonempty storage
+  ---
+  duration_ms: 10.712792
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:105:1'
+  failureType: 'testCodeFailure'
+  error: 'Local initial facts do not match their joined proof and code evidence.'
+  code: 'LOCAL_INPUT_FACTS_INVALID'
+  name: 'InputFactsError'
+  stack: |-
+    need (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/input-facts.js:15:43)
+    validateInputFacts (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/input-facts.js:40:3)
+    facts (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:40:9)
+    async TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:107:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: absent and prefunded empty targets retain accepted successful root creation
+not ok 5 - absent and prefunded empty targets retain accepted successful root creation
+  ---
+  duration_ms: 5.752959
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:116:1'
+  failureType: 'testCodeFailure'
+  error: 'Local initial facts do not match their joined proof and code evidence.'
+  code: 'LOCAL_INPUT_FACTS_INVALID'
+  name: 'InputFactsError'
+  stack: |-
+    need (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/input-facts.js:15:43)
+    validateInputFacts (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/input-facts.js:40:3)
+    facts (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:40:9)
+    async TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:118:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Amsterdam no-child ledger cannot authorize storage-only collision with a genuine creator nonce increment
+not ok 6 - Amsterdam no-child ledger cannot authorize storage-only collision with a genuine creator nonce increment
+  ---
+  duration_ms: 1.952542
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:123:1'
+  failureType: 'testCodeFailure'
+  error: 'Local initial facts do not match their joined proof and code evidence.'
+  code: 'LOCAL_INPUT_FACTS_INVALID'
+  name: 'InputFactsError'
+  stack: |-
+    need (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/input-facts.js:15:43)
+    validateInputFacts (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/input-facts.js:40:3)
+    facts (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:40:9)
+    async TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:125:15)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: query starting reset masks the old storage root, while carried authorization nonce or code still collides
+not ok 7 - query starting reset masks the old storage root, while carried authorization nonce or code still collides
+  ---
+  duration_ms: 1.775125
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:137:1'
+  failureType: 'testCodeFailure'
+  error: 'Local initial facts do not match their joined proof and code evidence.'
+  code: 'LOCAL_INPUT_FACTS_INVALID'
+  name: 'InputFactsError'
+  stack: |-
+    need (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/input-facts.js:15:43)
+    validateInputFacts (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/input-facts.js:40:3)
+    facts (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:40:9)
+    async TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/storage-creation-parent.test.js:138:13)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 1
+# fail 6
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 235.7725

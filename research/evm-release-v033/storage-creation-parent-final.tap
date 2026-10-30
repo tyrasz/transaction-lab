@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: storage-only target facts are proof-bound even when every storage slot is undemanded
+ok 1 - storage-only target facts are proof-bound even when every storage slot is undemanded
+  ---
+  duration_ms: 14.702541
+  type: 'test'
+  ...
+# Subtest: root CREATE storage-only collision cannot pass the empty-frame shortcut on historical or Amsterdam forks
+ok 2 - root CREATE storage-only collision cannot pass the empty-frame shortcut on historical or Amsterdam forks
+  ---
+  duration_ms: 12.372375
+  type: 'test'
+  ...
+# Subtest: historical internal CREATE and CREATE2 storage-only collisions are rejected even under root rollback
+ok 3 - historical internal CREATE and CREATE2 storage-only collisions are rejected even under root rollback
+  ---
+  duration_ms: 13.634916
+  type: 'test'
+  ...
+# Subtest: genuine nonce or code collision predicates remain accepted with nonempty storage
+ok 4 - genuine nonce or code collision predicates remain accepted with nonempty storage
+  ---
+  duration_ms: 13.71575
+  type: 'test'
+  ...
+# Subtest: absent and prefunded empty targets retain accepted successful root creation
+ok 5 - absent and prefunded empty targets retain accepted successful root creation
+  ---
+  duration_ms: 8.247084
+  type: 'test'
+  ...
+# Subtest: Amsterdam no-child ledger cannot authorize storage-only collision with a genuine creator nonce increment
+ok 6 - Amsterdam no-child ledger cannot authorize storage-only collision with a genuine creator nonce increment
+  ---
+  duration_ms: 4.126125
+  type: 'test'
+  ...
+# Subtest: query starting reset masks the old storage root, while carried authorization nonce or code still collides
+ok 7 - query starting reset masks the old storage root, while carried authorization nonce or code still collides
+  ---
+  duration_ms: 6.221875
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 242.433209

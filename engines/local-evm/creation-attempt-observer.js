@@ -4,6 +4,7 @@
 // This is a consistency ledger, not an independently verified execution proof.
 import { EVMError } from '@ethereumjs/evm';
 import { Account, bigIntToBytes, bytesToHex, createAddressFromString, generateAddress, generateAddress2, KECCAK256_NULL, KECCAK256_RLP } from '@ethereumjs/util';
+import { storageOnlyCreationAccount, unsupportedStorageCreation } from './creation-support.js';
 
 const MAX_WORD = (1n << 256n) - 1n;
 const MAX_NONCE = (1n << 64n) - 1n;
@@ -152,6 +153,7 @@ export function createCreationAttemptObserver({ common, getAccount, check, bound
       if (!candidate?.written || candidate.targetFacts) return;
       if (address(accountAddress) !== candidate.target) invalid('creator write was not followed by its target read');
       candidate.targetFacts = snapshot(account);
+      if (storageOnlyCreationAccount(account)) throw unsupportedStorageCreation();
     },
     exitFrame(frame, result) {
       check(); const ctx = context(frame);

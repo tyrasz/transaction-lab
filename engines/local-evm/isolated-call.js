@@ -18,6 +18,7 @@ import { validateInputFacts } from './input-facts.js';
 import { existingDelegationTarget } from './sender-delegation.js';
 import { normalizeAuthorizationList } from './authorization-list.js';
 import { deriveAuthorizationPreparation } from './authorization-validation.js';
+import { deriveAmsterdamAuthorizationEntryGas } from './amsterdam-authorization-validation.js';
 import { ISOLATED_LIMITS, IsolationError, decode, encode, envelope, fields, need, normalizeLimits, validateRpcRequest } from './isolated-protocol.js';
 export { ISOLATED_LIMITS, IsolationError } from './isolated-protocol.js';
 
@@ -219,7 +220,11 @@ async function executeIsolated(options, previewMode) {
     } else if (complete || output.trace !== null) {
       const trace = output.trace;
       const preparedGas = preparation?.processing.preparation?.authorizationGasUsed ?? '0';
-      need(trace?.type === (call.to === null ? 'CREATE' : 'CALL') && trace.from === call.from.toLowerCase() && trace.caller === call.from.toLowerCase() && trace.input === call.data.toLowerCase() && trace.value === '0x' + ethereumQuantity(call.value).toString(16) && trace.gas === '0x' + (gas - costs.intrinsic - BigInt(preparedGas)).toString(16));
+      const entryGas = !complete && call.authorizationList !== undefined && common.isActivatedEIP(8037)
+        ? deriveAmsterdamAuthorizationEntryGas({ request: call, header, inputs, common })
+        : gas - costs.intrinsic - BigInt(preparedGas);
+      need(typeof entryGas === 'bigint');
+      need(trace?.type === (call.to === null ? 'CREATE' : 'CALL') && trace.from === call.from.toLowerCase() && trace.caller === call.from.toLowerCase() && trace.input === call.data.toLowerCase() && trace.value === '0x' + ethereumQuantity(call.value).toString(16) && trace.gas === '0x' + entryGas.toString(16));
       if (call.to !== null) need(trace.to === call.to.toLowerCase() && trace.executionAddress === call.to.toLowerCase());
       if (complete) need(trace.output === output.execution.returnData && trace.error === output.execution.error && ethereumQuantity(trace.gasUsed) === ethereumQuantity(output.execution.executionGasUsed));
       if (preparation?.processing.preparation?.phase === 'recipient_out_of_gas') {
