@@ -61,9 +61,17 @@ separate process association. These checks do not simulate a transaction.
 
 ## Installation status
 
-Candidate checks are complete. The old main-only Sepolia evidence and status
-history have been preserved by merge `8d8d367b`. Installation must stop the old
-service, fast-forward main, explicitly apply/check the ignored local dependency
-patch, restart from main and repeat the same GET-only identity checks. The
-installed report and final process association are recorded separately after
-those actions; this checkpoint does not yet claim installation.
+The old main-only Sepolia evidence and status history were preserved by merge
+`8d8d367b`. The previous main server (PID 8340) was stopped before main
+fast-forwarded to `43a3d18d`. Explicit preparation changed only the installed
+local dependency's `evm.js` and `interpreter.js`; `gas.js` already had the
+correct delegation rule. The separate check verified all three final hashes.
+The dependency patch/check reports are retained unchanged.
+
+Version **0.35.0 is running read-only on port 5174**, launched from main as
+PID 47363. The saved listener working-directory check binds that launch to the
+installed checkout. Five installed GETs passed with the same complete local
+identity, capabilities and interface bytes as the candidate. The installed
+report hash is `67c3c05dcad529d5a00e93e3da90401527befde07f2530da07d4885001e603dd`.
+The temporary candidate on 5175 was then stopped. No transaction was executed
+or broadcast during these installation checks.
