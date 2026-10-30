@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
 import { performance } from 'node:perf_hooks';
 import { VERSION } from './config.js';
+import { assertDelegationRuntimePatched } from '../engines/local-evm/delegation-runtime-patch.js';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const LOCAL = 'engines/local-evm', DEPS = `${LOCAL}/node_modules`;
@@ -107,6 +108,7 @@ export function loadLocalApi() {
       need(isDeepStrictEqual(actual, startup.value));
     }
     await assertSourcesUnchanged();
+    const delegationRuntime = assertDelegationRuntimePatched();
     let api;
     try { api = await import('./local-simulation.js'); }
     catch (error) { if (['ENOENT', 'ERR_MODULE_NOT_FOUND'].includes(error.code)) return null; throw error; }
@@ -114,6 +116,7 @@ export function loadLocalApi() {
     const implementation = frozen({ name: 'Transaction Lab isolated proof-backed Ethereum preview', version: VERSION,
       sourceSha256: sha(JSON.stringify(startup.value)), sourceFiles: startup.value.files.map(row => row.path),
       inventory: startup.value.files, runtime: startup.value.runtime,
+      runtimePatches: [{ id: 'eip7702-exact-designation-length-v1', ...delegationRuntime }],
       identityAlgorithm: 'SHA256(JSON.stringify({files:sorted_complete_inventory,runtime:node_executable_identity}))' });
     return Object.freeze({ ...api, implementation, assertSourcesUnchanged,
       async simulateLocal(input, rpc, options) {

@@ -176,6 +176,33 @@ test('an Amsterdam storage-only creation result is explicitly unsupported with r
   assert.equal(report.attempt.isolation.processClosed, true); assert.equal(report.attempt.broker.pendingAtReturn, 0);
 });
 
+test('malformed delegation runtime is an API-visible EVM failure with measured fees and retained authorization', async () => {
+  for (const [priced, authorized] of [[false, false], [true, false], [true, true]]) {
+    const authorizationList = authorized ? [signAuthorization({ chainId: BigInt(CHAIN), key: TEST_KEY, nonce: 2n, address: TARGET })] : undefined;
+    const f = await fixture({ priced, gas: '200000', ...(authorized ? { authorizationList } : {}),
+      target: { nonce: 1n, balance: 9n, code: '0xef0100' } });
+    const p = transport(f), report = await simulateLocal(inputFor(f), p.rpc); p.check(report);
+    assert.equal(report.status, 'complete', JSON.stringify(report.error)); assert.equal(report.error, null);
+    assert.equal(report.execution.status, 'failed'); assert.equal(report.execution.error, 'invalid opcode');
+    assert.equal(report.source.canonicalStatus, 'verified');
+    const original = report.attempt.preview.original, output = original.output;
+    assert.equal(output.gasAccounting.gasUsed, '200000'); assert.equal(output.trace.error, 'invalid opcode');
+    assert.equal(output.trace.calls.length, 0);
+    const sender = original.changes.accounts.find(row => row.address === TX_SENDER);
+    assert.deepEqual(sender.nonce, { before: '0x1', after: authorized ? '0x3' : '0x2' });
+    if (authorized) {
+      assert.equal(output.authorizationProcessing.preparation.phase, 'message');
+      assert.equal(output.authorizationProcessing.preparation.retained, true);
+      assert.equal(sender.code.after, '0xef0100' + TARGET.slice(2));
+    } else assert.equal(sender.code, undefined);
+    amount(report.measurements[0], TX_SENDER, 1000000000000n, 1000000000000n - BigInt(output.feeAccounting?.gasCharge ?? '0'));
+    amount(report.measurements[1], TARGET, 9n, 9n);
+    assert.equal(output.feeAccounting !== undefined, priced);
+    assert.equal(report.attempt.isolation.processClosed, true); assert.equal(report.attempt.broker.pendingAtReturn, 0);
+    assert(p.wires.filter(row => row.method === 'eth_getProof').every(row => [TX_SENDER, TARGET, COINBASE].includes(row.params[0])));
+  }
+});
+
 test('real HTTP route/loader selects normalized Sepolia transport, persists exact results and leaves provider routes closed', async t => {
   const f = await fixture(), p = transport(f), factories = [];
   const directory = await mkdtemp(path.join(os.tmpdir(), 'sepolia-local-api-')); t.after(() => rm(directory, { recursive: true, force: true }));
@@ -201,5 +228,9 @@ test('real HTTP route/loader selects normalized Sepolia transport, persists exac
   assert.deepEqual(factories, [{ chainId: CHAIN }]);
   assert.equal(report.implementation.sourceFiles.includes('src/proof-rpc.js'), true);
   assert.equal(report.implementation.sourceFiles.includes('engines/local-evm/creation-attempt-validation.js'), true);
+  assert.equal(report.implementation.runtimePatches[0].id, 'eip7702-exact-designation-length-v1');
+  assert.equal(report.implementation.runtimePatches[0].package, '@ethereumjs/evm');
+  assert.equal(report.implementation.runtimePatches[0].version, '10.1.3');
+  assert.deepEqual(report.implementation.runtimePatches[0].files.map(row => row.path), ['dist/esm/evm.js', 'dist/esm/opcodes/gas.js']);
   assert.deepEqual(JSON.parse(await readFile(path.join(directory, 'simulations', report.id + '.json'), 'utf8')), report);
 });

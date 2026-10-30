@@ -1,0 +1,328 @@
+{
+  "status": "built_and_verified",
+  "pins": {
+    "version": "v1.17.10",
+    "commit": "1df30b18d9ed35ee9d28ffd4648442c2204554ad",
+    "tree": "cc329acc8f69375efe7e3cbba00e1acb1e2d373f",
+    "goVersion": "go1.27.3",
+    "goFile": "go1.27.3.darwin-arm64.tar.gz",
+    "goBytes": 68196737,
+    "goSha256": "dd3908cf20959d798c1e06ebe5b72213f0505ce01373b40ce3110975a6cd99c2"
+  },
+  "sourceInventorySha256": "36e245fda711de52fe5e0b8c917d4bbbffd840ed7edfc0696f29cbb1f8b24dff",
+  "dependencyInventorySha256": "364ceb9f506861fb3326452f45a1406370f7f7aec485d43002b8823247c049db",
+  "goBinarySha256": "aa355b078a81158d418079a3f8c776719eb99cc6f527e39ffa3250c66566aafb",
+  "goModSha256": "df92841ea528f644350b890d9d67fd78e1f68ff2424e90f3e495cfcf8e30f21d",
+  "goSumSha256": "ddafb18490c93ae43659876330add971403706b3403bf0d0ac7760a6daabdf65",
+  "buildScriptSha256": "50b2be99591f5eb9e7730820731b5e8fd1208078bfea8505747897b0a1d3c188",
+  "evm": {
+    "absolutePath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/bin/evm",
+    "path": "bin/evm",
+    "bytes": 54847666,
+    "sha256": "10385eddbfd76c3d05b9853f30f4372f2468f6a8c1ac64c445a7490694fc3521"
+  },
+  "commands": [
+    {
+      "name": "git-init",
+      "args": [
+        "/usr/bin/git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "init"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source",
+      "startedAt": "2026-10-28T06:23:25.554631+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:23:25.761896+00:00",
+      "stdout": "logs/01-git-init.stdout",
+      "stderr": "logs/01-git-init.stderr"
+    },
+    {
+      "name": "git-fetch",
+      "args": [
+        "/usr/bin/git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "fetch",
+        "--depth=1",
+        "https://github.com/ethereum/go-ethereum.git",
+        "refs/tags/v1.17.10"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source",
+      "startedAt": "2026-10-28T06:23:25.762461+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:23:28.421264+00:00",
+      "stdout": "logs/02-git-fetch.stdout",
+      "stderr": "logs/02-git-fetch.stderr"
+    },
+    {
+      "name": "git-resolve",
+      "args": [
+        "/usr/bin/git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "rev-parse",
+        "FETCH_HEAD"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source",
+      "startedAt": "2026-10-28T06:23:28.421776+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:23:28.629205+00:00",
+      "stdout": "logs/03-git-resolve.stdout",
+      "stderr": "logs/03-git-resolve.stderr"
+    },
+    {
+      "name": "git-checkout",
+      "args": [
+        "/usr/bin/git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "checkout",
+        "--detach",
+        "1df30b18d9ed35ee9d28ffd4648442c2204554ad"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source",
+      "startedAt": "2026-10-28T06:23:28.629983+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:23:29.040386+00:00",
+      "stdout": "logs/04-git-checkout.stdout",
+      "stderr": "logs/04-git-checkout.stderr"
+    },
+    {
+      "name": "git-tree",
+      "args": [
+        "/usr/bin/git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "rev-parse",
+        "HEAD^{tree}"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source",
+      "startedAt": "2026-10-28T06:23:29.040980+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:23:29.249483+00:00",
+      "stdout": "logs/05-git-tree.stdout",
+      "stderr": "logs/05-git-tree.stderr"
+    },
+    {
+      "name": "git-fsck",
+      "args": [
+        "/usr/bin/git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "fsck",
+        "--full"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source",
+      "startedAt": "2026-10-28T06:23:29.250535+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:23:29.666430+00:00",
+      "stdout": "logs/06-git-fsck.stdout",
+      "stderr": "logs/06-git-fsck.stderr"
+    },
+    {
+      "name": "git-resolve-current",
+      "args": [
+        "/usr/bin/git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "rev-parse",
+        "HEAD"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source",
+      "startedAt": "2026-10-28T06:25:21.214272+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:25:21.426192+00:00",
+      "stdout": "logs/07-git-resolve-current.stdout",
+      "stderr": "logs/07-git-resolve-current.stderr"
+    },
+    {
+      "name": "git-tree-current",
+      "args": [
+        "/usr/bin/git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "rev-parse",
+        "HEAD^{tree}"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source",
+      "startedAt": "2026-10-28T06:25:21.426500+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:25:21.636934+00:00",
+      "stdout": "logs/08-git-tree-current.stdout",
+      "stderr": "logs/08-git-tree-current.stderr"
+    },
+    {
+      "name": "git-fsck",
+      "args": [
+        "/usr/bin/git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "fsck",
+        "--full"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source",
+      "startedAt": "2026-10-28T06:25:21.637228+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:25:22.051672+00:00",
+      "stdout": "logs/09-git-fsck.stdout",
+      "stderr": "logs/09-git-fsck.stderr"
+    },
+    {
+      "name": "go-version",
+      "args": [
+        "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/go/bin/go",
+        "version"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10",
+      "startedAt": "2026-10-28T06:25:22.264243+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:25:22.686955+00:00",
+      "stdout": "logs/10-go-version.stdout",
+      "stderr": "logs/10-go-version.stderr"
+    },
+    {
+      "name": "go-environment",
+      "args": [
+        "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/go/bin/go",
+        "env",
+        "-json"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source",
+      "startedAt": "2026-10-28T06:25:22.687356+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:25:23.313625+00:00",
+      "stdout": "logs/11-go-environment.stdout",
+      "stderr": "logs/11-go-environment.stderr"
+    },
+    {
+      "name": "build-evm",
+      "args": [
+        "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/go/bin/go",
+        "build",
+        "-mod=readonly",
+        "-trimpath",
+        "-p=2",
+        "-buildvcs=true",
+        "-o",
+        "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/bin/evm",
+        "./cmd/evm"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source",
+      "startedAt": "2026-10-28T06:25:23.314180+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:26:19.670271+00:00",
+      "stdout": "logs/12-build-evm.stdout",
+      "stderr": "logs/12-build-evm.stderr"
+    },
+    {
+      "name": "module-verify",
+      "args": [
+        "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/go/bin/go",
+        "mod",
+        "verify"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source",
+      "startedAt": "2026-10-28T06:26:19.670721+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:26:28.130141+00:00",
+      "stdout": "logs/13-module-verify.stdout",
+      "stderr": "logs/13-module-verify.stderr"
+    },
+    {
+      "name": "binary-build-info",
+      "args": [
+        "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/go/bin/go",
+        "version",
+        "-m",
+        "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/bin/evm"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source",
+      "startedAt": "2026-10-28T06:26:28.130801+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:26:28.338346+00:00",
+      "stdout": "logs/14-binary-build-info.stdout",
+      "stderr": "logs/14-binary-build-info.stderr"
+    },
+    {
+      "name": "dependency-modules",
+      "args": [
+        "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/go/bin/go",
+        "list",
+        "-m",
+        "-json",
+        "all"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source",
+      "startedAt": "2026-10-28T06:26:28.339473+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:26:39.046733+00:00",
+      "stdout": "logs/15-dependency-modules.stdout",
+      "stderr": "logs/15-dependency-modules.stderr"
+    },
+    {
+      "name": "git-status",
+      "args": [
+        "/usr/bin/git",
+        "-c",
+        "core.hooksPath=/dev/null",
+        "status",
+        "--porcelain",
+        "--untracked-files=all"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source",
+      "startedAt": "2026-10-28T06:26:39.400473+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:26:39.612440+00:00",
+      "stdout": "logs/16-git-status.stdout",
+      "stderr": "logs/16-git-status.stderr"
+    },
+    {
+      "name": "evm-version",
+      "args": [
+        "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/bin/evm",
+        "--version"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10",
+      "startedAt": "2026-10-28T06:26:39.775641+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:26:40.596763+00:00",
+      "stdout": "logs/17-evm-version.stdout",
+      "stderr": "logs/17-evm-version.stderr"
+    },
+    {
+      "name": "statetest-help",
+      "args": [
+        "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/bin/evm",
+        "statetest",
+        "--help"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10",
+      "startedAt": "2026-10-28T06:26:40.597722+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:26:40.811342+00:00",
+      "stdout": "logs/18-statetest-help.stdout",
+      "stderr": "logs/18-statetest-help.stderr"
+    },
+    {
+      "name": "t8n-help",
+      "args": [
+        "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/bin/evm",
+        "t8n",
+        "--help"
+      ],
+      "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10",
+      "startedAt": "2026-10-28T06:26:40.812528+00:00",
+      "exitCode": 0,
+      "finishedAt": "2026-10-28T06:26:41.027884+00:00",
+      "stdout": "logs/19-t8n-help.stdout",
+      "stderr": "logs/19-t8n-help.stderr"
+    }
+  ],
+  "durationMs": 200758,
+  "targetFixturesExecuted": 0,
+  "networkRpcCalls": 0,
+  "globalInstallation": false,
+  "signatureVerification": "GitHub signed-commit attestation retained; not independent local OpenPGP verification.",
+  "resourceScope": "900-second process deadline; compiler Go memory target is not a hard RSS cap."
+}

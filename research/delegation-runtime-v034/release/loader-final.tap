@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: local loader binds full static closure, worker entry, entire dependencies, symlink target and Node bytes
+ok 1 - local loader binds full static closure, worker entry, entire dependencies, symlink target and Node bytes
+  ---
+  duration_ms: 91.574375
+  type: 'test'
+  ...
+# Subtest: stock EVM bytes before loader startup refuse availability; explicitly patched copies pass with bound metadata
+ok 2 - stock EVM bytes before loader startup refuse availability; explicitly patched copies pass with bound metadata
+  ---
+  duration_ms: 157.437834
+  type: 'test'
+  ...
+# Subtest: missing optional worker at startup stays unavailable until a new process
+ok 3 - missing optional worker at startup stays unavailable until a new process
+  ---
+  duration_ms: 124.330458
+  type: 'test'
+  ...
+# Subtest: changed source between startup and lazy import rejects, rather than relabeling cached modules
+ok 4 - changed source between startup and lazy import rejects, rather than relabeling cached modules
+  ---
+  duration_ms: 67.924
+  type: 'test'
+  ...
+# Subtest: changed source during lazy import is rejected
+ok 5 - changed source during lazy import is rejected
+  ---
+  duration_ms: 75.035334
+  type: 'test'
+  ...
+# Subtest: every simulation rechecks added dependency files before invoking its adapter
+ok 6 - every simulation rechecks added dependency files before invoking its adapter
+  ---
+  duration_ms: 82.3185
+  type: 'test'
+  ...
+# Subtest: source changes during a simulation remove all nested preview amounts afterward
+ok 7 - source changes during a simulation remove all nested preview amounts afterward
+  ---
+  duration_ms: 90.333833
+  type: 'test'
+  ...
+# Subtest: escaping dependency symlinks are rejected before import
+ok 8 - escaping dependency symlinks are rejected before import
+  ---
+  duration_ms: 58.137958
+  type: 'test'
+  ...
+# Subtest: cancellation or exhausted deadline after execution is rechecked after final source verification
+ok 9 - cancellation or exhausted deadline after execution is rechecked after final source verification
+  ---
+  duration_ms: 115.36825
+  type: 'test'
+  ...
+# Subtest: real installed closure contains all current local runtime and complete pinned dependency tree without copying it
+ok 10 - real installed closure contains all current local runtime and complete pinned dependency tree without copying it
+  ---
+  duration_ms: 1522.932833
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2442.095167

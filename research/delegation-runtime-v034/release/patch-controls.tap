@@ -1,0 +1,46 @@
+TAP version 13
+# Subtest: exact three length checks are the only byte changes and retain existing slice indexes
+ok 1 - exact three length checks are the only byte changes and retain existing slice indexes
+  ---
+  duration_ms: 16.876666
+  type: 'test'
+  ...
+# Subtest: already corrected bytes are verified without rewriting; explicit apply is idempotent
+ok 2 - already corrected bytes are verified without rewriting; explicit apply is idempotent
+  ---
+  duration_ms: 12.657375
+  type: 'test'
+  ...
+# Subtest: an original/corrected mixture is not verified until an explicit application completes it
+ok 3 - an original/corrected mixture is not verified until an explicit application completes it
+  ---
+  duration_ms: 16.576208
+  type: 'test'
+  ...
+# Subtest: all files are validated before writing: unknown bytes in either file leave both untouched
+ok 4 - all files are validated before writing: unknown bytes in either file leave both untouched
+  ---
+  duration_ms: 2.692417
+  type: 'test'
+  ...
+# Subtest: unexpected package versions/names, truncated runtime and missing files fail without writes
+ok 5 - unexpected package versions/names, truncated runtime and missing files fail without writes
+  ---
+  duration_ms: 4.3155
+  type: 'test'
+  ...
+# Subtest: symlinked runtime files are refused without mutating the linked file or the other runtime
+ok 6 - symlinked runtime files are refused without mutating the linked file or the other runtime
+  ---
+  duration_ms: 1.607709
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 110.962583

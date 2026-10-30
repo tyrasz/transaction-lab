@@ -1,0 +1,779 @@
+{
+  "index": 3,
+  "id": "nested_call_length3",
+  "childMessages": [
+    "{\"v\":1,\"type\":\"rpc\",\"id\":1,\"method\":\"eth_getProof\",\"params\":[\"0x1a642f0e3c3af545e7acbd38b07251b3990914f1\",[],{\"blockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"requireCanonical\":true}]}",
+    "{\"v\":1,\"type\":\"rpc\",\"id\":2,\"method\":\"eth_getProof\",\"params\":[\"0x8888888888888888888888888888888888888888\",[],{\"blockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"requireCanonical\":true}]}",
+    "{\"v\":1,\"type\":\"rpc\",\"id\":3,\"method\":\"eth_getCode\",\"params\":[\"0x8888888888888888888888888888888888888888\",{\"blockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"requireCanonical\":true}]}",
+    "{\"v\":1,\"type\":\"rpc\",\"id\":4,\"method\":\"eth_getProof\",\"params\":[\"0x4444444444444444444444444444444444444444\",[],{\"blockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"requireCanonical\":true}]}",
+    "{\"v\":1,\"type\":\"rpc\",\"id\":5,\"method\":\"eth_getCode\",\"params\":[\"0x4444444444444444444444444444444444444444\",{\"blockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"requireCanonical\":true}]}",
+    "{\"v\":1,\"type\":\"result\",\"id\":1,\"result\":{\"output\":{\"execution\":{\"status\":\"unavailable\",\"error\":{\"code\":\"LOCAL_EXECUTION_FAILED\",\"message\":\"Local execution could not complete; arbitrary host error details are omitted.\"},\"executionGasUsed\":null,\"returnData\":null},\"trace\":{\"type\":\"CALL\",\"from\":\"0x1a642f0e3c3af545e7acbd38b07251b3990914f1\",\"to\":\"0x8888888888888888888888888888888888888888\",\"executionAddress\":\"0x8888888888888888888888888888888888888888\",\"caller\":\"0x1a642f0e3c3af545e7acbd38b07251b3990914f1\",\"value\":\"0x0\",\"input\":\"0x\",\"gas\":\"0x2d2a8\",\"gasUsed\":null,\"output\":null,\"error\":null,\"depth\":0,\"calls\":[{\"type\":\"CALL\",\"from\":\"0x8888888888888888888888888888888888888888\",\"to\":\"0x4444444444444444444444444444444444444444\",\"executionAddress\":\"0x4444444444444444444444444444444444444444\",\"caller\":\"0x8888888888888888888888888888888888888888\",\"value\":\"0x0\",\"input\":\"0x\",\"gas\":\"0x186a0\",\"gasUsed\":null,\"output\":null,\"error\":null,\"depth\":1,\"calls\":[],\"creationAttempts\":[],\"incomplete\":true}],\"creationAttempts\":[],\"incomplete\":true},\"logs\":[],\"environment\":{\"chainId\":11155111,\"hardfork\":\"amsterdam\",\"slotNumber\":\"12345\",\"number\":\"12018196\",\"timestamp\":\"1793261160\",\"gasLimit\":\"60000000\",\"baseFeePerGas\":\"7\",\"mixHash\":\"0xb4490f4a119a322bbce1cca15bd37107dd11bd35876d278866a7f1c0cebb538d\",\"miner\":\"0x9999999999999999999999999999999999999999\",\"sourceBlockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"sourceParentHash\":\"0x303c1a3363dbc7d2f5dba6ddcd3e921d408e27c1bd0ab27a6c0aeb04b4ff4c6e\",\"sourceBlockIdentityVerified\":false,\"blobBaseFeePerGas\":\"18406936\"},\"semantics\":{\"kind\":\"unsigned_message\",\"signatureVerification\":false,\"transactionNonceValidation\":false,\"callerNonce\":\"runCall_increments_once_including_EVM_revert\",\"gasBudget\":\"message_execution_only_intrinsic_transaction_gas_not_subtracted\",\"gasUsed\":\"execution_gas_before_transaction_refund_and_intrinsic_gas\",\"gasPrice\":\"10\",\"feeSettlement\":false,\"warmAddresses\":\"sender_destination_coinbase_and_fork_active_precompiles_no_access_list\",\"logs\":\"committed_root_result_only_no_duplicated_descendant_log_arrays\",\"callTree\":\"entered_messages_only\",\"chainScope\":\"Ethereum_Sepolia_pinned_timestamp_selected_fork\",\"lifecycle\":\"no_lifecycle_operation_encountered\",\"deadline\":\"cooperative_until_final_atomic_commit_no_forceful_IO_cancellation\"},\"limits\":{\"gas\":5000000,\"steps\":1000000,\"frames\":1000,\"depth\":32,\"logs\":2000,\"memoryBytes\":1048576,\"returnBytes\":1048576,\"calldataBytes\":32768,\"traceBytes\":8388608,\"wallMs\":8000},\"usage\":{\"steps\":8,\"frames\":2,\"maxDepth\":1,\"logOpcodes\":0,\"retainedTraceBytes\":1068},\"stateDisposition\":\"rolled_back\",\"profile\":{\"name\":\"ethereum_unsigned_eip1559_call\",\"chainId\":11155111,\"hardfork\":\"amsterdam\",\"forkSchedule\":\"pinned_ethereumjs_common_10.1.3_sepolia_amsterdam_1791294816\",\"sourceBlockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"sourceStateRoot\":\"0x112d8afe64e23971af134a9babb9fa70001831d85f0541046a237609a786105c\",\"sourceBlockIdentityVerified\":false,\"sourceStateProofVerified\":false,\"actualBlockBaseFee\":\"7\",\"executionBaseFee\":\"7\",\"gasPrice\":\"10\",\"declaredGasLimit\":\"200000\",\"intrinsicGas\":\"15000\",\"calldataFloor\":\"15000\",\"messageGasLimit\":\"185000\",\"calldataZeroBytes\":\"0\",\"calldataNonzeroBytes\":\"0\",\"outerSignatureVerified\":false,\"feesSettled\":false,\"originalTransactionPosition\":false,\"expectedOutputsUsed\":false,\"executionProfile\":\"unsigned_eip1559_block_end\",\"fees\":{\"maxFeePerGas\":\"13\",\"maxPriorityFeePerGas\":\"3\"},\"executionBlobBaseFee\":\"18406936\",\"sourceExcessBlobGas\":\"195463959\"},\"gasAccounting\":null,\"gasAccountingScope\":\"Unsigned EIP-1559 gas including intrinsic, one-fifth refund cap and active calldata floor; fees settled only on completed execution, without an outer signed-transaction validity claim.\"},\"inputs\":{\"status\":\"available\",\"context\":{\"chainId\":11155111,\"blockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"stateRoot\":\"0x112d8afe64e23971af134a9babb9fa70001831d85f0541046a237609a786105c\",\"header\":{\"parentHash\":\"0x303c1a3363dbc7d2f5dba6ddcd3e921d408e27c1bd0ab27a6c0aeb04b4ff4c6e\",\"sha3Uncles\":\"0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347\",\"miner\":\"0x9999999999999999999999999999999999999999\",\"stateRoot\":\"0x112d8afe64e23971af134a9babb9fa70001831d85f0541046a237609a786105c\",\"transactionsRoot\":\"0xc0bf856ff9a4c6e79039614d3aaa9f3f41eb21b9d40cf06c19ce56f1c2295d34\",\"receiptsRoot\":\"0x155555e90e00d88e0423b2ad971901face30c5c554b4846178fc5a8fa4e30405\",\"logsBloom\":\"0xfeeb7a6ff9ffb7ff3ebb74fbffa59dd9f7fffdddf4e1fe94dfffb7bf7ef6bdef3d3dfbfefa9ff7ffee9ff3effbcf7fffbf5befcdffdfffb55fff8ff3ff7feb8eb7feddfb73fefffefbfabb9ffb7bb6f2ef7f47fffdef7f3fb2b7ef5ffeffdf8f3feb6ff57efdff7d7ebdfabb7f0ebd4fba79faffbdfff7fe53976cff1fdf7bbe52fb3eff7fd5f77d67fffc7b5edeff9f575ffd1fedfdc0dfdfbf7fdfeffe37beff6a5cf7ffebf7aee3ff7ffff9effbe87dfdffdffb7cf1ced9f62bffefb3dbffffb6bbffdaeefe7f5f7bdfffffebfffdfdfe7fcf5efff77cdf8ffb737df7ebcffcbf3f597ffd7fd4fffdffdfbffbdceeff2fd17fffbf87df5bb4efbdeebfdfff\",\"difficulty\":\"0x0\",\"number\":\"0xb76214\",\"gasLimit\":\"0x3938700\",\"gasUsed\":\"0x0\",\"timestamp\":\"0x6ae2fe68\",\"extraData\":\"0x546974616e2028746974616e6275696c6465722e78797a29\",\"mixHash\":\"0xb4490f4a119a322bbce1cca15bd37107dd11bd35876d278866a7f1c0cebb538d\",\"nonce\":\"0x0000000000000000\",\"baseFeePerGas\":\"0x7\",\"withdrawalsRoot\":\"0xfaa9651587102a5d5af2fed1ba433b59d411ab15f52744f429af452c81e35519\",\"blobGasUsed\":\"0x0\",\"excessBlobGas\":\"0xba68b17\",\"parentBeaconBlockRoot\":\"0x9f00b9751ceec28dd48c5c02963eb6686b53312da752b6ee068df6218a678c6e\",\"requestsHash\":\"0x9dc9b48acb5092dc805cefed9f6584f93482272dd75dd8604225c125aa080260\",\"blockAccessListHash\":\"0x0000000000000000000000000000000000000000000000000000000000000000\",\"slotNumber\":\"0x3039\",\"hash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\"},\"selector\":{\"blockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"requireCanonical\":true},\"stateRootTrust\":\"caller_supplied_header\",\"provenance\":\"verified_eip1186_proofs_and_code_hash\",\"expectedOutputsUsed\":false},\"accounts\":{\"0x1a642f0e3c3af545e7acbd38b07251b3990914f1\":{\"exists\":true,\"nonce\":\"1\",\"balance\":\"1000000000000\",\"code\":\"0x\",\"storage\":{}},\"0x8888888888888888888888888888888888888888\":{\"exists\":true,\"nonce\":\"1\",\"balance\":\"19\",\"code\":\"0x60206020600060006000734444444444444444444444444444444444444444620186a0f160005260406000f3\",\"storage\":{}},\"0x4444444444444444444444444444444444444444\":{\"exists\":true,\"nonce\":\"1\",\"balance\":\"17\",\"code\":\"0xef0100\",\"storage\":{}}},\"provenance\":[{\"account\":\"0x1a642f0e3c3af545e7acbd38b07251b3990914f1\",\"accountProof\":{\"exists\":true,\"nonceRaw\":\"1\",\"balanceRaw\":\"1000000000000\",\"codeHash\":\"0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470\",\"storageRoot\":\"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\"},\"proofEvidenceId\":1,\"codeEvidenceId\":null,\"codeDerivation\":\"verified_account_empty_code_hash\",\"storage\":[]},{\"account\":\"0x8888888888888888888888888888888888888888\",\"accountProof\":{\"exists\":true,\"nonceRaw\":\"1\",\"balanceRaw\":\"19\",\"codeHash\":\"0x7929e82862a94962786e7b3e536059985a073b5b045d687c7c1a5640a0a91409\",\"storageRoot\":\"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\"},\"proofEvidenceId\":2,\"codeEvidenceId\":3,\"storage\":[]},{\"account\":\"0x4444444444444444444444444444444444444444\",\"accountProof\":{\"exists\":true,\"nonceRaw\":\"1\",\"balanceRaw\":\"17\",\"codeHash\":\"0x2797b56f16fc0b7304f884c281a4e8a323b1c54b7bb3785bcaace5030f0f82d8\",\"storageRoot\":\"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\"},\"proofEvidenceId\":4,\"codeEvidenceId\":5,\"storage\":[]}],\"coverage\":\"Only demanded, proof-verified initial accounts and storage keys; unrequested storage is unknown.\"},\"inputEvidence\":[{\"id\":1,\"request\":{\"method\":\"eth_getProof\",\"params\":[\"0x1a642f0e3c3af545e7acbd38b07251b3990914f1\",[],{\"blockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"requireCanonical\":true}]},\"requestText\":\"{\\\"method\\\":\\\"eth_getProof\\\",\\\"params\\\":[\\\"0x1a642f0e3c3af545e7acbd38b07251b3990914f1\\\",[],{\\\"blockHash\\\":\\\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\\\",\\\"requireCanonical\\\":true}]}\",\"requestSha256\":\"877d26e6dcb597cac80fedd3c473a78c20668853e7745b5a6cff8bfbc231fb66\",\"status\":\"received\",\"representation\":\"parsed_rpc_result_not_wire_bytes\",\"resultBytes\":1013,\"resultSha256\":\"3a6800ce7d8f59e97f4834006f27e6297b9e2fd859b316863b4f198b3c0903da\",\"result\":{\"address\":\"0x1a642f0e3c3af545e7acbd38b07251b3990914f1\",\"accountProof\":[\"0xf8f18080a0a1fcef6d0f4ab7168e3d60c4928a67139de7fc1cd0b00c976df9ee983697802a80a0ebafb25a62ccf685803632fa0992bd2fdf7134e86b200d0b4916350f69d3de6ba086d136ea32200a2e6e4e06a98591362b5c137779673a7309aeae9b7a4b8686d0a0e79f2ac1208e5a3c1293bcbc25e7229b4826c8139e734d926ffde77383cd8a4080a0ce37feacce18691bd75ec6de0181316c4364dc680531918574295dfa14529cce80808080a016fac4b18148e1a87bbcf812f60043200b3b67e7381d638d9769b18473ae6ae7a032559be3c7eb7b47ccc220f532a337e81ad07261c02455fb422f044159a1da4d8080\",\"0xf86ea03c5efa1707c93140989e0f95b9a0b8616e0c8ef51392617bf9c917aff96ef769b84bf8490185e8d4a51000a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a0c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470\"],\"balance\":\"0xe8d4a51000\",\"nonce\":\"0x1\",\"codeHash\":\"0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470\",\"storageHash\":\"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\",\"storageProof\":[]},\"durationMs\":1.0632920000000041,\"verification\":\"verified\"},{\"id\":2,\"request\":{\"method\":\"eth_getProof\",\"params\":[\"0x8888888888888888888888888888888888888888\",[],{\"blockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"requireCanonical\":true}]},\"requestText\":\"{\\\"method\\\":\\\"eth_getProof\\\",\\\"params\\\":[\\\"0x8888888888888888888888888888888888888888\\\",[],{\\\"blockHash\\\":\\\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\\\",\\\"requireCanonical\\\":true}]}\",\"requestSha256\":\"21769cd3b6b31bb7cdb259be1449a961f48300489fd8462953684a5a269bb786\",\"status\":\"received\",\"representation\":\"parsed_rpc_result_not_wire_bytes\",\"resultBytes\":995,\"resultSha256\":\"819dc30199b27e0439e5dcde35a677651c7cce5430f7a61af49510326ac7d840\",\"result\":{\"address\":\"0x8888888888888888888888888888888888888888\",\"accountProof\":[\"0xf8f18080a0a1fcef6d0f4ab7168e3d60c4928a67139de7fc1cd0b00c976df9ee983697802a80a0ebafb25a62ccf685803632fa0992bd2fdf7134e86b200d0b4916350f69d3de6ba086d136ea32200a2e6e4e06a98591362b5c137779673a7309aeae9b7a4b8686d0a0e79f2ac1208e5a3c1293bcbc25e7229b4826c8139e734d926ffde77383cd8a4080a0ce37feacce18691bd75ec6de0181316c4364dc680531918574295dfa14529cce80808080a016fac4b18148e1a87bbcf812f60043200b3b67e7381d638d9769b18473ae6ae7a032559be3c7eb7b47ccc220f532a337e81ad07261c02455fb422f044159a1da4d8080\",\"0xf869a030c8707c906a797561008f61c112c70c07c0e57952e0348106ae2b8be92a5d59b846f8440113a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a07929e82862a94962786e7b3e536059985a073b5b045d687c7c1a5640a0a91409\"],\"balance\":\"0x13\",\"nonce\":\"0x1\",\"codeHash\":\"0x7929e82862a94962786e7b3e536059985a073b5b045d687c7c1a5640a0a91409\",\"storageHash\":\"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\",\"storageProof\":[]},\"durationMs\":0.7229169999999954,\"verification\":\"verified\"},{\"id\":3,\"request\":{\"method\":\"eth_getCode\",\"params\":[\"0x8888888888888888888888888888888888888888\",{\"blockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"requireCanonical\":true}]},\"requestText\":\"{\\\"method\\\":\\\"eth_getCode\\\",\\\"params\\\":[\\\"0x8888888888888888888888888888888888888888\\\",{\\\"blockHash\\\":\\\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\\\",\\\"requireCanonical\\\":true}]}\",\"requestSha256\":\"423350e0489725d19753c7623cb51af2629a8b36695eb208f8369acbb38f3c05\",\"status\":\"received\",\"representation\":\"parsed_rpc_result_not_wire_bytes\",\"resultBytes\":92,\"resultSha256\":\"816071ee3ed7722a2ccfaa059283c409537c218767a41209d4d81c310134815a\",\"result\":\"0x60206020600060006000734444444444444444444444444444444444444444620186a0f160005260406000f3\",\"durationMs\":0.151457999999991,\"verification\":\"verified\"},{\"id\":4,\"request\":{\"method\":\"eth_getProof\",\"params\":[\"0x4444444444444444444444444444444444444444\",[],{\"blockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"requireCanonical\":true}]},\"requestText\":\"{\\\"method\\\":\\\"eth_getProof\\\",\\\"params\\\":[\\\"0x4444444444444444444444444444444444444444\\\",[],{\\\"blockHash\\\":\\\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\\\",\\\"requireCanonical\\\":true}]}\",\"requestSha256\":\"340df207d254d95d8dbda53f26a9f2d6a917e7cb667b37da743e6d7a9b2d740e\",\"status\":\"received\",\"representation\":\"parsed_rpc_result_not_wire_bytes\",\"resultBytes\":995,\"resultSha256\":\"b3a79699241682ab44d749c7ef33f800d08bbc556e224df83c1fd3650302b3dd\",\"result\":{\"address\":\"0x4444444444444444444444444444444444444444\",\"accountProof\":[\"0xf8f18080a0a1fcef6d0f4ab7168e3d60c4928a67139de7fc1cd0b00c976df9ee983697802a80a0ebafb25a62ccf685803632fa0992bd2fdf7134e86b200d0b4916350f69d3de6ba086d136ea32200a2e6e4e06a98591362b5c137779673a7309aeae9b7a4b8686d0a0e79f2ac1208e5a3c1293bcbc25e7229b4826c8139e734d926ffde77383cd8a4080a0ce37feacce18691bd75ec6de0181316c4364dc680531918574295dfa14529cce80808080a016fac4b18148e1a87bbcf812f60043200b3b67e7381d638d9769b18473ae6ae7a032559be3c7eb7b47ccc220f532a337e81ad07261c02455fb422f044159a1da4d8080\",\"0xf869a03cfa6af4bfa0111fd5e7625d43e84cd2d40629cf6008219d2c0e30ed48abf8b6b846f8440111a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a02797b56f16fc0b7304f884c281a4e8a323b1c54b7bb3785bcaace5030f0f82d8\"],\"balance\":\"0x11\",\"nonce\":\"0x1\",\"codeHash\":\"0x2797b56f16fc0b7304f884c281a4e8a323b1c54b7bb3785bcaace5030f0f82d8\",\"storageHash\":\"0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421\",\"storageProof\":[]},\"durationMs\":0.23208299999998871,\"verification\":\"verified\"},{\"id\":5,\"request\":{\"method\":\"eth_getCode\",\"params\":[\"0x4444444444444444444444444444444444444444\",{\"blockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"requireCanonical\":true}]},\"requestText\":\"{\\\"method\\\":\\\"eth_getCode\\\",\\\"params\\\":[\\\"0x4444444444444444444444444444444444444444\\\",{\\\"blockHash\\\":\\\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\\\",\\\"requireCanonical\\\":true}]}\",\"requestSha256\":\"69c47672bd0a0e77716f26e523643e54810629473b4e3fe3c4e1de9f41d81800\",\"status\":\"received\",\"representation\":\"parsed_rpc_result_not_wire_bytes\",\"resultBytes\":10,\"resultSha256\":\"0e0b7fd8925b8543ffe431c7f77528bf3e69d0ff8c948b522593fac7f77971e0\",\"result\":\"0xef0100\",\"durationMs\":0.11258399999999824,\"verification\":\"verified\"}],\"inputUsage\":{\"status\":\"available\",\"calls\":5,\"observedResultBytes\":3105,\"retainedResultBytes\":3105,\"accounts\":3,\"slots\":0,\"reads\":6,\"distinctReads\":6,\"limits\":{\"accounts\":128,\"slots\":1024,\"calls\":256,\"responseBytes\":8388608,\"totalBytes\":33554432,\"codeBytes\":131072,\"reads\":200000,\"requestMs\":1000,\"wallMs\":8000}},\"inputReads\":{\"total\":6,\"distinct\":6,\"reads\":[{\"kind\":\"account\",\"account\":\"0x1a642f0e3c3af545e7acbd38b07251b3990914f1\"},{\"kind\":\"code\",\"account\":\"0x1a642f0e3c3af545e7acbd38b07251b3990914f1\"},{\"kind\":\"account\",\"account\":\"0x8888888888888888888888888888888888888888\"},{\"kind\":\"code\",\"account\":\"0x8888888888888888888888888888888888888888\"},{\"kind\":\"account\",\"account\":\"0x4444444444444444444444444444444444444444\"},{\"kind\":\"code\",\"account\":\"0x4444444444444444444444444444444444444444\"}]},\"stateReads\":{\"total\":13,\"distinct\":6,\"reads\":[{\"kind\":\"account\",\"address\":\"0x1a642f0e3c3af545e7acbd38b07251b3990914f1\"},{\"kind\":\"code\",\"address\":\"0x1a642f0e3c3af545e7acbd38b07251b3990914f1\"},{\"kind\":\"code\",\"address\":\"0x8888888888888888888888888888888888888888\"},{\"kind\":\"account\",\"address\":\"0x8888888888888888888888888888888888888888\"},{\"kind\":\"code\",\"address\":\"0x4444444444444444444444444444444444444444\"},{\"kind\":\"account\",\"address\":\"0x4444444444444444444444444444444444444444\"}]},\"changes\":{\"scope\":\"Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.\",\"accounts\":[]}}}"
+  ],
+  "stdout": [],
+  "stderr": [],
+  "proofRecords": [
+    {
+      "method": "eth_getProof",
+      "params": [
+        "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+        [],
+        {
+          "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+          "requireCanonical": true
+        }
+      ],
+      "result": {
+        "address": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+        "accountProof": [
+          "0xf8f18080a0a1fcef6d0f4ab7168e3d60c4928a67139de7fc1cd0b00c976df9ee983697802a80a0ebafb25a62ccf685803632fa0992bd2fdf7134e86b200d0b4916350f69d3de6ba086d136ea32200a2e6e4e06a98591362b5c137779673a7309aeae9b7a4b8686d0a0e79f2ac1208e5a3c1293bcbc25e7229b4826c8139e734d926ffde77383cd8a4080a0ce37feacce18691bd75ec6de0181316c4364dc680531918574295dfa14529cce80808080a016fac4b18148e1a87bbcf812f60043200b3b67e7381d638d9769b18473ae6ae7a032559be3c7eb7b47ccc220f532a337e81ad07261c02455fb422f044159a1da4d8080",
+          "0xf86ea03c5efa1707c93140989e0f95b9a0b8616e0c8ef51392617bf9c917aff96ef769b84bf8490185e8d4a51000a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a0c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+        ],
+        "balance": "0xe8d4a51000",
+        "nonce": "0x1",
+        "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+        "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "storageProof": []
+      }
+    },
+    {
+      "method": "eth_getProof",
+      "params": [
+        "0x8888888888888888888888888888888888888888",
+        [],
+        {
+          "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+          "requireCanonical": true
+        }
+      ],
+      "result": {
+        "address": "0x8888888888888888888888888888888888888888",
+        "accountProof": [
+          "0xf8f18080a0a1fcef6d0f4ab7168e3d60c4928a67139de7fc1cd0b00c976df9ee983697802a80a0ebafb25a62ccf685803632fa0992bd2fdf7134e86b200d0b4916350f69d3de6ba086d136ea32200a2e6e4e06a98591362b5c137779673a7309aeae9b7a4b8686d0a0e79f2ac1208e5a3c1293bcbc25e7229b4826c8139e734d926ffde77383cd8a4080a0ce37feacce18691bd75ec6de0181316c4364dc680531918574295dfa14529cce80808080a016fac4b18148e1a87bbcf812f60043200b3b67e7381d638d9769b18473ae6ae7a032559be3c7eb7b47ccc220f532a337e81ad07261c02455fb422f044159a1da4d8080",
+          "0xf869a030c8707c906a797561008f61c112c70c07c0e57952e0348106ae2b8be92a5d59b846f8440113a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a07929e82862a94962786e7b3e536059985a073b5b045d687c7c1a5640a0a91409"
+        ],
+        "balance": "0x13",
+        "nonce": "0x1",
+        "codeHash": "0x7929e82862a94962786e7b3e536059985a073b5b045d687c7c1a5640a0a91409",
+        "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "storageProof": []
+      }
+    },
+    {
+      "method": "eth_getCode",
+      "params": [
+        "0x8888888888888888888888888888888888888888",
+        {
+          "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+          "requireCanonical": true
+        }
+      ],
+      "result": "0x60206020600060006000734444444444444444444444444444444444444444620186a0f160005260406000f3"
+    },
+    {
+      "method": "eth_getProof",
+      "params": [
+        "0x4444444444444444444444444444444444444444",
+        [],
+        {
+          "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+          "requireCanonical": true
+        }
+      ],
+      "result": {
+        "address": "0x4444444444444444444444444444444444444444",
+        "accountProof": [
+          "0xf8f18080a0a1fcef6d0f4ab7168e3d60c4928a67139de7fc1cd0b00c976df9ee983697802a80a0ebafb25a62ccf685803632fa0992bd2fdf7134e86b200d0b4916350f69d3de6ba086d136ea32200a2e6e4e06a98591362b5c137779673a7309aeae9b7a4b8686d0a0e79f2ac1208e5a3c1293bcbc25e7229b4826c8139e734d926ffde77383cd8a4080a0ce37feacce18691bd75ec6de0181316c4364dc680531918574295dfa14529cce80808080a016fac4b18148e1a87bbcf812f60043200b3b67e7381d638d9769b18473ae6ae7a032559be3c7eb7b47ccc220f532a337e81ad07261c02455fb422f044159a1da4d8080",
+          "0xf869a03cfa6af4bfa0111fd5e7625d43e84cd2d40629cf6008219d2c0e30ed48abf8b6b846f8440111a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a02797b56f16fc0b7304f884c281a4e8a323b1c54b7bb3785bcaace5030f0f82d8"
+        ],
+        "balance": "0x11",
+        "nonce": "0x1",
+        "codeHash": "0x2797b56f16fc0b7304f884c281a4e8a323b1c54b7bb3785bcaace5030f0f82d8",
+        "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "storageProof": []
+      }
+    },
+    {
+      "method": "eth_getCode",
+      "params": [
+        "0x4444444444444444444444444444444444444444",
+        {
+          "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+          "requireCanonical": true
+        }
+      ],
+      "result": "0xef0100"
+    }
+  ],
+  "parentResult": {
+    "status": "completed",
+    "error": null,
+    "output": {
+      "execution": {
+        "status": "unavailable",
+        "error": {
+          "code": "LOCAL_EXECUTION_FAILED",
+          "message": "Local execution could not complete; arbitrary host error details are omitted."
+        },
+        "executionGasUsed": null,
+        "returnData": null
+      },
+      "trace": {
+        "type": "CALL",
+        "from": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+        "to": "0x8888888888888888888888888888888888888888",
+        "executionAddress": "0x8888888888888888888888888888888888888888",
+        "caller": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+        "value": "0x0",
+        "input": "0x",
+        "gas": "0x2d2a8",
+        "gasUsed": null,
+        "output": null,
+        "error": null,
+        "depth": 0,
+        "calls": [
+          {
+            "type": "CALL",
+            "from": "0x8888888888888888888888888888888888888888",
+            "to": "0x4444444444444444444444444444444444444444",
+            "executionAddress": "0x4444444444444444444444444444444444444444",
+            "caller": "0x8888888888888888888888888888888888888888",
+            "value": "0x0",
+            "input": "0x",
+            "gas": "0x186a0",
+            "gasUsed": null,
+            "output": null,
+            "error": null,
+            "depth": 1,
+            "calls": [],
+            "creationAttempts": [],
+            "incomplete": true
+          }
+        ],
+        "creationAttempts": [],
+        "incomplete": true
+      },
+      "logs": [],
+      "environment": {
+        "chainId": 11155111,
+        "hardfork": "amsterdam",
+        "slotNumber": "12345",
+        "number": "12018196",
+        "timestamp": "1793261160",
+        "gasLimit": "60000000",
+        "baseFeePerGas": "7",
+        "mixHash": "0xb4490f4a119a322bbce1cca15bd37107dd11bd35876d278866a7f1c0cebb538d",
+        "miner": "0x9999999999999999999999999999999999999999",
+        "sourceBlockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+        "sourceParentHash": "0x303c1a3363dbc7d2f5dba6ddcd3e921d408e27c1bd0ab27a6c0aeb04b4ff4c6e",
+        "sourceBlockIdentityVerified": false,
+        "blobBaseFeePerGas": "18406936"
+      },
+      "semantics": {
+        "kind": "unsigned_message",
+        "signatureVerification": false,
+        "transactionNonceValidation": false,
+        "callerNonce": "runCall_increments_once_including_EVM_revert",
+        "gasBudget": "message_execution_only_intrinsic_transaction_gas_not_subtracted",
+        "gasUsed": "execution_gas_before_transaction_refund_and_intrinsic_gas",
+        "gasPrice": "10",
+        "feeSettlement": false,
+        "warmAddresses": "sender_destination_coinbase_and_fork_active_precompiles_no_access_list",
+        "logs": "committed_root_result_only_no_duplicated_descendant_log_arrays",
+        "callTree": "entered_messages_only",
+        "chainScope": "Ethereum_Sepolia_pinned_timestamp_selected_fork",
+        "lifecycle": "no_lifecycle_operation_encountered",
+        "deadline": "cooperative_until_final_atomic_commit_no_forceful_IO_cancellation"
+      },
+      "limits": {
+        "gas": 5000000,
+        "steps": 1000000,
+        "frames": 1000,
+        "depth": 32,
+        "logs": 2000,
+        "memoryBytes": 1048576,
+        "returnBytes": 1048576,
+        "calldataBytes": 32768,
+        "traceBytes": 8388608,
+        "wallMs": 8000
+      },
+      "usage": {
+        "steps": 8,
+        "frames": 2,
+        "maxDepth": 1,
+        "logOpcodes": 0,
+        "retainedTraceBytes": 1068
+      },
+      "stateDisposition": "rolled_back",
+      "profile": {
+        "name": "ethereum_unsigned_eip1559_call",
+        "chainId": 11155111,
+        "hardfork": "amsterdam",
+        "forkSchedule": "pinned_ethereumjs_common_10.1.3_sepolia_amsterdam_1791294816",
+        "sourceBlockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+        "sourceStateRoot": "0x112d8afe64e23971af134a9babb9fa70001831d85f0541046a237609a786105c",
+        "sourceBlockIdentityVerified": false,
+        "sourceStateProofVerified": false,
+        "actualBlockBaseFee": "7",
+        "executionBaseFee": "7",
+        "gasPrice": "10",
+        "declaredGasLimit": "200000",
+        "intrinsicGas": "15000",
+        "calldataFloor": "15000",
+        "messageGasLimit": "185000",
+        "calldataZeroBytes": "0",
+        "calldataNonzeroBytes": "0",
+        "outerSignatureVerified": false,
+        "feesSettled": false,
+        "originalTransactionPosition": false,
+        "expectedOutputsUsed": false,
+        "executionProfile": "unsigned_eip1559_block_end",
+        "fees": {
+          "maxFeePerGas": "13",
+          "maxPriorityFeePerGas": "3"
+        },
+        "executionBlobBaseFee": "18406936",
+        "sourceExcessBlobGas": "195463959"
+      },
+      "gasAccounting": null,
+      "gasAccountingScope": "Unsigned EIP-1559 gas including intrinsic, one-fifth refund cap and active calldata floor; fees settled only on completed execution, without an outer signed-transaction validity claim."
+    },
+    "inputs": {
+      "status": "available",
+      "context": {
+        "chainId": 11155111,
+        "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+        "stateRoot": "0x112d8afe64e23971af134a9babb9fa70001831d85f0541046a237609a786105c",
+        "header": {
+          "parentHash": "0x303c1a3363dbc7d2f5dba6ddcd3e921d408e27c1bd0ab27a6c0aeb04b4ff4c6e",
+          "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+          "miner": "0x9999999999999999999999999999999999999999",
+          "stateRoot": "0x112d8afe64e23971af134a9babb9fa70001831d85f0541046a237609a786105c",
+          "transactionsRoot": "0xc0bf856ff9a4c6e79039614d3aaa9f3f41eb21b9d40cf06c19ce56f1c2295d34",
+          "receiptsRoot": "0x155555e90e00d88e0423b2ad971901face30c5c554b4846178fc5a8fa4e30405",
+          "logsBloom": "0xfeeb7a6ff9ffb7ff3ebb74fbffa59dd9f7fffdddf4e1fe94dfffb7bf7ef6bdef3d3dfbfefa9ff7ffee9ff3effbcf7fffbf5befcdffdfffb55fff8ff3ff7feb8eb7feddfb73fefffefbfabb9ffb7bb6f2ef7f47fffdef7f3fb2b7ef5ffeffdf8f3feb6ff57efdff7d7ebdfabb7f0ebd4fba79faffbdfff7fe53976cff1fdf7bbe52fb3eff7fd5f77d67fffc7b5edeff9f575ffd1fedfdc0dfdfbf7fdfeffe37beff6a5cf7ffebf7aee3ff7ffff9effbe87dfdffdffb7cf1ced9f62bffefb3dbffffb6bbffdaeefe7f5f7bdfffffebfffdfdfe7fcf5efff77cdf8ffb737df7ebcffcbf3f597ffd7fd4fffdffdfbffbdceeff2fd17fffbf87df5bb4efbdeebfdfff",
+          "difficulty": "0x0",
+          "number": "0xb76214",
+          "gasLimit": "0x3938700",
+          "gasUsed": "0x0",
+          "timestamp": "0x6ae2fe68",
+          "extraData": "0x546974616e2028746974616e6275696c6465722e78797a29",
+          "mixHash": "0xb4490f4a119a322bbce1cca15bd37107dd11bd35876d278866a7f1c0cebb538d",
+          "nonce": "0x0000000000000000",
+          "baseFeePerGas": "0x7",
+          "withdrawalsRoot": "0xfaa9651587102a5d5af2fed1ba433b59d411ab15f52744f429af452c81e35519",
+          "blobGasUsed": "0x0",
+          "excessBlobGas": "0xba68b17",
+          "parentBeaconBlockRoot": "0x9f00b9751ceec28dd48c5c02963eb6686b53312da752b6ee068df6218a678c6e",
+          "requestsHash": "0x9dc9b48acb5092dc805cefed9f6584f93482272dd75dd8604225c125aa080260",
+          "blockAccessListHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "slotNumber": "0x3039",
+          "hash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6"
+        },
+        "selector": {
+          "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+          "requireCanonical": true
+        },
+        "stateRootTrust": "caller_supplied_header",
+        "provenance": "verified_eip1186_proofs_and_code_hash",
+        "expectedOutputsUsed": false
+      },
+      "accounts": {
+        "0x1a642f0e3c3af545e7acbd38b07251b3990914f1": {
+          "exists": true,
+          "nonce": "1",
+          "balance": "1000000000000",
+          "code": "0x",
+          "storage": {}
+        },
+        "0x8888888888888888888888888888888888888888": {
+          "exists": true,
+          "nonce": "1",
+          "balance": "19",
+          "code": "0x60206020600060006000734444444444444444444444444444444444444444620186a0f160005260406000f3",
+          "storage": {}
+        },
+        "0x4444444444444444444444444444444444444444": {
+          "exists": true,
+          "nonce": "1",
+          "balance": "17",
+          "code": "0xef0100",
+          "storage": {}
+        }
+      },
+      "provenance": [
+        {
+          "account": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+          "accountProof": {
+            "exists": true,
+            "nonceRaw": "1",
+            "balanceRaw": "1000000000000",
+            "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+            "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+          },
+          "proofEvidenceId": 1,
+          "codeEvidenceId": null,
+          "codeDerivation": "verified_account_empty_code_hash",
+          "storage": []
+        },
+        {
+          "account": "0x8888888888888888888888888888888888888888",
+          "accountProof": {
+            "exists": true,
+            "nonceRaw": "1",
+            "balanceRaw": "19",
+            "codeHash": "0x7929e82862a94962786e7b3e536059985a073b5b045d687c7c1a5640a0a91409",
+            "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+          },
+          "proofEvidenceId": 2,
+          "codeEvidenceId": 3,
+          "storage": []
+        },
+        {
+          "account": "0x4444444444444444444444444444444444444444",
+          "accountProof": {
+            "exists": true,
+            "nonceRaw": "1",
+            "balanceRaw": "17",
+            "codeHash": "0x2797b56f16fc0b7304f884c281a4e8a323b1c54b7bb3785bcaace5030f0f82d8",
+            "storageRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421"
+          },
+          "proofEvidenceId": 4,
+          "codeEvidenceId": 5,
+          "storage": []
+        }
+      ],
+      "coverage": "Only demanded, proof-verified initial accounts and storage keys; unrequested storage is unknown."
+    },
+    "inputEvidence": [
+      {
+        "id": 1,
+        "request": {
+          "method": "eth_getProof",
+          "params": [
+            "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+            [],
+            {
+              "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getProof\",\"params\":[\"0x1a642f0e3c3af545e7acbd38b07251b3990914f1\",[],{\"blockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"requireCanonical\":true}]}",
+        "requestSha256": "877d26e6dcb597cac80fedd3c473a78c20668853e7745b5a6cff8bfbc231fb66",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 1013,
+        "resultSha256": "3a6800ce7d8f59e97f4834006f27e6297b9e2fd859b316863b4f198b3c0903da",
+        "result": {
+          "address": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+          "accountProof": [
+            "0xf8f18080a0a1fcef6d0f4ab7168e3d60c4928a67139de7fc1cd0b00c976df9ee983697802a80a0ebafb25a62ccf685803632fa0992bd2fdf7134e86b200d0b4916350f69d3de6ba086d136ea32200a2e6e4e06a98591362b5c137779673a7309aeae9b7a4b8686d0a0e79f2ac1208e5a3c1293bcbc25e7229b4826c8139e734d926ffde77383cd8a4080a0ce37feacce18691bd75ec6de0181316c4364dc680531918574295dfa14529cce80808080a016fac4b18148e1a87bbcf812f60043200b3b67e7381d638d9769b18473ae6ae7a032559be3c7eb7b47ccc220f532a337e81ad07261c02455fb422f044159a1da4d8080",
+            "0xf86ea03c5efa1707c93140989e0f95b9a0b8616e0c8ef51392617bf9c917aff96ef769b84bf8490185e8d4a51000a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a0c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"
+          ],
+          "balance": "0xe8d4a51000",
+          "nonce": "0x1",
+          "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+          "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "storageProof": []
+        },
+        "durationMs": 1.0632920000000041,
+        "verification": "verified"
+      },
+      {
+        "id": 2,
+        "request": {
+          "method": "eth_getProof",
+          "params": [
+            "0x8888888888888888888888888888888888888888",
+            [],
+            {
+              "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getProof\",\"params\":[\"0x8888888888888888888888888888888888888888\",[],{\"blockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"requireCanonical\":true}]}",
+        "requestSha256": "21769cd3b6b31bb7cdb259be1449a961f48300489fd8462953684a5a269bb786",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 995,
+        "resultSha256": "819dc30199b27e0439e5dcde35a677651c7cce5430f7a61af49510326ac7d840",
+        "result": {
+          "address": "0x8888888888888888888888888888888888888888",
+          "accountProof": [
+            "0xf8f18080a0a1fcef6d0f4ab7168e3d60c4928a67139de7fc1cd0b00c976df9ee983697802a80a0ebafb25a62ccf685803632fa0992bd2fdf7134e86b200d0b4916350f69d3de6ba086d136ea32200a2e6e4e06a98591362b5c137779673a7309aeae9b7a4b8686d0a0e79f2ac1208e5a3c1293bcbc25e7229b4826c8139e734d926ffde77383cd8a4080a0ce37feacce18691bd75ec6de0181316c4364dc680531918574295dfa14529cce80808080a016fac4b18148e1a87bbcf812f60043200b3b67e7381d638d9769b18473ae6ae7a032559be3c7eb7b47ccc220f532a337e81ad07261c02455fb422f044159a1da4d8080",
+            "0xf869a030c8707c906a797561008f61c112c70c07c0e57952e0348106ae2b8be92a5d59b846f8440113a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a07929e82862a94962786e7b3e536059985a073b5b045d687c7c1a5640a0a91409"
+          ],
+          "balance": "0x13",
+          "nonce": "0x1",
+          "codeHash": "0x7929e82862a94962786e7b3e536059985a073b5b045d687c7c1a5640a0a91409",
+          "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "storageProof": []
+        },
+        "durationMs": 0.7229169999999954,
+        "verification": "verified"
+      },
+      {
+        "id": 3,
+        "request": {
+          "method": "eth_getCode",
+          "params": [
+            "0x8888888888888888888888888888888888888888",
+            {
+              "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getCode\",\"params\":[\"0x8888888888888888888888888888888888888888\",{\"blockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"requireCanonical\":true}]}",
+        "requestSha256": "423350e0489725d19753c7623cb51af2629a8b36695eb208f8369acbb38f3c05",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 92,
+        "resultSha256": "816071ee3ed7722a2ccfaa059283c409537c218767a41209d4d81c310134815a",
+        "result": "0x60206020600060006000734444444444444444444444444444444444444444620186a0f160005260406000f3",
+        "durationMs": 0.151457999999991,
+        "verification": "verified"
+      },
+      {
+        "id": 4,
+        "request": {
+          "method": "eth_getProof",
+          "params": [
+            "0x4444444444444444444444444444444444444444",
+            [],
+            {
+              "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getProof\",\"params\":[\"0x4444444444444444444444444444444444444444\",[],{\"blockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"requireCanonical\":true}]}",
+        "requestSha256": "340df207d254d95d8dbda53f26a9f2d6a917e7cb667b37da743e6d7a9b2d740e",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 995,
+        "resultSha256": "b3a79699241682ab44d749c7ef33f800d08bbc556e224df83c1fd3650302b3dd",
+        "result": {
+          "address": "0x4444444444444444444444444444444444444444",
+          "accountProof": [
+            "0xf8f18080a0a1fcef6d0f4ab7168e3d60c4928a67139de7fc1cd0b00c976df9ee983697802a80a0ebafb25a62ccf685803632fa0992bd2fdf7134e86b200d0b4916350f69d3de6ba086d136ea32200a2e6e4e06a98591362b5c137779673a7309aeae9b7a4b8686d0a0e79f2ac1208e5a3c1293bcbc25e7229b4826c8139e734d926ffde77383cd8a4080a0ce37feacce18691bd75ec6de0181316c4364dc680531918574295dfa14529cce80808080a016fac4b18148e1a87bbcf812f60043200b3b67e7381d638d9769b18473ae6ae7a032559be3c7eb7b47ccc220f532a337e81ad07261c02455fb422f044159a1da4d8080",
+            "0xf869a03cfa6af4bfa0111fd5e7625d43e84cd2d40629cf6008219d2c0e30ed48abf8b6b846f8440111a056e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421a02797b56f16fc0b7304f884c281a4e8a323b1c54b7bb3785bcaace5030f0f82d8"
+          ],
+          "balance": "0x11",
+          "nonce": "0x1",
+          "codeHash": "0x2797b56f16fc0b7304f884c281a4e8a323b1c54b7bb3785bcaace5030f0f82d8",
+          "storageHash": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+          "storageProof": []
+        },
+        "durationMs": 0.23208299999998871,
+        "verification": "verified"
+      },
+      {
+        "id": 5,
+        "request": {
+          "method": "eth_getCode",
+          "params": [
+            "0x4444444444444444444444444444444444444444",
+            {
+              "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "requestText": "{\"method\":\"eth_getCode\",\"params\":[\"0x4444444444444444444444444444444444444444\",{\"blockHash\":\"0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6\",\"requireCanonical\":true}]}",
+        "requestSha256": "69c47672bd0a0e77716f26e523643e54810629473b4e3fe3c4e1de9f41d81800",
+        "status": "received",
+        "representation": "parsed_rpc_result_not_wire_bytes",
+        "resultBytes": 10,
+        "resultSha256": "0e0b7fd8925b8543ffe431c7f77528bf3e69d0ff8c948b522593fac7f77971e0",
+        "result": "0xef0100",
+        "durationMs": 0.11258399999999824,
+        "verification": "verified"
+      }
+    ],
+    "inputUsage": {
+      "status": "available",
+      "calls": 5,
+      "observedResultBytes": 3105,
+      "retainedResultBytes": 3105,
+      "accounts": 3,
+      "slots": 0,
+      "reads": 6,
+      "distinctReads": 6,
+      "limits": {
+        "accounts": 128,
+        "slots": 1024,
+        "calls": 256,
+        "responseBytes": 8388608,
+        "totalBytes": 33554432,
+        "codeBytes": 131072,
+        "reads": 200000,
+        "requestMs": 1000,
+        "wallMs": 8000
+      }
+    },
+    "inputReads": {
+      "total": 6,
+      "distinct": 6,
+      "reads": [
+        {
+          "kind": "account",
+          "account": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1"
+        },
+        {
+          "kind": "code",
+          "account": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1"
+        },
+        {
+          "kind": "account",
+          "account": "0x8888888888888888888888888888888888888888"
+        },
+        {
+          "kind": "code",
+          "account": "0x8888888888888888888888888888888888888888"
+        },
+        {
+          "kind": "account",
+          "account": "0x4444444444444444444444444444444444444444"
+        },
+        {
+          "kind": "code",
+          "account": "0x4444444444444444444444444444444444444444"
+        }
+      ]
+    },
+    "stateReads": {
+      "total": 13,
+      "distinct": 6,
+      "reads": [
+        {
+          "kind": "account",
+          "address": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1"
+        },
+        {
+          "kind": "code",
+          "address": "0x1a642f0e3c3af545e7acbd38b07251b3990914f1"
+        },
+        {
+          "kind": "code",
+          "address": "0x8888888888888888888888888888888888888888"
+        },
+        {
+          "kind": "account",
+          "address": "0x8888888888888888888888888888888888888888"
+        },
+        {
+          "kind": "code",
+          "address": "0x4444444444444444444444444444444444444444"
+        },
+        {
+          "kind": "account",
+          "address": "0x4444444444444444444444444444444444444444"
+        }
+      ]
+    },
+    "changes": {
+      "scope": "Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.",
+      "accounts": []
+    },
+    "headerVerification": {
+      "status": "verified",
+      "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+      "stateRoot": "0x112d8afe64e23971af134a9babb9fa70001831d85f0541046a237609a786105c",
+      "parentHash": "0x303c1a3363dbc7d2f5dba6ddcd3e921d408e27c1bd0ab27a6c0aeb04b4ff4c6e",
+      "number": "12018196",
+      "timestamp": "1793261160",
+      "hardfork": "amsterdam",
+      "encodedBytes": 673,
+      "headerFields": 23,
+      "consensusVerified": false,
+      "finalityVerified": false,
+      "bodyVerified": false,
+      "chainId": 11155111,
+      "forkSchedule": "pinned_ethereumjs_common_10.1.3_sepolia_amsterdam_1791294816"
+    },
+    "isolation": {
+      "worker": "engines/local-evm/isolated-worker.js",
+      "processSeparated": true,
+      "childPid": 3396,
+      "node": "v22.23.2",
+      "v8": "12.4.254.21-node.56",
+      "v8OldSpaceMiB": 256,
+      "hardTotalRssCap": false,
+      "osNetworkSandbox": false,
+      "osFilesystemSandbox": false,
+      "sourceImplementationBound": false,
+      "wallMs": 10000,
+      "drainMs": 1000,
+      "durationMs": 113.5328750000001,
+      "terminateRequested": false,
+      "processClosed": true,
+      "exitCode": 0,
+      "exitSignal": null,
+      "stdioBytes": 0,
+      "limits": {
+        "wallMs": 10000,
+        "requestMs": 1000,
+        "drainMs": 1000,
+        "killWaitMs": 1000,
+        "heapMiB": 256,
+        "calls": 256,
+        "responseBytes": 8388608,
+        "totalResponseBytes": 33554432,
+        "outputBytes": 67108864,
+        "stdioBytes": 65536,
+        "inputs": {
+          "accounts": 128,
+          "slots": 1024,
+          "codeBytes": 131072,
+          "reads": 200000,
+          "wallMs": 8000
+        },
+        "execution": {
+          "gas": 5000000,
+          "steps": 1000000,
+          "frames": 1000,
+          "depth": 32,
+          "logs": 2000,
+          "memoryBytes": 1048576,
+          "returnBytes": 1048576,
+          "calldataBytes": 32768,
+          "traceBytes": 8388608,
+          "wallMs": 8000
+        }
+      }
+    },
+    "broker": {
+      "calls": 5,
+      "dispatches": 5,
+      "accountedParsedResultBytes": 3105,
+      "records": [
+        {
+          "id": 1,
+          "request": {
+            "method": "eth_getProof",
+            "params": [
+              "0x1a642f0e3c3af545e7acbd38b07251b3990914f1",
+              [],
+              {
+                "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 1013,
+          "resultSha256": "3a6800ce7d8f59e97f4834006f27e6297b9e2fd859b316863b4f198b3c0903da",
+          "durationMs": 0.2120830000000069
+        },
+        {
+          "id": 2,
+          "request": {
+            "method": "eth_getProof",
+            "params": [
+              "0x8888888888888888888888888888888888888888",
+              [],
+              {
+                "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 995,
+          "resultSha256": "819dc30199b27e0439e5dcde35a677651c7cce5430f7a61af49510326ac7d840",
+          "durationMs": 0.20891599999993105
+        },
+        {
+          "id": 3,
+          "request": {
+            "method": "eth_getCode",
+            "params": [
+              "0x8888888888888888888888888888888888888888",
+              {
+                "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 92,
+          "resultSha256": "816071ee3ed7722a2ccfaa059283c409537c218767a41209d4d81c310134815a",
+          "durationMs": 0.051041999999938525
+        },
+        {
+          "id": 4,
+          "request": {
+            "method": "eth_getProof",
+            "params": [
+              "0x4444444444444444444444444444444444444444",
+              [],
+              {
+                "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 995,
+          "resultSha256": "b3a79699241682ab44d749c7ef33f800d08bbc556e224df83c1fd3650302b3dd",
+          "durationMs": 0.13245800000004238
+        },
+        {
+          "id": 5,
+          "request": {
+            "method": "eth_getCode",
+            "params": [
+              "0x4444444444444444444444444444444444444444",
+              {
+                "blockHash": "0x491d8d9d1e92d54b54d2cf0d0e5d0f31f9f463ddcad5c3e15b4e1bca97b62fd6",
+                "requireCanonical": true
+              }
+            ]
+          },
+          "status": "received",
+          "representation": "parsed_rpc_result_not_wire_bytes",
+          "dispatched": true,
+          "resultBytes": 10,
+          "resultSha256": "0e0b7fd8925b8543ffe431c7f77528bf3e69d0ff8c948b522593fac7f77971e0",
+          "durationMs": 0.02483299999994415
+        }
+      ],
+      "pendingAtReturn": 0,
+      "rawWireCaptured": false,
+      "inRangeBlockhash": "authenticated_parent_hash_chain_with_shared_input_limits"
+    }
+  },
+  "error": null,
+  "childSpawn": {
+    "args": [
+      "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/isolated-worker.js",
+      [],
+      {
+        "execPath": "/opt/homebrew/Cellar/node@22/22.23.2/bin/node",
+        "execArgv": [
+          "--max-old-space-size=256"
+        ],
+        "cwd": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/",
+        "env": {},
+        "stdio": [
+          "ignore",
+          "pipe",
+          "pipe",
+          "ipc"
+        ],
+        "serialization": "json"
+      }
+    ]
+  },
+  "elapsedMs": 113.939708
+}

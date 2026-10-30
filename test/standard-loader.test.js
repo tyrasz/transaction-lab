@@ -14,6 +14,7 @@ const execute = promisify(execFile);
 const files = [
   'package.json',
   'engines/evm-context.js',
+  'engines/local-evm/delegation-runtime-patch.js',
   ...[
     'account-effects', 'affected-balances', 'allowances', 'analyze', 'balances',
     'config', 'current-state', 'historical-state', 'lending-balances', 'lending',
@@ -71,7 +72,7 @@ test('independent inventory covers static server imports and the optional engine
   // server reproduction; its dependency closure has its own local loader.
   const runtime = files.filter(file => file.endsWith('.js') && file !== 'src/local-simulation.js');
   assert.deepEqual([...visited].sort(), runtime);
-  assert.equal(files.length, 39);
+  assert.equal(files.length, 40);
 });
 
 test('stable startup loads the real adapter once with the complete immutable disk identity', async t => {

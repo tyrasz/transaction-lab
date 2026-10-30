@@ -111,7 +111,9 @@ function derive({request,header,inputs,common}, entryGasOnly) {
     const spill = stateCost > reservoir ? stateCost-reservoir : 0n;
     // The exact designation is mandatory for a protocol delegation. Do not
     // infer a target from truncated/extended indicator-looking runtime bytes.
-    need(!current.code.startsWith('0xef0100') || DESIGNATION.test(current.code));
+    // Other lengths are ordinary runtime code. Its leading 0xef can fail the
+    // entered message, but must not invent a delegation charge or roll back
+    // authorizations as though recipient preparation had run out of gas.
     const delegatedTo = DESIGNATION.test(current.code) ? '0x'+current.code.slice(8) : null;
     const accessCost = delegatedTo === null ? 0n : warm.has(delegatedTo) ? WARM : COLD;
     const stateOutOfGas = spill > gas, delegationOutOfGas = !stateOutOfGas && accessCost > gas-spill;

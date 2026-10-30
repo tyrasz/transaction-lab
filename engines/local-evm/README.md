@@ -8,12 +8,15 @@ From the project root:
 
 ```sh
 npm ci --prefix engines/local-evm --ignore-scripts
+npm run prepare:runtime --prefix engines/local-evm
 npm run test:local
 ```
 
-Dependencies and integrity hashes are pinned in this package's lockfile. The primary service's dependency-free runtime remains unchanged.
+Dependencies and integrity hashes are pinned in this package's lockfile. Version 0.34 additionally requires the explicit preparation above: `delegation-runtime-patch.js` validates the original EthereumJS 10.1.3 ESM file hashes and adds exactly three 23-byte length checks. It checks all inputs before writing, accepts an already-corrected runtime, and rejects unknown bytes or versions. No install script, import or request applies the patch automatically. Both API loading and worker startup verify the corrected hashes; API implementation metadata discloses the patch identity and two file hashes. Reinstalling dependencies requires rerunning preparation. CommonJS files, the fixture comparison dependency and archived runtimes remain unchanged.
 
 ## Ethereum reference
+
+Malformed code starting with `0xef0100` but with a length other than 23 bytes is ordinary bytecode, not a delegation designation. It reaches normal invalid-opcode handling without a delegation-target lookup, charge or warming. Root failures retain applicable fees and outer nonce changes; successful authorizations survive an entered message failure. A parent may catch an internal call failure. Raw `EXTCODESIZE`, `EXTCODEHASH` and `EXTCODECOPY` still observe the original code. Exact indicators resolve one hop; preactivation behavior, strict sender/authority eligibility and unexpected host-error rollback remain separate. [EIP-7702](https://eips.ethereum.org/EIPS/eip-7702#delegation-indicator).
 
 The independent input path uses `verifyEthereumHeader({header,expectedHash})`, `createRpcStateInputs({chainId:1,blockHash,header,rpc})`, `createProofStateManager({inputs})`, and `executeEthereumCall({request,header,stateManager})`. The request contains `{from,to,data,value,gas,accessList?,blobVersionedHashes?,authorizationList?,executionProfile?,fees?}`. Callers retain the header verification and input-proof evidence alongside the execution result; the executor alone does not claim to authenticate its state manager.
 

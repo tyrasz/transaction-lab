@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: malformed root designation lengths are ordinary invalid code with retained fees/nonce and reverted value
+ok 1 - malformed root designation lengths are ordinary invalid code with retained fees/nonce and reverted value
+  ---
+  duration_ms: 490.341083
+  type: 'test'
+  ...
+# Subtest: all four call types catch malformed-code INVALID with raw context, value rollback and no extra delegation gas
+ok 2 - all four call types catch malformed-code INVALID with raw context, value rollback and no extra delegation gas
+  ---
+  duration_ms: 1322.674958
+  type: 'test'
+  ...
+# Subtest: exact 23-byte delegation resolves once under root and all four call contexts
+ok 3 - exact 23-byte delegation resolves once under root and all four call contexts
+  ---
+  duration_ms: 1137.641792
+  type: 'test'
+  ...
+# Subtest: preactivation designation bytes keep their ordinary invalid-opcode behavior
+ok 4 - preactivation designation bytes keep their ordinary invalid-opcode behavior
+  ---
+  duration_ms: 334.090459
+  type: 'test'
+  ...
+# Subtest: EXTCODESIZE, EXTCODEHASH and EXTCODECOPY observe exact malformed and valid stored bytes
+ok 5 - EXTCODESIZE, EXTCODEHASH and EXTCODECOPY observe exact malformed and valid stored bytes
+  ---
+  duration_ms: 662.037875
+  type: 'test'
+  ...
+# Subtest: missing raw recipient or exact implementation proof/code rolls back fees, nonce and message writes
+ok 6 - missing raw recipient or exact implementation proof/code rolls back fees, nonce and message writes
+  ---
+  duration_ms: 452.172334
+  type: 'test'
+  ...
+# Subtest: Amsterdam authorizations survive malformed recipient INVALID even below the spurious delegation access threshold
+ok 7 - Amsterdam authorizations survive malformed recipient INVALID even below the spurious delegation access threshold
+  ---
+  duration_ms: 339.938375
+  type: 'test'
+  ...
+# Subtest: historical Prague authorization/refund survives malformed recipient message failure
+ok 8 - historical Prague authorization/refund survives malformed recipient message failure
+  ---
+  duration_ms: 149.482125
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5115.411416

@@ -5,7 +5,11 @@
   "type": "module",
   "description": "Isolated experimental unsigned EVM execution with explicit input-state provenance",
   "engines": { "node": ">=22" },
-  "scripts": { "test": "node --test test/*.test.js" },
+  "scripts": {
+    "prepare:runtime": "node delegation-runtime-patch.js apply",
+    "check:runtime": "node delegation-runtime-patch.js check",
+    "test": "node delegation-runtime-patch.js check && node --test test/*.test.js"
+  },
   "dependencies": {
     "@ethereumjs/common": "10.1.3",
     "@ethereumjs/evm": "10.1.3",

@@ -1,0 +1,432 @@
+{
+  "schemaVersion": 1,
+  "reviewDate": "2026-10-30",
+  "repositoryCommit": "f00b685a773d8508fd1164b2d42edfce4ff3a20b",
+  "scope": {
+    "sourceAnalysisOnly": true,
+    "targetExecutions": 0,
+    "networkRpcCalls": 0,
+    "productionWrites": false,
+    "eelsPinnedSourceVerified": false,
+    "canonicalNetworkActivationInferredFromDocumentStatus": false
+  },
+  "localSources": [
+    {
+      "path": "engines/local-evm/node_modules/@ethereumjs/evm/dist/esm/evm.js",
+      "bytes": 67254,
+      "sha256": "e978f659e72aeb8ee22ebc4559bafb37e4760b0557512224f734b5b46da22f46",
+      "anchors": [
+        [
+          "root_preparation",
+          388,
+          409
+        ],
+        [
+          "load_code",
+          1303,
+          1328
+        ]
+      ],
+      "fixtureTreeByteIdentical": true
+    },
+    {
+      "path": "engines/local-evm/node_modules/@ethereumjs/evm/dist/esm/opcodes/gas.js",
+      "bytes": 40662,
+      "sha256": "72087f58b0b78e2f5dc7fed7cfa48aeee6000c5dbff4f3d851622f40c5a900c4",
+      "anchors": [
+        [
+          "delegation_access",
+          22,
+          40
+        ]
+      ],
+      "fixtureTreeByteIdentical": true
+    },
+    {
+      "path": "engines/local-evm/node_modules/@ethereumjs/evm/dist/esm/interpreter.js",
+      "bytes": 57164,
+      "sha256": "27106c4194446a01eb6207a2c5158e13eb242fc6cbb7e180d4b937cd87ba6499",
+      "anchors": [
+        [
+          "invalid_opcode",
+          254,
+          256
+        ]
+      ],
+      "fixtureTreeByteIdentical": true
+    },
+    {
+      "path": "engines/local-evm/node_modules/@ethereumjs/evm/dist/esm/opcodes/codes.js",
+      "bytes": 13197,
+      "sha256": "46e6b74f7cff1256a065f3df6756d0b5290bde8740ec7d5ec5152f9263aac231",
+      "anchors": [
+        [
+          "custom_opcodes",
+          384,
+          405
+        ]
+      ]
+    },
+    {
+      "path": "engines/local-evm/node_modules/@ethereumjs/evm/dist/esm/types.d.ts",
+      "bytes": 25318,
+      "sha256": "80c9469eb0e0ce83e3523729e995247a8b4a6ef8a8b0d3deea22045ceae09ece",
+      "anchors": [
+        [
+          "custom_opcode_api",
+          338,
+          350
+        ]
+      ]
+    },
+    {
+      "path": "engines/local-evm/node_modules/@ethereumjs/util/dist/esm/address.js",
+      "bytes": 4047,
+      "sha256": "5277a11133c853af8bea176c10941af4a543acd3cb1f09dbb2abb66b8670a15d",
+      "anchors": [
+        [
+          "length_check",
+          8,
+          12
+        ]
+      ]
+    },
+    {
+      "path": "engines/fixture-evm/node_modules/@ethereumjs/vm/dist/esm/runTx.js",
+      "bytes": 53701,
+      "sha256": "e64717c0ff4046a6fe3496e41c3a6e53c24a7f7bd74a63c8b0ddf8ab390e3373",
+      "anchors": [
+        [
+          "authority_eligibility",
+          119,
+          126
+        ],
+        [
+          "sender_eligibility",
+          591,
+          604
+        ]
+      ]
+    },
+    {
+      "path": "engines/local-evm/sender-delegation.js",
+      "bytes": 404,
+      "sha256": "60c354715581a3fd343ae0de84d948f251e62cc830dba297ef04d0775eab70dd",
+      "anchors": [
+        [
+          "strict_sender",
+          1,
+          7
+        ]
+      ]
+    },
+    {
+      "path": "engines/local-evm/authorization-list.js",
+      "bytes": 4382,
+      "sha256": "acc500a86de92b3dd831be33e680d4be25408648ffd1fe304190dd05157bb8e5",
+      "anchors": [
+        [
+          "strict_authority",
+          54,
+          57
+        ]
+      ]
+    },
+    {
+      "path": "engines/local-evm/amsterdam-authorization.js",
+      "bytes": 9539,
+      "sha256": "5072c0a220a21bdb16541d4ff2b704f9f15f18b0c146069ab31f68b7c0a7d52c",
+      "anchors": []
+    },
+    {
+      "path": "engines/local-evm/amsterdam-authorization-validation.js",
+      "bytes": 12577,
+      "sha256": "f3a4666da7356ad84923c1a2a5f88cce992a280ddcd880ce56961ee7594505da",
+      "anchors": [
+        [
+          "recipient_guard",
+          110,
+          119
+        ]
+      ]
+    },
+    {
+      "path": "engines/local-evm/ethereum-profile.js",
+      "bytes": 8722,
+      "sha256": "9717c1814e340aa5ff903482f3d1a7c9062086ca14e7bc421e8f6612d2b179eb",
+      "anchors": [
+        [
+          "trusted_admission",
+          1,
+          29
+        ]
+      ]
+    }
+  ],
+  "ethereumjsPackagePins": {
+    "@ethereumjs/evm": {
+      "version": "10.1.3",
+      "resolved": "https://registry.npmjs.org/@ethereumjs/evm/-/evm-10.1.3.tgz",
+      "integrity": "sha512-7C6oo3f1rvtsFAQOURcmEkyUTBTePBbQUgWTfzrual8kbb0R8053rY+PolvFDETfVSK/TrPzZFhFe5sgz+Clgw==",
+      "license": "MPL-2.0",
+      "dependencies": {
+        "@ethereumjs/common": "^10.1.3",
+        "@ethereumjs/statemanager": "^10.1.3",
+        "@ethereumjs/util": "^10.1.3",
+        "@noble/curves": "^2.0.1",
+        "@noble/hashes": "^2.0.1",
+        "debug": "^4.4.0",
+        "eventemitter3": "^5.0.1"
+      },
+      "engines": {
+        "node": ">=20"
+      }
+    },
+    "@ethereumjs/util": {
+      "version": "10.1.3",
+      "resolved": "https://registry.npmjs.org/@ethereumjs/util/-/util-10.1.3.tgz",
+      "integrity": "sha512-PhezOVe4DFaC+QLIsnK/tiOaXjpjS2F9AH4Ez0EfWevFw9NWNSg95l7I0dWuHF0B7v9odm2Ijqwo0EnARXtUmA==",
+      "license": "MPL-2.0",
+      "dependencies": {
+        "@ethereumjs/rlp": "^10.1.3",
+        "@noble/curves": "^2.0.1",
+        "@noble/hashes": "^2.0.1"
+      },
+      "engines": {
+        "node": ">=20"
+      }
+    }
+  },
+  "geth": {
+    "directory": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10",
+    "commit": "1df30b18d9ed35ee9d28ffd4648442c2204554ad",
+    "sourceInventorySha256": "36e245fda711de52fe5e0b8c917d4bbbffd840ed7edfc0696f29cbb1f8b24dff",
+    "toolchainManifestSha256": "791a91bca058b516b21a66097787f96959477958219eaee9dd20e73367b21333",
+    "files": [
+      {
+        "path": "source/core/types/tx_setcode.go",
+        "sha256": "fc75cb24a0b05c65c7c808f0573544bf05c78383eeaf9f041d28c78a7f97c4e1",
+        "bytes": 8085,
+        "anchors": [
+          [
+            "strict_parser",
+            37,
+            42
+          ]
+        ],
+        "inventoryBound": true
+      },
+      {
+        "path": "source/core/vm/evm.go",
+        "sha256": "42016043f3376a3d8fca94693a0641f775af4010b750310b762a847c1fbbd1a8",
+        "bytes": 32605,
+        "anchors": [
+          [
+            "dispatch",
+            302,
+            348
+          ],
+          [
+            "one_hop",
+            722,
+            749
+          ]
+        ],
+        "inventoryBound": true
+      },
+      {
+        "path": "source/core/vm/operations_acl.go",
+        "sha256": "d4dc266c9a5efb62c7e1aaf27d92402b4b454cf130e4ab295f07d49a3ac504b5",
+        "bytes": 24598,
+        "anchors": [
+          [
+            "call_family_gas",
+            371,
+            425
+          ],
+          [
+            "amsterdam_gas",
+            500,
+            514
+          ]
+        ],
+        "inventoryBound": true
+      },
+      {
+        "path": "source/core/state_transition.go",
+        "sha256": "b85812dfd250889b4c9f63b1f752281fbcce08cc9e4dd43946aed4c01f7bdb94",
+        "bytes": 48808,
+        "anchors": [
+          [
+            "sender",
+            599,
+            606
+          ],
+          [
+            "root_warming",
+            904,
+            914
+          ],
+          [
+            "root_charge",
+            1009,
+            1038
+          ],
+          [
+            "authority",
+            1126,
+            1140
+          ]
+        ],
+        "inventoryBound": true
+      },
+      {
+        "path": "source/core/vm/jump_table.go",
+        "sha256": "6add24c79b46632f8fc5ab6e38f6d57adbb2e1e7ee3674d85b821c549d6ea7ca",
+        "bytes": 30101,
+        "anchors": [
+          [
+            "undefined_opcodes",
+            1098,
+            1109
+          ]
+        ],
+        "inventoryBound": true
+      },
+      {
+        "path": "source/core/vm/instructions.go",
+        "sha256": "06027536b7f673b6faae36e76c7789a12cdced522b7fe14e55912e67546ee0d4",
+        "bytes": 53609,
+        "anchors": [
+          [
+            "undefined_opcode",
+            898,
+            900
+          ]
+        ],
+        "inventoryBound": true
+      }
+    ]
+  },
+  "officialWebSources": [
+    {
+      "url": "https://eips.ethereum.org/EIPS/eip-7702",
+      "statusObserved": "Final",
+      "anchors": [
+        "Delegation indicator",
+        "Precompiles",
+        "Loops",
+        "Transaction origination"
+      ],
+      "exactBytesRetained": false,
+      "sha256": null
+    },
+    {
+      "url": "https://eips.ethereum.org/EIPS/eip-2780",
+      "statusObserved": "Last Call",
+      "anchors": [
+        "Account creation and access charges",
+        "Interactions with other EIPs"
+      ],
+      "exactBytesRetained": false,
+      "sha256": null
+    },
+    {
+      "url": "https://steel.ethereum.foundation/docs/execution-specs/specs/reference/src/ethereum/forks/amsterdam/vm/eoa_delegation.py.html",
+      "mode": "official_current_search_result_text",
+      "sourceLines": [
+        [
+          58,
+          61
+        ],
+        [
+          98,
+          109
+        ],
+        [
+          174,
+          188
+        ],
+        [
+          218,
+          226
+        ]
+      ],
+      "commit": null,
+      "exactBytesRetained": false,
+      "sha256": null
+    },
+    {
+      "url": "https://steel.ethereum.foundation/docs/execution-specs/specs/reference/src/ethereum/forks/amsterdam/vm/interpreter.py.html",
+      "mode": "official_current_search_result_text",
+      "sourceLines": [
+        [
+          194,
+          217
+        ],
+        [
+          437,
+          447
+        ]
+      ],
+      "commit": null,
+      "exactBytesRetained": false,
+      "sha256": null
+    }
+  ],
+  "unavailablePinnedEelsRetrievals": [
+    {
+      "url": "https://raw.githubusercontent.com/ethereum/execution-specs/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/amsterdam/vm/eoa_delegation.py",
+      "status": "web_tool_cache_miss",
+      "bytesRetained": false,
+      "sha256": null
+    },
+    {
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/amsterdam/vm/eoa_delegation.py",
+      "status": "web_tool_cache_miss",
+      "bytesRetained": false,
+      "sha256": null
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ethereum/execution-specs/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/prague/vm/eoa_delegation.py",
+      "status": "web_tool_cache_miss",
+      "bytesRetained": false,
+      "sha256": null
+    },
+    {
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/prague/vm/eoa_delegation.py",
+      "status": "web_tool_cache_miss",
+      "bytesRetained": false,
+      "sha256": null
+    },
+    {
+      "url": "https://api.github.com/repos/ethereum/execution-specs/contents/src/ethereum/forks/amsterdam/vm/eoa_delegation.py?ref=e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e",
+      "status": "web_tool_not_accessible",
+      "bytesRetained": false,
+      "sha256": null
+    }
+  ],
+  "findings": [
+    {
+      "kind": "pinned_source_divergence",
+      "topic": "malformed_prefix_length",
+      "ethereumjs": "prefix-only load/access predicates; Address requires exactly20bytes",
+      "geth": "exact23 predicate; malformed raw code is not delegation",
+      "executedByThisReview": false
+    },
+    {
+      "kind": "source_agreement",
+      "topic": "one_hop_only",
+      "executedByThisReview": false
+    },
+    {
+      "kind": "unexecuted_arbitrary_prestate_caveat",
+      "topic": "stored_bytecode_on_active_precompile",
+      "reachableChainStateEstablished": false
+    },
+    {
+      "kind": "integration_requirement",
+      "topic": "recipient_only_parent_guard_must_allow_nonindicator_invalid_bytecode; sender_authority_remain_strict"
+    }
+  ]
+}

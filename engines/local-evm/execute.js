@@ -19,6 +19,13 @@ import { ethereumStateGasBudget, settleEthereumStateGas } from './ethereum-state
 import { createCreationAttemptObserver } from './creation-attempt-observer.js';
 import { storageOnlyCreationAccount, unsupportedStorageCreation } from './creation-support.js';
 import { applyAmsterdamAuthorizations, amsterdamPreparationHalt } from './amsterdam-authorization.js';
+import { assertDelegationRuntimePatched } from './delegation-runtime-patch.js';
+
+// The pinned dependency needs three exact EIP-7702 length gates. Verify the
+// explicit preparation step before accepting execution in this process; never
+// rewrite dependencies while serving a request. Archived older runtimes remain
+// independent and the source inventory includes the corrected dependency bytes.
+assertDelegationRuntimePatched();
 
 export const EXECUTION_LIMITS = Object.freeze({ gas: 5000000, steps: 1000000, frames: 1000, depth: 32, logs: 2000, memoryBytes: 1048576, returnBytes: 1048576, calldataBytes: 32768, traceBytes: 8388608, wallMs: 10000 });
 export const ETHEREUM_EXECUTION_LIMITS = Object.freeze({ ...EXECUTION_LIMITS, wallMs: 120000 });

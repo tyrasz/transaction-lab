@@ -1,0 +1,444 @@
+TAP version 13
+# Subtest: local loader binds full static closure, worker entry, entire dependencies, symlink target and Node bytes
+not ok 1 - local loader binds full static closure, worker entry, entire dependencies, symlink target and Node bytes
+  ---
+  duration_ms: 56.993333
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/local-loader.test.js:55:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Command failed: /opt/homebrew/Cellar/node@22/22.23.2/bin/node --input-type=module -e 
+        import assert from 'node:assert/strict';
+        import { readFile, appendFile, writeFile, rename, rm } from 'node:fs/promises';
+        import { createHash } from 'node:crypto';
+        const loaderUrl="file:///var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-70wbB4/src/local-loader.js";
+        
+        const {loadLocalApi}=await import(loaderUrl);const first=loadLocalApi();assert.equal(loadLocalApi(),first);
+        const api=await first;assert.equal(await loadLocalApi(),api);await api.assertSourcesUnchanged();
+        const identity=api.implementation;assert.ok(Object.isFrozen(identity.inventory));
+        assert.equal(identity.sourceSha256,createHash('sha256').update(JSON.stringify({files:identity.inventory,runtime:identity.runtime})).digest('hex'));
+        for(const row of identity.inventory)if(row.kind==='file'){const data=await readFile(row.path);assert.equal(data.length,row.bytes);assert.equal(createHash('sha256').update(data).digest('hex'),row.sha256);}
+        assert.equal(identity.runtime.executableSha256,createHash('sha256').update(await readFile(process.execPath)).digest('hex'));
+        console.log(JSON.stringify(identity));
+      
+      
+    node:internal/modules/esm/resolve:275
+        throw new ERR_MODULE_NOT_FOUND(
+              ^
+    
+    Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-70wbB4/engines/local-evm/delegation-runtime-patch.js' imported from /private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-70wbB4/src/local-loader.js
+        at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+        at moduleResolve (node:internal/modules/esm/resolve:861:10)
+        at defaultResolve (node:internal/modules/esm/resolve:985:11)
+        at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+        at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+        at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+        at ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+      code: 'ERR_MODULE_NOT_FOUND',
+      url: 'file:///private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-70wbB4/engines/local-evm/delegation-runtime-patch.js'
+    }
+    
+    Node.js v22.23.2
+    
+  code: 1
+  stack: |-
+    finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    moduleResolve (node:internal/modules/esm/resolve:861:10)
+    defaultResolve (node:internal/modules/esm/resolve:985:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+    genericNodeError (node:internal/errors:983:15)
+    wrappedFn (node:internal/errors:537:14)
+    ChildProcess.exithandler (node:child_process:417:12)
+    ChildProcess.emit (node:events:519:28)
+    maybeClose (node:internal/child_process:1101:16)
+    ChildProcess._handle.onexit (node:internal/child_process:304:5)
+  ...
+# Subtest: missing optional worker at startup stays unavailable until a new process
+not ok 2 - missing optional worker at startup stays unavailable until a new process
+  ---
+  duration_ms: 53.271791
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/local-loader.test.js:70:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Command failed: /opt/homebrew/Cellar/node@22/22.23.2/bin/node --input-type=module -e 
+        import assert from 'node:assert/strict';
+        import { readFile, appendFile, writeFile, rename, rm } from 'node:fs/promises';
+        import { createHash } from 'node:crypto';
+        const loaderUrl="file:///var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-Q6bWIF/src/local-loader.js";
+        
+        await rename('engines/local-evm/isolated-worker.js','engines/local-evm/worker.saved');
+        const {loadLocalApi}=await import(loaderUrl);
+        await rename('engines/local-evm/worker.saved','engines/local-evm/isolated-worker.js');
+        assert.equal(await loadLocalApi(),null);assert.equal(await loadLocalApi(),null);
+      
+      
+    node:internal/modules/esm/resolve:275
+        throw new ERR_MODULE_NOT_FOUND(
+              ^
+    
+    Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-Q6bWIF/engines/local-evm/delegation-runtime-patch.js' imported from /private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-Q6bWIF/src/local-loader.js
+        at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+        at moduleResolve (node:internal/modules/esm/resolve:861:10)
+        at defaultResolve (node:internal/modules/esm/resolve:985:11)
+        at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+        at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+        at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+        at ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+      code: 'ERR_MODULE_NOT_FOUND',
+      url: 'file:///private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-Q6bWIF/engines/local-evm/delegation-runtime-patch.js'
+    }
+    
+    Node.js v22.23.2
+    
+  code: 1
+  stack: |-
+    finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    moduleResolve (node:internal/modules/esm/resolve:861:10)
+    defaultResolve (node:internal/modules/esm/resolve:985:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+    genericNodeError (node:internal/errors:983:15)
+    wrappedFn (node:internal/errors:537:14)
+    ChildProcess.exithandler (node:child_process:417:12)
+    ChildProcess.emit (node:events:519:28)
+    maybeClose (node:internal/child_process:1101:16)
+    ChildProcess._handle.onexit (node:internal/child_process:304:5)
+  ...
+# Subtest: changed source between startup and lazy import rejects, rather than relabeling cached modules
+not ok 3 - changed source between startup and lazy import rejects, rather than relabeling cached modules
+  ---
+  duration_ms: 53.184166
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/local-loader.test.js:81:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Command failed: /opt/homebrew/Cellar/node@22/22.23.2/bin/node --input-type=module -e 
+        import assert from 'node:assert/strict';
+        import { readFile, appendFile, writeFile, rename, rm } from 'node:fs/promises';
+        import { createHash } from 'node:crypto';
+        const loaderUrl="file:///var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-euZYHr/src/local-loader.js";
+        
+        const {loadLocalApi}=await import(loaderUrl);await appendFile('src/rpc.js','// change');
+        await assert.rejects(loadLocalApi(),{code:'LOCAL_PREVIEW_SOURCE_CHANGED'});
+      
+      
+    node:internal/modules/esm/resolve:275
+        throw new ERR_MODULE_NOT_FOUND(
+              ^
+    
+    Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-euZYHr/engines/local-evm/delegation-runtime-patch.js' imported from /private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-euZYHr/src/local-loader.js
+        at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+        at moduleResolve (node:internal/modules/esm/resolve:861:10)
+        at defaultResolve (node:internal/modules/esm/resolve:985:11)
+        at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+        at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+        at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+        at ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+      code: 'ERR_MODULE_NOT_FOUND',
+      url: 'file:///private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-euZYHr/engines/local-evm/delegation-runtime-patch.js'
+    }
+    
+    Node.js v22.23.2
+    
+  code: 1
+  stack: |-
+    finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    moduleResolve (node:internal/modules/esm/resolve:861:10)
+    defaultResolve (node:internal/modules/esm/resolve:985:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+    genericNodeError (node:internal/errors:983:15)
+    wrappedFn (node:internal/errors:537:14)
+    ChildProcess.exithandler (node:child_process:417:12)
+    ChildProcess.emit (node:events:519:28)
+    maybeClose (node:internal/child_process:1101:16)
+    ChildProcess._handle.onexit (node:internal/child_process:304:5)
+  ...
+# Subtest: changed source during lazy import is rejected
+not ok 4 - changed source during lazy import is rejected
+  ---
+  duration_ms: 54.235833
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/local-loader.test.js:89:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Command failed: /opt/homebrew/Cellar/node@22/22.23.2/bin/node --input-type=module -e 
+        import assert from 'node:assert/strict';
+        import { readFile, appendFile, writeFile, rename, rm } from 'node:fs/promises';
+        import { createHash } from 'node:crypto';
+        const loaderUrl="file:///var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-ChFNli/src/local-loader.js";
+        const {loadLocalApi}=await import(loaderUrl);await assert.rejects(loadLocalApi(),{code:'LOCAL_PREVIEW_SOURCE_CHANGED'});
+      
+    node:internal/modules/esm/resolve:275
+        throw new ERR_MODULE_NOT_FOUND(
+              ^
+    
+    Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-ChFNli/engines/local-evm/delegation-runtime-patch.js' imported from /private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-ChFNli/src/local-loader.js
+        at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+        at moduleResolve (node:internal/modules/esm/resolve:861:10)
+        at defaultResolve (node:internal/modules/esm/resolve:985:11)
+        at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+        at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+        at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+        at ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+      code: 'ERR_MODULE_NOT_FOUND',
+      url: 'file:///private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-ChFNli/engines/local-evm/delegation-runtime-patch.js'
+    }
+    
+    Node.js v22.23.2
+    
+  code: 1
+  stack: |-
+    finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    moduleResolve (node:internal/modules/esm/resolve:861:10)
+    defaultResolve (node:internal/modules/esm/resolve:985:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+    genericNodeError (node:internal/errors:983:15)
+    wrappedFn (node:internal/errors:537:14)
+    ChildProcess.exithandler (node:child_process:417:12)
+    ChildProcess.emit (node:events:519:28)
+    maybeClose (node:internal/child_process:1101:16)
+    ChildProcess._handle.onexit (node:internal/child_process:304:5)
+  ...
+# Subtest: every simulation rechecks added dependency files before invoking its adapter
+not ok 5 - every simulation rechecks added dependency files before invoking its adapter
+  ---
+  duration_ms: 55.411666
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/local-loader.test.js:94:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Command failed: /opt/homebrew/Cellar/node@22/22.23.2/bin/node --input-type=module -e 
+        import assert from 'node:assert/strict';
+        import { readFile, appendFile, writeFile, rename, rm } from 'node:fs/promises';
+        import { createHash } from 'node:crypto';
+        const loaderUrl="file:///var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-PK4o4Z/src/local-loader.js";
+        
+        const {loadLocalApi}=await import(loaderUrl);const api=await loadLocalApi();
+        await writeFile('engines/local-evm/node_modules/example/new.js','// addition');
+        await assert.rejects(api.simulateLocal({},{}),{code:'LOCAL_PREVIEW_SOURCE_CHANGED'});
+      
+      
+    node:internal/modules/esm/resolve:275
+        throw new ERR_MODULE_NOT_FOUND(
+              ^
+    
+    Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-PK4o4Z/engines/local-evm/delegation-runtime-patch.js' imported from /private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-PK4o4Z/src/local-loader.js
+        at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+        at moduleResolve (node:internal/modules/esm/resolve:861:10)
+        at defaultResolve (node:internal/modules/esm/resolve:985:11)
+        at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+        at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+        at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+        at ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+      code: 'ERR_MODULE_NOT_FOUND',
+      url: 'file:///private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-PK4o4Z/engines/local-evm/delegation-runtime-patch.js'
+    }
+    
+    Node.js v22.23.2
+    
+  code: 1
+  stack: |-
+    finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    moduleResolve (node:internal/modules/esm/resolve:861:10)
+    defaultResolve (node:internal/modules/esm/resolve:985:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+    genericNodeError (node:internal/errors:983:15)
+    wrappedFn (node:internal/errors:537:14)
+    ChildProcess.exithandler (node:child_process:417:12)
+    ChildProcess.emit (node:events:519:28)
+    maybeClose (node:internal/child_process:1101:16)
+    ChildProcess._handle.onexit (node:internal/child_process:304:5)
+  ...
+# Subtest: source changes during a simulation remove all nested preview amounts afterward
+not ok 6 - source changes during a simulation remove all nested preview amounts afterward
+  ---
+  duration_ms: 52.5495
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/local-loader.test.js:103:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Command failed: /opt/homebrew/Cellar/node@22/22.23.2/bin/node --input-type=module -e 
+        import assert from 'node:assert/strict';
+        import { readFile, appendFile, writeFile, rename, rm } from 'node:fs/promises';
+        import { createHash } from 'node:crypto';
+        const loaderUrl="file:///var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-eYdtU3/src/local-loader.js";
+        
+        const {loadLocalApi}=await import(loaderUrl);const api=await loadLocalApi();
+        const result=await api.simulateLocal({mutate:true},{});
+        assert.equal(result.status,'unavailable');assert.equal(result.error.code,'LOCAL_PREVIEW_SOURCE_CHANGED');
+        assert.equal(result.execution.status,'unavailable');assert.deepEqual(result.measurements,[]);assert.equal(result.attempt.preview,null);
+      
+      
+    node:internal/modules/esm/resolve:275
+        throw new ERR_MODULE_NOT_FOUND(
+              ^
+    
+    Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-eYdtU3/engines/local-evm/delegation-runtime-patch.js' imported from /private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-eYdtU3/src/local-loader.js
+        at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+        at moduleResolve (node:internal/modules/esm/resolve:861:10)
+        at defaultResolve (node:internal/modules/esm/resolve:985:11)
+        at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+        at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+        at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+        at ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+      code: 'ERR_MODULE_NOT_FOUND',
+      url: 'file:///private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-eYdtU3/engines/local-evm/delegation-runtime-patch.js'
+    }
+    
+    Node.js v22.23.2
+    
+  code: 1
+  stack: |-
+    finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    moduleResolve (node:internal/modules/esm/resolve:861:10)
+    defaultResolve (node:internal/modules/esm/resolve:985:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+    genericNodeError (node:internal/errors:983:15)
+    wrappedFn (node:internal/errors:537:14)
+    ChildProcess.exithandler (node:child_process:417:12)
+    ChildProcess.emit (node:events:519:28)
+    maybeClose (node:internal/child_process:1101:16)
+    ChildProcess._handle.onexit (node:internal/child_process:304:5)
+  ...
+# Subtest: escaping dependency symlinks are rejected before import
+not ok 7 - escaping dependency symlinks are rejected before import
+  ---
+  duration_ms: 52.852
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/local-loader.test.js:113:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Command failed: /opt/homebrew/Cellar/node@22/22.23.2/bin/node --input-type=module -e 
+        import assert from 'node:assert/strict';
+        import { readFile, appendFile, writeFile, rename, rm } from 'node:fs/promises';
+        import { createHash } from 'node:crypto';
+        const loaderUrl="file:///var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-Xh0ycP/src/local-loader.js";
+        const {loadLocalApi}=await import(loaderUrl);await assert.rejects(loadLocalApi(),{code:'LOCAL_PREVIEW_SOURCE_CHANGED'});
+      
+    node:internal/modules/esm/resolve:275
+        throw new ERR_MODULE_NOT_FOUND(
+              ^
+    
+    Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-Xh0ycP/engines/local-evm/delegation-runtime-patch.js' imported from /private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-Xh0ycP/src/local-loader.js
+        at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+        at moduleResolve (node:internal/modules/esm/resolve:861:10)
+        at defaultResolve (node:internal/modules/esm/resolve:985:11)
+        at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+        at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+        at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+        at ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+      code: 'ERR_MODULE_NOT_FOUND',
+      url: 'file:///private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-Xh0ycP/engines/local-evm/delegation-runtime-patch.js'
+    }
+    
+    Node.js v22.23.2
+    
+  code: 1
+  stack: |-
+    finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    moduleResolve (node:internal/modules/esm/resolve:861:10)
+    defaultResolve (node:internal/modules/esm/resolve:985:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+    genericNodeError (node:internal/errors:983:15)
+    wrappedFn (node:internal/errors:537:14)
+    ChildProcess.exithandler (node:child_process:417:12)
+    ChildProcess.emit (node:events:519:28)
+    maybeClose (node:internal/child_process:1101:16)
+    Socket.<anonymous> (node:internal/child_process:456:11)
+    Socket.emit (node:events:519:28)
+    Pipe.<anonymous> (node:net:347:12)
+  ...
+# Subtest: cancellation or exhausted deadline after execution is rechecked after final source verification
+not ok 8 - cancellation or exhausted deadline after execution is rechecked after final source verification
+  ---
+  duration_ms: 53.582458
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/local-loader.test.js:118:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Command failed: /opt/homebrew/Cellar/node@22/22.23.2/bin/node --input-type=module -e 
+        import assert from 'node:assert/strict';
+        import { readFile, appendFile, writeFile, rename, rm } from 'node:fs/promises';
+        import { createHash } from 'node:crypto';
+        const loaderUrl="file:///var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-83GAje/src/local-loader.js";
+        
+        const {loadLocalApi}=await import(loaderUrl);const api=await loadLocalApi();
+        const controller=new AbortController();
+        const cancelled=await api.simulateLocal({cancel:true},{controller,usage:()=>({remainingWallMs:10000})},{signal:controller.signal});
+        assert.equal(cancelled.error.code,'LOCAL_PREVIEW_CANCELLED');assert.equal(cancelled.execution.status,'unavailable');assert.equal(cancelled.attempt.preview,null);assert.deepEqual(cancelled.measurements,[]);
+        const expired=await api.simulateLocal({},{usage:()=>({remainingWallMs:0})});
+        assert.equal(expired.error.code,'LOCAL_PREVIEW_BUDGET');assert.equal(expired.attempt.preview,null);assert.deepEqual(expired.measurements,[]);
+        const stable=await api.simulateLocal({},{usage:()=>({remainingWallMs:10000})});
+        assert.equal(stable.status,'complete');assert.ok(stable.timing.totalMs>=0);assert.equal(stable.usage.remainingWallMs,10000);
+      
+      
+    node:internal/modules/esm/resolve:275
+        throw new ERR_MODULE_NOT_FOUND(
+              ^
+    
+    Error [ERR_MODULE_NOT_FOUND]: Cannot find module '/private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-83GAje/engines/local-evm/delegation-runtime-patch.js' imported from /private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-83GAje/src/local-loader.js
+        at finalizeResolution (node:internal/modules/esm/resolve:275:11)
+        at moduleResolve (node:internal/modules/esm/resolve:861:10)
+        at defaultResolve (node:internal/modules/esm/resolve:985:11)
+        at #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+        at ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+        at ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+        at ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+      code: 'ERR_MODULE_NOT_FOUND',
+      url: 'file:///private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/local-loader-83GAje/engines/local-evm/delegation-runtime-patch.js'
+    }
+    
+    Node.js v22.23.2
+    
+  code: 1
+  stack: |-
+    finalizeResolution (node:internal/modules/esm/resolve:275:11)
+    moduleResolve (node:internal/modules/esm/resolve:861:10)
+    defaultResolve (node:internal/modules/esm/resolve:985:11)
+    #cachedDefaultResolve (node:internal/modules/esm/loader:747:20)
+    ModuleLoader.resolve (node:internal/modules/esm/loader:724:38)
+    ModuleLoader.getModuleJobForImport (node:internal/modules/esm/loader:320:38)
+    ModuleJob._link (node:internal/modules/esm/module_job:182:49) {
+    genericNodeError (node:internal/errors:983:15)
+    wrappedFn (node:internal/errors:537:14)
+    ChildProcess.exithandler (node:child_process:417:12)
+    ChildProcess.emit (node:events:519:28)
+    maybeClose (node:internal/child_process:1101:16)
+    ChildProcess._handle.onexit (node:internal/child_process:304:5)
+  ...
+# Subtest: real installed closure contains all current local runtime and complete pinned dependency tree without copying it
+ok 9 - real installed closure contains all current local runtime and complete pinned dependency tree without copying it
+  ---
+  duration_ms: 1480.935042
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 1
+# fail 8
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1969.249958

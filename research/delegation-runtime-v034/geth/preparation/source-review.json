@@ -1,0 +1,128 @@
+{
+  "files": 3909,
+  "bytes": 24059209,
+  "missingRelativeImports": [],
+  "dependencies": {
+    "mode": "separate_full_copies",
+    "localPatched": {
+      "package": "@ethereumjs/evm",
+      "version": "10.1.3",
+      "files": [
+        {
+          "path": "dist/esm/evm.js",
+          "sha256": "fcc46a02ca958fcdb9a74626f532e9181165e056bef467a3ad40c631310ac440"
+        },
+        {
+          "path": "dist/esm/opcodes/gas.js",
+          "sha256": "b014bb84c89c87a222e990ef10dffd6b91ee1eb19ab58539d2d6bc6763680970"
+        }
+      ]
+    },
+    "fixtureStock": [
+      {
+        "path": "engines/fixture-evm/node_modules/@ethereumjs/evm/dist/esm/evm.js",
+        "kind": "file",
+        "bytes": 67254,
+        "sha256": "e978f659e72aeb8ee22ebc4559bafb37e4760b0557512224f734b5b46da22f46",
+        "mode": 420
+      },
+      {
+        "path": "engines/fixture-evm/node_modules/@ethereumjs/evm/dist/esm/opcodes/gas.js",
+        "kind": "file",
+        "bytes": 40662,
+        "sha256": "72087f58b0b78e2f5dc7fed7cfa48aeee6000c5dbff4f3d851622f40c5a900c4",
+        "mode": 420
+      }
+    ],
+    "patchDeclaration": {
+      "package": "@ethereumjs/evm",
+      "version": "10.1.3",
+      "files": [
+        {
+          "path": "dist/esm/evm.js",
+          "originalSha256": "e978f659e72aeb8ee22ebc4559bafb37e4760b0557512224f734b5b46da22f46",
+          "patchedSha256": "fcc46a02ca958fcdb9a74626f532e9181165e056bef467a3ad40c631310ac440",
+          "replacements": [
+            {
+              "before": "if (equalsBytes(recipientCode.slice(0, 3), DELEGATION_7702_FLAG)) {",
+              "after": "if (recipientCode.length === 23 && equalsBytes(recipientCode.slice(0, 3), DELEGATION_7702_FLAG)) {"
+            },
+            {
+              "before": "                    equalsBytes(message.code.slice(0, 3), DELEGATION_7702_FLAG)) {",
+              "after": "                    message.code.length === 23 && equalsBytes(message.code.slice(0, 3), DELEGATION_7702_FLAG)) {"
+            }
+          ]
+        },
+        {
+          "path": "dist/esm/opcodes/gas.js",
+          "originalSha256": "72087f58b0b78e2f5dc7fed7cfa48aeee6000c5dbff4f3d851622f40c5a900c4",
+          "patchedSha256": "b014bb84c89c87a222e990ef10dffd6b91ee1eb19ab58539d2d6bc6763680970",
+          "replacements": [
+            {
+              "before": "if (equalsBytes(code.slice(0, 3), DELEGATION_7702_FLAG)) {",
+              "after": "if (code.length === 23 && equalsBytes(code.slice(0, 3), DELEGATION_7702_FLAG)) {"
+            }
+          ]
+        }
+      ]
+    },
+    "patchUtility": {
+      "path": "engines/local-evm/delegation-runtime-patch.js",
+      "kind": "file",
+      "bytes": 6808,
+      "sha256": "2b22c4bd47a5a4faac903559394dce84d7527bf866ac518c711ebbc2ecff2a59",
+      "mode": 420
+    }
+  },
+  "harness": [
+    {
+      "path": "research/delegation-runtime-v034/geth/PLAN.md",
+      "kind": "file",
+      "bytes": 7396,
+      "sha256": "cb6736d91339a266e95be49a70b6e0fd59cb2bd7623e79de2df5f99b2334bce5",
+      "mode": 420
+    },
+    {
+      "path": "research/delegation-runtime-v034/geth/archive.mjs",
+      "kind": "file",
+      "bytes": 6330,
+      "sha256": "cb99211ba06f0511994c7de1fed18c105bf541ffb32d47412b10d63676828fcd",
+      "mode": 420
+    },
+    {
+      "path": "research/delegation-runtime-v034/geth/cases.mjs",
+      "kind": "file",
+      "bytes": 7345,
+      "sha256": "e68ed396ac18370e72d9989813cf98ec0299b840644b161001e2d166f11af196",
+      "mode": 420
+    },
+    {
+      "path": "research/delegation-runtime-v034/geth/compare.mjs",
+      "kind": "file",
+      "bytes": 8732,
+      "sha256": "2e9a94d780929ee60e20370a1dfd683594c843c495b4ec02e8ca39d58042a09d",
+      "mode": 420
+    },
+    {
+      "path": "research/delegation-runtime-v034/geth/run.mjs",
+      "kind": "file",
+      "bytes": 16487,
+      "sha256": "c1d8b6a0fdeeee4138d4f6ceee466a2c738daa5a55622d3f091cda29f0f0388f",
+      "mode": 420
+    },
+    {
+      "path": "research/delegation-runtime-v034/geth/run.test.mjs",
+      "kind": "file",
+      "bytes": 16045,
+      "sha256": "e45305b4b4567bf45c3a93604b46ffec1bd5c09576df9b256a4d7937c4f03443",
+      "mode": 420
+    },
+    {
+      "path": "research/delegation-runtime-v034/geth/worker.mjs",
+      "kind": "file",
+      "bytes": 2859,
+      "sha256": "65c00e85cf01dde0f7df34b12e8225fd765332648ab92fc23fa19b82187b342e",
+      "mode": 420
+    }
+  ]
+}
