@@ -20,12 +20,20 @@ retained. A bounded `/usr/bin/caffeinate -i` wrapper may inhibit idle sleep, but
 does not excuse manual suspension or extend deadlines. No restart, retries,
 replacement slots, substituted wallets/blocks, provider fallback or saved-proof
 fallback. Terminal cancellation/drain has25seconds; incomplete drainage cannot
-produce valid metrics. Offline hashing and sealing are timed separately.
+produce valid metrics. Drainage includes actual fetch, body-read and
+cancellation promises. A returned timeout alone is not drained I/O. Check
+absolute and monotonic elapsed time after each phase and at termination; retain
+late output while withholding run metrics. Offline hashing and sealing are
+timed separately.
 
 Every selected row is reprojected from its preserved envelope under the frozen
 current local profile, including supported top-level CREATE and optional
-access-list/blob context. Authorization/coded-sender/KZG/unknown-context and
-resource limits remain explicit. The census's older provider projection is
+access-list/blob context, existing delegated senders, and Prague-or-later
+type-4 authorization lists of at most16 tuples. Authorization quantities are
+converted from census representation to canonical RPC hex without changing
+order, duplicates, signatures, or protocol-skipped tuples. The exact list is
+passed to both engines. Creation/blob combinations with authorizations and
+unknown context or resource limits remain explicit. The census's older provider projection is
 retained for provenance and never silently changed. Unsupported rows remain in
 S. Execution uses the parent's block-end state, fixed5M gas and zero gas price,
 BASEFEE and declared BLOBBASEFEE; it is not mined-position replay, signature
@@ -44,6 +52,13 @@ oracle-unavailable. Explicit base-fee overrides request the same profile;
 there is no bytecode context witness, so providerContextExecutionAttested is
 false. No provider trace/poststate may initialize the local engine.
 
+Bind every accepted file to its original write hash and size; verify the local
+result and its seal again immediately before oracle dispatch. A final durable
+write ledger includes all frozen plan files and run evidence before the ledger
+itself. Exact inventory and original identities must still match before final
+sealing. Account proofs can establish empty code without a separate code RPC;
+the auditor independently rechecks that derivation and its evidence reference.
+
 Limits retain6144 public calls/512MiB total,8MiB per body,25seconds per request,
 256 local reads/32MiB per case,65 oracle reads/32MiB per case and384 per slot.
 The fixed oracle currently uses four requests; global bounds may stop later
@@ -57,6 +72,12 @@ lifecycle support/evidence makes that channel unavailable and never converts
 an unknown into a match. Preserve measured mismatches even when another channel
 is unavailable. Local completion defines execution availability; oracle failure
 cannot turn a valid local execution into a local failure.
+
+Authorization intrinsic cost and ordered processing refunds are independently
+folded from signed tuples and proven initial accounts. Curve recovery and the
+parent's defensive output validator are shared primitives, not independent EVM
+engines. Sparse provider diffs cannot establish a whole storage-namespace clear;
+such a state channel remains unavailable unless complete evidence supports it.
 
 Report N and S, local completed/S (success/revert/fault separately), five-channel
 matches/S, matches/comparable, all unsupported/resource/provider failures, and

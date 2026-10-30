@@ -72,7 +72,10 @@ function accessList(v) {
 function authorizations(v) {
   return array(v, MAX_CENSUS, 'Authorization list').map(item => {
     keys(item, ['chainId', 'address', 'nonce', 'yParity', 'r', 's'], 'Authorization entry');
-    const yParity = quantity(item.yParity, 'Authorization parity'); need(BigInt(yParity) <= 1n, 'Authorization parity is outside 0/1.');
+    // Tuple signatures can be protocol-skipped without invalidating their
+    // containing transaction. Preserve uint8 parity; outer signature parity
+    // remains separately restricted to 0/1 in normalizeEnvelope.
+    const yParity = quantity(item.yParity, 'Authorization parity', 8);
     return { chainId: quantity(item.chainId, 'Authorization chain'), address: address(item.address, 'Authorization address'), nonce: quantity(item.nonce, 'Authorization nonce', 64), yParity, r: signatureWord(item.r, 'Authorization r'), s: signatureWord(item.s, 'Authorization s') };
   });
 }

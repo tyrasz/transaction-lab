@@ -1,10 +1,10 @@
 import { createAuthenticatedAncestry } from '../../engines/local-evm/authenticated-ancestry.js';
 import { performance } from 'node:perf_hooks';
-import { captureHttp } from '../../reports/ethereum-lending-local-reference/wire.mjs';
+import { captureHttp } from './cohort-http.mjs';
 
 // One public-wire budget shared by selection, product and independent local
-// execution. captureHttp is frozen prior evidence infrastructure; archive it
-// with this module when freezing a future run.
+// execution. Archive the actual HTTP capture alongside this module. Its
+// tracked I/O includes fetch, reads and cancellation, not only RPC wrappers.
 export const COHORT_PROVIDERS = Object.freeze({
   drpc: 'https://eth.drpc.org/',
   publicnode: 'https://ethereum-rpc.publicnode.com/',
@@ -99,13 +99,18 @@ export function createCohortTransport({ budget, provider, profile, blockHash, he
   }
   let ancestryFailure = false;
   const fixed = limitsBelow({ ...profiles[profile], requestMs: 25000, responseBytes: 8 * 1024 * 1024, wallMs: profile === 'census' ? 3600000 : 145000 }, limits);
-  const scope = { bytes: 0, maxBytes: fixed.totalBytes }, records = [], denied = [], pending = new Set();
+  const scope = { bytes: 0, maxBytes: fixed.totalBytes }, records = [], denied = [], pending = new Set(), pendingIO = new Set();
   let calls = 0, dispatches = 0, nextId = 0, busy = false, start = null;
   const url = COHORT_PROVIDERS[provider], ids = new Set();
   function deny(code, method) {
     // Do not retain attacker-sized input or an unbounded denial log.
     if (denied.length < 1024) denied.push({ code, method: typeof method === 'string' ? method.slice(0, 80) : null });
     fail(code);
+  }
+  function track(promise) {
+    const observed = Promise.resolve(promise); pendingIO.add(observed);
+    observed.then(() => pendingIO.delete(observed), () => pendingIO.delete(observed));
+    return observed;
   }
   async function dispatch(body, signal) {
     const method = body?.method;
@@ -118,6 +123,7 @@ export function createCohortTransport({ budget, provider, profile, blockHash, he
     if (busy) deny('concurrent_dispatch', method);
     if (ids.has(body.id)) deny('duplicate_request_id', method);
     if (shared.saveFailure) deny('wire_save_failed', method);
+    if (shared.unaccountedData) deny('unaccounted_response_data', method);
     if (ancestryFailure) deny('ancestor_header_invalid', method);
     const now = performance.now(), deadline = Math.min(shared.deadline, (start ?? now) + fixed.wallMs);
     if (calls >= fixed.calls || shared.calls >= shared.limits.calls || now >= deadline || scope.bytes >= scope.maxBytes || shared.bytes >= shared.maxBytes) deny('attempt_budget', method);
@@ -126,7 +132,7 @@ export function createCohortTransport({ budget, provider, profile, blockHash, he
     const active = (async () => {
       let dispatched = false;
       const measuredFetch = (input, options) => { dispatched = true; dispatches++; shared.dispatches++; return fetchImpl(input, options); };
-      const wire = await captureHttp({ url, body: request, deadline, requestMs: fixed.requestMs, responseBytes: fixed.responseBytes, shared, scope, fetchImpl: measuredFetch, signal });
+      const wire = await captureHttp({ url, body: request, deadline, requestMs: fixed.requestMs, responseBytes: fixed.responseBytes, shared, scope, fetchImpl: measuredFetch, signal, track, onUnaccountedData: () => { shared.unaccountedData = true; } });
       wire.id = request.id; wire.globalId = globalId; wire.provider = provider; wire.profile = profile; wire.request = request;
       wire.dispatched = dispatched;
       const p = wire.parsed;
@@ -157,7 +163,11 @@ export function createCohortTransport({ budget, provider, profile, blockHash, he
     records: () => structuredClone(records),
     denied: () => structuredClone(denied),
     usage: () => ({ attempts: calls, dispatches, observedBytes: scope.bytes, shared: budget.snapshot(), limits: fixed }),
-    async drain() { await Promise.allSettled([...pending]); if (shared.saveFailure) fail('wire_save_failed'); },
+    async drain() {
+      while (pending.size || pendingIO.size) await Promise.allSettled([...pending, ...pendingIO]);
+      if (shared.saveFailure) fail('wire_save_failed');
+      if (shared.unaccountedData) fail('unaccounted_response_data');
+    },
     async call(method, params = [], { signal } = {}) {
       const wire = await dispatch({ jsonrpc: '2.0', id: ++nextId, method, params }, signal);
       if (shared.saveFailure) fail('wire_save_failed');

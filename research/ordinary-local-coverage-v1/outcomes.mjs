@@ -6,6 +6,9 @@ import { verifyEthereumHeader } from '../../engines/local-evm/ethereum-header.js
 import { validateInputFacts } from '../../engines/local-evm/input-facts.js';
 import { validateExecutionChanges } from '../../engines/local-evm/execution-changes.js';
 import { canonicalStateChanges } from '../../engines/local-evm/preview-mutations.js';
+import { ethereumCommon } from '../../engines/local-evm/ethereum-profile.js';
+import { normalizeAuthorizationList } from '../../engines/local-evm/authorization-list.js';
+import { eoaCode7702RecoverAuthority } from '../../engines/local-evm/node_modules/@ethereumjs/util/dist/esm/index.js';
 import { encode, decode } from '../../engines/local-evm/isolated-protocol.js';
 import { verifyCohortWireRecord } from '../standard-evm/cohort-verify.mjs';
 import { keccak_256 } from '../../engines/local-evm/node_modules/@noble/hashes/sha3.js';
@@ -29,14 +32,17 @@ const reason = e => e instanceof Incomplete ? e.message : 'Evidence is malformed
 const sort = rows => rows.sort((a,b)=>a.address.localeCompare(b.address)).map(r=>({...r,...(r.storage?{storage:r.storage.sort((a,b)=>a.slot.localeCompare(b.slot))}:{})}));
 
 function callRequest(request) {
-  fields(request,['from','to','data','value','gas'],['accessList','blobVersionedHashes']);
+  fields(request,['from','to','data','value','gas'],['accessList','blobVersionedHashes','authorizationList']);
   need(matches(request.from,ADDRESS) && (request.to===null || matches(request.to,ADDRESS)) && matches(request.data,DATA) && request.data.length<=65538 && q(request.gas)===5000000n,'Request is outside fixed local profile');
   const context=normalizeEvmContext(request); need(!(request.to===null && context.blobVersionedHashes),'Blob creation is unsupported');
-  return {from:request.from,to:request.to,data:request.data,value:hx(request.value),gas:'0x4c4b40',...context};
+  const authorizationList=normalizeAuthorizationList(request);
+  if(authorizationList)need(equal(request.authorizationList,authorizationList)&&request.to!==null&&!context.blobVersionedHashes,'Authorization context must be canonical, non-creation and non-blob');
+  return {from:request.from,to:request.to,data:request.data,value:hx(request.value),gas:'0x4c4b40',...context,...(authorizationList?{authorizationList}:{})};
 }
 export function oracleRequests({request,header}) {
   const normalized=callRequest(request), context=rpcEvmContext(normalized);
-  const call={from:normalized.from,...(normalized.to===null?{}:{to:normalized.to}),data:normalized.data,value:normalized.value,gas:normalized.gas,gasPrice:'0x0',...context};
+  costs(normalized,header);
+  const call={from:normalized.from,...(normalized.to===null?{}:{to:normalized.to}),data:normalized.data,value:normalized.value,gas:normalized.gas,gasPrice:'0x0',...context,...(normalized.authorizationList?{authorizationList:normalized.authorizationList}:{})};
   const selector={blockHash:header.hash,requireCanonical:true}, blockOverrides={baseFeePerGas:'0x0',...(context.blobVersionedHashes?{blobBaseFee:'0x0'}:{})};
   return [
     {label:'header_before',method:'eth_getBlockByHash',params:[header.hash,false]},
@@ -53,16 +59,44 @@ function implementation(actual,expected) {
   }
   need(equal(actual,expected),'Local implementation differs from frozen source identity');
 }
-function costs(call,header) {
+export function costs(call,header) {
   const time=q(header.timestamp), forks=[[1681338455n,'shanghai'],[1710338135n,'cancun'],[1746612311n,'prague'],[1764798551n,'osaka'],[1765290071n,'bpo1'],[1767747671n,'bpo2']];
   const hardfork=forks.filter(([at])=>time>=at).at(-1)?.[1]; need(hardfork,'Unsupported declared mainnet fork');
   const bytes=Buffer.from(call.data.slice(2),'hex'); let zero=0n,nonzero=0n; for(const b of bytes)b===0?zero++:nonzero++;
   const addresses=BigInt(call.accessList?.length??0),slots=BigInt(call.accessList?.reduce((n,r)=>n+r.storageKeys.length,0)??0),access=addresses*2400n+slots*1900n;
   const creation=call.to===null?32000n:0n, init=call.to===null?2n*((BigInt(bytes.length)+31n)/32n):0n;
-  const intrinsic=21000n+4n*zero+16n*nonzero+access+creation+init, floor=time>=1746612311n?21000n+10n*(zero+4n*nonzero):0n;
+  const authorizations=BigInt(call.authorizationList?.length??0),authorization=25000n*authorizations;
+  if(authorizations)need(time>=1746612311n&&call.to!==null&&!call.blobVersionedHashes,'Authorization context requires Prague-or-later ordinary mainnet call');
+  const intrinsic=21000n+4n*zero+16n*nonzero+access+creation+init+authorization, floor=time>=1746612311n?21000n+10n*(zero+4n*nonzero):0n;
   need(intrinsic<=5000000n&&floor<=5000000n,'Request gas cannot cover intrinsic/floor');
   if(call.blobVersionedHashes)need(time>=1710338135n&&q(header.excessBlobGas,(1n<<64n)-1n)>=0n,'Blob context/header is unsupported');
-  return {hardfork,zero,nonzero,addresses,slots,access,creation,init,intrinsic,floor};
+  return {hardfork,zero,nonzero,addresses,slots,access,creation,init,authorizations,authorization,intrinsic,floor};
+}
+// Independent EIP-7702 ordered fold for this mainnet Prague-through-BPO2
+// evaluator. Shared curve recovery/structural normalization are explicit;
+// no child processing/refund or production authorization decision is reused.
+export function authorizationAccounting(call,inputs) {
+  const list=normalizeAuthorizationList(call); if(!list)return {refund:0n,processing:null,codeChanges:new Map()};
+  const accounts=new Map(), entries=[], codeChanges=new Map(),maxNonce=(1n<<64n)-1n;
+  const order=0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141n;
+  function account(address){if(!accounts.has(address)){const a=initial(inputs,address);accounts.set(address,{...a,initialCode:a.code});}return accounts.get(address);}
+  const sender=account(call.from);need(sender.nonce<maxNonce,'Sender nonce overflow');sender.nonce++;sender.exists=true;
+  const unpadded=n=>n===0n?new Uint8Array():Uint8Array.from(Buffer.from(n.toString(16).padStart(Math.ceil(n.toString(16).length/2)*2,'0'),'hex'));
+  let refund=0n;
+  for(const [index,t] of list.entries()){
+    let authority=null,why=null;const chain=BigInt(t.chainId),nonce=BigInt(t.nonce),r=BigInt(t.r),s=BigInt(t.s),parity=BigInt(t.yParity);
+    if(chain!==0n&&chain!==1n)why='wrong_chain';
+    else if(nonce>=maxNonce)why='nonce_overflow';
+    else if(parity>1n||r===0n||r>=order||s===0n||s>order/2n)why='invalid_signature';
+    else {try{authority=eoaCode7702RecoverAuthority([unpadded(chain),Uint8Array.from(Buffer.from(t.address.slice(2),'hex')),unpadded(nonce),unpadded(parity),unpadded(r),unpadded(s)]).toString();}catch{why='invalid_signature';}}
+    if(why===null){const a=account(authority);
+      if(a.code!=='0x'&&!/^0xef0100[0-9a-f]{40}$/.test(a.code))why='authority_has_code';
+      else if(a.nonce!==nonce)why='nonce_mismatch';
+      else {if(a.exists)refund+=12500n;a.exists=true;a.nonce++;a.code=BigInt(t.address)===0n?'0x':'0xef0100'+t.address.slice(2);codeChanges.set(authority,{before:a.initialCode,after:a.code});}
+    }
+    entries.push({index,authority,status:why===null?'applied':'skipped',reason:why});
+  }
+  return {refund,processing:{entries,gasRefundCounter:refund.toString()},codeChanges};
 }
 function profileBinding(output,call,header) {
   const c=costs(call,header), expected={
@@ -71,6 +105,7 @@ function profileBinding(output,call,header) {
     calldataZeroBytes:c.zero.toString(),calldataNonzeroBytes:c.nonzero.toString(),outerSignatureVerified:false,feesSettled:false,originalTransactionPosition:false,expectedOutputsUsed:false,
     ...(call.accessList?{accessList:call.accessList,accessListAddressCount:c.addresses.toString(),accessListStorageKeyCount:c.slots.toString(),accessListIntrinsicGas:c.access.toString()}:{}),
     ...(call.blobVersionedHashes?{blobVersionedHashes:call.blobVersionedHashes,executionBlobBaseFee:'0',sourceExcessBlobGas:q(header.excessBlobGas).toString()}:{}),
+    ...(call.authorizationList?{authorizationList:call.authorizationList,authorizationCount:c.authorizations.toString(),authorizationIntrinsicGas:c.authorization.toString()}:{}),
     ...(call.to===null?{operation:'create',initcodeBytes:(c.zero+c.nonzero).toString(),creationIntrinsicGas:'32000',initcodeWordGas:c.init.toString()}:{}),
   };
   need(equal(output.profile,expected),'Local full unsigned profile differs from independently derived request costs/context');
@@ -91,8 +126,11 @@ async function bindLocal(local,call,header,expected) {
   const c=profileBinding(o,call,header), t=o.trace;
   need(t?.type===(call.to===null?'CREATE':'CALL')&&t.from===call.from&&t.caller===call.from&&t.input===call.data&&q(t.value)===q(call.value)&&q(t.gas)===5000000n-c.intrinsic&&t.output===o.execution.returnData&&t.error===error&&q(t.gasUsed)===q(o.execution.executionGasUsed),'Local root contradicts bound request/output');
   if(call.to!==null)need(t.to===call.to&&t.executionAddress===call.to,'Local root destination differs');
-  validateExecutionChanges({changes:a.changes,inputs:a.inputs,output:o,sender:call.from,destination:call.to,selfdestructOnlyCreated:q(header.timestamp)>=1710338135n});
-  return {attempt:a,output:o,costs:c};
+  const authorization=authorizationAccounting(call,a.inputs);
+  need(equal(o.authorizationProcessing??null,authorization.processing),'Local authorization processing/refund differs from independent ordered fold');
+  const common=ethereumCommon(header,1);need(common.hardfork()===c.hardfork,'Pinned fork schedule differs from evaluator schedule');
+  validateExecutionChanges({changes:a.changes,inputs:a.inputs,output:o,sender:call.from,destination:call.to,selfdestructOnlyCreated:common.isActivatedEIP(6780),common,request:call,header});
+  return {attempt:a,output:o,costs:c,authorization};
 }
 function errorClass(error,local=false) {
   if(error===null)return {status:'success',exception:null};
@@ -175,7 +213,7 @@ function preFields(pre,a) {
   if(own(pre,'codeHash'))need(pre.codeHash===a.codeHash,'Provider prior code hash differs from proof');
   if(own(pre,'storage')){need(record(pre.storage),'Malformed prior storage');for(const [k,v]of Object.entries(pre.storage))need(matches(k,WORD)&&matches(v,WORD)&&v===oldSlot(a,k),'Provider prior slot differs from proof');}
 }
-export function oracleStateChanges(diff,inputs) {
+export function oracleStateChanges(diff,inputs,authorization={codeChanges:new Map()}) {
   fields(diff,['pre','post']);need(record(diff.pre)&&record(diff.post),'Missing original state diff');
   const keys=[...new Set([...Object.keys(diff.pre),...Object.keys(diff.post)])].sort();need(keys.length<=128,'Excessive changed accounts');
   const out=[];let slots=0;
@@ -189,7 +227,7 @@ export function oracleStateChanges(diff,inputs) {
     for(const k of ['nonce','balance'])if(own(post,k)){const n=q(post[k]);need(pre===undefined||own(pre,k)||a[k]===0n,'Missing nonzero prior basic field');if(n!==a[k])row[k]={before:hx(a[k].toString()),after:hx(n.toString())};}
     const code=own(post,'code')?post.code:a.code;need(matches(code,DATA)&&code.length<=49154,'Malformed/excessive runtime code');
     if(own(post,'codeHash'))need(matches(post.codeHash,WORD)&&post.codeHash===hashCode(code),'Unverified or inconsistent post codeHash');
-    if(code!==a.code){need(own(post,'code')&&a.code==='0x'&&a.nonce===0n&&a.storageRoot===EMPTY_ROOT,'Unsupported runtime replacement');row.code={before:a.code,after:code};}
+    if(code!==a.code){const authorized=authorization.codeChanges.get(address);need(own(post,'code')&&((authorized?.before===a.code&&authorized.after===code)||(a.code==='0x'&&a.nonce===0n&&a.storageRoot===EMPTY_ROOT)),'Unsupported runtime replacement');row.code={before:a.code,after:code};}
     const ps=pre?.storage??{},ns=post.storage??{};need(record(ps)&&record(ns),'Malformed sparse storage');const storage=[];
     for(const key of [...new Set([...Object.keys(ps),...Object.keys(ns)])].sort()){
       need(++slots<=1024&&matches(key,WORD),'Excessive/malformed changed slots');const old=oldSlot(a,key);
@@ -203,16 +241,17 @@ export function oracleStateChanges(diff,inputs) {
   }
   return sort(out);
 }
-function localStateChanges(attempt) {
+export function localStateChanges(attempt) {
   const rows=canonicalStateChanges(attempt.changes).accounts;
   return sort(rows.map(row=>{
     const a=initial(attempt.inputs,row.address);
     if(row.existence?.after===false)return {address:row.address,existence:{before:true,after:false},initialStorageRoot:a.storageRoot};
+    need(!own(row,'reset'),'Sparse oracle diff cannot establish whole storage namespace reset');
     const {existence,...rest}=row;return {...rest,...(existence?{existence:{before:existence.before,after:existence.after}}:{})};
   }));
 }
-function localGas(local) {
-  const {output:o,costs:c}=local,m=q(o.execution.executionGasUsed),r=q(o.execution.gasRefundCounter);
+export function localGas(local) {
+  const {output:o,costs:c}=local,m=q(o.execution.executionGasUsed),r=q(o.execution.gasRefundCounter)+(local.authorization?.refund??0n);
   need(m<=5000000n-c.intrinsic,'Message gas exceeds budget');const before=c.intrinsic+m,refund=r<before/5n?r:before/5n,base=before-refund,floor=c.floor>base?c.floor-base:0n;
   need(equal(o.gasAccounting,{beforeRefund:before.toString(),appliedRefund:refund.toString(),floorAdjustment:floor.toString(),gasUsed:(base+floor).toString()}),'Local charged gas accounting differs');return (base+floor).toString();
 }
@@ -262,7 +301,7 @@ export async function adjudicateLocalOutcome(input) {
   channel('gasAccounting',()=>[localGas(local),q(trace.gasUsed).toString()]);
   channel('fullObservedStateChanges',()=>{
     const diff=wires.get(2);need(diff?.status==='completed','Original prestate diff unavailable; no changes inferred from execution status');
-    return [localStateChanges(local.attempt),oracleStateChanges(diff.parsed.result,local.attempt.inputs)];
+    return [localStateChanges(local.attempt),oracleStateChanges(diff.parsed.result,local.attempt.inputs,local.authorization)];
   });
   const statuses=Object.values(result.channels).map(c=>c.status);result.allChannelsComplete=statuses.every(s=>s!=='unavailable');
   result.outcome.comparison=statuses.includes('mismatch')?'mismatch':statuses.every(s=>s==='match')?'match':'not_comparable';

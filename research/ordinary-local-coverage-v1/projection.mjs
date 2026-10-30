@@ -2,9 +2,11 @@
 import { isDeepStrictEqual as equal } from 'node:util';
 import { normalizeEvmContext } from '../../engines/evm-context.js';
 import { verifyEthereumHeader } from '../../engines/local-evm/ethereum-header.js';
+import { ethereumCommon } from '../../engines/local-evm/ethereum-profile.js';
+import { normalizeAuthorizationList } from '../../engines/local-evm/authorization-list.js';
 import { encode, decode } from '../../engines/local-evm/isolated-protocol.js';
 
-export const PROJECTION_POLICY = Object.freeze({ gas: '5000000', calldataBytes: 32768, originalGasCeiling: '5000000', supportedTypes: ['0', '1', '2', '3'] });
+export const PROJECTION_POLICY = Object.freeze({ gas: '5000000', calldataBytes: 32768, originalGasCeiling: '5000000', supportedTypes: ['0', '1', '2', '3', '4'] });
 const ADDRESS = /^0x[0-9a-f]{40}$/, WORD = /^0x[0-9a-f]{64}$/, DATA = /^0x(?:[0-9a-f]{2})*$/, DECIMAL = /^(0|[1-9][0-9]*)$/;
 const need = (v, message) => { if (!v) throw new Error(message); };
 export function projectSelectedCase({ row, census }) {
@@ -20,7 +22,7 @@ export function projectSelectedCase({ row, census }) {
   need(BigInt(verified.number) + 1n === BigInt(row.blockNumber) && WORD.test(row.transactionHash), 'Parent header/transaction identity differs.');
   need(ADDRESS.test(e.from) && (e.to === null || ADDRESS.test(e.to)) && DATA.test(e.input) && typeof e.value === 'string' && DECIMAL.test(e.value) && BigInt(e.value) < 1n << 256n && typeof e.gas === 'string' && DECIMAL.test(e.gas) && BigInt(e.gas) > 0n, 'Validated envelope projection is malformed.');
   const reasons = [];
-  if (!PROJECTION_POLICY.supportedTypes.includes(e.type)) reasons.push(e.type === '4' ? 'authorization_context_unsupported' : 'unknown_transaction_type');
+  if (!PROJECTION_POLICY.supportedTypes.includes(e.type)) reasons.push('unknown_transaction_type');
   need(e.extensions && Object.getPrototypeOf(e.extensions) === Object.prototype, 'Envelope extension inventory missing.');
   if (Object.keys(e.extensions).length) reasons.push('unrecognized_envelope_fields');
   if (BigInt(e.gas) > 5000000n) reasons.push('original_gas_limit_exceeds_profile');
@@ -28,11 +30,30 @@ export function projectSelectedCase({ row, census }) {
   let context = {};
   try { context = normalizeEvmContext({ ...(Object.hasOwn(e, 'accessList') ? { accessList: e.accessList } : {}), ...(Object.hasOwn(e, 'blobVersionedHashes') ? { blobVersionedHashes: e.blobVersionedHashes } : {}) }); }
   catch { reasons.push('transaction_context_exceeds_profile'); }
+  // All normalized census scalars, including r/s, are decimal strings.
+  // Convert representation only; keep tuple order, duplicates and
+  // protocol-skipped signatures/chain IDs/nonces for actual execution.
+  let authorizationList;
+  if (e.type === '4' || Object.hasOwn(e, 'authorizationList')) {
+    try {
+      need(e.type === '4' && Array.isArray(e.authorizationList), 'Authorization envelope type differs.');
+      const fields = ['chainId', 'address', 'nonce', 'yParity', 'r', 's'];
+      const list = e.authorizationList.map(tuple => {
+        need(tuple && Object.keys(tuple).length === fields.length && fields.every(k => Object.hasOwn(tuple, k)), 'Authorization tuple differs.');
+        need(ADDRESS.test(tuple.address) && ['chainId', 'nonce', 'yParity', 'r', 's'].every(k => typeof tuple[k] === 'string' && tuple[k].length <= 78 && DECIMAL.test(tuple[k])), 'Authorization census representation differs.');
+        return Object.fromEntries(fields.map(k => [k, k === 'address' ? tuple[k] : '0x' + BigInt(tuple[k]).toString(16)]));
+      });
+      authorizationList = normalizeAuthorizationList({ authorizationList: list });
+    } catch { reasons.push('authorization_context_exceeds_profile'); }
+    if (e.to === null) reasons.push('authorization_creation_unsupported');
+    if (Object.hasOwn(e, 'blobVersionedHashes')) reasons.push('authorization_blob_context_unsupported');
+    if (!ethereumCommon(header).isActivatedEIP(7702)) reasons.push('authorization_before_prague');
+  }
   if (e.to === null && Object.hasOwn(e, 'blobVersionedHashes')) reasons.push('blob_creation_unsupported');
   return { status: reasons.length ? 'unsupported' : 'projectable', reasons, transactionHash: row.transactionHash, parentHeader: header,
-    ...(reasons.length ? {} : { request: { from: e.from, to: e.to, data: e.input, value: e.value, gas: '5000000', ...context } }),
+    ...(reasons.length ? {} : { request: { from: e.from, to: e.to, data: e.input, value: e.value, gas: '5000000', ...context, ...(authorizationList ? { authorizationList } : {}) } }),
     originalGasLimit: e.gas, simulationGas: '5000000', profile: 'local_kernel_unsigned_unpriced_parent_block_end',
     originalTransactionReplay: false, signatureVerified: false, feeSettlement: false,
-    omittedOuterFields: ['nonce', 'gas', 'signature', 'gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas', 'maxFeePerBlobGas', 'blob_sidecar', 'authorizationList'],
+    omittedOuterFields: ['nonce', 'gas', 'signature', 'gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas', 'maxFeePerBlobGas', 'blob_sidecar', ...(!authorizationList || reasons.length ? ['authorizationList'] : [])],
   };
 }

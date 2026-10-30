@@ -53,13 +53,29 @@ export async function loadPlan({outputDirectory,expectedPlanSha256}){
   return{directory,plan,source};
 }
 export function createTimingGate({wallStart=Date.now(),monotonicStart=performance.now(),now=Date.now,monotonic=()=>performance.now()}={}){
-  let last=wallStart,violation=null;
-  function remaining(){const at=now(),mono=monotonic();if(!Number.isSafeInteger(at)||at<last||!Number.isFinite(mono)||mono<monotonicStart)violation??={code:'clock_invalid',at};last=at;return violation?0:Math.max(0,Math.floor(Math.min(POLICY.collectionAndExecutionMs-(at-wallStart),POLICY.collectionAndExecutionMs-(mono-monotonicStart))));}
-  return Object.freeze({remaining,violation:()=>structuredClone(violation),checkWait(deadline){const at=now();remaining();if(at-deadline>POLICY.maxWaitOverrunMs)violation??={code:'wait_overrun',at,deadline,overrunMs:at-deadline};need(!violation&&remaining()>0,violation?.code??'absolute_deadline');}});
+  let last=wallStart,lastMono=monotonicStart,violation=null,clockFailed=false;
+  const iso=value=>Number.isSafeInteger(value)&&Math.abs(value)<=8.64e15?new Date(value).toISOString():null;
+  function sample(){
+    const at=now(),mono=monotonic(),clockValid=!clockFailed&&Number.isSafeInteger(at)&&iso(at)!==null&&at>=last&&Number.isFinite(mono)&&mono>=lastMono;
+    if(!clockValid)clockFailed=true;
+    if(!clockValid)violation??={code:'clock_invalid',at:iso(at)};
+    last=at;lastMono=mono;return{at,mono,clockValid};
+  }
+  function elapsed(mark,s){return{phase:mark.phase,limitMs:mark.limitMs,startedAt:iso(mark.wallStart),finishedAt:iso(s.at),
+    wallElapsedMs:Number.isFinite(s.at-mark.wallStart)?Math.max(0,s.at-mark.wallStart):null,
+    monotonicElapsedMs:Number.isFinite(s.mono-mark.monotonicStart)?Math.max(0,s.mono-mark.monotonicStart):null,
+    clockValid:s.clockValid,withinBudget:s.clockValid&&s.at-mark.wallStart<mark.limitMs&&s.mono-mark.monotonicStart<mark.limitMs};}
+  const run={phase:'run',limitMs:POLICY.collectionAndExecutionMs,wallStart,monotonicStart};
+  function globalTiming(s){const timing=elapsed(run,s);if(!timing.withinBudget)violation??={code:s.clockValid?'absolute_deadline':'clock_invalid',timing};return timing;}
+  function remaining(){const t=globalTiming(sample());return violation?0:Math.max(0,Math.floor(Math.min(t.limitMs-t.wallElapsedMs,t.limitMs-t.monotonicElapsedMs)));}
+  return Object.freeze({remaining,violation:()=>structuredClone(violation),snapshot:()=>globalTiming(sample()),
+    beginPhase(phase,limitMs){need(['local','oracle'].includes(phase)&&Number.isSafeInteger(limitMs)&&limitMs>0,'phase_timing_invalid');const s=sample();globalTiming(s);return{phase,limitMs,wallStart:s.at,monotonicStart:s.mono};},
+    endPhase(mark){const s=sample(),timing=elapsed(mark,s);globalTiming(s);if(!timing.withinBudget)violation??={code:s.clockValid?'phase_deadline':'clock_invalid',timing};return timing;},
+    checkWait(deadline){const s=sample();globalTiming(s);if(s.at-deadline>POLICY.maxWaitOverrunMs)violation??={code:'wait_overrun',at:s.at,deadline,overrunMs:s.at-deadline};need(!violation&&remaining()>0,violation?.code??'absolute_deadline');}});
 }
 export function unsupportedOutcome(transactionHash,reasons){return{outcome:{transactionHash,execution:'unsupported',comparison:'not_comparable'},channels:{},reasons:[...reasons],allChannelsComplete:false};}
 const compact=value=>({...value,channels:Object.fromEntries(Object.entries(value.channels).map(([k,v])=>[k,{status:v.status,...(v.reason?{reason:v.reason}:{})}]))});
-export async function executeCases({census,implementation,executeLocal,executeOracle,save,hashArtifact,canAttempt,assertHealthy}){
+export async function executeCases({census,implementation,executeLocal,executeOracle,save,hashArtifact,verifyArtifact=()=>{},canAttempt,assertHealthy}){
   const rows=[];let fatal=null;
   for(let i=0;i<census.selected.length;i++){
     const row=census.selected[i],id=String(i+1).padStart(3,'0');let projection=null;
@@ -79,6 +95,7 @@ export async function executeCases({census,implementation,executeLocal,executeOr
     if(projection.status==='unsupported'){
       oracle={dispatch:'unsupported',records:[],transportWireIds:[],reason:'Unsupported local projection; no oracle attempted'};outcome=unsupportedOutcome(row.transactionHash,projection.reasons);
     }else{
+      verifyArtifact(`cases/${id}/local.json`);verifyArtifact(`cases/${id}/LOCAL_SEALED.json`);
       assertHealthy();oracle=canAttempt()?await executeOracle({id,request:projection.request,header:row.parentHeader}):{dispatch:'budget_unattempted',records:[],transportWireIds:[],reason:'Run budget prevented oracle collection'};
       outcome=await adjudicateLocalOutcome({transactionHash:row.transactionHash,request:projection.request,header:row.parentHeader,expectedLocalImplementation:implementation,local,oracle});
     }
@@ -98,7 +115,7 @@ export async function runFrozen({outputDirectory,expectedPlanSha256}){
   const{executeIsolatedEthereumCall}=await import('../../engines/local-evm/isolated-call.js');
   const writer=createArtifactWriter(directory),startedAt=new Date().toISOString(),gate=createTimingGate(),budget=createCohortWireBudget(),controller=new AbortController();
   const began=performance.now(),transports=new Set();
-  let captureClosed=false,eventId=0,selection=null,caseRun=null,sourceUnchanged=false,runtimeUnchanged=false;const failures=[];
+  let captureClosed=false,eventId=0,selection=null,caseRun=null,sourceUnchanged=false,runtimeUnchanged=false,timing=null;const failures=[];
   const save=(path,value)=>{need(!captureClosed,'capture_closed');writer.write(path,value);};
   save('STARTED.json',{schemaVersion:'1.0',planSha256:expectedPlanSha256,sourceManifestSha256:plan.sourceManifestSha256,startedAt,pid:process.pid,runtime:plan.runtime});
   const timer=setTimeout(()=>controller.abort(),POLICY.collectionAndExecutionMs);
@@ -119,37 +136,44 @@ export async function runFrozen({outputDirectory,expectedPlanSha256}){
     need(await finiteDrain(Object.values(censusTransports),POLICY.terminalDrainMs),'transport_drain_incomplete');health();Object.values(censusTransports).forEach(t=>transports.delete(t));save('selection.json',selection);
     if(selection.status==='complete'){
       save('classification.json',classifyCohortIntents(classificationInput(selection.census)));
-      caseRun=await executeCases({census:selection.census,implementation:plan.localImplementation,save,canAttempt,assertHealthy:health,
+      caseRun=await executeCases({census:selection.census,implementation:plan.localImplementation,save,canAttempt,assertHealthy:health,verifyArtifact:path=>writer.verify(path),
         hashArtifact:path=>{const{bytes}=json(join(directory,path),256*1024*1024);return{path,bytes:bytes.length,sha256:sha(bytes)};},
         executeLocal:async({request,header})=>{
-          await sourceCheck();health();const wire=transport('local',header.hash,header),phaseController=new AbortController(),signal=AbortSignal.any([controller.signal,phaseController.signal]);
+          const phase=gate.beginPhase('local',POLICY.localWallMs);
+          await sourceCheck();health();writer.verifyAll();
+          if(!canAttempt())return{dispatch:'budget_unattempted',implementation:plan.localImplementation,attempt:null,transportWireIds:[],reason:'Run budget expired before local dispatch',timing:gate.endPhase(phase)};
+          const wire=transport('local',header.hash,header),phaseController=new AbortController(),signal=AbortSignal.any([controller.signal,phaseController.signal]);
           let attempt=null,reason;
           try{attempt=await executeIsolatedEthereumCall({request,header,rpc:{call:(m,p,o)=>{need(canAttempt(),'absolute_deadline');return wire.call(m,p,{...o,signal:AbortSignal.any([signal,...(o?.signal?[o.signal]:[])])});}},signal,limits:{wallMs:Math.max(1,Math.min(POLICY.localWallMs,gate.remaining())),drainMs:POLICY.terminalDrainMs}});}
           catch{reason='Local engine invocation failed without a complete retained attempt';}
           await finish(wire,phaseController);
           if(attempt)need(attempt.broker?.pendingAtReturn===0&&(!attempt.isolation?.childPid||attempt.isolation.processClosed),'local_drain_incomplete');
           need(attempt||wire.records().length===0,'local_invocation_incomplete');
-          await sourceCheck();return{dispatch:attempt?.status==='completed'?'completed':'unavailable',implementation:plan.localImplementation,attempt,...(reason?{reason}:{}),transportWireIds:wire.records().map(r=>r.globalId),transportUsage:wire.usage(),transportDenied:wire.denied()};
+          await sourceCheck();writer.verifyAll();const timing=gate.endPhase(phase);
+          return{dispatch:attempt?.status==='completed'?'completed':'unavailable',implementation:plan.localImplementation,attempt,...(reason?{reason}:{}),transportWireIds:wire.records().map(r=>r.globalId),transportUsage:wire.usage(),transportDenied:wire.denied(),timing};
         },
         executeOracle:async({request,header})=>{
-          await sourceCheck();health();const wire=transport('product',header.hash),phaseController=new AbortController(),signal=AbortSignal.any([controller.signal,phaseController.signal]);
+          const phase=gate.beginPhase('oracle',POLICY.oracleWallMs);
+          await sourceCheck();health();writer.verifyAll();const wire=transport('product',header.hash),phaseController=new AbortController(),signal=AbortSignal.any([controller.signal,phaseController.signal]);
           const attempts=[];for(const item of oracleRequests({request,header})){
             if(!canAttempt())break;
             try{await wire.call(item.method,item.params,{signal});attempts.push({label:item.label,status:'returned'});}catch(error){attempts.push({label:item.label,status:'failed',code:error?.code??'oracle_unavailable'});health();}
           }
-          await finish(wire,phaseController);await sourceCheck();const records=wire.records();
-          return{dispatch:attempts.length===oracleRequests({request,header}).length&&records.every(r=>r.status==='completed')?'completed':'unavailable',records,attempts,transportWireIds:records.map(r=>r.globalId),transportUsage:wire.usage(),transportDenied:wire.denied()};
+          await finish(wire,phaseController);await sourceCheck();writer.verifyAll();const records=wire.records(),timing=gate.endPhase(phase);
+          return{dispatch:attempts.length===oracleRequests({request,header}).length&&records.every(r=>r.status==='completed')?'completed':'unavailable',records,attempts,transportWireIds:records.map(r=>r.globalId),transportUsage:wire.usage(),transportDenied:wire.denied(),timing};
         }});
     }
   }catch(error){failures.push({code:['artifact_save_failed','transport_drain_incomplete','local_drain_incomplete'].includes(error?.code)?error.code:'capture_interrupted'});}
-  finally{clearTimeout(timer);controller.abort();if(!await finiteDrain(transports,POLICY.terminalDrainMs))failures.push({code:'transport_drain_incomplete'});}
+  finally{timing=gate.snapshot();clearTimeout(timer);controller.abort();if(!await finiteDrain(transports,POLICY.terminalDrainMs))failures.push({code:'transport_drain_incomplete'});}
   const executionWindowMs=performance.now()-began;captureClosed=true;
   try{await sourceCheck();sourceUnchanged=true;}catch{failures.push({code:'source_drift'});}try{await verifyNodeRuntime(plan.runtime);runtimeUnchanged=true;}catch{failures.push({code:'runtime_drift'});}
   if(writer.failed||budget.snapshot().saveFailure)failures.push({code:'artifact_save_failed'});
+  if(gate.violation()&&selection?.status==='complete')failures.push({code:gate.violation().code});
+  try{writer.verifyAll();}catch{failures.push({code:'artifact_save_failed'});}
   const status=failures.length||caseRun?.status==='interrupted'?'interrupted':selection?.status==='complete'&&caseRun?'complete':'selection_failed';
   const results={schemaVersion:'1.0',status,planSha256:expectedPlanSha256,sourceManifestSha256:plan.sourceManifestSha256,sourceUnchanged,runtimeUnchanged,selectionStatus:selection?.status??null,
-    caseRun:failures.length?withholdCaseMetrics(caseRun):caseRun,budget:budget.snapshot(),timingViolation:gate.violation(),startedAt,finishedAt:new Date().toISOString(),durationMs:performance.now()-began,executionWindowMs,failures,scope:plan.scope};
-  writer.write('results.json',results);const evidence=sealEvidence(directory,expectedPlanSha256,plan.sourceManifestSha256);return{...results,evidence};
+    caseRun:failures.length?withholdCaseMetrics(caseRun):caseRun,budget:budget.snapshot(),timing,timingViolation:gate.violation(),startedAt,finishedAt:new Date().toISOString(),durationMs:performance.now()-began,executionWindowMs,failures,scope:plan.scope};
+  writer.write('results.json',results);writer.sealLedger();const evidence=sealEvidence(directory,expectedPlanSha256,plan.sourceManifestSha256,{writer});return{...results,evidence};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
   const[command,directory,expected]=process.argv.slice(2);

@@ -108,13 +108,34 @@ test('per-body bound retains exact prefix without changing larger total-byte lim
   assert.equal(transport.usage().observedBytes, 8);
 });
 
-test('deadline cancels ignored-signal fetch; late completion cannot change returned evidence', async () => {
+test('deadline retains immutable evidence but drainage waits for ignored-signal fetch and cancellation', async () => {
   let resolve; const transport = make({ limits: { requestMs: 10 }, fetchImpl: () => new Promise(r => { resolve = r; }) });
   await assert.rejects(transport.call('eth_chainId'), code('deadline'));
-  await transport.drain(); const before = transport.records();
+  let drained = false; const draining = transport.drain().then(() => { drained = true; });
+  await new Promise(r => setTimeout(r, 15)); assert.equal(drained, false);
+  const before = transport.records();
   resolve(new Response('{"jsonrpc":"2.0","id":1,"result":"late"}'));
-  await new Promise(r => setTimeout(r, 15));
+  await draining;
   assert.deepEqual(transport.records(), before); assert.equal(transport.usage().dispatches, 1);
+});
+
+test('returned deadline is not drainage until pending body read and cancellation both settle', async () => {
+  let finishRead, finishCancel;
+  const reader = {read: () => new Promise(r => { finishRead = r; }), cancel: () => new Promise(r => { finishCancel = r; })};
+  const transport = make({limits:{requestMs:10},fetchImpl:async()=>({status:200,ok:true,headers:new Headers(),body:{getReader:()=>reader}})});
+  await assert.rejects(transport.call('eth_chainId'),code('deadline'));
+  const before=transport.records();let drained=false;const draining=transport.drain().then(()=>{drained=true;});
+  finishRead({done:true});await new Promise(r=>setTimeout(r,5));assert.equal(drained,false);
+  finishCancel();await draining;assert.deepEqual(transport.records(),before);
+});
+
+test('late body bytes keep saved evidence immutable and invalidate drainage and further shared dispatch',async()=>{
+  let finishRead;const budget=createCohortWireBudget();
+  const transport=make({budget,limits:{requestMs:10},fetchImpl:async()=>({status:200,ok:true,headers:new Headers(),body:{getReader:()=>({read:()=>new Promise(r=>{finishRead=r;}),cancel:async()=>{}})}})});
+  await assert.rejects(transport.call('eth_chainId'),code('deadline'));const before=transport.records();
+  const draining=assert.rejects(transport.drain(),code('unaccounted_response_data'));
+  finishRead({done:false,value:Buffer.from('late bytes')});await draining;assert.deepEqual(transport.records(),before);
+  await assert.rejects(make({budget}).call('eth_chainId'),code('unaccounted_response_data'));
 });
 
 test('pre-abort and concurrent calls dispatch no extra requests', async () => {

@@ -72,6 +72,14 @@ function bindPhase(phase,wires,claimed,profile,hash){
   return rows;
 }
 const compact=value=>({...value,channels:Object.fromEntries(Object.entries(value.channels).map(([k,v])=>[k,{status:v.status,...(v.reason?{reason:v.reason}:{})}]))});
+export function verifyTiming(timing,phase,limitMs){
+  need(record(timing)&&equal(Object.keys(timing).sort(),['phase','limitMs','startedAt','finishedAt','wallElapsedMs','monotonicElapsedMs','clockValid','withinBudget'].sort())&&timing.phase===phase&&timing.limitMs===limitMs,'Timing record shape or bound differs');
+  need(typeof timing.clockValid==='boolean'&&typeof timing.withinBudget==='boolean','Timing flags differ');
+  need((timestamp(timing.startedAt)||timing.startedAt===null)&&(timestamp(timing.finishedAt)||timing.finishedAt===null)&&(finite(timing.wallElapsedMs)||timing.wallElapsedMs===null)&&(finite(timing.monotonicElapsedMs)||timing.monotonicElapsedMs===null),'Timing observations differ');
+  if(timing.clockValid)need(timestamp(timing.startedAt)&&timestamp(timing.finishedAt)&&finite(timing.monotonicElapsedMs)&&Date.parse(timing.finishedAt)-Date.parse(timing.startedAt)===timing.wallElapsedMs&&timing.wallElapsedMs>=0,'Wall timing arithmetic differs');
+  need(timing.withinBudget===(timing.clockValid&&timing.wallElapsedMs<limitMs&&timing.monotonicElapsedMs<limitMs),'Timing completion contradicts recorded clocks');
+  return timing;
+}
 export async function verifyEvidence({outputDirectory,expectedManifestSha256}){
   const p=await packet(outputDirectory,expectedManifestSha256),sources=await verifyFrozenSources({outputDirectory:p.root,expectedManifestSha256:p.manifest.sourceManifestSha256});
   await verifyNodeRuntime(sources.manifest.runtime);
@@ -82,12 +90,18 @@ export async function verifyEvidence({outputDirectory,expectedManifestSha256}){
     'engines/local-evm/ethereum-header.js','engines/local-evm/verified-state-proof.js','engines/local-evm/authenticated-ancestry.js','engines/local-evm/input-facts.js',
   ].map(archived)));
   const plan=await p.read('plan.json'),started=await p.read('STARTED.json'),results=await p.read('results.json');
+  const ledger=await p.read('write-ledger.json'),preexisting=['FROZEN.json','plan.json','source-manifest.json'];
+  need(ledger?.schemaVersion==='1.0'&&Array.isArray(ledger.files),'Original-write ledger missing');
+  const expectedLedger=[...p.byPath.values()].filter(e=>e.path!=='write-ledger.json').map(e=>({...e,origin:preexisting.includes(e.path)?'preexisting':'written'})).sort((a,b)=>a.path.localeCompare(b.path));
+  need(equal(ledger.files,expectedLedger),'Original-write ledger differs from retained bytes/inventory');
   await modules.loadPlan({outputDirectory:p.root,expectedPlanSha256:p.manifest.planSha256});
   need(results.planSha256===p.manifest.planSha256&&results.sourceManifestSha256===p.manifest.sourceManifestSha256&&equal(results.scope,plan.scope),'Result plan binding differs');
   need(started.planSha256===p.manifest.planSha256&&started.sourceManifestSha256===p.manifest.sourceManifestSha256&&equal(started.runtime,plan.runtime)&&started.startedAt===results.startedAt,'Start identity differs');
-  need(started.schemaVersion==='1.0'&&results.schemaVersion==='1.0'&&integer(started.pid)&&started.pid>0&&timestamp(started.startedAt)&&timestamp(results.finishedAt)&&timestamp(plan.frozenAt)&&Date.parse(results.finishedAt)>=Date.parse(started.startedAt)&&Date.parse(started.startedAt)>=Date.parse(plan.frozenAt),'Run chronology differs');
+  need(started.schemaVersion==='1.0'&&results.schemaVersion==='1.0'&&integer(started.pid)&&started.pid>0&&timestamp(started.startedAt)&&timestamp(results.finishedAt)&&timestamp(plan.frozenAt)&&(Date.parse(results.finishedAt)>=Date.parse(started.startedAt)||results.timingViolation?.code==='clock_invalid')&&Date.parse(started.startedAt)>=Date.parse(plan.frozenAt),'Run chronology differs');
   need(['complete','selection_failed','interrupted'].includes(results.status)&&Array.isArray(results.failures)&&finite(results.executionWindowMs)&&finite(results.durationMs)&&results.durationMs>=results.executionWindowMs,'Result completion/timing is malformed');
   need(results.status==='interrupted'||(results.sourceUnchanged===true&&results.runtimeUnchanged===true&&results.failures.length===0),'Unverified source cannot produce complete metrics');
+  const timings=[verifyTiming(results.timing,'run',plan.policy.collectionAndExecutionMs)];
+  if(results.timing.clockValid)need(Date.parse(results.timing.startedAt)>=Date.parse(started.startedAt)&&Date.parse(results.timing.finishedAt)<=Date.parse(results.finishedAt),'Run timing lies outside capture');
   need(equal(results.budget.limits,{calls:plan.policy.totalCalls,totalBytes:plan.policy.totalResponseBytes,wallMs:plan.policy.collectionAndExecutionMs}),'Budget differs');
   const paths=[...p.byPath.keys()];need(paths.every(n=>!n.startsWith('wire/')||/^wire\/\d{6}\.json$/.test(n))&&paths.every(n=>!n.startsWith('events/')||/^events\/\d{5}\.json$/.test(n)),'Unexpected wire/event artifact path');
   const wirePaths=paths.filter(n=>/^wire\/\d{6}\.json$/.test(n)).sort(),wires=[],byId=new Map(),summaries=[];
@@ -99,18 +113,55 @@ export async function verifyEvidence({outputDirectory,expectedManifestSha256}){
   for(const path of paths.filter(n=>/^events\/\d{5}\.json$/.test(n)).sort()){need(path===`events/${String(events.length+1).padStart(5,'0')}.json`,'Event numbering differs');events.push(await p.read(path));}
   const censusWires=wires.filter(w=>w.profile==='census'),input=modules.verifyCollectorBindings(selection,censusWires,events,plan,modules.verifyEthereumHeader),claimed=new Set(censusWires.map(w=>w.globalId));
   need(results.selectionStatus===selection.status,'Selection summary differs');
-  if(results.timingViolation){const v=results.timingViolation;need(selection.status==='selection_failed'&&results.caseRun===null&&v.code==='wait_overrun'&&integer(v.at)&&integer(v.deadline)&&v.at-v.deadline===v.overrunMs&&v.overrunMs>plan.policy.maxWaitOverrunMs,'Timing failure cannot become completed selection');need(events.some(e=>e.kind==='wait_chunk_started'&&Date.parse(e.details.until)===v.deadline),'Timing violation has no declared wait');}
-  let census=null,proofsVerified=0,outcomes=[];
+  let census=null,proofsVerified=0,outcomes=[],outcomesRecomputed=0,partialCases=0;
+  const phaseTiming=(phase,name)=>{if(phase.timing)timings.push(verifyTiming(phase.timing,name,name==='local'?plan.policy.localWallMs:plan.policy.oracleWallMs));else need(!phase.transportUsage,'Dispatched phase lacks terminal clock observations');};
   if(selection.status==='complete'){
     need(input&&selection.artifacts.failure===null,'Completed selection has failed evidence');census=modules.validateCohortCensus(input);need(equal(census,selection.census),'Census does not reproduce');
     need(equal(await p.read('classification.json'),modules.classifyCohortIntents(modules.classificationInput(census))),'All-population classification differs');
-    need(results.caseRun?.fatal===null&&results.caseRun?.interruptedLedger===null&&results.caseRun?.status==='complete'&&results.caseRun.rows.length===census.selected.length&&results.status==='complete','Interrupted selected execution has no complete audited metrics');
+    const interrupted=results.status==='interrupted',run=results.caseRun;
+    need(record(run)&&Array.isArray(run.rows)&&run.rows.length===census.selected.length,'Selected denominator is incomplete');
+    if(interrupted)need(run.status==='interrupted'&&run.accounting===null&&Array.isArray(run.interruptedLedger),'Interrupted run must withhold metrics and retain its ledger');
+    else need(run.fatal===null&&run.interruptedLedger===null&&run.status==='complete'&&results.status==='complete','Completed selected execution has failed evidence');
+    const fatalIndex=run.fatal?.caseId===null?null:run.fatal?run.rows.findIndex(e=>e.id===run.fatal.caseId):null;
+    if(run.fatal)need(interrupted&&record(run.fatal)&&['artifact_save_failed','transport_drain_incomplete','local_drain_incomplete','case_integrity_failure','final_health_failure'].includes(run.fatal.code)&&(run.fatal.caseId===null||fatalIndex>=0),'Fatal case identity differs');
+    need(paths.filter(n=>n.startsWith('cases/')).every(n=>/^cases\/\d{3}\/(request|local|LOCAL_SEALED|oracle|outcome)\.json$/.test(n)&&Number(n.split('/')[1])>=1&&Number(n.split('/')[1])<=census.selected.length),'Unknown case artifact');
     let prior=censusWires.at(-1)?.globalId??0;
     for(let i=0;i<census.selected.length;i++){
-      const row=census.selected[i],id=String(i+1).padStart(3,'0'),entry=results.caseRun.rows[i],projection=modules.projectSelectedCase({row,census}),request=await p.read(`cases/${id}/request.json`);
+      const row=census.selected[i],id=String(i+1).padStart(3,'0'),entry=run.rows[i],prefix=`cases/${id}/`;
+      need(entry.id===id&&entry.transactionHash===row.transactionHash,'Selected case identity differs');
+      if(!entry.localArtifact||!entry.oracleArtifact){
+        need(interrupted&&fatalIndex!==null&&i>=fatalIndex,'Missing phase artifacts outside the declared interrupted suffix');partialCases++;
+        const later=i>fatalIndex,expectedOutcome={transactionHash:row.transactionHash,execution:later?'budget_unattempted':'provider_unavailable',comparison:later?'budget_unattempted':'not_comparable'};
+        need(equal(entry.adjudication,{outcome:expectedOutcome,channels:{},reasons:[later?'Prior integrity failure stopped dispatch; no replacement':'Case could not retain a complete verified result'],allChannelsComplete:false}),'Interrupted slot was promoted or relabelled');
+        if(later){need(entry.projection===null&&!paths.some(n=>n.startsWith(prefix)),'Dispatch or artifacts after fatal case');}
+        else{
+          let projection=null;try{projection=modules.projectSelectedCase({row,census});}catch{/* A malformed projection remains an explicit unavailable slot. */}
+          need(equal(entry.projection,projection),'Interrupted projection differs');
+          const retained=async name=>p.byPath.has(prefix+name)?p.read(prefix+name):null;
+          const request=await retained('request.json'),local=await retained('local.json'),seal=await retained('LOCAL_SEALED.json'),oracle=await retained('oracle.json'),outcome=await retained('outcome.json');
+          if(request)need(equal(request,{transactionHash:row.transactionHash,parentHeader:row.parentHeader,projection}),'Partial request differs');
+          need((!local||request)&&(!seal||local)&&(!oracle||seal)&&(!outcome||oracle),'Interrupted artifact order differs');
+          if(local){
+            need(equal(local.implementation,plan.localImplementation),'Partial local implementation differs');phaseTiming(local,'local');
+            const rows=bindPhase(local,byId,claimed,'local',row.parentBlockHash);need(rows.every(w=>w.globalId>prior),'Partial phase order differs');if(rows.length)prior=rows.at(-1).globalId;
+            proofsVerified+=(await modules.verifyLocalBindings(local,rows,row.parentHeader,modules)).proofsVerified;
+            if(local.attempt?.inputs)await modules.validateInputFacts({inputs:local.attempt.inputs,inputEvidence:local.attempt.inputEvidence,stateRoot:row.parentHeader.stateRoot});
+            if(seal){const meta=p.byPath.get(prefix+'local.json');need(equal(seal,{schemaVersion:'1.0',path:prefix+'local.json',bytes:meta.bytes,sha256:meta.sha256,wireIds:local.transportWireIds,lastWireId:local.transportWireIds.at(-1)??null,at:seal.at})&&timestamp(seal.at),'Partial local seal differs');}
+          }
+          if(oracle){
+            need(projection?.status==='projectable','Partial oracle lacks its declared request');phaseTiming(oracle,'oracle');
+            const rows=bindPhase(oracle,byId,claimed,'product',row.parentBlockHash),expected=modules.oracleRequests({request:projection.request,header:row.parentHeader});
+            need(rows.length<=expected.length&&rows.every((w,j)=>w.globalId>prior&&w.request.method===expected[j].method&&equal(w.request.params,expected[j].params)&&Date.parse(w.startedAt)>=Date.parse(seal.at)),'Partial oracle sequence differs');if(rows.length)prior=rows.at(-1).globalId;
+            if(outcome){const derived=await modules.adjudicateLocalOutcome({transactionHash:row.transactionHash,request:projection.request,header:row.parentHeader,expectedLocalImplementation:plan.localImplementation,local,oracle});need(equal(outcome,derived),'Retained partial outcome differs');outcomesRecomputed++;}
+          }
+        }
+        outcomes.push(expectedOutcome);continue;
+      }
+      const projection=modules.projectSelectedCase({row,census}),request=await p.read(`${prefix}request.json`);
       need(equal(request,{transactionHash:row.transactionHash,parentHeader:row.parentHeader,projection}),'Case request/projection differs');
       need(entry.id===id&&entry.transactionHash===row.transactionHash&&equal(entry.projection,projection)&&entry.localArtifact===`cases/${id}/local.json`&&entry.oracleArtifact===`cases/${id}/oracle.json`,'Case ledger differs');
       const local=await p.read(entry.localArtifact),seal=await p.read(`cases/${id}/LOCAL_SEALED.json`),oracle=await p.read(entry.oracleArtifact),localWires=bindPhase(local,byId,claimed,'local',row.parentBlockHash),oracleWires=bindPhase(oracle,byId,claimed,'product',row.parentBlockHash);
+      phaseTiming(local,'local');phaseTiming(oracle,'oracle');
       const meta=p.byPath.get(entry.localArtifact);need(equal(seal,{schemaVersion:'1.0',path:entry.localArtifact,bytes:meta.bytes,sha256:meta.sha256,wireIds:local.transportWireIds,lastWireId:local.transportWireIds.at(-1)??null,at:seal.at})&&timestamp(seal.at),'Local durable seal differs');
       need(equal(local.implementation,plan.localImplementation),'Local product identity differs');
       const phase=[...localWires,...oracleWires];need(phase.every((w,j)=>w.globalId>(j?phase[j-1].globalId:prior)),'Local/oracle phase order differs');if(phase.length)prior=phase.at(-1).globalId;
@@ -127,15 +178,30 @@ export async function verifyEvidence({outputDirectory,expectedManifestSha256}){
         for(let j=0;j<oracleWires.length;j++)need(oracleWires[j].request.method===expected[j].method&&equal(oracleWires[j].request.params,expected[j].params),'Oracle request sequence differs');
         outcome=await modules.adjudicateLocalOutcome({transactionHash:row.transactionHash,request:projection.request,header:row.parentHeader,expectedLocalImplementation:plan.localImplementation,local,oracle});
       }
-      need(equal(outcome,await p.read(`cases/${id}/outcome.json`))&&equal(compact(outcome),entry.adjudication),'Independent outcome recomputation differs');outcomes.push(outcome.outcome);
+      need(equal(outcome,await p.read(`cases/${id}/outcome.json`))&&equal(compact(outcome),entry.adjudication),'Independent outcome recomputation differs');outcomes.push(outcome.outcome);outcomesRecomputed++;
     }
-    need(equal(results.caseRun.accounting,modules.accountCohortOutcomes(census.selection,outcomes)),'Denominator or accounting differs');
+    const accounting=modules.accountCohortOutcomes(census.selection,outcomes);
+    need(equal(interrupted?run.interruptedLedger:run.accounting,interrupted?accounting.ledger:accounting),'Denominator or accounting differs');
   }else need(results.caseRun===null&&selection.census===null&&results.status!=='complete','Failed selection manufactured a denominator');
-  need(claimed.size===wires.length,'Unjoined evidence wire remains');
+  const unjoined=wires.filter(w=>!claimed.has(w.globalId));
+  if(unjoined.length){
+    // A fatal phase can fail before its wrapper is saved. Its raw suffix is
+    // still hash/wire-audited, but is never claimed as joined execution input.
+    const fatal=results.caseRun?.fatal,index=results.caseRun?.rows.findIndex(e=>e.id===fatal?.caseId),row=census?.selected[index];
+    need(results.status==='interrupted'&&partialCases>0&&row&&unjoined.every(w=>w.globalId>Math.max(0,...claimed)&&w.profile==='local'&&((['eth_getProof','eth_getCode'].includes(w.request.method)&&equal(w.request.params.at(-1),{blockHash:row.parentBlockHash,requireCanonical:true}))||(w.request.method==='eth_getBlockByHash'&&w.request.params.length===2&&WORD.test(w.request.params[0])&&w.request.params[1]===false))),'Unjoined evidence is not a retained failed local-phase suffix');
+  }
+  const violation=results.timingViolation;
+  if(violation){
+    need(results.status!=='complete'&&(selection.status!=='complete'||(results.status==='interrupted'&&results.failures.some(f=>f.code===violation.code))),'Timing failure retained completed metrics');
+    if(violation.code==='wait_overrun'){need(selection.status==='selection_failed'&&results.caseRun===null&&integer(violation.at)&&integer(violation.deadline)&&violation.at-violation.deadline===violation.overrunMs&&violation.overrunMs>plan.policy.maxWaitOverrunMs,'Wait failure differs');need(events.some(e=>e.kind==='wait_chunk_started'&&Date.parse(e.details.until)===violation.deadline),'Wait violation has no declared wait');}
+    else if(violation.code==='phase_deadline')need(timings.some(t=>t.phase!=='run'&&!t.withinBudget&&equal(t,violation.timing)),'Phase violation lacks its retained terminal clocks');
+    else if(violation.code==='absolute_deadline'){verifyTiming(violation.timing,'run',plan.policy.collectionAndExecutionMs);need(!violation.timing.withinBudget&&!results.timing.withinBudget&&violation.timing.startedAt===results.timing.startedAt,'Absolute deadline differs');}
+    else need(violation.code==='clock_invalid'&&timings.some(t=>!t.clockValid),'Unknown or unsupported timing failure');
+  }else need(timings.every(t=>t.withinBudget),'Late or invalid clocks lack terminal withholding');
   await verifyFrozenSources({outputDirectory:p.root,expectedManifestSha256:p.manifest.sourceManifestSha256});await verifyNodeRuntime(plan.runtime);
   return{status:'verified',reportStatus:results.status,expectedManifestSha256,sourceManifestSha256:p.manifest.sourceManifestSha256,planSha256:p.manifest.planSha256,
-    sourceFiles:sources.manifest.filesCount,evidenceFiles:p.byPath.size,wires:wires.length,proofsVerified,census:census?.census.length??null,selected:census?.selected.length??null,outcomesRecomputed:outcomes.length,
-    completeWireBinding:true,limitations:{newIndependentExecution:false,sourceSafetyAttested:false,providerContextExecutionAttested:false,consensusVerified:false,originalTransactionReplay:false,apiCoverage:false,economicCompleteness:false,unretainedObservedHashesVerified:summaries.every(s=>s.unretainedObservedHashVerified)}};
+    sourceFiles:sources.manifest.filesCount,evidenceFiles:p.byPath.size,wires:wires.length,proofsVerified,census:census?.census.length??null,selected:census?.selected.length??null,outcomesRecomputed,partialCases,metricsAvailable:results.status==='complete',
+    completeWireBinding:unjoined.length===0,unjoinedEvidenceWireIds:unjoined.map(w=>w.globalId),limitations:{newIndependentExecution:false,sourceSafetyAttested:false,providerContextExecutionAttested:false,consensusVerified:false,originalTransactionReplay:false,apiCoverage:false,economicCompleteness:false,unretainedObservedHashesVerified:summaries.every(s=>s.unretainedObservedHashVerified)}};
 }
 if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  const[directory,hash]=process.argv.slice(2);need(directory&&hash,'Usage: verify.mjs DIR EVIDENCE_MANIFEST_SHA');

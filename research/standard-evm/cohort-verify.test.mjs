@@ -115,9 +115,9 @@ test('actual-shaped HTTP502 without internal RPC evidence retains unavailable an
   const altered = structuredClone(product); delete altered.request; bad(() => verifyProductBindings(altered, [wire], request));
   const incorrect = structuredClone(product); incorrect.httpStatus = 200; bad(() => verifyProductBindings(incorrect, [wire], request));
 });
-test('account and storage facts reverify against cryptographic input proofs, including absence', async () => {
-  for (const account of [A, C]) {
-    const fixture = await proofFixture({ address: account, requested: [word(0)] }), header = { hash: word(111), stateRoot: fixture.input.stateRoot };
+test('account and storage facts reverify legacy code and proof-derived empty code, including hidden storage and absence', async () => {
+  for (const [account, code] of [[A, '0x600100'], [A, '0x'], [C, '0x']]) {
+    const fixture = await proofFixture({ address: account, code, requested: [word(0)] }), header = { hash: word(111), stateRoot: fixture.input.stateRoot };
     const rpc = createCohortTransport({ budget: createCohortWireBudget(), provider: 'drpc', profile: 'local', blockHash: header.hash, fetchImpl: async (_url, options) => {
       const r = JSON.parse(options.body); return new Response(JSON.stringify({ jsonrpc: '2.0', id: r.id, result: r.method === 'eth_getCode' ? fixture.input.code : fixture.input.proof }));
     } });
@@ -126,6 +126,25 @@ test('account and storage facts reverify against cryptographic input proofs, inc
     const local = { dispatch: 'completed', attempt: { status: 'completed', inputs: collector.snapshotInputs(), inputEvidence,
       broker: { calls: inputEvidence.length, dispatches: inputEvidence.length, pendingAtReturn: 0, records: inputEvidence.map(e => ({ id: e.id, request: e.request, status: 'received', dispatched: true, resultSha256: e.resultSha256, resultBytes: e.resultBytes })) } } };
     assert((await verifyLocalBindings(local, wires, header, { verifyStateProof })).proofsVerified >= 1);
+    const provenance = local.attempt.inputs.provenance[0];
+    if (code === '0x') {
+      assert(wires.every(w => w.request.method === 'eth_getProof'));
+      assert.equal(provenance.codeEvidenceId, null);
+      assert.equal(provenance.codeDerivation, account === C ? 'verified_account_absence' : 'verified_account_empty_code_hash');
+      for (const mutate of [
+        p => { p.codeDerivation = account === C ? 'verified_account_empty_code_hash' : 'verified_account_absence'; },
+        p => { p.codeDerivation = 'empty'; }, p => { p.codeEvidenceId = 1; },
+        p => { delete p.codeDerivation; }, p => { p.extra = true; }, p => { p.proofEvidenceId = '1'; },
+      ]) {
+        const changed = structuredClone(local); mutate(changed.attempt.inputs.provenance[0]);
+        await assert.rejects(verifyLocalBindings(changed, wires, header, { verifyStateProof }));
+      }
+    } else {
+      assert(wires.some(w => w.request.method === 'eth_getCode'));
+      const hidden = structuredClone(local); hidden.attempt.inputs.accounts[account].code = '0x';
+      Object.assign(hidden.attempt.inputs.provenance[0], { codeEvidenceId: null, codeDerivation: 'verified_account_empty_code_hash' });
+      await assert.rejects(verifyLocalBindings(hidden, wires, header, { verifyStateProof }), e => e.code === 'STATE_PROOF_INVALID');
+    }
     const facts = structuredClone(local);
     if (account === A) facts.attempt.inputs.accounts[account].storage[word(0)] = word(8);
     else facts.attempt.inputs.provenance[0].storage[0].value = word(1);
@@ -161,9 +180,9 @@ test('actual child ancestor inputs join captured wire and verify independently; 
   const r=JSON.parse(options.body),result=await f.rpc.call(r.method,r.params);return new Response(JSON.stringify({jsonrpc:'2.0',id:r.id,result}));
  }});
  const attempt=await executeIsolatedEthereumCall({request:f.request,header:f.header,rpc}),local={dispatch:'completed',attempt},wires=rpc.records(),modules={verifyStateProof,...ancestry};
- assert.equal(attempt.output.execution.status,'success');assert.equal(wires.length,5);wires.forEach(verifyCohortWireRecord);assert.equal(wires.at(-1).ancestorVerification,'verified');
+ assert.equal(attempt.output.execution.status,'success');assert.equal(wires.length,4);assert.equal(wires.filter(w=>w.request.method==='eth_getCode').length,1);wires.forEach(verifyCohortWireRecord);assert.equal(wires.at(-1).ancestorVerification,'verified');
  assert.equal((await verifyLocalBindings(local,wires,f.header,modules)).proofsVerified,2);
- for(const mutate of [x=>{x.attempt.inputs.ancestry.lookups[0].hash='0x'+'1'.repeat(64);},x=>{delete x.attempt.inputs.ancestry;},x=>{delete x.attempt.inputEvidence[4].result;}]){
+ for(const mutate of [x=>{x.attempt.inputs.ancestry.lookups[0].hash='0x'+'1'.repeat(64);},x=>{delete x.attempt.inputs.ancestry;},x=>{delete x.attempt.inputEvidence.find(e=>e.request.method==='eth_getBlockByHash').result;}]){
   const changed=structuredClone(local);mutate(changed);await assert.rejects(verifyLocalBindings(changed,wires,f.header,modules));
  }
  await assert.rejects(verifyLocalBindings(local,wires,f.header,{verifyStateProof}),/ancestor verifier/);

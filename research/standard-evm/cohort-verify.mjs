@@ -17,6 +17,7 @@ const sha = v => createHash('sha256').update(v).digest('hex');
 const own = (o, k) => Object.hasOwn(o, k);
 const record = v => v && typeof v === 'object' && !Array.isArray(v);
 const HEX = /^[0-9a-f]{64}$/, WORD = /^0x[0-9a-f]{64}$/;
+const EMPTY_CODE_HASH = '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470';
 const PROVIDERS = { drpc: 'https://eth.drpc.org/', publicnode: 'https://ethereum-rpc.publicnode.com/' };
 const LIMITS = { files: 30000, fileBytes: 256 * 1024 * 1024, totalBytes: 8 * 1024 * 1024 * 1024, wireBytes: 8 * 1024 * 1024, calls: 6144 };
 const integer = v => Number.isSafeInteger(v) && v >= 0;
@@ -295,9 +296,25 @@ export async function verifyLocalBindings(local, wires, header, modules) {
     modules.validateAncestryEvidence(header, attempt.inputs.ancestry, attempt.inputEvidence);
   }
   for (const p of attempt.inputs.provenance ?? []) {
-    const proof = attempt.inputEvidence[p.proofEvidenceId - 1], code = attempt.inputEvidence[p.codeEvidenceId - 1];
-    need(proof?.request.method === 'eth_getProof' && code?.request.method === 'eth_getCode' && proof.request.params[0] === p.account && code.request.params[0] === p.account && own(proof, 'result') && own(code, 'result'), 'Proven account lacks exact proof/code evidence.');
-    const v = await modules.verifyStateProof({ stateRoot: header.stateRoot, address: p.account, storageKeys: proof.request.params[1], proof: proof.result, code: code.result });
+    const derived = record(p) && own(p, 'codeDerivation');
+    need(record(p) && equal(Object.keys(p).sort(), ['account', 'accountProof', 'proofEvidenceId', 'codeEvidenceId', 'storage', ...(derived ? ['codeDerivation'] : [])].sort()), 'Account provenance shape differs.');
+    need(integer(p.proofEvidenceId) && p.proofEvidenceId > 0, 'Account proof evidence ID differs.');
+    const proof = attempt.inputEvidence[p.proofEvidenceId - 1];
+    need(proof?.request.method === 'eth_getProof' && proof.request.params[0] === p.account && own(proof, 'result'), 'Proven account lacks exact proof evidence.');
+    let code;
+    if (derived) {
+      need(p.codeEvidenceId === null && ['verified_account_absence', 'verified_account_empty_code_hash'].includes(p.codeDerivation), 'Derived code provenance differs.');
+      code = '0x';
+    } else {
+      need(integer(p.codeEvidenceId) && p.codeEvidenceId > p.proofEvidenceId, 'Account code evidence ID differs.');
+      const evidence = attempt.inputEvidence[p.codeEvidenceId - 1];
+      need(evidence?.request.method === 'eth_getCode' && evidence.request.params[0] === p.account && own(evidence, 'result'), 'Proven account lacks exact code evidence.');
+      code = evidence.result;
+    }
+    // Even an empty runtime is checked against the authenticated account leaf.
+    // A child-provided derivation label never substitutes for the proof.
+    const v = await modules.verifyStateProof({ stateRoot: header.stateRoot, address: p.account, storageKeys: proof.request.params[1], proof: proof.result, code });
+    if (derived) need(v.account.codeHash === EMPTY_CODE_HASH && p.codeDerivation === (v.account.exists ? 'verified_account_empty_code_hash' : 'verified_account_absence'), 'Derived code label contradicts proven account.');
     need(equal(v.account, p.accountProof), 'Account facts differ from independently checked proof.'); proofsVerified++;
     const stored = attempt.inputs.accounts[p.account];
     if (!v.account.exists) {
@@ -305,10 +322,11 @@ export async function verifyLocalBindings(local, wires, header, modules) {
       for (const slot of p.storage) need(WORD.test(slot.key) && slot.value === '0x' + '0'.repeat(64) && slot.exists === false && slot.evidenceId === p.proofEvidenceId, 'Absent-account storage was not derived from its exclusion proof.');
     }
     else {
-      need(stored?.exists === true && stored.nonce === v.account.nonceRaw && stored.balance === v.account.balanceRaw && stored.code === code.result, 'Input account basics differ from proof.');
+      need(stored?.exists === true && stored.nonce === v.account.nonceRaw && stored.balance === v.account.balanceRaw && stored.code === code, 'Input account basics differ from proof.');
       for (const slot of p.storage) {
         const e = attempt.inputEvidence[slot.evidenceId - 1]; need(e?.request.method === 'eth_getProof' && e.request.params[0] === p.account && own(e, 'result'), 'Storage fact lacks its proof.');
-        const s = await modules.verifyStateProof({ stateRoot: header.stateRoot, address: p.account, storageKeys: e.request.params[1], proof: e.result, code: code.result });
+        const s = await modules.verifyStateProof({ stateRoot: header.stateRoot, address: p.account, storageKeys: e.request.params[1], proof: e.result, code });
+        need(equal(s.account, v.account), 'Storage proof account differs.');
         const fact = s.storage.find(x => x.key === slot.key); need(fact && fact.valueWord === slot.value && fact.exists === slot.exists && stored.storage[slot.key] === slot.value, 'Storage input differs from verified proof.'); proofsVerified++;
       }
       need(equal(Object.keys(stored.storage).sort(), p.storage.map(s => s.key).sort()), 'Input storage has unproven entries.');

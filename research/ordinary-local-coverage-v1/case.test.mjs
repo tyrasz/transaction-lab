@@ -68,7 +68,7 @@ test('selected projection admits explicit CREATE and ordered duplicate context w
   const f=await lifecycleFixture({code:'0x00'});
   const base=projectionInput(f,{to:null,input:'0x',accessList:[{address:OTHER,storageKeys:[word(1),word(1)]},{address:OTHER,storageKeys:[]}]});
   const p=projectSelectedCase(base);assert.equal(p.status,'projectable');assert.equal(p.request.to,null);assert.equal(p.request.gas,'5000000');assert.deepEqual(p.request.accessList,base.census.envelopes[0].normalizedEnvelope.accessList);
-  for(const [change,why]of [[{gas:'5000001'},'original_gas_limit_exceeds_profile'],[{type:'4'},'authorization_context_unsupported'],[{extensions:{newField:1}},'unrecognized_envelope_fields'],[{to:null,blobVersionedHashes:['0x01'+'11'.repeat(31)]},'blob_creation_unsupported'],[{input:'0x'+'00'.repeat(32769)},'calldata_exceeds_profile']]){
+  for(const [change,why]of [[{gas:'5000001'},'original_gas_limit_exceeds_profile'],[{type:'4'},'authorization_context_exceeds_profile'],[{extensions:{newField:1}},'unrecognized_envelope_fields'],[{to:null,blobVersionedHashes:['0x01'+'11'.repeat(31)]},'blob_creation_unsupported'],[{input:'0x'+'00'.repeat(32769)},'calldata_exceeds_profile']]){
     const out=projectSelectedCase(projectionInput(f,change));assert.equal(out.status,'unsupported');assert.ok(out.reasons.includes(why));assert.equal(out.transactionHash,HASH);assert.equal(out.request,undefined);
   }
   const wrong=projectionInput(f);wrong.row=copy(wrong.row);wrong.row.transactionIndex='2';assert.throws(()=>projectSelectedCase(wrong));

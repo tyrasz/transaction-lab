@@ -5,6 +5,8 @@ import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { validateCohortCensus, CohortCensusError, CENSUS_LIMITS } from './cohort-census.mjs';
 import { createCohortSelection } from './cohort-accounting.mjs';
+import { projectSelectedCase } from '../ordinary-local-coverage-v1/projection.mjs';
+import { oracleRequests } from '../ordinary-local-coverage-v1/outcomes.mjs';
 const require = createRequire(new URL('../../engines/local-evm/package.json', import.meta.url));
 const { RLP } = await import(require.resolve('@ethereumjs/rlp'));
 const { keccak_256 } = await import(require.resolve('@noble/hashes/sha3.js'));
@@ -88,6 +90,24 @@ test('bounded access-list/blob contexts are preserved while unsupported profiles
   assert.deepEqual(out.selected[7].projection.request.accessList, cases[7].accessList);
   assert.ok(out.selected.filter(r => r.projection.status === 'unsupported').every(r => !Object.hasOwn(r.projection, 'request')));
   assert.equal(out.envelopes[6].providerEnvelopes[0].envelope.futureContext.id, 'unchanged');
+});
+
+test('authorization tuple uint8 parity preserves protocol-skipped entries without relaxing outer signature parity', () => {
+  const list=[0n,1n,2n,255n].map(yParity=>({chainId:'0x0',address:addr(4),nonce:'0x0',yParity:q(yParity),r:'0x1',s:'0x2'}));
+  const input=bodyFixture([[tx(1,{type:'0x4',authorizationList:list})],[]]);
+  // Equivalent fixed-width provider scalar encodings normalize to decimals.
+  input.observations[1].headers[1].transactions[0].authorizationList.forEach(t=>{t.r=word(1);t.s=word(2);});
+  const out=validateCohortCensus(input),normalized=out.envelopes[0].normalizedEnvelope.authorizationList;
+  assert.equal(out.census.length,1);assert.equal(out.selected.length,1);
+  assert.deepEqual(normalized.map(t=>t.yParity),['0','1','2','255']);assert(normalized.every(t=>t.r==='1'&&t.s==='2'));
+  assert.deepEqual(out.envelopes[0].providerEnvelopes[0].envelope.authorizationList,list);
+  const projection=projectSelectedCase({row:out.selected[0],census:out});assert.equal(projection.status,'projectable');
+  assert.deepEqual(projection.request.authorizationList,list,'Decimal census scalars convert back without tuple loss, value change or reordering');
+  const planned=oracleRequests({request:projection.request,header:projection.parentHeader});
+  assert.deepEqual(planned[1].params[0].authorizationList,list);assert.deepEqual(planned[2].params[0].authorizationList,list);
+  for(const parity of ['0x100','0x00','-1']){const forged=clone(input);both(forged,o=>{o.headers[1].transactions[0].authorizationList[0].yParity=parity;});expectBad(forged,/Authorization parity/);}
+  for(const parity of ['0x2','0xff']){const forged=clone(input);both(forged,o=>{o.headers[1].transactions[0].v=parity;});expectBad(forged,/Typed signature parity/);}
+  const disagree=clone(input);disagree.observations[1].headers[1].transactions[0].authorizationList[2].yParity='0x3';expectBad(disagree);
 });
 
 test('context bounds retain unsupported rows and duplicate access entries remain exact', () => {

@@ -8,7 +8,8 @@ import { createRequire, syncBuiltinESMExports } from 'node:module';
 import timersPromises from 'node:timers/promises';
 import { createTimingGate, freezeRun, loadPlan, executeCases, withholdCaseMetrics, POLICY } from './run.mjs';
 import { createArtifactWriter, sealEvidence } from './artifacts.mjs';
-import { createCohortSelection } from '../standard-evm/cohort-accounting.mjs';
+import { createCohortSelection, accountCohortOutcomes } from '../standard-evm/cohort-accounting.mjs';
+import { verifyTiming } from './verify.mjs';
 const ROOT=resolve(fileURLToPath(new URL('../..',import.meta.url))),sha=v=>createHash('sha256').update(v).digest('hex');
 const temp=t=>{const d=mkdtempSync('/tmp/ordinary-local-test-');t.after(()=>rmSync(d,{recursive:true,force:true}));return d;};
 
@@ -19,6 +20,20 @@ test('absolute deadline, backwards clocks and excessive wait gaps close the gate
   wall=1000;const bad=createTimingGate({wallStart:wall,monotonicStart:0,now:()=>wall,monotonic:()=>0});wall--;assert.equal(bad.remaining(),0);assert.equal(bad.violation().code,'clock_invalid');
 });
 
+test('both phase clocks and terminal global clocks independently withhold late completion',()=>{
+ for(const clock of ['wall','monotonic']){
+  let wall=1000,mono=0;const gate=createTimingGate({wallStart:wall,monotonicStart:mono,now:()=>wall,monotonic:()=>mono});
+  const phase=gate.beginPhase('local',POLICY.localWallMs);
+  if(clock==='wall')wall+=POLICY.localWallMs+1;else mono+=POLICY.localWallMs+1;
+  const timing=gate.endPhase(phase);assert.equal(timing.withinBudget,false);assert.equal(gate.violation().code,'phase_deadline');assert.equal(gate.remaining(),0);
+  assert.equal(verifyTiming(timing,'local',POLICY.localWallMs).withinBudget,false);
+  assert.throws(()=>verifyTiming({...timing,withinBudget:true},'local',POLICY.localWallMs));
+  assert.throws(()=>verifyTiming({...timing,limitMs:timing.limitMs+1},'local',POLICY.localWallMs));
+ }
+ let wall=1000,mono=0;const gate=createTimingGate({wallStart:wall,monotonicStart:mono,now:()=>wall,monotonic:()=>mono});
+ wall+=POLICY.collectionAndExecutionMs+1;assert.equal(gate.snapshot().withinBudget,false);assert.equal(gate.violation().code,'absolute_deadline');
+});
+
 test('durable artifact writer rejects overwrite and sealing binds every non-runtime file',t=>{
  const d=temp(t),w=createArtifactWriter(d);w.write('local.json',{exact:'value'});const sealed=sealEvidence(d,'a'.repeat(64),'b'.repeat(64));assert.equal(sealed.manifestSha256,sha(readFileSync(join(d,'evidence-manifest.json'))));assert.throws(()=>w.write('local.json',{}),{code:'artifact_save_failed'});
 });
@@ -26,7 +41,8 @@ test('durable artifact writer rejects overwrite and sealing binds every non-runt
 // Offline only: synthetic future blocks/clock and exact archived proof/code
 // responses. The oracle answers are synthetic reuse of a prior saved trace;
 // this validates plumbing, not a new independent accuracy observation.
-test('real frozen worker, local-first seal, raw oracle, offline audit, and tamper rejection',async t=>{
+test('real frozen worker retains exact oracle bytes on success and late final response; audit never promotes late metrics',async t=>{
+ for(const delayed of [false,true]){
  const dir=temp(t),out=join(dir,'capture'),source=new URL('../../reports/ethereum-lending-local-reference/',import.meta.url);
  const mb=readFileSync(new URL('manifest.json',source));assert.equal(sha(mb),'34b1e325ea08604705e50f06da81e442bb48cea017faf3058671e1e1a4e8f8c5');const manifest=JSON.parse(mb);
  const read=name=>{const b=readFileSync(new URL(name,source));assert.equal(sha(b),manifest.files.find(r=>r.path===name).sha256);return JSON.parse(b);};
@@ -51,28 +67,57 @@ test('real frozen worker, local-first seal, raw oracle, offline audit, and tampe
  else if(r.method==='eth_getBlockByNumber'&&r.params[0]==='latest')result=headers[0];
  else if(r.method==='eth_getBlockByNumber'&&r.params[0]==='finalized')result=headers[3];
  else if(r.method==='eth_getBlockByHash'&&headers.some(h=>h.hash===r.params[0])){const h=headers.find(h=>h.hash===r.params[0]);result=r.params[1]?h:{...h,transactions:h.transactions.map(tx=>typeof tx==='string'?tx:tx.hash)};}
- else if(r.method==='eth_getBlockByNumber'&&r.params[0]===old.header.number)result=headers[0];
+ else if(r.method==='eth_getBlockByNumber'&&r.params[0]===old.header.number){result=headers[0];if(delayed)clock+=POLICY.oracleWallMs+1;}
  else if(['eth_getProof','eth_getCode'].includes(r.method)){const answer=local.transport.find(a=>a.request.method===r.method&&JSON.stringify(a.request.params)===JSON.stringify(r.params));if(answer)result=answer.parsed.result;}
  else if(r.method==='debug_traceCall'){assert(existsSync(join(out,'cases/001/LOCAL_SEALED.json')),'Product must be durably sealed before oracle trace');oracleCalls++;result=r.params[2].tracer==='callTracer'?trace:JSON.parse(diff.responseText).result;}
  if(result===undefined){unexpected={method:r.method,params:r.params};throw Error('No fake response; network is forbidden');}return new Response(JSON.stringify({jsonrpc:'2.0',id:r.id,result}));};
  let result;
- try{result=await archived.runFrozen({outputDirectory:out,expectedPlanSha256:frozen.planSha256});assert.equal(unexpected,null,JSON.stringify(unexpected));assert.equal(result.status,'complete',JSON.stringify(result));assert.equal(result.caseRun.accounting.counts.selected,1);assert.equal(result.caseRun.accounting.counts.comparison.match,1,JSON.stringify(result.caseRun));assert.equal(oracleCalls,2);const prior=calls;await assert.rejects(archived.runFrozen({outputDirectory:out,expectedPlanSha256:frozen.planSha256}),{code:'artifact_save_failed'});assert.equal(calls,prior);}
+ try{result=await archived.runFrozen({outputDirectory:out,expectedPlanSha256:frozen.planSha256});assert.equal(unexpected,null,JSON.stringify(unexpected));assert.equal(result.status,delayed?'interrupted':'complete',JSON.stringify(result));
+  if(delayed){assert.equal(result.caseRun.accounting,null);assert.equal(result.timingViolation.code,'phase_deadline');assert.equal(result.caseRun.interruptedLedger.filter(r=>r.selected).length,1);
+   const retained=JSON.parse(readFileSync(join(out,'cases/001/oracle.json')));assert.equal(retained.records.length,4);assert(retained.records.every(r=>r.status==='completed'));assert.equal(retained.timing.withinBudget,false);
+   assert.equal(JSON.parse(readFileSync(join(out,'cases/001/local.json'))).attempt.output.execution.status,'success');
+  }else{assert.equal(result.caseRun.accounting.counts.selected,1);assert.equal(result.caseRun.accounting.counts.comparison.match,1,JSON.stringify(result.caseRun));}
+  assert.equal(oracleCalls,2);const prior=calls;await assert.rejects(archived.runFrozen({outputDirectory:out,expectedPlanSha256:frozen.planSha256}),{code:'artifact_save_failed'});assert.equal(calls,prior);}
  finally{globalThis.Date=RealDate;globalThis.fetch=realFetch;timersPromises.setTimeout=realDelay;syncBuiltinESMExports();}
  const verifier=await import(pathToFileURL(join(out,'runtime/research/ordinary-local-coverage-v1/verify.mjs')));
  globalThis.fetch=async()=>{throw Error('Audit network forbidden');};
  try{
-  const verified=await verifier.verifyEvidence({outputDirectory:out,expectedManifestSha256:result.evidence.manifestSha256});assert.equal(verified.status,'verified');assert.equal(verified.selected,1);assert.equal(verified.outcomesRecomputed,1);assert(verified.proofsVerified>0);assert.equal(verified.limitations.newIndependentExecution,false);
+  const verified=await verifier.verifyEvidence({outputDirectory:out,expectedManifestSha256:result.evidence.manifestSha256});assert.equal(verified.status,'verified');assert.equal(verified.metricsAvailable,!delayed);assert.equal(verified.selected,1);assert.equal(verified.outcomesRecomputed,1);assert(verified.proofsVerified>0);assert.equal(verified.limitations.newIndependentExecution,false);
+  if(!delayed){
+   // Artifact-only interrupted-packet control: retain both actual phases, but
+   // model failure before the outcome file became durable. No target rerun.
+   const names=['results.json','cases/001/outcome.json','write-ledger.json','evidence-manifest.json'];
+   const original=new Map(names.map(name=>[name,readFileSync(join(out,name))]));
+   const write=(name,value)=>{chmodSync(join(out,name),0o644);writeFileSync(join(out,name),JSON.stringify(value,null,2)+'\n');};
+   const reseal=()=>{
+    const manifest=JSON.parse(original.get('evidence-manifest.json'));
+    const files=manifest.files.filter(e=>e.path!=='write-ledger.json'&&existsSync(join(out,e.path))).map(e=>{const bytes=readFileSync(join(out,e.path));return{path:e.path,bytes:bytes.length,sha256:sha(bytes),origin:['source-manifest.json','plan.json','FROZEN.json'].includes(e.path)?'preexisting':'written'};}).sort((a,b)=>a.path.localeCompare(b.path));
+    write('write-ledger.json',{schemaVersion:'1.0',files});rmSync(join(out,'evidence-manifest.json'));return sealEvidence(out,frozen.planSha256,frozen.sourceManifestSha256);
+   };
+   try{
+    const interrupted=JSON.parse(original.get('results.json')),row=interrupted.caseRun.rows[0],outcome={transactionHash:row.transactionHash,execution:'provider_unavailable',comparison:'not_comparable'};
+    const selection=JSON.parse(readFileSync(join(out,'selection.json'))).census.selection;
+    interrupted.status='interrupted';interrupted.caseRun={...interrupted.caseRun,status:'interrupted',fatal:{caseId:'001',code:'artifact_save_failed'},accounting:null,interruptedLedger:accountCohortOutcomes(selection,[outcome]).ledger,
+     rows:[{id:row.id,transactionHash:row.transactionHash,projection:row.projection,adjudication:{outcome,channels:{},reasons:['Case could not retain a complete verified result'],allChannelsComplete:false}}]};
+    write('results.json',interrupted);rmSync(join(out,'cases/001/outcome.json'));
+    const pin=reseal(),partial=await verifier.verifyEvidence({outputDirectory:out,expectedManifestSha256:pin.manifestSha256});
+    assert.equal(partial.metricsAvailable,false);assert.equal(partial.partialCases,1);assert.equal(partial.outcomesRecomputed,0);assert.equal(partial.selected,1);assert.equal(partial.completeWireBinding,true);
+    interrupted.caseRun.accounting=accountCohortOutcomes(selection,[outcome]);write('results.json',interrupted);const promoted=reseal();
+    await assert.rejects(verifier.verifyEvidence({outputDirectory:out,expectedManifestSha256:promoted.manifestSha256}),/withhold metrics/);
+   }finally{for(const[name,bytes]of original){if(existsSync(join(out,name)))chmodSync(join(out,name),0o644);writeFileSync(join(out,name),bytes);}}
+  }
   for(const [path,mutate]of [
    ['cases/001/LOCAL_SEALED.json',x=>{x.sha256='0'.repeat(64);}],
    ['cases/001/oracle.json',x=>{x.records[1].request.params[0].value='0x1';}],
    ['cases/001/local.json',x=>{x.attempt.inputs.accounts[x.attempt.output.trace.from].balance='1';}],
-   ['results.json',x=>{x.caseRun.accounting.counts.selected=2;}],
+   ['results.json',x=>{x.caseRun.accounting={counts:{selected:2}};}],
   ]){
    const target=join(out,path),before=readFileSync(target),value=JSON.parse(before);mutate(value);chmodSync(target,0o644);writeFileSync(target,JSON.stringify(value,null,2)+'\n');rmSync(join(out,'evidence-manifest.json'));const forged=sealEvidence(out,frozen.planSha256,frozen.sourceManifestSha256);
    await assert.rejects(verifier.verifyEvidence({outputDirectory:out,expectedManifestSha256:forged.manifestSha256}));
    writeFileSync(target,before);rmSync(join(out,'evidence-manifest.json'));sealEvidence(out,frozen.planSha256,frozen.sourceManifestSha256);
   }
  }finally{globalThis.fetch=realFetch;}
+ }
 });
 
 function caseCensus(types=['2','2','4']){
