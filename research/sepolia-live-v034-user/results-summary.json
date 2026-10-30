@@ -1,0 +1,113 @@
+{
+  "version": "0.34.0",
+  "readOnly": true,
+  "signed": false,
+  "broadcast": false,
+  "feesSettled": false,
+  "claimsWalletOwnership": false,
+  "source": "Fresh current-state local simulations backed by public Sepolia account/storage proofs",
+  "scope": "These two examples passed. This is not Dynamic SDK execution, an Arbitrum deposit test, cross-chain settlement, or a general accuracy claim.",
+  "cases": [
+    {
+      "case": "native",
+      "status": "complete",
+      "executionStatus": "success",
+      "chainId": 11155111,
+      "blockNumber": "12023833",
+      "blockHash": "0x6723c0d36a7ab104bec434bed12131bd6b349e71fdbe7af9c9b3a3595a86cdfb",
+      "gasUsed": "21000",
+      "measurements": [
+        {
+          "identity": {
+            "kind": "native_balance",
+            "account": "0x6efb29cee3b414272eb7a8f3ebabf873d36bc033",
+            "chainId": "11155111"
+          },
+          "name": "balance",
+          "beforeRaw": "13130858998086982305299",
+          "afterRaw": "13130857998086982305299",
+          "deltaRaw": "-1000000000000000",
+          "unit": {
+            "kind": "native_wei",
+            "scale": "1000000000000000000"
+          }
+        },
+        {
+          "identity": {
+            "kind": "native_balance",
+            "account": "0x000000000000000000000000000000000000dead",
+            "chainId": "11155111"
+          },
+          "name": "balance",
+          "beforeRaw": "2716352752586137573846",
+          "afterRaw": "2716353752586137573846",
+          "deltaRaw": "1000000000000000",
+          "unit": {
+            "kind": "native_wei",
+            "scale": "1000000000000000000"
+          }
+        }
+      ],
+      "rawResponse": "native/response.json"
+    },
+    {
+      "case": "weth",
+      "status": "complete",
+      "executionStatus": "success",
+      "chainId": 11155111,
+      "blockNumber": "12023835",
+      "blockHash": "0x067bae9f460d3393510f8d7e02f74bbc7a4748efc67cf2a2ac3e9fbea99c69e0",
+      "gasUsed": "35138",
+      "measurements": [
+        {
+          "identity": {
+            "kind": "native_balance",
+            "account": "0x6efb29cee3b414272eb7a8f3ebabf873d36bc033",
+            "chainId": "11155111"
+          },
+          "name": "balance",
+          "beforeRaw": "13130858998086982305299",
+          "afterRaw": "13130857998086982305299",
+          "deltaRaw": "-1000000000000000",
+          "unit": {
+            "kind": "native_wei",
+            "scale": "1000000000000000000"
+          }
+        },
+        {
+          "identity": {
+            "kind": "native_balance",
+            "account": "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
+            "chainId": "11155111"
+          },
+          "name": "balance",
+          "beforeRaw": "192760981483644967906461",
+          "afterRaw": "192760982483644967906461",
+          "deltaRaw": "1000000000000000",
+          "unit": {
+            "kind": "native_wei",
+            "scale": "1000000000000000000"
+          }
+        },
+        {
+          "identity": {
+            "kind": "balanceOf",
+            "chainId": "11155111",
+            "token": "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
+            "account": "0x6efb29cee3b414272eb7a8f3ebabf873d36bc033",
+            "contractIdentityVerified": false
+          },
+          "name": "balance",
+          "beforeRaw": "100000000000000000",
+          "afterRaw": "101000000000000000",
+          "deltaRaw": "1000000000000000",
+          "unit": {
+            "kind": "token_raw_units",
+            "scale": null
+          }
+        }
+      ],
+      "rawResponse": "weth/response.json"
+    }
+  ]
+}
