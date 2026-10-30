@@ -1,0 +1,20 @@
+{
+  "files": 5,
+  "fixtureIds": 15,
+  "postVectors": 15,
+  "perFork": {
+    "Amsterdam": 3,
+    "Cancun": 3,
+    "Osaka": 3,
+    "Prague": 3,
+    "Shanghai": 3
+  },
+  "preAccountsWithNonemptyStorageAcrossRows": 0,
+  "createdAddressAlreadyInPre": 0,
+  "topLevelCreationTransactions": 0,
+  "parentCREATECount": 15,
+  "parentCREATE2Count": 0,
+  "directPreexistingStorageCreationVectors": 0,
+  "targetExecutions": 0
+}
+All 15 vectors create a new codeless account with freshly written storage; none attempts creation at an address with preexisting storage. Preserve as controls, not evidence for preexisting-storage creation collision/reset behavior.

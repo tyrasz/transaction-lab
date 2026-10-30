@@ -1,0 +1,607 @@
+{
+  "schema": "storage-creation-source-resolution-v1",
+  "date": "2026-10-30",
+  "scope": {
+    "readOnlyResearch": true,
+    "newTargetsExecuted": 0,
+    "rpcCalls": 0,
+    "productionModified": false,
+    "oldEvidenceModified": false
+  },
+  "conclusion": {
+    "status": "specification_rule_resolved_client_disagreement_retained",
+    "collisionPredicate": "nonce != 0 OR code is nonempty; nonempty storage alone is not a collision in inspected supported fork specifications",
+    "successfulCreation": "clear the entire old storage namespace before initcode, preserve old balance plus endowment, initialize nonce1, commit new code/storage only if creation succeeds",
+    "failure": "restore old target account/storage and endowment on initcode/code-deposit or ancestor failure; ordinary creator-nonce and fee rules remain separate",
+    "eip7610": "proposal not demonstrated activated in any listed fork; do not infer activation from library predicate, test directory label, retroactive wording or Last Call status",
+    "runtimeRecommendation": "retain current explicit unsupported boundary until a separately reviewed specification-aligned implementation and frozen comparisons are authorized; do not choose Geth-preserve or EJS-collide merely to achieve a match"
+  },
+  "forkSourceLines": {
+    "shanghai": {
+      "root": [
+        103,
+        115
+      ],
+      "create": [
+        155,
+        197
+      ],
+      "deployable": [
+        279,
+        287
+      ],
+      "clear": [
+        412,
+        428
+      ],
+      "read": [
+        192,
+        202
+      ],
+      "original": [
+        205,
+        225
+      ],
+      "internal": [
+        99,
+        105
+      ]
+    },
+    "cancun": {
+      "root": [
+        103,
+        115
+      ],
+      "create": [
+        155,
+        198
+      ],
+      "deployable": [
+        281,
+        289
+      ],
+      "clear": [
+        414,
+        432
+      ],
+      "read": [
+        194,
+        204
+      ],
+      "original": [
+        207,
+        227
+      ],
+      "internal": [
+        100,
+        106
+      ]
+    },
+    "prague": {
+      "root": [
+        108,
+        120
+      ],
+      "create": [
+        175,
+        218
+      ],
+      "deployable": [
+        281,
+        289
+      ],
+      "clear": [
+        414,
+        432
+      ],
+      "read": [
+        194,
+        204
+      ],
+      "original": [
+        207,
+        227
+      ],
+      "internal": [
+        100,
+        106
+      ]
+    },
+    "osaka": {
+      "root": [
+        108,
+        120
+      ],
+      "create": [
+        175,
+        218
+      ],
+      "deployable": [
+        281,
+        289
+      ],
+      "clear": [
+        414,
+        432
+      ],
+      "read": [
+        194,
+        204
+      ],
+      "original": [
+        207,
+        227
+      ],
+      "internal": [
+        100,
+        106
+      ]
+    },
+    "amsterdam": {
+      "root": [
+        173,
+        183
+      ],
+      "create": [
+        339,
+        392
+      ],
+      "deployable": [
+        362,
+        370
+      ],
+      "clear": [
+        518,
+        539
+      ],
+      "read": [
+        274,
+        285
+      ],
+      "internal": [
+        96,
+        132
+      ]
+    }
+  },
+  "localSources": [
+    {
+      "kind": "eels_pinned_source",
+      "commit": "e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/source/src/ethereum/forks/shanghai/vm/interpreter.py",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/shanghai/vm/interpreter.py",
+      "path": "src/ethereum/forks/shanghai/vm/interpreter.py",
+      "bytes": 7785,
+      "sha256": "3ea441b7d066b8934998785d47a669fcceca97dbe4b0de1290d1f715b85d34da",
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "eels_pinned_source",
+      "commit": "e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/source/src/ethereum/forks/shanghai/state_tracker.py",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/shanghai/state_tracker.py",
+      "path": "src/ethereum/forks/shanghai/state_tracker.py",
+      "bytes": 18993,
+      "sha256": "ef0ff4c8e75e0700454be486e29846d91a0a21ae48071a941d80f7465a1eed59",
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "eels_pinned_source",
+      "commit": "e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/source/src/ethereum/forks/shanghai/vm/instructions/system.py",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/shanghai/vm/instructions/system.py",
+      "path": "src/ethereum/forks/shanghai/vm/instructions/system.py",
+      "bytes": 19593,
+      "sha256": "fa82f0e1852a23e9f3418a2a49ce303a70f53dac4989834a7394d4e8401bcb42",
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "eels_pinned_source",
+      "commit": "e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/source/src/ethereum/forks/cancun/vm/interpreter.py",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/cancun/vm/interpreter.py",
+      "path": "src/ethereum/forks/cancun/vm/interpreter.py",
+      "bytes": 7878,
+      "sha256": "98dc038e5b043eeacc4ca77c9fa014e81bcf7d1d1ffec38e25216e458417a067",
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "eels_pinned_source",
+      "commit": "e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/source/src/ethereum/forks/cancun/state_tracker.py",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/cancun/state_tracker.py",
+      "path": "src/ethereum/forks/cancun/state_tracker.py",
+      "bytes": 19210,
+      "sha256": "98ce4eda0fece360921a866c1b05f3bc957a9107fc97a803480e5ea75f470181",
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "eels_pinned_source",
+      "commit": "e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/source/src/ethereum/forks/cancun/vm/instructions/system.py",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/cancun/vm/instructions/system.py",
+      "path": "src/ethereum/forks/cancun/vm/instructions/system.py",
+      "bytes": 19510,
+      "sha256": "301d8e7b599a2390c8f1a508e0243ee2ff3b8dc41065fffbc3756230292b4e5c",
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "eels_pinned_source",
+      "commit": "e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/source/src/ethereum/forks/prague/vm/interpreter.py",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/prague/vm/interpreter.py",
+      "path": "src/ethereum/forks/prague/vm/interpreter.py",
+      "bytes": 8725,
+      "sha256": "561cc703c2c7b4f7ddae780cae4aeed50611356dfb33032576e9e7eac5ea0c52",
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "eels_pinned_source",
+      "commit": "e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/source/src/ethereum/forks/prague/state_tracker.py",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/prague/state_tracker.py",
+      "path": "src/ethereum/forks/prague/state_tracker.py",
+      "bytes": 19210,
+      "sha256": "98ce4eda0fece360921a866c1b05f3bc957a9107fc97a803480e5ea75f470181",
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "eels_pinned_source",
+      "commit": "e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/source/src/ethereum/forks/prague/vm/instructions/system.py",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/prague/vm/instructions/system.py",
+      "path": "src/ethereum/forks/prague/vm/instructions/system.py",
+      "bytes": 20676,
+      "sha256": "28ae401b66a3c587d18dc2460e5ab338c18900fb89de7e9452d1559f45940cca",
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "eels_pinned_source",
+      "commit": "e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/source/src/ethereum/forks/osaka/vm/interpreter.py",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/osaka/vm/interpreter.py",
+      "path": "src/ethereum/forks/osaka/vm/interpreter.py",
+      "bytes": 8723,
+      "sha256": "b49415a2459b35396cb0a049d727d1525da2cc1eef89d07ff8ade1b87abf0698",
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "eels_pinned_source",
+      "commit": "e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/source/src/ethereum/forks/osaka/state_tracker.py",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/osaka/state_tracker.py",
+      "path": "src/ethereum/forks/osaka/state_tracker.py",
+      "bytes": 19210,
+      "sha256": "98ce4eda0fece360921a866c1b05f3bc957a9107fc97a803480e5ea75f470181",
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "eels_pinned_source",
+      "commit": "e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/source/src/ethereum/forks/osaka/vm/instructions/system.py",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/osaka/vm/instructions/system.py",
+      "path": "src/ethereum/forks/osaka/vm/instructions/system.py",
+      "bytes": 20676,
+      "sha256": "28ae401b66a3c587d18dc2460e5ab338c18900fb89de7e9452d1559f45940cca",
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "eels_pinned_source",
+      "commit": "e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/source/src/ethereum/forks/amsterdam/vm/interpreter.py",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/amsterdam/vm/interpreter.py",
+      "path": "src/ethereum/forks/amsterdam/vm/interpreter.py",
+      "bytes": 14385,
+      "sha256": "8dd244e747b1b1516ba90de947f9f0d5db84bab4dc51256af0db8dd7a051fd7c",
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "eels_pinned_source",
+      "commit": "e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/source/src/ethereum/forks/amsterdam/state_tracker.py",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/amsterdam/state_tracker.py",
+      "path": "src/ethereum/forks/amsterdam/state_tracker.py",
+      "bytes": 23411,
+      "sha256": "b8a6082a210bcfdfc51e1487589a0b3ddfdd3b36ceee9dab6783f6bfca1f6229",
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "eels_pinned_source",
+      "commit": "e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/source/src/ethereum/forks/amsterdam/vm/instructions/system.py",
+      "url": "https://github.com/ethereum/execution-specs/blob/e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e/src/ethereum/forks/amsterdam/vm/instructions/system.py",
+      "path": "src/ethereum/forks/amsterdam/vm/instructions/system.py",
+      "bytes": 29974,
+      "sha256": "d6d4df0e26882b26da44c535d4a29d2e8ef61d76da407290be51d403a5356c4b",
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "geth_pinned_source",
+      "commit": "1df30b18d9ed35ee9d28ffd4648442c2204554ad",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source/core/vm/evm.go",
+      "url": "https://github.com/ethereum/go-ethereum/blob/1df30b18d9ed35ee9d28ffd4648442c2204554ad/core/vm/evm.go",
+      "path": "core/vm/evm.go",
+      "bytes": 32605,
+      "sha256": "42016043f3376a3d8fca94693a0641f775af4010b750310b762a847c1fbbd1a8",
+      "lines": [
+        585,
+        615
+      ],
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "geth_pinned_source",
+      "commit": "1df30b18d9ed35ee9d28ffd4648442c2204554ad",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source/core/state/statedb.go",
+      "url": "https://github.com/ethereum/go-ethereum/blob/1df30b18d9ed35ee9d28ffd4648442c2204554ad/core/state/statedb.go",
+      "path": "core/state/statedb.go",
+      "bytes": 54894,
+      "sha256": "bffcab7175078d9000dcfa97dcb8a78cac65ce98d77ed455ca9a0602d2821b11",
+      "lines": [
+        672,
+        683
+      ],
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "geth_pinned_source",
+      "commit": "1df30b18d9ed35ee9d28ffd4648442c2204554ad",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source/core/state/state_object.go",
+      "url": "https://github.com/ethereum/go-ethereum/blob/1df30b18d9ed35ee9d28ffd4648442c2204554ad/core/state/state_object.go",
+      "path": "core/state/state_object.go",
+      "bytes": 22134,
+      "sha256": "a074a2697be515d12a174576c4297946a17174d6e56467895e391d4cdd1d805f",
+      "lines": [
+        164,
+        215
+      ],
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "geth_pinned_source",
+      "commit": "1df30b18d9ed35ee9d28ffd4648442c2204554ad",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source/tests/state_test.go",
+      "url": "https://github.com/ethereum/go-ethereum/blob/1df30b18d9ed35ee9d28ffd4648442c2204554ad/tests/state_test.go",
+      "path": "tests/state_test.go",
+      "bytes": 10125,
+      "sha256": "eb21853b3d6f08af61b42b14e034525f8792c4eb059cb7a536fada67fc080ee3",
+      "lines": [
+        57,
+        64
+      ],
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "geth_pinned_source",
+      "commit": "1df30b18d9ed35ee9d28ffd4648442c2204554ad",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source/tests/block_test.go",
+      "url": "https://github.com/ethereum/go-ethereum/blob/1df30b18d9ed35ee9d28ffd4648442c2204554ad/tests/block_test.go",
+      "path": "tests/block_test.go",
+      "bytes": 5194,
+      "sha256": "9ec832e60ba0085dd7ab9ff7013df93199417abffb40a997fa91907bd26b783c",
+      "lines": [
+        69,
+        73
+      ],
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "geth_pinned_source",
+      "commit": "1df30b18d9ed35ee9d28ffd4648442c2204554ad",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source/tests/init.go",
+      "url": "https://github.com/ethereum/go-ethereum/blob/1df30b18d9ed35ee9d28ffd4648442c2204554ad/tests/init.go",
+      "path": "tests/init.go",
+      "bytes": 30950,
+      "sha256": "c651b2e940b6653432d62e64a9e21264a60c4789f135df57dadea0f3b7168462",
+      "lines": [
+        570,
+        740
+      ],
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "geth_pinned_source",
+      "commit": "1df30b18d9ed35ee9d28ffd4648442c2204554ad",
+      "localPath": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source/params/config.go",
+      "url": "https://github.com/ethereum/go-ethereum/blob/1df30b18d9ed35ee9d28ffd4648442c2204554ad/params/config.go",
+      "path": "params/config.go",
+      "bytes": 53348,
+      "sha256": "2995638ab6f8b596dc4f01587fc2d39171b6883904209b956d8236e7a110e6ba",
+      "lines": [
+        35,
+        180
+      ],
+      "sourceInventoryMatched": true
+    },
+    {
+      "kind": "ethereumjs_installed_source",
+      "evmVersion": "10.1.3",
+      "path": "engines/local-evm/node_modules/@ethereumjs/evm/dist/esm/evm.js",
+      "bytes": 67315,
+      "sha256": "fcc46a02ca958fcdb9a74626f532e9181165e056bef467a3ad40c631310ac440",
+      "lines": [
+        656,
+        677
+      ],
+      "scope": "v034 local evm.js includes declared delegation-only patch; storage predicates unchanged; no claim this file equals stock package"
+    },
+    {
+      "kind": "ethereumjs_installed_source",
+      "evmVersion": "10.1.3",
+      "path": "engines/local-evm/node_modules/@ethereumjs/evm/dist/esm/interpreter.js",
+      "bytes": 57164,
+      "sha256": "27106c4194446a01eb6207a2c5158e13eb242fc6cbb7e180d4b937cd87ba6499",
+      "lines": [
+        1000,
+        1019
+      ],
+      "scope": "v034 local evm.js includes declared delegation-only patch; storage predicates unchanged; no claim this file equals stock package"
+    },
+    {
+      "kind": "ethereumjs_installed_source",
+      "evmVersion": "10.1.3",
+      "path": "engines/local-evm/node_modules/@ethereumjs/common/dist/esm/hardforks.js",
+      "bytes": 6518,
+      "sha256": "cf9af355416667b2f6770bdd22aa1a67ce9aedff8326eae0931efa8b4a418fd4",
+      "lines": [
+        141,
+        203
+      ],
+      "scope": "v034 local evm.js includes declared delegation-only patch; storage predicates unchanged; no claim this file equals stock package"
+    },
+    {
+      "kind": "ethereumjs_installed_source",
+      "evmVersion": "10.1.3",
+      "path": "engines/local-evm/node_modules/@ethereumjs/common/dist/esm/eips.js",
+      "bytes": 23110,
+      "sha256": "439ed7b59b9bce2cb9a1fa7ae86df352a068eccf140f57e6c5b02cc085e16dc2",
+      "lines": null,
+      "scope": "v034 local evm.js includes declared delegation-only patch; storage predicates unchanged; no claim this file equals stock package"
+    }
+  ],
+  "eelsAcquisition": {
+    "plan": "research/storage-creation-v035/eels-acquisition/source-extraction-plan.json",
+    "planSha256": "fef8a6f04f33e19023d13242d9877fec54521fe0fa9f2d7258a79160b62bf8ba",
+    "result": "research/storage-creation-v035/eels-acquisition/source-extraction-result.json",
+    "resultSha256": "edfcc345dc4b245710f9cb9662bb7029baef08f5e00f1381ba36445448c5d80c",
+    "archiveSha256": "066dd6ffc615f5f8894cd4f6ea711ba8164e5f1bb83bdf53221a49fefcfb9db6",
+    "provenanceLimit": "Pinned-URL archive and retained bytes; parent acquisition expressly does not validate Git objects. Locally retained source lines take precedence over earlier web-rendered line numbers."
+  },
+  "gethSourceInventory": {
+    "path": "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/geth-v1.17.10/source-inventory.json",
+    "sha256": "36e245fda711de52fe5e0b8c917d4bbbffd840ed7edfc0696f29cbb1f8b24dff",
+    "gitTestSubmodule": "c67e485ff8b5be9abc8ad15345ec21aa22e290d9"
+  },
+  "webSources": [
+    {
+      "url": "https://eips.ethereum.org/EIPS/eip-684",
+      "section": "Specification",
+      "finding": "Final; nonce/code collision only, retroactive",
+      "retrievedOn": "2026-10-30",
+      "rawBytesRetained": false,
+      "sha256": null,
+      "provenance": "official web rendering; source URLs/sections only, not byte-pinned"
+    },
+    {
+      "url": "https://eips.ethereum.org/EIPS/eip-7610",
+      "section": "Specification; Rationale; Backwards Compatibility; Test Cases",
+      "finding": "Last Call; proposed nonempty-storage collision; hardfork required; not an activation declaration",
+      "retrievedOn": "2026-10-30",
+      "rawBytesRetained": false,
+      "sha256": null,
+      "provenance": "official web rendering; source URLs/sections only, not byte-pinned"
+    },
+    {
+      "url": "https://eips.ethereum.org/EIPS/eip-161",
+      "section": "Specification",
+      "finding": "Creation nonce increment; empty-account cleanup ignores storage in emptiness predicate",
+      "retrievedOn": "2026-10-30",
+      "rawBytesRetained": false,
+      "sha256": null,
+      "provenance": "official web rendering; source URLs/sections only, not byte-pinned"
+    },
+    {
+      "url": "https://ethereum.github.io/yellowpaper/paper.pdf",
+      "version": "Shanghai efc5f9a 2025-02-04",
+      "section": "7, equations 99,102,115,118; PDF pages11-12",
+      "finding": "Allow nonce0/codeempty target, initialize storage empty, preserve balance, restore pre-create state on failure",
+      "retrievedOn": "2026-10-30",
+      "rawBytesRetained": false,
+      "sha256": null,
+      "provenance": "official web rendering; source URLs/sections only, not byte-pinned"
+    },
+    {
+      "url": "https://eips.ethereum.org/EIPS/eip-7569",
+      "section": "Included EIPs; Activation",
+      "finding": "Cancun no7610; mainnet1710338135",
+      "retrievedOn": "2026-10-30",
+      "rawBytesRetained": false,
+      "sha256": null,
+      "provenance": "official web rendering; source URLs/sections only, not byte-pinned"
+    },
+    {
+      "url": "https://eips.ethereum.org/EIPS/eip-7600",
+      "section": "Included EIPs; Activation",
+      "finding": "Prague no7610; mainnet1746612311",
+      "retrievedOn": "2026-10-30",
+      "rawBytesRetained": false,
+      "sha256": null,
+      "provenance": "official web rendering; source URLs/sections only, not byte-pinned"
+    },
+    {
+      "url": "https://eips.ethereum.org/EIPS/eip-7607",
+      "section": "Included EIPs; Activation",
+      "finding": "Osaka no7610; mainnet1764798551; BPO1/2 do not add creation rule",
+      "retrievedOn": "2026-10-30",
+      "rawBytesRetained": false,
+      "sha256": null,
+      "provenance": "official web rendering; source URLs/sections only, not byte-pinned"
+    },
+    {
+      "url": "https://eips.ethereum.org/EIPS/eip-7773",
+      "section": "Scheduled for Inclusion; Activation",
+      "finding": "Amsterdam list excludes7610; mainnet timestamp blank; Sepolia1791294816",
+      "retrievedOn": "2026-10-30",
+      "rawBytesRetained": false,
+      "sha256": null,
+      "provenance": "official web rendering; source URLs/sections only, not byte-pinned"
+    },
+    {
+      "url": "https://eips.ethereum.org/EIPS/eip-4895",
+      "section": "Specification",
+      "finding": "Shanghai timestamp1681338455; this EIP itself is withdrawal semantics, not complete fork schedule",
+      "retrievedOn": "2026-10-30",
+      "rawBytesRetained": false,
+      "sha256": null,
+      "provenance": "official web rendering; source URLs/sections only, not byte-pinned"
+    }
+  ],
+  "reachability": {
+    "historicallyPossibleAccountShape": true,
+    "historicalExplanation": "Before EIP161, initcode could write storage and return empty runtime without starting nonce1. EIP7610 reports historical examples; no chain scan repeated here.",
+    "modernOrdinaryCreation": "EIP161 initializes nonce1; present code/nonce already blocks overwrite. Reaching a historical target again generally requires a 160-bit creation-address collision/preimage, not simply replaying an already consumed creator nonce.",
+    "selfdestruct": "Shanghai deletes the account; Cancun+ only same-transaction creations are deleted; Amsterdam8246 clears nonce/code/storage together. None alone supplies a modern nonce0/codeempty/nonempty-storage construction.",
+    "authorization": "7702 application increments authority nonce, including clearing designation; not a nonce0 storage-only construction.",
+    "zeroBalance": "EIP161 emptiness ignores storage, so touching a zero-balance nonce0/codeempty leaf can delete it; positive balance avoids that particular cleanup.",
+    "limits": "No mainnet existence/absence, counts, practical collision feasibility, or arbitrary test prestate reachability attested."
+  },
+  "officialFixtures": {
+    "confirmedCurrentReleaseResetCorpus": [],
+    "falseLead": "All15 retained create_empty_contract_with_storage vectors start without old storage per parent structural inspection; they are ordinary creation controls, not disputed reset evidence.",
+    "oldCorpusLeads": [
+      {
+        "name": "create2collisionStorageParis",
+        "path": "GeneralStateTests/stCreate2/create2collisionStorageParis.json",
+        "status": "pinned Geth skip expression confirmed; raw fixture not acquired by this agent"
+      },
+      {
+        "name": "InitCollisionParis",
+        "path": "GeneralStateTests/stSStoreTest/InitCollisionParis.json",
+        "status": "pinned Geth skip expression confirmed; raw fixture not acquired by this agent"
+      },
+      {
+        "name": "dynamicAccountOverwriteEmpty_Paris",
+        "path": "GeneralStateTests/stExtCodeHash/dynamicAccountOverwriteEmpty_Paris.json",
+        "status": "pinned Geth skip expression confirmed; raw fixture not acquired by this agent"
+      }
+    ],
+    "newCorpusLead": "Current Geth master web source mentions paris/eip7610_create_collision/{initcollision,revert_in_create}; current label and skip are not fork activation evidence. Await independent acquisition before using these as expected-result oracles."
+  },
+  "fetchLimits": {
+    "policy": "Bounded primary-source browser research only; no new archive download/extraction by this agent; stop at32 direct URL opens and8 search queries; local retained source reads and hashes only thereafter.",
+    "browserByteCapEnforced": false,
+    "browserLimitExplanation": "web tool returns bounded rendered output, not a controllable raw HTTP byte budget; no raw-byte or Git-identity claim for those pages.",
+    "failedFetches": [
+      "pinned EELS Shanghai/Cancun interpreter and Amsterdam state_tracker via raw URL cache miss; resolved by parent-owned local archive",
+      "old ethereum/tests develop and pinned raw filler/filled-test paths cache miss",
+      "current EELS test_initcollision raw path cache miss"
+    ],
+    "parentArchiveAcquisitionLimits": {
+      "compressedBytes": 67108864,
+      "expandedBytes": 536870912,
+      "fileBytes": 16777216,
+      "files": 30000,
+      "seconds": 120
+    }
+  }
+}

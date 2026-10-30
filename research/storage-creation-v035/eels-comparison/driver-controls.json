@@ -1,0 +1,116 @@
+{
+  "targetExecutions": 0,
+  "driverSha256": "ed53966baf8696034fba1a7de511d161da06d505d5a72d4aee1c1506692263f3",
+  "checks": [
+    {
+      "check": "oversized_child_output_retained_and_bounded",
+      "passed": true,
+      "returncode": 1,
+      "stdout": {
+        "path": "stdout",
+        "kind": "file",
+        "bytes": 2097152,
+        "mode": 420,
+        "sha256": "6932fd31e5daf4739b9fa78ff777b2831b0995cc1d0b0093cac80601902013bc"
+      },
+      "stderrBytes": 109
+    },
+    {
+      "check": "prior_output_mutation_rejected",
+      "passed": true
+    },
+    {
+      "check": "unexpected_artifact_rejected",
+      "passed": true
+    },
+    {
+      "check": "timeout_invalidates_packet",
+      "passed": true,
+      "evidenceUsable": false,
+      "unattempted": 5,
+      "fatal": {
+        "type": "AssertionError",
+        "message": "Output or process bound exceeded; preserved raw files."
+      },
+      "process": {
+        "argv": [
+          "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/venv/bin/python",
+          "-I",
+          "-B",
+          "/private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/eels-synthetic-runner-ibt7phq3/worker.py",
+          "/private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/eels-synthetic-runner-ibt7phq3/0.json",
+          "/private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/eels-synthetic-runner-ibt7phq3"
+        ],
+        "bounded": false,
+        "elapsed": {
+          "monotonicSeconds": 1.006006832991261,
+          "wallSeconds": 1.006014108657837
+        },
+        "error": {
+          "message": "Command '['/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/venv/bin/python', '-I', '-B', '/private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/eels-synthetic-runner-ibt7phq3/worker.py', '/private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/eels-synthetic-runner-ibt7phq3/0.json', '/private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/eels-synthetic-runner-ibt7phq3']' timed out after 0.9999677499872632 seconds",
+          "type": "TimeoutExpired"
+        },
+        "limitTerminated": true,
+        "returncode": null,
+        "stderr": {
+          "bytes": 0,
+          "kind": "file",
+          "mode": 420,
+          "path": "001.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout": {
+          "bytes": 0,
+          "kind": "file",
+          "mode": 420,
+          "path": "001.stdout",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "timeoutSeconds": 1
+      }
+    },
+    {
+      "check": "file_limit_invalidates_packet",
+      "passed": true,
+      "evidenceUsable": false,
+      "unattempted": 5,
+      "fatal": {
+        "type": "AssertionError",
+        "message": "Output or process bound exceeded; preserved raw files."
+      },
+      "process": {
+        "argv": [
+          "/Users/home/Documents/Codex/2026-10-23/thi/outputs/evm-toolchains/eels-e27f097ec7/venv/bin/python",
+          "-I",
+          "-B",
+          "/private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/eels-synthetic-runner-5dhj78sy/worker.py",
+          "/private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/eels-synthetic-runner-5dhj78sy/0.json",
+          "/private/var/folders/b5/f7pd1jd94z394hknbmcp9j_c0000gn/T/eels-synthetic-runner-5dhj78sy"
+        ],
+        "bounded": false,
+        "elapsed": {
+          "monotonicSeconds": 0.04967575002228841,
+          "wallSeconds": 0.04967617988586426
+        },
+        "error": null,
+        "limitTerminated": true,
+        "returncode": -25,
+        "stderr": {
+          "bytes": 0,
+          "kind": "file",
+          "mode": 420,
+          "path": "001.stderr",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stdout": {
+          "bytes": 2097152,
+          "kind": "file",
+          "mode": 420,
+          "path": "001.stdout",
+          "sha256": "6932fd31e5daf4739b9fa78ff777b2831b0995cc1d0b0093cac80601902013bc"
+        },
+        "timeoutSeconds": 1
+      }
+    }
+  ]
+}

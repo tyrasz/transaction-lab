@@ -1,0 +1,70 @@
+{
+  "status": "foundation_verified_not_activated",
+  "sources": [
+    {
+      "path": "engines/local-evm/proof-state.js",
+      "sha256": "0e02e75ec8a06606719d391dcd225ce447e3fc3d74e3bb7067bd3b6fc44cadaa"
+    },
+    {
+      "path": "engines/local-evm/test/creation-storage-clear-state.test.js",
+      "sha256": "6c557a6b511da323d5ea9318bba349facd70daa7392718c0d346602a0f61c33e"
+    },
+    {
+      "path": "engines/local-evm/execute.js",
+      "sha256": "fb7db0e62a6c850ab4bcee4c6d64e828e6f6f38c3c6e69bb2d319736492cf361"
+    },
+    {
+      "path": "engines/local-evm/creation-support.js",
+      "sha256": "5c92fed2708d472ea69c7efe8064844303a946cce59a7e813df7b9a47f9d9a34"
+    },
+    {
+      "path": "engines/local-evm/creation-attempt-observer.js",
+      "sha256": "1f421988f908c01b628a486b3419db446429daf41844f0d8751e767eed691ff4"
+    },
+    {
+      "path": "engines/local-evm/creation-attempt-validation.js",
+      "sha256": "bb9fe76e3be652c576a02faa849db3a64bad38cb9fd061960ddcc86607f65c74"
+    },
+    {
+      "path": "engines/local-evm/execution-changes.js",
+      "sha256": "a1b44305110f7b5640c6d1914c0d674425118b4b1095679895e22fa21f2a518e"
+    },
+    {
+      "path": "engines/local-evm/preview-mutations.js",
+      "sha256": "accf3bf24294fc8fc6a79ea284e4c807edfedf8c7aed2a344191c5f11a5087d8"
+    }
+  ],
+  "tests": {
+    "focusedGroups": 11,
+    "existingFocusedGroups": 28,
+    "fullEngine": {
+      "tests": 1007,
+      "pass": 1007,
+      "fail": 0,
+      "durationMs": 27853.40575
+    }
+  },
+  "review": {
+    "rootReviewed": true,
+    "peerReviewed": true,
+    "concreteIssuesFound": [],
+    "scope": [
+      "explicit mode and proof-backed eligibility",
+      "prefunding and hidden-storage namespace",
+      "pending same-target creation binding",
+      "checkpoint commit/revert/copy",
+      "new writes equal to removed old values",
+      "nonrollback original-value marker and next-invocation reset"
+    ]
+  },
+  "publicStorageOnlyCreationSupported": false,
+  "runtimeDependenciesModified": false,
+  "candidateInstalled": false,
+  "remaining": [
+    "compose collision runtime patch with existing delegation length patch",
+    "worker creation eligibility and clear routing",
+    "independent parent chronology and reset validation",
+    "query/lifecycle composition",
+    "end-to-end independent failure/rollback and fork coverage"
+  ]
+}

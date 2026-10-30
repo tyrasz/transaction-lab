@@ -10,7 +10,8 @@ const MAX_UINT = (1n << 256n) - 1n, MAX_NONCE = (1n << 64n) - 1n;
 const LIMITS = Object.freeze({ reads: 200000, checkpoints: 128 });
 const ZERO_WORD = '0x' + '00'.repeat(32);
 const AMSTERDAM_CLEARING_BASIS = 'same_invocation_created_contract_clearing_eip8246';
-const RESET_BASES = new Set(['same_invocation_created_contract_deletion', 'shanghai_selfdestruct_deletion', 'eip161_empty_account_cleanup', AMSTERDAM_CLEARING_BASIS]);
+const CREATION_STORAGE_CLEAR_BASIS = 'contract_creation_storage_clear';
+const RESET_BASES = new Set(['same_invocation_created_contract_deletion', 'shanghai_selfdestruct_deletion', 'eip161_empty_account_cleanup', AMSTERDAM_CLEARING_BASIS, CREATION_STORAGE_CLEAR_BASIS]);
 const copyAccount = account => account === undefined ? undefined : createAccountFromRLP(account.serialize());
 const quantity = value => '0x' + value.toString(16);
 const padded = bytes => '0x' + bytesToHex(bytes).slice(2).padStart(64, '0');
@@ -20,7 +21,22 @@ function fail(code, message) { throw Object.assign(new Error(message), { code })
  * Lazy facts are seeded into every existing checkpoint: discovering an input
  * inside a reverted child never turns that input into an invented zero. */
 class ProofStateManager extends SimpleStateManager {
-  constructor(inputs) { super(); this.inputs = inputs; this.base = new Map(); this.loading = new Map(); this.slotLoading = new Map(); this.reads = new Map(); this.readCount = 0; this.creationStack = [new Map()]; this.resetStack = [new Map()]; this.authorizationStack = [new Set()]; this.emptyCleanup = null; }
+  constructor(inputs) {
+    super(); this.inputs = inputs; this.base = new Map(); this.loading = new Map(); this.slotLoading = new Map(); this.reads = new Map(); this.readCount = 0;
+    this.creationStack = [new Map()]; this.resetStack = [new Map()]; this.authorizationStack = [new Set()]; this.pendingCreationClearStack = [new Set()]; this.emptyCleanup = null;
+    // EELS created_accounts survives message rollback: original SSTORE values
+    // remain zero after a creation attempt, even when current storage reverts.
+    // This invocation-local marker is deliberately separate from creationStack
+    // and resetStack, whose execution permissions/namespaces do roll back.
+    this.originalStorageCreated = new Set();
+    const getOriginal = this.originalStorageCache.get.bind(this.originalStorageCache);
+    const clearOriginal = this.originalStorageCache.clear.bind(this.originalStorageCache);
+    this.originalStorageCache.get = async (address, key) => {
+      const account = this.addressKey(address); this.slotKey(key);
+      return this.originalStorageCreated.has(account) ? new Uint8Array() : getOriginal(address, key);
+    };
+    this.originalStorageCache.clear = () => { this.originalStorageCreated.clear(); clearOriginal(); };
+  }
   created(key) { return this.creationStack.at(-1).has(key); }
   addressKey(address) {
     const value = address?.toString();
@@ -116,6 +132,34 @@ class ProofStateManager extends SimpleStateManager {
   async clearStorage(address) {
     const key = this.addressKey(address); await this.loadAccount(key); this.assertDeployable(key);
   }
+  /** Foundation only: the executor must separately select the trusted
+   * nonce/code collision rule. Generic clearStorage retains its existing gate.
+   * A clear has no standalone authority to survive: newContract must bind it
+   * through beginContractCreation before a checkpoint can commit or snapshot. */
+  async clearStorageForContractCreation(address, options) {
+    if (options === null || typeof options !== 'object' || types.isProxy(options) || Object.getPrototypeOf(options) !== Object.prototype) {
+      fail('LOCAL_STATE_INVALID', 'Creation storage clearing requires an explicit trusted collision mode.');
+    }
+    const keys = Reflect.ownKeys(options), mode = Object.getOwnPropertyDescriptor(options, 'mode');
+    if (keys.length !== 1 || keys[0] !== 'mode' || !mode?.enumerable || !Object.hasOwn(mode, 'value') || mode.value !== 'ethereum_nonce_code_collision') {
+      fail('LOCAL_STATE_INVALID', 'Creation storage clearing requires an explicit trusted collision mode.');
+    }
+    if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'Creation storage clearing requires an active rollback checkpoint.');
+    const key = this.addressKey(address); await this.loadAccount(key);
+    const current = this.topAccountStack().get(key);
+    if (!current || this.resetStack.at(-1).has(key) || bytesToHex(current.storageRoot) === EMPTY_STORAGE_ROOT ||
+        this.created(key) || this.pendingCreationClearStack.at(-1).has(key) || current.nonce !== 0n ||
+        bytesToHex(current.codeHash) !== EMPTY_CODE_HASH || bytesToHex(this.topCodeStack().get(key)) !== '0x') {
+      fail('LOCAL_STATE_UNSUPPORTED', 'Creation storage clearing requires a nonce-zero, code-empty, nonempty-storage target without a prior reset, active creation or pending clear.');
+    }
+    // Preserve the current account, including prefunding and zero nonce/code.
+    // The immutable proof root authenticates all removed slots, including ones
+    // never loaded. Do not fetch/enumerate those old slots or reset other caches.
+    const cleared = copyAccount(current); cleared.storageRoot = hexToBytes(EMPTY_STORAGE_ROOT); this.topAccountStack().set(key, cleared);
+    for (const slot of this.topStorageStack().keys()) if (slot.startsWith(key + '_')) this.topStorageStack().set(slot, new Uint8Array());
+    this.resetStack.at(-1).set(key, CREATION_STORAGE_CLEAR_BASIS);
+    this.pendingCreationClearStack.at(-1).add(key);
+  }
   assertDeployable(key) {
     const base = this.base.get(key), current = this.topAccountStack().get(key);
     // CREATE first checks collisions, then clears storage before newContract.
@@ -136,6 +180,8 @@ class ProofStateManager extends SimpleStateManager {
     if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'Contract creation requires an active rollback checkpoint.');
     const key = this.addressKey(address); this.assertDeployable(key);
     this.creationStack.at(-1).set(key, basis);
+    this.pendingCreationClearStack.at(-1).delete(key);
+    this.originalStorageCreated.add(key);
   }
   async putCode(address, value) {
     const key = this.addressKey(address), base = await this.loadAccount(key), current = this.topAccountStack().get(key);
@@ -240,8 +286,13 @@ class ProofStateManager extends SimpleStateManager {
     this.creationStack.push(new Map(this.creationStack.at(-1)));
     this.resetStack.push(new Map(this.resetStack.at(-1)));
     this.authorizationStack.push(new Set(this.authorizationStack.at(-1)));
+    this.pendingCreationClearStack.push(new Set(this.pendingCreationClearStack.at(-1)));
+  }
+  assertNoPendingCreationClears() {
+    if (this.pendingCreationClearStack.at(-1).size !== 0) fail('LOCAL_STATE_INVALID', 'A creation storage clear must be bound to contract creation before commit or snapshot.');
   }
   assertRepresentableAccountResets() {
+    this.assertNoPendingCreationClears();
     for (const [address, basis] of this.resetStack.at(-1)) {
       const base = this.base.get(address);
       const current = this.topAccountStack().get(address);
@@ -250,11 +301,12 @@ class ProofStateManager extends SimpleStateManager {
   }
   async commit() {
     if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'No state checkpoint exists to commit.');
+    this.assertNoPendingCreationClears();
     // Nested message commits may still be reverted by an enclosing message.
     if (this.accountStack.length === 2) this.assertRepresentableAccountResets();
-    await super.commit(); this.creationStack.splice(-2, 1); this.resetStack.splice(-2, 1); this.authorizationStack.splice(-2, 1);
+    await super.commit(); this.creationStack.splice(-2, 1); this.resetStack.splice(-2, 1); this.authorizationStack.splice(-2, 1); this.pendingCreationClearStack.splice(-2, 1);
   }
-  async revert() { if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'No state checkpoint exists to revert.'); await super.revert(); this.creationStack.pop(); this.resetStack.pop(); this.authorizationStack.pop(); }
+  async revert() { if (this.accountStack.length < 2) fail('LOCAL_STATE_INVALID', 'No state checkpoint exists to revert.'); await super.revert(); this.creationStack.pop(); this.resetStack.pop(); this.authorizationStack.pop(); this.pendingCreationClearStack.pop(); }
   shallowCopy() {
     if (this.emptyCleanup !== null || this.accountStack.length !== 1 || [...this.loading.keys()].some(key => !this.base.has(key)) || [...this.slotLoading.keys()].some(id => !this.topStorageStack().has(id))) fail('LOCAL_STATE_UNSUPPORTED', 'Copy only a settled state manager outside active checkpoints.');
     const copy = new ProofStateManager(this.inputs);
@@ -265,6 +317,7 @@ class ProofStateManager extends SimpleStateManager {
     copy.creationStack = this.creationStack.map(frame => new Map(frame));
     copy.resetStack = this.resetStack.map(frame => new Map(frame));
     copy.authorizationStack = this.authorizationStack.map(frame => new Set(frame));
+    copy.pendingCreationClearStack = this.pendingCreationClearStack.map(frame => new Set(frame));
     return copy;
   }
   snapshotReads() { return { total: this.readCount, distinct: this.reads.size, reads: structuredClone([...this.reads.values()]) }; }

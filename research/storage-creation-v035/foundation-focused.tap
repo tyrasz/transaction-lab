@@ -1,0 +1,76 @@
+TAP version 13
+# Subtest: explicit creation clearing preserves prefunding and masks loaded and hidden storage without old proof reads
+ok 1 - explicit creation clearing preserves prefunding and masks loaded and hidden storage without old proof reads
+  ---
+  duration_ms: 10.304875
+  type: 'test'
+  ...
+# Subtest: new storage has a complete zero baseline including old-equal writes and excludes later zeroed writes
+ok 2 - new storage has a complete zero baseline including old-equal writes and excludes later zeroed writes
+  ---
+  duration_ms: 1.804334
+  type: 'test'
+  ...
+# Subtest: failed creation and committed child followed by ancestor rollback restore the previous namespace
+ok 3 - failed creation and committed child followed by ancestor rollback restore the previous namespace
+  ---
+  duration_ms: 7.274625
+  type: 'test'
+  ...
+# Subtest: late immutable proofs seed original ancestors but cannot resurrect the cleared child namespace
+ok 4 - late immutable proofs seed original ancestors but cannot resurrect the cleared child namespace
+  ---
+  duration_ms: 2.608083
+  type: 'test'
+  ...
+# Subtest: unbound clears cannot commit or snapshot, and only the matching creation consumes the pending clear
+ok 5 - unbound clears cannot commit or snapshot, and only the matching creation consumes the pending clear
+  ---
+  duration_ms: 1.680958
+  type: 'test'
+  ...
+# Subtest: settled copies keep independent reset writes and start new original-value baselines
+ok 6 - settled copies keep independent reset writes and start new original-value baselines
+  ---
+  duration_ms: 1.161083
+  type: 'test'
+  ...
+# Subtest: original storage creation markers survive child and ancestor rollback without clearing other accounts
+ok 7 - original storage creation markers survive child and ancestor rollback without clearing other accounts
+  ---
+  duration_ms: 4.185959
+  type: 'test'
+  ...
+# Subtest: no checkpoint, invalid modes, repeated clears and active creation are rejected without extra authority
+ok 8 - no checkpoint, invalid modes, repeated clears and active creation are rejected without extra authority
+  ---
+  duration_ms: 1.490167
+  type: 'test'
+  ...
+# Subtest: nonce or code collisions remain ineligible and generic storage clearing remains closed
+ok 9 - nonce or code collisions remain ineligible and generic storage clearing remains closed
+  ---
+  duration_ms: 3.18225
+  type: 'test'
+  ...
+# Subtest: zero-balance storage-only, absent and empty-storage targets preserve their exact creation starting balances
+ok 10 - zero-balance storage-only, absent and empty-storage targets preserve their exact creation starting balances
+  ---
+  duration_ms: 1.955583
+  type: 'test'
+  ...
+# Subtest: a prior authenticated deletion retains its own reset lineage through ordinary recreation
+ok 11 - a prior authenticated deletion retains its own reset lineage through ordinary recreation
+  ---
+  duration_ms: 0.770291
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 130.6465
