@@ -1,0 +1,136 @@
+TAP version 13
+# Subtest: the ordered eight declarations are deterministic and remain input-only
+ok 1 - the ordered eight declarations are deterministic and remain input-only
+  ---
+  duration_ms: 103.720291
+  type: 'test'
+  ...
+# Subtest: every signed type-2 envelope roundtrips and matches the declared call
+ok 2 - every signed type-2 envelope roundtrips and matches the declared call
+  ---
+  duration_ms: 14.339875
+  type: 'test'
+  ...
+# Subtest: fork headers, full allocation roots, and the declared STOP amendment agree
+ok 3 - fork headers, full allocation roots, and the declared STOP amendment agree
+  ---
+  duration_ms: 7.805791
+  type: 'test'
+  ...
+# Subtest: CREATE and CREATE2 targets are derived from the actual creator and initcode
+ok 4 - CREATE and CREATE2 targets are derived from the actual creator and initcode
+  ---
+  duration_ms: 0.137208
+  type: 'test'
+  ...
+# Subtest: constructors read the hidden slot, write old-equal and fresh values, then return or REVERT
+ok 5 - constructors read the hidden slot, write old-equal and fresh values, then return or REVERT
+  ---
+  duration_ms: 0.426458
+  type: 'test'
+  ...
+# Subtest: internal creation copies exact initcode after the caller dirty write and restores its original value
+ok 6 - internal creation copies exact initcode after the caller dirty write and restores its original value
+  ---
+  duration_ms: 0.187875
+  type: 'test'
+  ...
+# Subtest: ancestor rollback is a caught CALL failure after successful CREATE2 and helper writes
+ok 7 - ancestor rollback is a caught CALL failure after successful CREATE2 and helper writes
+  ---
+  duration_ms: 0.162375
+  type: 'test'
+  ...
+# Subtest: full prestate and target storage roots are independently bound before applying deltas
+ok 8 - full prestate and target storage roots are independently bound before applying deltas
+  ---
+  duration_ms: 45.73675
+  type: 'test'
+  ...
+# Subtest: reset authenticates the old full storage root and deployment cannot omit it
+ok 9 - reset authenticates the old full storage root and deployment cannot omit it
+  ---
+  duration_ms: 7.407666
+  type: 'test'
+  ...
+# Subtest: a fresh namespace retains old-equal 999, removes hidden 991, and preserves omitted prefunding
+ok 10 - a fresh namespace retains old-equal 999, removes hidden 991, and preserves omitted prefunding
+  ---
+  duration_ms: 2.065667
+  type: 'test'
+  ...
+# Subtest: reset storage before-values are zero while account fields retain their actual prestate
+ok 11 - reset storage before-values are zero while account fields retain their actual prestate
+  ---
+  duration_ms: 4.944041
+  type: 'test'
+  ...
+# Subtest: whole-account deletion, foreign reset families, and arbitrary-account resets are rejected
+ok 12 - whole-account deletion, foreign reset families, and arbitrary-account resets are rejected
+  ---
+  duration_ms: 11.19625
+  type: 'test'
+  ...
+# Subtest: a rollback declaration can represent an unchanged target alongside independent account deltas
+ok 13 - a rollback declaration can represent an unchanged target alongside independent account deltas
+  ---
+  duration_ms: 4.122208
+  type: 'test'
+  ...
+# Subtest: scenario labels do not force outcomes: a retained reset on rollback remains representable
+ok 14 - scenario labels do not force outcomes: a retained reset on rollback remains representable
+  ---
+  duration_ms: 0.627084
+  type: 'test'
+  ...
+# Subtest: eight-case fixed process arguments distinguish preparation from execution
+ok 15 - eight-case fixed process arguments distinguish preparation from execution
+  ---
+  duration_ms: 5.78725
+  type: 'test'
+  ...
+# Subtest: execution gate rejects missing or altered flag before opening a capture
+ok 16 - execution gate rejects missing or altered flag before opening a capture
+  ---
+  duration_ms: 0.530625
+  type: 'test'
+  ...
+# Subtest: prepared reports bind arguments, byte hashes, identity and no-execution status
+ok 17 - prepared reports bind arguments, byte hashes, identity and no-execution status
+  ---
+  duration_ms: 1.442042
+  type: 'test'
+  ...
+# Subtest: timeouts, stderr, process failures, failed closure and malformed report stay unavailable
+ok 18 - timeouts, stderr, process failures, failed closure and malformed report stay unavailable
+  ---
+  duration_ms: 0.494167
+  type: 'test'
+  ...
+# Subtest: completed product must include successful isolation and distinct closed child
+ok 19 - completed product must include successful isolation and distinct closed child
+  ---
+  duration_ms: 0.272208
+  type: 'test'
+  ...
+# Subtest: comparison distinguishes missing dimensions and disagreements
+ok 20 - comparison distinguishes missing dimensions and disagreements
+  ---
+  duration_ms: 0.128209
+  type: 'test'
+  ...
+# Subtest: prepare-only returns precede execution imports and official execution entrypoint
+ok 21 - prepare-only returns precede execution imports and official execution entrypoint
+  ---
+  duration_ms: 0.199875
+  type: 'test'
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 21
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 299.24325

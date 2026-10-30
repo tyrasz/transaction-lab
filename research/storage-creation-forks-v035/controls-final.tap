@@ -1,0 +1,214 @@
+TAP version 13
+# Subtest: the ordered eight declarations are deterministic and remain input-only
+ok 1 - the ordered eight declarations are deterministic and remain input-only
+  ---
+  duration_ms: 112.924042
+  type: 'test'
+  ...
+# Subtest: every signed type-2 envelope roundtrips and matches the declared call
+ok 2 - every signed type-2 envelope roundtrips and matches the declared call
+  ---
+  duration_ms: 14.56375
+  type: 'test'
+  ...
+# Subtest: fork headers, full allocation roots, and the declared STOP amendment agree
+ok 3 - fork headers, full allocation roots, and the declared STOP amendment agree
+  ---
+  duration_ms: 7.784875
+  type: 'test'
+  ...
+# Subtest: CREATE and CREATE2 targets are derived from the actual creator and initcode
+ok 4 - CREATE and CREATE2 targets are derived from the actual creator and initcode
+  ---
+  duration_ms: 0.158125
+  type: 'test'
+  ...
+# Subtest: constructors read the hidden slot, write old-equal and fresh values, then return or REVERT
+ok 5 - constructors read the hidden slot, write old-equal and fresh values, then return or REVERT
+  ---
+  duration_ms: 0.454042
+  type: 'test'
+  ...
+# Subtest: internal creation copies exact initcode after the caller dirty write and restores its original value
+ok 6 - internal creation copies exact initcode after the caller dirty write and restores its original value
+  ---
+  duration_ms: 0.198791
+  type: 'test'
+  ...
+# Subtest: ancestor rollback is a caught CALL failure after successful CREATE2 and helper writes
+ok 7 - ancestor rollback is a caught CALL failure after successful CREATE2 and helper writes
+  ---
+  duration_ms: 0.170792
+  type: 'test'
+  ...
+# Subtest: all six historical declarations use charged gas as the single-transaction block contribution
+ok 8 - all six historical declarations use charged gas as the single-transaction block contribution
+  ---
+  duration_ms: 80.957583
+  type: 'test'
+  ...
+# Subtest: historical block contribution never uses a supplied Amsterdam-only property
+ok 9 - historical block contribution never uses a supplied Amsterdam-only property
+  ---
+  duration_ms: 1.102584
+  type: 'test'
+  ...
+# Subtest: both Amsterdam declarations retain the dedicated block contribution independently of charged gas
+ok 10 - both Amsterdam declarations retain the dedicated block contribution independently of charged gas
+  ---
+  duration_ms: 4.466666
+  type: 'test'
+  ...
+# Subtest: Amsterdam refuses missing dedicated block gas instead of falling back to charged gas
+ok 11 - Amsterdam refuses missing dedicated block gas instead of falling back to charged gas
+  ---
+  duration_ms: 0.680666
+  type: 'test'
+  ...
+# Subtest: all forks reject noncanonical, non-string and out-of-range charged gas
+ok 12 - all forks reject noncanonical, non-string and out-of-range charged gas
+  ---
+  duration_ms: 7.975375
+  type: 'test'
+  ...
+# Subtest: Amsterdam rejects malformed or out-of-range dedicated block gas independently
+ok 13 - Amsterdam rejects malformed or out-of-range dedicated block gas independently
+  ---
+  duration_ms: 0.474375
+  type: 'test'
+  ...
+# Subtest: canonical zero and exact gas-limit values remain valid in both projected channels
+ok 14 - canonical zero and exact gas-limit values remain valid in both projected channels
+  ---
+  duration_ms: 5.10775
+  type: 'test'
+  ...
+# Subtest: full prestate and target storage roots are independently bound before applying deltas
+ok 15 - full prestate and target storage roots are independently bound before applying deltas
+  ---
+  duration_ms: 50.240291
+  type: 'test'
+  ...
+# Subtest: reset authenticates the old full storage root and deployment cannot omit it
+ok 16 - reset authenticates the old full storage root and deployment cannot omit it
+  ---
+  duration_ms: 9.602542
+  type: 'test'
+  ...
+# Subtest: a fresh namespace retains old-equal 999, removes hidden 991, and preserves omitted prefunding
+ok 17 - a fresh namespace retains old-equal 999, removes hidden 991, and preserves omitted prefunding
+  ---
+  duration_ms: 2.290917
+  type: 'test'
+  ...
+# Subtest: reset storage before-values are zero while account fields retain their actual prestate
+ok 18 - reset storage before-values are zero while account fields retain their actual prestate
+  ---
+  duration_ms: 4.000875
+  type: 'test'
+  ...
+# Subtest: whole-account deletion, foreign reset families, and arbitrary-account resets are rejected
+ok 19 - whole-account deletion, foreign reset families, and arbitrary-account resets are rejected
+  ---
+  duration_ms: 15.425875
+  type: 'test'
+  ...
+# Subtest: a rollback declaration can represent an unchanged target alongside independent account deltas
+ok 20 - a rollback declaration can represent an unchanged target alongside independent account deltas
+  ---
+  duration_ms: 1.452625
+  type: 'test'
+  ...
+# Subtest: scenario labels do not force outcomes: a retained reset on rollback remains representable
+ok 21 - scenario labels do not force outcomes: a retained reset on rollback remains representable
+  ---
+  duration_ms: 0.736833
+  type: 'test'
+  ...
+# Subtest: eight-case fixed process arguments distinguish preparation from execution
+ok 22 - eight-case fixed process arguments distinguish preparation from execution
+  ---
+  duration_ms: 5.925833
+  type: 'test'
+  ...
+# Subtest: execution gate rejects missing or altered flag before opening a capture
+ok 23 - execution gate rejects missing or altered flag before opening a capture
+  ---
+  duration_ms: 0.654959
+  type: 'test'
+  ...
+# Subtest: prepared reports bind arguments, byte hashes, identity and no-execution status
+ok 24 - prepared reports bind arguments, byte hashes, identity and no-execution status
+  ---
+  duration_ms: 2.099917
+  type: 'test'
+  ...
+# Subtest: timeouts, stderr, process failures, failed closure and malformed report stay unavailable
+ok 25 - timeouts, stderr, process failures, failed closure and malformed report stay unavailable
+  ---
+  duration_ms: 0.548083
+  type: 'test'
+  ...
+# Subtest: completed product must include successful isolation and distinct closed child
+ok 26 - completed product must include successful isolation and distinct closed child
+  ---
+  duration_ms: 0.239041
+  type: 'test'
+  ...
+# Subtest: timeout, maxBuffer overflow, failed group cleanup and strict elapsed caps invalidate the packet
+ok 27 - timeout, maxBuffer overflow, failed group cleanup and strict elapsed caps invalidate the packet
+  ---
+  duration_ms: 0.136209
+  type: 'test'
+  ...
+# Subtest: actual product child closure failures invalidate even a clean outer process
+ok 28 - actual product child closure failures invalidate even a clean outer process
+  ---
+  duration_ms: 0.2355
+  type: 'test'
+  ...
+# Subtest: original-write ledger rejects coherent old-output resealing and exact membership changes
+ok 29 - original-write ledger rejects coherent old-output resealing and exact membership changes
+  ---
+  duration_ms: 10.581667
+  type: 'test'
+  ...
+# Subtest: ledger seals retain original written identities and preexisting freeze identities
+ok 30 - ledger seals retain original written identities and preexisting freeze identities
+  ---
+  duration_ms: 3.682333
+  type: 'test'
+  ...
+# Subtest: pure driver controls stop after an unbounded first attempt and retain all sixteen positions
+ok 31 - pure driver controls stop after an unbounded first attempt and retain all sixteen positions
+  ---
+  duration_ms: 6.622416
+  type: 'test'
+  ...
+# Subtest: pure driver checks the original-write ledger before another dispatch and at termination
+ok 32 - pure driver checks the original-write ledger before another dispatch and at termination
+  ---
+  duration_ms: 1.02275
+  type: 'test'
+  ...
+# Subtest: comparison distinguishes missing dimensions and disagreements
+ok 33 - comparison distinguishes missing dimensions and disagreements
+  ---
+  duration_ms: 0.221875
+  type: 'test'
+  ...
+# Subtest: prepare-only returns precede execution imports and official execution entrypoint
+ok 34 - prepare-only returns precede execution imports and official execution entrypoint
+  ---
+  duration_ms: 0.168708
+  type: 'test'
+  ...
+1..34
+# tests 34
+# suites 0
+# pass 34
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 342.108333
