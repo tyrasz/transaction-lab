@@ -93,11 +93,43 @@ ran, but all four EELS adapters failed before execution because of mixed
 integer types in the funding check. The frozen comparator also rejected
 nonce/balance-only product rows because it wrongly required `storage` arrays.
 The result is **zero comparable positions and 72 unavailable channels**, not
-an accuracy result. The sibling `../local-sequence-v036-reference-v2/` is being
-prepared with those two corrections and the identical inputs; repeats must not
-count as new coverage. The old external Python runtime's drift and a fresh
-current-runtime inventory are fully recorded. Old captures remain unchanged.
-No public-chain sequence capture or release has occurred for this feature.
+an accuracy result. That first capture and its original comparison remain
+unchanged.
+
+The corrected sibling [v2 packet](../local-sequence-v036-reference-v2/NOTES.md)
+ran the same four byte-identical synthetic inputs once per client. Its saved
+`reference-v2-comparison.json` reports **10/10 mutually completed positions
+matched, 60 matched channels, zero mismatches, and 12 null channels** for the
+two declared positions that both clients left unattempted after
+the preceding revert. All stop dispositions agree. Eight successful and two
+reverted executions are comparable; stopped positions are not execution
+matches. All eight outer processes were observed, with retained source,
+closure and original-write checks; the execution-and-verification interval
+was 8.400 seconds. Queries are retained but excluded from comparison.
+
+V2 plan SHA256 is
+`a1df7fb169e89826b0a27e4dd4e83796b5c0fb9dbafba48c7821676d5bf88da4`;
+capture manifest is
+`402045e7a4b5e69d51a7956e66fab4e6b0b71204b65430a310929db748e9f270`;
+saved comparison SHA256 is
+`1e17eddb695225216373230a839cee9dbe8616ff6fd28318d127df95254bb735`.
+The independent bounded adapter review passed **21/21** input/artifact controls
+without running either client. Its exact log is `reference-v2-peer-review.tap`,
+with SHA256 `dd4d0b6386f35271227ff7019efec2cd56bbf6906c2d28544136cecdaa6d583a`
+also retained in `reference-v2-peer-review.tap.sha256`.
+The separate independent audit of the completed capture is pending; these
+counts are the frozen comparator's saved results.
+
+The repeat corrects only Python typed-integer admission arithmetic and the
+comparator's omitted-storage handling. It is not a new case population and
+does not establish real Aave, Morpho or Hyperlend sequence coverage. The
+reference uses stock EELS transaction transitions under the same declared
+environment, not a cumulative consensus block test; proof revalidation shares
+the production verifier. The old external Python runtime's drift and a fresh
+current-runtime inventory are fully recorded; v2 uses the same inventory as
+the first sequence attempt. No public-chain sequence capture or release has
+occurred. Installed 0.35.0 remains unchanged, and actual browser visual review
+is still pending.
 
 These development checks do not change the public 16-call accuracy sample or
 establish Aave/Morpho/Hyperlend category coverage or general EVM accuracy.

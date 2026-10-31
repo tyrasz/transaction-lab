@@ -1,0 +1,234 @@
+{
+  "status": "separate_corrected_preparation_no_new_targets",
+  "sameCasesNotNewCoverage": true,
+  "priorCapture": {
+    "plan": {
+      "path": "research/local-sequence-v036-reference/capture/plan.json",
+      "bytes": 980202,
+      "sha256": "76fb2f64a719f5e577869a43f915e4b555547bf85f1b6a8d769e96de5d557030"
+    },
+    "manifest": {
+      "path": "research/local-sequence-v036-reference/capture/manifest.json",
+      "bytes": 1024235,
+      "sha256": "adad620ff6b97af186670c3af46b40e662539a167ef392bb9c1b5be84f10b6b9"
+    },
+    "comparison": {
+      "path": "research/local-sequence-v036-work/reference-comparison.json",
+      "bytes": 9321,
+      "sha256": "d65a552dfe31015238b707ac952610630c8cf29315ed8952514a936bd7818259"
+    },
+    "rawProcesses": {
+      "productObserved": 4,
+      "eelsUnavailable": 4
+    },
+    "originalComparison": {
+      "comparablePositions": 0,
+      "unavailableChannels": 72
+    },
+    "defects": [
+      {
+        "adapter": "eels-worker.py",
+        "line": 247,
+        "message": "TypeError: unsupported operand type(s) for +: 'Uint' and 'U256'",
+        "stage": "before_first_BlockState_BlockEnvironment_apply_body"
+      },
+      {
+        "adapter": "observations.mjs",
+        "line": 53,
+        "message": "assert(Array.isArray(row.storage)) rejected legitimate omitted storage field on nonce/balance-only rows",
+        "stage": "saved_output_projection"
+      }
+    ]
+  },
+  "corrections": [
+    {
+      "adapter": "eels-worker.py",
+      "change": "can_fund converts all four typed numeric operands to Python integers; preparation and per-step admission call the same helper",
+      "officialForkSourceChanged": false
+    },
+    {
+      "adapter": "observations.mjs",
+      "change": "omitted storage means an empty list; present storage must be an array of unique canonical slots; explicit null rejected"
+    }
+  ],
+  "unchanged": {
+    "inputSerialization": "four declarations byte-identical to immutable first input files",
+    "engineRuntimeEntriesChecked": 3893,
+    "engineRuntimeEntriesChanged": 0,
+    "toolchain": {
+      "path": "research/local-sequence-v036-reference-v2/toolchain.json",
+      "bytes": 1191447,
+      "sha256": "3c69ebf10c2650c6f5ad29bcc7bf738766f72fd9b7ff01424f3cc2227b3aca19"
+    },
+    "officialSourceCommit": "e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e",
+    "officialSourceFiles": [
+      {
+        "path": "src/ethereum/forks/osaka/fork.py",
+        "bytes": 32228,
+        "sha256": "248a5feeed281cc6809c8f3ef7bd6fb98ea822c442f363a2c8b05630168c6a6f"
+      },
+      {
+        "path": "src/ethereum/forks/osaka/state_tracker.py",
+        "bytes": 19210,
+        "sha256": "98ce4eda0fece360921a866c1b05f3bc957a9107fc97a803480e5ea75f470181"
+      },
+      {
+        "path": "src/ethereum/forks/osaka/vm/interpreter.py",
+        "bytes": 8723,
+        "sha256": "b49415a2459b35396cb0a049d727d1525da2cc1eef89d07ff8ade1b87abf0698"
+      },
+      {
+        "path": "src/ethereum/forks/osaka/vm/__init__.py",
+        "bytes": 5314,
+        "sha256": "75f6a4170760ca958e6e8c46c85f866469043defd17cf28d8e969c63fba30ba5"
+      },
+      {
+        "path": "src/ethereum/forks/amsterdam/fork.py",
+        "bytes": 35464,
+        "sha256": "83583924d14331e54877204042e03c1b5898477ae41adec606c09a846229c793"
+      },
+      {
+        "path": "src/ethereum/forks/amsterdam/state_tracker.py",
+        "bytes": 23411,
+        "sha256": "b8a6082a210bcfdfc51e1487589a0b3ddfdd3b36ceee9dab6783f6bfca1f6229"
+      },
+      {
+        "path": "src/ethereum/forks/amsterdam/vm/interpreter.py",
+        "bytes": 14385,
+        "sha256": "8dd244e747b1b1516ba90de947f9f0d5db84bab4dc51256af0db8dd7a051fd7c"
+      },
+      {
+        "path": "src/ethereum/forks/amsterdam/vm/__init__.py",
+        "bytes": 9050,
+        "sha256": "72bc02de1fc03a5a7ec70725cc8b8dd18241eb1a4b6e598f059505399cbefdab"
+      },
+      {
+        "path": "src/ethereum/trace.py",
+        "bytes": 5966,
+        "sha256": "9ed51588b6b5db70bd962dd86270a244804b1e60b574f64c63cd973baf203439"
+      },
+      {
+        "path": "src/ethereum/state_mpt.py",
+        "bytes": 6080,
+        "sha256": "bec5a5621ab7d4488dd073ae440015358b6e768bb4d661d6d5b1733d3e41cb96"
+      }
+    ]
+  },
+  "referenceScope": "Each step rebuilds a fresh full MPT from only EELS prior allocation; stock single-transaction apply_body at same declared environment. No product result input.",
+  "runtimeCaveat": "EELS source and regular venv package bytes unchanged. CPython executable, libpython, 187 pyc files, 3 stdlib native extensions and 3 resolved Python symlinks differ from prior capture. New inventory is explicit, not a restoration of old runtime. Drift observed bytes uses lstat size; SHA follows file symlinks.",
+  "sourceFiles": [
+    {
+      "path": "research/local-sequence-v036-reference-v2/PLAN.md",
+      "bytes": 14086,
+      "sha256": "461f6b73700f2c9faf8b0884b1f72823362b9fad8f12a98cbbb605a2088d168c"
+    },
+    {
+      "path": "research/local-sequence-v036-reference-v2/cases.mjs",
+      "bytes": 6404,
+      "sha256": "61b847443bc951664b971c776041642f9b45f0debcbcf6730bf64e0953ce913f"
+    },
+    {
+      "path": "research/local-sequence-v036-reference-v2/cases.test.mjs",
+      "bytes": 13620,
+      "sha256": "acfefb66a2d7db8a33aa2e8085d24912850f0e8d45d35c65a367096d1d0cf4b0"
+    },
+    {
+      "path": "research/local-sequence-v036-reference-v2/eels-worker.py",
+      "bytes": 21127,
+      "sha256": "21362c6e7c457c055fec1059f68d246942a27cdc09d19ecf38f6545730b07368"
+    },
+    {
+      "path": "research/local-sequence-v036-reference-v2/toolchain.mjs",
+      "bytes": 1651,
+      "sha256": "708735a59ecca8934c6ef73f79835f68b25c2aa8b1367b3060f4ace996991dd5"
+    },
+    {
+      "path": "research/local-sequence-v036-reference-v2/observations.mjs",
+      "bytes": 17455,
+      "sha256": "64619eda914c19df8615e418fdba2db276b82bc34b9ed54d45c23f7d1d0359ae"
+    },
+    {
+      "path": "research/local-sequence-v036-reference-v2/observations.test.mjs",
+      "bytes": 14612,
+      "sha256": "5e1dc682682cfd389208ac7e243496d681ebb09d1262ff2f9b1db1f64e8c5203"
+    },
+    {
+      "path": "research/local-sequence-v036-reference-v2/product-worker.mjs",
+      "bytes": 2130,
+      "sha256": "dee45b7eb03f7dcb186314723cfdf1a0a6a107e6fc36c7cb6305a2d8b9cf3088"
+    },
+    {
+      "path": "research/local-sequence-v036-reference-v2/exec-bounded.py",
+      "bytes": 701,
+      "sha256": "0faf67b2d4b8487c491dbbe31bb751cbf9ae1711e2b4b1e3f7804d5a12b86d87"
+    },
+    {
+      "path": "research/local-sequence-v036-reference-v2/run.mjs",
+      "bytes": 26340,
+      "sha256": "6552837fb98881d91c4c2f69df2a4bf0f28e95748cbc1881e6a33007aad7126a"
+    },
+    {
+      "path": "research/local-sequence-v036-reference-v2/run.test.mjs",
+      "bytes": 15291,
+      "sha256": "a74b0d643e5adbcf12f9266aaa5593651ccb0972517f616700fc2611e39f07b2"
+    }
+  ],
+  "control": {
+    "groups": 36,
+    "passed": 36,
+    "log": {
+      "path": "/private/tmp/evm-v036-sequence-reference-v2-controls-first.tap",
+      "bytes": 9931,
+      "sha256": "05ced87a2944c356afa5b60a1d073ca26a3f9ec923a2d17360478dd380eba3c8"
+    },
+    "includes": [
+      "all_current_toolchain_bytes",
+      "all_four_initial_inputs_and_twelve_signatures",
+      "typed_funds_equal_insufficient_nonzero_value",
+      "exact_initial_input_byte_identity",
+      "actual_first_saved_product_shapes",
+      "duplicate_storage_slot_rejection",
+      "malformed_null_storage_rejection",
+      "all_existing_pure_and_harmless_driver_controls"
+    ],
+    "targetExecutions": 0
+  },
+  "priorLogs": [
+    {
+      "path": "/private/tmp/evm-v036-sequence-reference-preparation-first.tap",
+      "bytes": 5581,
+      "sha256": "00382ba57a5d9949a05b406a60209ff3306797eba5bf9c5fbcd45e483c9abe93"
+    },
+    {
+      "path": "/private/tmp/evm-v036-sequence-reference-preparation-second.tap",
+      "bytes": 1954,
+      "sha256": "bc2ccdb0fe9d3cecf41bd3550e1ac926b042b0dd5ca5af1d351dd2f7d7eefec0"
+    },
+    {
+      "path": "/private/tmp/evm-v036-sequence-reference-preparation-final.tap",
+      "bytes": 2236,
+      "sha256": "fca12a15b69bbc8e7f61476a5b386bae2fb46da3fa9a467f66fa35e38b388646"
+    },
+    {
+      "path": "/private/tmp/evm-v036-sequence-reference-current-runtime.tap",
+      "bytes": 2481,
+      "sha256": "3142b44700d1db1e7214ba7413a7944851235914f0d8ec34b39ba8f52b0a4e8a"
+    },
+    {
+      "path": "/private/tmp/evm-v036-sequence-observations-first.tap",
+      "bytes": 1950,
+      "sha256": "99f107bb93d780d8ee39016c6d83f9634650740a7d40c34b3bd2cb06904ecef2"
+    },
+    {
+      "path": "/private/tmp/evm-v036-sequence-observations-final.tap",
+      "bytes": 2220,
+      "sha256": "c999e3c81922a9aea093354d1cb389ea04ac440222b11aa42a113a39c7feeec3"
+    }
+  ],
+  "comparisonLimitations": [
+    "Initial proof revalidation shares production validateInputFacts.",
+    "Pure fabricated and saved-product controls are not independent EVM execution evidence.",
+    "A future bounded repeat uses exactly the original four cases; first failures remain immutable and separately reported."
+  ],
+  "newTargetExecutions": 0
+}

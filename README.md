@@ -125,6 +125,31 @@ Historical reads use a different route because block-end state is insufficient f
 
 `POST /api/simulate` accepts `{chainId,from,to,data,value,block?}` for HyperEVM chain 999. `value` is a decimal wei string. `block` is `latest` or a hexadecimal block number. Its interpretation and the existing HyperEVM measurement rules are unchanged.
 
+A HyperEVM frontend can submit its unsigned contract-call fields before asking the wallet to sign:
+
+```js
+const response = await fetch('/api/simulate', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    chainId: 999,
+    from: walletAddress,
+    to: transaction.to,
+    data: transaction.data ?? '0x',
+    value: BigInt(transaction.value ?? 0).toString(),
+    block: 'latest',
+  }),
+});
+const preview = await response.json();
+if (!response.ok) throw new Error(preview.error?.message ?? 'Simulation request failed');
+```
+
+Here `transaction` is the application's proposed call and `walletAddress` is its sender. Native HYPE value is expressed in wei; a USDC amount is encoded in `data`. This endpoint does not accept a serialized signed transaction or wallet-specific gas, nonce and fee fields. Its fixed-gas, unpriced call environment is not a preview of every possible signed transaction envelope. No signature, Dynamic session or broadcast is required.
+
+Render `execution.status` and the decoded `protocol` when available. Display exact asset changes from `balanceChanges.assets` only when `balanceChanges.status === 'measured'`; keep each account, token and raw integer amount distinct. Read `allowanceChanges`, `coverage` and `warnings` separately. The `inAssets` and `outAssets` arrays describe transfer events, which can include accrued interest; they are not net balance measurements. An empty or unavailable result must not become a zero-change claim. A saved [Hyperlend response](reports/hyperlend-current-v15/response.json) illustrates this contract; it is an October 28 capture from version 0.15, not a fresh execution of the installed version.
+
+The example uses the app's same-origin backend. The installed service accepts localhost hosts and same-origin requests, so a hosted frontend needs an intentionally deployed backend or proxy. HyperCore exchange actions and subsequent CoreWriter settlement require separate coverage; this EVM endpoint does not establish their final Spot or Perps balances. Arbitrary contract execution does not imply complete protocol interpretation, asset discovery or security assessment.
+
 `POST /api/replay` accepts `{chainId:999,transactionHash}` for a confirmed historical HyperEVM transaction. Its original-position replay semantics are unchanged.
 
 `POST /api/evm/local-sequence` accepts `{chainId:1|11155111,from,block?,queries,calls:[{to,data,value?,gas?,accessList?,blobVersionedHashes?,authorizationList?,executionProfile?,fees?},...]}`. The two to four calls share one sender, block and explicit query list of one to eight entries. Calls cannot override those shared fields. Per-call gas and optional fee/context fields follow the single local API. All proof, execution, state-read, time and retained-output budgets are shared; the HTTP body limit is 768 KiB. A sequence is non-atomic: earlier successful steps survive a later failure. A completed failing step retains its fork-selected nonce/preparation/fee effects; an unavailable attempt restores its starting overlay.
