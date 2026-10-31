@@ -75,6 +75,13 @@ channels and 117 query channels remain null/unavailable**. The
 Provider success does not count as local/provider agreement or general
 transaction accuracy.
 
+The separate [provider-only extraction](PROVIDER-OBSERVATIONS.md) validates all
+six original traces and 78 query trace halves against saved raw responses,
+header witnesses and cumulative overrides. It retains the Aave supply's
+one-raw-unit receipt-token rounding and the Kiln approval's already-sufficient
+allowance. Its values remain provider observations; the sender facts used for
+query mutation checks are provider reads, not independently verified proofs.
+
 The run used 253 read-only RPC calls and 1,373,852 response bytes, taking
 66.182 seconds within its recorded matrix interval. All four workers closed,
 sources were unchanged, and the capture is structurally usable. No retry,

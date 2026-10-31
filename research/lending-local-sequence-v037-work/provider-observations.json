@@ -1,0 +1,3986 @@
+{
+  "kind": "provider_only_saved_observations",
+  "planSha256": "727d4a3fe8dfa7901323cf9f7b4d09518c232c448eabddfb7f7b81c113ce5cad",
+  "manifestSha256": "1a414e70a04610bb8e7b784f97ce2edb2773ef07e40205c7a8edb8d533ea85ea",
+  "extractorSha256": "81eaeb68032baed56ae331259cfb3668b75b499c993c47a046cee34b61f827e6",
+  "manifestFiles": 4367,
+  "counts": {
+    "originals": 6,
+    "measurements": 39,
+    "halves": 78,
+    "evidenceJoinsIncludingRepeatedReferences": 405
+  },
+  "cases": [
+    {
+      "id": "aave-usdc-approve-supply-withdraw-half",
+      "blockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+      "blockNumber": "26270482",
+      "sender": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+      "amounts": {
+        "depositRaw": "3962903485",
+        "withdrawRaw": "1981451742",
+        "decimals": 6,
+        "withdrawRule": "floor(original_supply_amount_raw / 2); underlying units, not receipt-token shares"
+      },
+      "providerReportSha256": "6ac0fc49e121e6f736bbad5c919c51c43214ab3c2ae54b0cf4093628fc6d536a",
+      "rpcCalls": 103,
+      "initialSenderFactScope": "provider_reads_not_proofs",
+      "steps": [
+        {
+          "index": 0,
+          "operation": "approve",
+          "status": "provider_success",
+          "gasUsed": "55570",
+          "returnData": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "committedLogCount": 1,
+          "originalRaw": [
+            {
+              "path": "provider/001/wire/0010.json",
+              "sha256": "11567e9cf21fcfdd50cb983e0aa505498c5306035ea0f1a92859d10632e6c2fc",
+              "rpcId": 10,
+              "responseSha256": "a94df2e90939895654a2cb8c9790636a78ba1362b3eaabf5b737d1ef2de50a99"
+            }
+          ],
+          "beforeOverridesSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+          "afterOverridesSha256": "7f20cea3604741c8ca4d36d1707d43206e80cb884af76ba83dff7f8bd96e3add",
+          "queries": [
+            {
+              "index": 0,
+              "id": "owner-usdc",
+              "label": "Original sender USDC",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "3962903485",
+                  "afterRaw": "3962903485",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000000ec351bbd",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0014.json",
+                      "sha256": "2dbea34572dc938fe1a9d1635ec10f700268416f089aa0f959dcbb9f179db9e9",
+                      "rpcId": 14,
+                      "responseSha256": "bb00620e059599201fc88ec88e3026d95dd58bd7fbbb2da70c580d094cd31ca2"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0015.json",
+                      "sha256": "54a1f02b4febafcd872e0af05a94d6369d13f7b62a62fc0aa4dd85d102e5dcc1",
+                      "rpcId": 15,
+                      "responseSha256": "942994b334011e49825363acd76b399db8b3d1e3206d09cecc890c4de4fe5ff1"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "3962903485"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000000ec351bbd",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0016.json",
+                      "sha256": "4324ef198cd7344a5f3474bbad2b9efad80b8389740a23e50368f78bca644176",
+                      "rpcId": 16,
+                      "responseSha256": "05d85c6b333e48632d009e9979a3f2ee18092666457f28f7f9f3e0994d5650ab"
+                    },
+                    {
+                      "path": "provider/001/wire/0048.json",
+                      "sha256": "84402f9f6d1b40f234fa8a67ab17704350d1db68221cc4120fa6ce4b7ea701c5",
+                      "rpcId": 48,
+                      "responseSha256": "a9cdf661c710b84160bdd325f2aba5e30dbae2cf7f2865680fb6ca3e160a6450"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0017.json",
+                      "sha256": "db0bc47eeb7132448586116e0c9c230c4c149d26f4d5c3160e1005d967151b9b",
+                      "rpcId": 17,
+                      "responseSha256": "eb9b62272c4f0bb162aeb06e4e21a8249a08292ade81f8118fc6da61f51ebc5e"
+                    },
+                    {
+                      "path": "provider/001/wire/0049.json",
+                      "sha256": "341eb30b50ab43e6eaef5e1831c46a03d7c19d9bcd283359864457367ed95b8f",
+                      "rpcId": 49,
+                      "responseSha256": "096a4e902fbf0604b7d27936629c158f9726ecdde61b61400589dfa0847ae0ef"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "3962903485"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 1,
+              "id": "beneficiary-aethusdc",
+              "label": "Beneficiary aEthUSDC position",
+              "subject": {
+                "asset": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+                "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0018.json",
+                      "sha256": "b63ca842e262a46297168a8e57a38ccb8b91e8d68e8f9b446bda24b5d82af591",
+                      "rpcId": 18,
+                      "responseSha256": "4eb967bf5d61a9a7f0c9fbe3c625071b4eec92f26043ef6ed0b1b453c0caee2e"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0019.json",
+                      "sha256": "4ff6c654f377ba4d70d5b15f981144209fcd559d6171d2d350c3a3203049baa7",
+                      "rpcId": 19,
+                      "responseSha256": "fe658820418e1e09fa0a2813bdfcb91cff1baa91df7c5de22aa951391989ead5"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "0"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0020.json",
+                      "sha256": "0df5bd0bf478bc27f8ac79f416875eb71342f285a11592c743957a284a92e033",
+                      "rpcId": 20,
+                      "responseSha256": "a29fa04d02011d39e69a7d08a28b5c5a88636275e6cb3101877b110159996799"
+                    },
+                    {
+                      "path": "provider/001/wire/0052.json",
+                      "sha256": "3792edf91a70dbf8c4d7bbac97e4d0c907d55b82238fc32762cd8e62c95cba82",
+                      "rpcId": 52,
+                      "responseSha256": "1e29af5cb06383a90f0285128775b83c5b5bb487f3fb8b41b5d2b483421f01ca"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0021.json",
+                      "sha256": "517191788d264ca7de73ff648dea1589f71c97addca32e5eb1c5b38df669fc03",
+                      "rpcId": 21,
+                      "responseSha256": "12b4c2a416e57fedd6cfb658b8cf92fa1855c822e7d37eb86a052d4daa72d545"
+                    },
+                    {
+                      "path": "provider/001/wire/0053.json",
+                      "sha256": "6172e0a8b3ff0a112d1fb752ca51c50e5feb7dac4064f8dd407133e4726e7d7b",
+                      "rpcId": 53,
+                      "responseSha256": "3899fc6c07eb72582f794759bdb03e820d040984b2e21aff663e05a069510be4"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "0"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 2,
+              "id": "reserve-usdc",
+              "label": "aEthUSDC reserve USDC custody",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "151987610826648",
+                  "afterRaw": "151987610826648",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000008a3b5f8db798",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0022.json",
+                      "sha256": "45305c14664788c3da21d230902bd5c41bfc794a88b4d3418e16c5be02e74277",
+                      "rpcId": 22,
+                      "responseSha256": "c3d5337e3f54aeae190d1ac6582be1daa341560a7a0b1cca17bfaa98883018c4"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0023.json",
+                      "sha256": "f8972586c910d33d7d837e3ef75e9f905ffdd0a1bb4bb2d1940534fed1e49537",
+                      "rpcId": 23,
+                      "responseSha256": "ac90722c71f24f552f663532d14a11250d985511e3147b1b5ebcdbcae9684034"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "151987610826648"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000008a3b5f8db798",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0024.json",
+                      "sha256": "2a6bcf6252f3de217815754f32ec8a0f1f7eff07ce781d6c5539fa0494088461",
+                      "rpcId": 24,
+                      "responseSha256": "b1e40f78991e5a6b61f85304ebf7cd28da0b4444ad4110b61207bfd90f26a823"
+                    },
+                    {
+                      "path": "provider/001/wire/0056.json",
+                      "sha256": "35d5e928f483ee62f83733ea9812c67f5e1c4e19132658703f88afaf4427c481",
+                      "rpcId": 56,
+                      "responseSha256": "4b88aa7d1d263ac9f1832a6f04acaf86c5c6d0c70b0ceb1fdbee3616ddf6fa04"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0025.json",
+                      "sha256": "dae88574f0effc811d9dfe494ab54b0e2074f2b3ccfabbc74d02f6274bb13bea",
+                      "rpcId": 25,
+                      "responseSha256": "d07c0f707457f17cd288dd96f7fc00d66da772f5de076e1abdb6c068b9c9abf7"
+                    },
+                    {
+                      "path": "provider/001/wire/0057.json",
+                      "sha256": "f8470fec2a3f55cb87c2bd1b1a4773c879c4d6ed1b57fbdc3eee61816ef1b6b3",
+                      "rpcId": 57,
+                      "responseSha256": "140490b0ec197c17384cfbaa7d85d29729cccf592e03acfe7e6005c6a4c1d141"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "151987610826648"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 3,
+              "id": "owner-pool-usdc",
+              "label": "Sender allowance to Aave Pool",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+                "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+                "kind": "allowance",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "0",
+                  "afterRaw": "3962903485",
+                  "deltaRaw": "3962903485"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0026.json",
+                      "sha256": "5d6488ba072931b89ddc9bab626b0a4f7ea6c89116c2bd8535709ad7a8c3d6ec",
+                      "rpcId": 26,
+                      "responseSha256": "3a31dfb793d3617444f957714174ec1bae1930abbdec41d3aa6e17d11a760c86"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0027.json",
+                      "sha256": "4717d5ebd64be788946204ae6342b1981134bcd42b792b00b97951d7858b5ff3",
+                      "rpcId": 27,
+                      "responseSha256": "9a9a97f6f95119721f0bcbbee14279639db8c93f2d4a997aa9d946380b0f8bd5"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "allowance",
+                      "raw": "0"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000000ec351bbd",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0028.json",
+                      "sha256": "aa580ab7fec1f4f3764c77c354546298236ae57656f2506851014c1b7bce8d2e",
+                      "rpcId": 28,
+                      "responseSha256": "fd8ef4f78efe74ea80f04869bcd1c7f5aa9a225dbebc3c6d21edcd02715aa0c7"
+                    },
+                    {
+                      "path": "provider/001/wire/0060.json",
+                      "sha256": "df8450923446b5e56e13d8990f002b8349e05898713f3c57a15f880df2cfe1d1",
+                      "rpcId": 60,
+                      "responseSha256": "d22c04deffcae51c51725c5a1593d7bea90475ccc81a2e7c04706464cacc5aea"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0029.json",
+                      "sha256": "76154ca101614c92174338f9c1579bdd0e82abfdc1203d3a4de39d1ddcc677f4",
+                      "rpcId": 29,
+                      "responseSha256": "a29de924961f8087f75df53efa8d83ec78f928b7a0ce8cc286aa651f9adb801a"
+                    },
+                    {
+                      "path": "provider/001/wire/0061.json",
+                      "sha256": "1914839d39aed59a48b5a6091b9b49fa9dc22e93ae8affd52d5721afdba26326",
+                      "rpcId": 61,
+                      "responseSha256": "bd65ebab8daf314f58b2a7d18f4a054241c14640cd1d2458ab36f0c991b09b60"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "allowance",
+                      "raw": "3962903485"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 4,
+              "id": "aave-account-data",
+              "label": "Sender Aave account data",
+              "subject": {
+                "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+                "contract": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+                "kind": "aave_v3_user_account_data",
+                "units": "oracle_base_units_unknown_currency_and_scale_plus_bps_and_1e18_health_factor"
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "totalCollateralBase",
+                  "beforeRaw": "114367800827",
+                  "afterRaw": "114367800827",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "totalDebtBase",
+                  "beforeRaw": "21216",
+                  "afterRaw": "21216",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "availableBorrowsBase",
+                  "beforeRaw": "107494274781",
+                  "afterRaw": "107494274781",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "currentLiquidationThreshold",
+                  "beforeRaw": "9599",
+                  "afterRaw": "9599",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "ltv",
+                  "beforeRaw": "9399",
+                  "afterRaw": "9399",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "healthFactor",
+                  "beforeRaw": "5175007482545248868778280",
+                  "afterRaw": "5175007482545248868778280",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000001aa0da25fb00000000000000000000000000000000000000000000000000000000000052e000000000000000000000000000000000000000000000000000000019072876dd000000000000000000000000000000000000000000000000000000000000257f00000000000000000000000000000000000000000000000000000000000024b70000000000000000000000000000000000000000000447d9b7bf2229cafc4128",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0030.json",
+                      "sha256": "688f5ab0d2b8ab04e6136420df14a3be2effd2336a9faa1d6a3e21dc9ec342fc",
+                      "rpcId": 30,
+                      "responseSha256": "61599329ed7d6fad86df5502b7412b73b350d3408a4172bf297fba3702bf8828"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0031.json",
+                      "sha256": "d7e5d1097a7d67a9ecb6e62f5f8e8b0a826f9d3b40f8c37ea91d777fefbc5b45",
+                      "rpcId": 31,
+                      "responseSha256": "5cc2f8d14b067cb33772dc06101f5fe950d6fb4d0ed05cf9f906677231c6ce24"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "totalCollateralBase",
+                      "raw": "114367800827"
+                    },
+                    {
+                      "name": "totalDebtBase",
+                      "raw": "21216"
+                    },
+                    {
+                      "name": "availableBorrowsBase",
+                      "raw": "107494274781"
+                    },
+                    {
+                      "name": "currentLiquidationThreshold",
+                      "raw": "9599"
+                    },
+                    {
+                      "name": "ltv",
+                      "raw": "9399"
+                    },
+                    {
+                      "name": "healthFactor",
+                      "raw": "5175007482545248868778280"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000001aa0da25fb00000000000000000000000000000000000000000000000000000000000052e000000000000000000000000000000000000000000000000000000019072876dd000000000000000000000000000000000000000000000000000000000000257f00000000000000000000000000000000000000000000000000000000000024b70000000000000000000000000000000000000000000447d9b7bf2229cafc4128",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0032.json",
+                      "sha256": "d8272960ed1de5931af25771193a0383108dd10af93c0d32e846079807f19663",
+                      "rpcId": 32,
+                      "responseSha256": "13d37de6b506cd6dbd836739f838822242596f40da158023603ecfee497cb7da"
+                    },
+                    {
+                      "path": "provider/001/wire/0064.json",
+                      "sha256": "82299617a183ede6ce8be378935dd5afb94b3d2f80f4411156ab2573d50d5fe2",
+                      "rpcId": 64,
+                      "responseSha256": "93c3ef263f15cc5d390f1761828749c6ea2b463ff6ed3913c8d9737d1e95766f"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0033.json",
+                      "sha256": "198458c0acaa8bbd6f43aea32dc65553c61969d0f015927ca288aad1e9123d18",
+                      "rpcId": 33,
+                      "responseSha256": "032d14c19082dabebc16c31763c84b11ed18b1b87753fc055b2bf1c5f77b0091"
+                    },
+                    {
+                      "path": "provider/001/wire/0065.json",
+                      "sha256": "28ab5194fc632ed043f0ef3df608c67a127f06062f568979ca379633028ca76f",
+                      "rpcId": 65,
+                      "responseSha256": "d7ad920e4a56b8d0b45450532c58ec71b4f5bea79998810a97ea7ed72377184a"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "totalCollateralBase",
+                      "raw": "114367800827"
+                    },
+                    {
+                      "name": "totalDebtBase",
+                      "raw": "21216"
+                    },
+                    {
+                      "name": "availableBorrowsBase",
+                      "raw": "107494274781"
+                    },
+                    {
+                      "name": "currentLiquidationThreshold",
+                      "raw": "9599"
+                    },
+                    {
+                      "name": "ltv",
+                      "raw": "9399"
+                    },
+                    {
+                      "name": "healthFactor",
+                      "raw": "5175007482545248868778280"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "operation": "supply",
+          "status": "provider_success",
+          "gasUsed": "165499",
+          "returnData": "0x",
+          "committedLogCount": 6,
+          "originalRaw": [
+            {
+              "path": "provider/001/wire/0044.json",
+              "sha256": "73fcfc04ca3b3c9537da2872a3dd82b9ad0dfd6858ca551b2acd581afa9874f9",
+              "rpcId": 44,
+              "responseSha256": "af6646850d6ebc00ccceda52b7940a10546f5fe9758f7824e3c961c2f627c386"
+            }
+          ],
+          "beforeOverridesSha256": "7f20cea3604741c8ca4d36d1707d43206e80cb884af76ba83dff7f8bd96e3add",
+          "afterOverridesSha256": "863e83cc65f3dd166ab60ec389fe0aaf84001fe70da7ee088e55880674ef93cf",
+          "queries": [
+            {
+              "index": 0,
+              "id": "owner-usdc",
+              "label": "Original sender USDC",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "3962903485",
+                  "afterRaw": "0",
+                  "deltaRaw": "-3962903485"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000000ec351bbd",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0016.json",
+                      "sha256": "4324ef198cd7344a5f3474bbad2b9efad80b8389740a23e50368f78bca644176",
+                      "rpcId": 16,
+                      "responseSha256": "05d85c6b333e48632d009e9979a3f2ee18092666457f28f7f9f3e0994d5650ab"
+                    },
+                    {
+                      "path": "provider/001/wire/0048.json",
+                      "sha256": "84402f9f6d1b40f234fa8a67ab17704350d1db68221cc4120fa6ce4b7ea701c5",
+                      "rpcId": 48,
+                      "responseSha256": "a9cdf661c710b84160bdd325f2aba5e30dbae2cf7f2865680fb6ca3e160a6450"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0017.json",
+                      "sha256": "db0bc47eeb7132448586116e0c9c230c4c149d26f4d5c3160e1005d967151b9b",
+                      "rpcId": 17,
+                      "responseSha256": "eb9b62272c4f0bb162aeb06e4e21a8249a08292ade81f8118fc6da61f51ebc5e"
+                    },
+                    {
+                      "path": "provider/001/wire/0049.json",
+                      "sha256": "341eb30b50ab43e6eaef5e1831c46a03d7c19d9bcd283359864457367ed95b8f",
+                      "rpcId": 49,
+                      "responseSha256": "096a4e902fbf0604b7d27936629c158f9726ecdde61b61400589dfa0847ae0ef"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "3962903485"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0050.json",
+                      "sha256": "537bb269b32f600e0e8981ff6fc3ca349fc6b3b2863bf4f650ca96f72d19bb5b",
+                      "rpcId": 50,
+                      "responseSha256": "088dbc3e5ea109d8c61a8ab16a890c99b992d7f21b1560e8a797708a24a7f776"
+                    },
+                    {
+                      "path": "provider/001/wire/0082.json",
+                      "sha256": "9b0563b4ed6e1c005049f291c0c175cbf1145847caf3e3a70c34ddd0b5609614",
+                      "rpcId": 82,
+                      "responseSha256": "dab6452f1f45e0bfadf3119de63136c0322dcb25534c3981d423e1676e035ffa"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0051.json",
+                      "sha256": "bdea377a9c74d1e7012ad46c033a14825e5366747fe9e873c22a3b243720cfb2",
+                      "rpcId": 51,
+                      "responseSha256": "c567f49a200b433b18139e2dcc2722aaf9a1ed2f929f42662d7c9d77eec66c35"
+                    },
+                    {
+                      "path": "provider/001/wire/0083.json",
+                      "sha256": "1c06b62bf6c44beac3a2106b9a938b3b3619b3b60faa1afbbd7fdf2d451bed7a",
+                      "rpcId": 83,
+                      "responseSha256": "0e84c38f403184d4177861e7eae745c371738975c5ea693840422d1c1ba4651c"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "0"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 1,
+              "id": "beneficiary-aethusdc",
+              "label": "Beneficiary aEthUSDC position",
+              "subject": {
+                "asset": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+                "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "0",
+                  "afterRaw": "3962903484",
+                  "deltaRaw": "3962903484"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0020.json",
+                      "sha256": "0df5bd0bf478bc27f8ac79f416875eb71342f285a11592c743957a284a92e033",
+                      "rpcId": 20,
+                      "responseSha256": "a29fa04d02011d39e69a7d08a28b5c5a88636275e6cb3101877b110159996799"
+                    },
+                    {
+                      "path": "provider/001/wire/0052.json",
+                      "sha256": "3792edf91a70dbf8c4d7bbac97e4d0c907d55b82238fc32762cd8e62c95cba82",
+                      "rpcId": 52,
+                      "responseSha256": "1e29af5cb06383a90f0285128775b83c5b5bb487f3fb8b41b5d2b483421f01ca"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0021.json",
+                      "sha256": "517191788d264ca7de73ff648dea1589f71c97addca32e5eb1c5b38df669fc03",
+                      "rpcId": 21,
+                      "responseSha256": "12b4c2a416e57fedd6cfb658b8cf92fa1855c822e7d37eb86a052d4daa72d545"
+                    },
+                    {
+                      "path": "provider/001/wire/0053.json",
+                      "sha256": "6172e0a8b3ff0a112d1fb752ca51c50e5feb7dac4064f8dd407133e4726e7d7b",
+                      "rpcId": 53,
+                      "responseSha256": "3899fc6c07eb72582f794759bdb03e820d040984b2e21aff663e05a069510be4"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "0"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000000ec351bbc",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0054.json",
+                      "sha256": "505af640db81bb1a1a194be6160355607b9727c1750d56fd111977d55a434581",
+                      "rpcId": 54,
+                      "responseSha256": "779863a221b6224ce8ec0d57de77ac4a2a0f49f2c006a58f02e9b569bbf7e036"
+                    },
+                    {
+                      "path": "provider/001/wire/0086.json",
+                      "sha256": "f1ba18b64f338175a23530af1e855030126266de5212a20d1d10e7f383b2d3a9",
+                      "rpcId": 86,
+                      "responseSha256": "e767e898c222322ea67dc4d03b1f6d466ae2c17f835a0d4dc2bcf19feeb0380e"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0055.json",
+                      "sha256": "204cbd8fa0f848b662ade4523b7e024a587361a39b048ceff517b6280e977a45",
+                      "rpcId": 55,
+                      "responseSha256": "64cf855a2dc1ad45489304fe7b177675af406c472c6f015d023bce2feec7b573"
+                    },
+                    {
+                      "path": "provider/001/wire/0087.json",
+                      "sha256": "e67477e9e73e5d1ebfbbe9eb2ae142805595c89295ddff7ed344146b47d05c44",
+                      "rpcId": 87,
+                      "responseSha256": "421f37a28fe0b64d64d4de56b7bb2632e5ce7867c85b3f75fb1807c8bcd68d0c"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "3962903484"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 2,
+              "id": "reserve-usdc",
+              "label": "aEthUSDC reserve USDC custody",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "151987610826648",
+                  "afterRaw": "151991573730133",
+                  "deltaRaw": "3962903485"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000008a3b5f8db798",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0024.json",
+                      "sha256": "2a6bcf6252f3de217815754f32ec8a0f1f7eff07ce781d6c5539fa0494088461",
+                      "rpcId": 24,
+                      "responseSha256": "b1e40f78991e5a6b61f85304ebf7cd28da0b4444ad4110b61207bfd90f26a823"
+                    },
+                    {
+                      "path": "provider/001/wire/0056.json",
+                      "sha256": "35d5e928f483ee62f83733ea9812c67f5e1c4e19132658703f88afaf4427c481",
+                      "rpcId": 56,
+                      "responseSha256": "4b88aa7d1d263ac9f1832a6f04acaf86c5c6d0c70b0ceb1fdbee3616ddf6fa04"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0025.json",
+                      "sha256": "dae88574f0effc811d9dfe494ab54b0e2074f2b3ccfabbc74d02f6274bb13bea",
+                      "rpcId": 25,
+                      "responseSha256": "d07c0f707457f17cd288dd96f7fc00d66da772f5de076e1abdb6c068b9c9abf7"
+                    },
+                    {
+                      "path": "provider/001/wire/0057.json",
+                      "sha256": "f8470fec2a3f55cb87c2bd1b1a4773c879c4d6ed1b57fbdc3eee61816ef1b6b3",
+                      "rpcId": 57,
+                      "responseSha256": "140490b0ec197c17384cfbaa7d85d29729cccf592e03acfe7e6005c6a4c1d141"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "151987610826648"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000008a3c4bc2d355",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0058.json",
+                      "sha256": "e10447f705e9ce0ee02f1c7a8ba0ccd84b367116d8aba60cd1fa5a822e2f7e4f",
+                      "rpcId": 58,
+                      "responseSha256": "8c2c502860d501b7fb7c50ab4baf131a3f9dfc26c7b30ef9282d003cb8d4fe72"
+                    },
+                    {
+                      "path": "provider/001/wire/0090.json",
+                      "sha256": "ddd1f6298500e0330374ae17478f483bacb8f36b1491d9b4ee1426496db8a79d",
+                      "rpcId": 90,
+                      "responseSha256": "438ceed447e609d1e6a53b4d85c6289a784c74ef1601de7ddc8910240dfa3fb9"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0059.json",
+                      "sha256": "b3ed10df92513e7ac1d08f7c472cb47fc8981b2e27b917acaef70224e0adb435",
+                      "rpcId": 59,
+                      "responseSha256": "4a1f0dcd88dbebe22e4229fa5c4110c49c4be88b481cb550bd9684926bb881fe"
+                    },
+                    {
+                      "path": "provider/001/wire/0091.json",
+                      "sha256": "1e4b1b6d11228cf3c26fcc3fd534d980cf8f1411021b8887d752e43809e84685",
+                      "rpcId": 91,
+                      "responseSha256": "c5cc0138da6db7c658a7429764bc2819f1627eb742727bf4d1c4e35fd76dd973"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "151991573730133"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 3,
+              "id": "owner-pool-usdc",
+              "label": "Sender allowance to Aave Pool",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+                "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+                "kind": "allowance",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "3962903485",
+                  "afterRaw": "0",
+                  "deltaRaw": "-3962903485"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000000ec351bbd",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0028.json",
+                      "sha256": "aa580ab7fec1f4f3764c77c354546298236ae57656f2506851014c1b7bce8d2e",
+                      "rpcId": 28,
+                      "responseSha256": "fd8ef4f78efe74ea80f04869bcd1c7f5aa9a225dbebc3c6d21edcd02715aa0c7"
+                    },
+                    {
+                      "path": "provider/001/wire/0060.json",
+                      "sha256": "df8450923446b5e56e13d8990f002b8349e05898713f3c57a15f880df2cfe1d1",
+                      "rpcId": 60,
+                      "responseSha256": "d22c04deffcae51c51725c5a1593d7bea90475ccc81a2e7c04706464cacc5aea"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0029.json",
+                      "sha256": "76154ca101614c92174338f9c1579bdd0e82abfdc1203d3a4de39d1ddcc677f4",
+                      "rpcId": 29,
+                      "responseSha256": "a29de924961f8087f75df53efa8d83ec78f928b7a0ce8cc286aa651f9adb801a"
+                    },
+                    {
+                      "path": "provider/001/wire/0061.json",
+                      "sha256": "1914839d39aed59a48b5a6091b9b49fa9dc22e93ae8affd52d5721afdba26326",
+                      "rpcId": 61,
+                      "responseSha256": "bd65ebab8daf314f58b2a7d18f4a054241c14640cd1d2458ab36f0c991b09b60"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "allowance",
+                      "raw": "3962903485"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0062.json",
+                      "sha256": "69f20987fbc95798b58175d1d3df9951d9d3407134ea0fa6cede7eb505eafcdb",
+                      "rpcId": 62,
+                      "responseSha256": "61b7765043789c588a1a8d2fd44530ff079dfe99699dd10be9461feadd84d245"
+                    },
+                    {
+                      "path": "provider/001/wire/0094.json",
+                      "sha256": "175a88136dbfdde74ce1d9dfb6eaafa9afdcc1980e6f1f4d46bc6426cf4aab1f",
+                      "rpcId": 94,
+                      "responseSha256": "a430566d9753b091ba2bea268b5ad681fc5c9442b89b8ad281d702e74933f000"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0063.json",
+                      "sha256": "0e227e78d17602f221212b8500f4939d53e3f874a12c1405a9eb71d37ff7b721",
+                      "rpcId": 63,
+                      "responseSha256": "4bd1cd998ec220f5c6f7c11c5229a51c8b7f01ffd181a738c69c1ac54fed274f"
+                    },
+                    {
+                      "path": "provider/001/wire/0095.json",
+                      "sha256": "1091f912e556f0e58ae5d047553463a95a27268b27fb65f6b35b7f0105d1d487",
+                      "rpcId": 95,
+                      "responseSha256": "f9cd03cd225ea9f3c45375bb2f94097b387d314ea95189fcb8d4cd45fdabe337"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "allowance",
+                      "raw": "0"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 4,
+              "id": "aave-account-data",
+              "label": "Sender Aave account data",
+              "subject": {
+                "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+                "contract": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+                "kind": "aave_v3_user_account_data",
+                "units": "oracle_base_units_unknown_currency_and_scale_plus_bps_and_1e18_health_factor"
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "totalCollateralBase",
+                  "beforeRaw": "114367800827",
+                  "afterRaw": "510592963427",
+                  "deltaRaw": "396225162600"
+                },
+                {
+                  "name": "totalDebtBase",
+                  "beforeRaw": "21216",
+                  "afterRaw": "21216",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "availableBorrowsBase",
+                  "beforeRaw": "107494274781",
+                  "afterRaw": "404644902299",
+                  "deltaRaw": "297150627518"
+                },
+                {
+                  "name": "currentLiquidationThreshold",
+                  "beforeRaw": "9599",
+                  "afterRaw": "8203",
+                  "deltaRaw": "-1396"
+                },
+                {
+                  "name": "ltv",
+                  "beforeRaw": "9399",
+                  "afterRaw": "7925",
+                  "deltaRaw": "-1474"
+                },
+                {
+                  "name": "healthFactor",
+                  "beforeRaw": "5175007482545248868778280",
+                  "afterRaw": "19742109048721719457013574",
+                  "deltaRaw": "14567101566176470588235294"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000001aa0da25fb00000000000000000000000000000000000000000000000000000000000052e000000000000000000000000000000000000000000000000000000019072876dd000000000000000000000000000000000000000000000000000000000000257f00000000000000000000000000000000000000000000000000000000000024b70000000000000000000000000000000000000000000447d9b7bf2229cafc4128",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0032.json",
+                      "sha256": "d8272960ed1de5931af25771193a0383108dd10af93c0d32e846079807f19663",
+                      "rpcId": 32,
+                      "responseSha256": "13d37de6b506cd6dbd836739f838822242596f40da158023603ecfee497cb7da"
+                    },
+                    {
+                      "path": "provider/001/wire/0064.json",
+                      "sha256": "82299617a183ede6ce8be378935dd5afb94b3d2f80f4411156ab2573d50d5fe2",
+                      "rpcId": 64,
+                      "responseSha256": "93c3ef263f15cc5d390f1761828749c6ea2b463ff6ed3913c8d9737d1e95766f"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0033.json",
+                      "sha256": "198458c0acaa8bbd6f43aea32dc65553c61969d0f015927ca288aad1e9123d18",
+                      "rpcId": 33,
+                      "responseSha256": "032d14c19082dabebc16c31763c84b11ed18b1b87753fc055b2bf1c5f77b0091"
+                    },
+                    {
+                      "path": "provider/001/wire/0065.json",
+                      "sha256": "28ab5194fc632ed043f0ef3df608c67a127f06062f568979ca379633028ca76f",
+                      "rpcId": 65,
+                      "responseSha256": "d7ad920e4a56b8d0b45450532c58ec71b4f5bea79998810a97ea7ed72377184a"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "totalCollateralBase",
+                      "raw": "114367800827"
+                    },
+                    {
+                      "name": "totalDebtBase",
+                      "raw": "21216"
+                    },
+                    {
+                      "name": "availableBorrowsBase",
+                      "raw": "107494274781"
+                    },
+                    {
+                      "name": "currentLiquidationThreshold",
+                      "raw": "9599"
+                    },
+                    {
+                      "name": "ltv",
+                      "raw": "9399"
+                    },
+                    {
+                      "name": "healthFactor",
+                      "raw": "5175007482545248868778280"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000076e1b6536300000000000000000000000000000000000000000000000000000000000052e00000000000000000000000000000000000000000000000000000005e36b7359b000000000000000000000000000000000000000000000000000000000000200b0000000000000000000000000000000000000000000000000000000000001ef500000000000000000000000000000000000000000010548de041c3c9c968df46",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0066.json",
+                      "sha256": "832c86ea745f639a77e4142e15a5c8ea467142040ae486c505aece45774c2953",
+                      "rpcId": 66,
+                      "responseSha256": "ffe62867e543e09fcee24e40508ba0f9f668a90f9ab0ff041b1967693675dcf8"
+                    },
+                    {
+                      "path": "provider/001/wire/0098.json",
+                      "sha256": "af0c1f0dd21530d049dbb9f3d87adda94467cc359cec8a874dcb7f8fc654c822",
+                      "rpcId": 98,
+                      "responseSha256": "69867e73cf550ca468c9e033dc62b0923bcdb0d375dd97547c9dfc16d6c9de26"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0067.json",
+                      "sha256": "e23cd6456dd30aa4c8a43d0b2562434cc65ced1a6b8c95324db37ced39772e2a",
+                      "rpcId": 67,
+                      "responseSha256": "f3369c90ad0cfe69e60cb2c22d19ed9e90c185d5b75bcd00e96a5df0acdfe10c"
+                    },
+                    {
+                      "path": "provider/001/wire/0099.json",
+                      "sha256": "a6844482aae8fbe85a1f66ebb979ad1d286885919d5ba3f91f3c4427b35b3e15",
+                      "rpcId": 99,
+                      "responseSha256": "67e3d0acb47d8af68502164af88fb05a19312fa00bffa6ae88052a079b401845"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "totalCollateralBase",
+                      "raw": "510592963427"
+                    },
+                    {
+                      "name": "totalDebtBase",
+                      "raw": "21216"
+                    },
+                    {
+                      "name": "availableBorrowsBase",
+                      "raw": "404644902299"
+                    },
+                    {
+                      "name": "currentLiquidationThreshold",
+                      "raw": "8203"
+                    },
+                    {
+                      "name": "ltv",
+                      "raw": "7925"
+                    },
+                    {
+                      "name": "healthFactor",
+                      "raw": "19742109048721719457013574"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "operation": "withdraw",
+          "status": "provider_success",
+          "gasUsed": "350023",
+          "returnData": "0x00000000000000000000000000000000000000000000000000000000761a8dde",
+          "committedLogCount": 5,
+          "originalRaw": [
+            {
+              "path": "provider/001/wire/0078.json",
+              "sha256": "e4f09038a8472a0fcf0e878792d0d0f42372677ffbf75f6c71fa9e0109c2fe34",
+              "rpcId": 78,
+              "responseSha256": "7abd2ac102d0bac7fb3c8f8041eb0c1c8e63b1a59fcb54385e250b23cfc510a7"
+            }
+          ],
+          "beforeOverridesSha256": "863e83cc65f3dd166ab60ec389fe0aaf84001fe70da7ee088e55880674ef93cf",
+          "afterOverridesSha256": "2f825f6b3c3214a0bda180aeec3c4df2dde8079657b65801db32b9d6f248cd7a",
+          "queries": [
+            {
+              "index": 0,
+              "id": "owner-usdc",
+              "label": "Original sender USDC",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "0",
+                  "afterRaw": "1981451742",
+                  "deltaRaw": "1981451742"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0050.json",
+                      "sha256": "537bb269b32f600e0e8981ff6fc3ca349fc6b3b2863bf4f650ca96f72d19bb5b",
+                      "rpcId": 50,
+                      "responseSha256": "088dbc3e5ea109d8c61a8ab16a890c99b992d7f21b1560e8a797708a24a7f776"
+                    },
+                    {
+                      "path": "provider/001/wire/0082.json",
+                      "sha256": "9b0563b4ed6e1c005049f291c0c175cbf1145847caf3e3a70c34ddd0b5609614",
+                      "rpcId": 82,
+                      "responseSha256": "dab6452f1f45e0bfadf3119de63136c0322dcb25534c3981d423e1676e035ffa"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0051.json",
+                      "sha256": "bdea377a9c74d1e7012ad46c033a14825e5366747fe9e873c22a3b243720cfb2",
+                      "rpcId": 51,
+                      "responseSha256": "c567f49a200b433b18139e2dcc2722aaf9a1ed2f929f42662d7c9d77eec66c35"
+                    },
+                    {
+                      "path": "provider/001/wire/0083.json",
+                      "sha256": "1c06b62bf6c44beac3a2106b9a938b3b3619b3b60faa1afbbd7fdf2d451bed7a",
+                      "rpcId": 83,
+                      "responseSha256": "0e84c38f403184d4177861e7eae745c371738975c5ea693840422d1c1ba4651c"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "0"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000000761a8dde",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0084.json",
+                      "sha256": "a0345219bb2f3d1d5115abac3f51ae5ab769b65d66009c3a81cf36ec0966dd4c",
+                      "rpcId": 84,
+                      "responseSha256": "f75ce0685416f633761c96409a95f07d157bf19ac44fb87bb2fcd11b2ed9e271"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0085.json",
+                      "sha256": "429fe3bef3d854679851313588d02f1410de08b0a43e8770675d59676c32f88b",
+                      "rpcId": 85,
+                      "responseSha256": "f0d270ec5f1d35782d05940d692cd5096fc35025e92ba7f0fa512fcbf0e6db3b"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "1981451742"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 1,
+              "id": "beneficiary-aethusdc",
+              "label": "Beneficiary aEthUSDC position",
+              "subject": {
+                "asset": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+                "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "3962903484",
+                  "afterRaw": "1981451742",
+                  "deltaRaw": "-1981451742"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000000ec351bbc",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0054.json",
+                      "sha256": "505af640db81bb1a1a194be6160355607b9727c1750d56fd111977d55a434581",
+                      "rpcId": 54,
+                      "responseSha256": "779863a221b6224ce8ec0d57de77ac4a2a0f49f2c006a58f02e9b569bbf7e036"
+                    },
+                    {
+                      "path": "provider/001/wire/0086.json",
+                      "sha256": "f1ba18b64f338175a23530af1e855030126266de5212a20d1d10e7f383b2d3a9",
+                      "rpcId": 86,
+                      "responseSha256": "e767e898c222322ea67dc4d03b1f6d466ae2c17f835a0d4dc2bcf19feeb0380e"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0055.json",
+                      "sha256": "204cbd8fa0f848b662ade4523b7e024a587361a39b048ceff517b6280e977a45",
+                      "rpcId": 55,
+                      "responseSha256": "64cf855a2dc1ad45489304fe7b177675af406c472c6f015d023bce2feec7b573"
+                    },
+                    {
+                      "path": "provider/001/wire/0087.json",
+                      "sha256": "e67477e9e73e5d1ebfbbe9eb2ae142805595c89295ddff7ed344146b47d05c44",
+                      "rpcId": 87,
+                      "responseSha256": "421f37a28fe0b64d64d4de56b7bb2632e5ce7867c85b3f75fb1807c8bcd68d0c"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "3962903484"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000000761a8dde",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0088.json",
+                      "sha256": "56529badac9ae99a037c629a55f382892ff54f0f2887f2218cab0d918bb83bf7",
+                      "rpcId": 88,
+                      "responseSha256": "38b3f4ebb7ca9ccdbb6b9e47c555bc0740193be04d38449a9b741fea6a2d4960"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0089.json",
+                      "sha256": "9aa9bcd04625d666e4210bbd876e7d23a0d2609571f57e94507906d7c300666a",
+                      "rpcId": 89,
+                      "responseSha256": "cc39d68e53dbeeb36de9c70760ed85085140c078ae54e8624f972c310fd46b9d"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "1981451742"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 2,
+              "id": "reserve-usdc",
+              "label": "aEthUSDC reserve USDC custody",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "151991573730133",
+                  "afterRaw": "151989592278391",
+                  "deltaRaw": "-1981451742"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000008a3c4bc2d355",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0058.json",
+                      "sha256": "e10447f705e9ce0ee02f1c7a8ba0ccd84b367116d8aba60cd1fa5a822e2f7e4f",
+                      "rpcId": 58,
+                      "responseSha256": "8c2c502860d501b7fb7c50ab4baf131a3f9dfc26c7b30ef9282d003cb8d4fe72"
+                    },
+                    {
+                      "path": "provider/001/wire/0090.json",
+                      "sha256": "ddd1f6298500e0330374ae17478f483bacb8f36b1491d9b4ee1426496db8a79d",
+                      "rpcId": 90,
+                      "responseSha256": "438ceed447e609d1e6a53b4d85c6289a784c74ef1601de7ddc8910240dfa3fb9"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0059.json",
+                      "sha256": "b3ed10df92513e7ac1d08f7c472cb47fc8981b2e27b917acaef70224e0adb435",
+                      "rpcId": 59,
+                      "responseSha256": "4a1f0dcd88dbebe22e4229fa5c4110c49c4be88b481cb550bd9684926bb881fe"
+                    },
+                    {
+                      "path": "provider/001/wire/0091.json",
+                      "sha256": "1e4b1b6d11228cf3c26fcc3fd534d980cf8f1411021b8887d752e43809e84685",
+                      "rpcId": 91,
+                      "responseSha256": "c5cc0138da6db7c658a7429764bc2819f1627eb742727bf4d1c4e35fd76dd973"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "151991573730133"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000008a3bd5a84577",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0092.json",
+                      "sha256": "d184844f6fcc2de0af48c089ac9485c89668dee1f5faca5ae6cd7f1e495e4815",
+                      "rpcId": 92,
+                      "responseSha256": "fb8209e5df364e2913fca01fc8136b8f490045027bd787e00d5dae674bf16276"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0093.json",
+                      "sha256": "88fdc111ed3d2edce29dc5f99ad11bc254b0ee755925f4c81dc1a338a20c9ec1",
+                      "rpcId": 93,
+                      "responseSha256": "5475d4257fe53618bbe88974b68765320a10e1d099dada5900b126a8ba4e9fec"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "151989592278391"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 3,
+              "id": "owner-pool-usdc",
+              "label": "Sender allowance to Aave Pool",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+                "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+                "kind": "allowance",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0062.json",
+                      "sha256": "69f20987fbc95798b58175d1d3df9951d9d3407134ea0fa6cede7eb505eafcdb",
+                      "rpcId": 62,
+                      "responseSha256": "61b7765043789c588a1a8d2fd44530ff079dfe99699dd10be9461feadd84d245"
+                    },
+                    {
+                      "path": "provider/001/wire/0094.json",
+                      "sha256": "175a88136dbfdde74ce1d9dfb6eaafa9afdcc1980e6f1f4d46bc6426cf4aab1f",
+                      "rpcId": 94,
+                      "responseSha256": "a430566d9753b091ba2bea268b5ad681fc5c9442b89b8ad281d702e74933f000"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0063.json",
+                      "sha256": "0e227e78d17602f221212b8500f4939d53e3f874a12c1405a9eb71d37ff7b721",
+                      "rpcId": 63,
+                      "responseSha256": "4bd1cd998ec220f5c6f7c11c5229a51c8b7f01ffd181a738c69c1ac54fed274f"
+                    },
+                    {
+                      "path": "provider/001/wire/0095.json",
+                      "sha256": "1091f912e556f0e58ae5d047553463a95a27268b27fb65f6b35b7f0105d1d487",
+                      "rpcId": 95,
+                      "responseSha256": "f9cd03cd225ea9f3c45375bb2f94097b387d314ea95189fcb8d4cd45fdabe337"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "allowance",
+                      "raw": "0"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0096.json",
+                      "sha256": "490e5eaad7b32aa7f7f4e239605c27a3ab0430b4cb67a4f6ff3564da7e068fcf",
+                      "rpcId": 96,
+                      "responseSha256": "53253071c39dc40e3396de216ea7fcd287b1579d44d4f9d64904c90e7952b29d"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0097.json",
+                      "sha256": "b115a5e7254f955e5dcaba98b5f364eb88386409a91f45ade4aa0559210a6553",
+                      "rpcId": 97,
+                      "responseSha256": "a9959a8c7932b2ce894db4afa673660b04180f839ca35b58edecdf2c1112f440"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "allowance",
+                      "raw": "0"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 4,
+              "id": "aave-account-data",
+              "label": "Sender Aave account data",
+              "subject": {
+                "account": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+                "contract": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+                "kind": "aave_v3_user_account_data",
+                "units": "oracle_base_units_unknown_currency_and_scale_plus_bps_and_1e18_health_factor"
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "totalCollateralBase",
+                  "beforeRaw": "510592963427",
+                  "afterRaw": "312480382127",
+                  "deltaRaw": "-198112581300"
+                },
+                {
+                  "name": "totalDebtBase",
+                  "beforeRaw": "21216",
+                  "afterRaw": "21216",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "availableBorrowsBase",
+                  "beforeRaw": "404644902299",
+                  "afterRaw": "256077651937",
+                  "deltaRaw": "-148567250362"
+                },
+                {
+                  "name": "currentLiquidationThreshold",
+                  "beforeRaw": "8203",
+                  "afterRaw": "8458",
+                  "deltaRaw": "255"
+                },
+                {
+                  "name": "ltv",
+                  "beforeRaw": "7925",
+                  "afterRaw": "8195",
+                  "deltaRaw": "270"
+                },
+                {
+                  "name": "healthFactor",
+                  "beforeRaw": "19742109048721719457013574",
+                  "afterRaw": "12458558265633484162895927",
+                  "deltaRaw": "-7283550783088235294117647"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000076e1b6536300000000000000000000000000000000000000000000000000000000000052e00000000000000000000000000000000000000000000000000000005e36b7359b000000000000000000000000000000000000000000000000000000000000200b0000000000000000000000000000000000000000000000000000000000001ef500000000000000000000000000000000000000000010548de041c3c9c968df46",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0066.json",
+                      "sha256": "832c86ea745f639a77e4142e15a5c8ea467142040ae486c505aece45774c2953",
+                      "rpcId": 66,
+                      "responseSha256": "ffe62867e543e09fcee24e40508ba0f9f668a90f9ab0ff041b1967693675dcf8"
+                    },
+                    {
+                      "path": "provider/001/wire/0098.json",
+                      "sha256": "af0c1f0dd21530d049dbb9f3d87adda94467cc359cec8a874dcb7f8fc654c822",
+                      "rpcId": 98,
+                      "responseSha256": "69867e73cf550ca468c9e033dc62b0923bcdb0d375dd97547c9dfc16d6c9de26"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0067.json",
+                      "sha256": "e23cd6456dd30aa4c8a43d0b2562434cc65ced1a6b8c95324db37ced39772e2a",
+                      "rpcId": 67,
+                      "responseSha256": "f3369c90ad0cfe69e60cb2c22d19ed9e90c185d5b75bcd00e96a5df0acdfe10c"
+                    },
+                    {
+                      "path": "provider/001/wire/0099.json",
+                      "sha256": "a6844482aae8fbe85a1f66ebb979ad1d286885919d5ba3f91f3c4427b35b3e15",
+                      "rpcId": 99,
+                      "responseSha256": "67e3d0acb47d8af68502164af88fb05a19312fa00bffa6ae88052a079b401845"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "totalCollateralBase",
+                      "raw": "510592963427"
+                    },
+                    {
+                      "name": "totalDebtBase",
+                      "raw": "21216"
+                    },
+                    {
+                      "name": "availableBorrowsBase",
+                      "raw": "404644902299"
+                    },
+                    {
+                      "name": "currentLiquidationThreshold",
+                      "raw": "8203"
+                    },
+                    {
+                      "name": "ltv",
+                      "raw": "7925"
+                    },
+                    {
+                      "name": "healthFactor",
+                      "raw": "19742109048721719457013574"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000048c1483caf00000000000000000000000000000000000000000000000000000000000052e00000000000000000000000000000000000000000000000000000003b9f6adfe1000000000000000000000000000000000000000000000000000000000000210a00000000000000000000000000000000000000000000000000000000000020030000000000000000000000000000000000000000000a4e33cc0072f9ca329037",
+                  "trace": [
+                    {
+                      "path": "provider/001/wire/0100.json",
+                      "sha256": "ac116ed1108ad82519bfc25c64b8ccc4dcaf21e5ca990e8d8a91ef4b14b7d765",
+                      "rpcId": 100,
+                      "responseSha256": "d465b624eddffc43f275cdb7effe85203110de44e522d59ab19c8c27c042664c"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/001/wire/0101.json",
+                      "sha256": "99e3bc2b3dd0b566ab509528142b8f14120a892babe1426d0e60047468fe15f3",
+                      "rpcId": 101,
+                      "responseSha256": "f8e8305e731f4bcfc85e532b0fb77839339ffafbde2bb05399d0d701d206ce6c"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "totalCollateralBase",
+                      "raw": "312480382127"
+                    },
+                    {
+                      "name": "totalDebtBase",
+                      "raw": "21216"
+                    },
+                    {
+                      "name": "availableBorrowsBase",
+                      "raw": "256077651937"
+                    },
+                    {
+                      "name": "currentLiquidationThreshold",
+                      "raw": "8458"
+                    },
+                    {
+                      "name": "ltv",
+                      "raw": "8195"
+                    },
+                    {
+                      "name": "healthFactor",
+                      "raw": "12458558265633484162895927"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "localFailure": {
+        "path": "local/001/wire/0003.json",
+        "sha256": "8760a409d7592c11d7884096612c871a21f7689655ea680f1445797fea13c3e3",
+        "request": {
+          "jsonrpc": "2.0",
+          "id": 3,
+          "method": "eth_getProof",
+          "params": [
+            "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+            [],
+            {
+              "blockHash": "0x4badf912d1bcc7f77197108544be0ab4b8cef7a94fb7a4ee1e65fda816300dc7",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "response": {
+          "id": 3,
+          "jsonrpc": "2.0",
+          "error": {
+            "code": -32000,
+            "message": "historical state ea7a9456b042ca8e618b09805777d6b4523a5192fe3ee897adec9844bc7386e2 is not available"
+          }
+        }
+      }
+    },
+    {
+      "id": "morpho-kiln-usdc-approve-deposit-withdraw-half",
+      "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+      "blockNumber": "26270562",
+      "sender": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+      "amounts": {
+        "depositRaw": "350000000000",
+        "withdrawRaw": "175000000000",
+        "decimals": 6,
+        "withdrawRule": "floor(original_deposit_assets_raw / 2); underlying units, not wrapper or inner-vault shares"
+      },
+      "providerReportSha256": "764348399661a752d2e3d9c4e902b763816acf87a5b231bc9187881600079be2",
+      "rpcCalls": 142,
+      "initialSenderFactScope": "provider_reads_not_proofs",
+      "steps": [
+        {
+          "index": 0,
+          "operation": "approve",
+          "status": "provider_success",
+          "gasUsed": "35670",
+          "returnData": "0x0000000000000000000000000000000000000000000000000000000000000001",
+          "committedLogCount": 1,
+          "originalRaw": [
+            {
+              "path": "provider/002/wire/0011.json",
+              "sha256": "6b139c320c80700aa2d3b31c7e79ff86ff649d1caadac1c189f8e4c706310a8c",
+              "rpcId": 11,
+              "responseSha256": "3d31c75160be2d0bd18d37786df913058bc1da98615a433385cad5b5603d7258"
+            }
+          ],
+          "beforeOverridesSha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b",
+          "afterOverridesSha256": "6bc283673ca2af5941c21a04bd0b23947d65268590953f31f78617ddd8b392a9",
+          "queries": [
+            {
+              "index": 0,
+              "id": "owner-usdc",
+              "label": "Original sender USDC",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "704323976173",
+                  "afterRaw": "704323976173",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x000000000000000000000000000000000000000000000000000000a3fcfafbed",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0015.json",
+                      "sha256": "d268a2d7d2310e65f8b34a6d68607f420422a2e3b17c6862a90938de0a0aa39b",
+                      "rpcId": 15,
+                      "responseSha256": "f8a45f1cfd6cbdbfdbdd6075afbc8a2aa8481a2c3f5f9031a788fb320b869dca"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0016.json",
+                      "sha256": "b4b559fecd128c35aae4d870920980bb8682b30d2057a4f7e4f3036b75797c81",
+                      "rpcId": 16,
+                      "responseSha256": "aa60ae9575dad88263d312acfaaa0bd3dc4f559cc36787a9c3b27fdcee43dfb9"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "704323976173"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x000000000000000000000000000000000000000000000000000000a3fcfafbed",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0017.json",
+                      "sha256": "a729643d29a126e55cc6687f63f72fae5daa4f7345e90cccac0038207871a391",
+                      "rpcId": 17,
+                      "responseSha256": "f1da319ece81092d75cf2333abbe482bac9e91ade9f023691c212d18f524daea"
+                    },
+                    {
+                      "path": "provider/002/wire/0062.json",
+                      "sha256": "85991c3a361869f5e78dbd41fcc70ea65f52310a2f778e942916303b1825680a",
+                      "rpcId": 62,
+                      "responseSha256": "c552cd717c85b68c2673813808fd03946d3f26953817d3c6c08ef8b26cab13ff"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0018.json",
+                      "sha256": "233a8b6791f89ef6faa6e339e59beaa87961c6cafc2298eddfaecaf24b6ac505",
+                      "rpcId": 18,
+                      "responseSha256": "c0af64017ed6f120aea704129d693e2820102a25c9f04dd54035684b167799fe"
+                    },
+                    {
+                      "path": "provider/002/wire/0063.json",
+                      "sha256": "5665cc9868a51a49fda97598c23d707503676b38124c0e6d3891ea83344bcef9",
+                      "rpcId": 63,
+                      "responseSha256": "b0d2d491f8e6112fd7ad8807b814c99a1b84dcbe05371df0dce9507dad444c2e"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "704323976173"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 1,
+              "id": "beneficiary-wrapper-shares",
+              "label": "Beneficiary mstkeUSDC wrapper shares",
+              "subject": {
+                "asset": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "1151370388097",
+                  "afterRaw": "1151370388097",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000010c1305e281",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0019.json",
+                      "sha256": "0cfd9a19f5ac3989b4ac57baefd4cd67aece90a107449e26dd2b2b5bce8f91bc",
+                      "rpcId": 19,
+                      "responseSha256": "255104bafae04fbab68b3d58bec86cdb0bfae9b81bdd482afafac468eac8cf93"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0020.json",
+                      "sha256": "3d94f450ec951bb541cc7849f79bddd02b178626aecf34467630c6621829a4b7",
+                      "rpcId": 20,
+                      "responseSha256": "163647e073309c4ff03f68e4ae9a20614a9c314ff648575c361454c063826e24"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "1151370388097"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000010c1305e281",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0021.json",
+                      "sha256": "1d7aa95dbcf6e0cd30993b5e8ae838a0d0bee511df4b2d688ba4b8ebca8541a3",
+                      "rpcId": 21,
+                      "responseSha256": "2c02f170aba772b5b3526ece60444e41b026eb45fbd18d6f4af11c8b6380c700"
+                    },
+                    {
+                      "path": "provider/002/wire/0066.json",
+                      "sha256": "a87f5fc7425ee0873069832ba7001154dc092f38164235036cba01a9e937d366",
+                      "rpcId": 66,
+                      "responseSha256": "9c016cc4d6c73cf8458fabe7b1318533fc17b4784a4b82cdb2c1280c842eacb3"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0022.json",
+                      "sha256": "1cfb768abc74a1cd02b737599880388168333d517f1bf9f0fb7001c2630c69d5",
+                      "rpcId": 22,
+                      "responseSha256": "a527c44dd23a3f3311e4a51583913b1f2b832c5245c22b96080ea64189b256a5"
+                    },
+                    {
+                      "path": "provider/002/wire/0067.json",
+                      "sha256": "62030aa4b1221d7e37b71c5962f7a90c42efddee7b3079b59b4bb1c5de2d4d7d",
+                      "rpcId": 67,
+                      "responseSha256": "fabc4824ed52640ef5834740c5ad8253d5f26590102f1acdc0f1643b78d2ac8e"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "1151370388097"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 2,
+              "id": "wrapper-vault-shares",
+              "label": "Wrapper-owned steakUSDC vault shares",
+              "subject": {
+                "asset": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "balanceOf",
+                "decimals": 18
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "24549620346225332293026418",
+                  "afterRaw": "24549620346225332293026418",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x000000000000000000000000000000000000000000144e9595ed64d1e2e14272",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0023.json",
+                      "sha256": "75bd85d7f02e5522fc0c62ba479d3291f276fbed30141a1a580e7e5eed267d1a",
+                      "rpcId": 23,
+                      "responseSha256": "4549d59199ec3d5647bc7a211c61873f48dc148bdba102d6425a0ed7779ddf05"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0024.json",
+                      "sha256": "8d285fc3dded589d8eea1255fb0a148a58e3d0108d0f25d0177819a6d35741b6",
+                      "rpcId": 24,
+                      "responseSha256": "e3e8f07674d22af8ad3d5656efeeb055165ee58a88212f45e032bf6377fd2b64"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "24549620346225332293026418"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x000000000000000000000000000000000000000000144e9595ed64d1e2e14272",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0025.json",
+                      "sha256": "b10bf6963c3fc4a73c851d84e071247c18ac818d2fde3a442132de5a62978b07",
+                      "rpcId": 25,
+                      "responseSha256": "f93f76b73a17de07c6d56168403c06b5215932801380fdf45582506a3002f569"
+                    },
+                    {
+                      "path": "provider/002/wire/0070.json",
+                      "sha256": "e06b56c0d280af52f45ddb69fcfca8e52993e245b021755c2a13ebcfe25771c4",
+                      "rpcId": 70,
+                      "responseSha256": "1e821786fabbd010b0126bb5c2cd013e72b914921f2f685b4f05d32b76820228"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0026.json",
+                      "sha256": "c7e1eb0ab83c2af35f7d522ef0395262a8f8c847fc61c5ee422955679df4a9d0",
+                      "rpcId": 26,
+                      "responseSha256": "0d5e47714c6d4b810dd8e76ec6384ff8dc69bb22bd182df8fcf4b5020114320c"
+                    },
+                    {
+                      "path": "provider/002/wire/0071.json",
+                      "sha256": "3410c0811fcc0a0f6faf9e63a76efde85f717682aead0889a3b9cf24925f0791",
+                      "rpcId": 71,
+                      "responseSha256": "b6b614b37af8fe69ba0af82f71d1525dbfdd661e19c8ef6c62e1f70a821c5728"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "24549620346225332293026418"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 3,
+              "id": "wrapper-usdc",
+              "label": "Wrapper USDC custody",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "20083625",
+                  "afterRaw": "20083625",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000000013273a9",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0027.json",
+                      "sha256": "f8a9b433c756ee70aec06110deca09736e9675de607b2b6cb1836f5aef23a651",
+                      "rpcId": 27,
+                      "responseSha256": "d13ed6010100dd702a4b51d690b67c815c8e46974c615fc2ab39dbb73f20c748"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0028.json",
+                      "sha256": "59449e417ebafdfe16689bcb9057644e1fbaccc9f192bba4af90cdc75af348e6",
+                      "rpcId": 28,
+                      "responseSha256": "812245829acf373481d719fa068cc363f508e4954176df068e8b996f29f576d6"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "20083625"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000000013273a9",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0029.json",
+                      "sha256": "ee422f57f2fdcb907867ac5b91b678f949e3caba0d4efb494c8cb2a7aa846d76",
+                      "rpcId": 29,
+                      "responseSha256": "c99eac7d91b655007c8539cb59de27f99eedec14176fca4f74d4cb01d71122f7"
+                    },
+                    {
+                      "path": "provider/002/wire/0074.json",
+                      "sha256": "2ca79c80a17325b8f6de6173592df106bad22e6b390f2583aa6ee95ac646a533",
+                      "rpcId": 74,
+                      "responseSha256": "3b1c9bdda9b0114e2fde17e29f72e62b0dc05418503d3cf3892d1969887b9d86"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0030.json",
+                      "sha256": "4ede6cae71d64d5677a57dfcb17451046c8b4e15926bbebef95d492eea92cede",
+                      "rpcId": 30,
+                      "responseSha256": "96877853f60578200c6776e642dcd45fa971adc60bf5dcf7a16c19b1ac69b48b"
+                    },
+                    {
+                      "path": "provider/002/wire/0075.json",
+                      "sha256": "2a0eab3d29d9925c218c52d8601a196cb593cf57bdf6dbb4f7c61662322314b2",
+                      "rpcId": 75,
+                      "responseSha256": "0cf63d763d7407533dc6dbc19c1d1e73511404993febecb06e120b40b571b71a"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "20083625"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 4,
+              "id": "vault-usdc",
+              "label": "Inner vault USDC custody",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "6011",
+                  "afterRaw": "6011",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x000000000000000000000000000000000000000000000000000000000000177b",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0031.json",
+                      "sha256": "e8862414f6bd9d04fcdeab98a4b32fc047aee93e7d2e438e88f1e1ea2a5945b5",
+                      "rpcId": 31,
+                      "responseSha256": "76bed9f2a3cd465aa1e7d7289b2879b7ccff4162fac773bf0169a9be449ea3d5"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0032.json",
+                      "sha256": "a2dc4e60e11dde5092eb7e23093d006204473006cb439b846815d5ae433dfbcd",
+                      "rpcId": 32,
+                      "responseSha256": "ee19d7bca60e90af6ce91fbdefee18d1655d0a9902533189f34c9894fef97290"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "6011"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x000000000000000000000000000000000000000000000000000000000000177b",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0033.json",
+                      "sha256": "f499cb7ee2b7f7806b47f2a45229d38d1d0ba9e614cca7dfc21994d896ff01d3",
+                      "rpcId": 33,
+                      "responseSha256": "f582fff79978139c61d3d4bafc768212811e7ed338a8f068e5d38190be3df043"
+                    },
+                    {
+                      "path": "provider/002/wire/0078.json",
+                      "sha256": "a8c4469b785be98b74b3bc12234603201669fa667a311f6bab83f14c3a6c1f15",
+                      "rpcId": 78,
+                      "responseSha256": "d2c6973b9e992624c5a1b0483d7c2db940761965897cf1a27e29a0eb1b281369"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0034.json",
+                      "sha256": "b9f9c683f01be23c97aa083ed71ac1ee2631628e06ee03425da7016cc16bb232",
+                      "rpcId": 34,
+                      "responseSha256": "3b81dac3c7fc27149089808bd8b1d37575d1dc22295a7e4c279187d3f2806826"
+                    },
+                    {
+                      "path": "provider/002/wire/0079.json",
+                      "sha256": "ea1077dcc7c5cd4430933919597af4ffef7d4ae1c3004df76df69ace8e106332",
+                      "rpcId": 79,
+                      "responseSha256": "8c1cf3214f44150b3d757ffde80a565f81cab006291149eab4c5dc49265b9135"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "6011"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 5,
+              "id": "blue-usdc",
+              "label": "Morpho Blue USDC custody",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "128890534855869",
+                  "afterRaw": "128890534855869",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000007539aa8b84bd",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0035.json",
+                      "sha256": "641677e86c9a983d440aafe73aa64fffa793c90d3b77073360a08d161c27b3f7",
+                      "rpcId": 35,
+                      "responseSha256": "3a35b213c4283dc1df230353ead15a183eb0fc391244ba1deaa2dce2785c6fbd"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0036.json",
+                      "sha256": "fb69e1b3cbddb9fabcd09dd869db373f3f95e4e4f5c7f0197bc2e8358b10e698",
+                      "rpcId": 36,
+                      "responseSha256": "a7ae35641508fff454a540106b3329be670b46d0884e0e95bad61d5f58aafdb7"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "128890534855869"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000007539aa8b84bd",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0037.json",
+                      "sha256": "e1b30bf08ee3d181e8b405b73ee32df2e82aab856608fa9a17f4a9742f7b11d9",
+                      "rpcId": 37,
+                      "responseSha256": "1930ceae0b646aca13cfb399dc6c55f08d6478b8b7b54a7feb588f1d1ded62af"
+                    },
+                    {
+                      "path": "provider/002/wire/0082.json",
+                      "sha256": "65cf7e8edd4a4d8bba42dbdd92dbd741dee845d3865113ac51320ccdd972ff0d",
+                      "rpcId": 82,
+                      "responseSha256": "4d6a6898c7ca745c506d67527ff9e58237b957aa40f13f8a8bba78e336e706f3"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0038.json",
+                      "sha256": "ee977fed1cd89a8c2599764bfa380835a54d0149efa0ed68f7d39ce206ce20c8",
+                      "rpcId": 38,
+                      "responseSha256": "db5be715300fa600437a5caac1644a998749c45c2cbf3b99e637bdeea9439428"
+                    },
+                    {
+                      "path": "provider/002/wire/0083.json",
+                      "sha256": "f9d7ed3c54a08774710a38d7ddce2a5f2a5b1e554bcb9efafefb3af0fb5e2f7a",
+                      "rpcId": 83,
+                      "responseSha256": "ea894f250aecc8d06725ee3610cd2e71e7f7f6d2284bd0acb8fb5db87fd55565"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "128890534855869"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 6,
+              "id": "owner-wrapper-usdc",
+              "label": "Sender allowance to wrapper",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "spender": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "allowance",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "350000000000",
+                  "afterRaw": "350000000000",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x000000000000000000000000000000000000000000000000000000517da02c00",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0039.json",
+                      "sha256": "b2a44219c73709a838ae3b9d9517d292220d9bb631a854a02c45d1471233f42b",
+                      "rpcId": 39,
+                      "responseSha256": "c38a4ddf3e986a0bb7703af861dbcbb866ce5d8115008a92857ad81983744b40"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0040.json",
+                      "sha256": "4a876dbb93b1531b1d27dafe98930ae6793732f9a6b2de5159439794b8ed9298",
+                      "rpcId": 40,
+                      "responseSha256": "db83dd5c16705030a90b0457ee2d8898561f1dbd6e394ef219aa9faa9da05280"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "allowance",
+                      "raw": "350000000000"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x000000000000000000000000000000000000000000000000000000517da02c00",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0041.json",
+                      "sha256": "3e1cbe1fd63e213dcd53174e2c89592ee87454c571ead03191deb07a57b9b25d",
+                      "rpcId": 41,
+                      "responseSha256": "f24b4538b2d0389f75f843c9f5ed9ad7d8569143e501496c689815ff79af8c2e"
+                    },
+                    {
+                      "path": "provider/002/wire/0086.json",
+                      "sha256": "ff034f7077140ee7fe8dd8c6f8b81d5790d2f00431f7aff3f4a185ab02a88aab",
+                      "rpcId": 86,
+                      "responseSha256": "0f0aff5392a6b50ec90ad01265d81924613aa19efa9d80cc291f1da6eb020d3b"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0042.json",
+                      "sha256": "0edbd3fb86fb64b6f40bba6791fc11615422fc619a4785f1827d43b6e21f3da6",
+                      "rpcId": 42,
+                      "responseSha256": "b3ed8e48a674721770ec582216e32f0465e53698cc5a6781aa1578e0ce21f7a6"
+                    },
+                    {
+                      "path": "provider/002/wire/0087.json",
+                      "sha256": "c6740602b135a6210ebd2c6e0fa554439d0c625e83ad675cd7246eaf5cddccdf",
+                      "rpcId": 87,
+                      "responseSha256": "622501fe8c732bf43d4501ca43a8b8d737e9e20e656e0ea41d29c0228063e2fe"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "allowance",
+                      "raw": "350000000000"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 7,
+              "id": "inner-vault-blue-position",
+              "label": "Inner vault Morpho Blue position; not sender ownership",
+              "subject": {
+                "account": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "contract": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+                "marketId": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
+                "kind": "morpho_blue_position",
+                "units": "raw_supply_shares_borrow_shares_and_collateral_without_asset_conversion"
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "supplyShares",
+                  "beforeRaw": "26565631929266438023",
+                  "afterRaw": "26565631929266438023",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "borrowShares",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "collateral",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000170ac157d29b37f8700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0043.json",
+                      "sha256": "662917def5699bd0b180c91fe95bb437a405da8bb7dec4b15cb09ee03fb7330f",
+                      "rpcId": 43,
+                      "responseSha256": "306e717b1d695e159a0c9e3d2e5ff11cc776ba86b6cbc0ae1d216d9a1e99bd87"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0044.json",
+                      "sha256": "08b3f630bd4142f159374414dfb2a01e550b1e1d135cb48f6756b9e3af74ba3c",
+                      "rpcId": 44,
+                      "responseSha256": "e6d8e5d3aa4df4467fa589791aa50bed34fd23fc801385063759028db42ffe12"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "supplyShares",
+                      "raw": "26565631929266438023"
+                    },
+                    {
+                      "name": "borrowShares",
+                      "raw": "0"
+                    },
+                    {
+                      "name": "collateral",
+                      "raw": "0"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000170ac157d29b37f8700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0045.json",
+                      "sha256": "e45bcbce521edd2df29c4c92342bf1864fde0f670cf547715483bec46201b809",
+                      "rpcId": 45,
+                      "responseSha256": "936afe70a0e248b1763d511bdcdb329e64fabaf196280eea615c469f14704198"
+                    },
+                    {
+                      "path": "provider/002/wire/0090.json",
+                      "sha256": "509ac578576d62ec2c9ecae34ff391980a648908c1e3f5fd84b0ff0153f6f81f",
+                      "rpcId": 90,
+                      "responseSha256": "32e6a5730d0bc5810a9e6b9c766acd62fa29926c36b50f1cbd5cfb050147e716"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0046.json",
+                      "sha256": "d3ca1204594fe323b23c81b7105a6654971e6c5e01ba90526ff303e72ebe5e95",
+                      "rpcId": 46,
+                      "responseSha256": "d4a2f063c3328c3c1c91429dab1021629605cfc36e2de3f2eb493fdf65d2c1e8"
+                    },
+                    {
+                      "path": "provider/002/wire/0091.json",
+                      "sha256": "fa2c3eda1286f01ac3f3dffb756d0293e713f99a671f87372727f05af7e68bbe",
+                      "rpcId": 91,
+                      "responseSha256": "43587304e7cd4632c4439fd9cf416f772e2e5bc097d01463b7a9122e6c4dfd50"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "supplyShares",
+                      "raw": "26565631929266438023"
+                    },
+                    {
+                      "name": "borrowShares",
+                      "raw": "0"
+                    },
+                    {
+                      "name": "collateral",
+                      "raw": "0"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "operation": "deposit",
+          "status": "provider_success",
+          "gasUsed": "1413682",
+          "returnData": "0x0000000000000000000000000000000000000000000000000000004cf32fd184",
+          "committedLogCount": 16,
+          "originalRaw": [
+            {
+              "path": "provider/002/wire/0058.json",
+              "sha256": "0f4821fa16f0e7509425099243a540a86d8d9320049831d16f264d7fb182607c",
+              "rpcId": 58,
+              "responseSha256": "8c78d20a43ae49a53e38a7d14ebc97101e6477e04b8636bff7450a77e13e1c67"
+            }
+          ],
+          "beforeOverridesSha256": "6bc283673ca2af5941c21a04bd0b23947d65268590953f31f78617ddd8b392a9",
+          "afterOverridesSha256": "7212be6621ee4366ec1cc25caba1cd750eabb028ced31da3f36a6c2fb41d943b",
+          "queries": [
+            {
+              "index": 0,
+              "id": "owner-usdc",
+              "label": "Original sender USDC",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "704323976173",
+                  "afterRaw": "354323976173",
+                  "deltaRaw": "-350000000000"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x000000000000000000000000000000000000000000000000000000a3fcfafbed",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0017.json",
+                      "sha256": "a729643d29a126e55cc6687f63f72fae5daa4f7345e90cccac0038207871a391",
+                      "rpcId": 17,
+                      "responseSha256": "f1da319ece81092d75cf2333abbe482bac9e91ade9f023691c212d18f524daea"
+                    },
+                    {
+                      "path": "provider/002/wire/0062.json",
+                      "sha256": "85991c3a361869f5e78dbd41fcc70ea65f52310a2f778e942916303b1825680a",
+                      "rpcId": 62,
+                      "responseSha256": "c552cd717c85b68c2673813808fd03946d3f26953817d3c6c08ef8b26cab13ff"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0018.json",
+                      "sha256": "233a8b6791f89ef6faa6e339e59beaa87961c6cafc2298eddfaecaf24b6ac505",
+                      "rpcId": 18,
+                      "responseSha256": "c0af64017ed6f120aea704129d693e2820102a25c9f04dd54035684b167799fe"
+                    },
+                    {
+                      "path": "provider/002/wire/0063.json",
+                      "sha256": "5665cc9868a51a49fda97598c23d707503676b38124c0e6d3891ea83344bcef9",
+                      "rpcId": 63,
+                      "responseSha256": "b0d2d491f8e6112fd7ad8807b814c99a1b84dcbe05371df0dce9507dad444c2e"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "704323976173"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x000000000000000000000000000000000000000000000000000000527f5acfed",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0064.json",
+                      "sha256": "44e518d8d1461c3e202d829ce7e0ab858b6dcb37bdbbdc12e7271771daa8b1ac",
+                      "rpcId": 64,
+                      "responseSha256": "6e1460f12efd0360ff17663eaf14cbae71b9002d47a75913d139c32f34b38571"
+                    },
+                    {
+                      "path": "provider/002/wire/0109.json",
+                      "sha256": "5655eec98a6a67f41fadfcc67bdae45e354137837220314c6ec3169cd1fd4282",
+                      "rpcId": 109,
+                      "responseSha256": "0c6f3013372667b2b82b5f362f0a79d10da1bfd755132541c4188c2709afc9c2"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0065.json",
+                      "sha256": "dbc63b666ff05c28bec4d09b0d5a24d5d8c61ece800be9df8c079eb18358e17d",
+                      "rpcId": 65,
+                      "responseSha256": "c2656ced005961b833c06c010f9fb07cb20d745c6dfc783558350440002ac232"
+                    },
+                    {
+                      "path": "provider/002/wire/0110.json",
+                      "sha256": "d1adb6e3e954e76ffeffb8f17b3881287b83950920a64b1113d445a3dc66c548",
+                      "rpcId": 110,
+                      "responseSha256": "94e91ac39c0c4a720ff58cba4fc2a66e40de4301758eb2c00f45baa2b43de03f"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "354323976173"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 1,
+              "id": "beneficiary-wrapper-shares",
+              "label": "Beneficiary mstkeUSDC wrapper shares",
+              "subject": {
+                "asset": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "1151370388097",
+                  "afterRaw": "1481867899909",
+                  "deltaRaw": "330497511812"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000010c1305e281",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0021.json",
+                      "sha256": "1d7aa95dbcf6e0cd30993b5e8ae838a0d0bee511df4b2d688ba4b8ebca8541a3",
+                      "rpcId": 21,
+                      "responseSha256": "2c02f170aba772b5b3526ece60444e41b026eb45fbd18d6f4af11c8b6380c700"
+                    },
+                    {
+                      "path": "provider/002/wire/0066.json",
+                      "sha256": "a87f5fc7425ee0873069832ba7001154dc092f38164235036cba01a9e937d366",
+                      "rpcId": 66,
+                      "responseSha256": "9c016cc4d6c73cf8458fabe7b1318533fc17b4784a4b82cdb2c1280c842eacb3"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0022.json",
+                      "sha256": "1cfb768abc74a1cd02b737599880388168333d517f1bf9f0fb7001c2630c69d5",
+                      "rpcId": 22,
+                      "responseSha256": "a527c44dd23a3f3311e4a51583913b1f2b832c5245c22b96080ea64189b256a5"
+                    },
+                    {
+                      "path": "provider/002/wire/0067.json",
+                      "sha256": "62030aa4b1221d7e37b71c5962f7a90c42efddee7b3079b59b4bb1c5de2d4d7d",
+                      "rpcId": 67,
+                      "responseSha256": "fabc4824ed52640ef5834740c5ad8253d5f26590102f1acdc0f1643b78d2ac8e"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "1151370388097"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x000000000000000000000000000000000000000000000000000001590635b405",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0068.json",
+                      "sha256": "9f593d8342e9e8d5d499865e5fd45a156ccc7e158d51a133bbd092018bdec845",
+                      "rpcId": 68,
+                      "responseSha256": "e80bbb5e33cae2ea58be8517341ce76319bc2636685b3eba07118459310409ef"
+                    },
+                    {
+                      "path": "provider/002/wire/0113.json",
+                      "sha256": "eae590f4fb3862a819d8abfa6a94bf8b85e3a1fb0ae049acaa5db9f0aa2c6cef",
+                      "rpcId": 113,
+                      "responseSha256": "9f45980393cc87f5f6dcb7cf86eced35def5dd75e51e62c3935dbb0d6a222b8d"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0069.json",
+                      "sha256": "4b8372ea9922fcfc88609ca4b42cf2ff3a8499afab03596326f79b7b454e4c98",
+                      "rpcId": 69,
+                      "responseSha256": "2f54b91e04b7226ac7cd5b0852880ab6bc4681211b26fb31f05b3df661fd1506"
+                    },
+                    {
+                      "path": "provider/002/wire/0114.json",
+                      "sha256": "d18956a347318daa0856372284a352482db1bf068c398fc487e9ea38a4163f82",
+                      "rpcId": 114,
+                      "responseSha256": "f63f47c3b22ce6e0f0bf755761c96197574c287372e65065caf6ff63a7085b4d"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "1481867899909"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 2,
+              "id": "wrapper-vault-shares",
+              "label": "Wrapper-owned steakUSDC vault shares",
+              "subject": {
+                "asset": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "balanceOf",
+                "decimals": 18
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "24549620346225332293026418",
+                  "afterRaw": "24855185467391819293915363",
+                  "deltaRaw": "305565121166487000888945"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x000000000000000000000000000000000000000000144e9595ed64d1e2e14272",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0025.json",
+                      "sha256": "b10bf6963c3fc4a73c851d84e071247c18ac818d2fde3a442132de5a62978b07",
+                      "rpcId": 25,
+                      "responseSha256": "f93f76b73a17de07c6d56168403c06b5215932801380fdf45582506a3002f569"
+                    },
+                    {
+                      "path": "provider/002/wire/0070.json",
+                      "sha256": "e06b56c0d280af52f45ddb69fcfca8e52993e245b021755c2a13ebcfe25771c4",
+                      "rpcId": 70,
+                      "responseSha256": "1e821786fabbd010b0126bb5c2cd013e72b914921f2f685b4f05d32b76820228"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0026.json",
+                      "sha256": "c7e1eb0ab83c2af35f7d522ef0395262a8f8c847fc61c5ee422955679df4a9d0",
+                      "rpcId": 26,
+                      "responseSha256": "0d5e47714c6d4b810dd8e76ec6384ff8dc69bb22bd182df8fcf4b5020114320c"
+                    },
+                    {
+                      "path": "provider/002/wire/0071.json",
+                      "sha256": "3410c0811fcc0a0f6faf9e63a76efde85f717682aead0889a3b9cf24925f0791",
+                      "rpcId": 71,
+                      "responseSha256": "b6b614b37af8fe69ba0af82f71d1525dbfdd661e19c8ef6c62e1f70a821c5728"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "24549620346225332293026418"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x000000000000000000000000000000000000000000148f4a4dd72057b793f8e3",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0072.json",
+                      "sha256": "61e9438d8f63cfca17f421adb4469249a53f41ba9f20e77d49430606f9464ec2",
+                      "rpcId": 72,
+                      "responseSha256": "19008bace8a2c85a350c9ae5303a87876e1b9742890c0038180a89925c9d4963"
+                    },
+                    {
+                      "path": "provider/002/wire/0117.json",
+                      "sha256": "d63cda3c7b5eef4903673cec410ab2bdc817dfd9a2e5cfa182706dc958bbbd45",
+                      "rpcId": 117,
+                      "responseSha256": "d7c8d0d97919637cebd7aec8106be01541686594978d16f10ebdfac94918d457"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0073.json",
+                      "sha256": "460249711a2883dfcc88560c89568ab931a973d7a972bd0d900ae3c466743275",
+                      "rpcId": 73,
+                      "responseSha256": "36f51ce251d7367b4ee122274ba447f66e03565b12c125196537335066ac560c"
+                    },
+                    {
+                      "path": "provider/002/wire/0118.json",
+                      "sha256": "94a97ec343f3bbc4c645f14f2d6475d76dfc88f5807a9267267dca6a7c33e2eb",
+                      "rpcId": 118,
+                      "responseSha256": "b3b2970008f486f8e9ca7f4049baa2761800989bc4dd16792466d109c2e8c1f8"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "24855185467391819293915363"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 3,
+              "id": "wrapper-usdc",
+              "label": "Wrapper USDC custody",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "20083625",
+                  "afterRaw": "20083625",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000000013273a9",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0029.json",
+                      "sha256": "ee422f57f2fdcb907867ac5b91b678f949e3caba0d4efb494c8cb2a7aa846d76",
+                      "rpcId": 29,
+                      "responseSha256": "c99eac7d91b655007c8539cb59de27f99eedec14176fca4f74d4cb01d71122f7"
+                    },
+                    {
+                      "path": "provider/002/wire/0074.json",
+                      "sha256": "2ca79c80a17325b8f6de6173592df106bad22e6b390f2583aa6ee95ac646a533",
+                      "rpcId": 74,
+                      "responseSha256": "3b1c9bdda9b0114e2fde17e29f72e62b0dc05418503d3cf3892d1969887b9d86"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0030.json",
+                      "sha256": "4ede6cae71d64d5677a57dfcb17451046c8b4e15926bbebef95d492eea92cede",
+                      "rpcId": 30,
+                      "responseSha256": "96877853f60578200c6776e642dcd45fa971adc60bf5dcf7a16c19b1ac69b48b"
+                    },
+                    {
+                      "path": "provider/002/wire/0075.json",
+                      "sha256": "2a0eab3d29d9925c218c52d8601a196cb593cf57bdf6dbb4f7c61662322314b2",
+                      "rpcId": 75,
+                      "responseSha256": "0cf63d763d7407533dc6dbc19c1d1e73511404993febecb06e120b40b571b71a"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "20083625"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000000013273a9",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0076.json",
+                      "sha256": "7a133c8d0aaa4d303fe8785de9ced1863c86bb325ee12b7cd3cbe02cfda3d8cb",
+                      "rpcId": 76,
+                      "responseSha256": "5ec016923cf65b27765deb33c7a3251d88222f14abc3fafa6a61618bb3b87f15"
+                    },
+                    {
+                      "path": "provider/002/wire/0121.json",
+                      "sha256": "fdd675810f97688a7189aab94aeb8cbefd10c7ca3f0db344cca943810ed6ce0b",
+                      "rpcId": 121,
+                      "responseSha256": "e7b996e5b1f413508c2bbe2622e0dd4704c8eaa761b65fd7cb28f09cf78f5fb5"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0077.json",
+                      "sha256": "8dfe2b0da64ed40a03e9d99f0b1eab3564ca7e39fc29b159fbf26c5ee726ca6e",
+                      "rpcId": 77,
+                      "responseSha256": "c5d01cb775f333bdcc71d554ef3b599224df52939843b4ca918a96b8dd75c807"
+                    },
+                    {
+                      "path": "provider/002/wire/0122.json",
+                      "sha256": "76bd1473dbbca2f3518aa0532cb627d53ce832d4cbdd6798fecd91cee36acbd9",
+                      "rpcId": 122,
+                      "responseSha256": "699b921d4199f3a5901bc33ed681fb7897dc316e716da746c301c33021820231"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "20083625"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 4,
+              "id": "vault-usdc",
+              "label": "Inner vault USDC custody",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "6011",
+                  "afterRaw": "6011",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x000000000000000000000000000000000000000000000000000000000000177b",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0033.json",
+                      "sha256": "f499cb7ee2b7f7806b47f2a45229d38d1d0ba9e614cca7dfc21994d896ff01d3",
+                      "rpcId": 33,
+                      "responseSha256": "f582fff79978139c61d3d4bafc768212811e7ed338a8f068e5d38190be3df043"
+                    },
+                    {
+                      "path": "provider/002/wire/0078.json",
+                      "sha256": "a8c4469b785be98b74b3bc12234603201669fa667a311f6bab83f14c3a6c1f15",
+                      "rpcId": 78,
+                      "responseSha256": "d2c6973b9e992624c5a1b0483d7c2db940761965897cf1a27e29a0eb1b281369"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0034.json",
+                      "sha256": "b9f9c683f01be23c97aa083ed71ac1ee2631628e06ee03425da7016cc16bb232",
+                      "rpcId": 34,
+                      "responseSha256": "3b81dac3c7fc27149089808bd8b1d37575d1dc22295a7e4c279187d3f2806826"
+                    },
+                    {
+                      "path": "provider/002/wire/0079.json",
+                      "sha256": "ea1077dcc7c5cd4430933919597af4ffef7d4ae1c3004df76df69ace8e106332",
+                      "rpcId": 79,
+                      "responseSha256": "8c1cf3214f44150b3d757ffde80a565f81cab006291149eab4c5dc49265b9135"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "6011"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x000000000000000000000000000000000000000000000000000000000000177b",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0080.json",
+                      "sha256": "52845bc0b5ffc1734fd3112cf4012f2f1488b8cde14aa48f30931bdadc0a492a",
+                      "rpcId": 80,
+                      "responseSha256": "8e5bb84b31064fa01b97f7377c8c4315cf9d835eaacbe08a8f6a57f724ce705c"
+                    },
+                    {
+                      "path": "provider/002/wire/0125.json",
+                      "sha256": "8686d0051099fe549d332787fbc66f471f0a64c9059e64c00bc4dceed0d67282",
+                      "rpcId": 125,
+                      "responseSha256": "4334115e7f27eb8c1b65ccb94ecd1e21bedf59f472eec6b8dc8c54df0c76b97c"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0081.json",
+                      "sha256": "5680992b76be829a3c733c887be464468299d53d1c198540382226baed878fcd",
+                      "rpcId": 81,
+                      "responseSha256": "0058b81611bc2a7abaabf85d032df5f91bc75bb892848e8635be32641780b238"
+                    },
+                    {
+                      "path": "provider/002/wire/0126.json",
+                      "sha256": "9df6b561157a02681d62a820ef868ffc91d289aa156d5ff46268efc502d75837",
+                      "rpcId": 126,
+                      "responseSha256": "55434caf6d33bc39a5640025b9898e16c3d65e42dea435ba9f28071e6e3d0243"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "6011"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 5,
+              "id": "blue-usdc",
+              "label": "Morpho Blue USDC custody",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "128890534855869",
+                  "afterRaw": "129240534855869",
+                  "deltaRaw": "350000000000"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000007539aa8b84bd",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0037.json",
+                      "sha256": "e1b30bf08ee3d181e8b405b73ee32df2e82aab856608fa9a17f4a9742f7b11d9",
+                      "rpcId": 37,
+                      "responseSha256": "1930ceae0b646aca13cfb399dc6c55f08d6478b8b7b54a7feb588f1d1ded62af"
+                    },
+                    {
+                      "path": "provider/002/wire/0082.json",
+                      "sha256": "65cf7e8edd4a4d8bba42dbdd92dbd741dee845d3865113ac51320ccdd972ff0d",
+                      "rpcId": 82,
+                      "responseSha256": "4d6a6898c7ca745c506d67527ff9e58237b957aa40f13f8a8bba78e336e706f3"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0038.json",
+                      "sha256": "ee977fed1cd89a8c2599764bfa380835a54d0149efa0ed68f7d39ce206ce20c8",
+                      "rpcId": 38,
+                      "responseSha256": "db5be715300fa600437a5caac1644a998749c45c2cbf3b99e637bdeea9439428"
+                    },
+                    {
+                      "path": "provider/002/wire/0083.json",
+                      "sha256": "f9d7ed3c54a08774710a38d7ddce2a5f2a5b1e554bcb9efafefb3af0fb5e2f7a",
+                      "rpcId": 83,
+                      "responseSha256": "ea894f250aecc8d06725ee3610cd2e71e7f7f6d2284bd0acb8fb5db87fd55565"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "128890534855869"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000758b282bb0bd",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0084.json",
+                      "sha256": "c437f1a1af74f69f0bd321babeed4148acb05ae67b0dd1ec059d33121af7dd5b",
+                      "rpcId": 84,
+                      "responseSha256": "976d6f93268e1a3a20e34e6cc118b0c315fcaf1e269f8b0739c62e11e8b0e246"
+                    },
+                    {
+                      "path": "provider/002/wire/0129.json",
+                      "sha256": "79c7b1bb1ce386f3f607d68ef68ccbd5adb8705ac928d04eb6b11031663813d8",
+                      "rpcId": 129,
+                      "responseSha256": "4a7cdceebb2a85cef030e73d84539ac405ad0f8c769cda453ac45c5e483913a9"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0085.json",
+                      "sha256": "6d1e379126541f70195be24c70460c7db998a4f37e7a51ed933f15bedffa20f1",
+                      "rpcId": 85,
+                      "responseSha256": "45f21d73e48e21a92c2d002b0b3950edd639dbaf680090d6872adab0a1f37b48"
+                    },
+                    {
+                      "path": "provider/002/wire/0130.json",
+                      "sha256": "8f89b63c9b80d64b2c18957c1b2fbb064db6cfc0164216e2508b4dfc409aac2d",
+                      "rpcId": 130,
+                      "responseSha256": "6842a0fc619ab80b93a6f2a9ab0c8611e2f7c39e29962d38e60a3035bfe2a019"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "129240534855869"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 6,
+              "id": "owner-wrapper-usdc",
+              "label": "Sender allowance to wrapper",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "spender": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "allowance",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "350000000000",
+                  "afterRaw": "0",
+                  "deltaRaw": "-350000000000"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x000000000000000000000000000000000000000000000000000000517da02c00",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0041.json",
+                      "sha256": "3e1cbe1fd63e213dcd53174e2c89592ee87454c571ead03191deb07a57b9b25d",
+                      "rpcId": 41,
+                      "responseSha256": "f24b4538b2d0389f75f843c9f5ed9ad7d8569143e501496c689815ff79af8c2e"
+                    },
+                    {
+                      "path": "provider/002/wire/0086.json",
+                      "sha256": "ff034f7077140ee7fe8dd8c6f8b81d5790d2f00431f7aff3f4a185ab02a88aab",
+                      "rpcId": 86,
+                      "responseSha256": "0f0aff5392a6b50ec90ad01265d81924613aa19efa9d80cc291f1da6eb020d3b"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0042.json",
+                      "sha256": "0edbd3fb86fb64b6f40bba6791fc11615422fc619a4785f1827d43b6e21f3da6",
+                      "rpcId": 42,
+                      "responseSha256": "b3ed8e48a674721770ec582216e32f0465e53698cc5a6781aa1578e0ce21f7a6"
+                    },
+                    {
+                      "path": "provider/002/wire/0087.json",
+                      "sha256": "c6740602b135a6210ebd2c6e0fa554439d0c625e83ad675cd7246eaf5cddccdf",
+                      "rpcId": 87,
+                      "responseSha256": "622501fe8c732bf43d4501ca43a8b8d737e9e20e656e0ea41d29c0228063e2fe"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "allowance",
+                      "raw": "350000000000"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0088.json",
+                      "sha256": "e0070c71df825ec7d43dd65744c2060847539778061bb403d754088f5788ce09",
+                      "rpcId": 88,
+                      "responseSha256": "8e7a5e4d3f7aa7e8dd4cab7e5ab3443a09cc0da6f676eb31212ba60f5ef889bc"
+                    },
+                    {
+                      "path": "provider/002/wire/0133.json",
+                      "sha256": "f855b92b8cdf062edb5179f2180d64a4fa2c5bae7737910181ccf7ad7039027f",
+                      "rpcId": 133,
+                      "responseSha256": "fd5c6d0141c97c3b7fd078bea1bc71faab995c540e452be4d9cbcaf9472a2caf"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0089.json",
+                      "sha256": "be3bfe890b59d8445bcd6697cb39873b2125464214290ea0491be6197f22b2c8",
+                      "rpcId": 89,
+                      "responseSha256": "5ec41072f0d767b1ce4cb5a1191f16c2d6358c76c977c37f5974a431b3345042"
+                    },
+                    {
+                      "path": "provider/002/wire/0134.json",
+                      "sha256": "63adcb23730467ba470dfd1c9ebc986887563337c284e1cffb13cdc4062e3ee3",
+                      "rpcId": 134,
+                      "responseSha256": "9e39f1a5367c48cd7297742fa30a85ff58f33d7275086cb54c589f932c5d8b6f"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "allowance",
+                      "raw": "0"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 7,
+              "id": "inner-vault-blue-position",
+              "label": "Inner vault Morpho Blue position; not sender ownership",
+              "subject": {
+                "account": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "contract": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+                "marketId": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
+                "kind": "morpho_blue_position",
+                "units": "raw_supply_shares_borrow_shares_and_collateral_without_asset_conversion"
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "supplyShares",
+                  "beforeRaw": "26565631929266438023",
+                  "afterRaw": "26884573979212466695",
+                  "deltaRaw": "318942049946028672"
+                },
+                {
+                  "name": "borrowShares",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "collateral",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000170ac157d29b37f8700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0045.json",
+                      "sha256": "e45bcbce521edd2df29c4c92342bf1864fde0f670cf547715483bec46201b809",
+                      "rpcId": 45,
+                      "responseSha256": "936afe70a0e248b1763d511bdcdb329e64fabaf196280eea615c469f14704198"
+                    },
+                    {
+                      "path": "provider/002/wire/0090.json",
+                      "sha256": "509ac578576d62ec2c9ecae34ff391980a648908c1e3f5fd84b0ff0153f6f81f",
+                      "rpcId": 90,
+                      "responseSha256": "32e6a5730d0bc5810a9e6b9c766acd62fa29926c36b50f1cbd5cfb050147e716"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0046.json",
+                      "sha256": "d3ca1204594fe323b23c81b7105a6654971e6c5e01ba90526ff303e72ebe5e95",
+                      "rpcId": 46,
+                      "responseSha256": "d4a2f063c3328c3c1c91429dab1021629605cfc36e2de3f2eb493fdf65d2c1e8"
+                    },
+                    {
+                      "path": "provider/002/wire/0091.json",
+                      "sha256": "fa2c3eda1286f01ac3f3dffb756d0293e713f99a671f87372727f05af7e68bbe",
+                      "rpcId": 91,
+                      "responseSha256": "43587304e7cd4632c4439fd9cf416f772e2e5bc097d01463b7a9122e6c4dfd50"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "supplyShares",
+                      "raw": "26565631929266438023"
+                    },
+                    {
+                      "name": "borrowShares",
+                      "raw": "0"
+                    },
+                    {
+                      "name": "collateral",
+                      "raw": "0"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000175193197f0ab4a0700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0092.json",
+                      "sha256": "bc8ec804e4f49f402101ae655773759213c5388d01ff72e109b55c68f0c79706",
+                      "rpcId": 92,
+                      "responseSha256": "a4680674cbe7f3bc1c9d06be0141808a358f250cfa5fba06193624265a484af2"
+                    },
+                    {
+                      "path": "provider/002/wire/0137.json",
+                      "sha256": "c59feb6c5ede05de8e6b96c3958107c0bb988387c612d4ada98dcfaa75d4fc81",
+                      "rpcId": 137,
+                      "responseSha256": "4def1d801430e52d072487e88d4ced5174e98ffbb5e52c00db40179e0dfd7433"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0093.json",
+                      "sha256": "b7f29123f9b22b152e9e1e90d76341563eb26586476ecfd885ca08118d7828d8",
+                      "rpcId": 93,
+                      "responseSha256": "cba057cc65023c251236f46202041c1ebda260af50fe924e974ec5265c4660da"
+                    },
+                    {
+                      "path": "provider/002/wire/0138.json",
+                      "sha256": "07224b4ac395fe316b00f4cf749c2dfb5a254edb9bb252d2f9b09aa29a587738",
+                      "rpcId": 138,
+                      "responseSha256": "a675ad2583746eabc70393c276fafa878b274a8932bd960579e0f343544148a9"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "supplyShares",
+                      "raw": "26884573979212466695"
+                    },
+                    {
+                      "name": "borrowShares",
+                      "raw": "0"
+                    },
+                    {
+                      "name": "collateral",
+                      "raw": "0"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "operation": "withdraw",
+          "status": "provider_success",
+          "gasUsed": "1487368",
+          "returnData": "0x000000000000000000000000000000000000000000000000000000267997e8c3",
+          "committedLogCount": 10,
+          "originalRaw": [
+            {
+              "path": "provider/002/wire/0105.json",
+              "sha256": "7f30a3ae80b205930418207f1391c7f6d90b5bf616810b790111a1577d6e3fb0",
+              "rpcId": 105,
+              "responseSha256": "7d6e98dd07fffda538493557a6c53600b3427dff1205a37d338e0936ac1bd6ee"
+            }
+          ],
+          "beforeOverridesSha256": "7212be6621ee4366ec1cc25caba1cd750eabb028ced31da3f36a6c2fb41d943b",
+          "afterOverridesSha256": "b10a68aa73d366390b75ae162a229958be744e932705af791501b6d0db53d23e",
+          "queries": [
+            {
+              "index": 0,
+              "id": "owner-usdc",
+              "label": "Original sender USDC",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "354323976173",
+                  "afterRaw": "529323976173",
+                  "deltaRaw": "175000000000"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x000000000000000000000000000000000000000000000000000000527f5acfed",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0064.json",
+                      "sha256": "44e518d8d1461c3e202d829ce7e0ab858b6dcb37bdbbdc12e7271771daa8b1ac",
+                      "rpcId": 64,
+                      "responseSha256": "6e1460f12efd0360ff17663eaf14cbae71b9002d47a75913d139c32f34b38571"
+                    },
+                    {
+                      "path": "provider/002/wire/0109.json",
+                      "sha256": "5655eec98a6a67f41fadfcc67bdae45e354137837220314c6ec3169cd1fd4282",
+                      "rpcId": 109,
+                      "responseSha256": "0c6f3013372667b2b82b5f362f0a79d10da1bfd755132541c4188c2709afc9c2"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0065.json",
+                      "sha256": "dbc63b666ff05c28bec4d09b0d5a24d5d8c61ece800be9df8c079eb18358e17d",
+                      "rpcId": 65,
+                      "responseSha256": "c2656ced005961b833c06c010f9fb07cb20d745c6dfc783558350440002ac232"
+                    },
+                    {
+                      "path": "provider/002/wire/0110.json",
+                      "sha256": "d1adb6e3e954e76ffeffb8f17b3881287b83950920a64b1113d445a3dc66c548",
+                      "rpcId": 110,
+                      "responseSha256": "94e91ac39c0c4a720ff58cba4fc2a66e40de4301758eb2c00f45baa2b43de03f"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "354323976173"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000007b3e2ae5ed",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0111.json",
+                      "sha256": "bd8d9d837e8f2f1a694de51c3c0ec24cbcd5fe1b06b317aed1022a4aca2fbb1b",
+                      "rpcId": 111,
+                      "responseSha256": "3d2871346c7f72bd5b27c551203f48c96410cc3a8c4af106fc40192c146d2916"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0112.json",
+                      "sha256": "cbb2fed0483fb47e88e19b0b1c3d276322f79c7c416988d537b605ccb508acdf",
+                      "rpcId": 112,
+                      "responseSha256": "4cce4441e67ad136a587fa0786c836244ac69560e08f968524417f7bd934e215"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "529323976173"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 1,
+              "id": "beneficiary-wrapper-shares",
+              "label": "Beneficiary mstkeUSDC wrapper shares",
+              "subject": {
+                "asset": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "1481867899909",
+                  "afterRaw": "1316619144002",
+                  "deltaRaw": "-165248755907"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x000000000000000000000000000000000000000000000000000001590635b405",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0068.json",
+                      "sha256": "9f593d8342e9e8d5d499865e5fd45a156ccc7e158d51a133bbd092018bdec845",
+                      "rpcId": 68,
+                      "responseSha256": "e80bbb5e33cae2ea58be8517341ce76319bc2636685b3eba07118459310409ef"
+                    },
+                    {
+                      "path": "provider/002/wire/0113.json",
+                      "sha256": "eae590f4fb3862a819d8abfa6a94bf8b85e3a1fb0ae049acaa5db9f0aa2c6cef",
+                      "rpcId": 113,
+                      "responseSha256": "9f45980393cc87f5f6dcb7cf86eced35def5dd75e51e62c3935dbb0d6a222b8d"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0069.json",
+                      "sha256": "4b8372ea9922fcfc88609ca4b42cf2ff3a8499afab03596326f79b7b454e4c98",
+                      "rpcId": 69,
+                      "responseSha256": "2f54b91e04b7226ac7cd5b0852880ab6bc4681211b26fb31f05b3df661fd1506"
+                    },
+                    {
+                      "path": "provider/002/wire/0114.json",
+                      "sha256": "d18956a347318daa0856372284a352482db1bf068c398fc487e9ea38a4163f82",
+                      "rpcId": 114,
+                      "responseSha256": "f63f47c3b22ce6e0f0bf755761c96197574c287372e65065caf6ff63a7085b4d"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "1481867899909"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x000000000000000000000000000000000000000000000000000001328c9dcb42",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0115.json",
+                      "sha256": "b42930b71af80cd6506ccb76e663edec1733e0e82c78f32892ad799fa1c91164",
+                      "rpcId": 115,
+                      "responseSha256": "ea20abfdc24c5cd6b5a13846af8e3eb6d73a742eeca828f3a09a7a0df7da7405"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0116.json",
+                      "sha256": "d81b947997e4f7db1cbd3e726557cc176c907b51e36e9276bdc1556b5b6efe40",
+                      "rpcId": 116,
+                      "responseSha256": "bd9cc52d264875faaa7457629750d49bd3afab0570c6bc74367a7d096fb25022"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "1316619144002"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 2,
+              "id": "wrapper-vault-shares",
+              "label": "Wrapper-owned steakUSDC vault shares",
+              "subject": {
+                "asset": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "balanceOf",
+                "decimals": 18
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "24855185467391819293915363",
+                  "afterRaw": "24702402906808575793470890",
+                  "deltaRaw": "-152782560583243500444473"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x000000000000000000000000000000000000000000148f4a4dd72057b793f8e3",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0072.json",
+                      "sha256": "61e9438d8f63cfca17f421adb4469249a53f41ba9f20e77d49430606f9464ec2",
+                      "rpcId": 72,
+                      "responseSha256": "19008bace8a2c85a350c9ae5303a87876e1b9742890c0038180a89925c9d4963"
+                    },
+                    {
+                      "path": "provider/002/wire/0117.json",
+                      "sha256": "d63cda3c7b5eef4903673cec410ab2bdc817dfd9a2e5cfa182706dc958bbbd45",
+                      "rpcId": 117,
+                      "responseSha256": "d7c8d0d97919637cebd7aec8106be01541686594978d16f10ebdfac94918d457"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0073.json",
+                      "sha256": "460249711a2883dfcc88560c89568ab931a973d7a972bd0d900ae3c466743275",
+                      "rpcId": 73,
+                      "responseSha256": "36f51ce251d7367b4ee122274ba447f66e03565b12c125196537335066ac560c"
+                    },
+                    {
+                      "path": "provider/002/wire/0118.json",
+                      "sha256": "94a97ec343f3bbc4c645f14f2d6475d76dfc88f5807a9267267dca6a7c33e2eb",
+                      "rpcId": 118,
+                      "responseSha256": "b3b2970008f486f8e9ca7f4049baa2761800989bc4dd16792466d109c2e8c1f8"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "24855185467391819293915363"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x000000000000000000000000000000000000000000146eeff1e24294cd3a9daa",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0119.json",
+                      "sha256": "f2ed4dad51cb6d7461d79247e14d1278e7dc9bada0c588f21967b11fd1a4c0ac",
+                      "rpcId": 119,
+                      "responseSha256": "ada49d8bd6dc7fb27417645cd7b1768bbbba9db3ebfe3e7f155f30b15a1aaf91"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0120.json",
+                      "sha256": "bb93028309b3917dbffcfd266047a734d39db79ce64d7eedb58ff09339a89019",
+                      "rpcId": 120,
+                      "responseSha256": "7442ce5270aac9c608fa42aea873fe5190ee8149670e31d64bc8f2f475cd2c72"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "24702402906808575793470890"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 3,
+              "id": "wrapper-usdc",
+              "label": "Wrapper USDC custody",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "20083625",
+                  "afterRaw": "20083625",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000000013273a9",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0076.json",
+                      "sha256": "7a133c8d0aaa4d303fe8785de9ced1863c86bb325ee12b7cd3cbe02cfda3d8cb",
+                      "rpcId": 76,
+                      "responseSha256": "5ec016923cf65b27765deb33c7a3251d88222f14abc3fafa6a61618bb3b87f15"
+                    },
+                    {
+                      "path": "provider/002/wire/0121.json",
+                      "sha256": "fdd675810f97688a7189aab94aeb8cbefd10c7ca3f0db344cca943810ed6ce0b",
+                      "rpcId": 121,
+                      "responseSha256": "e7b996e5b1f413508c2bbe2622e0dd4704c8eaa761b65fd7cb28f09cf78f5fb5"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0077.json",
+                      "sha256": "8dfe2b0da64ed40a03e9d99f0b1eab3564ca7e39fc29b159fbf26c5ee726ca6e",
+                      "rpcId": 77,
+                      "responseSha256": "c5d01cb775f333bdcc71d554ef3b599224df52939843b4ca918a96b8dd75c807"
+                    },
+                    {
+                      "path": "provider/002/wire/0122.json",
+                      "sha256": "76bd1473dbbca2f3518aa0532cb627d53ce832d4cbdd6798fecd91cee36acbd9",
+                      "rpcId": 122,
+                      "responseSha256": "699b921d4199f3a5901bc33ed681fb7897dc316e716da746c301c33021820231"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "20083625"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000000000013273a9",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0123.json",
+                      "sha256": "2056f8e1364b29747adec3b7d1533b08968875c7892fdef6d7ff69b193ebb455",
+                      "rpcId": 123,
+                      "responseSha256": "6d2ae161a382c598ec6aa30f2510e3798081606458fadcddfb4c8fa6c18a6d41"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0124.json",
+                      "sha256": "ff18076b42f0ea3964a73145224df3ef42622aa1bc7344374eb20be7e75c59be",
+                      "rpcId": 124,
+                      "responseSha256": "e18649d5aab4247b0f150e5d77dbfe3ccbe7cd04aa42830ac096fe380dff12d1"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "20083625"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 4,
+              "id": "vault-usdc",
+              "label": "Inner vault USDC custody",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "6011",
+                  "afterRaw": "6011",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x000000000000000000000000000000000000000000000000000000000000177b",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0080.json",
+                      "sha256": "52845bc0b5ffc1734fd3112cf4012f2f1488b8cde14aa48f30931bdadc0a492a",
+                      "rpcId": 80,
+                      "responseSha256": "8e5bb84b31064fa01b97f7377c8c4315cf9d835eaacbe08a8f6a57f724ce705c"
+                    },
+                    {
+                      "path": "provider/002/wire/0125.json",
+                      "sha256": "8686d0051099fe549d332787fbc66f471f0a64c9059e64c00bc4dceed0d67282",
+                      "rpcId": 125,
+                      "responseSha256": "4334115e7f27eb8c1b65ccb94ecd1e21bedf59f472eec6b8dc8c54df0c76b97c"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0081.json",
+                      "sha256": "5680992b76be829a3c733c887be464468299d53d1c198540382226baed878fcd",
+                      "rpcId": 81,
+                      "responseSha256": "0058b81611bc2a7abaabf85d032df5f91bc75bb892848e8635be32641780b238"
+                    },
+                    {
+                      "path": "provider/002/wire/0126.json",
+                      "sha256": "9df6b561157a02681d62a820ef868ffc91d289aa156d5ff46268efc502d75837",
+                      "rpcId": 126,
+                      "responseSha256": "55434caf6d33bc39a5640025b9898e16c3d65e42dea435ba9f28071e6e3d0243"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "6011"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x000000000000000000000000000000000000000000000000000000000000177b",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0127.json",
+                      "sha256": "d6d5e23613fcaca13d1565f0df736df1656b8fc379448a5aab6806b237435e64",
+                      "rpcId": 127,
+                      "responseSha256": "731dbc7b547b8de5b3023c051bd3244e334d954f1b737319f89d766812d4d294"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0128.json",
+                      "sha256": "f67b94d408472706a6050aa38598338cd41945aa1bd982eaca3f6f827e2834d7",
+                      "rpcId": 128,
+                      "responseSha256": "a8b2372b19c0ba07670008affee2046ecee5ab4cd2fc859597bb73fbd6f1d6a3"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "6011"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 5,
+              "id": "blue-usdc",
+              "label": "Morpho Blue USDC custody",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "129240534855869",
+                  "afterRaw": "129065534855869",
+                  "deltaRaw": "-175000000000"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000758b282bb0bd",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0084.json",
+                      "sha256": "c437f1a1af74f69f0bd321babeed4148acb05ae67b0dd1ec059d33121af7dd5b",
+                      "rpcId": 84,
+                      "responseSha256": "976d6f93268e1a3a20e34e6cc118b0c315fcaf1e269f8b0739c62e11e8b0e246"
+                    },
+                    {
+                      "path": "provider/002/wire/0129.json",
+                      "sha256": "79c7b1bb1ce386f3f607d68ef68ccbd5adb8705ac928d04eb6b11031663813d8",
+                      "rpcId": 129,
+                      "responseSha256": "4a7cdceebb2a85cef030e73d84539ac405ad0f8c769cda453ac45c5e483913a9"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0085.json",
+                      "sha256": "6d1e379126541f70195be24c70460c7db998a4f37e7a51ed933f15bedffa20f1",
+                      "rpcId": 85,
+                      "responseSha256": "45f21d73e48e21a92c2d002b0b3950edd639dbaf680090d6872adab0a1f37b48"
+                    },
+                    {
+                      "path": "provider/002/wire/0130.json",
+                      "sha256": "8f89b63c9b80d64b2c18957c1b2fbb064db6cfc0164216e2508b4dfc409aac2d",
+                      "rpcId": 130,
+                      "responseSha256": "6842a0fc619ab80b93a6f2a9ab0c8611e2f7c39e29962d38e60a3035bfe2a019"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "129240534855869"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000000007562695b9abd",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0131.json",
+                      "sha256": "34073e8c8b7e3e9de41cdc650f651a7aeb9709f431a601cf67b78d0b1a09dda2",
+                      "rpcId": 131,
+                      "responseSha256": "85113b090f2b6a2edcffb4ed2a4ab88e83aafe60b655b643260c5b8969a1a52a"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0132.json",
+                      "sha256": "9c52182e5181e7bd2d450b2e3cf3c2857f90d7ce73836875be391146a93179e2",
+                      "rpcId": 132,
+                      "responseSha256": "9957b1006f09ad8a5443521d00f73a272b7b7f1f210b46c0a17630a79b181210"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "balance",
+                      "raw": "129065534855869"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 6,
+              "id": "owner-wrapper-usdc",
+              "label": "Sender allowance to wrapper",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "spender": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "allowance",
+                "decimals": 6
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0088.json",
+                      "sha256": "e0070c71df825ec7d43dd65744c2060847539778061bb403d754088f5788ce09",
+                      "rpcId": 88,
+                      "responseSha256": "8e7a5e4d3f7aa7e8dd4cab7e5ab3443a09cc0da6f676eb31212ba60f5ef889bc"
+                    },
+                    {
+                      "path": "provider/002/wire/0133.json",
+                      "sha256": "f855b92b8cdf062edb5179f2180d64a4fa2c5bae7737910181ccf7ad7039027f",
+                      "rpcId": 133,
+                      "responseSha256": "fd5c6d0141c97c3b7fd078bea1bc71faab995c540e452be4d9cbcaf9472a2caf"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0089.json",
+                      "sha256": "be3bfe890b59d8445bcd6697cb39873b2125464214290ea0491be6197f22b2c8",
+                      "rpcId": 89,
+                      "responseSha256": "5ec41072f0d767b1ce4cb5a1191f16c2d6358c76c977c37f5974a431b3345042"
+                    },
+                    {
+                      "path": "provider/002/wire/0134.json",
+                      "sha256": "63adcb23730467ba470dfd1c9ebc986887563337c284e1cffb13cdc4062e3ee3",
+                      "rpcId": 134,
+                      "responseSha256": "9e39f1a5367c48cd7297742fa30a85ff58f33d7275086cb54c589f932c5d8b6f"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "allowance",
+                      "raw": "0"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0135.json",
+                      "sha256": "35f57c42d0af63d6ea9c172b9a9a7fe02e0e694b172b4fc3420e02161acb9145",
+                      "rpcId": 135,
+                      "responseSha256": "083ed08f2d930a4f2d21a27fb1b9e2a7ee36fb0fe975dfbcd8a85fe45a56431e"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0136.json",
+                      "sha256": "d85a9ce97c291af337c9c44f5871ce7c17912dfa855fb21c3eb4123115e132b9",
+                      "rpcId": 136,
+                      "responseSha256": "029e55917d1abe146a14b48d1dc0381600d2f4be92a3e44546d3f0cd244c65cc"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "allowance",
+                      "raw": "0"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "index": 7,
+              "id": "inner-vault-blue-position",
+              "label": "Inner vault Morpho Blue position; not sender ownership",
+              "subject": {
+                "account": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "contract": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+                "marketId": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
+                "kind": "morpho_blue_position",
+                "units": "raw_supply_shares_borrow_shares_and_collateral_without_asset_conversion"
+              },
+              "status": "provider_measured",
+              "values": [
+                {
+                  "name": "supplyShares",
+                  "beforeRaw": "26884573979212466695",
+                  "afterRaw": "26725102954239452358",
+                  "deltaRaw": "-159471024973014337"
+                },
+                {
+                  "name": "borrowShares",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "collateral",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "sides": {
+                "before": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000175193197f0ab4a0700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0092.json",
+                      "sha256": "bc8ec804e4f49f402101ae655773759213c5388d01ff72e109b55c68f0c79706",
+                      "rpcId": 92,
+                      "responseSha256": "a4680674cbe7f3bc1c9d06be0141808a358f250cfa5fba06193624265a484af2"
+                    },
+                    {
+                      "path": "provider/002/wire/0137.json",
+                      "sha256": "c59feb6c5ede05de8e6b96c3958107c0bb988387c612d4ada98dcfaa75d4fc81",
+                      "rpcId": 137,
+                      "responseSha256": "4def1d801430e52d072487e88d4ced5174e98ffbb5e52c00db40179e0dfd7433"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0093.json",
+                      "sha256": "b7f29123f9b22b152e9e1e90d76341563eb26586476ecfd885ca08118d7828d8",
+                      "rpcId": 93,
+                      "responseSha256": "cba057cc65023c251236f46202041c1ebda260af50fe924e974ec5265c4660da"
+                    },
+                    {
+                      "path": "provider/002/wire/0138.json",
+                      "sha256": "07224b4ac395fe316b00f4cf749c2dfb5a254edb9bb252d2f9b09aa29a587738",
+                      "rpcId": 138,
+                      "responseSha256": "a675ad2583746eabc70393c276fafa878b274a8932bd960579e0f343544148a9"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "supplyShares",
+                      "raw": "26884573979212466695"
+                    },
+                    {
+                      "name": "borrowShares",
+                      "raw": "0"
+                    },
+                    {
+                      "name": "collateral",
+                      "raw": "0"
+                    }
+                  ]
+                },
+                "after": {
+                  "returnData": "0x00000000000000000000000000000000000000000000000172e2a38a8d2f64c600000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                  "trace": [
+                    {
+                      "path": "provider/002/wire/0139.json",
+                      "sha256": "3632fce07cfb259f3716bbc9bb37940b1c3526f19b2651c798d924812dcc2bcd",
+                      "rpcId": 139,
+                      "responseSha256": "1de676aebb8c4babd874955c4a54f5bc96fc80e1bf4895f5ef92b8201688d2ef"
+                    }
+                  ],
+                  "mutation": [
+                    {
+                      "path": "provider/002/wire/0140.json",
+                      "sha256": "5fb55584ea88c6dbf6b19b23ad5c33c5996c2892eb2a30777e63485f748a366a",
+                      "rpcId": 140,
+                      "responseSha256": "4db05dd45c8c7ab00465e85a1fe83cfb6cbbd5fef576d952e8dc951f9caaea31"
+                    }
+                  ],
+                  "values": [
+                    {
+                      "name": "supplyShares",
+                      "raw": "26725102954239452358"
+                    },
+                    {
+                      "name": "borrowShares",
+                      "raw": "0"
+                    },
+                    {
+                      "name": "collateral",
+                      "raw": "0"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "localFailure": {
+        "path": "local/002/wire/0003.json",
+        "sha256": "919745b5648b95ec94471f69f8facc6eb1bd47b75afc9e67baab8bc30a59d2a6",
+        "request": {
+          "jsonrpc": "2.0",
+          "id": 3,
+          "method": "eth_getProof",
+          "params": [
+            "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+            [],
+            {
+              "blockHash": "0x00cbe8bb974276f900d767a7853e0011817eeebbea1d9525e7c1fb230fd21d61",
+              "requireCanonical": true
+            }
+          ]
+        },
+        "response": {
+          "id": 3,
+          "jsonrpc": "2.0",
+          "error": {
+            "code": -32000,
+            "message": "historical state 37ac4c37f5e4962fc3dcc2d1362b66b2a2e5895c034ba33d9b7ec53c40714f66 is not available"
+          }
+        }
+      }
+    }
+  ],
+  "localAgreement": {
+    "originalChannels": {
+      "matched": 0,
+      "mismatched": 0,
+      "unavailable": 30
+    },
+    "queryChannels": {
+      "matched": 0,
+      "mismatched": 0,
+      "unavailable": 117
+    }
+  },
+  "scope": {
+    "source": "saved_drpc_responses_only",
+    "targetsExecuted": 0,
+    "networkCalls": 0,
+    "independentExecutionAgreement": false,
+    "initialStateProofsAvailable": false,
+    "originalGas": 5000000,
+    "providerQueryGas": 300000,
+    "priced": false,
+    "signedHistoricalReplay": false,
+    "completeEffects": false
+  },
+  "limitations": [
+    "Both local proof attempts failed on unavailable historical state; provider success does not establish local execution correctness.",
+    "Header hashes/witnesses, overrides, raw response joins, getter ABI values and nonce-only query mutations were checked using archived shared validators; this is not a second execution engine.",
+    "Provider sender nonce/balance/code reads anchor query mutation checks but are not authenticated state proofs.",
+    "Gas is the saved callTracer/API reported charge, not an independently reconstructed receipt.",
+    "Aave account-data base units have unknown currency/scale here; Morpho position belongs to the inner vault, not directly to the sender.",
+    "Contract-held balances and shares are not assumed to be sender assets."
+  ]
+}
