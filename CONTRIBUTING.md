@@ -20,6 +20,8 @@ A project license has not yet been selected. Public visibility does not establis
 
 Do not remove report or research files solely because they look generated. Tests intentionally use retained bytes and hashes. New results belong in a new declared location; frozen sources, manifests, inputs, failures and denominators must remain unchanged.
 
+Clone the full Git history. Some provenance tests use `git show` to compare evidence with its original source commit. If your checkout is shallow, run `git fetch --unshallow` before the full test suite. CI uses `fetch-depth: 0` for the same reason.
+
 ## Setup and configuration
 
 Use Node.js 22 or later. The root package has no dependencies; each engine has its own `package-lock.json`. Install all four engine packages with the exact commands in [Quickstart](README.md#quickstart). Keep `--ignore-scripts`, and explicitly run `prepare:runtime` only for the local engine. The runtime checker rejects unexpected dependency bytes; do not bypass it or patch the fixture engine to make comparisons agree.
