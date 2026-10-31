@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: nonce carry and cumulative writes preserve different later fields and remove writes returned to initial
+ok 1 - nonce carry and cumulative writes preserve different later fields and remove writes returned to initial
+  ---
+  duration_ms: 7.465125
+  type: 'test'
+  ...
+# Subtest: provider carry uses its own prior values even after an observed disagreement
+ok 2 - provider carry uses its own prior values even after an observed disagreement
+  ---
+  duration_ms: 1.636625
+  type: 'test'
+  ...
+# Subtest: omitted post storage clears pre-only slots; omitted basic fields remain unchanged
+ok 3 - omitted post storage clears pre-only slots; omitted basic fields remain unchanged
+  ---
+  duration_ms: 0.56875
+  type: 'test'
+  ...
+# Subtest: changed basic values require matching prevalues except authenticated zero omissions
+ok 4 - changed basic values require matching prevalues except authenticated zero omissions
+  ---
+  duration_ms: 2.242792
+  type: 'test'
+  ...
+# Subtest: missing initial slot/account anchors stay unavailable, with empty-root zero inference explicit
+ok 5 - missing initial slot/account anchors stay unavailable, with empty-root zero inference explicit
+  ---
+  duration_ms: 1.583292
+  type: 'test'
+  ...
+# Subtest: lifecycle/reset/code transitions and absent-account normalizations are never dropped
+ok 6 - lifecycle/reset/code transitions and absent-account normalizations are never dropped
+  ---
+  duration_ms: 0.643333
+  type: 'test'
+  ...
+# Subtest: duplicate accounts/slots/provenance, unknown fields and malformed explicit storage reject
+ok 7 - duplicate accounts/slots/provenance, unknown fields and malformed explicit storage reject
+  ---
+  duration_ms: 0.868417
+  type: 'test'
+  ...
+# Subtest: wrong local global before/starting overlay and step ordering cannot produce a match
+ok 8 - wrong local global before/starting overlay and step ordering cannot produce a match
+  ---
+  duration_ms: 0.360875
+  type: 'test'
+  ...
+# Subtest: unavailable and stopped positions retain null comparisons; other side is not poisoned
+ok 9 - unavailable and stopped positions retain null comparisons; other side is not poisoned
+  ---
+  duration_ms: 0.428667
+  type: 'test'
+  ...
+# Subtest: pinned saved Aave approval/supply diffs exercise real sparse shapes with synthetic anchors only
+ok 10 - pinned saved Aave approval/supply diffs exercise real sparse shapes with synthetic anchors only
+  ---
+  duration_ms: 1.946333
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 78.213958

@@ -1,0 +1,40 @@
+{
+  "scope": "saved_output_revalidation_only_no_VM_or_network",
+  "artifact": "research/lending-local-sequence-v037-work/controls/lending-v037-context-offline-current-first.json",
+  "artifactSha256": "344abe5f38ac8f4ae268f0832dd8fd154128e37391ab09b2f97550d552b845a4",
+  "initialFactsVerified": true,
+  "originalsValidated": 3,
+  "queryPairsValidated": 9,
+  "queryHalvesValidated": 18,
+  "publicCalls": 0,
+  "newVMInvocations": 0,
+  "sourceFiles": [
+    {
+      "file": "context-validation.mjs",
+      "sha256": "0a9497cfeca935977708acd851c37353964522f6e723b4a6b5555a96bc3411e9"
+    },
+    {
+      "file": "context-validation.test.mjs",
+      "sha256": "29d8fb57b6010b661b2e06e17aca261838b07a96e99cd42909f73163f1451aa1"
+    }
+  ],
+  "validationScope": {
+    "mode": "saved_only_no_execution",
+    "chainId": 1,
+    "originalGas": "5000000",
+    "localQueryGas": "1000000",
+    "providerQueryGas": "300000",
+    "providerGasPriceIndependentlyWitnessed": false,
+    "providerHeaderWitness": "NUMBER_TIMESTAMP_GASLIMIT_BASEFEE_PREVRANDAO_COINBASE_CHAINID_parent_BLOCKHASH",
+    "sharedValidation": [
+      "execution_header_hash",
+      "fork_and_intrinsic_gas_selection",
+      "historical_scalar_gas_arithmetic",
+      "local_nonce_only_query_mutation",
+      "provider_nonce_only_query_diff_and_read_trace"
+    ],
+    "gasValidation": "accounting_bound_to_root_message_gas_and_reported_refund_counter_not_independent_refund_eligibility",
+    "initialProofsAndTransportJoin": "required_externally",
+    "queryPurity": "no_committed_logs_and_net_changes_except_expected_sender_nonce_not_no_transient_writes"
+  }
+}

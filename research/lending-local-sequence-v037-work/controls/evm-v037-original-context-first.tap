@@ -1,0 +1,184 @@
+TAP version 13
+# Subtest: query eligibility requires two anchored overlays but does not hide a valid state disagreement
+ok 1 - query eligibility requires two anchored overlays but does not hide a valid state disagreement
+  ---
+  duration_ms: 0.875334
+  type: 'test'
+  ...
+# Subtest: saved scalar and typed-position shapes parse as distinct query controls
+ok 2 - saved scalar and typed-position shapes parse as distinct query controls
+  ---
+  duration_ms: 14.439625
+  type: 'test'
+  ...
+# Subtest: unavailable and missing getter states retain null channels
+ok 3 - unavailable and missing getter states retain null channels
+  ---
+  duration_ms: 4.938583
+  type: 'test'
+  ...
+# Subtest: request, identity, calldata, gas and state-selector substitutions are rejected
+ok 4 - request, identity, calldata, gas and state-selector substitutions are rejected
+  ---
+  duration_ms: 4.95775
+  type: 'test'
+  ...
+# Subtest: projected amount tampering cannot pass because the raw getter bytes agree
+ok 5 - projected amount tampering cannot pass because the raw getter bytes agree
+  ---
+  duration_ms: 2.26225
+  type: 'test'
+  ...
+# Subtest: missing, duplicate or differently overridden mutation evidence is rejected
+ok 6 - missing, duplicate or differently overridden mutation evidence is rejected
+  ---
+  duration_ms: 1.679709
+  type: 'test'
+  ...
+# Subtest: even internally consistent getter overrides must match the selected sequence side
+ok 7 - even internally consistent getter overrides must match the selected sequence side
+  ---
+  duration_ms: 0.614375
+  type: 'test'
+  ...
+# Subtest: saved provider cumulative contexts bind raw diffs and prior state before comparison
+ok 8 - saved provider cumulative contexts bind raw diffs and prior state before comparison
+  ---
+  duration_ms: 0.842083
+  type: 'test'
+  ...
+# Subtest: a valid raw trace at the wrong original starting overlay is rejected
+ok 9 - a valid raw trace at the wrong original starting overlay is rejected
+  ---
+  duration_ms: 0.679542
+  type: 'test'
+  ...
+# Subtest: original RPC options cannot select a different transaction position or disable evidence
+ok 10 - original RPC options cannot select a different transaction position or disable evidence
+  ---
+  duration_ms: 1.5035
+  type: 'test'
+  ...
+# Subtest: typed position identity and ABI return lengths cannot be substituted
+ok 11 - typed position identity and ABI return lengths cannot be substituted
+  ---
+  duration_ms: 2.060375
+  type: 'test'
+  ...
+# Subtest: different valid getter values are mismatches, not unavailable or passing zeros
+ok 12 - different valid getter values are mismatches, not unavailable or passing zeros
+  ---
+  duration_ms: 0.563583
+  type: 'test'
+  ...
+# Subtest: saved original controls distinguish output channels from uncomputed state
+ok 13 - saved original controls distinguish output channels from uncomputed state
+  ---
+  duration_ms: 1.125666
+  type: 'test'
+  ...
+# Subtest: missing originals and unverified canonical context are never execution matches
+ok 14 - missing originals and unverified canonical context are never execution matches
+  ---
+  duration_ms: 0.529417
+  type: 'test'
+  ...
+# Subtest: original envelope and gas-accounting inconsistencies withhold channels
+ok 15 - original envelope and gas-accounting inconsistencies withhold channels
+  ---
+  duration_ms: 1.316333
+  type: 'test'
+  ...
+# Subtest: valid differing original return/gas/logs are retained as measured mismatches
+ok 16 - valid differing original return/gas/logs are retained as measured mismatches
+  ---
+  duration_ms: 0.183916
+  type: 'test'
+  ...
+# Subtest: missing full capture gate preserves every declared position/query in denominator
+ok 17 - missing full capture gate preserves every declared position/query in denominator
+  ---
+  duration_ms: 0.304959
+  type: 'test'
+  ...
+# Subtest: nonce carry and cumulative writes preserve different later fields and remove writes returned to initial
+ok 18 - nonce carry and cumulative writes preserve different later fields and remove writes returned to initial
+  ---
+  duration_ms: 7.655916
+  type: 'test'
+  ...
+# Subtest: provider carry uses its own prior values even after an observed disagreement
+ok 19 - provider carry uses its own prior values even after an observed disagreement
+  ---
+  duration_ms: 1.7565
+  type: 'test'
+  ...
+# Subtest: omitted post storage clears pre-only slots; omitted basic fields remain unchanged
+ok 20 - omitted post storage clears pre-only slots; omitted basic fields remain unchanged
+  ---
+  duration_ms: 0.571
+  type: 'test'
+  ...
+# Subtest: changed basic values require matching prevalues except authenticated zero omissions
+ok 21 - changed basic values require matching prevalues except authenticated zero omissions
+  ---
+  duration_ms: 2.093541
+  type: 'test'
+  ...
+# Subtest: missing initial slot/account anchors stay unavailable, with empty-root zero inference explicit
+ok 22 - missing initial slot/account anchors stay unavailable, with empty-root zero inference explicit
+  ---
+  duration_ms: 1.638458
+  type: 'test'
+  ...
+# Subtest: real absent-input shape is retained when unused and cannot authorize materialization
+ok 23 - real absent-input shape is retained when unused and cannot authorize materialization
+  ---
+  duration_ms: 0.247083
+  type: 'test'
+  ...
+# Subtest: lifecycle/reset/code transitions and absent-account normalizations are never dropped
+ok 24 - lifecycle/reset/code transitions and absent-account normalizations are never dropped
+  ---
+  duration_ms: 0.643833
+  type: 'test'
+  ...
+# Subtest: duplicate accounts/slots/provenance, unknown fields and malformed explicit storage reject
+ok 25 - duplicate accounts/slots/provenance, unknown fields and malformed explicit storage reject
+  ---
+  duration_ms: 0.91575
+  type: 'test'
+  ...
+# Subtest: wrong local global before/starting overlay and step ordering cannot produce a match
+ok 26 - wrong local global before/starting overlay and step ordering cannot produce a match
+  ---
+  duration_ms: 0.514125
+  type: 'test'
+  ...
+# Subtest: coherent original and nonce-only query snapshots cannot rescue a false global storage before-value
+ok 27 - coherent original and nonce-only query snapshots cannot rescue a false global storage before-value
+  ---
+  duration_ms: 0.734458
+  type: 'test'
+  ...
+# Subtest: unavailable and stopped positions retain null comparisons; other side is not poisoned
+ok 28 - unavailable and stopped positions retain null comparisons; other side is not poisoned
+  ---
+  duration_ms: 0.364166
+  type: 'test'
+  ...
+# Subtest: pinned saved Aave approval/supply diffs exercise real sparse shapes with synthetic anchors only
+ok 29 - pinned saved Aave approval/supply diffs exercise real sparse shapes with synthetic anchors only
+  ---
+  duration_ms: 1.4785
+  type: 'test'
+  ...
+1..29
+# tests 29
+# suites 0
+# pass 29
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 130.655709

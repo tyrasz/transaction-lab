@@ -1,0 +1,94 @@
+TAP version 13
+# Subtest: exact two-case request/header fingerprints and source inventory are fixed
+ok 1 - exact two-case request/header fingerprints and source inventory are fixed
+  ---
+  duration_ms: 0.70625
+  type: 'test'
+  ...
+# Subtest: both public APIs normalize each declaration without silently dropping or altering fields
+ok 2 - both public APIs normalize each declaration without silently dropping or altering fields
+  ---
+  duration_ms: 1.725666
+  type: 'test'
+  ...
+# Subtest: Aave calldata uses the retained USDC amount, Pool approval, sender beneficiary, and rounded-down half withdrawal
+ok 3 - Aave calldata uses the retained USDC amount, Pool approval, sender beneficiary, and rounded-down half withdrawal
+  ---
+  duration_ms: 0.092
+  type: 'test'
+  ...
+# Subtest: Kiln withdrawal is assets-denominated with sender as receiver and owner, not a direct Blue redeem
+ok 4 - Kiln withdrawal is assets-denominated with sender as receiver and owner, not a direct Blue redeem
+  ---
+  duration_ms: 0.059959
+  type: 'test'
+  ...
+# Subtest: Aave query order distinguishes sender receipt balance, reserve underlying, allowance, and account data
+ok 5 - Aave query order distinguishes sender receipt balance, reserve underlying, allowance, and account data
+  ---
+  duration_ms: 0.109375
+  type: 'test'
+  ...
+# Subtest: Kiln eight-query tuple preserves wrapper/vault ownership and binds Blue position to vault, not wallet
+ok 6 - Kiln eight-query tuple preserves wrapper/vault ownership and binds Blue position to vault, not wallet
+  ---
+  duration_ms: 0.060209
+  type: 'test'
+  ...
+# Subtest: scope keeps novel withdrawals and gas-context differences explicit; returned declarations are immutable
+ok 7 - scope keeps novel withdrawals and gas-context differences explicit; returned declarations are immutable
+  ---
+  duration_ms: 0.180875
+  type: 'test'
+  ...
+# Subtest: an isolated exact source copy reproduces both fixed requests
+ok 8 - an isolated exact source copy reproduces both fixed requests
+  ---
+  duration_ms: 11.450459
+  type: 'test'
+  ...
+# Subtest: same-length provenance URL tampering is rejected by source hash before ABI use
+ok 9 - same-length provenance URL tampering is rejected by source hash before ABI use
+  ---
+  duration_ms: 7.12275
+  type: 'test'
+  ...
+# Subtest: same-length change to Aave original supply calldata is refused, not silently re-declared
+ok 10 - same-length change to Aave original supply calldata is refused, not silently re-declared
+  ---
+  duration_ms: 7.065333
+  type: 'test'
+  ...
+# Subtest: same-length change to Kiln original deposit beneficiary is refused by pinned source identity
+ok 11 - same-length change to Kiln original deposit beneficiary is refused by pinned source identity
+  ---
+  duration_ms: 8.294583
+  type: 'test'
+  ...
+# Subtest: same-length saved header mutation cannot move the fixed initial state
+ok 12 - same-length saved header mutation cannot move the fixed initial state
+  ---
+  duration_ms: 6.101417
+  type: 'test'
+  ...
+# Subtest: saved ABI content changes and byte-count changes both fail closed
+ok 13 - saved ABI content changes and byte-count changes both fail closed
+  ---
+  duration_ms: 10.586875
+  type: 'test'
+  ...
+# Subtest: fixture symlink is refused even when its target has the exact trusted bytes
+ok 14 - fixture symlink is refused even when its target has the exact trusted bytes
+  ---
+  duration_ms: 3.470958
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 207.403333

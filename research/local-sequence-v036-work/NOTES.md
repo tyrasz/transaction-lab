@@ -84,8 +84,9 @@ passed **774/774** in `full-app-final.tap` (101.144 s). These tests use local
 fixtures and temporary localhost servers, not new public-chain observations.
 
 The candidate server on port 5175 passed health/configuration GET checks and
-advertises local sequences for Ethereum and Sepolia. Its browser layout check
-is pending because the Mac was locked. Installed port 5174 remains unchanged.
+advertises local sequences for Ethereum and Sepolia. Browser checking was
+initially blocked by the locked Mac; the subsequent editor-only check is
+recorded below. Installed port 5174 remains unchanged.
 
 The first independent four-sequence capture is preserved in
 `../local-sequence-v036-reference/`; see its `NOTES.md`. Four product processes
@@ -133,8 +134,12 @@ environment, not a cumulative consensus block test; proof revalidation shares
 the production verifier. The old external Python runtime's drift and a fresh
 current-runtime inventory are fully recorded; v2 uses the same inventory as
 the first sequence attempt. No public-chain sequence capture or release has
-occurred. Installed 0.35.0 remains unchanged, and actual browser visual review
-is still pending.
+occurred. Installed 0.35.0 remains unchanged. The Mac became available, and
+`browser-editor-check.json` records actual Ethereum/Sepolia ordered-form,
+advanced-control and four-call-limit checks at 1280 × 720, with no browser
+console errors. Two screenshots were viewed in the conversation, not saved
+as files. No simulation was dispatched; result-view and responsive checks
+remain outside this browser observation.
 
 These development checks do not change the public 16-call accuracy sample or
 establish Aave/Morpho/Hyperlend category coverage or general EVM accuracy.

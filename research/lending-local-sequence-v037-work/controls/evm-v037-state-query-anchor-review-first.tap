@@ -1,0 +1,82 @@
+TAP version 13
+# Subtest: nonce carry and cumulative writes preserve different later fields and remove writes returned to initial
+ok 1 - nonce carry and cumulative writes preserve different later fields and remove writes returned to initial
+  ---
+  duration_ms: 7.818292
+  type: 'test'
+  ...
+# Subtest: provider carry uses its own prior values even after an observed disagreement
+ok 2 - provider carry uses its own prior values even after an observed disagreement
+  ---
+  duration_ms: 1.382334
+  type: 'test'
+  ...
+# Subtest: omitted post storage clears pre-only slots; omitted basic fields remain unchanged
+ok 3 - omitted post storage clears pre-only slots; omitted basic fields remain unchanged
+  ---
+  duration_ms: 0.560875
+  type: 'test'
+  ...
+# Subtest: changed basic values require matching prevalues except authenticated zero omissions
+ok 4 - changed basic values require matching prevalues except authenticated zero omissions
+  ---
+  duration_ms: 2.090542
+  type: 'test'
+  ...
+# Subtest: missing initial slot/account anchors stay unavailable, with empty-root zero inference explicit
+ok 5 - missing initial slot/account anchors stay unavailable, with empty-root zero inference explicit
+  ---
+  duration_ms: 1.533916
+  type: 'test'
+  ...
+# Subtest: real absent-input shape is retained when unused and cannot authorize materialization
+ok 6 - real absent-input shape is retained when unused and cannot authorize materialization
+  ---
+  duration_ms: 0.269292
+  type: 'test'
+  ...
+# Subtest: lifecycle/reset/code transitions and absent-account normalizations are never dropped
+ok 7 - lifecycle/reset/code transitions and absent-account normalizations are never dropped
+  ---
+  duration_ms: 0.648709
+  type: 'test'
+  ...
+# Subtest: duplicate accounts/slots/provenance, unknown fields and malformed explicit storage reject
+ok 8 - duplicate accounts/slots/provenance, unknown fields and malformed explicit storage reject
+  ---
+  duration_ms: 0.862084
+  type: 'test'
+  ...
+# Subtest: wrong local global before/starting overlay and step ordering cannot produce a match
+ok 9 - wrong local global before/starting overlay and step ordering cannot produce a match
+  ---
+  duration_ms: 0.493791
+  type: 'test'
+  ...
+# Subtest: coherent original and nonce-only query snapshots cannot rescue a false global storage before-value
+ok 10 - coherent original and nonce-only query snapshots cannot rescue a false global storage before-value
+  ---
+  duration_ms: 0.689833
+  type: 'test'
+  ...
+# Subtest: unavailable and stopped positions retain null comparisons; other side is not poisoned
+ok 11 - unavailable and stopped positions retain null comparisons; other side is not poisoned
+  ---
+  duration_ms: 0.348292
+  type: 'test'
+  ...
+# Subtest: pinned saved Aave approval/supply diffs exercise real sparse shapes with synthetic anchors only
+ok 12 - pinned saved Aave approval/supply diffs exercise real sparse shapes with synthetic anchors only
+  ---
+  duration_ms: 1.333167
+  type: 'test'
+  ...
+1..12
+# tests 12
+# suites 0
+# pass 12
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 75.808583

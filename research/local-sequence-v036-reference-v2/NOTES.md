@@ -60,6 +60,8 @@ verifier and do not constitute a second proof implementation.
 
 This narrow synthetic agreement does not change the public 16-call accuracy
 sample or establish representative EVM accuracy, full effects/security coverage,
-or real-protocol sequence correctness. Installed release **0.35.0** is unchanged;
-browser visual review and release remain pending. No public network, wallet
+or real-protocol sequence correctness. Installed release **0.35.0** is unchanged.
+The [browser editor check](../local-sequence-v036-work/browser-editor-check.json)
+now covers Ethereum/Sepolia selection, ordered forms, advanced controls and
+the four-call limit. Result-view visual review and release remain pending. No public network, wallet
 signature or broadcast was used; reference signatures use the public fixture key.

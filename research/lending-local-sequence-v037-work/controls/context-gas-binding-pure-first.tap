@@ -1,0 +1,94 @@
+TAP version 13
+# Subtest: synthetic local original and before/after query contexts validate without execution
+ok 1 - synthetic local original and before/after query contexts validate without execution
+  ---
+  duration_ms: 6.446125
+  type: 'test'
+  ...
+# Subtest: local original context refuses changed source, fork, gas, fees and root envelope
+ok 2 - local original context refuses changed source, fork, gas, fees and root envelope
+  ---
+  duration_ms: 5.256833
+  type: 'test'
+  ...
+# Subtest: local root status, return data and gas use must agree with projected output
+ok 3 - local root status, return data and gas use must agree with projected output
+  ---
+  duration_ms: 4.237791
+  type: 'test'
+  ...
+# Subtest: coherent projected gas tampering cannot detach accounting from root gas and refund counter
+ok 4 - coherent projected gas tampering cannot detach accounting from root gas and refund counter
+  ---
+  duration_ms: 2.573375
+  type: 'test'
+  ...
+# Subtest: local getters must start at the exact original snapshots and use 1M query gas
+ok 5 - local getters must start at the exact original snapshots and use 1M query gas
+  ---
+  duration_ms: 2.204209
+  type: 'test'
+  ...
+# Subtest: local getters require verified sender anchor and reject extra net writes or logs
+ok 6 - local getters require verified sender anchor and reject extra net writes or logs
+  ---
+  duration_ms: 1.671334
+  type: 'test'
+  ...
+# Subtest: saved provider first and carried second original have exact source and synthetic header witnesses
+ok 7 - saved provider first and carried second original have exact source and synthetic header witnesses
+  ---
+  duration_ms: 2.32925
+  type: 'test'
+  ...
+# Subtest: provider source headers and identity must bind chain, source hash and consensus fields
+ok 8 - provider source headers and identity must bind chain, source hash and consensus fields
+  ---
+  duration_ms: 3.927708
+  type: 'test'
+  ...
+# Subtest: each of the eight provider header words is checked, including synthetic zero BASEFEE
+ok 9 - each of the eight provider header words is checked, including synthetic zero BASEFEE
+  ---
+  duration_ms: 5.52925
+  type: 'test'
+  ...
+# Subtest: header witnesses require exact probe code, complete before/after overrides and request envelope
+ok 10 - header witnesses require exact probe code, complete before/after overrides and request envelope
+  ---
+  duration_ms: 5.311959
+  type: 'test'
+  ...
+# Subtest: saved scalar and typed provider getters retain nonce-only state under first and carried contexts
+ok 11 - saved scalar and typed provider getters retain nonce-only state under first and carried contexts
+  ---
+  duration_ms: 4.372042
+  type: 'test'
+  ...
+# Subtest: provider getter mutations cannot add storage, transfer balance or use a different sender nonce
+ok 12 - provider getter mutations cannot add storage, transfer balance or use a different sender nonce
+  ---
+  duration_ms: 1.485375
+  type: 'test'
+  ...
+# Subtest: provider getter raw trace must be successful, log-free and use the exact carried query context
+ok 13 - provider getter raw trace must be successful, log-free and use the exact carried query context
+  ---
+  duration_ms: 2.047875
+  type: 'test'
+  ...
+# Subtest: offline current-engine integration: fixed approve100 deposit100 withdraw50 with three CALL queries
+ok 14 - offline current-engine integration: fixed approve100 deposit100 withdraw50 with three CALL queries # SKIP
+  ---
+  duration_ms: 0.017292
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 128.18325
