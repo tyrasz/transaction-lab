@@ -83,10 +83,27 @@ test('actual local state write is scored as evaluated product, five exact synthe
   const {input}=await fixture();const result=await adjudicateLocalOutcome(input);
   assert.equal(result.outcome.execution,'success');assert.equal(result.outcome.comparison,'match',JSON.stringify(result));assert.equal(result.allChannelsComplete,true);assert.equal(result.limitations.providerContextExecutionAttested,false);
 });
-test('actual root revert and actual invalid opcode count completed, with nonce-only state retained',async()=>{
-  for(const [code,status]of [['0x60006000fd','reverted'],['0xfe','failed']]){
-    const {input}=await fixture({code});const r=await adjudicateLocalOutcome(input);assert.equal(r.outcome.execution,status);assert.equal(r.outcome.comparison,'match',JSON.stringify(r));
-  }
+test('actual root revert counts completed, with nonce-only state retained',async()=>{
+  const {input}=await fixture({code:'0x60006000fd'});const r=await adjudicateLocalOutcome(input);assert.equal(r.outcome.execution,'reverted');assert.equal(r.outcome.comparison,'match',JSON.stringify(r));
+});
+test('actual invalid opcode accepts exact Geth INVALID spelling with raw binding and independent channels',async()=>{
+  const {input,trace,diff}=await fixture({code:'0xfe'});
+  assert.equal(input.local.attempt.output.execution.error,'invalid opcode');
+  const baseline=await adjudicateLocalOutcome(input);assert.equal(baseline.outcome.comparison,'match');
+  const geth={...trace,error:'invalid opcode: INVALID'};rewrite(input.oracle.records[1],geth);
+  const result=await adjudicateLocalOutcome(input);assert.equal(result.outcome.execution,'failed');assert.equal(result.outcome.comparison,'match',JSON.stringify(result));assert.equal(result.allChannelsComplete,true);
+  assert(Object.values(result.channels).every(c=>c.status==='match'));assert.equal(result.evidence.oracle.rawExecutionError,'invalid opcode: INVALID');
+  const badRaw=copy(input);badRaw.oracle.records[1].parsed.result.error='invalid opcode';
+  assert.equal((await adjudicateLocalOutcome(badRaw)).outcome.comparison,'oracle_unavailable');
+  const unknown=copy(input);rewrite(unknown.oracle.records[1],{...geth,error:'invalid opcode: INVALID extra'});
+  const missing=await adjudicateLocalOutcome(unknown);assert.equal(missing.channels.executionStatus.status,'unavailable');assert.equal(missing.outcome.comparison,'not_comparable');
+  for(const name of['returnData','committedLogs','gasAccounting','fullObservedStateChanges'])assert.equal(missing.channels[name].status,'match');
+  const gas=copy(input);rewrite(gas.oracle.records[1],{...geth,gasUsed:hx(BigInt(geth.gasUsed)-1n)});
+  const gasResult=await adjudicateLocalOutcome(gas);assert.equal(gasResult.channels.executionStatus.status,'match');assert.equal(gasResult.channels.gasAccounting.status,'mismatch');
+  const logs=copy(input);rewrite(logs.oracle.records[1],{...geth,logs:[{address:FACTORY,topics:['0x01'],data:'0x'}]});
+  const logResult=await adjudicateLocalOutcome(logs);assert.equal(logResult.channels.executionStatus.status,'match');assert.equal(logResult.channels.committedLogs.status,'unavailable');
+  const state=copy(input),changed=copy(diff),sender=input.request.from;changed.post[sender].nonce=hx(BigInt(changed.post[sender].nonce)+1n);rewrite(state.oracle.records[2],changed);
+  const stateResult=await adjudicateLocalOutcome(state);assert.equal(stateResult.channels.executionStatus.status,'match');assert.equal(stateResult.channels.fullObservedStateChanges.status,'mismatch');
 });
 test('actual top-level deployment, internal deployment and Shanghai whole-account deletion are comparable',async()=>{
   for(const options of [{request:{to:null,data:'0x'+initcode()}},{code:undefined},{shanghai:true,code:'0x73'+OTHER.slice(2)+'ff',accounts:{[FACTORY]:{nonce:7n,balance:1000n,code:'0x73'+OTHER.slice(2)+'ff',storage:{[word(991)]:99n}}}}]){

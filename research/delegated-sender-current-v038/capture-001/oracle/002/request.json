@@ -1,0 +1,154 @@
+{
+  "id": "delegated-usdt-015",
+  "index": 1,
+  "kind": "oracle",
+  "inputSha256": "661b2c16b592407cb5d20e9a72fc8d2e1298e4c62bd21b415a5e41a33c5303ed",
+  "request": [
+    {
+      "label": "header_before",
+      "method": "eth_getBlockByHash",
+      "params": [
+        "0x59dcdd6b3ccf74ff760c0db757a2e29ae7c7d96aa422ee6375644b740b332138",
+        false
+      ]
+    },
+    {
+      "label": "call_trace",
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x3068aaa8e7e07693cf3066dd15f174f7afc30c40",
+          "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "data": "0xa9059cbb000000000000000000000000fbea74cd7e84295846bdd47bf248c004187182800000000000000000000000000000000000000000000000000000000005a995c0",
+          "value": "0x0",
+          "gas": "0x4c4b40",
+          "gasPrice": "0x0",
+          "accessList": []
+        },
+        {
+          "blockHash": "0x59dcdd6b3ccf74ff760c0db757a2e29ae7c7d96aa422ee6375644b740b332138",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "callTracer",
+          "tracerConfig": {
+            "withLog": true
+          },
+          "blockOverrides": {
+            "baseFeePerGas": "0x0"
+          }
+        }
+      ]
+    },
+    {
+      "label": "state_diff",
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x3068aaa8e7e07693cf3066dd15f174f7afc30c40",
+          "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "data": "0xa9059cbb000000000000000000000000fbea74cd7e84295846bdd47bf248c004187182800000000000000000000000000000000000000000000000000000000005a995c0",
+          "value": "0x0",
+          "gas": "0x4c4b40",
+          "gasPrice": "0x0",
+          "accessList": []
+        },
+        {
+          "blockHash": "0x59dcdd6b3ccf74ff760c0db757a2e29ae7c7d96aa422ee6375644b740b332138",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "prestateTracer",
+          "tracerConfig": {
+            "diffMode": true
+          },
+          "blockOverrides": {
+            "baseFeePerGas": "0x0"
+          }
+        }
+      ]
+    },
+    {
+      "label": "header_after",
+      "method": "eth_getBlockByNumber",
+      "params": [
+        "0x1917da9",
+        false
+      ]
+    }
+  ],
+  "normalized": [
+    {
+      "label": "header_before",
+      "method": "eth_getBlockByHash",
+      "params": [
+        "0x59dcdd6b3ccf74ff760c0db757a2e29ae7c7d96aa422ee6375644b740b332138",
+        false
+      ]
+    },
+    {
+      "label": "call_trace",
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x3068aaa8e7e07693cf3066dd15f174f7afc30c40",
+          "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "data": "0xa9059cbb000000000000000000000000fbea74cd7e84295846bdd47bf248c004187182800000000000000000000000000000000000000000000000000000000005a995c0",
+          "value": "0x0",
+          "gas": "0x4c4b40",
+          "gasPrice": "0x0",
+          "accessList": []
+        },
+        {
+          "blockHash": "0x59dcdd6b3ccf74ff760c0db757a2e29ae7c7d96aa422ee6375644b740b332138",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "callTracer",
+          "tracerConfig": {
+            "withLog": true
+          },
+          "blockOverrides": {
+            "baseFeePerGas": "0x0"
+          }
+        }
+      ]
+    },
+    {
+      "label": "state_diff",
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x3068aaa8e7e07693cf3066dd15f174f7afc30c40",
+          "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "data": "0xa9059cbb000000000000000000000000fbea74cd7e84295846bdd47bf248c004187182800000000000000000000000000000000000000000000000000000000005a995c0",
+          "value": "0x0",
+          "gas": "0x4c4b40",
+          "gasPrice": "0x0",
+          "accessList": []
+        },
+        {
+          "blockHash": "0x59dcdd6b3ccf74ff760c0db757a2e29ae7c7d96aa422ee6375644b740b332138",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "prestateTracer",
+          "tracerConfig": {
+            "diffMode": true
+          },
+          "blockOverrides": {
+            "baseFeePerGas": "0x0"
+          }
+        }
+      ]
+    },
+    {
+      "label": "header_after",
+      "method": "eth_getBlockByNumber",
+      "params": [
+        "0x1917da9",
+        false
+      ]
+    }
+  ]
+}

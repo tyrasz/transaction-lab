@@ -1,0 +1,118 @@
+TAP version 13
+# Subtest: two synthetic proof-bound API originals retain exactly five channels each, without invoking execution
+not ok 1 - two synthetic proof-bound API originals retain exactly five channels each, without invoking execution
+  ---
+  duration_ms: 18.766125
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/delegated-sender-current-v038/outcomes.test.mjs:99:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    {"delegation":{"status":"verified_existing_delegation","sender":"0x08bb7baf5d5621dace37db11d81e4516c6697493","target":"0x7777777777777777777777777777777777777777","code":"0xef01007777777777777777777777777777777777777777","proofVerified":true,"blockHash":"0x39028f9ad1b6bb2cc2aa4e317fe31dab981b128e9965bd6a0d379ebe3787209e","stateRoot":"0xe52266ca40c8c26e30fbaf741bf48b711f6f16d041bd4bfd9f7b9390c113dd3d","authorizationListProcessed":false},"outcome":{"transactionHash":"0x31cac6ebe975a4ca6666adf9b107fdb291af2cbeecbcf838397034e60daa03b8","execution":"provider_unavailable","comparison":"not_comparable"},"channels":{"executionStatus":{"status":"unavailable","reason":"Comparison not reached"},"returnData":{"status":"unavailable","reason":"Comparison not reached"},"committedLogs":{"status":"unavailable","reason":"Comparison not reached"},"gasAccounting":{"status":"unavailable","reason":"Comparison not reached"},"fullObservedStateChanges":{"status":"unavailable","reason":"Comparison not reached"}},"reasons":["Evidence is malformed, incomplete, or fails independent binding"],"allChannelsComplete":false,"evidence":{},"limitations":{"evaluatedProduct":"current_isolated_local_kernel","oracle":"remote_native_trace_and_sparse_diff","artifactHashesBound":false,"sourceIdentityAuthenticityVerified":false,"providerContextExecutionAttested":false,"headerConsensusOrFinalityVerified":false,"fullPoststateRootCompared":false,"fullCallTreeEquality":false,"originalTransactionReplay":false,"feeSettlement":false,"completeEconomicInventory":false,"securityScore":false},"scope":{"evaluatedProduct":"guarded_simulateLocal_API_original","oracle":"remote_native_trace_and_sparse_diff","queryMeasurementsCompared":false,"originalTransactionReplay":false,"feeSettlement":false,"authorizationListProcessed":false,"fullPoststateRootCompared":false,"fullCallTreeEquality":false,"independentConsensus":false,"providerContextExecutionAttested":false,"sharedProviderInfrastructure":true,"rawWireAndArchiveAuthenticity":"requires_outer_saved_packet_adjudication","parentValidationAndProofVerifierSharedWithProduct":true}}
+    + actual - expected
+    
+    + 'not_comparable'
+    - 'match'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'match'
+  actual: 'not_comparable'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/delegated-sender-current-v038/outcomes.test.mjs:103:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: valid raw disagreements remain mismatches in each applicable original channel
+not ok 2 - valid raw disagreements remain mismatches in each applicable original channel
+  ---
+  duration_ms: 5.281583
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/delegated-sender-current-v038/outcomes.test.mjs:109:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    {"delegation":{"status":"verified_existing_delegation","sender":"0x08bb7baf5d5621dace37db11d81e4516c6697493","target":"0x7777777777777777777777777777777777777777","code":"0xef01007777777777777777777777777777777777777777","proofVerified":true,"blockHash":"0x39028f9ad1b6bb2cc2aa4e317fe31dab981b128e9965bd6a0d379ebe3787209e","stateRoot":"0xe52266ca40c8c26e30fbaf741bf48b711f6f16d041bd4bfd9f7b9390c113dd3d","authorizationListProcessed":false},"outcome":{"transactionHash":"0x31cac6ebe975a4ca6666adf9b107fdb291af2cbeecbcf838397034e60daa03b8","execution":"provider_unavailable","comparison":"not_comparable"},"channels":{"executionStatus":{"status":"unavailable","reason":"Comparison not reached"},"returnData":{"status":"unavailable","reason":"Comparison not reached"},"committedLogs":{"status":"unavailable","reason":"Comparison not reached"},"gasAccounting":{"status":"unavailable","reason":"Comparison not reached"},"fullObservedStateChanges":{"status":"unavailable","reason":"Comparison not reached"}},"reasons":["Evidence is malformed, incomplete, or fails independent binding"],"allChannelsComplete":false,"evidence":{},"limitations":{"evaluatedProduct":"current_isolated_local_kernel","oracle":"remote_native_trace_and_sparse_diff","artifactHashesBound":false,"sourceIdentityAuthenticityVerified":false,"providerContextExecutionAttested":false,"headerConsensusOrFinalityVerified":false,"fullPoststateRootCompared":false,"fullCallTreeEquality":false,"originalTransactionReplay":false,"feeSettlement":false,"completeEconomicInventory":false,"securityScore":false},"scope":{"evaluatedProduct":"guarded_simulateLocal_API_original","oracle":"remote_native_trace_and_sparse_diff","queryMeasurementsCompared":false,"originalTransactionReplay":false,"feeSettlement":false,"authorizationListProcessed":false,"fullPoststateRootCompared":false,"fullCallTreeEquality":false,"independentConsensus":false,"providerContextExecutionAttested":false,"sharedProviderInfrastructure":true,"rawWireAndArchiveAuthenticity":"requires_outer_saved_packet_adjudication","parentValidationAndProofVerifierSharedWithProduct":true}}
+    + actual - expected
+    
+    + 'unavailable'
+    - 'mismatch'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'mismatch'
+  actual: 'unavailable'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/delegated-sender-current-v038/outcomes.test.mjs:118:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: proof-verified empty, absent and non-designation senders are changed_sender, never delegated coverage
+ok 3 - proof-verified empty, absent and non-designation senders are changed_sender, never delegated coverage
+  ---
+  duration_ms: 16.373875
+  type: 'test'
+  ...
+# Subtest: forged delegation metadata, nonce changes and invalid sender proofs cannot become matches
+ok 4 - forged delegation metadata, nonce changes and invalid sender proofs cannot become matches
+  ---
+  duration_ms: 12.728666
+  type: 'test'
+  ...
+# Subtest: canonical API/source/drain/child gates reject withheld and contradictory reports without audit fallback
+ok 5 - canonical API/source/drain/child gates reject withheld and contradictory reports without audit fallback
+  ---
+  duration_ms: 14.454041
+  type: 'test'
+  ...
+# Subtest: API requests, query identities and original broker/raw response prefix are bound exactly
+ok 6 - API requests, query identities and original broker/raw response prefix are bound exactly
+  ---
+  duration_ms: 8.729709
+  type: 'test'
+  ...
+# Subtest: query failure and additional query input suffix do not replace the original snapshot or add comparison channels
+not ok 7 - query failure and additional query input suffix do not replace the original snapshot or add comparison channels
+  ---
+  duration_ms: 3.881
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/delegated-sender-current-v038/outcomes.test.mjs:174:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    {"delegation":{"status":"verified_existing_delegation","sender":"0x08bb7baf5d5621dace37db11d81e4516c6697493","target":"0x7777777777777777777777777777777777777777","code":"0xef01007777777777777777777777777777777777777777","proofVerified":true,"blockHash":"0x39028f9ad1b6bb2cc2aa4e317fe31dab981b128e9965bd6a0d379ebe3787209e","stateRoot":"0xe52266ca40c8c26e30fbaf741bf48b711f6f16d041bd4bfd9f7b9390c113dd3d","authorizationListProcessed":false},"outcome":{"transactionHash":"0x31cac6ebe975a4ca6666adf9b107fdb291af2cbeecbcf838397034e60daa03b8","execution":"provider_unavailable","comparison":"not_comparable"},"channels":{"executionStatus":{"status":"unavailable","reason":"Comparison not reached"},"returnData":{"status":"unavailable","reason":"Comparison not reached"},"committedLogs":{"status":"unavailable","reason":"Comparison not reached"},"gasAccounting":{"status":"unavailable","reason":"Comparison not reached"},"fullObservedStateChanges":{"status":"unavailable","reason":"Comparison not reached"}},"reasons":["Evidence is malformed, incomplete, or fails independent binding"],"allChannelsComplete":false,"evidence":{},"limitations":{"evaluatedProduct":"current_isolated_local_kernel","oracle":"remote_native_trace_and_sparse_diff","artifactHashesBound":false,"sourceIdentityAuthenticityVerified":false,"providerContextExecutionAttested":false,"headerConsensusOrFinalityVerified":false,"fullPoststateRootCompared":false,"fullCallTreeEquality":false,"originalTransactionReplay":false,"feeSettlement":false,"completeEconomicInventory":false,"securityScore":false},"scope":{"evaluatedProduct":"guarded_simulateLocal_API_original","oracle":"remote_native_trace_and_sparse_diff","queryMeasurementsCompared":false,"originalTransactionReplay":false,"feeSettlement":false,"authorizationListProcessed":false,"fullPoststateRootCompared":false,"fullCallTreeEquality":false,"independentConsensus":false,"providerContextExecutionAttested":false,"sharedProviderInfrastructure":true,"rawWireAndArchiveAuthenticity":"requires_outer_saved_packet_adjudication","parentValidationAndProofVerifierSharedWithProduct":true}}
+    + actual - expected
+    
+    + 'not_comparable'
+    - 'match'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'match'
+  actual: 'not_comparable'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/delegated-sender-current-v038/outcomes.test.mjs:183:42)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: missing and wrong-context raw oracle evidence preserve the five-channel unavailable denominator
+ok 8 - missing and wrong-context raw oracle evidence preserve the five-channel unavailable denominator
+  ---
+  duration_ms: 7.5785
+  type: 'test'
+  ...
+# Subtest: accessors are rejected without execution or mutation of caller-owned evidence
+ok 9 - accessors are rejected without execution or mutation of caller-owned evidence
+  ---
+  duration_ms: 1.626834
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 6
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 200.692917

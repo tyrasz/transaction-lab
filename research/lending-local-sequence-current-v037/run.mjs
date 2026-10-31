@@ -3,10 +3,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-import {spawn} from 'node:child_process';
 import {performance} from 'node:perf_hooks';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {read,json,sha,walk,entry,checkRows,copyRows,nodeIdentity,createLedger,verifyPacket} from './archive.mjs';
+import {runSealedWorker} from '../worker-process.mjs';
 export const PREFIX='research/lending-local-sequence-current-v037';
 export const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
 import {readPinnedTemplates,deriveTemplateProfile,validateTemplateProfile,TEMPLATE_PROFILES,deriveCurrentDeclarations,validateCurrentDeclarations,HISTORICAL_TEMPLATES,CURRENT_DENOMINATOR} from './declarations.mjs';
@@ -15,7 +15,7 @@ import {replayHeaderSelection,assertFirstTargetFresh,HEADER_SELECTION_POLICY} fr
 export {TEMPLATE_PROFILES,validateTemplateProfile};
 export const OWN=['PLAN.md','declarations.mjs','declarations.test.mjs','funded-profile.mjs','funded-profile.test.mjs','selection.mjs','selection.test.mjs','strict-json.mjs','strict-json.test.mjs','select-current-header.mjs','select-current-header.test.mjs',
  'adjudicate.mjs','adjudicate.test.mjs','run.mjs','run.test.mjs','archive.mjs','capture.mjs','capture.test.mjs','worker.mjs'];
-export const SHARED=['research/standard-evm/cohort-http.mjs','reports/ethereum-lending-local-reference/compare.mjs',
+export const SHARED=['research/worker-process.mjs','research/standard-evm/cohort-http.mjs','reports/ethereum-lending-local-reference/compare.mjs',
  ...['observations.mjs','state-observations.mjs','context-validation.mjs'].map(n=>'research/lending-local-sequence-v037/'+n)];
 export const AGGREGATE_LIMITS=Object.freeze({networkCalls:1039,networkBytes:326*1024*1024,selectionPhaseMs:60000,targetPhaseMs:900000});
 export const LIMITS=Object.freeze({cases:2,processes:4,positions:6,totalMs:900000,localProcessMs:190000,providerProcessMs:300000,prepareProcessMs:30000,
@@ -92,24 +92,11 @@ export function validateWireDirectory(directory,report){
  assert.equal(observedBytes,report.captureUsage.observedBytes);return{calls:paths.length,observedBytes};
 }
 export async function processOnce(plan,index,kind,prepareOnly,writer,timeoutMs,{beforeSpawn=()=>null}={}){
- const relative=`${kind}/${id(index)}`,outDir=path.join(plan.inputBase,relative);fs.mkdirSync(outDir,{recursive:false});
- const call=invocation(plan,index,kind,outDir,prepareOnly),start=Date.now(),mono=performance.now(),buffers={stdout:[],stderr:[]},observed={stdout:0,stderr:0};
- let child,firstTarget=null,limitFailure=null,error=null,cleanupSignalAccepted=false;const kill=()=>{try{if(child?.pid)process.kill(-child.pid,'SIGKILL');cleanupSignalAccepted=true;}catch(e){if(e.code==='ESRCH')cleanupSignalAccepted=true;else error??={name:e.name,message:e.message};}};
- let timer;const terminal=await new Promise(resolve=>{
-  try{firstTarget=beforeSpawn();child=spawn(call.executable,call.args,{cwd:plan.runtimePath,detached:true,stdio:['ignore','pipe','pipe'],env:{PATH:process.env.PATH??'',LANG:'C',TZ:'UTC'}});}catch(e){error={name:e.name,message:e.message};return resolve({status:null,signal:null,closed:false});}
-  timer=setTimeout(()=>{limitFailure='wall_timeout';kill();},timeoutMs);
-  for(const k of ['stdout','stderr'])child[k].on('data',chunk=>{const old=observed[k];observed[k]+=chunk.length;const room=Math.max(0,LIMITS.streamBytes-old);if(room)buffers[k].push(chunk.subarray(0,room));if(observed[k]>LIMITS.streamBytes){limitFailure='output_bytes';kill();}});
-  child.on('error',e=>{error={name:e.name,message:e.message,code:e.code??null};});child.on('close',(status,signal)=>resolve({status,signal,closed:true}));
- });clearTimeout(timer);kill();
- const stem=`processes/${kind}-${id(index)}`,stdout=Buffer.concat(buffers.stdout),stderr=Buffer.concat(buffers.stderr),record={...call,pid:child?.pid??null,timeoutMs,wallMs:Date.now()-start,monotonicMs:performance.now()-mono,...terminal,error,limitFailure,cleanupSignalAccepted,observedBytes:observed};
- let report=null,workerManifestSha256=null,workerSealed=false;
- try{const summary=JSON.parse(stdout);workerManifestSha256=summary.manifestSha256;const m=verifyPacket(outDir,workerManifestSha256);writer.adopt(relative,[...m.files,entry(outDir,'manifest.json')].sort((a,b)=>a.path.localeCompare(b.path)));workerSealed=true;report=json(path.join(outDir,'report.json'));}
- catch(e){try{writer.adopt(relative);}catch{}error??={name:e.name,message:e.message};record.error=error;}
- for(const[k,bytes]of[['stdout',stdout],['stderr',stderr]]){writer.write(stem+'.'+k,bytes);record[k]={path:stem+'.'+k,bytes:bytes.length,sha256:sha(bytes)};}
- if(firstTarget!==null)record.firstTarget=firstTarget;
- const processSha256=writer.save(stem+'-process.json',record);writer.save(stem+'-seal.json',{processSha256,workerManifestSha256,workerSealed,stdout:record.stdout,stderr:record.stderr});
+ const relative=`${kind}/${id(index)}`,outDir=path.join(plan.inputBase,relative),call=invocation(plan,index,kind,outDir,prepareOnly),stem=`processes/${kind}-${id(index)}`;
+ const worker=await runSealedWorker({...call,cwd:plan.runtimePath,outDir,relative,stem,writer,timeoutMs,streamBytes:LIMITS.streamBytes,beforeSpawn});
+ const {record,stdout,stderr,report,workerManifestSha256}=worker;
  let validation={status:'unavailable',bounded:false,calls:null,networkBytes:null};
- try{assert(workerSealed&&terminal.closed&&terminal.status===0&&terminal.signal===null&&error===null&&limitFailure===null&&cleanupSignalAccepted&&stderr.length===0);
+ try{assert(worker.boundedProcess);
   validateProcessRecord(record,{plan,index,kind,outDir,prepareOnly,stdout,stderr});if(!prepareOnly)validateWireDirectory(outDir,report);validation=validateReport(report,{plan,index,kind,prepareOnly,pid:record.pid});}catch{}
  return{...validation,process:stem+'-process.json',seal:stem+'-seal.json',workerManifestSha256};
 }

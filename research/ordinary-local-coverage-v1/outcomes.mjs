@@ -132,10 +132,14 @@ async function bindLocal(local,call,header,expected) {
   validateExecutionChanges({changes:a.changes,inputs:a.inputs,output:o,sender:call.from,destination:call.to,selfdestructOnlyCreated:common.isActivatedEIP(6780),common,request:call,header});
   return {attempt:a,output:o,costs:c,authorization};
 }
-function errorClass(error,local=false) {
+export function errorClass(error,local=false) {
   if(error===null)return {status:'success',exception:null};
   if(error===(local?'revert':'execution reverted'))return {status:'reverted',exception:'revert'};
-  const aliases=[[/^out of gas$/,'out_of_gas'],[/^invalid opcode(?:: opcode 0x[0-9a-f]{2} not defined)?$/,'invalid_opcode'],[/^invalid (?:JUMP|jump)(?: destination)?$/,'invalid_jump'],[/^stack underflow(?: \([0-9]+ <=> [0-9]+\))?$/,'stack_underflow'],[/^stack (?:limit reached|overflow)(?: \([0-9]+\))?$/,'stack_overflow'],[/^(?:write protection|static state change)$/,'write_protection'],[/^return data out of bounds$/,'return_data_bounds'],[/^(?:contract address collision|create collision)$/,'create_collision'],[/^code size to deposit exceeds maximum code size$/,'code_size']];
+  // Geth formats ErrInvalidOpCode as "invalid opcode: %s" and names 0xfe "INVALID":
+  // https://raw.githubusercontent.com/ethereum/go-ethereum/v1.16.5/core/vm/errors.go
+  // https://raw.githubusercontent.com/ethereum/go-ethereum/v1.16.5/core/vm/opcodes.go
+  // Admit only that exact additional spelling; unknown suffixes remain unavailable.
+  const aliases=[[/^out of gas$/,'out_of_gas'],[/^invalid opcode(?:: INVALID(?![\s\S])|: opcode 0x[0-9a-f]{2} not defined)?$/,'invalid_opcode'],[/^invalid (?:JUMP|jump)(?: destination)?$/,'invalid_jump'],[/^stack underflow(?: \([0-9]+ <=> [0-9]+\))?$/,'stack_underflow'],[/^stack (?:limit reached|overflow)(?: \([0-9]+\))?$/,'stack_overflow'],[/^(?:write protection|static state change)$/,'write_protection'],[/^return data out of bounds$/,'return_data_bounds'],[/^(?:contract address collision|create collision)$/,'create_collision'],[/^code size to deposit exceeds maximum code size$/,'code_size']];
   for(const [pattern,exception]of aliases)if(typeof error==='string'&&pattern.test(error))return {status:'failed',exception};
   throw new Incomplete('Unrecognized actual EVM exception; exception equality is unavailable');
 }

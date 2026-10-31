@@ -1,0 +1,64 @@
+TAP version 13
+# Subtest: exact two original byte files and provenance pins form a fixed ten-channel denominator
+ok 1 - exact two original byte files and provenance pins form a fixed ten-channel denominator
+  ---
+  duration_ms: 1.906167
+  type: 'test'
+  ...
+# Subtest: both original envelopes, transaction identities and distinct historical headers remain exact
+ok 2 - both original envelopes, transaction identities and distinct historical headers remain exact
+  ---
+  duration_ms: 3.661292
+  type: 'test'
+  ...
+# Subtest: balanceOf query order is sender then the exact original ABI recipient; no query adds a comparison channel
+ok 3 - balanceOf query order is sender then the exact original ABI recipient; no query adds a comparison channel
+  ---
+  duration_ms: 1.629042
+  type: 'test'
+  ...
+# Subtest: reordered, truncated, reserialized or coherently substituted templates are refused before derivation
+ok 4 - reordered, truncated, reserialized or coherently substituted templates are refused before derivation
+  ---
+  duration_ms: 1.765417
+  type: 'test'
+  ...
+# Subtest: invalid header hash, changed consensus fields and unsupported header properties are rejected
+ok 5 - invalid header hash, changed consensus fields and unsupported header properties are rejected
+  ---
+  duration_ms: 3.919625
+  type: 'test'
+  ...
+# Subtest: exact rederivation rejects altered envelopes, API context, headers, identities, query order or denominator
+ok 6 - exact rederivation rejects altered envelopes, API context, headers, identities, query order or denominator
+  ---
+  duration_ms: 47.150416
+  type: 'test'
+  ...
+# Subtest: extra argument/list fields, sparse lists and accessors cannot smuggle result-derived inputs
+ok 7 - extra argument/list fields, sparse lists and accessors cannot smuggle result-derived inputs
+  ---
+  duration_ms: 0.718708
+  type: 'test'
+  ...
+# Subtest: immutable source/provenance file changes and symlink substitutions are refused
+ok 8 - immutable source/provenance file changes and symlink substitutions are refused
+  ---
+  duration_ms: 5.190417
+  type: 'test'
+  ...
+# Subtest: selected header integrity does not claim selection freshness, canonicality, historical repair or target execution
+ok 9 - selected header integrity does not claim selection freshness, canonicality, historical repair or target execution
+  ---
+  duration_ms: 12.080209
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 201.484917

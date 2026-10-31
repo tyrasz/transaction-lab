@@ -1,0 +1,154 @@
+{
+  "id": "delegated-usdt-002",
+  "index": 0,
+  "kind": "oracle",
+  "inputSha256": "d2fe07044db518695939db349a3785f09e627c13491f1f94fde7b27bf94eca03",
+  "request": [
+    {
+      "label": "header_before",
+      "method": "eth_getBlockByHash",
+      "params": [
+        "0x49b97e395a7e594a00de1f8fc289717527962d2f3a0e6666966fa0d1398b2ce4",
+        false
+      ]
+    },
+    {
+      "label": "call_trace",
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x08bb7baf5d5621dace37db11d81e4516c6697493",
+          "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "data": "0xa9059cbb000000000000000000000000c24526704a5a88f2dac16b35af15bc37a0809c7b00000000000000000000000000000000000000000000000000000000e5004480",
+          "value": "0x0",
+          "gas": "0x4c4b40",
+          "gasPrice": "0x0",
+          "accessList": []
+        },
+        {
+          "blockHash": "0x49b97e395a7e594a00de1f8fc289717527962d2f3a0e6666966fa0d1398b2ce4",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "callTracer",
+          "tracerConfig": {
+            "withLog": true
+          },
+          "blockOverrides": {
+            "baseFeePerGas": "0x0"
+          }
+        }
+      ]
+    },
+    {
+      "label": "state_diff",
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x08bb7baf5d5621dace37db11d81e4516c6697493",
+          "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "data": "0xa9059cbb000000000000000000000000c24526704a5a88f2dac16b35af15bc37a0809c7b00000000000000000000000000000000000000000000000000000000e5004480",
+          "value": "0x0",
+          "gas": "0x4c4b40",
+          "gasPrice": "0x0",
+          "accessList": []
+        },
+        {
+          "blockHash": "0x49b97e395a7e594a00de1f8fc289717527962d2f3a0e6666966fa0d1398b2ce4",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "prestateTracer",
+          "tracerConfig": {
+            "diffMode": true
+          },
+          "blockOverrides": {
+            "baseFeePerGas": "0x0"
+          }
+        }
+      ]
+    },
+    {
+      "label": "header_after",
+      "method": "eth_getBlockByNumber",
+      "params": [
+        "0x1912563",
+        false
+      ]
+    }
+  ],
+  "normalized": [
+    {
+      "label": "header_before",
+      "method": "eth_getBlockByHash",
+      "params": [
+        "0x49b97e395a7e594a00de1f8fc289717527962d2f3a0e6666966fa0d1398b2ce4",
+        false
+      ]
+    },
+    {
+      "label": "call_trace",
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x08bb7baf5d5621dace37db11d81e4516c6697493",
+          "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "data": "0xa9059cbb000000000000000000000000c24526704a5a88f2dac16b35af15bc37a0809c7b00000000000000000000000000000000000000000000000000000000e5004480",
+          "value": "0x0",
+          "gas": "0x4c4b40",
+          "gasPrice": "0x0",
+          "accessList": []
+        },
+        {
+          "blockHash": "0x49b97e395a7e594a00de1f8fc289717527962d2f3a0e6666966fa0d1398b2ce4",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "callTracer",
+          "tracerConfig": {
+            "withLog": true
+          },
+          "blockOverrides": {
+            "baseFeePerGas": "0x0"
+          }
+        }
+      ]
+    },
+    {
+      "label": "state_diff",
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x08bb7baf5d5621dace37db11d81e4516c6697493",
+          "to": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+          "data": "0xa9059cbb000000000000000000000000c24526704a5a88f2dac16b35af15bc37a0809c7b00000000000000000000000000000000000000000000000000000000e5004480",
+          "value": "0x0",
+          "gas": "0x4c4b40",
+          "gasPrice": "0x0",
+          "accessList": []
+        },
+        {
+          "blockHash": "0x49b97e395a7e594a00de1f8fc289717527962d2f3a0e6666966fa0d1398b2ce4",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "prestateTracer",
+          "tracerConfig": {
+            "diffMode": true
+          },
+          "blockOverrides": {
+            "baseFeePerGas": "0x0"
+          }
+        }
+      ]
+    },
+    {
+      "label": "header_after",
+      "method": "eth_getBlockByNumber",
+      "params": [
+        "0x1912563",
+        false
+      ]
+    }
+  ]
+}
