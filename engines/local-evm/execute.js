@@ -20,6 +20,7 @@ import { createCreationAttemptObserver } from './creation-attempt-observer.js';
 import { storageOnlyCreationAccount } from './creation-support.js';
 import { applyAmsterdamAuthorizations, amsterdamPreparationHalt } from './amsterdam-authorization.js';
 import { assertDelegationRuntimePatched } from './delegation-runtime-patch.js';
+import { RpcStateInputError } from './rpc-state-inputs.js';
 
 // The pinned dependency needs the exact, declared runtime corrections. Verify
 // the explicit preparation step before accepting execution in this process; never
@@ -55,6 +56,7 @@ function supportedAddress(value, chainId) {
 }
 function safeFailure(error) {
   if (error instanceof ExecutionError) return { status: error.status, error: { code: error.code, message: error.message } };
+  if (error instanceof RpcStateInputError && error.code === 'RPC_STATE_INPUT_UNAVAILABLE') return { status: 'unavailable', error: { code: 'LOCAL_INPUT_UNAVAILABLE', message: 'Required pinned input state is unavailable; no execution result can be reported.' } };
   if (error?.code === 'LOCAL_STATE_MISSING') return { status: 'unavailable', error: { code: 'LOCAL_STATE_MISSING', message: 'Required local input state was not supplied.' } };
   if (['LOCAL_ETHEREUM_STATE_GAS_UNSUPPORTED', 'LOCAL_ETHEREUM_FORK_UNSUPPORTED'].includes(error?.code)) return { status: 'unsupported', error: { code: error.code, message: error.message } };
   if (error?.code === 'LOCAL_STATE_UNSUPPORTED') return { status: 'unsupported', error: { code: 'LOCAL_STATE_UNSUPPORTED', message: 'The supplied sparse state adapter does not support this state change.' } };

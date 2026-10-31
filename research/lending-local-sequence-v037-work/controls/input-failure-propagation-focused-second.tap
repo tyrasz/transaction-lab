@@ -1,0 +1,136 @@
+TAP version 13
+# Subtest: self-authorized creation proof failure retains independently derived root entry gas but no preparation or settlement
+ok 1 - self-authorized creation proof failure retains independently derived root entry gas but no preparation or settlement
+  ---
+  duration_ms: 192.279542
+  type: 'test'
+  ...
+# Subtest: actual incomplete child cannot substitute preauthorization gas or either adjacent gas value
+ok 2 - actual incomplete child cannot substitute preauthorization gas or either adjacent gas value
+  ---
+  duration_ms: 451.362292
+  type: 'test'
+  ...
+# Subtest: actual incomplete child cannot retain authorization, fee, lifecycle or state-change claims
+ok 3 - actual incomplete child cannot retain authorization, fee, lifecycle or state-change claims
+  ---
+  duration_ms: 694.362625
+  type: 'test'
+  ...
+# Subtest: missing recipient proof after valid preparation preserves unavailable output and its postauthorization root gas
+ok 4 - missing recipient proof after valid preparation preserves unavailable output and its postauthorization root gas
+  ---
+  duration_ms: 142.646125
+  type: 'test'
+  ...
+# Subtest: pure entry derivation needs every reached authority proof but not recipient-only facts, and rejects preparation OOG
+ok 5 - pure entry derivation needs every reached authority proof but not recipient-only facts, and rejects preparation OOG
+  ---
+  duration_ms: 11.988042
+  type: 'test'
+  ...
+# Subtest: priced/unpriced internal CREATE and CREATE2 clear storage-only targets and retain new creation effects
+ok 6 - priced/unpriced internal CREATE and CREATE2 clear storage-only targets and retain new creation effects
+  ---
+  duration_ms: 666.944375
+  type: 'test'
+  ...
+# Subtest: zero-balance hidden-storage targets deploy with a complete cleared namespace
+ok 7 - zero-balance hidden-storage targets deploy with a complete cleared namespace
+  ---
+  duration_ms: 290.596458
+  type: 'test'
+  ...
+# Subtest: ancestor REVERT restores cleared storage while a caught successful child retains its deployment
+ok 8 - ancestor REVERT restores cleared storage while a caught successful child retains its deployment
+  ---
+  duration_ms: 469.651583
+  type: 'test'
+  ...
+# Subtest: root CREATE clears hidden storage before constructor reads and writes
+ok 9 - root CREATE clears hidden storage before constructor reads and writes
+  ---
+  duration_ms: 272.765791
+  type: 'test'
+  ...
+# Subtest: Shanghai through Osaka root CREATE and internal CREATE/CREATE2 clear storage-only targets
+ok 10 - Shanghai through Osaka root CREATE and internal CREATE/CREATE2 clear storage-only targets
+  ---
+  duration_ms: 1615.804875
+  type: 'test'
+  ...
+# Subtest: delegated sender and self-authorization retain preparation through successful clearing and a subsequent real collision
+ok 11 - delegated sender and self-authorization retain preparation through successful clearing and a subsequent real collision
+  ---
+  duration_ms: 263.819792
+  type: 'test'
+  ...
+# Subtest: absent and empty-storage targets still deploy through root CREATE and internal CREATE2 with signed/full-MPT agreement
+ok 12 - absent and empty-storage targets still deploy through root CREATE and internal CREATE2 with signed/full-MPT agreement
+  ---
+  duration_ms: 545.954166
+  type: 'test'
+  ...
+# Subtest: creation queries are measured when reverted and withheld when they retain cleared storage, without poisoning later overlays
+ok 13 - creation queries are measured when reverted and withheld when they retain cleared storage, without poisoning later overlays
+  ---
+  duration_ms: 275.338042
+  type: 'test'
+  ...
+# Subtest: a reverted deployment into empty storage remains a neutral measured query contrast
+ok 14 - a reverted deployment into empty storage remains a neutral measured query contrast
+  ---
+  duration_ms: 147.862625
+  type: 'test'
+  ...
+# Subtest: ordinary CALL and creation fail-fast leave a storage-only target unchanged after state-gas precharge
+ok 15 - ordinary CALL and creation fail-fast leave a storage-only target unchanged after state-gas precharge
+  ---
+  duration_ms: 379.49
+  type: 'test'
+  ...
+# Subtest: after-state query newly routed through authorization withholds retained creation mutations without erasing preparation
+ok 16 - after-state query newly routed through authorization withholds retained creation mutations without erasing preparation
+  ---
+  duration_ms: 146.53625
+  type: 'test'
+  ...
+# Subtest: a wrapper getter measures zero before creation and the fresh value after clearing while preserving the original overlay
+ok 17 - a wrapper getter measures zero before creation and the fresh value after clearing while preserving the original overlay
+  ---
+  duration_ms: 131.943375
+  type: 'test'
+  ...
+# Subtest: a creation-target proof host failure cannot be caught by an ancestor or retain earlier writes
+ok 18 - a creation-target proof host failure cannot be caught by an ancestor or retain earlier writes
+  ---
+  duration_ms: 257.7485
+  type: 'test'
+  ...
+# Subtest: isolated first proof failure preserves typed input unavailability without remote details or measurements
+ok 19 - isolated first proof failure preserves typed input unavailability without remote details or measurements
+  ---
+  duration_ms: 153.073
+  type: 'test'
+  ...
+# Subtest: isolated later proof failure rolls back only the failed invocation and preserves the validated priced prefix
+ok 20 - isolated later proof failure rolls back only the failed invocation and preserves the validated priced prefix
+  ---
+  duration_ms: 180.929791
+  type: 'test'
+  ...
+# Subtest: only the real allowlisted input error is classified; spoofed, invalid-proof and unknown host errors remain withheld
+ok 21 - only the real allowlisted input error is classified; spoofed, invalid-proof and unknown host errors remain withheld
+  ---
+  duration_ms: 14.797375
+  type: 'test'
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 21
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5718.427583

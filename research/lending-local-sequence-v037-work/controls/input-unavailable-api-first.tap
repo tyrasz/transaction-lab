@@ -1,0 +1,36 @@
+TAP version 13
+# Subtest: first unavailable account proof remains a distinct input failure through the actual API and worker
+not ok 1 - first unavailable account proof remains a distinct input failure through the actual API and worker
+  ---
+  duration_ms: 148.610625
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/local-sequence.test.js:177:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'LOCAL_EXECUTION_FAILED'
+    - 'LOCAL_INPUT_UNAVAILABLE'
+             ^
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'LOCAL_INPUT_UNAVAILABLE'
+  actual: 'LOCAL_EXECUTION_FAILED'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/local-sequence.test.js:183:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 536.676708

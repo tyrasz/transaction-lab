@@ -62,8 +62,8 @@ retained at `capture/local/001/wire/0003.json` and
 `capture/local/002/wire/0003.json` within the linked packet directory. Source
 headers and final rereads passed; missing proof inputs are neither contract
 reverts nor successful execution. The product exposed a generic local-execution
-error; a separate narrow product correction is being checked without modifying
-this frozen packet.
+error; the separate correction described below leaves this frozen packet
+unchanged.
 
 The archived saved-only adjudicator completed successfully against both external
 pins. It verified 4,367 manifest entries, original-write ledgers, raw-wire joins,
@@ -92,3 +92,29 @@ installed 0.35 service remains unchanged.
 Provider error evidence currently withholds the whole affected sequence during
 comparison, even where individual original channels might otherwise be usable;
 all declared positions remain in the denominator.
+
+## Typed input failure correction
+
+Development now maps only an actual `RpcStateInputError` with code
+`RPC_STATE_INPUT_UNAVAILABLE` to `LOCAL_INPUT_UNAVAILABLE`, with a fixed local
+message. Provider text is not forwarded. Unknown or lookalike host exceptions
+and invalid proofs remain generic unavailable errors. The change alters error
+classification only: first-read failure leaves state unchanged; a later read
+failure rolls back that invocation while retaining the prior validated prefix.
+Affected amounts remain unavailable and later original calls are not attempted.
+
+The [engine controls](controls/CONTROLS-input-failure.md) retain the first test
+assumption errors and their correction, with **21/21 focused controls** passing.
+The full engine regression then passed **1,089/1,089** (31.558 seconds), recorded
+in [the full TAP](controls/input-unavailable-engine-full.tap). A new actual
+API/ProofRpcClient/isolated-child regression first reproduced the old generic
+code. The subsequent four-file application run passed **38/39**: its one failure
+was a test expecting rollback before any checkpoint existed. After correcting
+that assertion to the observed `unchanged` disposition, the single affected test
+passed. All 39 distinct application checks have passing final observations;
+there was no subsequent full four-file rerun. All first logs remain retained.
+
+Peer review confirmed the typed classification, constant-message sanitization,
+unchanged host-failure latch and rollback precedence. This is offline regression
+evidence; no public lending sequence was rerun against the correction. The
+installed app remains 0.35.0.

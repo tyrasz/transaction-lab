@@ -16,7 +16,7 @@ const queries = [allowance, balance(SEQUENCE_TOKEN, SEQUENCE_SENDER), balance(SE
 const callOf = ({ from, ...call }) => call;
 const inputFor = (f, methods = ['approve', 'deposit'], extra = {}) => ({ chainId: f.chainId, from: SEQUENCE_SENDER,
   block: 'latest', calls: methods.map(name => callOf(f.requests[name])), queries, ...extra });
-function transport(f, { rpcChain, finalHeader, failStorage, cancelFinal, drainComplete = true, limits } = {}) {
+function transport(f, { rpcChain, finalHeader, failStorage, failAccount, cancelFinal, drainComplete = true, limits } = {}) {
   const wires = [], failures = []; let headers = 0;
   const rpc = new ProofRpcClient({ chainId: f.chainId, url: 'https://synthetic.invalid', ...(limits ? { limits } : {}),
     fetchImpl: async (_url, options) => {
@@ -39,7 +39,9 @@ function transport(f, { rpcChain, finalHeader, failStorage, cancelFinal, drainCo
         } else {
           assert(['eth_getProof', 'eth_getCode'].includes(request.method));
           assert.deepEqual(request.params.at(-1), { blockHash: f.header.hash, requireCanonical: true });
-          if (request.method === 'eth_getProof' && request.params[0] === SEQUENCE_TOKEN && request.params[1].includes(failStorage)) {
+          if (request.method === 'eth_getProof' && request.params[0] === failAccount) {
+            error = { code: -32000, message: 'private provider diagnostic must not reach the frontend' };
+          } else if (request.method === 'eth_getProof' && request.params[0] === SEQUENCE_TOKEN && request.params[1].includes(failStorage)) {
             error = { code: -32000, message: 'Declared synthetic storage proof is unavailable' };
           } else result = await f.rpc.call(request.method, request.params);
         }
@@ -170,6 +172,23 @@ test('query-only missing proof preserves every original and withholds affected m
   assert.equal(report.steps[0].measurements[1].status, 'unavailable'); assert.equal(report.steps[0].measurements[1].values, null);
   assert(report.steps[1].measurements.every(row => row.values === null));
   for (const step of report.attempt.sequence.steps) assert(!step.original.inputEvidence.some(wire => wire.request.method === 'eth_getProof' && wire.request.params[1].includes(balanceSlot(SEQUENCE_RECIPIENT))));
+});
+
+test('first unavailable account proof remains a distinct input failure through the actual API and worker', async () => {
+  const f = await sequenceFixture(), p = transport(f, { failAccount: SEQUENCE_SENDER });
+  const report = await simulateLocalSequence(inputFor(f), p.rpc); p.check(report);
+  assert.equal(report.source.canonicalStatus, 'verified');
+  assert.deepEqual(report.steps.map(step => step.status), ['unavailable', 'not_attempted']);
+  assert.equal(report.steps[0].execution.status, 'unavailable');
+  assert.equal(report.steps[0].execution.error.code, 'LOCAL_INPUT_UNAVAILABLE');
+  assert(report.steps.every(step => step.measurements.every(row => row.values === null)));
+  assert.equal(report.attempt.sequence.steps[0].original.output.stateDisposition, 'unchanged');
+  assert.equal(report.attempt.isolation.processClosed, true);
+  assert.equal(report.attempt.broker.pendingAtReturn, 0);
+  assert.equal(report.drain.complete, true);
+  assert.equal(p.wires.filter(wire => wire.method === 'eth_getProof').length, 1);
+  assert.equal(p.wires.at(-1).method, 'eth_getBlockByNumber');
+  assert(!JSON.stringify(report).includes('private provider diagnostic'));
 });
 
 test('wrong chain or wrong selected number is withheld before state reads', async () => {

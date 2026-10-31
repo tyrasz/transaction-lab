@@ -64,7 +64,7 @@ async function tamper(t, f, mutate) {
         const message = JSON.parse(values[0]);
         if (message.type === 'result') {
           assert.equal(message.result.output.execution.status, 'unavailable');
-          assert.equal(message.result.output.execution.error.code, 'LOCAL_EXECUTION_FAILED');
+          assert.equal(message.result.output.execution.error.code, 'LOCAL_INPUT_UNAVAILABLE');
           assert.equal(message.result.inputs.failure.code, 'RPC_STATE_INPUT_UNAVAILABLE');
           mutate(message.result); recount(message.result.output); changed = true;
           values[0] = JSON.stringify(message);
@@ -88,7 +88,7 @@ test('self-authorized creation proof failure retains independently derived root 
   const f = await selfAuthorizationWithMissingCreationProof(), result = await run(f);
   const expected = preauthGas(f) - INDICATOR;
   rolledBack(result, 'unavailable', expected);
-  assert.equal(result.output.execution.error.code, 'LOCAL_EXECUTION_FAILED');
+  assert.equal(result.output.execution.error.code, 'LOCAL_INPUT_UNAVAILABLE');
   assert.equal(result.inputs.failure.code, 'RPC_STATE_INPUT_UNAVAILABLE');
   assert.equal(f.failed.length, 1); assert.equal(result.inputs.accounts[f.missingCreationTarget], undefined);
   assert(result.output.usage.steps > 0);

@@ -243,7 +243,7 @@ test('a creation-target proof host failure cannot be caught by an ancestor or re
   const output=await raw(f),r=await executeIsolatedEthereumCall({request:f.request,header:f.header,chainId:11155111,rpc:f.rpc});
   assert.equal(r.status,'completed',JSON.stringify(r.error));
   for(const value of[output,r.output]){
-   assert.equal(value.execution.status,'unavailable');assert.equal(value.execution.error.code,'LOCAL_EXECUTION_FAILED');assert.equal(value.stateDisposition,'rolled_back');
+   assert.equal(value.execution.status,'unavailable');assert.equal(value.execution.error.code,'LOCAL_INPUT_UNAVAILABLE');assert.equal(value.stateDisposition,'rolled_back');
    assert.equal(value.execution.returnData,null);assert.equal(value.execution.executionGasUsed,null);assert.deepEqual(value.logs,[]);
    assert.equal(value.authorizationProcessing,undefined);assert.equal(value.feeAccounting,undefined);assert.equal(value.semantics.feeSettlement,false);
   }
