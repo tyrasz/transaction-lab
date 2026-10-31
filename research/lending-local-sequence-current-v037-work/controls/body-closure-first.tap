@@ -1,0 +1,124 @@
+TAP version 13
+# Subtest: normal body remains byte-exact and is cancelled once with tracked complete drainage
+ok 1 - normal body remains byte-exact and is cancelled once with tracked complete drainage
+  ---
+  duration_ms: 17.257375
+  type: 'test'
+  ...
+# Subtest: malformed HTTP headers close acquired unread body while retaining the exact empty failure record
+ok 2 - malformed HTTP headers close acquired unread body while retaining the exact empty failure record
+  ---
+  duration_ms: 1.705625
+  type: 'test'
+  ...
+# Subtest: getReader failure closes acquired unread body and does not fabricate response bytes
+ok 3 - getReader failure closes acquired unread body and does not fabricate response bytes
+  ---
+  duration_ms: 0.314208
+  type: 'test'
+  ...
+# Subtest: orphan cancellation rejection latches unavailable closure and prevents later requests
+ok 4 - orphan cancellation rejection latches unavailable closure and prevents later requests
+  ---
+  duration_ms: 0.401625
+  type: 'test'
+  ...
+# Subtest: pending cancellation cannot be reported drained even after managed fetch returned
+ok 5 - pending cancellation cannot be reported drained even after managed fetch returned
+  ---
+  duration_ms: 4.917666
+  type: 'test'
+  ...
+# Subtest: late fetch with throwing header access still cancels its acquired body after timeout
+ok 6 - late fetch with throwing header access still cancels its acquired body after timeout
+  ---
+  duration_ms: 11.066458
+  type: 'test'
+  ...
+# Subtest: three fixed reads retain exact wire bytes, clocks and request/response joins before selection
+ok 7 - three fixed reads retain exact wire bytes, clocks and request/response joins before selection
+  ---
+  duration_ms: 25.367375
+  type: 'test'
+  ...
+# Subtest: HTTP/rate-limit/raw malformed responses remain failure evidence with no retry
+ok 8 - HTTP/rate-limit/raw malformed responses remain failure evidence with no retry
+  ---
+  duration_ms: 1.270166
+  type: 'test'
+  ...
+# Subtest: overflow counts the entire received chunk while retaining only the bounded prefix
+ok 9 - overflow counts the entire received chunk while retaining only the bounded prefix
+  ---
+  duration_ms: 43.844917
+  type: 'test'
+  ...
+# Subtest: actual body cancellation rejection prevents the next request and is not drained
+ok 10 - actual body cancellation rejection prevents the next request and is not drained
+  ---
+  duration_ms: 0.724209
+  type: 'test'
+  ...
+# Subtest: malformed headers or reader acquisition still cancel the acquired native body
+ok 11 - malformed headers or reader acquisition still cancel the acquired native body
+  ---
+  duration_ms: 0.438167
+  type: 'test'
+  ...
+# Subtest: failed persistence preserves response transcript but withholds selection and later reads
+ok 12 - failed persistence preserves response transcript but withholds selection and later reads
+  ---
+  duration_ms: 3.737166
+  type: 'test'
+  ...
+# Subtest: late ignored-abort fetch remains pending at cutoff and cannot mutate returned records
+ok 13 - late ignored-abort fetch remains pending at cutoff and cannot mutate returned records
+  ---
+  duration_ms: 32.763416
+  type: 'test'
+  ...
+# Subtest: late read bytes are flagged even when native promises eventually settle
+ok 14 - late read bytes are flagged even when native promises eventually settle
+  ---
+  duration_ms: 41.860709
+  type: 'test'
+  ...
+# Subtest: clock reversal before native dispatch yields unavailable with no invented wire
+ok 15 - clock reversal before native dispatch yields unavailable with no invented wire
+  ---
+  duration_ms: 0.265959
+  type: 'test'
+  ...
+# Subtest: terminal phase overrun after raw persistence preserves all three replies without selection
+ok 16 - terminal phase overrun after raw persistence preserves all three replies without selection
+  ---
+  duration_ms: 4.3535
+  type: 'test'
+  ...
+# Subtest: pending asynchronous persistence is bounded and cannot claim drainage
+ok 17 - pending asynchronous persistence is bounded and cannot claim drainage
+  ---
+  duration_ms: 21.359417
+  type: 'test'
+  ...
+# Subtest: invalid initialization never fabricates a selection or dispatches a native request
+ok 18 - invalid initialization never fabricates a selection or dispatches a native request
+  ---
+  duration_ms: 0.14175
+  type: 'test'
+  ...
+# Subtest: late fetch with throwing headers closes its acquired body without rewriting returned failure bytes
+ok 19 - late fetch with throwing headers closes its acquired body without rewriting returned failure bytes
+  ---
+  duration_ms: 31.827
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 289.716833

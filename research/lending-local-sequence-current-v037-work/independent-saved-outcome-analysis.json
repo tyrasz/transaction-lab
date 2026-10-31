@@ -1,0 +1,334 @@
+{
+  "scope": "Read-only saved evidence inspection. No target, network, VM or comparator rerun; no capture changes.",
+  "captureIntentSha256": "814889cb61ec7078ae2192a55ce6af72ea18c3675d89cbad092818f4aacb20cd",
+  "captureManifestSha256": "9b2a3937f5bb1f024e73f171211273d31459792a4ec393f6050337eed87a501a",
+  "observations": [
+    {
+      "id": "aave-usdc-approve-supply-withdraw-half",
+      "sender": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+      "requestedDepositRaw": "3962903485",
+      "measuredOwnerUsdcRaw": "0",
+      "measuredApprovalAllowance": {
+        "name": "allowance",
+        "beforeRaw": "0",
+        "afterRaw": "3962903485",
+        "deltaRaw": "3962903485",
+        "unit": {
+          "kind": "token_raw_units",
+          "scale": null
+        }
+      },
+      "source": {
+        "local": {
+          "reportPath": "research/lending-local-sequence-current-v037/capture/local/001/report.json",
+          "reportSha256": "313ac78bd314fc45fa04258060f58d9efafcf93ca7c8bb38def9ab12d8044d65",
+          "workerManifestSha256": "11abf7070f172b4ddcfce414b3057e5f811823dc65a597e3d119d5f90c3c1305",
+          "manifestFiles": 125,
+          "processSealVerified": true,
+          "workerPacketVerified": true
+        },
+        "provider": {
+          "reportPath": "research/lending-local-sequence-current-v037/capture/provider/001/report.json",
+          "reportSha256": "7122b4d8d5e9f51bf3e7a71e44b08df28a21840cc80491a66969b767d0642a01",
+          "workerManifestSha256": "a22db248e67c4db572bbd61e464ed3e3d38c9f864db151092606908c43df501f",
+          "manifestFiles": 52,
+          "processSealVerified": true,
+          "workerPacketVerified": true
+        }
+      },
+      "workerObservations": {
+        "local": {
+          "returned": "returned",
+          "workerError": null,
+          "wireCalls": 122,
+          "wireBytes": 1499187,
+          "rawErrorCount": 0,
+          "clientErrorCount": 0,
+          "elapsedMs": 36148.889084,
+          "drainComplete": true
+        },
+        "provider": {
+          "returned": "returned",
+          "workerError": null,
+          "wireCalls": 49,
+          "wireBytes": 147895,
+          "rawErrorCount": 0,
+          "clientErrorCount": 0,
+          "elapsedMs": 13309.154583000001,
+          "drainComplete": true
+        }
+      },
+      "steps": [
+        {
+          "index": 0,
+          "operation": "approve",
+          "local": {
+            "positionStatus": "completed",
+            "executionStatus": "success",
+            "chargedGas": "55570",
+            "returnData": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "revertReason": null,
+            "committedLogs": 1
+          },
+          "provider": {
+            "positionStatus": "completed",
+            "executionStatus": "success",
+            "chargedGas": "55570",
+            "returnData": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "revertReason": null,
+            "revertStateValidation": null
+          },
+          "chargedGasEqual": true,
+          "returnDataEqual": true
+        },
+        {
+          "index": 1,
+          "operation": "supply",
+          "local": {
+            "positionStatus": "completed",
+            "executionStatus": "reverted",
+            "chargedGas": "117046",
+            "returnData": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002645524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63650000000000000000000000000000000000000000000000000000",
+            "revertReason": "ERC20: transfer amount exceeds balance",
+            "committedLogs": 0
+          },
+          "provider": {
+            "positionStatus": "reverted_or_failed",
+            "executionStatus": "reverted_or_failed",
+            "chargedGas": "117046",
+            "returnData": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002645524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63650000000000000000000000000000000000000000000000000000",
+            "revertReason": "ERC20: transfer amount exceeds balance",
+            "revertStateValidation": {
+              "status": "verified",
+              "basis": "explicit_original_nonce_only_diff_and_same_context_header_witnesses",
+              "originalTraceEvidenceId": 10,
+              "diffEvidenceId": 11,
+              "beforeWitnessEvidenceId": 12,
+              "afterWitnessEvidenceId": 13,
+              "sender": "0x48c16c5652add27eddb0f896748a35fc60b8d1b4",
+              "beforeNonceRaw": "61",
+              "afterNonceRaw": "62",
+              "balanceRaw": "54079780113346147",
+              "changesBeyondSenderNonce": "none_observed",
+              "feeSettlement": false
+            }
+          },
+          "chargedGasEqual": true,
+          "returnDataEqual": true
+        },
+        {
+          "index": 2,
+          "operation": "withdraw",
+          "local": {
+            "positionStatus": "not_attempted",
+            "executionStatus": null,
+            "chargedGas": null,
+            "returnData": null,
+            "revertReason": null,
+            "committedLogs": null
+          },
+          "provider": {
+            "positionStatus": "skipped",
+            "executionStatus": null,
+            "chargedGas": null,
+            "returnData": null,
+            "revertReason": null,
+            "revertStateValidation": null
+          },
+          "chargedGasEqual": null,
+          "returnDataEqual": null
+        }
+      ],
+      "querySummary": {
+        "localMeasuredRows": 10,
+        "localUnattemptedRows": 5,
+        "providerMeasuredRows": 5,
+        "providerRevertSkippedRows": 5,
+        "bothWithdrawalUnattemptedRows": 5
+      }
+    },
+    {
+      "id": "morpho-kiln-usdc-approve-deposit-withdraw-half",
+      "sender": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+      "requestedDepositRaw": "350000000000",
+      "measuredOwnerUsdcRaw": "112952478562",
+      "measuredApprovalAllowance": {
+        "name": "allowance",
+        "beforeRaw": "0",
+        "afterRaw": "350000000000",
+        "deltaRaw": "350000000000",
+        "unit": {
+          "kind": "token_raw_units",
+          "scale": null
+        }
+      },
+      "source": {
+        "local": {
+          "reportPath": "research/lending-local-sequence-current-v037/capture/local/002/report.json",
+          "reportSha256": "85410cd1267711f4d11937672fc63cf1629e20de46666923617a219d5927d2e2",
+          "workerManifestSha256": "4323d737bff2c17f64df7bc70298c646c261219f792e575c9903ae113c43002e",
+          "manifestFiles": 225,
+          "processSealVerified": true,
+          "workerPacketVerified": true
+        },
+        "provider": {
+          "reportPath": "research/lending-local-sequence-current-v037/capture/provider/002/report.json",
+          "reportSha256": "50f7009afea88ace74cbfc3324df99785017d4e1fb362f519e0a45fa7acd2452",
+          "workerManifestSha256": "a49147b2d45f3aaacf0be0ee111d26eb4079e05841de472671812d17289dde0b",
+          "manifestFiles": 66,
+          "processSealVerified": true,
+          "workerPacketVerified": true
+        }
+      },
+      "workerObservations": {
+        "local": {
+          "returned": "returned",
+          "workerError": null,
+          "wireCalls": 222,
+          "wireBytes": 2638552,
+          "rawErrorCount": 0,
+          "clientErrorCount": 0,
+          "elapsedMs": 61825.085792,
+          "drainComplete": true
+        },
+        "provider": {
+          "returned": "returned",
+          "workerError": null,
+          "wireCalls": 63,
+          "wireBytes": 324276,
+          "rawErrorCount": 0,
+          "clientErrorCount": 0,
+          "elapsedMs": 15227.578958,
+          "drainComplete": true
+        }
+      },
+      "steps": [
+        {
+          "index": 0,
+          "operation": "approve",
+          "local": {
+            "positionStatus": "completed",
+            "executionStatus": "success",
+            "chargedGas": "55570",
+            "returnData": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "revertReason": null,
+            "committedLogs": 1
+          },
+          "provider": {
+            "positionStatus": "completed",
+            "executionStatus": "success",
+            "chargedGas": "55570",
+            "returnData": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "revertReason": null,
+            "revertStateValidation": null
+          },
+          "chargedGasEqual": true,
+          "returnDataEqual": true
+        },
+        {
+          "index": 1,
+          "operation": "deposit",
+          "local": {
+            "positionStatus": "completed",
+            "executionStatus": "reverted",
+            "chargedGas": "872433",
+            "returnData": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002645524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63650000000000000000000000000000000000000000000000000000",
+            "revertReason": "ERC20: transfer amount exceeds balance",
+            "committedLogs": 0
+          },
+          "provider": {
+            "positionStatus": "reverted_or_failed",
+            "executionStatus": "reverted_or_failed",
+            "chargedGas": "872433",
+            "returnData": "0x08c379a00000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002645524332303a207472616e7366657220616d6f756e7420657863656564732062616c616e63650000000000000000000000000000000000000000000000000000",
+            "revertReason": "ERC20: transfer amount exceeds balance",
+            "revertStateValidation": {
+              "status": "verified",
+              "basis": "explicit_original_nonce_only_diff_and_same_context_header_witnesses",
+              "originalTraceEvidenceId": 11,
+              "diffEvidenceId": 12,
+              "beforeWitnessEvidenceId": 13,
+              "afterWitnessEvidenceId": 14,
+              "sender": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+              "beforeNonceRaw": "2307",
+              "afterNonceRaw": "2308",
+              "balanceRaw": "10194358719618778646",
+              "changesBeyondSenderNonce": "none_observed",
+              "feeSettlement": false
+            }
+          },
+          "chargedGasEqual": true,
+          "returnDataEqual": true
+        },
+        {
+          "index": 2,
+          "operation": "withdraw",
+          "local": {
+            "positionStatus": "not_attempted",
+            "executionStatus": null,
+            "chargedGas": null,
+            "returnData": null,
+            "revertReason": null,
+            "committedLogs": null
+          },
+          "provider": {
+            "positionStatus": "skipped",
+            "executionStatus": null,
+            "chargedGas": null,
+            "returnData": null,
+            "revertReason": null,
+            "revertStateValidation": null
+          },
+          "chargedGasEqual": null,
+          "returnDataEqual": null
+        }
+      ],
+      "querySummary": {
+        "localMeasuredRows": 16,
+        "localUnattemptedRows": 8,
+        "providerMeasuredRows": 8,
+        "providerRevertSkippedRows": 8,
+        "bothWithdrawalUnattemptedRows": 8
+      }
+    }
+  ],
+  "savedAdjudicator": {
+    "path": "research/lending-local-sequence-current-v037-work/saved-comparison-first.json",
+    "sha256": "cfc658e5edc55820baf7ef702f1622af3dbb7985d039e9bc51cd4c2d39fdec2d",
+    "evidenceUsable": true,
+    "counts": {
+      "originalChannels": {
+        "matched": 20,
+        "mismatched": 0,
+        "unavailable": 10
+      },
+      "queryChannels": {
+        "matched": 39,
+        "mismatched": 0,
+        "unavailable": 78
+      }
+    },
+    "rerunHere": false
+  },
+  "unavailableChannels": {
+    "originals": {
+      "count": 10,
+      "cause": "Two withdraw originals were not attempted after the preceding supply/deposit reverted; 5 channels each."
+    },
+    "queries": [
+      {
+        "count": 39,
+        "cause": "After reverted originals, all 13 local query rows are measured but provider marks them not_applicable; 3 channels each."
+      },
+      {
+        "count": 39,
+        "cause": "All 13 withdrawal query rows lack attempted original state on both sides; 3 channels each."
+      }
+    ]
+  },
+  "limitations": [
+    "The selected wallets lacked the fixed deposit amounts at this state; successful real lending deposit and withdrawal paths were not reached.",
+    "Agreement covers these observed executions and declared queries only, not representative accuracy or complete economic effects.",
+    "Both proof inputs and provider execution use the declared common public provider."
+  ]
+}

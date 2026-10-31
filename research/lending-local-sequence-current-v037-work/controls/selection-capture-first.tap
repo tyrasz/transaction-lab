@@ -1,0 +1,244 @@
+TAP version 13
+# Subtest: two pinned input templates receive one shared header; every other input value remains exact
+ok 1 - two pinned input templates receive one shared header; every other input value remains exact
+  ---
+  duration_ms: 15.28675
+  type: 'test'
+  ...
+# Subtest: template byte changes, ordering changes and additional templates are refused
+ok 2 - template byte changes, ordering changes and additional templates are refused
+  ---
+  duration_ms: 0.821958
+  type: 'test'
+  ...
+# Subtest: changes to any call, query, amount, context, selection or second-case header are refused
+ok 3 - changes to any call, query, amount, context, selection or second-case header are refused
+  ---
+  duration_ms: 54.559
+  type: 'test'
+  ...
+# Subtest: failed selection cannot produce target declarations or silently reuse historical headers
+ok 4 - failed selection cannot produce target declarations or silently reuse historical headers
+  ---
+  duration_ms: 2.230583
+  type: 'test'
+  ...
+# Subtest: three fixed reads retain exact wire bytes, clocks and request/response joins before selection
+ok 5 - three fixed reads retain exact wire bytes, clocks and request/response joins before selection
+  ---
+  duration_ms: 27.222833
+  type: 'test'
+  ...
+# Subtest: HTTP/rate-limit/raw malformed responses remain failure evidence with no retry
+ok 6 - HTTP/rate-limit/raw malformed responses remain failure evidence with no retry
+  ---
+  duration_ms: 1.377584
+  type: 'test'
+  ...
+# Subtest: overflow counts the entire received chunk while retaining only the bounded prefix
+ok 7 - overflow counts the entire received chunk while retaining only the bounded prefix
+  ---
+  duration_ms: 45.947584
+  type: 'test'
+  ...
+# Subtest: actual body cancellation rejection prevents the next request and is not drained
+ok 8 - actual body cancellation rejection prevents the next request and is not drained
+  ---
+  duration_ms: 0.751875
+  type: 'test'
+  ...
+# Subtest: malformed headers or reader acquisition still cancel the acquired native body
+ok 9 - malformed headers or reader acquisition still cancel the acquired native body
+  ---
+  duration_ms: 0.480167
+  type: 'test'
+  ...
+# Subtest: failed persistence preserves response transcript but withholds selection and later reads
+ok 10 - failed persistence preserves response transcript but withholds selection and later reads
+  ---
+  duration_ms: 3.849916
+  type: 'test'
+  ...
+# Subtest: late ignored-abort fetch remains pending at cutoff and cannot mutate returned records
+ok 11 - late ignored-abort fetch remains pending at cutoff and cannot mutate returned records
+  ---
+  duration_ms: 31.269125
+  type: 'test'
+  ...
+# Subtest: late read bytes are flagged even when native promises eventually settle
+ok 12 - late read bytes are flagged even when native promises eventually settle
+  ---
+  duration_ms: 41.871916
+  type: 'test'
+  ...
+# Subtest: clock reversal before native dispatch yields unavailable with no invented wire
+ok 13 - clock reversal before native dispatch yields unavailable with no invented wire
+  ---
+  duration_ms: 0.261
+  type: 'test'
+  ...
+# Subtest: terminal phase overrun after raw persistence preserves all three replies without selection
+ok 14 - terminal phase overrun after raw persistence preserves all three replies without selection
+  ---
+  duration_ms: 3.919458
+  type: 'test'
+  ...
+# Subtest: pending asynchronous persistence is bounded and cannot claim drainage
+ok 15 - pending asynchronous persistence is bounded and cannot claim drainage
+  ---
+  duration_ms: 21.451375
+  type: 'test'
+  ...
+# Subtest: invalid initialization never fabricates a selection or dispatches a native request
+ok 16 - invalid initialization never fabricates a selection or dispatches a native request
+  ---
+  duration_ms: 0.127834
+  type: 'test'
+  ...
+# Subtest: exactly three prescribed requests select one complete header; saved reduction agrees
+ok 17 - exactly three prescribed requests select one complete header; saved reduction agrees
+  ---
+  duration_ms: 13.859375
+  type: 'test'
+  ...
+# Subtest: no retry, concurrent request, skipped read or completion after failure
+ok 18 - no retry, concurrent request, skipped read or completion after failure
+  ---
+  duration_ms: 0.326375
+  type: 'test'
+  ...
+# Subtest: raw transport and JSON-RPC identity failures are retained and withheld
+ok 19 - raw transport and JSON-RPC identity failures are retained and withheld
+  ---
+  duration_ms: 0.556292
+  type: 'test'
+  ...
+# Subtest: header authenticity and complete canonical reread are both required
+ok 20 - header authenticity and complete canonical reread are both required
+  ---
+  duration_ms: 7.725292
+  type: 'test'
+  ...
+# Subtest: stale and future selection uses header timestamp and latest receipt clock
+ok 21 - stale and future selection uses header timestamp and latest receipt clock
+  ---
+  duration_ms: 1.693208
+  type: 'test'
+  ...
+# Subtest: both request clocks and both phase clocks are enforced; reversal is rejected
+ok 22 - both request clocks and both phase clocks are enforced; reversal is rejected
+  ---
+  duration_ms: 1.912667
+  type: 'test'
+  ...
+# Subtest: terminal drain and first-target freshness are separately bounded
+ok 23 - terminal drain and first-target freshness are separately bounded
+  ---
+  duration_ms: 9.201666
+  type: 'test'
+  ...
+# Subtest: bounded failure prefix is retained, while oversized observed body is unusable
+ok 24 - bounded failure prefix is retained, while oversized observed body is unusable
+  ---
+  duration_ms: 0.127916
+  type: 'test'
+  ...
+# Subtest: invalid encodings, hidden properties and missing external pin are refused
+ok 25 - invalid encodings, hidden properties and missing external pin are refused
+  ---
+  duration_ms: 0.288458
+  type: 'test'
+  ...
+# Subtest: saved transcript recomputes hashes, counters, header, request and terminal status
+ok 26 - saved transcript recomputes hashes, counters, header, request and terminal status
+  ---
+  duration_ms: 6.245125
+  type: 'test'
+  ...
+# Subtest: explicit source/persistence/closure failure stays unavailable with full denominator delegated to coordinator
+ok 27 - explicit source/persistence/closure failure stays unavailable with full denominator delegated to coordinator
+  ---
+  duration_ms: 0.234125
+  type: 'test'
+  ...
+# Subtest: pre-event clock/schema failures retain replayable unavailable markers, never dispatch authority
+ok 28 - pre-event clock/schema failures retain replayable unavailable markers, never dispatch authority
+  ---
+  duration_ms: 0.1935
+  type: 'test'
+  ...
+# Subtest: late terminal work preserves all raw responses but cannot become selected by replay
+ok 29 - late terminal work preserves all raw responses but cannot become selected by replay
+  ---
+  duration_ms: 9.588458
+  type: 'test'
+  ...
+# Subtest: all post-terminal operations preserve both selected and unavailable snapshots exactly
+ok 30 - all post-terminal operations preserve both selected and unavailable snapshots exactly
+  ---
+  duration_ms: 6.477333
+  type: 'test'
+  ...
+# Subtest: duplicate response/result or nested header keys cannot silently select a later value
+ok 31 - duplicate response/result or nested header keys cannot silently select a later value
+  ---
+  duration_ms: 0.572958
+  type: 'test'
+  ...
+# Subtest: ordinary noncanonical JSON text retains native parse semantics without changing its bytes
+ok 32 - ordinary noncanonical JSON text retains native parse semantics without changing its bytes
+  ---
+  duration_ms: 1.549667
+  type: 'test'
+  ...
+# Subtest: duplicate decoded member names are rejected at every object depth including array members
+ok 33 - duplicate decoded member names are rejected at every object depth including array members
+  ---
+  duration_ms: 0.209958
+  type: 'test'
+  ...
+# Subtest: escaped equivalents collide while distinct decoded names remain distinct
+ok 34 - escaped equivalents collide while distinct decoded names remain distinct
+  ---
+  duration_ms: 0.2315
+  type: 'test'
+  ...
+# Subtest: malformed grammar, trailing data and invalid escapes cannot reach the native value parser
+ok 35 - malformed grammar, trailing data and invalid escapes cannot reach the native value parser
+  ---
+  duration_ms: 0.180208
+  type: 'test'
+  ...
+# Subtest: byte bound counts UTF-8 bytes and can only be lowered from the fixed ceiling
+ok 36 - byte bound counts UTF-8 bytes and can only be lowered from the fixed ceiling
+  ---
+  duration_ms: 0.105417
+  type: 'test'
+  ...
+# Subtest: container depth is explicit for both arrays and objects with an exact boundary
+ok 37 - container depth is explicit for both arrays and objects with an exact boundary
+  ---
+  duration_ms: 0.205167
+  type: 'test'
+  ...
+# Subtest: declared work budget includes sizing, scanner, key decoding and final native parsing
+ok 38 - declared work budget includes sizing, scanner, key decoding and final native parsing
+  ---
+  duration_ms: 0.085
+  type: 'test'
+  ...
+# Subtest: input and bound records reject coercions, accessors, proxies and unsupported fields
+ok 39 - input and bound records reject coercions, accessors, proxies and unsupported fields
+  ---
+  duration_ms: 0.090459
+  type: 'test'
+  ...
+1..39
+# tests 39
+# suites 0
+# pass 39
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 263.607584

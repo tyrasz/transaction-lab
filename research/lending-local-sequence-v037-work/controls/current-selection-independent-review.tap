@@ -1,0 +1,112 @@
+TAP version 13
+# Subtest: two pinned input templates receive one shared header; every other input value remains exact
+ok 1 - two pinned input templates receive one shared header; every other input value remains exact
+  ---
+  duration_ms: 11.708167
+  type: 'test'
+  ...
+# Subtest: template byte changes, ordering changes and additional templates are refused
+ok 2 - template byte changes, ordering changes and additional templates are refused
+  ---
+  duration_ms: 0.77575
+  type: 'test'
+  ...
+# Subtest: changes to any call, query, amount, context, selection or second-case header are refused
+ok 3 - changes to any call, query, amount, context, selection or second-case header are refused
+  ---
+  duration_ms: 50.544375
+  type: 'test'
+  ...
+# Subtest: failed selection cannot produce target declarations or silently reuse historical headers
+ok 4 - failed selection cannot produce target declarations or silently reuse historical headers
+  ---
+  duration_ms: 1.824667
+  type: 'test'
+  ...
+# Subtest: exactly three prescribed requests select one complete header; saved reduction agrees
+ok 5 - exactly three prescribed requests select one complete header; saved reduction agrees
+  ---
+  duration_ms: 7.771125
+  type: 'test'
+  ...
+# Subtest: no retry, concurrent request, skipped read or completion after failure
+ok 6 - no retry, concurrent request, skipped read or completion after failure
+  ---
+  duration_ms: 0.252542
+  type: 'test'
+  ...
+# Subtest: raw transport and JSON-RPC identity failures are retained and withheld
+ok 7 - raw transport and JSON-RPC identity failures are retained and withheld
+  ---
+  duration_ms: 0.692625
+  type: 'test'
+  ...
+# Subtest: header authenticity and complete canonical reread are both required
+ok 8 - header authenticity and complete canonical reread are both required
+  ---
+  duration_ms: 6.706459
+  type: 'test'
+  ...
+# Subtest: stale and future selection uses header timestamp and latest receipt clock
+ok 9 - stale and future selection uses header timestamp and latest receipt clock
+  ---
+  duration_ms: 1.575666
+  type: 'test'
+  ...
+# Subtest: both request clocks and both phase clocks are enforced; reversal is rejected
+ok 10 - both request clocks and both phase clocks are enforced; reversal is rejected
+  ---
+  duration_ms: 1.409834
+  type: 'test'
+  ...
+# Subtest: terminal drain and first-target freshness are separately bounded
+ok 11 - terminal drain and first-target freshness are separately bounded
+  ---
+  duration_ms: 5.891333
+  type: 'test'
+  ...
+# Subtest: bounded failure prefix is retained, while oversized observed body is unusable
+ok 12 - bounded failure prefix is retained, while oversized observed body is unusable
+  ---
+  duration_ms: 0.106667
+  type: 'test'
+  ...
+# Subtest: invalid encodings, hidden properties and missing external pin are refused
+ok 13 - invalid encodings, hidden properties and missing external pin are refused
+  ---
+  duration_ms: 0.291834
+  type: 'test'
+  ...
+# Subtest: saved transcript recomputes hashes, counters, header, request and terminal status
+ok 14 - saved transcript recomputes hashes, counters, header, request and terminal status
+  ---
+  duration_ms: 5.299958
+  type: 'test'
+  ...
+# Subtest: explicit source/persistence/closure failure stays unavailable with full denominator delegated to coordinator
+ok 15 - explicit source/persistence/closure failure stays unavailable with full denominator delegated to coordinator
+  ---
+  duration_ms: 0.207583
+  type: 'test'
+  ...
+# Subtest: pre-event clock/schema failures retain replayable unavailable markers, never dispatch authority
+ok 16 - pre-event clock/schema failures retain replayable unavailable markers, never dispatch authority
+  ---
+  duration_ms: 0.175667
+  type: 'test'
+  ...
+# Subtest: late terminal work preserves all raw responses but cannot become selected by replay
+ok 17 - late terminal work preserves all raw responses but cannot become selected by replay
+  ---
+  duration_ms: 7.140833
+  type: 'test'
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 207.039125

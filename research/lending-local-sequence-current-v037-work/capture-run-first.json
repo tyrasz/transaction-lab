@@ -1,0 +1,170 @@
+{
+  "manifestSha256": "9b2a3937f5bb1f024e73f171211273d31459792a4ec393f6050337eed87a501a",
+  "intentSha256": "814889cb61ec7078ae2192a55ce6af72ea18c3675d89cbad092818f4aacb20cd",
+  "planSha256": "63117e789becf9b1efa85ed09a40ed3ac0b052bf584696ee9e1d5fcb3db915a6",
+  "selectionManifestSha256": "e07d7084dbb84e183b8ee57709606304db5b54ce759749d692f5eb936b386bea",
+  "phase": "target_matrix",
+  "coordinatorStarted": {
+    "wallMs": 1793422155233,
+    "monotonicMs": 394.228792
+  },
+  "selectionUsage": {
+    "calls": 3,
+    "observedBytes": 30951,
+    "retainedBytes": 30951,
+    "savedWires": 3,
+    "wireJoins": [
+      {
+        "id": 1,
+        "path": "wire/0001.json",
+        "dispatched": true,
+        "requestSha256": "09fabe0af56b7726f1666ddd147482df4d951f86f66124b936716c53ab0e8471",
+        "responseSha256": "79226432df73e05966f20e4d291fb5048bfef1138d7078f8feab534126df1aa5",
+        "retainedBytes": 39,
+        "observedBytes": 39,
+        "saved": true
+      },
+      {
+        "id": 2,
+        "path": "wire/0002.json",
+        "dispatched": true,
+        "requestSha256": "ea099c30d3683d74a056405807b4ab857a06189f3e4702981d75935407ac986e",
+        "responseSha256": "a1e6259fe1a28c2a921d92e56dff54a58f05e9afb78453c4f548e3e546272783",
+        "retainedBytes": 15456,
+        "observedBytes": 15456,
+        "saved": true
+      },
+      {
+        "id": 3,
+        "path": "wire/0003.json",
+        "dispatched": true,
+        "requestSha256": "e98b3a591dc88d36f2b4c555a2460a458de7fe5dc81eafe13c3e48180badb62c",
+        "responseSha256": "d1d5bd4f59b50738d0e78c8538bd21ea8f719a4f80ede7666a76e92bfa81f110",
+        "retainedBytes": 15456,
+        "observedBytes": 15456,
+        "saved": true
+      }
+    ],
+    "limits": {
+      "requests": 3,
+      "responseBytes": 2097152,
+      "totalBytes": 6291456,
+      "requestMs": 15000,
+      "phaseMs": 60000,
+      "drainMs": 10000,
+      "headerAgeMs": 120000,
+      "headerFutureMs": 30000,
+      "firstTargetMs": 180000
+    }
+  },
+  "selectionElapsed": {
+    "started": {
+      "wallMs": 1793422155327,
+      "monotonicMs": 488.206084
+    },
+    "finished": {
+      "wallMs": 1793422155460,
+      "monotonicMs": 620.430334
+    },
+    "wallMs": 133,
+    "monotonicMs": 132.22425000000004,
+    "nativeMs": 132.42641700000001
+  },
+  "denominator": {
+    "sequences": 2,
+    "originalPositions": 6,
+    "originalChannels": 30,
+    "queryPositions": 39,
+    "queryChannels": 117
+  },
+  "rows": [
+    {
+      "kind": "local",
+      "index": 0,
+      "id": "aave-usdc-approve-supply-withdraw-half",
+      "status": "returned",
+      "bounded": true,
+      "calls": 122,
+      "networkBytes": 1499187,
+      "process": "processes/local-001-process.json",
+      "seal": "processes/local-001-seal.json",
+      "workerManifestSha256": "11abf7070f172b4ddcfce414b3057e5f811823dc65a597e3d119d5f90c3c1305"
+    },
+    {
+      "kind": "local",
+      "index": 1,
+      "id": "morpho-kiln-usdc-approve-deposit-withdraw-half",
+      "status": "returned",
+      "bounded": true,
+      "calls": 222,
+      "networkBytes": 2638552,
+      "process": "processes/local-002-process.json",
+      "seal": "processes/local-002-seal.json",
+      "workerManifestSha256": "4323d737bff2c17f64df7bc70298c646c261219f792e575c9903ae113c43002e"
+    },
+    {
+      "kind": "provider",
+      "index": 0,
+      "id": "aave-usdc-approve-supply-withdraw-half",
+      "status": "returned",
+      "bounded": true,
+      "calls": 49,
+      "networkBytes": 147895,
+      "process": "processes/provider-001-process.json",
+      "seal": "processes/provider-001-seal.json",
+      "workerManifestSha256": "a22db248e67c4db572bbd61e464ed3e3d38c9f864db151092606908c43df501f"
+    },
+    {
+      "kind": "provider",
+      "index": 1,
+      "id": "morpho-kiln-usdc-approve-deposit-withdraw-half",
+      "status": "returned",
+      "bounded": true,
+      "calls": 63,
+      "networkBytes": 324276,
+      "process": "processes/provider-002-process.json",
+      "seal": "processes/provider-002-seal.json",
+      "workerManifestSha256": "a49147b2d45f3aaacf0be0ee111d26eb4079e05841de472671812d17289dde0b"
+    }
+  ],
+  "fatal": null,
+  "sourceUnchanged": true,
+  "elapsed": {
+    "wallMs": 134773,
+    "monotonicMs": 134772.219542,
+    "reversed": false
+  },
+  "targetPhaseStarted": {
+    "wallMs": 1793422156206,
+    "monotonicMs": 1366.718375
+  },
+  "networkCalls": 456,
+  "networkBytes": 4609910,
+  "knownBoundedNetworkCalls": 456,
+  "knownBoundedNetworkBytes": 4609910,
+  "evidenceUsable": true,
+  "scope": {
+    "endpoint": "https://eth.drpc.org",
+    "adapter": "current_guarded_local_and_current_standard_sequence_APIs",
+    "httpApi": false,
+    "ui": false,
+    "retries": 0,
+    "providerFallback": false,
+    "broadcast": false,
+    "sharedProviderInfrastructure": true,
+    "independentConsensus": false,
+    "fullRealTransactionReplay": false,
+    "originalGas": 5000000,
+    "originalPricing": "unsigned_unpriced_block_end",
+    "localQueryGas": 1000000,
+    "providerQueryGas": 300000,
+    "queryTiming": "local_all_originals_then_disposable_queries_provider_between_originals",
+    "queryGasEquivalent": false,
+    "selection": "one_fresh_header_then_fixed_hash_no_reselection",
+    "freshAtSelectionOnly": true,
+    "denominator": "two_fixed_sequences_three_declared_positions_each_failures_and_unattempted_retained"
+  },
+  "prepareOnly": false,
+  "totalNetworkCalls": 459,
+  "totalNetworkBytes": 4640861
+}

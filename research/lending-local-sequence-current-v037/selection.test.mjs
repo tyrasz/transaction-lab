@@ -31,14 +31,16 @@ test('exactly three prescribed requests select one complete header; saved reduct
   assert.deepEqual(result.header, header);
   assert.equal(result.scope.sourceIdentityVerifiedHere, false);
   assert.equal(result.scope.nativeIoClosureVerifiedHere, false);
-  assert.throws(() => s.request(at(8)), /No further/);
+  assert.throws(() => s.request(at(8)), /already terminal/);
+  assert.deepEqual(s.snapshot(), result);
+  assert.deepEqual(replayHeaderSelection(s.snapshot()), result);
 });
 
 test('no retry, concurrent request, skipped read or completion after failure', () => {
   const s = create(), r = s.request(at(1));
   assert.throws(() => s.accept(wire(r, '0xaa36a7'), at(2)), /not mainnet/);
   assert.equal(replayHeaderSelection(s.snapshot()).status, 'unavailable');
-  assert.throws(() => s.request(at(3)), /No further/);
+  assert.throws(() => s.request(at(3)), /already terminal/);
   const concurrent = create(); concurrent.request(at(1));
   assert.throws(() => concurrent.request(at(2)), /No further/);
   assert.throws(() => create().finish(at(1)), /All three/);
@@ -186,4 +188,28 @@ test('late terminal work preserves all raw responses but cannot become selected 
   assert.throws(() => replayHeaderSelection(stale), /continues after selection failure/);
   const expired = create().fail('Coordinator timed out before selection completed.', at(60001));
   assert.equal(replayHeaderSelection(expired).status, 'unavailable');
+});
+
+test('all post-terminal operations preserve both selected and unavailable snapshots exactly', () => {
+  for (const s of [ready(), create()]) {
+    const saved = s.snapshot().requests === 3 ? s.finish(at(7)) : s.fail('Retained failure.', at(1));
+    for (const operation of [() => s.request(at(8)), () => s.accept({}, at(8)), () => s.finish(at(8)), () => s.fail('Later failure.', at(8))]) {
+      assert.throws(operation, /already terminal/);
+      assert.deepEqual(s.snapshot(), saved);
+      assert.deepEqual(replayHeaderSelection(s.snapshot()), saved);
+    }
+  }
+});
+
+test('duplicate response/result or nested header keys cannot silently select a later value', () => {
+  const duplicateChain = create(), request = duplicateChain.request(at(1));
+  const text = '{"jsonrpc":"2.0","id":1,"result":"0xaa36a7","result":"0x1"}';
+  const raw = wire(request, null, { responseBase64: Buffer.from(text).toString('base64'), responseBytesObserved: Buffer.byteLength(text) });
+  assert.throws(() => duplicateChain.accept(raw, at(2)), /duplicate/i);
+  assert.equal(replayHeaderSelection(duplicateChain.snapshot()).status, 'unavailable');
+  const s = create(); chain(s); const latestRequest = s.request(at(3));
+  const encodedHeader = JSON.stringify(header).replace('{', '{"hash":"0x' + '00'.repeat(32) + '",');
+  const nested = '{"jsonrpc":"2.0","id":2,"result":' + encodedHeader + '}';
+  assert.throws(() => s.accept(wire(latestRequest, null, { responseBase64: Buffer.from(nested).toString('base64'), responseBytesObserved: Buffer.byteLength(nested) }), at(4)), /duplicate/i);
+  assert.equal(replayHeaderSelection(s.snapshot()).status, 'unavailable');
 });

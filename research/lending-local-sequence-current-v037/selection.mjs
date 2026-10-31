@@ -6,6 +6,7 @@ import { createHash } from 'node:crypto';
 import { isDeepStrictEqual, types } from 'node:util';
 import { verifyEthereumHeader } from '../../engines/local-evm/ethereum-header.js';
 import { ethereumCommon } from '../../engines/local-evm/ethereum-profile.js';
+import { parseStrictJson } from './strict-json.mjs';
 
 export const SELECTION_ENDPOINT = 'https://eth.drpc.org';
 export const HEADER_SELECTION_POLICY = Object.freeze({ requests: 3, responseBytes: 2 * 1024 * 1024,
@@ -65,6 +66,9 @@ export function createHeaderSelection({ sourceBinding, started }) {
     return next;
   }
   function guarded(action) {
+    // Terminal reports are immutable. Later source/persistence/closure faults
+    // belong in the capture/coordinator wrapper, not in a rewritten transcript.
+    need(status === 'selecting', 'Selection is already terminal.');
     const eventCount = events.length, wasSelecting = status === 'selecting';
     try { return action(); }
     catch (e) {
@@ -112,7 +116,7 @@ export function createHeaderSelection({ sourceBinding, started }) {
       need(totalBytes <= HEADER_SELECTION_POLICY.totalBytes && raw.responseBytesObserved <= HEADER_SELECTION_POLICY.responseBytes, 'Observed response byte limit exceeded.');
       need(raw.endpoint === pending.endpoint && raw.requestText === pending.requestText, 'Raw request differs from the prescribed request.');
       need(raw.httpStatus === 200 && raw.complete && raw.error === null && bytes.length === raw.responseBytesObserved, 'Header transport did not complete successfully.');
-      const text = new TextDecoder('utf-8', { fatal: true }).decode(bytes), response = JSON.parse(text);
+      const text = new TextDecoder('utf-8', { fatal: true }).decode(bytes), response = parseStrictJson(text);
       record(response, ['jsonrpc', 'id', 'result'], 'JSON-RPC response');
       need(response.jsonrpc === '2.0' && response.id === pending.index + 1, 'JSON-RPC response identity differs.');
       if (pending.index === 0) need(response.result === '0x1', 'Supplier chain is not mainnet.');
