@@ -1,0 +1,166 @@
+TAP version 13
+# Subtest: sealed Aave and Morpho token deposits have no modeled native-value candidates
+ok 1 - sealed Aave and Morpho token deposits have no modeled native-value candidates
+  ---
+  duration_ms: 4.581917
+  type: 'test'
+  ...
+# Subtest: positive root value is counted once with exact uint256 arithmetic, independent of logs or diff amounts
+ok 2 - positive root value is counted once with exact uint256 arithmetic, independent of logs or diff amounts
+  ---
+  duration_ms: 0.2555
+  type: 'test'
+  ...
+# Subtest: internal transfers, refunds and repeated recipients are accumulated without losing zero-net participants
+ok 3 - internal transfers, refunds and repeated recipients are accumulated without losing zero-net participants
+  ---
+  duration_ms: 0.13925
+  type: 'test'
+  ...
+# Subtest: self-transfers cancel while positive root and internal participants remain candidates, including the zero address
+ok 4 - self-transfers cancel while positive root and internal participants remain candidates, including the zero address
+  ---
+  duration_ms: 0.104792
+  type: 'test'
+  ...
+# Subtest: delegate inherited value never transfers to the implementation account and nested CALL uses storage context
+ok 5 - delegate inherited value never transfers to the implementation account and nested CALL uses storage context
+  ---
+  duration_ms: 0.342042
+  type: 'test'
+  ...
+# Subtest: CALLCODE keeps native/storage account while its explicit value becomes subsequent delegate context
+ok 6 - CALLCODE keeps native/storage account while its explicit value becomes subsequent delegate context
+  ---
+  duration_ms: 0.176375
+  type: 'test'
+  ...
+# Subtest: root and caught ancestor reverts discard every nested native transfer, including successful descendants
+ok 7 - root and caught ancestor reverts discard every nested native transfer, including successful descendants
+  ---
+  duration_ms: 0.133125
+  type: 'test'
+  ...
+# Subtest: static ancestry rejects value transfer while allowing EIP-214 CALLCODE and inherited delegate value
+ok 8 - static ancestry rejects value transfer while allowing EIP-214 CALLCODE and inherited delegate value
+  ---
+  duration_ms: 0.213083
+  type: 'test'
+  ...
+# Subtest: explicit post balances discover unmatched state changes and missing initial fields without guessing zero
+ok 9 - explicit post balances discover unmatched state changes and missing initial fields without guessing zero
+  ---
+  duration_ms: 0.212333
+  type: 'test'
+  ...
+# Subtest: selection ranks sender then original recipient then lexical while retaining all omitted flow and diff accounts
+ok 10 - selection ranks sender then original recipient then lexical while retaining all omitted flow and diff accounts
+  ---
+  duration_ms: 0.336417
+  type: 'test'
+  ...
+# Subtest: every lifecycle or unknown context is rejected even under a reverted ancestor
+ok 11 - every lifecycle or unknown context is rejected even under a reverted ancestor
+  ---
+  duration_ms: 0.291958
+  type: 'test'
+  ...
+# Subtest: normalized frame schema rejects coercions, omitted fields, malformed errors and noncanonical values safely
+ok 12 - normalized frame schema rejects coercions, omitted fields, malformed errors and noncanonical values safely
+  ---
+  duration_ms: 0.309041
+  type: 'test'
+  ...
+# Subtest: event evidence is validated for context and bounds but cannot create or price native effects
+ok 13 - event evidence is validated for context and bounds but cannot create or price native effects
+  ---
+  duration_ms: 0.206458
+  type: 'test'
+  ...
+# Subtest: candidate, frame, depth, log and text limits fail closed without truncation
+ok 14 - candidate, frame, depth, log and text limits fail closed without truncation
+  ---
+  duration_ms: 7.522708
+  type: 'test'
+  ...
+# Subtest: diff schema and collisions are rejected without invoking untrusted accessors or echoing provider text
+ok 15 - diff schema and collisions are rejected without invoking untrusted accessors or echoing provider text
+  ---
+  duration_ms: 0.12925
+  type: 'test'
+  ...
+# Subtest: standard compatibility entry point preserves the shared collector function and limits
+ok 16 - standard compatibility entry point preserves the shared collector function and limits
+  ---
+  duration_ms: 2.663667
+  type: 'test'
+  ...
+# Subtest: native amounts use exact 18-decimal rendering and do not change supplied snapshots
+ok 17 - native amounts use exact 18-decimal rendering and do not change supplied snapshots
+  ---
+  duration_ms: 1.462166
+  type: 'test'
+  ...
+# Subtest: zero and uint256 endpoint balances preserve exact signed deltas
+ok 18 - zero and uint256 endpoint balances preserve exact signed deltas
+  ---
+  duration_ms: 0.324792
+  type: 'test'
+  ...
+# Subtest: first eight candidates are measured and omitted candidates retain explicit partial coverage
+ok 19 - first eight candidates are measured and omitted candidates retain explicit partial coverage
+  ---
+  duration_ms: 0.27925
+  type: 'test'
+  ...
+# Subtest: remaining RPC budget can omit candidates within the account cap without inventing measurements
+ok 20 - remaining RPC budget can omit candidates within the account cap without inventing measurements
+  ---
+  duration_ms: 0.311875
+  type: 'test'
+  ...
+# Subtest: empty candidates and failed originals are distinct not-applicable outcomes
+ok 21 - empty candidates and failed originals are distinct not-applicable outcomes
+  ---
+  duration_ms: 0.209292
+  type: 'test'
+  ...
+# Subtest: historical, missing, mismatched or already failed contexts never perform reads
+ok 22 - historical, missing, mismatched or already failed contexts never perform reads
+  ---
+  duration_ms: 0.196916
+  type: 'test'
+  ...
+# Subtest: wrong original trace and pinned execution identities fail closed
+ok 23 - wrong original trace and pinned execution identities fail closed
+  ---
+  duration_ms: 0.363459
+  type: 'test'
+  ...
+# Subtest: candidate selection and count mutations cannot publish partial invented amounts
+ok 24 - candidate selection and count mutations cannot publish partial invented amounts
+  ---
+  duration_ms: 0.6015
+  type: 'test'
+  ...
+# Subtest: measurement uint ranges, exact delta, evidence and accessor shapes are validated
+ok 25 - measurement uint ranges, exact delta, evidence and accessor shapes are validated
+  ---
+  duration_ms: 0.964375
+  type: 'test'
+  ...
+# Subtest: shared failures before and after reads withhold all amounts, evidence and identity
+ok 26 - shared failures before and after reads withhold all amounts, evidence and identity
+  ---
+  duration_ms: 0.337459
+  type: 'test'
+  ...
+1..26
+# tests 26
+# suites 0
+# pass 26
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 88.800459

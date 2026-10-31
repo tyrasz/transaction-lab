@@ -11,6 +11,7 @@ import { measureBalances } from './balances.js';
 import { measureLendingBalances } from './lending-balances.js';
 import { measureAllowances } from './allowances.js';
 import { measureAffectedBalances } from './affected-balances.js';
+import { measureNativeBalances } from './native-balances.js';
 import { createVerifiedCurrentStateContext } from './current-state.js';
 import { createHistoricalStateContext } from './historical-state.js';
 import { analyzePermissions } from './permissions.js';
@@ -23,7 +24,7 @@ import { loadLocalApi } from './local-loader.js';
 import { loadArbitrumApi } from './arbitrum-loader.js';
 
 const ROOT = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
-const engineFiles = ['account-effects.js','affected-balances.js','allowances.js','analyze.js','arbitrum-loader.js','balances.js','config.js','current-state.js','historical-state.js','lending.js','lending-balances.js','local-loader.js','local-sequence.js','local-simulation.js','permissions.js','proof-rpc.js','query-validation.js','revert.js','rpc.js','server.js','standard-loader.js','standard-rpc.js','state-diff.js','state.js','validate.js'];
+const engineFiles = ['account-effects.js','affected-balances.js','allowances.js','analyze.js','arbitrum-loader.js','balances.js','config.js','current-state.js','historical-state.js','lending.js','lending-balances.js','local-loader.js','local-sequence.js','local-simulation.js','native-balances.js','native-effects.js','permissions.js','proof-rpc.js','query-validation.js','revert.js','rpc.js','server.js','standard-loader.js','standard-rpc.js','state-diff.js','state.js','validate.js'];
 const engineHash = createHash('sha256');
 for (const name of engineFiles) engineHash.update(name+'\0').update(await readFile(path.join(ROOT,'src',name))).update('\0');
 const implementation = Object.freeze({name:'Transaction Lab',version:VERSION,sourceSha256:engineHash.digest('hex'),sourceFiles:engineFiles});
@@ -56,7 +57,7 @@ function finalizeMeasurements(stateContext, results) {
   const evidence = stateContext.snapshotEvidence();
   return results.map(result => {
     const snapshot = result.evidence.request.length ? structuredClone(evidence) : result.evidence;
-    if (stateContext.canonicalFailure && result.status === 'measured') {
+    if (stateContext.canonicalFailure && ['measured', 'partial'].includes(result.status)) {
       const { executionIdentity, ...rest } = result;
       return { ...rest, status: 'unavailable', ...(Array.isArray(result.assets) ? { assets: [] } : {}), ...(Array.isArray(result.allowances) ? { allowances: [] } : {}),
         ...(Array.isArray(result.reusedPairs) ? { reusedPairs: [] } : {}),
@@ -272,17 +273,22 @@ export async function simulate(input, rpc) {
     measureAllowances({request,trace,block,rpc,metadata:METADATA,analysis,permissions,stateContext}),
   ]);
   const affectedResult = await measureAffectedBalances({request,trace,block,rpc,metadata:METADATA,existingBalanceChanges:initialResults[0],stateContext});
-  const [balanceResult,allowanceResult,affectedBalanceResult] = finalizeMeasurements(stateContext,[...initialResults,affectedResult]);
+  // Keep established token queries first in the shared bounded context.
+  const nativeResult = await measureNativeBalances({request,trace,block,rpc,stateContext});
+  const [balanceResult,allowanceResult,affectedBalanceResult,nativeBalanceResult] = finalizeMeasurements(stateContext,[...initialResults,affectedResult,nativeResult]);
   const {evidence:balanceEvidence,...balanceChanges} = balanceResult;
   const {evidence:allowanceEvidence,...allowanceChanges} = allowanceResult;
   const {evidence:affectedBalanceEvidence,...affectedBalanceChanges} = affectedBalanceResult;
+  const {evidence:nativeBalanceEvidence,...nativeBalanceChanges} = nativeBalanceResult;
+  const nativeAuditEvidence = nativeBalanceChanges.status === 'unavailable' ? stateContext.snapshotEvidence() : null;
+  const nativeBalanceAudit = nativeAuditEvidence?.request.length ? {verification:'unverified',reason:stateContext.canonicalFailure ?? 'Native measurement validation did not complete.',...structuredClone(nativeAuditEvidence)} : null;
   includePermissionCoverage(analysis,permissions,allowanceChanges);
   const accountEffects = projectAccountEffects({request,analysis,permissions,balanceChanges,allowanceChanges,affectedBalanceChanges});
   return {
     schemaVersion:'1.0', implementation, id:randomUUID(), createdAt:new Date().toISOString(), request,
     source:{provider:rpc.provider,chainId:999,blockNumber:block.number,blockHash:block.hash,timestamp:block.timestamp,mode:'simulation',blockBinding:'explicit_block_hash',requestedBlock:blockTag},
-    ...analysis, balanceChanges, allowanceChanges, affectedBalanceChanges, permissions, accountEffects, timing:{totalMs:Math.round(performance.now()-start),rpcMs:Math.round(rpc.rpcMs)},
-    evidence:{traceMethod:traceRequest.method,traceRequest,traceResponse:trace,balanceMeasurement:balanceEvidence,allowanceMeasurement:allowanceEvidence,affectedBalanceMeasurement:affectedBalanceEvidence},
+    ...analysis, balanceChanges, allowanceChanges, affectedBalanceChanges, nativeBalanceChanges, permissions, accountEffects, timing:{totalMs:Math.round(performance.now()-start),rpcMs:Math.round(rpc.rpcMs)},
+    evidence:{traceMethod:traceRequest.method,traceRequest,traceResponse:trace,balanceMeasurement:balanceEvidence,allowanceMeasurement:allowanceEvidence,affectedBalanceMeasurement:affectedBalanceEvidence,nativeBalanceMeasurement:nativeBalanceEvidence,...(nativeBalanceAudit?{nativeBalanceAudit}:{})},
   };
 }
 
@@ -337,14 +343,15 @@ export async function replay(input, rpc) {
   const {evidence:balanceEvidence,...balanceChanges} = balanceResult;
   const {evidence:allowanceEvidence,...allowanceChanges} = allowanceResult;
   const {evidence:affectedBalanceEvidence,...affectedBalanceChanges} = affectedBalanceResult;
+  const nativeBalanceChanges = {status:'not_applicable',basis:'current_pinned_state_validated_native_balance',assets:[],candidateAccountCount:0,omittedAccounts:[],feeScope:'excluded',limits:{maxAccounts:8},warnings:['Native HYPE balance measurement is not supported for historical replay. Missing measurements do not imply zero change; fees are excluded.']};
   includePermissionCoverage(analysis,permissions,allowanceChanges);
   const accountEffects = projectAccountEffects({request,analysis,permissions,balanceChanges,allowanceChanges,affectedBalanceChanges});
   return {
     schemaVersion:'1.0',implementation,id:randomUUID(),createdAt:new Date().toISOString(),request,
     source:{provider:rpc.provider,chainId:999,blockNumber:block.number,blockHash:block.hash,timestamp:block.timestamp,mode:'historical_trace',blockBinding:'transaction_hash',transactionHash,transactionIndex:BigInt(tx.transactionIndex).toString()},
-    ...analysis,permissions,balanceChanges,allowanceChanges,affectedBalanceChanges,accountEffects,
+    ...analysis,permissions,balanceChanges,allowanceChanges,affectedBalanceChanges,nativeBalanceChanges,accountEffects,
     timing:{totalMs:Math.round(performance.now()-start),rpcMs:Math.round(rpc.rpcMs)},
-    evidence:{traceMethod:traceRequest.method,traceRequest,traceResponse:trace,receipt,receiptRechecked:true,balanceMeasurement:balanceEvidence,allowanceMeasurement:allowanceEvidence,affectedBalanceMeasurement:affectedBalanceEvidence},
+    evidence:{traceMethod:traceRequest.method,traceRequest,traceResponse:trace,receipt,receiptRechecked:true,balanceMeasurement:balanceEvidence,allowanceMeasurement:allowanceEvidence,affectedBalanceMeasurement:affectedBalanceEvidence,nativeBalanceMeasurement:{request:[],response:[]}},
   };
 }
 

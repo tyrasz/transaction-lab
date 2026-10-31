@@ -1,0 +1,259 @@
+TAP version 13
+# Subtest: real Hyperlend trace: exact USDC principal and distinct accrued interest
+ok 1 - real Hyperlend trace: exact USDC principal and distinct accrued interest
+  ---
+  duration_ms: 1.960375
+  type: 'test'
+  ...
+# Subtest: real CoreWriter trace is incomplete HyperCore coverage and creates no invented assets
+ok 2 - real CoreWriter trace is incomplete HyperCore coverage and creates no invented assets
+  ---
+  duration_ms: 0.147375
+  type: 'test'
+  ...
+# Subtest: a top-level revert discards every descendant log
+ok 3 - a top-level revert discards every descendant log
+  ---
+  duration_ms: 0.198375
+  type: 'test'
+  ...
+# Subtest: out-of-gas differs from a contract revert and also discards events
+ok 4 - out-of-gas differs from a contract revert and also discards events
+  ---
+  duration_ms: 0.091875
+  type: 'test'
+  ...
+# Subtest: caught inner failure discards its entire subtree but preserves successful siblings
+ok 5 - caught inner failure discards its entire subtree but preserves successful siblings
+  ---
+  duration_ms: 0.147292
+  type: 'test'
+  ...
+# Subtest: duplicate global log records are counted once; separate identical emissions remain separate
+ok 6 - duplicate global log records are counted once; separate identical emissions remain separate
+  ---
+  duration_ms: 0.31525
+  type: 'test'
+  ...
+# Subtest: amounts above Number.MAX_SAFE_INTEGER stay exact and decimals are never guessed
+ok 7 - amounts above Number.MAX_SAFE_INTEGER stay exact and decimals are never guessed
+  ---
+  duration_ms: 0.128333
+  type: 'test'
+  ...
+# Subtest: deposit for another beneficiary keeps sender-only incoming assets and principal reconciliation
+ok 8 - deposit for another beneficiary keeps sender-only incoming assets and principal reconciliation
+  ---
+  duration_ms: 0.146834
+  type: 'test'
+  ...
+# Subtest: missing receipt logs downgrade otherwise recognized supply coverage
+ok 9 - missing receipt logs downgrade otherwise recognized supply coverage
+  ---
+  duration_ms: 0.244167
+  type: 'test'
+  ...
+# Subtest: recognized supply with successful but empty trace is not supported complete event coverage
+ok 10 - recognized supply with successful but empty trace is not supported complete event coverage
+  ---
+  duration_ms: 0.290458
+  type: 'test'
+  ...
+# Subtest: missing or malformed token decimals downgrade known supply without inventing display units
+ok 11 - missing or malformed token decimals downgrade known supply without inventing display units
+  ---
+  duration_ms: 0.921375
+  type: 'test'
+  ...
+# Subtest: unknown empty calls are unsupported rather than complete empty previews
+ok 12 - unknown empty calls are unsupported rather than complete empty previews
+  ---
+  duration_ms: 0.05825
+  type: 'test'
+  ...
+# Subtest: malformed events and ERC721 events are omitted, with incomplete coverage
+ok 13 - malformed events and ERC721 events are omitted, with incomplete coverage
+  ---
+  duration_ms: 0.077792
+  type: 'test'
+  ...
+# Subtest: protocol identity requires matching chain and deployed pool, not selector alone
+ok 14 - protocol identity requires matching chain and deployed pool, not selector alone
+  ---
+  duration_ms: 0.12225
+  type: 'test'
+  ...
+# Subtest: native value is not silently claimed as complete ERC20 coverage
+ok 15 - native value is not silently claimed as complete ERC20 coverage
+  ---
+  duration_ms: 0.095208
+  type: 'test'
+  ...
+# Subtest: self transfers are visible in both directions without fabricating a net loss
+ok 16 - self transfers are visible in both directions without fabricating a net loss
+  ---
+  duration_ms: 0.041333
+  type: 'test'
+  ...
+# Subtest: missing trace is a failed result rather than successful empty simulation
+ok 17 - missing trace is a failed result rather than successful empty simulation
+  ---
+  duration_ms: 0.027208
+  type: 'test'
+  ...
+# Subtest: observed one-unit rounding distinguishes deposited USDC from Mint-implied principal
+ok 18 - observed one-unit rounding distinguishes deposited USDC from Mint-implied principal
+  ---
+  duration_ms: 0.198625
+  type: 'test'
+  ...
+# Subtest: rounding reconciliation rejects values outside the mathematically derived interval
+ok 19 - rounding reconciliation rejects values outside the mathematically derived interval
+  ---
+  duration_ms: 0.151042
+  type: 'test'
+  ...
+# Subtest: one-unit mismatch is not accepted without the verified implementation and matching scaled mint input
+ok 20 - one-unit mismatch is not accepted without the verified implementation and matching scaled mint input
+  ---
+  duration_ms: 0.176875
+  type: 'test'
+  ...
+# Subtest: rounding bound depends on index and scaled amount, not a blanket one-unit tolerance
+ok 21 - rounding bound depends on index and scaled amount, not a blanket one-unit tolerance
+  ---
+  duration_ms: 0.126417
+  type: 'test'
+  ...
+# Subtest: revert decoding preserves RPC error and only interprets failed contract return data
+ok 22 - revert decoding preserves RPC error and only interprets failed contract return data
+  ---
+  duration_ms: 0.069333
+  type: 'test'
+  ...
+# Subtest: current failed call exposes explicit native no-measurement and inventories both native sources
+ok 23 - current failed call exposes explicit native no-measurement and inventories both native sources
+  ---
+  duration_ms: 3.072125
+  type: 'test'
+  ...
+# Subtest: historical replay has explicit unsupported native view and dispatches no native read
+ok 24 - historical replay has explicit unsupported native view and dispatches no native read
+  ---
+  duration_ms: 2.096541
+  type: 'test'
+  ...
+# Subtest: shared finalization withholds measured and partial amounts and identities after late canonical failure
+ok 25 - shared finalization withholds measured and partial amounts and identities after late canonical failure
+  ---
+  duration_ms: 0.858833
+  type: 'test'
+  ...
+# Subtest: HyperEVM result renders exact HYPE and wei without pooling accounts or replacing token views
+ok 26 - HyperEVM result renders exact HYPE and wei without pooling accounts or replacing token views
+  ---
+  duration_ms: 4.227334
+  type: 'test'
+  ...
+# Subtest: partial native results keep only measured rows and visibly retain omitted accounts
+ok 27 - partial native results keep only measured rows and visibly retain omitted accounts
+  ---
+  duration_ms: 0.57375
+  type: 'test'
+  ...
+# Subtest: unavailable, missing, historical and wrong-context native results expose no projected amounts
+ok 28 - unavailable, missing, historical and wrong-context native results expose no projected amounts
+  ---
+  duration_ms: 4.279209
+  type: 'test'
+  ...
+# Subtest: native rows reject missing, malformed, duplicate or contradictory quantities without inferring zero
+ok 29 - native rows reject missing, malformed, duplicate or contradictory quantities without inferring zero
+  ---
+  duration_ms: 3.379667
+  type: 'test'
+  ...
+# Subtest: largest uint256 and zero balances remain exact, and warning text uses text nodes
+ok 30 - largest uint256 and zero balances remain exact, and warning text uses text nodes
+  ---
+  duration_ms: 0.443166
+  type: 'test'
+  ...
+# Subtest: simulation binds trace to the observed block hash and never switches to latest
+ok 31 - simulation binds trace to the observed block hash and never switches to latest
+  ---
+  duration_ms: 3.104041
+  type: 'test'
+  ...
+# Subtest: historical trace rejects a transaction and receipt from different blocks
+ok 32 - historical trace rejects a transaction and receipt from different blocks
+  ---
+  duration_ms: 0.380833
+  type: 'test'
+  ...
+# Subtest: HTTP API rejects invalid and cross-origin requests before network activity
+not ok 33 - HTTP API rejects invalid and cross-origin requests before network activity
+  ---
+  duration_ms: 3.599667
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/server.test.js:34:1'
+  failureType: 'testCodeFailure'
+  error: 'listen EPERM: operation not permitted 127.0.0.1'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1919:21)
+    listenInCluster (node:net:1998:12)
+    node:net:2207:7
+    process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+  ...
+# Subtest: incomplete or unrelated root traces are rejected rather than shown as empty success
+ok 34 - incomplete or unrelated root traces are rejected rather than shown as empty success
+  ---
+  duration_ms: 0.577
+  type: 'test'
+  ...
+# Subtest: real nested delegate calls and omitted zero root value remain valid
+ok 35 - real nested delegate calls and omitted zero root value remain valid
+  ---
+  duration_ms: 2.609584
+  type: 'test'
+  ...
+# Subtest: simulation rejects a returned block that differs from the requested numeric block
+ok 36 - simulation rejects a returned block that differs from the requested numeric block
+  ---
+  duration_ms: 0.08575
+  type: 'test'
+  ...
+# Subtest: approval observations are exposed with partial coverage, without a general safety verdict
+ok 37 - approval observations are exposed with partial coverage, without a general safety verdict
+  ---
+  duration_ms: 0.455875
+  type: 'test'
+  ...
+# Subtest: historical replay validates block hash, number, receipt index and gas
+ok 38 - historical replay validates block hash, number, receipt index and gas
+  ---
+  duration_ms: 0.427167
+  type: 'test'
+  ...
+# Subtest: replay rejects status inconsistency without modifying the raw trace
+ok 39 - replay rejects status inconsistency without modifying the raw trace
+  ---
+  duration_ms: 0.237083
+  type: 'test'
+  ...
+# Subtest: replay preserves actual evidence and rechecks receipt identity after tracing
+ok 40 - replay preserves actual evidence and rechecks receipt identity after tracing
+  ---
+  duration_ms: 0.574042
+  type: 'test'
+  ...
+1..40
+# tests 40
+# suites 0
+# pass 39
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 65079.335917

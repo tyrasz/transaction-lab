@@ -1,0 +1,76 @@
+TAP version 13
+# Subtest: independent transfer walk drops failed ancestors and excludes delegate/CALLCODE transfers
+ok 1 - independent transfer walk drops failed ancestors and excludes delegate/CALLCODE transfers
+  ---
+  duration_ms: 1.407542
+  type: 'test'
+  ...
+# Subtest: witness diff enforces only sender nonce with unchanged balance
+ok 2 - witness diff enforces only sender nonce with unchanged balance
+  ---
+  duration_ms: 0.753875
+  type: 'test'
+  ...
+# Subtest: witness bytecode directly names selected accounts and independent BALANCE word offsets
+ok 3 - witness bytecode directly names selected accounts and independent BALANCE word offsets
+  ---
+  duration_ms: 0.065583
+  type: 'test'
+  ...
+# Subtest: retained wallet parsed-response shape binds anchors, witness words, trace net and original delta
+ok 4 - retained wallet parsed-response shape binds anchors, witness words, trace net and original delta
+  ---
+  duration_ms: 1.487084
+  type: 'test'
+  ...
+# Subtest: mutated public amount, missing raw anchor and non-neutral witness each reject
+ok 5 - mutated public amount, missing raw anchor and non-neutral witness each reject
+  ---
+  duration_ms: 1.155458
+  type: 'test'
+  ...
+# Subtest: changed witness output with a consistent evidence/raw join still fails amount binding
+ok 6 - changed witness output with a consistent evidence/raw join still fails amount binding
+  ---
+  duration_ms: 0.355417
+  type: 'test'
+  ...
+# Subtest: unavailable WHYPE diagnostics remain unavailable and publish no native amounts
+ok 7 - unavailable WHYPE diagnostics remain unavailable and publish no native amounts
+  ---
+  duration_ms: 1.028542
+  type: 'test'
+  ...
+# Subtest: native-only selected touches require independent balance/code and leave strict helper unchanged
+ok 8 - native-only selected touches require independent balance/code and leave strict helper unchanged
+  ---
+  duration_ms: 0.507416
+  type: 'test'
+  ...
+# Subtest: native touches reject storage, changed fields, unknown/probe/not-selected accounts and bad code/nonce
+ok 9 - native touches reject storage, changed fields, unknown/probe/not-selected accounts and bad code/nonce
+  ---
+  duration_ms: 0.611666
+  type: 'test'
+  ...
+# Subtest: same-block reference selection binds exact saved reference bytes and the two actual selection calls
+ok 10 - same-block reference selection binds exact saved reference bytes and the two actual selection calls
+  ---
+  duration_ms: 3.264916
+  type: 'test'
+  ...
+# Subtest: BALANCE witness revertReason cannot become a measured result even if raw and public evidence agree
+ok 11 - BALANCE witness revertReason cannot become a measured result even if raw and public evidence agree
+  ---
+  duration_ms: 0.47375
+  type: 'test'
+  ...
+1..11
+# tests 11
+# suites 0
+# pass 11
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 70.915

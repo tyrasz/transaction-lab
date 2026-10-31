@@ -1,0 +1,778 @@
+TAP version 13
+# Subtest: sealed Aave and Morpho token deposits have no modeled native-value candidates
+ok 1 - sealed Aave and Morpho token deposits have no modeled native-value candidates
+  ---
+  duration_ms: 8.200625
+  type: 'test'
+  ...
+# Subtest: positive root value is counted once with exact uint256 arithmetic, independent of logs or diff amounts
+ok 2 - positive root value is counted once with exact uint256 arithmetic, independent of logs or diff amounts
+  ---
+  duration_ms: 0.632166
+  type: 'test'
+  ...
+# Subtest: internal transfers, refunds and repeated recipients are accumulated without losing zero-net participants
+ok 3 - internal transfers, refunds and repeated recipients are accumulated without losing zero-net participants
+  ---
+  duration_ms: 0.399625
+  type: 'test'
+  ...
+# Subtest: self-transfers cancel while positive root and internal participants remain candidates, including the zero address
+ok 4 - self-transfers cancel while positive root and internal participants remain candidates, including the zero address
+  ---
+  duration_ms: 0.200958
+  type: 'test'
+  ...
+# Subtest: delegate inherited value never transfers to the implementation account and nested CALL uses storage context
+ok 5 - delegate inherited value never transfers to the implementation account and nested CALL uses storage context
+  ---
+  duration_ms: 0.673291
+  type: 'test'
+  ...
+# Subtest: CALLCODE keeps native/storage account while its explicit value becomes subsequent delegate context
+ok 6 - CALLCODE keeps native/storage account while its explicit value becomes subsequent delegate context
+  ---
+  duration_ms: 0.223917
+  type: 'test'
+  ...
+# Subtest: root and caught ancestor reverts discard every nested native transfer, including successful descendants
+ok 7 - root and caught ancestor reverts discard every nested native transfer, including successful descendants
+  ---
+  duration_ms: 0.152125
+  type: 'test'
+  ...
+# Subtest: static ancestry rejects value transfer while allowing EIP-214 CALLCODE and inherited delegate value
+ok 8 - static ancestry rejects value transfer while allowing EIP-214 CALLCODE and inherited delegate value
+  ---
+  duration_ms: 0.629625
+  type: 'test'
+  ...
+# Subtest: explicit post balances discover unmatched state changes and missing initial fields without guessing zero
+ok 9 - explicit post balances discover unmatched state changes and missing initial fields without guessing zero
+  ---
+  duration_ms: 0.474708
+  type: 'test'
+  ...
+# Subtest: selection ranks sender then original recipient then lexical while retaining all omitted flow and diff accounts
+ok 10 - selection ranks sender then original recipient then lexical while retaining all omitted flow and diff accounts
+  ---
+  duration_ms: 0.948875
+  type: 'test'
+  ...
+# Subtest: every lifecycle or unknown context is rejected even under a reverted ancestor
+ok 11 - every lifecycle or unknown context is rejected even under a reverted ancestor
+  ---
+  duration_ms: 0.822459
+  type: 'test'
+  ...
+# Subtest: normalized frame schema rejects coercions, omitted fields, malformed errors and noncanonical values safely
+ok 12 - normalized frame schema rejects coercions, omitted fields, malformed errors and noncanonical values safely
+  ---
+  duration_ms: 1.866959
+  type: 'test'
+  ...
+# Subtest: event evidence is validated for context and bounds but cannot create or price native effects
+ok 13 - event evidence is validated for context and bounds but cannot create or price native effects
+  ---
+  duration_ms: 0.247958
+  type: 'test'
+  ...
+# Subtest: candidate, frame, depth, log and text limits fail closed without truncation
+ok 14 - candidate, frame, depth, log and text limits fail closed without truncation
+  ---
+  duration_ms: 13.065
+  type: 'test'
+  ...
+# Subtest: diff schema and collisions are rejected without invoking untrusted accessors or echoing provider text
+ok 15 - diff schema and collisions are rejected without invoking untrusted accessors or echoing provider text
+  ---
+  duration_ms: 0.168166
+  type: 'test'
+  ...
+# Subtest: frozen development oracle retains all source and raw-response fingerprints and exactly seven independently queried pairs
+ok 16 - frozen development oracle retains all source and raw-response fingerprints and exactly seven independently queried pairs
+  ---
+  duration_ms: 11.2125
+  type: 'test'
+  ...
+# Subtest: observed original-position router balances reproduce every raw oracle amount without unrecorded responses
+ok 17 - observed original-position router balances reproduce every raw oracle amount without unrecorded responses
+  ---
+  duration_ms: 19.640916
+  type: 'test'
+  ...
+# Subtest: observed original-position direct-a balances reproduce every raw oracle amount without unrecorded responses
+ok 18 - observed original-position direct-a balances reproduce every raw oracle amount without unrecorded responses
+  ---
+  duration_ms: 4.305958
+  type: 'test'
+  ...
+# Subtest: real cached original-position readings prove reused pairs without any additional recorded token requests
+ok 19 - real cached original-position readings prove reused pairs without any additional recorded token requests
+  ---
+  duration_ms: 4.791708
+  type: 'test'
+  ...
+# Subtest: exact uint256 state is independent of event amounts and owner differs from submitter
+ok 20 - exact uint256 state is independent of event amounts and owner differs from submitter
+  ---
+  duration_ms: 2.405792
+  type: 'test'
+  ...
+# Subtest: false-returning transferFrom remains a candidate without inventing movement
+ok 21 - false-returning transferFrom remains a candidate without inventing movement
+  ---
+  duration_ms: 0.210375
+  type: 'test'
+  ...
+# Subtest: hUSDC and variable debt events preserve interest differences and liability metadata
+ok 22 - hUSDC and variable debt events preserve interest differences and liability metadata
+  ---
+  duration_ms: 0.628833
+  type: 'test'
+  ...
+# Subtest: self transfers retain gross totals and zero net; zero-address mint/burn legs are excluded
+ok 23 - self transfers retain gross totals and zero net; zero-address mint/burn legs are excluded
+  ---
+  duration_ms: 0.590708
+  type: 'test'
+  ...
+# Subtest: successful siblings survive failed/static branches and removed logs
+ok 24 - successful siblings survive failed/static branches and removed logs
+  ---
+  duration_ms: 0.684417
+  type: 'test'
+  ...
+# Subtest: failed root and unsupported chain perform no state reads
+ok 25 - failed root and unsupported chain perform no state reads
+  ---
+  duration_ms: 0.359791
+  type: 'test'
+  ...
+# Subtest: validated current payable outer call retains configured-token measurements and exact caller provenance
+ok 26 - validated current payable outer call retains configured-token measurements and exact caller provenance
+  ---
+  duration_ms: 0.706125
+  type: 'test'
+  ...
+# Subtest: historical and legacy positive-value calls remain unsupported without token reads
+ok 27 - historical and legacy positive-value calls remain unsupported without token reads
+  ---
+  duration_ms: 0.147042
+  type: 'test'
+  ...
+# Subtest: supplied forged analysis and permissions cannot add participants or suppress actual trace evidence
+ok 28 - supplied forged analysis and permissions cannot add participants or suppress actual trace evidence
+  ---
+  duration_ms: 0.575208
+  type: 'test'
+  ...
+# Subtest: unknown token events do not block configured participants or become measurement targets
+ok 29 - unknown token events do not block configured participants or become measurement targets
+  ---
+  duration_ms: 0.945958
+  type: 'test'
+  ...
+# Subtest: strict root identity and caller provenance reject stale or malformed traces before RPC
+ok 30 - strict root identity and caller provenance reject stale or malformed traces before RPC
+  ---
+  duration_ms: 0.401791
+  type: 'test'
+  ...
+# Subtest: configured event provenance requires the exact known token delegate and canonical ABI
+ok 31 - configured event provenance requires the exact known token delegate and canonical ABI
+  ---
+  duration_ms: 0.370083
+  type: 'test'
+  ...
+# Subtest: noncanonical transferFrom arguments without events cannot create candidates
+ok 32 - noncanonical transferFrom arguments without events cannot create candidates
+  ---
+  duration_ms: 0.057208
+  type: 'test'
+  ...
+# Subtest: same frame and indexed log duplicates do not overcount but conflicting indexes fail closed
+ok 33 - same frame and indexed log duplicates do not overcount but conflicting indexes fail closed
+  ---
+  duration_ms: 0.158125
+  type: 'test'
+  ...
+# Subtest: unindexed separate identical events remain separate observations
+ok 34 - unindexed separate identical events remain separate observations
+  ---
+  duration_ms: 0.081834
+  type: 'test'
+  ...
+# Subtest: temporary lifecycle frames are rejected even under reverted/static ancestors before any RPC
+ok 35 - temporary lifecycle frames are rejected even under reverted/static ancestors before any RPC
+  ---
+  duration_ms: 1.006875
+  type: 'test'
+  ...
+# Subtest: eight-pair candidate limit includes reused pairs, and a ninth never truncates
+ok 36 - eight-pair candidate limit includes reused pairs, and a ninth never truncates
+  ---
+  duration_ms: 0.256958
+  type: 'test'
+  ...
+# Subtest: frame, depth, event and cyclic resource limits fail before measurement
+ok 37 - frame, depth, event and cyclic resource limits fail before measurement
+  ---
+  duration_ms: 4.793958
+  type: 'test'
+  ...
+# Subtest: reuse requires exact identity/basis, unique valid pairs, and independent same-context value proof
+ok 38 - reuse requires exact identity/basis, unique valid pairs, and independent same-context value proof
+  ---
+  duration_ms: 1.467458
+  type: 'test'
+  ...
+# Subtest: partial reuse retains only additional independently measured assets
+ok 39 - partial reuse retains only additional independently measured assets
+  ---
+  duration_ms: 0.335167
+  type: 'test'
+  ...
+# Subtest: metadata, mismatching context, malformed amounts and poisoned exceptions fail closed
+ok 40 - metadata, mismatching context, malformed amounts and poisoned exceptions fail closed
+  ---
+  duration_ms: 1.853417
+  type: 'test'
+  ...
+# Subtest: canonical failure, including a previous shared failure, withholds all new and reused results
+ok 41 - canonical failure, including a previous shared failure, withholds all new and reused results
+  ---
+  duration_ms: 0.208542
+  type: 'test'
+  ...
+# Subtest: current affected queries remain unavailable until both implementation paths are validated, without RPC or context preparation
+ok 42 - current affected queries remain unavailable until both implementation paths are validated, without RPC or context preparation
+  ---
+  duration_ms: 0.118125
+  type: 'test'
+  ...
+# Subtest: validated current context admits affected participants with independently returned values and explicit synthetic environment
+ok 43 - validated current context admits affected participants with independently returned values and explicit synthetic environment
+  ---
+  duration_ms: 0.098958
+  type: 'test'
+  ...
+# Subtest: current context basis alone cannot admit an unvalidated query/environment profile
+ok 44 - current context basis alone cannot admit an unvalidated query/environment profile
+  ---
+  duration_ms: 0.184583
+  type: 'test'
+  ...
+# Subtest: current measured pair reuse retains the validated basis and rechecks exact same-context amounts
+ok 45 - current measured pair reuse retains the validated basis and rechecks exact same-context amounts
+  ---
+  duration_ms: 0.187041
+  type: 'test'
+  ...
+# Subtest: observed supply trace identifies USDC sender/custody and hUSDC beneficiary; synthetic query values are separate
+ok 46 - observed supply trace identifies USDC sender/custody and hUSDC beneficiary; synthetic query values are separate
+  ---
+  duration_ms: 10.658792
+  type: 'test'
+  ...
+# Subtest: observed router trace selects exactly five USDC participants with independent net-event arithmetic
+ok 47 - observed router trace selects exactly five USDC participants with independent net-event arithmetic
+  ---
+  duration_ms: 5.641583
+  type: 'test'
+  ...
+# Subtest: all six observed lending traces select known cash and position participants with preserved debt roles
+ok 48 - all six observed lending traces select known cash and position participants with preserved debt roles
+  ---
+  duration_ms: 7.801375
+  type: 'test'
+  ...
+# Subtest: observed direct transferFrom selects the original owner and recipient independently of request.from
+ok 49 - observed direct transferFrom selects the original owner and recipient independently of request.from
+  ---
+  duration_ms: 0.728584
+  type: 'test'
+  ...
+# Subtest: synthetic late affected-consumer canonical failure invalidates earlier supply balances, allowances and reuse
+ok 50 - synthetic late affected-consumer canonical failure invalidates earlier supply balances, allowances and reuse
+  ---
+  duration_ms: 15.335417
+  type: 'test'
+  ...
+# Subtest: synthetic late affected-consumer canonical failure invalidates earlier repay balances, allowances and reuse
+ok 51 - synthetic late affected-consumer canonical failure invalidates earlier repay balances, allowances and reuse
+  ---
+  duration_ms: 13.811208
+  type: 'test'
+  ...
+# Subtest: synthetic failure of the additional supply custody query preserves already-proven balances and allowance
+ok 52 - synthetic failure of the additional supply custody query preserves already-proven balances and allowance
+  ---
+  duration_ms: 7.264416
+  type: 'test'
+  ...
+# Subtest: eight current API outcomes preserve frozen source, complete raw HTTP/RPC bytes and all196 calls
+ok 53 - eight current API outcomes preserve frozen source, complete raw HTTP/RPC bytes and all196 calls
+  ---
+  duration_ms: 8.472667
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-supply on drpc
+ok 54 - genuine full current transport replay: current-supply on drpc
+  ---
+  duration_ms: 21.99775
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-supply on hyperlend-archive
+ok 55 - genuine full current transport replay: current-supply on hyperlend-archive
+  ---
+  duration_ms: 8.886041
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-borrow on drpc
+ok 56 - genuine full current transport replay: current-borrow on drpc
+  ---
+  duration_ms: 11.487334
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-borrow on hyperlend-archive
+ok 57 - genuine full current transport replay: current-borrow on hyperlend-archive
+  ---
+  duration_ms: 11.326833
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-direct-transferfrom-a on drpc
+ok 58 - genuine full current transport replay: current-direct-transferfrom-a on drpc
+  ---
+  duration_ms: 5.37
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-direct-transferfrom-a on hyperlend-archive
+ok 59 - genuine full current transport replay: current-direct-transferfrom-a on hyperlend-archive
+  ---
+  duration_ms: 5.0755
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-usdc-router-permit-consumed on drpc
+ok 60 - genuine full current transport replay: current-usdc-router-permit-consumed on drpc
+  ---
+  duration_ms: 0.912833
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-usdc-router-permit-consumed on hyperlend-archive
+ok 61 - genuine full current transport replay: current-usdc-router-permit-consumed on hyperlend-archive
+  ---
+  duration_ms: 1.070792
+  type: 'test'
+  ...
+# Subtest: the original eight hexadecimal-value HTTP400 failures remain intact and still reject before any RPC
+ok 62 - the original eight hexadecimal-value HTTP400 failures remain intact and still reject before any RPC
+  ---
+  duration_ms: 0.665042
+  type: 'test'
+  ...
+# Subtest: v0.6 six-run capture retains the frozen source and full HTTP outcomes
+ok 63 - v0.6 six-run capture retains the frozen source and full HTTP outcomes
+  ---
+  duration_ms: 0.980042
+  type: 'test'
+  ...
+# Subtest: v0.7 predeclared eleven attempts retain frozen implementation and every original RPC/HTTP response
+ok 64 - v0.7 predeclared eleven attempts retain frozen implementation and every original RPC/HTTP response
+  ---
+  duration_ms: 13.187
+  type: 'test'
+  ...
+# Subtest: v0.7.1 retains all fourteen guarded API outcomes and every genuine new RPC response
+ok 65 - v0.7.1 retains all fourteen guarded API outcomes and every genuine new RPC response
+  ---
+  duration_ms: 14.0105
+  type: 'test'
+  ...
+# Subtest: recorded full replay: supply through drpc
+ok 66 - recorded full replay: supply through drpc
+  ---
+  duration_ms: 15.144791
+  type: 'test'
+  ...
+# Subtest: recorded full replay: supply through hyperlend-archive
+ok 67 - recorded full replay: supply through hyperlend-archive
+  ---
+  duration_ms: 6.357125
+  type: 'test'
+  ...
+# Subtest: recorded full replay: withdraw through drpc
+ok 68 - recorded full replay: withdraw through drpc
+  ---
+  duration_ms: 6.998084
+  type: 'test'
+  ...
+# Subtest: recorded full replay: borrow through drpc
+ok 69 - recorded full replay: borrow through drpc
+  ---
+  duration_ms: 7.195083
+  type: 'test'
+  ...
+# Subtest: recorded full replay: borrow through hyperlend-archive
+ok 70 - recorded full replay: borrow through hyperlend-archive
+  ---
+  duration_ms: 6.461292
+  type: 'test'
+  ...
+# Subtest: recorded full replay: repay through drpc
+ok 71 - recorded full replay: repay through drpc
+  ---
+  duration_ms: 7.850417
+  type: 'test'
+  ...
+# Subtest: recorded full replay: repay through hyperlend-archive
+ok 72 - recorded full replay: repay through hyperlend-archive
+  ---
+  duration_ms: 6.757042
+  type: 'test'
+  ...
+# Subtest: recorded affected owner replay: direct-transferfrom-a
+ok 73 - recorded affected owner replay: direct-transferfrom-a
+  ---
+  duration_ms: 3.670709
+  type: 'test'
+  ...
+# Subtest: recorded affected owner replay: direct-transferfrom-b
+ok 74 - recorded affected owner replay: direct-transferfrom-b
+  ---
+  duration_ms: 3.263334
+  type: 'test'
+  ...
+# Subtest: original v0.6 direct-B index inconsistency still withholds all state using its untouched recording
+ok 75 - original v0.6 direct-B index inconsistency still withholds all state using its untouched recording
+  ---
+  duration_ms: 0.716166
+  type: 'test'
+  ...
+# Subtest: historical API keeps original execution while refusing balances after canonical state changes
+ok 76 - historical API keeps original execution while refusing balances after canonical state changes
+  ---
+  duration_ms: 3.271542
+  type: 'test'
+  ...
+# Subtest: historical API retains original events but safely rejects nested provider failures during measurement
+ok 77 - historical API retains original events but safely rejects nested provider failures during measurement
+  ---
+  duration_ms: 2.382958
+  type: 'test'
+  ...
+# Subtest: recorded archive failure remains a provider failure and cannot become an empty preview
+ok 78 - recorded archive failure remains a provider failure and cannot become an empty preview
+  ---
+  duration_ms: 0.443667
+  type: 'test'
+  ...
+# Subtest: standard compatibility entry point preserves the shared collector function and limits
+ok 79 - standard compatibility entry point preserves the shared collector function and limits
+  ---
+  duration_ms: 5.082917
+  type: 'test'
+  ...
+# Subtest: native amounts use exact 18-decimal rendering and do not change supplied snapshots
+ok 80 - native amounts use exact 18-decimal rendering and do not change supplied snapshots
+  ---
+  duration_ms: 1.988417
+  type: 'test'
+  ...
+# Subtest: zero and uint256 endpoint balances preserve exact signed deltas
+ok 81 - zero and uint256 endpoint balances preserve exact signed deltas
+  ---
+  duration_ms: 0.354208
+  type: 'test'
+  ...
+# Subtest: first eight candidates are measured and omitted candidates retain explicit partial coverage
+ok 82 - first eight candidates are measured and omitted candidates retain explicit partial coverage
+  ---
+  duration_ms: 0.358416
+  type: 'test'
+  ...
+# Subtest: remaining RPC budget can omit candidates within the account cap without inventing measurements
+ok 83 - remaining RPC budget can omit candidates within the account cap without inventing measurements
+  ---
+  duration_ms: 0.366916
+  type: 'test'
+  ...
+# Subtest: empty candidates and failed originals are distinct not-applicable outcomes
+ok 84 - empty candidates and failed originals are distinct not-applicable outcomes
+  ---
+  duration_ms: 0.230959
+  type: 'test'
+  ...
+# Subtest: historical, missing, mismatched or already failed contexts never perform reads
+ok 85 - historical, missing, mismatched or already failed contexts never perform reads
+  ---
+  duration_ms: 0.208584
+  type: 'test'
+  ...
+# Subtest: wrong original trace and pinned execution identities fail closed
+ok 86 - wrong original trace and pinned execution identities fail closed
+  ---
+  duration_ms: 0.38375
+  type: 'test'
+  ...
+# Subtest: candidate selection and count mutations cannot publish partial invented amounts
+ok 87 - candidate selection and count mutations cannot publish partial invented amounts
+  ---
+  duration_ms: 0.634084
+  type: 'test'
+  ...
+# Subtest: measurement uint ranges, exact delta, evidence and accessor shapes are validated
+ok 88 - measurement uint ranges, exact delta, evidence and accessor shapes are validated
+  ---
+  duration_ms: 1.390458
+  type: 'test'
+  ...
+# Subtest: shared failures before and after reads withhold all amounts, evidence and identity
+ok 89 - shared failures before and after reads withhold all amounts, evidence and identity
+  ---
+  duration_ms: 0.38875
+  type: 'test'
+  ...
+# Subtest: permission capture contains exactly six observed HTTP200 responses with the frozen engine
+ok 90 - permission capture contains exactly six observed HTTP200 responses with the frozen engine
+  ---
+  duration_ms: 2.4305
+  type: 'test'
+  ...
+# Subtest: recorded full permission replay: usdc-approve-hyperlend through drpc
+ok 91 - recorded full permission replay: usdc-approve-hyperlend through drpc
+  ---
+  duration_ms: 4.82
+  type: 'test'
+  ...
+# Subtest: recorded full permission replay: usdc-approve-hyperlend through hyperlend-archive
+ok 92 - recorded full permission replay: usdc-approve-hyperlend through hyperlend-archive
+  ---
+  duration_ms: 3.587292
+  type: 'test'
+  ...
+# Subtest: recorded full permission replay: husdc-relayed-permit through drpc
+ok 93 - recorded full permission replay: husdc-relayed-permit through drpc
+  ---
+  duration_ms: 2.634833
+  type: 'test'
+  ...
+# Subtest: recorded full permission replay: husdc-relayed-permit through hyperlend-archive
+ok 94 - recorded full permission replay: husdc-relayed-permit through hyperlend-archive
+  ---
+  duration_ms: 3.113083
+  type: 'test'
+  ...
+# Subtest: recorded full permission replay: usdc-router-permit-consumed through drpc
+ok 95 - recorded full permission replay: usdc-router-permit-consumed through drpc
+  ---
+  duration_ms: 14.72225
+  type: 'test'
+  ...
+# Subtest: recorded full permission replay: usdc-router-permit-consumed through hyperlend-archive
+ok 96 - recorded full permission replay: usdc-router-permit-consumed through hyperlend-archive
+  ---
+  duration_ms: 13.4485
+  type: 'test'
+  ...
+# Subtest: independent inventory covers static server imports and the optional engine import closure
+ok 97 - independent inventory covers static server imports and the optional engine import closure
+  ---
+  duration_ms: 20.863166
+  type: 'test'
+  ...
+# Subtest: stable startup loads the real adapter once with the complete immutable disk identity
+ok 98 - stable startup loads the real adapter once with the complete immutable disk identity
+  ---
+  duration_ms: 143.955583
+  type: 'test'
+  ...
+# Subtest: optional dependency absent at startup remains unavailable after installation until restart
+ok 99 - optional dependency absent at startup remains unavailable after installation until restart
+  ---
+  duration_ms: 241.556666
+  type: 'test'
+  ...
+# Subtest: rejects post-startup drift in src/analyze.js before optional import and caches rejection
+ok 100 - rejects post-startup drift in src/analyze.js before optional import and caches rejection
+  ---
+  duration_ms: 87.624042
+  type: 'test'
+  ...
+# Subtest: rejects post-startup drift in src/config.js before optional import and caches rejection
+ok 101 - rejects post-startup drift in src/config.js before optional import and caches rejection
+  ---
+  duration_ms: 110.606708
+  type: 'test'
+  ...
+# Subtest: rejects post-startup drift in src/standard-rpc.js before optional import and caches rejection
+ok 102 - rejects post-startup drift in src/standard-rpc.js before optional import and caches rejection
+  ---
+  duration_ms: 79.350416
+  type: 'test'
+  ...
+# Subtest: rejects post-startup drift in src/native-balances.js before optional import and caches rejection
+ok 103 - rejects post-startup drift in src/native-balances.js before optional import and caches rejection
+  ---
+  duration_ms: 75.828875
+  type: 'test'
+  ...
+# Subtest: rejects post-startup drift in src/native-effects.js before optional import and caches rejection
+ok 104 - rejects post-startup drift in src/native-effects.js before optional import and caches rejection
+  ---
+  duration_ms: 82.586209
+  type: 'test'
+  ...
+# Subtest: rejects post-startup drift in engines/standard-evm/sequence-state.js before optional import and caches rejection
+ok 105 - rejects post-startup drift in engines/standard-evm/sequence-state.js before optional import and caches rejection
+  ---
+  duration_ms: 79.819166
+  type: 'test'
+  ...
+# Subtest: rejects post-startup drift in engines/standard-evm/node_modules/@noble/hashes/utils.js before optional import and caches rejection
+ok 106 - rejects post-startup drift in engines/standard-evm/node_modules/@noble/hashes/utils.js before optional import and caches rejection
+  ---
+  duration_ms: 97.510625
+  type: 'test'
+  ...
+# Subtest: rejects changes during optional module evaluation after the pre-import check
+ok 107 - rejects changes during optional module evaluation after the pre-import check
+  ---
+  duration_ms: 88.61975
+  type: 'test'
+  ...
+# Subtest: removing an optional source after startup withholds the adapter
+ok 108 - removing an optional source after startup withholds the adapter
+  ---
+  duration_ms: 72.867583
+  type: 'test'
+  ...
+# Subtest: configuration exposes experimental Ethereum separately and binds its complete current implementation closure
+not ok 109 - configuration exposes experimental Ethereum separately and binds its complete current implementation closure
+  ---
+  duration_ms: 4.966167
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/standard-server.test.js:54:1'
+  failureType: 'testCodeFailure'
+  error: 'listen EPERM: operation not permitted 127.0.0.1'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1919:21)
+    listenInCluster (node:net:1998:12)
+    node:net:2207:7
+    process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+  ...
+# Subtest: HTTP validation, origin and host protections reject inputs before creating either provider
+not ok 110 - HTTP validation, origin and host protections reject inputs before creating either provider
+  ---
+  duration_ms: 1.346625
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/standard-server.test.js:77:1'
+  failureType: 'testCodeFailure'
+  error: 'listen EPERM: operation not permitted 127.0.0.1'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1919:21)
+    listenInCluster (node:net:1998:12)
+    node:net:2207:7
+    process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+  ...
+# Subtest: missing optional dependency returns 503 while health and the established HyperEVM route keep working
+not ok 111 - missing optional dependency returns 503 while health and the established HyperEVM route keep working
+  ---
+  duration_ms: 0.2385
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/standard-server.test.js:107:1'
+  failureType: 'testCodeFailure'
+  error: 'listen EPERM: operation not permitted 127.0.0.1'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1919:21)
+    listenInCluster (node:net:1998:12)
+    node:net:2207:7
+    process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+  ...
+# Subtest: the two-simulation limit is rechecked after asynchronous loading and shared with the legacy route
+not ok 112 - the two-simulation limit is rechecked after asynchronous loading and shared with the legacy route
+  ---
+  duration_ms: 0.4005
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/standard-server.test.js:128:1'
+  failureType: 'testCodeFailure'
+  error: 'listen EPERM: operation not permitted 127.0.0.1'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1919:21)
+    listenInCluster (node:net:1998:12)
+    node:net:2207:7
+    process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+  ...
+# Subtest: full HTTP production transport: aave-usdc-supply-with-permit (exact original Aave playback)
+not ok 113 - full HTTP production transport: aave-usdc-supply-with-permit (exact original Aave playback)
+  ---
+  duration_ms: 2.455375
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/standard-server.test.js:188:53'
+  failureType: 'testCodeFailure'
+  error: 'listen EPERM: operation not permitted 127.0.0.1'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1919:21)
+    listenInCluster (node:net:1998:12)
+    node:net:2207:7
+    process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+  ...
+# Subtest: full HTTP production transport: morpho-kiln-usdc-deposit (ID-adapted Morpho playback)
+not ok 114 - full HTTP production transport: morpho-kiln-usdc-deposit (ID-adapted Morpho playback)
+  ---
+  duration_ms: 0.68625
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/standard-server.test.js:188:53'
+  failureType: 'testCodeFailure'
+  error: 'listen EPERM: operation not permitted 127.0.0.1'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1919:21)
+    listenInCluster (node:net:1998:12)
+    node:net:2207:7
+    process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+  ...
+# Subtest: provider failure remains an explicit unavailable HTTP result with hashed, withheld error bytes
+not ok 115 - provider failure remains an explicit unavailable HTTP result with hashed, withheld error bytes
+  ---
+  duration_ms: 0.33
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/standard-server.test.js:225:1'
+  failureType: 'testCodeFailure'
+  error: 'listen EPERM: operation not permitted 127.0.0.1'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1919:21)
+    listenInCluster (node:net:1998:12)
+    node:net:2207:7
+    process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+  ...
+# Subtest: HTTP accepts canonical positive wei and preserves its exact engine value without displaying unmeasured native balances
+not ok 116 - HTTP accepts canonical positive wei and preserves its exact engine value without displaying unmeasured native balances
+  ---
+  duration_ms: 0.196625
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/test/standard-server.test.js:241:1'
+  failureType: 'testCodeFailure'
+  error: 'listen EPERM: operation not permitted 127.0.0.1'
+  code: 'EPERM'
+  stack: |-
+    Server.setupListenHandle [as _listen2] (node:net:1919:21)
+    listenInCluster (node:net:1998:12)
+    node:net:2207:7
+    process.processTicksAndRejections (node:internal/process/task_queues:89:21)
+  ...
+1..116
+# tests 116
+# suites 0
+# pass 108
+# fail 8
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6551.581583

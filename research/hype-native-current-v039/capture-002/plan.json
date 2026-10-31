@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "createdAt": "2026-10-31T13:06:27.292Z",
+  "providers": [
+    {
+      "id": "drpc",
+      "url": "https://hyperliquid.drpc.org"
+    },
+    {
+      "id": "hyperlend-archive",
+      "url": "https://rpc.hyperlend.finance/archive"
+    }
+  ],
+  "cases": [
+    {
+      "id": "001-wallet-transfer",
+      "request": {
+        "chainId": 999,
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x000000000000000000000000000000000000dead",
+        "data": "0x",
+        "value": "1000000000000"
+      }
+    },
+    {
+      "id": "002-self-transfer",
+      "request": {
+        "chainId": 999,
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "data": "0x",
+        "value": "1000000000000"
+      }
+    },
+    {
+      "id": "003-whype-deposit",
+      "request": {
+        "chainId": 999,
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x5555555555555555555555555555555555555555",
+        "data": "0xd0e30db0",
+        "value": "1000000000000"
+      }
+    },
+    {
+      "id": "004-whype-withdraw",
+      "request": {
+        "chainId": 999,
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x5555555555555555555555555555555555555555",
+        "data": "0x2e1a7d4d0000000000000000000000000000000000000000000000000000000000000001",
+        "value": "0"
+      }
+    },
+    {
+      "id": "005-hyperlend-supply",
+      "request": {
+        "chainId": 999,
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "to": "0x00a89d7a5a02160f20150ebea7a2b5e4879a1a8b",
+        "value": "0",
+        "data": "0x617ba037000000000000000000000000b88339cb7199b77e23db6e890353e22632ba630f0000000000000000000000000000000000000000000000000000000000e5e4030000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d00000000000000000000000000000000000000000000000000000000000000000"
+      }
+    }
+  ],
+  "attempts": 10,
+  "selection": "same block as retained reference capture; no fallback",
+  "selectionReference": {
+    "number": "0x2fb298d",
+    "hash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+    "selectionSha256": "3fc69814f862da2e35f137729b11e5e2136d4f47793be5efd5dd6fd10dd02cb9",
+    "priorManifestSha256": "044f99cb954c798550c34b602c92aac62c4c61b60bda15e90ca3bb63f7ffb2de",
+    "priorTerminalSha256": "923e96af3cfb6de2562ad4bbdcf88dc2b3692254722c8d76aa6d0c389bf34ad4"
+  },
+  "runtime": {
+    "node": "v22.23.2",
+    "platform": "darwin",
+    "arch": "arm64",
+    "executableSha256": "1f72236fcbfc84855d7c884fbcba0f6a7c635d600d7e493b823e77c467f2ae95"
+  },
+  "scope": {
+    "readOnly": true,
+    "signed": false,
+    "broadcast": false,
+    "fees": "excluded",
+    "independentClientClaim": false,
+    "installedAppChanged": false
+  }
+}

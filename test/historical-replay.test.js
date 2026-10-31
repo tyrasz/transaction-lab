@@ -26,7 +26,7 @@ const freshCapture=JSON.parse(guardedBytes);
 // Ethereum loader/transport and Arbitrum loader. Independently hash that current inventory;
 // the original 0.7.1 capture identity and historical RPC sequence stay untouched.
 const sourceFiles=freshCapture.implementation.sourceFiles.flatMap(name=>name==='analyze.js' ? [name,'arbitrum-loader.js'] : name==='historical-state.js'
- ? ['current-state.js',name] : name==='server.js' ? [name,'standard-loader.js','standard-rpc.js'] : name==='lending-balances.js' ? [name,'local-loader.js','local-sequence.js','local-simulation.js'] : name==='permissions.js' ? [name,'proof-rpc.js'] : [name]);
+ ? ['current-state.js',name] : name==='server.js' ? [name,'standard-loader.js','standard-rpc.js'] : name==='lending-balances.js' ? [name,'local-loader.js','local-sequence.js','local-simulation.js','native-balances.js','native-effects.js'] : name==='permissions.js' ? [name,'proof-rpc.js'] : [name]);
 const currentHash=createHash('sha256');
 for(const name of sourceFiles){assert.match(name,/^[a-z-]+\.js$/);currentHash.update(name+'\0').update(await readFile(new URL('../src/'+name,import.meta.url))).update('\0');}
 const currentEngine=currentHash.digest('hex');
@@ -39,7 +39,15 @@ const independent={
 };
 // v0.7.1 adds a separately observed original replay diff. Compare all API
 // observations and proof fields; check implementation provenance separately.
-function withoutGenerated(report){const {id,createdAt,timing,implementation,...rest}=report;return rest;}
+function withoutGenerated(report, current = false){
+ const {id,createdAt,timing,implementation,...rest}=structuredClone(report);
+ if(current){
+  assert.deepEqual(rest.nativeBalanceChanges,{status:'not_applicable',basis:'current_pinned_state_validated_native_balance',assets:[],candidateAccountCount:0,omittedAccounts:[],feeScope:'excluded',limits:{maxAccounts:8},warnings:['Native HYPE balance measurement is not supported for historical replay. Missing measurements do not imply zero change; fees are excluded.']});
+  assert.deepEqual(rest.evidence.nativeBalanceMeasurement,{request:[],response:[]});
+  delete rest.nativeBalanceChanges;delete rest.evidence.nativeBalanceMeasurement;
+ }
+ return rest;
+}
 function assertImplementation(report){
  assert.deepEqual(report.implementation,{name:'Transaction Lab',version:VERSION,sourceSha256:currentEngine,sourceFiles},'Implementation name, current version, ordered source inventory and independently calculated source hash all match');
 }
@@ -123,7 +131,7 @@ for(const item of capture.cases)for(const legacyRun of item.runs.filter(run=>run
   for(const field of ['traceMethod','traceRequest','traceResponse','receipt','receiptRechecked'])assert.deepEqual(report.evidence[field],expected.evidence[field],`Original ${field} raw execution is preserved`);
   assertEffects(report,item.operation);
   assertImplementation(report);
-  assert.deepEqual(withoutGenerated(report),withoutGenerated(fresh.response),'New complete RPC interleaving, shared snapshots and all API semantics are exact');
+  assert.deepEqual(withoutGenerated(report,true),withoutGenerated(fresh.response),'Original complete RPC interleaving, shared snapshots and all legacy API semantics are exact; historical native nonmeasurement is asserted separately');
   const prior=structuredClone(v6For(item.operation,legacyRun.provider)?.response??legacyRun.response);
   if(prior.allowanceChanges.status==='measured')prior.allowanceChanges.executionIdentity.validation.originalReplayState='complete_pre_post_diff_match';
   assert.deepEqual(report.permissions,prior.permissions,'All prior permission observations and correlations are preserved');
@@ -161,7 +169,7 @@ for(const item of capture.cases)for(const legacyRun of item.runs.filter(run=>run
 
 for(const item of freshCapture.cases.filter(c=>c.id.startsWith('direct-')))for(const run of item.runs){
  test(`recorded affected owner replay: ${item.id}`,async()=>{
-  const rpc=recordedRpc(run),report=await replay(run.request,rpc);assert.equal(rpc.consumed,run.rpcCalls.length);assert.deepEqual(withoutGenerated(report),withoutGenerated(run.response));assertImplementation(report);
+  const rpc=recordedRpc(run),report=await replay(run.request,rpc);assert.equal(rpc.consumed,run.rpcCalls.length);assert.deepEqual(withoutGenerated(report,true),withoutGenerated(run.response));assertImplementation(report);
   const amount=item.id.endsWith('-a')?'1277067':'1118386',owner='0xfc1bdd1ff58200761d56ccbce73f6f42ebe56379',spender='0x2908da1b63c4f7ce001bf5d875d179930a79eed4';
   const call=report.permissions.observations[0];assert.equal(report.permissions.observations.length,1);assert.deepEqual([call.kind,call.owner,call.spender,call.recipient,call.submitter,call.amountRaw],['transfer_from_call',owner,spender,spender,spender,amount]);
   if(item.id==='direct-transferfrom-b'){

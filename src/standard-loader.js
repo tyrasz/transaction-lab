@@ -10,6 +10,7 @@ const files = Object.freeze([
   'src/account-effects.js', 'src/affected-balances.js', 'src/allowances.js',
   'src/analyze.js', 'src/balances.js', 'src/current-state.js',
   'src/historical-state.js', 'src/lending-balances.js', 'src/lending.js',
+  'src/native-balances.js', 'src/native-effects.js',
   'src/permissions.js', 'src/revert.js',
   'src/standard-loader.js', 'src/standard-rpc.js', 'src/standard-simulation.js',
   'src/local-loader.js', 'src/local-sequence.js', 'src/local-simulation.js', 'src/proof-rpc.js',

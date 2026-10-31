@@ -222,7 +222,7 @@ export function analyzeTrace({ request, trace, block = null, metadata = {}, mode
   if (logs.length && logs.every(entry => entry.logIndex !== null)) {
     logs.sort((a, b) => BigInt(a.logIndex) < BigInt(b.logIndex) ? -1 : BigInt(a.logIndex) > BigInt(b.logIndex) ? 1 : 0);
   }
-  if (nativeValue) reasons.add('Native-token value transfers occurred; this version only previews ERC20 events and does not calculate native balance changes or fees.');
+  if (nativeValue) reasons.add('Native-token value transfers occurred. Check the separate HYPE balance view for available current-state measurements; ERC20 event totals exclude native value, and network fees are not calculated.');
   if (coreCalls.length) {
     reasons.add('CoreWriter submits actions for separate HyperCore processing. This EVM trace does not simulate or verify the resulting Spot or Perps balance changes.');
     if (!protocol) protocol = coreCalls.map(decodeClassTransfer).find(Boolean) ?? { name: 'HyperCore', operation: 'unknown', transport: 'CoreWriter' };

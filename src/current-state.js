@@ -7,11 +7,12 @@ import { assertNoProviderErrorResult } from './rpc.js';
 import { buildStateOverrides, failState, hex, StateValidationError, stateErrorDescription, uint, UINT256_MAX } from './state.js';
 import { canonicalStateDiff } from './state-diff.js';
 import { assertReadOnlyFrame, normalizeTokenQuery, semanticTrace, validateTokenQueryTrace } from './query-validation.js';
+import { collectNativeEffects } from './native-effects.js';
 
 const ADDRESS = /^0x[0-9a-f]{40}$/i, WORD = /^0x[0-9a-f]{64}$/i, BYTES = /^0x(?:[0-9a-f]{2})*$/i;
 const PROBE = '0x000000000000000000000000000000000000ba1a';
 const MAX_NONCE = (1n << 64n) - 1n;
-const MAX_PAIRS = 12, MAX_CALLS = 64, CANONICAL_RESERVE = 3;
+const MAX_PAIRS = 12, MAX_CALLS = 64;
 const MAX_RESPONSE_BYTES = 8 * 1024 * 1024, MAX_EVIDENCE_BYTES = 32 * 1024 * 1024;
 const MAX_CONTEXT_MS = 120000, MAX_INFLIGHT_RPC_MS = 25000;
 const DEADLINE_MESSAGE = 'Current state measurement exceeded its 120-second context deadline.';
@@ -55,6 +56,8 @@ export function createVerifiedCurrentStateContext({ request, block, rpc, trace, 
   const req = structuredClone(request), boundBlock = structuredClone(block), originalTrace = structuredClone(trace);
   const key = identityKey(req, boundBlock), evidence = { request: [], response: [] }, pairs = new Map();
   let preparation, pinned, header, overrides, senderNonce, senderBalance, afterNonce, afterBalance, executionIdentity;
+  let nativeCollection, nativeRead, effectiveDiff, canonicalReserve = 3, canonicalCalls = 0;
+  const nativeAnchors = new Map(), nativeExpected = new Map(), codeAnchors = new Map(), stateNormalization = [];
   let evidenceBytes = 0, canonicalFailure = null, startedAt, deadlineFailure = false;
   function checkDeadline() {
     const current = now();
@@ -72,12 +75,18 @@ export function createVerifiedCurrentStateContext({ request, block, rpc, trace, 
       throw error;
     }
   }
+  function checkShared() {
+    checkDeadline();
+    if (canonicalFailure) failState(canonicalFailure);
+  }
+  const remainingCanonical = () => Math.max(0, canonicalReserve - canonicalCalls);
   async function call(method, params, canonical = false) {
     checkDeadline();
-    // Normal reads cannot consume the final slots needed by three consumers.
-    if (evidence.request.length >= MAX_CALLS - (canonical ? 0 : CANONICAL_RESERVE)) failState('Current state measurement exceeds its reserved 64-RPC budget.');
+    // Token consumers and the optional native consumer share one bounded ledger.
+    if (evidence.request.length >= MAX_CALLS - (canonical ? 0 : remainingCanonical())) failState('Current state measurement exceeds its reserved 64-RPC budget.');
     const id = evidence.request.length + 1;
     evidence.request.push({ id, method, params: structuredClone(params) });
+    if (canonical) canonicalCalls++;
     let result, rpcError;
     try { result = await rpc.call(method, structuredClone(params)); }
     catch (error) { rpcError = error; }
@@ -113,49 +122,138 @@ export function createVerifiedCurrentStateContext({ request, block, rpc, trace, 
     if (identity.hash !== lower(boundBlock.hash) || uint(identity.number) !== uint(boundBlock.number) || uint(identity.timestamp) !== uint(boundBlock.timestamp)) failState('Current provider block header does not match the pinned identity.');
     if (header && JSON.stringify(identity) !== JSON.stringify(headerIdentity(header))) failState('Current block header fields changed during measurement.');
   }
-  async function headerWitness(after) {
-    const code = '0x43600052426020524560405248606052446080524160a0524660c0527f' + (uint(boundBlock.number) - 1n).toString(16).padStart(64, '0') + '4060e0526101006000f3';
+  function assertNativeQueryDiff(raw, after, rows) {
+    const diff = canonicalStateDiff(raw), sender = lower(req.from), selected = new Set(rows.map(row => row.account));
+    // Observed provider compatibility for our fixed BALANCE-only probe: some
+    // replies retain an unchanged touched account with an exactly empty post.
+    // This is not a general Geth diff rule. Never normalize storage (its omission
+    // can mean a cleared slot), lifecycle, the probe itself or token query diffs.
+    // canonicalStateDiff makes a fresh copy; the retained raw response is intact.
+    for (const account of new Set([...Object.keys(diff.pre), ...Object.keys(diff.post)])) {
+      if (account === sender) continue;
+      const pre = diff.pre[account], post = diff.post[account];
+      if (account === PROBE || !selected.has(account) || !pre || !post
+        || Object.keys(post).length || Object.keys(pre).some(field => !['balance', 'nonce', 'code'].includes(field))) failState('Native balance witness contains unsupported touched-account effects.');
+      const balance = after ? nativeExpected.get(account) : nativeAnchors.get(account)?.value;
+      if (typeof balance !== 'bigint' || (pre.balance === undefined ? balance !== 0n : quantity(pre.balance) !== balance)) failState('Native balance witness touched-account balance differs from its established state.');
+      if (pre.code !== undefined && codeAnchors.has(account) && pre.code !== codeAnchors.get(account).code) failState('Native balance witness touched-account code differs from its pinned classification.');
+      delete diff.pre[account]; delete diff.post[account];
+    }
+    assertQueryDiff(diff, sender, after ? afterNonce : senderNonce, after ? afterBalance : senderBalance);
+  }
+  async function headerWitness(after, rows = []) {
+    let code = '0x43600052426020524560405248606052446080524160a0524660c0527f' + (uint(boundBlock.number) - 1n).toString(16).padStart(64, '0') + '4060e052';
+    for (const [i, row] of rows.entries()) code += '73' + row.account.slice(2) + '3161' + (256 + 32 * i).toString(16).padStart(4, '0') + '52';
+    code += '61' + (256 + 32 * rows.length).toString(16).padStart(4, '0') + '6000f3';
     const witness = { from: lower(req.from), to: PROBE, data: '0x', value: '0x0', gas: '0x493e0' };
-    const raw = await call('debug_traceCall', [witness, pinned, { ...tracer('trace'), stateOverrides: { ...(after ? overrides : {}), [PROBE]: { code } } }]);
+    const stateOverrides = { ...(after ? overrides : {}), [PROBE]: { code } }, traceEvidenceId = evidence.request.length + 1;
+    const raw = await call('debug_traceCall', [witness, pinned, { ...tracer('trace'), stateOverrides }]);
     if (uint(raw?.gas) !== 300000n) failState('Current header witness does not match its fixed 300000-gas envelope.');
     const frame = semanticTrace(raw);
     assertReadOnlyFrame(frame, { type: 'CALL', from: req.from, to: PROBE, input: '0x', childCount: 0 });
-    if (frame.output.length !== 514 || BigInt(frame.gasUsed) === 0n || BigInt(frame.gasUsed) > 300000n) failState('Current header witness returned malformed data.');
+    if (frame.output.length !== 514 + 64 * rows.length || BigInt(frame.gasUsed) === 0n || BigInt(frame.gasUsed) > 300000n) failState('Current header witness returned malformed data.');
     const expected = [header.number, header.timestamp, header.gasLimit, 0, header.mixHash, header.miner, CHAIN_ID, header.parentHash].map(BigInt);
     if (expected.some((value, i) => BigInt('0x' + frame.output.slice(2 + i * 64, 66 + i * 64)) !== value)) failState('Current query header does not match the synthetic unpriced BASEFEE-zero profile.');
+    if (rows.length) {
+      const mutationEvidenceId = evidence.request.length + 1;
+      assertNativeQueryDiff(await call('debug_traceCall', [witness, pinned, { ...tracer('diff'), stateOverrides }]), after, rows);
+      checkShared();
+      for (const [i, row] of rows.entries()) {
+        const observed = BigInt('0x' + frame.output.slice(514 + 64 * i, 578 + 64 * i));
+        if (observed !== (after ? nativeExpected.get(row.account) : nativeAnchors.get(row.account).value)) failState('Native balance witness disagrees with pinned balances or the complete original state changes.');
+        row[after ? 'after' : 'before'] = observed;
+        row.queryEvidence.push({ state: after ? 'after' : 'before', traceEvidenceId, mutationEvidenceId, wordIndex: 8 + i });
+      }
+    }
+  }
+  async function nativeBasic(method, account) {
+    // Mandatory normalization must still leave both preparation witnesses and
+    // all outstanding canonical checks; optional display reads happen later.
+    if (evidence.request.length + 1 + 2 + remainingCanonical() > MAX_CALLS) failState('Complete native state preparation exceeds its reserved RPC budget.');
+    return call(method, [account, pinned]);
+  }
+  async function anchorNative(account, preparing = false) {
+    if (!nativeAnchors.has(account)) {
+      const evidenceId = evidence.request.length + 1;
+      const value = quantity(await (preparing ? nativeBasic('eth_getBalance', account) : call('eth_getBalance', [account, pinned])));
+      if (value === null) failState('Pinned native balance is malformed.');
+      nativeAnchors.set(account, { value, evidenceId });
+    }
+    return nativeAnchors.get(account).value;
+  }
+  async function prepareNative(expected, diff) {
+    nativeCollection = collectNativeEffects(expected, diff);
+    if (nativeCollection.candidates.length) canonicalReserve = 4;
+    effectiveDiff = structuredClone(diff);
+    for (const account of Object.keys(diff.post).filter(account => !Object.hasOwn(diff.pre, account))) {
+      const post = diff.post[account];
+      if (!(quantity(post.balance) > 0n) || post.nonce !== undefined && quantity(post.nonce) !== 0n
+        || post.code !== undefined && post.code !== '0x' || post.storage !== undefined && Object.keys(post.storage).length) failState('Unsupported newly created account state.');
+      if (BigInt(nativeCollection.netValueByAccount[account] ?? '0') <= 0n || await anchorNative(account, true) !== 0n) failState('New funded account lacks an independently established empty balance.');
+      const nonceEvidenceId = evidence.request.length + 1;
+      if (quantity(await nativeBasic('eth_getTransactionCount', account), MAX_NONCE) !== 0n) failState('New funded account did not have an empty nonce.');
+      if (!codeAnchors.has(account)) {
+        const evidenceId = evidence.request.length + 1, code = await nativeBasic('eth_getCode', account);
+        codeAnchors.set(account, { code, evidenceId });
+      }
+      if (codeAnchors.get(account).code !== '0x') failState('New funded account did not have empty code.');
+      effectiveDiff.pre[account] = { balance: '0', ...(post.nonce === undefined ? {} : { nonce: '0' }), ...(post.code === undefined ? {} : { code: '0x' }) };
+      stateNormalization.push({ account, basis: 'pinned_zero_balance_zero_nonce_empty_code', balanceEvidenceId: nativeAnchors.get(account).evidenceId, nonceEvidenceId, codeEvidenceId: codeAnchors.get(account).evidenceId });
+    }
+    // Every candidate is checked, including those omitted by the display cap.
+    for (const candidate of nativeCollection.candidates) {
+      const account = candidate.account, pre = effectiveDiff.pre[account], post = effectiveDiff.post[account], net = BigInt(candidate.netValueRaw);
+      if (Boolean(pre) !== Boolean(post)) failState('Native account lifecycle changes are unsupported.');
+      if (pre) {
+        const initial = pre.balance === undefined ? await anchorNative(account, true) : quantity(pre.balance);
+        if (initial === null || pre.balance === undefined && initial !== 0n) failState('Omitted native prebalance was not independently established as zero.');
+        const final = post.balance === undefined ? initial : quantity(post.balance);
+        if (final === null || final - initial !== net) failState('Native state diff disagrees with committed CALL value effects.');
+        nativeExpected.set(account, final);
+      } else if (net !== 0n) failState('Native transfer is absent from the complete original state diff.');
+    }
   }
   async function prepare() {
     checkDeadline();
     if (!preparation) preparation = (async () => {
-      if (uint(req?.chainId) !== BigInt(CHAIN_ID) || !isAddress(req?.from) || !isAddress(req?.to) || !bytes(req?.data) || quantity(req?.value) !== 0n || !isWord(boundBlock?.hash) || quantity(boundBlock?.number) === null || uint(boundBlock.number) === 0n || quantity(boundBlock?.timestamp) === null) failState('Current measurement requires a zero-value chain-999 contract request and pinned block.');
+      if (uint(req?.chainId) !== BigInt(CHAIN_ID) || !isAddress(req?.from) || !isAddress(req?.to) || !bytes(req?.data) || quantity(req?.value) === null || !isWord(boundBlock?.hash) || quantity(boundBlock?.number) === null || uint(boundBlock.number) === 0n || quantity(boundBlock?.timestamp) === null) failState('Current measurement requires a chain-999 unsigned request and pinned block.');
       if (['gas', 'gasPrice', 'maxFeePerGas', 'maxPriorityFeePerGas', 'nonce', 'accessList', 'authorizationList', 'type', 'blobVersionedHashes', 'maxFeePerBlobGas'].some(field => req[field] !== undefined)) failState('Current measurement accepts only its fixed unpriced unsigned envelope.');
       const expected = semanticTrace(originalTrace);
-      if (failed(expected) || expected.type !== 'CALL' || expected.from !== lower(req.from) || expected.to !== lower(req.to) || expected.input !== lower(req.data) || expected.value !== '0' || uint(originalTrace.gas) !== 5000000n || BigInt(expected.gasUsed) === 0n || BigInt(expected.gasUsed) > 5000000n) failState('Original current trace does not match the fixed unsigned call.');
+      if (failed(expected) || expected.type !== 'CALL' || expected.from !== lower(req.from) || expected.to !== lower(req.to) || expected.input !== lower(req.data) || BigInt(expected.value) !== quantity(req.value) || uint(originalTrace.gas) !== 5000000n || BigInt(expected.gasUsed) === 0n || BigInt(expected.gasUsed) > 5000000n) failState('Original current trace does not match the fixed unsigned call.');
       // Even reverted temporary lifecycle operations can disappear from a diff.
       if (hasLifecycle(expected)) failState('Contract creation or destruction, including reverted subtrees, is outside current measurement scope.');
       if (usesProbe(expected)) failState('The reserved current header witness address is not disjoint.');
       pinned = { blockHash: lower(boundBlock.hash), requireCanonical: true };
       header = await call('eth_getBlockByHash', [pinned.blockHash, false]); assertHeader(header);
       senderNonce = quantity(await call('eth_getTransactionCount', [lower(req.from), pinned]), MAX_NONCE - 2n);
+      const senderBalanceEvidenceId = evidence.request.length + 1;
       senderBalance = quantity(await call('eth_getBalance', [lower(req.from), pinned]));
       if (senderNonce === null || senderBalance === null) failState('Current sender nonce or native balance is malformed or outside the supported range.');
+      if (senderBalance < quantity(req.value)) failState('Sender native balance cannot fund the requested value.');
+      nativeAnchors.set(lower(req.from), { value: senderBalance, evidenceId: senderBalanceEvidenceId });
+      const senderCodeEvidenceId = evidence.request.length + 1;
       const senderCode = await call('eth_getCode', [lower(req.from), pinned]);
       if (senderCode !== '0x') failState('Current state queries require an EOA sender with empty runtime code.');
+      codeAnchors.set(lower(req.from), { code: senderCode, evidenceId: senderCodeEvidenceId });
+      const rootCodeEvidenceId = evidence.request.length + 1;
       const rootCode = await call('eth_getCode', [lower(req.to), pinned]);
-      if (!bytes(rootCode) || rootCode === '0x') failState('Current root is not a confirmed contract with runtime code.');
+      if (!bytes(rootCode)) failState('Current root code classification is malformed.');
+      codeAnchors.set(lower(req.to), { code: lower(rootCode), evidenceId: rootCodeEvidenceId });
+      if (rootCode === '0x' && (expected.calls.length || expected.logs.length || expected.output !== '0x')) failState('Empty-code recipient has unsupported execution behavior.');
       if (await call('eth_getCode', [PROBE, pinned]) !== '0x') failState('The reserved current header witness address is not empty.');
-      const originalCall = { from: lower(req.from), to: lower(req.to), data: lower(req.data), value: '0x0', gas: '0x4c4b40' };
+      const originalCall = { from: lower(req.from), to: lower(req.to), data: lower(req.data), value: hex(req.value), gas: '0x4c4b40' };
       const diff = canonicalStateDiff(await call('debug_traceCall', [originalCall, pinned, tracer('diff')]));
-      overrides = buildStateOverrides(diff);
       if (diff.pre[lower(req.to)]?.code !== undefined && diff.pre[lower(req.to)].code !== lower(rootCode)) failState('Original current diff root code differs from the pinned contract classification.');
       if (Object.hasOwn(diff.pre, PROBE) || Object.hasOwn(diff.post, PROBE)) failState('Original state changes overlap the reserved current header witness address.');
+      await prepareNative(expected, diff);
+      overrides = buildStateOverrides(effectiveDiff);
       const pre = diff.pre[lower(req.from)], post = diff.post[lower(req.from)];
       if (!pre || !post || quantity(pre.nonce) !== senderNonce || quantity(post.nonce) !== senderNonce + 1n || quantity(pre.balance) !== senderBalance || Object.keys(pre).some(field => !['balance', 'nonce'].includes(field)) || Object.keys(post).some(field => !['balance', 'nonce'].includes(field))) failState('Original current diff does not match the pinned EOA sender state and nonce transition.');
       afterNonce = quantity(overrides[lower(req.from)]?.nonce, MAX_NONCE - 1n);
       afterBalance = overrides[lower(req.from)]?.balance === undefined ? senderBalance : quantity(overrides[lower(req.from)].balance);
-      if (afterNonce !== senderNonce + 1n || afterBalance === null) failState('Original current overrides do not preserve the supported sender context.');
+      if (afterNonce !== senderNonce + 1n || afterBalance === null || afterBalance !== senderBalance + BigInt(nativeCollection.netValueByAccount[lower(req.from)] ?? '0')) failState('Original current overrides do not preserve the supported sender context.');
       await headerWitness(false); await headerWitness(true);
-      executionIdentity = { stateBlockHash: pinned.blockHash, blockNumber: uint(boundBlock.number).toString(), timestamp: uint(boundBlock.timestamp).toString(), stateBinding: 'block_hash', headerContext: 'synthetic_unpriced_basefee_zero', feePolicy: 'gas_price_omitted_no_query_native_debit', method: 'debug_traceCall', originalEnvelopeSha256: sha(originalCall), stateOverridesSha256: sha(overrides), validation: { originalTraceBinding: 'caller_supplied_pinned_trace_with_matching_fixed_envelope', headerFields: ['number', 'timestamp', 'gasLimit', 'baseFee_zero', 'prevRandao', 'coinbase', 'chainId', 'parentHash'], actualBlockBaseFeeRaw: uint(header.baseFeePerGas).toString(), queryScope: 'configured_USDC_hUSDC_variable_debt_balanceOf_and_USDC_hUSDC_allowance', queryImplementation: 'configured_address_paths_before_and_after_no_runtime_code_attestation', queryMutation: 'sender_nonce_increment_only_with_unchanged_native_balance', maxPairs: MAX_PAIRS, maxRpcCalls: MAX_CALLS, reservedCanonicalCalls: CANONICAL_RESERVE, maxContextMs: MAX_CONTEXT_MS, maxInFlightRpcMs: MAX_INFLIGHT_RPC_MS, inFlightRpcBound: 'conditional_on_transport_timeout_at_most_25000ms' } };
+      executionIdentity = { stateBlockHash: pinned.blockHash, blockNumber: uint(boundBlock.number).toString(), timestamp: uint(boundBlock.timestamp).toString(), stateBinding: 'block_hash', headerContext: 'synthetic_unpriced_basefee_zero', feePolicy: 'gas_price_omitted_no_query_native_debit', method: 'debug_traceCall', originalEnvelopeSha256: sha(originalCall), stateOverridesSha256: sha(overrides), validation: { originalTraceBinding: 'caller_supplied_pinned_trace_with_matching_fixed_envelope', headerFields: ['number', 'timestamp', 'gasLimit', 'baseFee_zero', 'prevRandao', 'coinbase', 'chainId', 'parentHash'], actualBlockBaseFeeRaw: uint(header.baseFeePerGas).toString(), queryScope: 'configured_USDC_hUSDC_variable_debt_balanceOf_and_USDC_hUSDC_allowance', queryImplementation: 'configured_address_paths_before_and_after_no_runtime_code_attestation', queryMutation: 'sender_nonce_increment_only_with_unchanged_native_balance', maxPairs: MAX_PAIRS, maxRpcCalls: MAX_CALLS, reservedCanonicalCalls: canonicalReserve, maxContextMs: MAX_CONTEXT_MS, maxInFlightRpcMs: MAX_INFLIGHT_RPC_MS, inFlightRpcBound: 'conditional_on_transport_timeout_at_most_25000ms' } };
     })().catch(error => {
       // Preparation is shared by every consumer; an unavailable identity must
       // invalidate the whole context, while an individual query failure does not.
@@ -190,8 +288,44 @@ export function createVerifiedCurrentStateContext({ request, block, rpc, trace, 
         })());
       }
       const result = await pairs.get(pairKey);
-      checkDeadline();
+      checkShared();
       return { ...result };
+    },
+    async readNativeBalances() {
+      checkShared();
+      if (!nativeRead) nativeRead = (async () => {
+        await prepare();
+        // API consumers schedule this after token work; settle already started
+        // pairs as well so their RPCs cannot compete with optional native reads.
+        await Promise.allSettled([...pairs.values()]);
+        checkShared();
+        const result = { feeScope: 'excluded', maxAccounts: 8, candidates: structuredClone(nativeCollection.candidates),
+          counts: { candidates: nativeCollection.candidates.length, selected: 0, omitted: nativeCollection.candidates.length }, measurements: [],
+          ...(stateNormalization.length ? { stateNormalization: structuredClone(stateNormalization) } : {}) };
+        for (const candidate of result.candidates) {
+          if (!candidate.selected) continue;
+          const anchorCalls = nativeAnchors.has(candidate.account) ? 0 : 1;
+          if (evidence.request.length + anchorCalls + 4 + remainingCanonical() > MAX_CALLS) {
+            candidate.selected = false; candidate.reason = 'rpc-budget'; continue;
+          }
+          const before = await anchorNative(candidate.account);
+          checkShared();
+          const pre = effectiveDiff.pre[candidate.account];
+          if (pre && (pre.balance === undefined ? before !== 0n : quantity(pre.balance) !== before)) failState('Native state prebalance differs from its pinned independent read.');
+          if (!nativeExpected.has(candidate.account)) nativeExpected.set(candidate.account, before);
+          result.measurements.push({ account: candidate.account, anchorEvidenceId: nativeAnchors.get(candidate.account).evidenceId, queryEvidence: [] });
+        }
+        if (result.measurements.length) {
+          await headerWitness(false, result.measurements); await headerWitness(true, result.measurements);
+          for (const row of result.measurements) row.delta = row.after - row.before;
+        }
+        result.counts.selected = result.measurements.length;
+        result.counts.omitted = result.counts.candidates - result.counts.selected;
+        return result;
+      })().catch(error => { canonicalFailure ??= stateErrorDescription(error); throw error; });
+      const result = await nativeRead;
+      checkShared();
+      return structuredClone(result);
     },
     async verifyCanonical() {
       try { await prepare(); assertHeader(await call('eth_getBlockByNumber', [hex(boundBlock.number), false], true)); }

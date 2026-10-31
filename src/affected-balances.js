@@ -129,7 +129,10 @@ export async function measureAffectedBalances({ request, trace, block, rpc, meta
   const verifiedCurrent = stateContext?.measurementBasis === 'current_pinned_state_validated_query';
   const basis = historical ? 'historical_transaction_position_balanceOf' : verifiedCurrent ? 'current_pinned_state_validated_query' : 'prestate_diff_balanceOf';
   const base = { status: 'not_applicable', basis, assets: [], reusedPairs: [], candidatePairCount: 0, limits: LIMITS, warnings: [], evidence: { request: [], response: [] } };
-  if (uint(request?.chainId) !== BigInt(CHAIN_ID) || !address(request?.from) || !address(request?.to) || !bytes(request?.data) || uint(request?.value) !== 0n || !object(trace) || failed(trace)) return { ...base, warnings: ['Affected-account measurements require a successful zero-value HyperEVM contract call.'] };
+  const nativeValue = uint(request?.value);
+  if (uint(request?.chainId) !== BigInt(CHAIN_ID) || !address(request?.from) || !address(request?.to) || !bytes(request?.data) || nativeValue === null || nativeValue > UINT256_MAX || (!verifiedCurrent && nativeValue !== 0n) || !object(trace) || failed(trace)) return { ...base, warnings: [nativeValue === 0n
+    ? 'Affected-account measurements require a successful zero-value HyperEVM contract call.'
+    : 'Affected-account measurements require a successful HyperEVM contract call. Native value is supported only by the validated current-state context; historical and legacy contexts require zero value.'] };
   let context;
   const warnings = [
     historical ? 'Configured-token balances are queried independently immediately before and after the original transaction at its exact position in the original block.' : verifiedCurrent

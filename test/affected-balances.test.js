@@ -127,6 +127,35 @@ test('failed root and unsupported chain perform no state reads', async () => {
   }
 });
 
+test('validated current payable outer call retains configured-token measurements and exact caller provenance', async () => {
+  const input = setup(); input.request.value = '1000000000000000001'; input.trace.value = '0xde0b6b3a7640001';
+  const values = new Map([[`${USDC}:${OWNER}`, [700n, 600n]], [`${USDC}:${RECIPIENT}`, [9n, 109n]]]);
+  const { result, queries } = await run(input, { historical: false, verifiedCurrent: true, values });
+  assert.equal(result.status, 'measured'); assert.equal(result.basis, 'current_pinned_state_validated_query'); assert.equal(queries.length, 2);
+  assert.deepEqual(result.assets.map(a => [a.account, a.beforeRaw, a.afterRaw, a.deltaRaw]), [[OWNER, '700', '600', '-100'], [RECIPIENT, '9', '109', '100']]);
+  assert(result.assets.every(a => a.asset.type === 'ERC20' && a.asset.address === USDC));
+  assert.equal(result.assets[0].candidateEvidence.transferCalls[0].spender, ROUTER);
+  assert.equal(result.assets[0].candidateEvidence.transferCalls[0].submitter, SUBMITTER);
+  for (const change of [i => { i.trace.value = '0x0'; }, i => { i.trace.calls[0].from = SUBMITTER; }, i => { i.trace.calls[0].calls[0].value = '0x1'; }]) {
+    const forged = structuredClone(input); change(forged);
+    const refused = await run(forged, { historical: false, verifiedCurrent: true, values });
+    assert.equal(refused.result.status, 'unavailable'); assert.deepEqual(refused.result.assets, []); assert.equal(refused.queries.length, 0);
+  }
+});
+
+test('historical and legacy positive-value calls remain unsupported without token reads', async () => {
+  for (const historical of [true, false]) {
+    const input = setup(); input.request.value = '1'; input.trace.value = '0x1';
+    const { result, queries } = await run(input, { historical, verifiedCurrent: false });
+    assert.equal(result.status, 'not_applicable'); assert.deepEqual(result.assets, []); assert.deepEqual(queries, []);
+  }
+  for (const value of ['-1', (MAX + 1n).toString(), null]) {
+    const input = setup(); input.request.value = value;
+    const { result, queries } = await run(input, { historical: false, verifiedCurrent: true });
+    assert.equal(result.status, 'not_applicable'); assert.deepEqual(result.assets, []); assert.deepEqual(queries, []);
+  }
+});
+
 test('supplied forged analysis and permissions cannot add participants or suppress actual trace evidence', async () => {
   const input = setup();
   input.analysis = { execution: { status: 'reverted' }, movements: [{ from: address(91), to: address(92), address: USDC }] };

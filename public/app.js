@@ -31,7 +31,7 @@ function formatTime(value) { if (value === null || value === undefined || value 
 
 async function request(url, body) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), url === '/api/evm/simulate-sequence' ? 300000 : ['/api/evm/simulate', '/api/evm/local-preview', '/api/evm/local-sequence', '/api/arbitrum/simulate'].includes(url) ? 180000 : 65000);
+  const timer = setTimeout(() => controller.abort(), url === '/api/simulate' ? 240000 : url === '/api/evm/simulate-sequence' ? 300000 : ['/api/evm/simulate', '/api/evm/local-preview', '/api/evm/local-sequence', '/api/arbitrum/simulate'].includes(url) ? 180000 : 65000);
   try {
     const response = await fetch(url, { method: body ? 'POST' : 'GET', headers: body ? { 'Content-Type': 'application/json' } : undefined, body: body ? JSON.stringify(body) : undefined, signal: controller.signal });
     const result = await response.json();
@@ -763,6 +763,68 @@ function renderBalanceChanges(changes, source = {}, affectedBalances) {
   const warnings = Array.isArray(changes.warnings) ? changes.warnings : [];
   $('balance-warnings').hidden = !warnings.length;
   $('balance-warnings').replaceChildren(...warnings.map((warning) => node('li', '', display(warning))));
+}
+
+function hypeAmount(raw) {
+  const value = BigInt(raw), absolute = value < 0n ? -value : value;
+  const fraction = (absolute % 1000000000000000000n).toString().padStart(18, '0').replace(/0+$/, '');
+  return `${value < 0n ? '-' : ''}${absolute / 1000000000000000000n}${fraction ? '.' + fraction : ''} HYPE`;
+}
+
+function renderNativeBalanceChanges(changes, source = {}, request = {}) {
+  $('hype-section').hidden = !changes;
+  $('hype-assets').replaceChildren(); $('hype-omitted').replaceChildren(); $('hype-warnings').replaceChildren();
+  $('hype-omitted-section').hidden = true;
+  if (!changes) return;
+  const historical = source.mode === 'historical_trace', identity = changes.executionIdentity;
+  const retained = !historical && source.chainId === 999 && ['measured', 'partial'].includes(changes.status)
+    && changes.basis === 'current_pinned_state_validated_native_balance' && changes.feeScope === 'excluded'
+    && identity?.headerContext === 'synthetic_unpriced_basefee_zero' && identity.stateBinding === 'block_hash'
+    && typeof source.blockHash === 'string' && /^0x[0-9a-f]{64}$/i.test(source.blockHash)
+    && typeof identity.stateBlockHash === 'string' && identity.stateBlockHash.toLowerCase() === source.blockHash.toLowerCase();
+  const seen = new Set(), rawAssets = Array.isArray(changes.assets) ? changes.assets : [];
+  const valid = entry => {
+    if (!entry || !/^0x[0-9a-f]{40}$/i.test(entry.account ?? '') || seen.has(entry.account.toLowerCase())
+      || entry.asset?.type !== 'native' || entry.asset.symbol !== 'HYPE' || entry.asset.decimals !== 18) return false;
+    for (const key of ['beforeRaw', 'afterRaw']) if (typeof entry[key] !== 'string' || !/^(?:0|[1-9][0-9]*)$/.test(entry[key]) || entry[key].length > 78 || BigInt(entry[key]) >= (1n << 256n)) return false;
+    if (typeof entry.deltaRaw !== 'string' || !/^(?:0|-?[1-9][0-9]*)$/.test(entry.deltaRaw) || entry.deltaRaw.length > 79
+      || BigInt(entry.afterRaw) - BigInt(entry.beforeRaw) !== BigInt(entry.deltaRaw)) return false;
+    seen.add(entry.account.toLowerCase()); return true;
+  };
+  const rowsValid = retained && rawAssets.length > 0 && rawAssets.length <= 8 && rawAssets.every(valid);
+  $('hype-badge').textContent = rowsValid ? changes.status === 'partial' ? 'Partial account coverage' : 'Before / after' : historical ? 'Not supported for replay' : changes.status === 'not_applicable' ? 'No measurement' : 'Unavailable';
+  $('hype-section').classList.toggle('measured', Boolean(rowsValid));
+  $('hype-description').textContent = rowsValid
+    ? 'HYPE held by each named account before and after the unsigned call, at the pinned block. Network fees are excluded. Accounts are shown separately and are not added together.'
+    : historical ? 'Native HYPE balances are not measured for historical replay. Missing values do not imply zero change. Network fees are excluded.'
+      : 'No validated native balance amounts are available in this result. Missing values do not imply zero balance or zero change. Network fees are excluded.';
+  if (rowsValid) for (const entry of rawAssets) {
+    const card = node('div', 'balance-card hype-card');
+    card.append(node('div', 'asset-symbol', 'HYPE · Hyperliquid'));
+    card.append(node('div', 'balance-role', typeof request.from === 'string' && entry.account.toLowerCase() === request.from.toLowerCase() ? 'Transaction sender’s balance' : 'Named account’s balance · ownership not inferred'));
+    card.append(node('div', 'hype-account', entry.account));
+    card.append(node('div', `balance-delta ${rawDirection(entry.deltaRaw)}`, `${BigInt(entry.deltaRaw) > 0n ? '+' : ''}${hypeAmount(entry.deltaRaw)}`));
+    const details = node('dl', 'balance-before-after');
+    for (const [label, key] of [['Before', 'beforeRaw'], ['After', 'afterRaw'], ['Change', 'deltaRaw']]) {
+      details.append(node('dt', '', label));
+      const amount = node('dd'); amount.append(node('span', '', hypeAmount(entry[key])), node('span', 'raw-amount', `${entry[key]} wei`)); details.append(amount);
+    }
+    card.append(details); $('hype-assets').append(card);
+  }
+  const omitted = Array.isArray(changes.omittedAccounts) ? changes.omittedAccounts : [];
+  $('hype-omitted-section').hidden = !omitted.length;
+  $('hype-omitted').replaceChildren(...omitted.map(item => node('li', '', `${display(item.account)} — ${item.reason === 'account-limit' ? 'Not measured: eight-account limit' : item.reason === 'rpc-budget' ? 'Not measured: shared request budget' : display(item.reason)}. Balance unknown.`)));
+  $('hype-counts').textContent = Number.isSafeInteger(changes.candidateAccountCount) && changes.candidateAccountCount >= 0
+    ? `${rowsValid ? rawAssets.length : 0} measured · ${changes.candidateAccountCount} observed candidate accounts · at most 8 measured. This is not a complete account inventory.`
+    : 'Candidate count unavailable. This is not a complete account inventory.';
+  const warnings = [...(Array.isArray(changes.warnings) ? changes.warnings : [])];
+  const allOmitted = changes.status === 'partial' && Array.isArray(changes.assets) && rawAssets.length === 0
+    && Number.isSafeInteger(changes.candidateAccountCount) && changes.candidateAccountCount > 0 && omitted.length === changes.candidateAccountCount
+    && omitted.every(item => /^0x[0-9a-f]{40}$/i.test(item?.account ?? '') && ['rpc-budget', 'account-limit'].includes(item.reason))
+    && new Set(omitted.map(item => item.account.toLowerCase())).size === omitted.length && omitted.some(item => item.reason === 'rpc-budget');
+  if (retained && !rowsValid && !allOmitted) warnings.push('Native amounts were withheld because the returned balance rows were incomplete or inconsistent.');
+  $('hype-warnings').hidden = !warnings.length;
+  $('hype-warnings').replaceChildren(...warnings.map(warning => node('li', '', display(warning))));
 }
 
 function renderPositions(changes, result) {
@@ -1892,6 +1954,7 @@ function renderResult(result) {
   renderAllowances(result.allowanceChanges, result.permissions, historical);
   renderPermissions(result.permissions, result.allowanceChanges);
   renderBalanceChanges(result.balanceChanges, source, result.affectedBalanceChanges);
+  renderNativeBalanceChanges(result.nativeBalanceChanges, source, result.request);
   renderAccountEffects(result.accountEffects, historical, result.affectedBalanceChanges);
   renderPositions(result.positionChanges, result);
   renderInterest(result.interestAccruals, protocol);
@@ -1909,7 +1972,7 @@ function renderResult(result) {
   addDefinition(details, 'RPC provider', source.provider);
   addDefinition(details, 'Trace method', result.evidence?.traceMethod);
   if (!historical) {
-    const validated = [result.balanceChanges, result.allowanceChanges, result.affectedBalanceChanges].some(value => value?.status === 'measured' && value.executionIdentity?.headerContext === 'synthetic_unpriced_basefee_zero');
+    const validated = [result.balanceChanges, result.allowanceChanges, result.affectedBalanceChanges, result.nativeBalanceChanges].some(value => ['measured', 'partial'].includes(value?.status) && value.executionIdentity?.headerContext === 'synthetic_unpriced_basefee_zero');
     addDefinition(details, 'Call environment', validated ? 'Unsigned call with a zero base fee; other block fields checked' : 'Unsigned call; gas price omitted and execution header not validated');
     addDefinition(details, 'Network fees', 'Not estimated');
   }

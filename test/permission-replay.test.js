@@ -25,7 +25,7 @@ const guardedCapture=JSON.parse(guardedBytes);
 // Declared current additions are independent of the response under test; the
 // pinned capture inventory and its historical implementation remain unchanged.
 const sourceFiles = guardedCapture.implementation.sourceFiles.flatMap(name => name === 'analyze.js' ? [name, 'arbitrum-loader.js'] : name === 'historical-state.js'
-  ? ['current-state.js', name] : name === 'server.js' ? [name, 'standard-loader.js', 'standard-rpc.js'] : name === 'lending-balances.js' ? [name, 'local-loader.js', 'local-sequence.js', 'local-simulation.js'] : name === 'permissions.js' ? [name, 'proof-rpc.js'] : [name]);
+  ? ['current-state.js', name] : name === 'server.js' ? [name, 'standard-loader.js', 'standard-rpc.js'] : name === 'lending-balances.js' ? [name, 'local-loader.js', 'local-sequence.js', 'local-simulation.js', 'native-balances.js', 'native-effects.js'] : name === 'permissions.js' ? [name, 'proof-rpc.js'] : [name]);
 const currentSourceHash = createHash('sha256');
 for (const name of sourceFiles) {
   assert.match(name, /^[a-z-]+\.js$/);
@@ -96,9 +96,16 @@ function assertLegacyMeasurementEvidence(actual, saved, caseId, provider) {
   assert.deepEqual([...usedIds], currentIds, 'The exact genuine context request IDs are consumed once each');
   assert.deepEqual([...usedRevisions].sort((a,b) => a-b), revisions.map(entry => entry[0]).sort((a,b) => a-b));
 }
+function withoutNativeAddition(actual) {
+  const result = structuredClone(actual);
+  assert.deepEqual(result.nativeBalanceChanges, {status:'not_applicable',basis:'current_pinned_state_validated_native_balance',assets:[],candidateAccountCount:0,omittedAccounts:[],feeScope:'excluded',limits:{maxAccounts:8},warnings:['Native HYPE balance measurement is not supported for historical replay. Missing measurements do not imply zero change; fees are excluded.']});
+  assert.deepEqual(result.evidence.nativeBalanceMeasurement, {request:[],response:[]});
+  delete result.nativeBalanceChanges; delete result.evidence.nativeBalanceMeasurement;
+  return result;
+}
 function assertLegacyResult(actual, saved, caseId, provider) {
   assertLegacyMeasurementEvidence(actual, saved, caseId, provider);
-  const result = structuredClone(actual), expected = structuredClone(saved);
+  const result = withoutNativeAddition(actual), expected = structuredClone(saved);
   // Generated IDs/time/timing and implementation provenance are validated apart
   // from semantic equality; original observations remain unchanged in v0.7.
   for (const report of [result,expected]) for (const key of ['id','createdAt','timing','implementation']) delete report[key];
@@ -241,7 +248,7 @@ for (const item of capture.cases) for (const legacyRun of item.runs) {
     const transfers=assertLegacyResult(result,legacyRun.response,item.id,legacyRun.provider);
     if(fresh){
       const withoutGenerated=report=>{const {id,createdAt,timing,implementation,...rest}=report;return rest;};
-      assert.deepEqual(withoutGenerated(result),withoutGenerated(fresh.response),'Every new API field and complete shared evidence matches the observed guarded response');
+      assert.deepEqual(withoutGenerated(withoutNativeAddition(result)),withoutGenerated(fresh.response),'Every legacy API field and complete shared evidence matches the observed guarded response; historical native nonmeasurement is separately asserted');
     }else{
       assert.deepEqual(result.evidence.balanceMeasurement,legacyRun.response.evidence.balanceMeasurement);
       assert.deepEqual(result.evidence.allowanceMeasurement,legacyRun.response.evidence.allowanceMeasurement);

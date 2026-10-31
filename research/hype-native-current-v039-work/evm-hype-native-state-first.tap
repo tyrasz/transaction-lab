@@ -1,0 +1,250 @@
+TAP version 13
+# Subtest: positive HYPE transfer keeps original value and defers optional anchors and native witnesses
+ok 1 - positive HYPE transfer keeps original value and defers optional anchors and native witnesses
+  ---
+  duration_ms: 4.000375
+  type: 'test'
+  ...
+# Subtest: self-transfer measures zero net while insufficient upfront value is rejected
+ok 2 - self-transfer measures zero net while insufficient upfront value is rejected
+  ---
+  duration_ms: 0.941625
+  type: 'test'
+  ...
+# Subtest: token consumers and native witnesses use the sender balance after a refund; identity stays fixed
+ok 3 - token consumers and native witnesses use the sender balance after a refund; identity stays fixed
+  ---
+  duration_ms: 1.649292
+  type: 'test'
+  ...
+# Subtest: funded-empty normalization uses independent zero balance/nonce/code and preserves the raw diff
+ok 4 - funded-empty normalization uses independent zero balance/nonce/code and preserves the raw diff
+  ---
+  duration_ms: 1.845875
+  type: 'test'
+  ...
+# Subtest: explicit final zero and omitted unchanged balance stay distinct from unsupported missing prebalance
+ok 5 - explicit final zero and omitted unchanged balance stay distinct from unsupported missing prebalance
+  ---
+  duration_ms: 1.191292
+  type: 'test'
+  ...
+# Subtest: caught ancestor reverts discard descendants; DELEGATECALL/CALLCODE values do not transfer funds
+ok 6 - caught ancestor reverts discard descendants; DELEGATECALL/CALLCODE values do not transfer funds
+  ---
+  duration_ms: 0.58175
+  type: 'test'
+  ...
+# Subtest: root failures, unsupported lifecycle, empty-code behavior and contradictory native evidence fail closed
+ok 7 - root failures, unsupported lifecycle, empty-code behavior and contradictory native evidence fail closed
+  ---
+  duration_ms: 0.71075
+  type: 'test'
+  ...
+# Subtest: native anchors, both complete witnesses and nonce-only mutations are independently checked
+ok 8 - native anchors, both complete witnesses and nonce-only mutations are independently checked
+  ---
+  duration_ms: 3.312416
+  type: 'test'
+  ...
+# Subtest: native cache deduplicates concurrent calls, clones results and refuses cached data after shared failure
+ok 9 - native cache deduplicates concurrent calls, clones results and refuses cached data after shared failure
+  ---
+  duration_ms: 1.063416
+  type: 'test'
+  ...
+# Subtest: native late deadline failure is latched, and cached success is not a deadline bypass
+ok 10 - native late deadline failure is latched, and cached success is not a deadline bypass
+  ---
+  duration_ms: 0.903125
+  type: 'test'
+  ...
+# Subtest: eight-account display cap retains omitted candidates and validates their balance changes
+ok 11 - eight-account display cap retains omitted candidates and validates their balance changes
+  ---
+  duration_ms: 0.976959
+  type: 'test'
+  ...
+# Subtest: optional native display cannot consume token queries or reserved canonical calls
+ok 12 - optional native display cannot consume token queries or reserved canonical calls
+  ---
+  duration_ms: 1.973667
+  type: 'test'
+  ...
+# Subtest: mandatory missing balance anchors cannot silently truncate complete after-state validation
+ok 13 - mandatory missing balance anchors cannot silently truncate complete after-state validation
+  ---
+  duration_ms: 1.284833
+  type: 'test'
+  ...
+# Subtest: zero native candidates preserve existing preparation witnesses and add no native RPCs
+ok 14 - zero native candidates preserve existing preparation witnesses and add no native RPCs
+  ---
+  duration_ms: 0.194833
+  type: 'test'
+  ...
+# Subtest: capability evidence remains immutable and each retained response binds its exact bytes and request
+ok 15 - capability evidence remains immutable and each retained response binds its exact bytes and request
+  ---
+  duration_ms: 2.555167
+  type: 'test'
+  ...
+# Subtest: recorded supply queries on A, with explicitly synthetic root-code preparation control
+ok 16 - recorded supply queries on A, with explicitly synthetic root-code preparation control
+  ---
+  duration_ms: 3.674833
+  type: 'test'
+  ...
+# Subtest: recorded borrow queries on A, with explicitly synthetic root-code preparation control
+ok 17 - recorded borrow queries on A, with explicitly synthetic root-code preparation control
+  ---
+  duration_ms: 2.182792
+  type: 'test'
+  ...
+# Subtest: recorded supply queries on B, with explicitly synthetic root-code preparation control
+ok 18 - recorded supply queries on B, with explicitly synthetic root-code preparation control
+  ---
+  duration_ms: 1.766708
+  type: 'test'
+  ...
+# Subtest: recorded borrow queries on B, with explicitly synthetic root-code preparation control
+ok 19 - recorded borrow queries on B, with explicitly synthetic root-code preparation control
+  ---
+  duration_ms: 1.792
+  type: 'test'
+  ...
+# Subtest: context snapshots inputs, caches inflight/completed queries, and returns isolated values and evidence
+ok 20 - context snapshots inputs, caches inflight/completed queries, and returns isolated values and evidence
+  ---
+  duration_ms: 0.991541
+  type: 'test'
+  ...
+# Subtest: malformed ABI and unknown/debt-allowance queries fail without preparing or making RPC calls
+ok 21 - malformed ABI and unknown/debt-allowance queries fail without preparing or making RPC calls
+  ---
+  duration_ms: 0.622792
+  type: 'test'
+  ...
+# Subtest: original failure, envelope mismatch and every lifecycle branch are rejected before any extra RPC
+ok 22 - original failure, envelope mismatch and every lifecycle branch are rejected before any extra RPC
+  ---
+  duration_ms: 1.609875
+  type: 'test'
+  ...
+# Subtest: pinned header, sender/root/witness classification, and direct nonce/native reads fail closed
+ok 23 - pinned header, sender/root/witness classification, and direct nonce/native reads fail closed
+  ---
+  duration_ms: 1.400625
+  type: 'test'
+  ...
+# Subtest: original diff must be strict, complete for sender nonce, and free of lifecycle/code changes
+ok 24 - original diff must be strict, complete for sender nonce, and free of lifecycle/code changes
+  ---
+  duration_ms: 5.700166
+  type: 'test'
+  ...
+# Subtest: every witnessed header field is validated before and after with BASEFEE explicitly zero
+ok 25 - every witnessed header field is validated before and after with BASEFEE explicitly zero
+  ---
+  duration_ms: 7.467959
+  type: 'test'
+  ...
+# Subtest: synthetic override-fidelity control preserves cleared/new slots and all accounts in both isolated after tracers
+ok 26 - synthetic override-fidelity control preserves cleared/new slots and all accounts in both isolated after tracers
+  ---
+  duration_ms: 0.892542
+  type: 'test'
+  ...
+# Subtest: unexplained native balance changes cannot hide in complete token poststate overrides
+ok 27 - unexplained native balance changes cannot hide in complete token poststate overrides
+  ---
+  duration_ms: 0.471625
+  type: 'test'
+  ...
+# Subtest: shared preparation failure is cached across all consumers without further RPC or identity
+ok 28 - shared preparation failure is cached across all consumers without further RPC or identity
+  ---
+  duration_ms: 0.584125
+  type: 'test'
+  ...
+# Subtest: post override queries must follow the configured token and Pool implementations even for unchanged output
+ok 29 - post override queries must follow the configured token and Pool implementations even for unchanged output
+  ---
+  duration_ms: 3.365291
+  type: 'test'
+  ...
+# Subtest: successful-looking query outputs cannot hide malformed/failed/static/extra-child traces
+ok 30 - successful-looking query outputs cannot hide malformed/failed/static/extra-child traces
+  ---
+  duration_ms: 4.866625
+  type: 'test'
+  ...
+# Subtest: header witnesses require their exact 300000-gas envelope before and after
+ok 31 - header witnesses require their exact 300000-gas envelope before and after
+  ---
+  duration_ms: 1.533666
+  type: 'test'
+  ...
+# Subtest: fake monotonic clock expires before a new RPC and never resumes cached results or requests
+ok 32 - fake monotonic clock expires before a new RPC and never resumes cached results or requests
+  ---
+  duration_ms: 0.591708
+  type: 'test'
+  ...
+# Subtest: fake clock discards late successful and failed RPC results, retaining fixed terminal timeout evidence
+ok 33 - fake clock discards late successful and failed RPC results, retaining fixed terminal timeout evidence
+  ---
+  duration_ms: 1.09825
+  type: 'test'
+  ...
+# Subtest: fake clock timeout is shared across pending queries and every in-flight request settles before evidence finalization
+ok 34 - fake clock timeout is shared across pending queries and every in-flight request settles before evidence finalization
+  ---
+  duration_ms: 0.559542
+  type: 'test'
+  ...
+# Subtest: query mutations require exactly independent sender nonce increments and unchanged absolute native balance
+ok 35 - query mutations require exactly independent sender nonce increments and unchanged absolute native balance
+  ---
+  duration_ms: 12.994834
+  type: 'test'
+  ...
+# Subtest: failed pairs are cached, unrelated successful queries and canonical checks remain usable
+ok 36 - failed pairs are cached, unrelated successful queries and canonical checks remain usable
+  ---
+  duration_ms: 0.738708
+  type: 'test'
+  ...
+# Subtest: canonical errors latch across concurrent/later successful checks and never expose provider secrets
+ok 37 - canonical errors latch across concurrent/later successful checks and never expose provider secrets
+  ---
+  duration_ms: 2.971708
+  type: 'test'
+  ...
+# Subtest: RPC/provider and local non-JSON/size failures retain only bounded terminal diagnostics
+ok 38 - RPC/provider and local non-JSON/size failures retain only bounded terminal diagnostics
+  ---
+  duration_ms: 10.4525
+  type: 'test'
+  ...
+# Subtest: 32 MiB retained response evidence limit uses UTF-8 bytes and canonical failure is latched
+ok 39 - 32 MiB retained response evidence limit uses UTF-8 bytes and canonical failure is latched
+  ---
+  duration_ms: 46.457875
+  type: 'test'
+  ...
+# Subtest: 12 distinct query cap shares inflight promises and leaves three canonical checks within 64 RPC
+ok 40 - 12 distinct query cap shares inflight promises and leaves three canonical checks within 64 RPC
+  ---
+  duration_ms: 2.031709
+  type: 'test'
+  ...
+1..40
+# tests 40
+# suites 0
+# pass 40
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 189.170666

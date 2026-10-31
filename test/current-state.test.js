@@ -196,7 +196,7 @@ test('synthetic override-fidelity control preserves cleared/new slots and all ac
     if (call.label === 'original-diff') {
       result.pre[USDC].storage[cleared] = word(7); delete result.post[USDC].storage[cleared];
       result.post[USDC].storage[inserted] = word(8);
-      result.pre[other] = { balance: '0x20' }; result.post[other] = { balance: '0x21' };
+      result.pre[other] = { storage: { [word(402)]: word(20) } }; result.post[other] = { storage: { [word(402)]: word(21) } };
     }
     return result;
   } });
@@ -206,13 +206,27 @@ test('synthetic override-fidelity control preserves cleared/new slots and all ac
   const overrides = after[0].params[2].stateOverrides;
   assert.equal(overrides[USDC].stateDiff[cleared], word(0));
   assert.equal(overrides[USDC].stateDiff[inserted], word(8));
-  assert.deepEqual(overrides[other], { balance: '0x21' });
+  assert.deepEqual(overrides[other], { stateDiff: { [word(402)]: word(21) } });
   assert.equal(Object.hasOwn(overrides[USDC], 'state'), false);
   assert.equal(BigInt(overrides[s.item.original.from].nonce), BigInt(s.records.find(record => record.label === 'sender-nonce').response.result) + 1n);
   const witness = s.calls.find(call => call.label === 'header-after').params[2].stateOverrides;
   const { [PROBE]: probe, ...witnessOriginal } = witness;
   assert.deepEqual(witnessOriginal, overrides); assert.ok(probe.code);
   assert.ok(s.calls.filter(call => call.label.startsWith('usdc-before-')).every(call => !Object.hasOwn(call.params[2], 'stateOverrides')));
+});
+
+test('unexplained native balance changes cannot hide in complete token poststate overrides', async () => {
+  const other = address(900);
+  const s = setup({ transform: (result, call) => {
+    if (call.label === 'original-diff') {
+      result.pre[other] = { balance: '0x20' }; result.post[other] = { balance: '0x21' };
+    }
+    return result;
+  } });
+  await assert.rejects(s.context.prepare(), /committed CALL/);
+  assert.equal(s.context.executionIdentity, null);
+  assert.match(s.context.canonicalFailure, /committed CALL/);
+  assert.ok(s.calls.every(call => !call.label.startsWith('header-before')));
 });
 
 test('shared preparation failure is cached across all consumers without further RPC or identity', async () => {

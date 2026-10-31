@@ -81,23 +81,39 @@ function completeEvidence(report) {
     assert.deepEqual(evidence.request.map(item => item.id).sort((a,b) => a-b), evidence.response.map(item => item.id).sort((a,b) => a-b), 'Every retained shared request has its settled result');
   }
   assert.deepEqual(snapshots[0], snapshots[1]); assert.deepEqual(snapshots[1], snapshots[2]);
+  const native = report.nativeBalanceChanges;
+  assert.deepEqual(native.assets, []); assert.deepEqual(native.omittedAccounts, []); assert.equal(native.candidateAccountCount, 0);
+  assert.equal(native.executionIdentity, undefined); assert.equal(native.feeScope, 'excluded');
+  if (native.status === 'unavailable') {
+    assert.deepEqual(report.evidence.nativeBalanceMeasurement, { request: [], response: [] }, 'Failed native validation exposes no provisional measurement evidence');
+    const { verification, reason, ...audit } = report.evidence.nativeBalanceAudit;
+    assert.equal(verification, 'unverified'); assert.equal(typeof reason, 'string'); assert(reason.length > 0);
+    assert.deepEqual(audit, snapshots[0], 'Settled shared diagnostics remain separate from unavailable native measurements');
+  } else {
+    assert.equal(native.status, 'not_applicable'); assert.match(native.warnings.join(' '), /No native balance candidates/);
+    assert.deepEqual(report.evidence.nativeBalanceMeasurement, snapshots[0], 'No-candidate native view reuses complete shared evidence without another RPC');
+    assert.equal(Object.hasOwn(report.evidence, 'nativeBalanceAudit'), false);
+  }
 }
 
-for (const mode of ['early_mismatch', 'middle_mismatch', 'late_mismatch', 'late_rpc_error']) test(`synthetic shared canonical ${mode} withholds all three current consumers after settlement`, async () => {
+for (const mode of ['early_mismatch', 'middle_mismatch', 'late_mismatch', 'late_rpc_error']) test(`synthetic shared canonical ${mode} withholds all four current consumers after settlement`, async () => {
   const rpc = provider(mode), report = await simulate(request, rpc);
   assert.equal(report.execution.status, 'success');
   assert.equal(report.balanceChanges.status, 'unavailable');
   assert.equal(report.allowanceChanges.status, 'unavailable');
   assert.equal(report.affectedBalanceChanges.status, 'unavailable');
+  assert.equal(report.nativeBalanceChanges.status, 'unavailable');
   assert.deepEqual(report.balanceChanges.assets, []); assert.deepEqual(report.allowanceChanges.allowances, []);
   assert.deepEqual(report.affectedBalanceChanges.assets, []); assert.deepEqual(report.affectedBalanceChanges.reusedPairs, []);
-  for (const measured of [report.balanceChanges, report.allowanceChanges, report.affectedBalanceChanges]) assert.equal(measured.executionIdentity, undefined);
+  for (const measured of [report.balanceChanges, report.allowanceChanges, report.affectedBalanceChanges, report.nativeBalanceChanges]) assert.equal(measured.executionIdentity, undefined);
   assert.equal(report.permissions.coverage.allowanceStateVerified, false);
   assert.equal(report.accountEffects.summary.measuredBalancePairs, 0); assert.equal(report.accountEffects.summary.measuredAllowancePairs, 0);
   assert.equal(report.outAssets[0].transferOut[0].value, '15.066115', 'Original event evidence remains available');
-  const checks = rpc.calls.filter(call => call.canonicalCheck), expectedChecks = mode.startsWith('late') ? 3 : 2;
+  // The first canonical failure is latched while the hUSDC pair is pending.
+  // Its settled read now checks that latch before a second canonical request.
+  const checks = rpc.calls.filter(call => call.canonicalCheck), expectedChecks = mode === 'early_mismatch' ? 1 : mode.startsWith('late') ? 3 : 2;
   assert.equal(checks.length, expectedChecks, 'Finalization adds no RPC calls');
-  assert.equal(rpc.calls.length, mode.startsWith('late') ? 30 : 25);
+  assert.equal(rpc.calls.length, mode === 'early_mismatch' ? 24 : mode.startsWith('late') ? 30 : 25);
   if (mode.startsWith('late')) assert.equal(rpc.calls.filter(call => call.origin === 'synthetic_custody_query_control').length, 4, 'Third check follows independently completed affected/custody queries');
   assert.doesNotMatch(JSON.stringify(report), /CANONICAL_TEST_SECRET/);
   completeEvidence(report);

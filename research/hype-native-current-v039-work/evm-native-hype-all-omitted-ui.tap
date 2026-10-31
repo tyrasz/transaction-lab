@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: HyperEVM result renders exact HYPE and wei without pooling accounts or replacing token views
+ok 1 - HyperEVM result renders exact HYPE and wei without pooling accounts or replacing token views
+  ---
+  duration_ms: 3.756125
+  type: 'test'
+  ...
+# Subtest: partial native results keep only measured rows and visibly retain omitted accounts
+ok 2 - partial native results keep only measured rows and visibly retain omitted accounts
+  ---
+  duration_ms: 0.510417
+  type: 'test'
+  ...
+# Subtest: all native accounts omitted by the shared budget stay unavailable without a malformed-row warning
+ok 3 - all native accounts omitted by the shared budget stay unavailable without a malformed-row warning
+  ---
+  duration_ms: 0.716458
+  type: 'test'
+  ...
+# Subtest: unavailable, missing, historical and wrong-context native results expose no projected amounts
+ok 4 - unavailable, missing, historical and wrong-context native results expose no projected amounts
+  ---
+  duration_ms: 3.979833
+  type: 'test'
+  ...
+# Subtest: native rows reject missing, malformed, duplicate or contradictory quantities without inferring zero
+ok 5 - native rows reject missing, malformed, duplicate or contradictory quantities without inferring zero
+  ---
+  duration_ms: 2.977208
+  type: 'test'
+  ...
+# Subtest: largest uint256 and zero balances remain exact, and warning text uses text nodes
+ok 6 - largest uint256 and zero balances remain exact, and warning text uses text nodes
+  ---
+  duration_ms: 0.352625
+  type: 'test'
+  ...
+# Subtest: HyperEVM simulation client allows its bounded state work while other request timeouts stay unchanged
+ok 7 - HyperEVM simulation client allows its bounded state work while other request timeouts stay unchanged
+  ---
+  duration_ms: 0.473875
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 72.396208

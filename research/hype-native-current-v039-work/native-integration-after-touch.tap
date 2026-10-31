@@ -1,0 +1,538 @@
+TAP version 13
+# Subtest: positive HYPE transfer keeps original value and defers optional anchors and native witnesses
+ok 1 - positive HYPE transfer keeps original value and defers optional anchors and native witnesses
+  ---
+  duration_ms: 6.363958
+  type: 'test'
+  ...
+# Subtest: self-transfer measures zero net while insufficient upfront value is rejected
+ok 2 - self-transfer measures zero net while insufficient upfront value is rejected
+  ---
+  duration_ms: 1.132417
+  type: 'test'
+  ...
+# Subtest: token consumers and native witnesses use the sender balance after a refund; identity stays fixed
+ok 3 - token consumers and native witnesses use the sender balance after a refund; identity stays fixed
+  ---
+  duration_ms: 2.785833
+  type: 'test'
+  ...
+# Subtest: funded-empty normalization uses independent zero balance/nonce/code and preserves the raw diff
+ok 4 - funded-empty normalization uses independent zero balance/nonce/code and preserves the raw diff
+  ---
+  duration_ms: 4.007084
+  type: 'test'
+  ...
+# Subtest: explicit final zero and omitted unchanged balance stay distinct from unsupported missing prebalance
+ok 5 - explicit final zero and omitted unchanged balance stay distinct from unsupported missing prebalance
+  ---
+  duration_ms: 4.01375
+  type: 'test'
+  ...
+# Subtest: caught ancestor reverts discard descendants; DELEGATECALL/CALLCODE values do not transfer funds
+ok 6 - caught ancestor reverts discard descendants; DELEGATECALL/CALLCODE values do not transfer funds
+  ---
+  duration_ms: 1.004125
+  type: 'test'
+  ...
+# Subtest: root failures, unsupported lifecycle, empty-code behavior and contradictory native evidence fail closed
+ok 7 - root failures, unsupported lifecycle, empty-code behavior and contradictory native evidence fail closed
+  ---
+  duration_ms: 0.805375
+  type: 'test'
+  ...
+# Subtest: native anchors, both complete witnesses and nonce-only mutations are independently checked
+ok 8 - native anchors, both complete witnesses and nonce-only mutations are independently checked
+  ---
+  duration_ms: 3.826708
+  type: 'test'
+  ...
+# Subtest: native cache deduplicates concurrent calls, clones results and refuses cached data after shared failure
+ok 9 - native cache deduplicates concurrent calls, clones results and refuses cached data after shared failure
+  ---
+  duration_ms: 1.167083
+  type: 'test'
+  ...
+# Subtest: native late deadline failure is latched, and cached success is not a deadline bypass
+ok 10 - native late deadline failure is latched, and cached success is not a deadline bypass
+  ---
+  duration_ms: 0.980916
+  type: 'test'
+  ...
+# Subtest: eight-account display cap retains omitted candidates and validates their balance changes
+ok 11 - eight-account display cap retains omitted candidates and validates their balance changes
+  ---
+  duration_ms: 1.978167
+  type: 'test'
+  ...
+# Subtest: optional native display cannot consume token queries or reserved canonical calls
+ok 12 - optional native display cannot consume token queries or reserved canonical calls
+  ---
+  duration_ms: 3.314208
+  type: 'test'
+  ...
+# Subtest: mandatory missing balance anchors cannot silently truncate complete after-state validation
+ok 13 - mandatory missing balance anchors cannot silently truncate complete after-state validation
+  ---
+  duration_ms: 1.514917
+  type: 'test'
+  ...
+# Subtest: zero native candidates preserve existing preparation witnesses and add no native RPCs
+ok 14 - zero native candidates preserve existing preparation witnesses and add no native RPCs
+  ---
+  duration_ms: 0.903541
+  type: 'test'
+  ...
+# Subtest: saved 003-whype-deposit-drpc before witness is accepted without inventing an after observation
+ok 15 - saved 003-whype-deposit-drpc before witness is accepted without inventing an after observation
+  ---
+  duration_ms: 1.888917
+  type: 'test'
+  ...
+# Subtest: saved 003-whype-deposit-hyperlend-archive before witness is accepted without inventing an after observation
+ok 16 - saved 003-whype-deposit-hyperlend-archive before witness is accepted without inventing an after observation
+  ---
+  duration_ms: 0.700625
+  type: 'test'
+  ...
+# Subtest: saved 004-whype-withdraw-drpc before witness is accepted without inventing an after observation
+ok 17 - saved 004-whype-withdraw-drpc before witness is accepted without inventing an after observation
+  ---
+  duration_ms: 0.667333
+  type: 'test'
+  ...
+# Subtest: saved 004-whype-withdraw-hyperlend-archive before witness is accepted without inventing an after observation
+ok 18 - saved 004-whype-withdraw-hyperlend-archive before witness is accepted without inventing an after observation
+  ---
+  duration_ms: 0.617791
+  type: 'test'
+  ...
+# Subtest: synthetic before and after native witnesses allow only anchored unchanged selected-account touches
+ok 19 - synthetic before and after native witnesses allow only anchored unchanged selected-account touches
+  ---
+  duration_ms: 0.892667
+  type: 'test'
+  ...
+# Subtest: native touch compatibility rejects changed fields, storage, lifecycle, wrong anchors and unrelated accounts
+ok 20 - native touch compatibility rejects changed fields, storage, lifecycle, wrong anchors and unrelated accounts
+  ---
+  duration_ms: 12.57325
+  type: 'test'
+  ...
+# Subtest: native compatibility never relaxes token query mutation validation or the fixed probe trace
+ok 21 - native compatibility never relaxes token query mutation validation or the fixed probe trace
+  ---
+  duration_ms: 1.196458
+  type: 'test'
+  ...
+# Subtest: eight current API outcomes preserve frozen source, complete raw HTTP/RPC bytes and all196 calls
+ok 22 - eight current API outcomes preserve frozen source, complete raw HTTP/RPC bytes and all196 calls
+  ---
+  duration_ms: 7.858084
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-supply on drpc
+ok 23 - genuine full current transport replay: current-supply on drpc
+  ---
+  duration_ms: 15.813708
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-supply on hyperlend-archive
+ok 24 - genuine full current transport replay: current-supply on hyperlend-archive
+  ---
+  duration_ms: 5.658625
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-borrow on drpc
+ok 25 - genuine full current transport replay: current-borrow on drpc
+  ---
+  duration_ms: 7.2215
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-borrow on hyperlend-archive
+ok 26 - genuine full current transport replay: current-borrow on hyperlend-archive
+  ---
+  duration_ms: 6.7
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-direct-transferfrom-a on drpc
+ok 27 - genuine full current transport replay: current-direct-transferfrom-a on drpc
+  ---
+  duration_ms: 3.075166
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-direct-transferfrom-a on hyperlend-archive
+ok 28 - genuine full current transport replay: current-direct-transferfrom-a on hyperlend-archive
+  ---
+  duration_ms: 2.784834
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-usdc-router-permit-consumed on drpc
+ok 29 - genuine full current transport replay: current-usdc-router-permit-consumed on drpc
+  ---
+  duration_ms: 0.6505
+  type: 'test'
+  ...
+# Subtest: genuine full current transport replay: current-usdc-router-permit-consumed on hyperlend-archive
+ok 30 - genuine full current transport replay: current-usdc-router-permit-consumed on hyperlend-archive
+  ---
+  duration_ms: 0.744709
+  type: 'test'
+  ...
+# Subtest: the original eight hexadecimal-value HTTP400 failures remain intact and still reject before any RPC
+ok 31 - the original eight hexadecimal-value HTTP400 failures remain intact and still reject before any RPC
+  ---
+  duration_ms: 0.641209
+  type: 'test'
+  ...
+# Subtest: capability evidence remains immutable and each retained response binds its exact bytes and request
+ok 32 - capability evidence remains immutable and each retained response binds its exact bytes and request
+  ---
+  duration_ms: 3.757042
+  type: 'test'
+  ...
+# Subtest: recorded supply queries on A, with explicitly synthetic root-code preparation control
+ok 33 - recorded supply queries on A, with explicitly synthetic root-code preparation control
+  ---
+  duration_ms: 6.590167
+  type: 'test'
+  ...
+# Subtest: recorded borrow queries on A, with explicitly synthetic root-code preparation control
+ok 34 - recorded borrow queries on A, with explicitly synthetic root-code preparation control
+  ---
+  duration_ms: 2.851375
+  type: 'test'
+  ...
+# Subtest: recorded supply queries on B, with explicitly synthetic root-code preparation control
+ok 35 - recorded supply queries on B, with explicitly synthetic root-code preparation control
+  ---
+  duration_ms: 1.794459
+  type: 'test'
+  ...
+# Subtest: recorded borrow queries on B, with explicitly synthetic root-code preparation control
+ok 36 - recorded borrow queries on B, with explicitly synthetic root-code preparation control
+  ---
+  duration_ms: 2.163166
+  type: 'test'
+  ...
+# Subtest: context snapshots inputs, caches inflight/completed queries, and returns isolated values and evidence
+ok 37 - context snapshots inputs, caches inflight/completed queries, and returns isolated values and evidence
+  ---
+  duration_ms: 1.086
+  type: 'test'
+  ...
+# Subtest: malformed ABI and unknown/debt-allowance queries fail without preparing or making RPC calls
+ok 38 - malformed ABI and unknown/debt-allowance queries fail without preparing or making RPC calls
+  ---
+  duration_ms: 0.382084
+  type: 'test'
+  ...
+# Subtest: original failure, envelope mismatch and every lifecycle branch are rejected before any extra RPC
+ok 39 - original failure, envelope mismatch and every lifecycle branch are rejected before any extra RPC
+  ---
+  duration_ms: 3.995625
+  type: 'test'
+  ...
+# Subtest: pinned header, sender/root/witness classification, and direct nonce/native reads fail closed
+ok 40 - pinned header, sender/root/witness classification, and direct nonce/native reads fail closed
+  ---
+  duration_ms: 1.539667
+  type: 'test'
+  ...
+# Subtest: original diff must be strict, complete for sender nonce, and free of lifecycle/code changes
+ok 41 - original diff must be strict, complete for sender nonce, and free of lifecycle/code changes
+  ---
+  duration_ms: 8.866708
+  type: 'test'
+  ...
+# Subtest: every witnessed header field is validated before and after with BASEFEE explicitly zero
+ok 42 - every witnessed header field is validated before and after with BASEFEE explicitly zero
+  ---
+  duration_ms: 11.554584
+  type: 'test'
+  ...
+# Subtest: synthetic override-fidelity control preserves cleared/new slots and all accounts in both isolated after tracers
+ok 43 - synthetic override-fidelity control preserves cleared/new slots and all accounts in both isolated after tracers
+  ---
+  duration_ms: 1.130792
+  type: 'test'
+  ...
+# Subtest: unexplained native balance changes cannot hide in complete token poststate overrides
+ok 44 - unexplained native balance changes cannot hide in complete token poststate overrides
+  ---
+  duration_ms: 0.688041
+  type: 'test'
+  ...
+# Subtest: shared preparation failure is cached across all consumers without further RPC or identity
+ok 45 - shared preparation failure is cached across all consumers without further RPC or identity
+  ---
+  duration_ms: 0.735292
+  type: 'test'
+  ...
+# Subtest: post override queries must follow the configured token and Pool implementations even for unchanged output
+ok 46 - post override queries must follow the configured token and Pool implementations even for unchanged output
+  ---
+  duration_ms: 5.981625
+  type: 'test'
+  ...
+# Subtest: successful-looking query outputs cannot hide malformed/failed/static/extra-child traces
+ok 47 - successful-looking query outputs cannot hide malformed/failed/static/extra-child traces
+  ---
+  duration_ms: 5.36875
+  type: 'test'
+  ...
+# Subtest: header witnesses require their exact 300000-gas envelope before and after
+ok 48 - header witnesses require their exact 300000-gas envelope before and after
+  ---
+  duration_ms: 2.459584
+  type: 'test'
+  ...
+# Subtest: fake monotonic clock expires before a new RPC and never resumes cached results or requests
+ok 49 - fake monotonic clock expires before a new RPC and never resumes cached results or requests
+  ---
+  duration_ms: 0.759625
+  type: 'test'
+  ...
+# Subtest: fake clock discards late successful and failed RPC results, retaining fixed terminal timeout evidence
+ok 50 - fake clock discards late successful and failed RPC results, retaining fixed terminal timeout evidence
+  ---
+  duration_ms: 1.2755
+  type: 'test'
+  ...
+# Subtest: fake clock timeout is shared across pending queries and every in-flight request settles before evidence finalization
+ok 51 - fake clock timeout is shared across pending queries and every in-flight request settles before evidence finalization
+  ---
+  duration_ms: 0.61875
+  type: 'test'
+  ...
+# Subtest: query mutations require exactly independent sender nonce increments and unchanged absolute native balance
+ok 52 - query mutations require exactly independent sender nonce increments and unchanged absolute native balance
+  ---
+  duration_ms: 15.238625
+  type: 'test'
+  ...
+# Subtest: failed pairs are cached, unrelated successful queries and canonical checks remain usable
+ok 53 - failed pairs are cached, unrelated successful queries and canonical checks remain usable
+  ---
+  duration_ms: 0.824416
+  type: 'test'
+  ...
+# Subtest: canonical errors latch across concurrent/later successful checks and never expose provider secrets
+ok 54 - canonical errors latch across concurrent/later successful checks and never expose provider secrets
+  ---
+  duration_ms: 3.103416
+  type: 'test'
+  ...
+# Subtest: RPC/provider and local non-JSON/size failures retain only bounded terminal diagnostics
+ok 55 - RPC/provider and local non-JSON/size failures retain only bounded terminal diagnostics
+  ---
+  duration_ms: 11.315542
+  type: 'test'
+  ...
+# Subtest: 32 MiB retained response evidence limit uses UTF-8 bytes and canonical failure is latched
+ok 56 - 32 MiB retained response evidence limit uses UTF-8 bytes and canonical failure is latched
+  ---
+  duration_ms: 50.165375
+  type: 'test'
+  ...
+# Subtest: 12 distinct query cap shares inflight promises and leaves three canonical checks within 64 RPC
+ok 57 - 12 distinct query cap shares inflight promises and leaves three canonical checks within 64 RPC
+  ---
+  duration_ms: 2.392792
+  type: 'test'
+  ...
+# Subtest: standard compatibility entry point preserves the shared collector function and limits
+ok 58 - standard compatibility entry point preserves the shared collector function and limits
+  ---
+  duration_ms: 4.765958
+  type: 'test'
+  ...
+# Subtest: native amounts use exact 18-decimal rendering and do not change supplied snapshots
+ok 59 - native amounts use exact 18-decimal rendering and do not change supplied snapshots
+  ---
+  duration_ms: 3.174041
+  type: 'test'
+  ...
+# Subtest: zero and uint256 endpoint balances preserve exact signed deltas
+ok 60 - zero and uint256 endpoint balances preserve exact signed deltas
+  ---
+  duration_ms: 0.685334
+  type: 'test'
+  ...
+# Subtest: first eight candidates are measured and omitted candidates retain explicit partial coverage
+ok 61 - first eight candidates are measured and omitted candidates retain explicit partial coverage
+  ---
+  duration_ms: 0.621
+  type: 'test'
+  ...
+# Subtest: remaining RPC budget can omit candidates within the account cap without inventing measurements
+ok 62 - remaining RPC budget can omit candidates within the account cap without inventing measurements
+  ---
+  duration_ms: 0.680125
+  type: 'test'
+  ...
+# Subtest: empty candidates and failed originals are distinct not-applicable outcomes
+ok 63 - empty candidates and failed originals are distinct not-applicable outcomes
+  ---
+  duration_ms: 0.440875
+  type: 'test'
+  ...
+# Subtest: historical, missing, mismatched or already failed contexts never perform reads
+ok 64 - historical, missing, mismatched or already failed contexts never perform reads
+  ---
+  duration_ms: 0.4235
+  type: 'test'
+  ...
+# Subtest: wrong original trace and pinned execution identities fail closed
+ok 65 - wrong original trace and pinned execution identities fail closed
+  ---
+  duration_ms: 1.180042
+  type: 'test'
+  ...
+# Subtest: candidate selection and count mutations cannot publish partial invented amounts
+ok 66 - candidate selection and count mutations cannot publish partial invented amounts
+  ---
+  duration_ms: 1.987333
+  type: 'test'
+  ...
+# Subtest: measurement uint ranges, exact delta, evidence and accessor shapes are validated
+ok 67 - measurement uint ranges, exact delta, evidence and accessor shapes are validated
+  ---
+  duration_ms: 2.81875
+  type: 'test'
+  ...
+# Subtest: shared failures before and after reads withhold all amounts, evidence and identity
+ok 68 - shared failures before and after reads withhold all amounts, evidence and identity
+  ---
+  duration_ms: 1.007
+  type: 'test'
+  ...
+# Subtest: current failed call exposes explicit native no-measurement and inventories both native sources
+ok 69 - current failed call exposes explicit native no-measurement and inventories both native sources
+  ---
+  duration_ms: 3.720958
+  type: 'test'
+  ...
+# Subtest: historical replay has explicit unsupported native view and dispatches no native read
+ok 70 - historical replay has explicit unsupported native view and dispatches no native read
+  ---
+  duration_ms: 2.325959
+  type: 'test'
+  ...
+# Subtest: shared finalization withholds measured and partial amounts and identities after late canonical failure
+ok 71 - shared finalization withholds measured and partial amounts and identities after late canonical failure
+  ---
+  duration_ms: 0.775291
+  type: 'test'
+  ...
+# Subtest: native failure preserves shared failed-read diagnostics only as explicitly unverified audit evidence
+ok 72 - native failure preserves shared failed-read diagnostics only as explicitly unverified audit evidence
+  ---
+  duration_ms: 0.824792
+  type: 'test'
+  ...
+# Subtest: real simulate pipeline measures synthetic native balances through shared validation and separate evidence
+ok 73 - real simulate pipeline measures synthetic native balances through shared validation and separate evidence
+  ---
+  duration_ms: 2.400584
+  type: 'test'
+  ...
+# Subtest: real simulate pipeline withholds native amounts after badWitness
+ok 74 - real simulate pipeline withholds native amounts after badWitness
+  ---
+  duration_ms: 1.04575
+  type: 'test'
+  ...
+# Subtest: real simulate pipeline withholds native amounts after changedHeader
+ok 75 - real simulate pipeline withholds native amounts after changedHeader
+  ---
+  duration_ms: 0.870709
+  type: 'test'
+  ...
+# Subtest: HyperEVM result renders exact HYPE and wei without pooling accounts or replacing token views
+ok 76 - HyperEVM result renders exact HYPE and wei without pooling accounts or replacing token views
+  ---
+  duration_ms: 4.160875
+  type: 'test'
+  ...
+# Subtest: partial native results keep only measured rows and visibly retain omitted accounts
+ok 77 - partial native results keep only measured rows and visibly retain omitted accounts
+  ---
+  duration_ms: 0.536791
+  type: 'test'
+  ...
+# Subtest: all native accounts omitted by the shared budget stay unavailable without a malformed-row warning
+ok 78 - all native accounts omitted by the shared budget stay unavailable without a malformed-row warning
+  ---
+  duration_ms: 0.761792
+  type: 'test'
+  ...
+# Subtest: unavailable, missing, historical and wrong-context native results expose no projected amounts
+ok 79 - unavailable, missing, historical and wrong-context native results expose no projected amounts
+  ---
+  duration_ms: 7.634
+  type: 'test'
+  ...
+# Subtest: native rows reject missing, malformed, duplicate or contradictory quantities without inferring zero
+ok 80 - native rows reject missing, malformed, duplicate or contradictory quantities without inferring zero
+  ---
+  duration_ms: 4.384791
+  type: 'test'
+  ...
+# Subtest: largest uint256 and zero balances remain exact, and warning text uses text nodes
+ok 81 - largest uint256 and zero balances remain exact, and warning text uses text nodes
+  ---
+  duration_ms: 0.39875
+  type: 'test'
+  ...
+# Subtest: HyperEVM simulation client allows its bounded state work while other request timeouts stay unchanged
+ok 82 - HyperEVM simulation client allows its bounded state work while other request timeouts stay unchanged
+  ---
+  duration_ms: 0.53025
+  type: 'test'
+  ...
+# Subtest: synthetic shared canonical early_mismatch withholds all four current consumers after settlement
+ok 83 - synthetic shared canonical early_mismatch withholds all four current consumers after settlement
+  ---
+  duration_ms: 10.077334
+  type: 'test'
+  ...
+# Subtest: synthetic shared canonical middle_mismatch withholds all four current consumers after settlement
+ok 84 - synthetic shared canonical middle_mismatch withholds all four current consumers after settlement
+  ---
+  duration_ms: 3.462833
+  type: 'test'
+  ...
+# Subtest: synthetic shared canonical late_mismatch withholds all four current consumers after settlement
+ok 85 - synthetic shared canonical late_mismatch withholds all four current consumers after settlement
+  ---
+  duration_ms: 4.321792
+  type: 'test'
+  ...
+# Subtest: synthetic shared canonical late_rpc_error withholds all four current consumers after settlement
+ok 86 - synthetic shared canonical late_rpc_error withholds all four current consumers after settlement
+  ---
+  duration_ms: 3.15675
+  type: 'test'
+  ...
+# Subtest: synthetic stable current run retains base, allowance and affected custody measurements with complete shared evidence
+ok 87 - synthetic stable current run retains base, allowance and affected custody measurements with complete shared evidence
+  ---
+  duration_ms: 3.44875
+  type: 'test'
+  ...
+# Subtest: synthetic local hUSDC query failure preserves allowance and withholds the affected consumer sharing the failed pair
+ok 88 - synthetic local hUSDC query failure preserves allowance and withholds the affected consumer sharing the failed pair
+  ---
+  duration_ms: 3.1345
+  type: 'test'
+  ...
+1..88
+# tests 88
+# suites 0
+# pass 88
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3797.743625

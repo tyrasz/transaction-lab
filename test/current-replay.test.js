@@ -18,7 +18,7 @@ const failedInputCapture = await pinnedJson('reports/current-validated-compariso
 const capability = await pinnedJson('reports/current-query-capability/capture.json', '3c11faec39109a330d91428d9ad359ee1601fc3820f5ae17b9971c61e7ddfae2');
 const CORE_SHA = '2205334781a09baf98c3f5cb05a546bcca7d4946aea33b510d1963c8eb561a0f';
 const sourceFiles = ['account-effects.js','affected-balances.js','allowances.js','analyze.js','balances.js','config.js','current-state.js','historical-state.js','lending.js','lending-balances.js','permissions.js','query-validation.js','revert.js','rpc.js','server.js','state-diff.js','state.js','validate.js'];
-const currentSourceFiles = sourceFiles.flatMap(name => name === 'analyze.js' ? [name, 'arbitrum-loader.js'] : name === 'server.js' ? [name, 'standard-loader.js', 'standard-rpc.js'] : name === 'lending-balances.js' ? [name, 'local-loader.js', 'local-sequence.js', 'local-simulation.js'] : name === 'permissions.js' ? [name, 'proof-rpc.js'] : [name]);
+const currentSourceFiles = sourceFiles.flatMap(name => name === 'analyze.js' ? [name, 'arbitrum-loader.js'] : name === 'server.js' ? [name, 'standard-loader.js', 'standard-rpc.js'] : name === 'lending-balances.js' ? [name, 'local-loader.js', 'local-sequence.js', 'local-simulation.js', 'native-balances.js', 'native-effects.js'] : name === 'permissions.js' ? [name, 'proof-rpc.js'] : [name]);
 const engineHash = createHash('sha256');
 for (const name of currentSourceFiles) engineHash.update(name + '\0').update(await readFile(new URL('../src/' + name, import.meta.url))).update('\0');
 const actualSourceHash = engineHash.digest('hex');
@@ -143,7 +143,21 @@ test('eight current API outcomes preserve frozen source, complete raw HTTP/RPC b
 for (const item of capture.cases) for (const run of item.runs) test(`genuine full current transport replay: ${item.id} on ${run.provider}`, { timeout: 5000 }, async () => {
   const transport = recordedTransport(run), report = await simulate(run.request, transport.rpc);
   transport.finish(); assertImplementation(report);
-  assert.deepEqual(withoutGenerated(report), withoutGenerated(run.response), 'Every semantic field, original trace, complete shared request/response and proof marker is preserved');
+  const { nativeBalanceChanges, ...existing } = withoutGenerated(report);
+  const { nativeBalanceMeasurement, ...existingEvidence } = existing.evidence;
+  assert.equal(nativeBalanceChanges.status, 'not_applicable');
+  assert.equal(nativeBalanceChanges.basis, 'current_pinned_state_validated_native_balance');
+  assert.equal(nativeBalanceChanges.feeScope, 'excluded'); assert.deepEqual(nativeBalanceChanges.limits, { maxAccounts: 8 });
+  assert.equal(nativeBalanceChanges.candidateAccountCount, 0); assert.deepEqual(nativeBalanceChanges.assets, []); assert.deepEqual(nativeBalanceChanges.omittedAccounts, []);
+  assert.equal(Object.hasOwn(nativeBalanceChanges, 'executionIdentity'), false);
+  if (run.response.execution.status === 'success') {
+    assert.match(nativeBalanceChanges.warnings.join(' '), /No native balance candidates/);
+    assert.deepEqual(nativeBalanceMeasurement, sharedEvidence(run), 'No-candidate native view reuses the complete shared preparation without an extra request');
+  } else {
+    assert.match(nativeBalanceChanges.warnings.join(' '), /original call failed/);
+    assert.deepEqual(nativeBalanceMeasurement, { request: [], response: [] });
+  }
+  assert.deepEqual({ ...existing, evidence: existingEvidence }, withoutGenerated(run.response), 'Every original semantic field, trace, complete shared request/response and proof marker is preserved apart from the separately checked native addition');
   assert.equal(report.source.mode, 'simulation'); assert.equal(report.security.status, 'not_assessed');
   if (item.id === 'current-supply') {
     assertPriorAmounts(report, run, 'supply');

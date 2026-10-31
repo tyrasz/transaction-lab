@@ -1,0 +1,98 @@
+TAP version 13
+# Subtest: independent transfer walk drops failed ancestors and excludes delegate/CALLCODE transfers
+ok 1 - independent transfer walk drops failed ancestors and excludes delegate/CALLCODE transfers
+  ---
+  duration_ms: 1.053208
+  type: 'test'
+  ...
+# Subtest: witness diff enforces only sender nonce with unchanged balance
+ok 2 - witness diff enforces only sender nonce with unchanged balance
+  ---
+  duration_ms: 0.969
+  type: 'test'
+  ...
+# Subtest: witness bytecode directly names selected accounts and independent BALANCE word offsets
+not ok 3 - witness bytecode directly names selected accounts and independent BALANCE word offsets
+  ---
+  duration_ms: 2.964416
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/hype-native-current-v039-work/audit.test.mjs:24:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert(typeof x === 'string' || Number.isSafeInteger(x))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    uint (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/hype-native-current-v039-work/audit.mjs:15:21)
+    word (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/hype-native-current-v039-work/audit.mjs:16:19)
+    witnessCode (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/hype-native-current-v039-work/audit.mjs:50:79)
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/hype-native-current-v039-work/audit.test.mjs:25:16)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: retained wallet parsed-response shape binds anchors, witness words, trace net and original delta
+not ok 4 - retained wallet parsed-response shape binds anchors, witness words, trace net and original delta
+  ---
+  duration_ms: 1.127708
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/hype-native-current-v039-work/audit.test.mjs:35:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert(typeof x === 'string' || Number.isSafeInteger(x))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    uint (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/hype-native-current-v039-work/audit.mjs:15:21)
+    word (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/hype-native-current-v039-work/audit.mjs:16:19)
+    witnessCode (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/hype-native-current-v039-work/audit.mjs:50:79)
+    auditAttempt (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/hype-native-current-v039-work/audit.mjs:142:16)
+    run (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/hype-native-current-v039-work/audit.test.mjs:34:18)
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/hype-native-current-v039-work/audit.test.mjs:36:18)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: mutated public amount, missing raw anchor and non-neutral witness each reject
+ok 5 - mutated public amount, missing raw anchor and non-neutral witness each reject
+  ---
+  duration_ms: 1.101084
+  type: 'test'
+  ...
+# Subtest: changed witness output with a consistent evidence/raw join still fails amount binding
+ok 6 - changed witness output with a consistent evidence/raw join still fails amount binding
+  ---
+  duration_ms: 0.325292
+  type: 'test'
+  ...
+# Subtest: unavailable WHYPE diagnostics remain unavailable and publish no native amounts
+ok 7 - unavailable WHYPE diagnostics remain unavailable and publish no native amounts
+  ---
+  duration_ms: 1.086583
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 5
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 66.424875

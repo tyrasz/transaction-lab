@@ -1,0 +1,1143 @@
+{
+  "id": "004-whype-withdraw-hyperlend-archive",
+  "provider": {
+    "id": "hyperlend-archive",
+    "url": "https://rpc.hyperlend.finance/archive"
+  },
+  "input": {
+    "chainId": 999,
+    "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+    "to": "0x5555555555555555555555555555555555555555",
+    "data": "0x2e1a7d4d0000000000000000000000000000000000000000000000000000000000000001",
+    "value": "0",
+    "block": "0x2fb298d"
+  },
+  "report": {
+    "schemaVersion": "1.0",
+    "implementation": {
+      "name": "Transaction Lab",
+      "version": "0.35.0",
+      "sourceSha256": "06661ac9c9ef0e3d6666e886888c7ae959bc4197712a5aa522493ce38f8e0ae8",
+      "sourceFiles": [
+        "account-effects.js",
+        "affected-balances.js",
+        "allowances.js",
+        "analyze.js",
+        "arbitrum-loader.js",
+        "balances.js",
+        "config.js",
+        "current-state.js",
+        "historical-state.js",
+        "lending.js",
+        "lending-balances.js",
+        "local-loader.js",
+        "local-sequence.js",
+        "local-simulation.js",
+        "native-balances.js",
+        "native-effects.js",
+        "permissions.js",
+        "proof-rpc.js",
+        "query-validation.js",
+        "revert.js",
+        "rpc.js",
+        "server.js",
+        "standard-loader.js",
+        "standard-rpc.js",
+        "state-diff.js",
+        "state.js",
+        "validate.js"
+      ]
+    },
+    "id": "380f5ad5-02ca-41ad-acb4-d8ce07c9d18b",
+    "createdAt": "2026-10-31T12:58:30.189Z",
+    "request": {
+      "chainId": 999,
+      "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+      "to": "0x5555555555555555555555555555555555555555",
+      "data": "0x2e1a7d4d0000000000000000000000000000000000000000000000000000000000000001",
+      "value": "0"
+    },
+    "source": {
+      "provider": "rpc.hyperlend.finance",
+      "chainId": 999,
+      "blockNumber": "50014605",
+      "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+      "timestamp": "1793451477",
+      "mode": "simulation",
+      "blockBinding": "explicit_block_hash",
+      "requestedBlock": "0x2fb298d"
+    },
+    "execution": {
+      "status": "success",
+      "gasUsed": "35068",
+      "returnData": "0x",
+      "error": null
+    },
+    "coverage": {
+      "status": "unsupported",
+      "reasons": [
+        "Protocol coverage is limited to Hyperlend USDC supply, withdrawal, variable-rate borrowing and repayment on HyperEVM; other executions are not fully interpreted.",
+        "Native-token value transfers occurred. Check the separate HYPE balance view for available current-state measurements; ERC20 event totals exclude native value, and network fees are not calculated."
+      ]
+    },
+    "protocol": null,
+    "inAssets": [],
+    "outAssets": [],
+    "movements": [],
+    "interestAccruals": [],
+    "positionChanges": [],
+    "warnings": [
+      "The inAssets, outAssets and movements fields describe ERC20 Transfer events, not measured before-and-after balances. Separately measured balanceChanges, when available, describe those balances. Events alone are not proof of a balance change.",
+      "Security has not been assessed. Successful execution is not a safety verdict."
+    ],
+    "security": {
+      "status": "not_assessed",
+      "findings": []
+    },
+    "balanceChanges": {
+      "status": "not_applicable",
+      "basis": "current_pinned_state_validated_query",
+      "assets": [],
+      "warnings": [
+        "Balance measurement is limited to successful, reconciled Hyperlend USDC supply executions."
+      ]
+    },
+    "allowanceChanges": {
+      "status": "not_applicable",
+      "basis": "current_pinned_state_validated_allowance",
+      "allowances": [],
+      "warnings": [
+        "No successful, verified USDC or hUSDC permission pairs were observed in this trace."
+      ],
+      "limits": {
+        "maxPairs": 8,
+        "maxPermissionObservations": 256
+      }
+    },
+    "affectedBalanceChanges": {
+      "status": "not_applicable",
+      "basis": "current_pinned_state_validated_query",
+      "assets": [],
+      "reusedPairs": [],
+      "candidatePairCount": 0,
+      "limits": {
+        "maxCandidatePairs": 8,
+        "candidateLimitIncludesReusedPairs": true,
+        "maxFrames": 1000,
+        "maxDepth": 32,
+        "maxLogs": 2000,
+        "maxTransferEvents": 256,
+        "maxPermissionObservations": 256
+      },
+      "warnings": [
+        "Configured-token balances are queried independently before and after the whole unsigned call, with validated query paths and nonce-only query effects. BASEFEE is synthetic zero; other execution header fields are checked against the pinned block.",
+        "Only observed Transfer participants and verified transferFrom owners/recipients are candidates. Silent changes, unknown tokens and native assets are outside this view.",
+        "Event net amounts and requested transfers are evidence, not state measurements, intent verification or a security verdict. Receipt-token and debt events may differ from measured changes because of interest or rounding.",
+        "No eligible configured-token balance candidates were observed."
+      ]
+    },
+    "nativeBalanceChanges": {
+      "status": "unavailable",
+      "basis": "current_pinned_state_validated_native_balance",
+      "assets": [],
+      "candidateAccountCount": 0,
+      "omittedAccounts": [],
+      "feeScope": "excluded",
+      "limits": {
+        "maxAccounts": 8
+      },
+      "warnings": [
+        "Native HYPE balances are independently read around the unsigned call in the validated, pinned current state. Gas fees are excluded.",
+        "Only observed native-flow and explicit balance-change candidates are measured, up to eight accounts. This is not a complete asset inventory or a transaction security assessment.",
+        "Native balance measurement is unavailable because its current-state validation did not complete."
+      ]
+    },
+    "permissions": {
+      "scope": {
+        "chainId": 999,
+        "verifiedTokenAddresses": [
+          "0xb88339cb7199b77e23db6e890353e22632ba630f",
+          "0x744e4f26ee30213989216e1632d9be3547c4885b"
+        ],
+        "standard": "ERC20",
+        "standardSource": "https://eips.ethereum.org/EIPS/eip-20"
+      },
+      "coverage": {
+        "status": "limited",
+        "reasons": [],
+        "allowanceStateVerified": false
+      },
+      "observations": [],
+      "findings": [],
+      "warnings": [
+        "Approval calldata describes a request; Approval events describe emitted evidence. Neither independently verifies the final on-chain allowance.",
+        "Maximum uint256 approval observations describe spender exposure, not maliciousness. No general security verdict or spender reputation assessment is provided."
+      ]
+    },
+    "accountEffects": {
+      "status": "not_applicable",
+      "basis": "observed_accounts_with_separate_state_measurements",
+      "coverage": {
+        "status": "limited",
+        "reasons": [
+          "Only accounts appearing in decoded transfer events, verified permission observations, or separately measured token balances are listed. Silent balance changes and native assets are outside this view."
+        ]
+      },
+      "summary": {
+        "accountCount": 0,
+        "nonSubmitterAccountCount": 0,
+        "tokenAccountPairs": 0,
+        "measuredBalancePairs": 0,
+        "unmeasuredBalancePairs": 0,
+        "measuredAllowancePairs": 0
+      },
+      "accounts": [],
+      "limits": {
+        "maxAccounts": 64,
+        "maxTokenAccountPairs": 128,
+        "maxMovements": 256,
+        "maxPermissionObservations": 256
+      },
+      "warnings": [
+        "Event net amounts are arithmetic over Transfer logs, not measured balance changes. No observed event does not mean no change.",
+        "An account other than the transaction submitter may be an owner, spender, recipient or contract. These roles do not establish consent, identity, trustworthiness or maliciousness."
+      ]
+    },
+    "timing": {
+      "totalMs": 4013,
+      "rpcMs": 4009
+    },
+    "evidence": {
+      "traceMethod": "debug_traceCall",
+      "traceRequest": {
+        "method": "debug_traceCall",
+        "params": [
+          {
+            "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "to": "0x5555555555555555555555555555555555555555",
+            "data": "0x2e1a7d4d0000000000000000000000000000000000000000000000000000000000000001",
+            "value": "0x0",
+            "gas": "0x4c4b40"
+          },
+          {
+            "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+            "requireCanonical": true
+          },
+          {
+            "tracer": "callTracer",
+            "timeout": "15s",
+            "tracerConfig": {
+              "withLog": true
+            }
+          }
+        ]
+      },
+      "traceResponse": {
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "gas": "0x4c4b40",
+        "gasUsed": "0x88fc",
+        "to": "0x5555555555555555555555555555555555555555",
+        "input": "0x2e1a7d4d0000000000000000000000000000000000000000000000000000000000000001",
+        "calls": [
+          {
+            "from": "0x5555555555555555555555555555555555555555",
+            "gas": "0x8fc",
+            "gasUsed": "0x0",
+            "to": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "input": "0x",
+            "value": "0x1",
+            "type": "CALL"
+          }
+        ],
+        "logs": [
+          {
+            "address": "0x5555555555555555555555555555555555555555",
+            "topics": [
+              "0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "data": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "position": "0x1",
+            "index": "0x0"
+          }
+        ],
+        "value": "0x0",
+        "type": "CALL"
+      },
+      "balanceMeasurement": {
+        "request": [],
+        "response": []
+      },
+      "allowanceMeasurement": {
+        "request": [],
+        "response": []
+      },
+      "affectedBalanceMeasurement": {
+        "request": [],
+        "response": []
+      },
+      "nativeBalanceMeasurement": {
+        "request": [],
+        "response": []
+      },
+      "nativeBalanceAudit": {
+        "verification": "unverified",
+        "reason": "Current state query changed accounts outside its sender nonce.",
+        "request": [
+          {
+            "id": 1,
+            "method": "eth_getBlockByHash",
+            "params": [
+              "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+              false
+            ]
+          },
+          {
+            "id": 2,
+            "method": "eth_getTransactionCount",
+            "params": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              {
+                "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+                "requireCanonical": true
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "method": "eth_getBalance",
+            "params": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              {
+                "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+                "requireCanonical": true
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "method": "eth_getCode",
+            "params": [
+              "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              {
+                "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+                "requireCanonical": true
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "method": "eth_getCode",
+            "params": [
+              "0x5555555555555555555555555555555555555555",
+              {
+                "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+                "requireCanonical": true
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "method": "eth_getCode",
+            "params": [
+              "0x000000000000000000000000000000000000ba1a",
+              {
+                "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+                "requireCanonical": true
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "method": "debug_traceCall",
+            "params": [
+              {
+                "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                "to": "0x5555555555555555555555555555555555555555",
+                "data": "0x2e1a7d4d0000000000000000000000000000000000000000000000000000000000000001",
+                "value": "0x0",
+                "gas": "0x4c4b40"
+              },
+              {
+                "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+                "requireCanonical": true
+              },
+              {
+                "tracer": "prestateTracer",
+                "timeout": "15s",
+                "tracerConfig": {
+                  "diffMode": true
+                }
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "method": "debug_traceCall",
+            "params": [
+              {
+                "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                "to": "0x000000000000000000000000000000000000ba1a",
+                "data": "0x",
+                "value": "0x0",
+                "gas": "0x493e0"
+              },
+              {
+                "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+                "requireCanonical": true
+              },
+              {
+                "tracer": "callTracer",
+                "timeout": "15s",
+                "tracerConfig": {
+                  "withLog": true
+                },
+                "stateOverrides": {
+                  "0x000000000000000000000000000000000000ba1a": {
+                    "code": "0x43600052426020524560405248606052446080524160a0524660c0527f0000000000000000000000000000000000000000000000000000000002fb298c4060e0526101006000f3"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": 9,
+            "method": "debug_traceCall",
+            "params": [
+              {
+                "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                "to": "0x000000000000000000000000000000000000ba1a",
+                "data": "0x",
+                "value": "0x0",
+                "gas": "0x493e0"
+              },
+              {
+                "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+                "requireCanonical": true
+              },
+              {
+                "tracer": "callTracer",
+                "timeout": "15s",
+                "tracerConfig": {
+                  "withLog": true
+                },
+                "stateOverrides": {
+                  "0x5555555555555555555555555555555555555555": {
+                    "balance": "0x2704e5cb69a65145a24d5",
+                    "stateDiff": {
+                      "0xfbf3ba646d93e7339d802377d3b09d71c5867e2762b777dfe6a1c3efd009db17": "0x0000000000000000000000000000000000000000000000001868095b51230022"
+                    }
+                  },
+                  "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                    "balance": "0x980a4981f351aba",
+                    "nonce": "0x164ac"
+                  },
+                  "0x000000000000000000000000000000000000ba1a": {
+                    "code": "0x43600052426020524560405248606052446080524160a0524660c0527f0000000000000000000000000000000000000000000000000000000002fb298c4060e0526101006000f3"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": 10,
+            "method": "eth_getBalance",
+            "params": [
+              "0x5555555555555555555555555555555555555555",
+              {
+                "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+                "requireCanonical": true
+              }
+            ]
+          },
+          {
+            "id": 11,
+            "method": "debug_traceCall",
+            "params": [
+              {
+                "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                "to": "0x000000000000000000000000000000000000ba1a",
+                "data": "0x",
+                "value": "0x0",
+                "gas": "0x493e0"
+              },
+              {
+                "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+                "requireCanonical": true
+              },
+              {
+                "tracer": "callTracer",
+                "timeout": "15s",
+                "tracerConfig": {
+                  "withLog": true
+                },
+                "stateOverrides": {
+                  "0x000000000000000000000000000000000000ba1a": {
+                    "code": "0x43600052426020524560405248606052446080524160a0524660c0527f0000000000000000000000000000000000000000000000000000000002fb298c4060e052739a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0316101005273555555555555555555555555555555555555555531610120526101406000f3"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "id": 12,
+            "method": "debug_traceCall",
+            "params": [
+              {
+                "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+                "to": "0x000000000000000000000000000000000000ba1a",
+                "data": "0x",
+                "value": "0x0",
+                "gas": "0x493e0"
+              },
+              {
+                "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+                "requireCanonical": true
+              },
+              {
+                "tracer": "prestateTracer",
+                "timeout": "15s",
+                "tracerConfig": {
+                  "diffMode": true
+                },
+                "stateOverrides": {
+                  "0x000000000000000000000000000000000000ba1a": {
+                    "code": "0x43600052426020524560405248606052446080524160a0524660c0527f0000000000000000000000000000000000000000000000000000000002fb298c4060e052739a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0316101005273555555555555555555555555555555555555555531610120526101406000f3"
+                  }
+                }
+              }
+            ]
+          }
+        ],
+        "response": [
+          {
+            "id": 1,
+            "method": "eth_getBlockByHash",
+            "result": {
+              "hash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+              "parentHash": "0x557b01e16f3b1264dfd8eb347bb189c503ef628de45b5401298301896d6b9b0d",
+              "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+              "miner": "0x0000000000000000000000000000000000000000",
+              "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "transactionsRoot": "0x71207fffa0b62fcd56a2d4531124edd8efda04ebd51c305bf2a4f4d15f21e56d",
+              "receiptsRoot": "0xd1b6c41084e26a1bce8bc0c161b9aa0fb7a486c7c278c5a6bc0a00f6dde47c13",
+              "logsBloom": "0x0000008003800010000000000000002802000000100040000002000440200000000a000080400504000044008000000008100000520020000002004000200401000000408010400c00000028602000000002000000000000100000000000000200000060020000000040000000000800100000024004100080200010004c00000200042400000000000100001130000000c40000800001000001000000000000020010021004000000200000000000140040080000000082000400401080010004000102800000040000010080004000810104092108000000001010000020200210000008001000080000020000000000004001080000000001000000004120",
+              "difficulty": "0x0",
+              "number": "0x2fb298d",
+              "gasLimit": "0x2dc6c0",
+              "gasUsed": "0xd791b",
+              "timestamp": "0x6ae5e5d5",
+              "extraData": "0x",
+              "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "nonce": "0x0000000000000000",
+              "baseFeePerGas": "0x5f5e100",
+              "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+              "blobGasUsed": "0x0",
+              "excessBlobGas": "0x0",
+              "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+              "size": "0xf4b",
+              "uncles": [],
+              "transactions": [
+                "0xd4d73d13ad80518189e461cc7be2c5623c834bc61e6625b471b184c08c089b30",
+                "0x2f0c353563a368210b360a2c3d38a1d1954683b01ce90c3d809aa599feab8d7f",
+                "0x492719c8024c2613d8622dbf2b8a929d5ebd738158b013d32af2432fd22fce0b",
+                "0x2219e6f73600b609113a2b3ea125b561fae6005e7ce7be071798dca7cb1362ac",
+                "0xc3c81caf876839455b672c09caea52ad2331d5caa66d58ba6b3cb2353d338646",
+                "0x8b3546d8011009814d4d5075354fda8bc58beb0c661f1168921d3c6e7213717a"
+              ],
+              "withdrawals": []
+            }
+          },
+          {
+            "id": 2,
+            "method": "eth_getTransactionCount",
+            "result": "0x164ab"
+          },
+          {
+            "id": 3,
+            "method": "eth_getBalance",
+            "result": "0x980a4981f351ab9"
+          },
+          {
+            "id": 4,
+            "method": "eth_getCode",
+            "result": "0x"
+          },
+          {
+            "id": 5,
+            "method": "eth_getCode",
+            "result": "0x6080604052600436106100bc5760003560e01c8063313ce56711610074578063a9059cbb1161004e578063a9059cbb146102cb578063d0e30db0146100bc578063dd62ed3e14610311576100bc565b8063313ce5671461024b57806370a082311461027657806395d89b41146102b6576100bc565b806318160ddd116100a557806318160ddd146101aa57806323b872dd146101d15780632e1a7d4d14610221576100bc565b806306fdde03146100c6578063095ea7b314610150575b6100c4610359565b005b3480156100d257600080fd5b506100db6103a8565b6040805160208082528351818301528351919283929083019185019080838360005b838110156101155781810151838201526020016100fd565b50505050905090810190601f1680156101425780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34801561015c57600080fd5b506101966004803603604081101561017357600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135169060200135610454565b604080519115158252519081900360200190f35b3480156101b657600080fd5b506101bf6104c7565b60408051918252519081900360200190f35b3480156101dd57600080fd5b50610196600480360360608110156101f457600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135811691602081013590911690604001356104cb565b34801561022d57600080fd5b506100c46004803603602081101561024457600080fd5b503561066b565b34801561025757600080fd5b50610260610700565b6040805160ff9092168252519081900360200190f35b34801561028257600080fd5b506101bf6004803603602081101561029957600080fd5b503573ffffffffffffffffffffffffffffffffffffffff16610709565b3480156102c257600080fd5b506100db61071b565b3480156102d757600080fd5b50610196600480360360408110156102ee57600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135169060200135610793565b34801561031d57600080fd5b506101bf6004803603604081101561033457600080fd5b5073ffffffffffffffffffffffffffffffffffffffff813581169160200135166107a7565b33600081815260036020908152604091829020805434908101909155825190815291517fe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c9281900390910190a2565b6000805460408051602060026001851615610100027fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0190941693909304601f8101849004840282018401909252818152929183018282801561044c5780601f106104215761010080835404028352916020019161044c565b820191906000526020600020905b81548152906001019060200180831161042f57829003601f168201915b505050505081565b33600081815260046020908152604080832073ffffffffffffffffffffffffffffffffffffffff8716808552908352818420869055815186815291519394909390927f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925928290030190a350600192915050565b4790565b73ffffffffffffffffffffffffffffffffffffffff83166000908152600360205260408120548211156104fd57600080fd5b73ffffffffffffffffffffffffffffffffffffffff84163314801590610573575073ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff14155b156105ed5773ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020548211156105b557600080fd5b73ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020805483900390555b73ffffffffffffffffffffffffffffffffffffffff808516600081815260036020908152604080832080548890039055938716808352918490208054870190558351868152935191937fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef929081900390910190a35060019392505050565b3360009081526003602052604090205481111561068757600080fd5b33600081815260036020526040808220805485900390555183156108fc0291849190818181858888f193505050501580156106c6573d6000803e3d6000fd5b5060408051828152905133917f7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65919081900360200190a250565b60025460ff1681565b60036020526000908152604090205481565b60018054604080516020600284861615610100027fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0190941693909304601f8101849004840282018401909252818152929183018282801561044c5780601f106104215761010080835404028352916020019161044c565b60006107a03384846104cb565b9392505050565b60046020908152600092835260408084209091529082529020548156fea265627a7a72315820e87684b404839c5657b1e7820bfa5ac4539ac8c83c21e28ec1086123db902cfe64736f6c63430005110032"
+          },
+          {
+            "id": 6,
+            "method": "eth_getCode",
+            "result": "0x"
+          },
+          {
+            "id": 7,
+            "method": "debug_traceCall",
+            "result": {
+              "post": {
+                "0x5555555555555555555555555555555555555555": {
+                  "balance": "0x2704e5cb69a65145a24d5",
+                  "storage": {
+                    "0xfbf3ba646d93e7339d802377d3b09d71c5867e2762b777dfe6a1c3efd009db17": "0x0000000000000000000000000000000000000000000000001868095b51230022"
+                  }
+                },
+                "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                  "balance": "0x980a4981f351aba",
+                  "nonce": 91308
+                }
+              },
+              "pre": {
+                "0x5555555555555555555555555555555555555555": {
+                  "balance": "0x2704e5cb69a65145a24d6",
+                  "code": "0x6080604052600436106100bc5760003560e01c8063313ce56711610074578063a9059cbb1161004e578063a9059cbb146102cb578063d0e30db0146100bc578063dd62ed3e14610311576100bc565b8063313ce5671461024b57806370a082311461027657806395d89b41146102b6576100bc565b806318160ddd116100a557806318160ddd146101aa57806323b872dd146101d15780632e1a7d4d14610221576100bc565b806306fdde03146100c6578063095ea7b314610150575b6100c4610359565b005b3480156100d257600080fd5b506100db6103a8565b6040805160208082528351818301528351919283929083019185019080838360005b838110156101155781810151838201526020016100fd565b50505050905090810190601f1680156101425780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34801561015c57600080fd5b506101966004803603604081101561017357600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135169060200135610454565b604080519115158252519081900360200190f35b3480156101b657600080fd5b506101bf6104c7565b60408051918252519081900360200190f35b3480156101dd57600080fd5b50610196600480360360608110156101f457600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135811691602081013590911690604001356104cb565b34801561022d57600080fd5b506100c46004803603602081101561024457600080fd5b503561066b565b34801561025757600080fd5b50610260610700565b6040805160ff9092168252519081900360200190f35b34801561028257600080fd5b506101bf6004803603602081101561029957600080fd5b503573ffffffffffffffffffffffffffffffffffffffff16610709565b3480156102c257600080fd5b506100db61071b565b3480156102d757600080fd5b50610196600480360360408110156102ee57600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135169060200135610793565b34801561031d57600080fd5b506101bf6004803603604081101561033457600080fd5b5073ffffffffffffffffffffffffffffffffffffffff813581169160200135166107a7565b33600081815260036020908152604091829020805434908101909155825190815291517fe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c9281900390910190a2565b6000805460408051602060026001851615610100027fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0190941693909304601f8101849004840282018401909252818152929183018282801561044c5780601f106104215761010080835404028352916020019161044c565b820191906000526020600020905b81548152906001019060200180831161042f57829003601f168201915b505050505081565b33600081815260046020908152604080832073ffffffffffffffffffffffffffffffffffffffff8716808552908352818420869055815186815291519394909390927f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925928290030190a350600192915050565b4790565b73ffffffffffffffffffffffffffffffffffffffff83166000908152600360205260408120548211156104fd57600080fd5b73ffffffffffffffffffffffffffffffffffffffff84163314801590610573575073ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff14155b156105ed5773ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020548211156105b557600080fd5b73ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020805483900390555b73ffffffffffffffffffffffffffffffffffffffff808516600081815260036020908152604080832080548890039055938716808352918490208054870190558351868152935191937fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef929081900390910190a35060019392505050565b3360009081526003602052604090205481111561068757600080fd5b33600081815260036020526040808220805485900390555183156108fc0291849190818181858888f193505050501580156106c6573d6000803e3d6000fd5b5060408051828152905133917f7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65919081900360200190a250565b60025460ff1681565b60036020526000908152604090205481565b60018054604080516020600284861615610100027fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0190941693909304601f8101849004840282018401909252818152929183018282801561044c5780601f106104215761010080835404028352916020019161044c565b60006107a03384846104cb565b9392505050565b60046020908152600092835260408084209091529082529020548156fea265627a7a72315820e87684b404839c5657b1e7820bfa5ac4539ac8c83c21e28ec1086123db902cfe64736f6c63430005110032",
+                  "storage": {
+                    "0xfbf3ba646d93e7339d802377d3b09d71c5867e2762b777dfe6a1c3efd009db17": "0x0000000000000000000000000000000000000000000000001868095b51230023"
+                  }
+                },
+                "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                  "balance": "0x980a4981f351ab9",
+                  "nonce": 91307
+                }
+              }
+            }
+          },
+          {
+            "id": 8,
+            "method": "debug_traceCall",
+            "result": {
+              "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "gas": "0x493e0",
+              "gasUsed": "0x527b",
+              "to": "0x000000000000000000000000000000000000ba1a",
+              "input": "0x",
+              "output": "0x0000000000000000000000000000000000000000000000000000000002fb298d000000000000000000000000000000000000000000000000000000006ae5e5d500000000000000000000000000000000000000000000000000000000002dc6c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003e7557b01e16f3b1264dfd8eb347bb189c503ef628de45b5401298301896d6b9b0d",
+              "value": "0x0",
+              "type": "CALL"
+            }
+          },
+          {
+            "id": 9,
+            "method": "debug_traceCall",
+            "result": {
+              "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "gas": "0x493e0",
+              "gasUsed": "0x527b",
+              "to": "0x000000000000000000000000000000000000ba1a",
+              "input": "0x",
+              "output": "0x0000000000000000000000000000000000000000000000000000000002fb298d000000000000000000000000000000000000000000000000000000006ae5e5d500000000000000000000000000000000000000000000000000000000002dc6c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003e7557b01e16f3b1264dfd8eb347bb189c503ef628de45b5401298301896d6b9b0d",
+              "value": "0x0",
+              "type": "CALL"
+            }
+          },
+          {
+            "id": 10,
+            "method": "eth_getBalance",
+            "result": "0x2704e5cb69a65145a24d6"
+          },
+          {
+            "id": 11,
+            "method": "debug_traceCall",
+            "result": {
+              "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+              "gas": "0x493e0",
+              "gasUsed": "0x5d1f",
+              "to": "0x000000000000000000000000000000000000ba1a",
+              "input": "0x",
+              "output": "0x0000000000000000000000000000000000000000000000000000000002fb298d000000000000000000000000000000000000000000000000000000006ae5e5d500000000000000000000000000000000000000000000000000000000002dc6c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003e7557b01e16f3b1264dfd8eb347bb189c503ef628de45b5401298301896d6b9b0d0000000000000000000000000000000000000000000000000980a4981f351ab900000000000000000000000000000000000000000002704e5cb69a65145a24d6",
+              "value": "0x0",
+              "type": "CALL"
+            }
+          },
+          {
+            "id": 12,
+            "method": "debug_traceCall",
+            "result": {
+              "post": {
+                "0x5555555555555555555555555555555555555555": {},
+                "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                  "nonce": 91308
+                }
+              },
+              "pre": {
+                "0x5555555555555555555555555555555555555555": {
+                  "balance": "0x2704e5cb69a65145a24d6",
+                  "code": "0x6080604052600436106100bc5760003560e01c8063313ce56711610074578063a9059cbb1161004e578063a9059cbb146102cb578063d0e30db0146100bc578063dd62ed3e14610311576100bc565b8063313ce5671461024b57806370a082311461027657806395d89b41146102b6576100bc565b806318160ddd116100a557806318160ddd146101aa57806323b872dd146101d15780632e1a7d4d14610221576100bc565b806306fdde03146100c6578063095ea7b314610150575b6100c4610359565b005b3480156100d257600080fd5b506100db6103a8565b6040805160208082528351818301528351919283929083019185019080838360005b838110156101155781810151838201526020016100fd565b50505050905090810190601f1680156101425780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34801561015c57600080fd5b506101966004803603604081101561017357600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135169060200135610454565b604080519115158252519081900360200190f35b3480156101b657600080fd5b506101bf6104c7565b60408051918252519081900360200190f35b3480156101dd57600080fd5b50610196600480360360608110156101f457600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135811691602081013590911690604001356104cb565b34801561022d57600080fd5b506100c46004803603602081101561024457600080fd5b503561066b565b34801561025757600080fd5b50610260610700565b6040805160ff9092168252519081900360200190f35b34801561028257600080fd5b506101bf6004803603602081101561029957600080fd5b503573ffffffffffffffffffffffffffffffffffffffff16610709565b3480156102c257600080fd5b506100db61071b565b3480156102d757600080fd5b50610196600480360360408110156102ee57600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135169060200135610793565b34801561031d57600080fd5b506101bf6004803603604081101561033457600080fd5b5073ffffffffffffffffffffffffffffffffffffffff813581169160200135166107a7565b33600081815260036020908152604091829020805434908101909155825190815291517fe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c9281900390910190a2565b6000805460408051602060026001851615610100027fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0190941693909304601f8101849004840282018401909252818152929183018282801561044c5780601f106104215761010080835404028352916020019161044c565b820191906000526020600020905b81548152906001019060200180831161042f57829003601f168201915b505050505081565b33600081815260046020908152604080832073ffffffffffffffffffffffffffffffffffffffff8716808552908352818420869055815186815291519394909390927f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925928290030190a350600192915050565b4790565b73ffffffffffffffffffffffffffffffffffffffff83166000908152600360205260408120548211156104fd57600080fd5b73ffffffffffffffffffffffffffffffffffffffff84163314801590610573575073ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff14155b156105ed5773ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020548211156105b557600080fd5b73ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020805483900390555b73ffffffffffffffffffffffffffffffffffffffff808516600081815260036020908152604080832080548890039055938716808352918490208054870190558351868152935191937fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef929081900390910190a35060019392505050565b3360009081526003602052604090205481111561068757600080fd5b33600081815260036020526040808220805485900390555183156108fc0291849190818181858888f193505050501580156106c6573d6000803e3d6000fd5b5060408051828152905133917f7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65919081900360200190a250565b60025460ff1681565b60036020526000908152604090205481565b60018054604080516020600284861615610100027fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0190941693909304601f8101849004840282018401909252818152929183018282801561044c5780601f106104215761010080835404028352916020019161044c565b60006107a03384846104cb565b9392505050565b60046020908152600092835260408084209091529082529020548156fea265627a7a72315820e87684b404839c5657b1e7820bfa5ac4539ac8c83c21e28ec1086123db902cfe64736f6c63430005110032"
+                },
+                "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+                  "balance": "0x980a4981f351ab9",
+                  "nonce": 91307
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "error": null,
+  "records": [
+    {
+      "id": 1,
+      "method": "eth_chainId",
+      "params": [],
+      "result": "0x3e7",
+      "completionSequence": 1
+    },
+    {
+      "id": 2,
+      "method": "eth_getBlockByNumber",
+      "params": [
+        "0x2fb298d",
+        false
+      ],
+      "result": {
+        "hash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+        "parentHash": "0x557b01e16f3b1264dfd8eb347bb189c503ef628de45b5401298301896d6b9b0d",
+        "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "miner": "0x0000000000000000000000000000000000000000",
+        "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "transactionsRoot": "0x71207fffa0b62fcd56a2d4531124edd8efda04ebd51c305bf2a4f4d15f21e56d",
+        "receiptsRoot": "0xd1b6c41084e26a1bce8bc0c161b9aa0fb7a486c7c278c5a6bc0a00f6dde47c13",
+        "logsBloom": "0x0000008003800010000000000000002802000000100040000002000440200000000a000080400504000044008000000008100000520020000002004000200401000000408010400c00000028602000000002000000000000100000000000000200000060020000000040000000000800100000024004100080200010004c00000200042400000000000100001130000000c40000800001000001000000000000020010021004000000200000000000140040080000000082000400401080010004000102800000040000010080004000810104092108000000001010000020200210000008001000080000020000000000004001080000000001000000004120",
+        "difficulty": "0x0",
+        "number": "0x2fb298d",
+        "gasLimit": "0x2dc6c0",
+        "gasUsed": "0xd791b",
+        "timestamp": "0x6ae5e5d5",
+        "extraData": "0x",
+        "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "nonce": "0x0000000000000000",
+        "baseFeePerGas": "0x5f5e100",
+        "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "blobGasUsed": "0x0",
+        "excessBlobGas": "0x0",
+        "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "size": "0xf4b",
+        "uncles": [],
+        "transactions": [
+          "0xd4d73d13ad80518189e461cc7be2c5623c834bc61e6625b471b184c08c089b30",
+          "0x2f0c353563a368210b360a2c3d38a1d1954683b01ce90c3d809aa599feab8d7f",
+          "0x492719c8024c2613d8622dbf2b8a929d5ebd738158b013d32af2432fd22fce0b",
+          "0x2219e6f73600b609113a2b3ea125b561fae6005e7ce7be071798dca7cb1362ac",
+          "0xc3c81caf876839455b672c09caea52ad2331d5caa66d58ba6b3cb2353d338646",
+          "0x8b3546d8011009814d4d5075354fda8bc58beb0c661f1168921d3c6e7213717a"
+        ],
+        "withdrawals": []
+      },
+      "completionSequence": 2
+    },
+    {
+      "id": 3,
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "to": "0x5555555555555555555555555555555555555555",
+          "data": "0x2e1a7d4d0000000000000000000000000000000000000000000000000000000000000001",
+          "value": "0x0",
+          "gas": "0x4c4b40"
+        },
+        {
+          "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "callTracer",
+          "timeout": "15s",
+          "tracerConfig": {
+            "withLog": true
+          }
+        }
+      ],
+      "result": {
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "gas": "0x4c4b40",
+        "gasUsed": "0x88fc",
+        "to": "0x5555555555555555555555555555555555555555",
+        "input": "0x2e1a7d4d0000000000000000000000000000000000000000000000000000000000000001",
+        "calls": [
+          {
+            "from": "0x5555555555555555555555555555555555555555",
+            "gas": "0x8fc",
+            "gasUsed": "0x0",
+            "to": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+            "input": "0x",
+            "value": "0x1",
+            "type": "CALL"
+          }
+        ],
+        "logs": [
+          {
+            "address": "0x5555555555555555555555555555555555555555",
+            "topics": [
+              "0x7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65",
+              "0x0000000000000000000000009a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0"
+            ],
+            "data": "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "position": "0x1",
+            "index": "0x0"
+          }
+        ],
+        "value": "0x0",
+        "type": "CALL"
+      },
+      "completionSequence": 3
+    },
+    {
+      "id": 4,
+      "method": "eth_getBlockByHash",
+      "params": [
+        "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+        false
+      ],
+      "result": {
+        "hash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+        "parentHash": "0x557b01e16f3b1264dfd8eb347bb189c503ef628de45b5401298301896d6b9b0d",
+        "sha3Uncles": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347",
+        "miner": "0x0000000000000000000000000000000000000000",
+        "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "transactionsRoot": "0x71207fffa0b62fcd56a2d4531124edd8efda04ebd51c305bf2a4f4d15f21e56d",
+        "receiptsRoot": "0xd1b6c41084e26a1bce8bc0c161b9aa0fb7a486c7c278c5a6bc0a00f6dde47c13",
+        "logsBloom": "0x0000008003800010000000000000002802000000100040000002000440200000000a000080400504000044008000000008100000520020000002004000200401000000408010400c00000028602000000002000000000000100000000000000200000060020000000040000000000800100000024004100080200010004c00000200042400000000000100001130000000c40000800001000001000000000000020010021004000000200000000000140040080000000082000400401080010004000102800000040000010080004000810104092108000000001010000020200210000008001000080000020000000000004001080000000001000000004120",
+        "difficulty": "0x0",
+        "number": "0x2fb298d",
+        "gasLimit": "0x2dc6c0",
+        "gasUsed": "0xd791b",
+        "timestamp": "0x6ae5e5d5",
+        "extraData": "0x",
+        "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "nonce": "0x0000000000000000",
+        "baseFeePerGas": "0x5f5e100",
+        "withdrawalsRoot": "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
+        "blobGasUsed": "0x0",
+        "excessBlobGas": "0x0",
+        "parentBeaconBlockRoot": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "size": "0xf4b",
+        "uncles": [],
+        "transactions": [
+          "0xd4d73d13ad80518189e461cc7be2c5623c834bc61e6625b471b184c08c089b30",
+          "0x2f0c353563a368210b360a2c3d38a1d1954683b01ce90c3d809aa599feab8d7f",
+          "0x492719c8024c2613d8622dbf2b8a929d5ebd738158b013d32af2432fd22fce0b",
+          "0x2219e6f73600b609113a2b3ea125b561fae6005e7ce7be071798dca7cb1362ac",
+          "0xc3c81caf876839455b672c09caea52ad2331d5caa66d58ba6b3cb2353d338646",
+          "0x8b3546d8011009814d4d5075354fda8bc58beb0c661f1168921d3c6e7213717a"
+        ],
+        "withdrawals": []
+      },
+      "completionSequence": 4
+    },
+    {
+      "id": 5,
+      "method": "eth_getTransactionCount",
+      "params": [
+        "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        {
+          "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+          "requireCanonical": true
+        }
+      ],
+      "result": "0x164ab",
+      "completionSequence": 5
+    },
+    {
+      "id": 6,
+      "method": "eth_getBalance",
+      "params": [
+        "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        {
+          "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+          "requireCanonical": true
+        }
+      ],
+      "result": "0x980a4981f351ab9",
+      "completionSequence": 6
+    },
+    {
+      "id": 7,
+      "method": "eth_getCode",
+      "params": [
+        "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        {
+          "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+          "requireCanonical": true
+        }
+      ],
+      "result": "0x",
+      "completionSequence": 7
+    },
+    {
+      "id": 8,
+      "method": "eth_getCode",
+      "params": [
+        "0x5555555555555555555555555555555555555555",
+        {
+          "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+          "requireCanonical": true
+        }
+      ],
+      "result": "0x6080604052600436106100bc5760003560e01c8063313ce56711610074578063a9059cbb1161004e578063a9059cbb146102cb578063d0e30db0146100bc578063dd62ed3e14610311576100bc565b8063313ce5671461024b57806370a082311461027657806395d89b41146102b6576100bc565b806318160ddd116100a557806318160ddd146101aa57806323b872dd146101d15780632e1a7d4d14610221576100bc565b806306fdde03146100c6578063095ea7b314610150575b6100c4610359565b005b3480156100d257600080fd5b506100db6103a8565b6040805160208082528351818301528351919283929083019185019080838360005b838110156101155781810151838201526020016100fd565b50505050905090810190601f1680156101425780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34801561015c57600080fd5b506101966004803603604081101561017357600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135169060200135610454565b604080519115158252519081900360200190f35b3480156101b657600080fd5b506101bf6104c7565b60408051918252519081900360200190f35b3480156101dd57600080fd5b50610196600480360360608110156101f457600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135811691602081013590911690604001356104cb565b34801561022d57600080fd5b506100c46004803603602081101561024457600080fd5b503561066b565b34801561025757600080fd5b50610260610700565b6040805160ff9092168252519081900360200190f35b34801561028257600080fd5b506101bf6004803603602081101561029957600080fd5b503573ffffffffffffffffffffffffffffffffffffffff16610709565b3480156102c257600080fd5b506100db61071b565b3480156102d757600080fd5b50610196600480360360408110156102ee57600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135169060200135610793565b34801561031d57600080fd5b506101bf6004803603604081101561033457600080fd5b5073ffffffffffffffffffffffffffffffffffffffff813581169160200135166107a7565b33600081815260036020908152604091829020805434908101909155825190815291517fe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c9281900390910190a2565b6000805460408051602060026001851615610100027fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0190941693909304601f8101849004840282018401909252818152929183018282801561044c5780601f106104215761010080835404028352916020019161044c565b820191906000526020600020905b81548152906001019060200180831161042f57829003601f168201915b505050505081565b33600081815260046020908152604080832073ffffffffffffffffffffffffffffffffffffffff8716808552908352818420869055815186815291519394909390927f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925928290030190a350600192915050565b4790565b73ffffffffffffffffffffffffffffffffffffffff83166000908152600360205260408120548211156104fd57600080fd5b73ffffffffffffffffffffffffffffffffffffffff84163314801590610573575073ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff14155b156105ed5773ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020548211156105b557600080fd5b73ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020805483900390555b73ffffffffffffffffffffffffffffffffffffffff808516600081815260036020908152604080832080548890039055938716808352918490208054870190558351868152935191937fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef929081900390910190a35060019392505050565b3360009081526003602052604090205481111561068757600080fd5b33600081815260036020526040808220805485900390555183156108fc0291849190818181858888f193505050501580156106c6573d6000803e3d6000fd5b5060408051828152905133917f7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65919081900360200190a250565b60025460ff1681565b60036020526000908152604090205481565b60018054604080516020600284861615610100027fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0190941693909304601f8101849004840282018401909252818152929183018282801561044c5780601f106104215761010080835404028352916020019161044c565b60006107a03384846104cb565b9392505050565b60046020908152600092835260408084209091529082529020548156fea265627a7a72315820e87684b404839c5657b1e7820bfa5ac4539ac8c83c21e28ec1086123db902cfe64736f6c63430005110032",
+      "completionSequence": 8
+    },
+    {
+      "id": 9,
+      "method": "eth_getCode",
+      "params": [
+        "0x000000000000000000000000000000000000ba1a",
+        {
+          "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+          "requireCanonical": true
+        }
+      ],
+      "result": "0x",
+      "completionSequence": 9
+    },
+    {
+      "id": 10,
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "to": "0x5555555555555555555555555555555555555555",
+          "data": "0x2e1a7d4d0000000000000000000000000000000000000000000000000000000000000001",
+          "value": "0x0",
+          "gas": "0x4c4b40"
+        },
+        {
+          "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "prestateTracer",
+          "timeout": "15s",
+          "tracerConfig": {
+            "diffMode": true
+          }
+        }
+      ],
+      "result": {
+        "post": {
+          "0x5555555555555555555555555555555555555555": {
+            "balance": "0x2704e5cb69a65145a24d5",
+            "storage": {
+              "0xfbf3ba646d93e7339d802377d3b09d71c5867e2762b777dfe6a1c3efd009db17": "0x0000000000000000000000000000000000000000000000001868095b51230022"
+            }
+          },
+          "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+            "balance": "0x980a4981f351aba",
+            "nonce": 91308
+          }
+        },
+        "pre": {
+          "0x5555555555555555555555555555555555555555": {
+            "balance": "0x2704e5cb69a65145a24d6",
+            "code": "0x6080604052600436106100bc5760003560e01c8063313ce56711610074578063a9059cbb1161004e578063a9059cbb146102cb578063d0e30db0146100bc578063dd62ed3e14610311576100bc565b8063313ce5671461024b57806370a082311461027657806395d89b41146102b6576100bc565b806318160ddd116100a557806318160ddd146101aa57806323b872dd146101d15780632e1a7d4d14610221576100bc565b806306fdde03146100c6578063095ea7b314610150575b6100c4610359565b005b3480156100d257600080fd5b506100db6103a8565b6040805160208082528351818301528351919283929083019185019080838360005b838110156101155781810151838201526020016100fd565b50505050905090810190601f1680156101425780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34801561015c57600080fd5b506101966004803603604081101561017357600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135169060200135610454565b604080519115158252519081900360200190f35b3480156101b657600080fd5b506101bf6104c7565b60408051918252519081900360200190f35b3480156101dd57600080fd5b50610196600480360360608110156101f457600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135811691602081013590911690604001356104cb565b34801561022d57600080fd5b506100c46004803603602081101561024457600080fd5b503561066b565b34801561025757600080fd5b50610260610700565b6040805160ff9092168252519081900360200190f35b34801561028257600080fd5b506101bf6004803603602081101561029957600080fd5b503573ffffffffffffffffffffffffffffffffffffffff16610709565b3480156102c257600080fd5b506100db61071b565b3480156102d757600080fd5b50610196600480360360408110156102ee57600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135169060200135610793565b34801561031d57600080fd5b506101bf6004803603604081101561033457600080fd5b5073ffffffffffffffffffffffffffffffffffffffff813581169160200135166107a7565b33600081815260036020908152604091829020805434908101909155825190815291517fe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c9281900390910190a2565b6000805460408051602060026001851615610100027fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0190941693909304601f8101849004840282018401909252818152929183018282801561044c5780601f106104215761010080835404028352916020019161044c565b820191906000526020600020905b81548152906001019060200180831161042f57829003601f168201915b505050505081565b33600081815260046020908152604080832073ffffffffffffffffffffffffffffffffffffffff8716808552908352818420869055815186815291519394909390927f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925928290030190a350600192915050565b4790565b73ffffffffffffffffffffffffffffffffffffffff83166000908152600360205260408120548211156104fd57600080fd5b73ffffffffffffffffffffffffffffffffffffffff84163314801590610573575073ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff14155b156105ed5773ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020548211156105b557600080fd5b73ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020805483900390555b73ffffffffffffffffffffffffffffffffffffffff808516600081815260036020908152604080832080548890039055938716808352918490208054870190558351868152935191937fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef929081900390910190a35060019392505050565b3360009081526003602052604090205481111561068757600080fd5b33600081815260036020526040808220805485900390555183156108fc0291849190818181858888f193505050501580156106c6573d6000803e3d6000fd5b5060408051828152905133917f7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65919081900360200190a250565b60025460ff1681565b60036020526000908152604090205481565b60018054604080516020600284861615610100027fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0190941693909304601f8101849004840282018401909252818152929183018282801561044c5780601f106104215761010080835404028352916020019161044c565b60006107a03384846104cb565b9392505050565b60046020908152600092835260408084209091529082529020548156fea265627a7a72315820e87684b404839c5657b1e7820bfa5ac4539ac8c83c21e28ec1086123db902cfe64736f6c63430005110032",
+            "storage": {
+              "0xfbf3ba646d93e7339d802377d3b09d71c5867e2762b777dfe6a1c3efd009db17": "0x0000000000000000000000000000000000000000000000001868095b51230023"
+            }
+          },
+          "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+            "balance": "0x980a4981f351ab9",
+            "nonce": 91307
+          }
+        }
+      },
+      "completionSequence": 10
+    },
+    {
+      "id": 11,
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "to": "0x000000000000000000000000000000000000ba1a",
+          "data": "0x",
+          "value": "0x0",
+          "gas": "0x493e0"
+        },
+        {
+          "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "callTracer",
+          "timeout": "15s",
+          "tracerConfig": {
+            "withLog": true
+          },
+          "stateOverrides": {
+            "0x000000000000000000000000000000000000ba1a": {
+              "code": "0x43600052426020524560405248606052446080524160a0524660c0527f0000000000000000000000000000000000000000000000000000000002fb298c4060e0526101006000f3"
+            }
+          }
+        }
+      ],
+      "result": {
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "gas": "0x493e0",
+        "gasUsed": "0x527b",
+        "to": "0x000000000000000000000000000000000000ba1a",
+        "input": "0x",
+        "output": "0x0000000000000000000000000000000000000000000000000000000002fb298d000000000000000000000000000000000000000000000000000000006ae5e5d500000000000000000000000000000000000000000000000000000000002dc6c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003e7557b01e16f3b1264dfd8eb347bb189c503ef628de45b5401298301896d6b9b0d",
+        "value": "0x0",
+        "type": "CALL"
+      },
+      "completionSequence": 11
+    },
+    {
+      "id": 12,
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "to": "0x000000000000000000000000000000000000ba1a",
+          "data": "0x",
+          "value": "0x0",
+          "gas": "0x493e0"
+        },
+        {
+          "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "callTracer",
+          "timeout": "15s",
+          "tracerConfig": {
+            "withLog": true
+          },
+          "stateOverrides": {
+            "0x5555555555555555555555555555555555555555": {
+              "balance": "0x2704e5cb69a65145a24d5",
+              "stateDiff": {
+                "0xfbf3ba646d93e7339d802377d3b09d71c5867e2762b777dfe6a1c3efd009db17": "0x0000000000000000000000000000000000000000000000001868095b51230022"
+              }
+            },
+            "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+              "balance": "0x980a4981f351aba",
+              "nonce": "0x164ac"
+            },
+            "0x000000000000000000000000000000000000ba1a": {
+              "code": "0x43600052426020524560405248606052446080524160a0524660c0527f0000000000000000000000000000000000000000000000000000000002fb298c4060e0526101006000f3"
+            }
+          }
+        }
+      ],
+      "result": {
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "gas": "0x493e0",
+        "gasUsed": "0x527b",
+        "to": "0x000000000000000000000000000000000000ba1a",
+        "input": "0x",
+        "output": "0x0000000000000000000000000000000000000000000000000000000002fb298d000000000000000000000000000000000000000000000000000000006ae5e5d500000000000000000000000000000000000000000000000000000000002dc6c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003e7557b01e16f3b1264dfd8eb347bb189c503ef628de45b5401298301896d6b9b0d",
+        "value": "0x0",
+        "type": "CALL"
+      },
+      "completionSequence": 12
+    },
+    {
+      "id": 13,
+      "method": "eth_getBalance",
+      "params": [
+        "0x5555555555555555555555555555555555555555",
+        {
+          "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+          "requireCanonical": true
+        }
+      ],
+      "result": "0x2704e5cb69a65145a24d6",
+      "completionSequence": 13
+    },
+    {
+      "id": 14,
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "to": "0x000000000000000000000000000000000000ba1a",
+          "data": "0x",
+          "value": "0x0",
+          "gas": "0x493e0"
+        },
+        {
+          "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "callTracer",
+          "timeout": "15s",
+          "tracerConfig": {
+            "withLog": true
+          },
+          "stateOverrides": {
+            "0x000000000000000000000000000000000000ba1a": {
+              "code": "0x43600052426020524560405248606052446080524160a0524660c0527f0000000000000000000000000000000000000000000000000000000002fb298c4060e052739a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0316101005273555555555555555555555555555555555555555531610120526101406000f3"
+            }
+          }
+        }
+      ],
+      "result": {
+        "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+        "gas": "0x493e0",
+        "gasUsed": "0x5d1f",
+        "to": "0x000000000000000000000000000000000000ba1a",
+        "input": "0x",
+        "output": "0x0000000000000000000000000000000000000000000000000000000002fb298d000000000000000000000000000000000000000000000000000000006ae5e5d500000000000000000000000000000000000000000000000000000000002dc6c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003e7557b01e16f3b1264dfd8eb347bb189c503ef628de45b5401298301896d6b9b0d0000000000000000000000000000000000000000000000000980a4981f351ab900000000000000000000000000000000000000000002704e5cb69a65145a24d6",
+        "value": "0x0",
+        "type": "CALL"
+      },
+      "completionSequence": 14
+    },
+    {
+      "id": 15,
+      "method": "debug_traceCall",
+      "params": [
+        {
+          "from": "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0",
+          "to": "0x000000000000000000000000000000000000ba1a",
+          "data": "0x",
+          "value": "0x0",
+          "gas": "0x493e0"
+        },
+        {
+          "blockHash": "0x779392613a87731c62bbee28e01a15fc713c8f2f8afb77dd745e77eef5aeec00",
+          "requireCanonical": true
+        },
+        {
+          "tracer": "prestateTracer",
+          "timeout": "15s",
+          "tracerConfig": {
+            "diffMode": true
+          },
+          "stateOverrides": {
+            "0x000000000000000000000000000000000000ba1a": {
+              "code": "0x43600052426020524560405248606052446080524160a0524660c0527f0000000000000000000000000000000000000000000000000000000002fb298c4060e052739a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0316101005273555555555555555555555555555555555555555531610120526101406000f3"
+            }
+          }
+        }
+      ],
+      "result": {
+        "post": {
+          "0x5555555555555555555555555555555555555555": {},
+          "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+            "nonce": 91308
+          }
+        },
+        "pre": {
+          "0x5555555555555555555555555555555555555555": {
+            "balance": "0x2704e5cb69a65145a24d6",
+            "code": "0x6080604052600436106100bc5760003560e01c8063313ce56711610074578063a9059cbb1161004e578063a9059cbb146102cb578063d0e30db0146100bc578063dd62ed3e14610311576100bc565b8063313ce5671461024b57806370a082311461027657806395d89b41146102b6576100bc565b806318160ddd116100a557806318160ddd146101aa57806323b872dd146101d15780632e1a7d4d14610221576100bc565b806306fdde03146100c6578063095ea7b314610150575b6100c4610359565b005b3480156100d257600080fd5b506100db6103a8565b6040805160208082528351818301528351919283929083019185019080838360005b838110156101155781810151838201526020016100fd565b50505050905090810190601f1680156101425780820380516001836020036101000a031916815260200191505b509250505060405180910390f35b34801561015c57600080fd5b506101966004803603604081101561017357600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135169060200135610454565b604080519115158252519081900360200190f35b3480156101b657600080fd5b506101bf6104c7565b60408051918252519081900360200190f35b3480156101dd57600080fd5b50610196600480360360608110156101f457600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135811691602081013590911690604001356104cb565b34801561022d57600080fd5b506100c46004803603602081101561024457600080fd5b503561066b565b34801561025757600080fd5b50610260610700565b6040805160ff9092168252519081900360200190f35b34801561028257600080fd5b506101bf6004803603602081101561029957600080fd5b503573ffffffffffffffffffffffffffffffffffffffff16610709565b3480156102c257600080fd5b506100db61071b565b3480156102d757600080fd5b50610196600480360360408110156102ee57600080fd5b5073ffffffffffffffffffffffffffffffffffffffff8135169060200135610793565b34801561031d57600080fd5b506101bf6004803603604081101561033457600080fd5b5073ffffffffffffffffffffffffffffffffffffffff813581169160200135166107a7565b33600081815260036020908152604091829020805434908101909155825190815291517fe1fffcc4923d04b559f4d29a8bfc6cda04eb5b0d3c460751c2402c5c5cc9109c9281900390910190a2565b6000805460408051602060026001851615610100027fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0190941693909304601f8101849004840282018401909252818152929183018282801561044c5780601f106104215761010080835404028352916020019161044c565b820191906000526020600020905b81548152906001019060200180831161042f57829003601f168201915b505050505081565b33600081815260046020908152604080832073ffffffffffffffffffffffffffffffffffffffff8716808552908352818420869055815186815291519394909390927f8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925928290030190a350600192915050565b4790565b73ffffffffffffffffffffffffffffffffffffffff83166000908152600360205260408120548211156104fd57600080fd5b73ffffffffffffffffffffffffffffffffffffffff84163314801590610573575073ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff14155b156105ed5773ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020548211156105b557600080fd5b73ffffffffffffffffffffffffffffffffffffffff841660009081526004602090815260408083203384529091529020805483900390555b73ffffffffffffffffffffffffffffffffffffffff808516600081815260036020908152604080832080548890039055938716808352918490208054870190558351868152935191937fddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef929081900390910190a35060019392505050565b3360009081526003602052604090205481111561068757600080fd5b33600081815260036020526040808220805485900390555183156108fc0291849190818181858888f193505050501580156106c6573d6000803e3d6000fd5b5060408051828152905133917f7fcf532c15f0a6db0bd6d0e038bea71d30d808c7d98cb3bf7268a95bf5081b65919081900360200190a250565b60025460ff1681565b60036020526000908152604090205481565b60018054604080516020600284861615610100027fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0190941693909304601f8101849004840282018401909252818152929183018282801561044c5780601f106104215761010080835404028352916020019161044c565b60006107a03384846104cb565b9392505050565b60046020908152600092835260408084209091529082529020548156fea265627a7a72315820e87684b404839c5657b1e7820bfa5ac4539ac8c83c21e28ec1086123db902cfe64736f6c63430005110032"
+          },
+          "0x9a1dbc6a6e7e59f6beb23db0d00b603fc90e94d0": {
+            "balance": "0x980a4981f351ab9",
+            "nonce": 91307
+          }
+        }
+      },
+      "completionSequence": 15
+    }
+  ],
+  "elapsedMs": 4013.458290999999,
+  "reportVerification": "validated_by_api"
+}

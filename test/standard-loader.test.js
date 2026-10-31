@@ -21,7 +21,7 @@ const files = [
     'permissions', 'query-validation', 'revert', 'rpc', 'server', 'standard-loader',
     'standard-rpc', 'standard-simulation', 'state-diff', 'state', 'validate',
     'local-loader', 'local-sequence', 'local-simulation', 'proof-rpc',
-    'arbitrum-loader',
+    'arbitrum-loader', 'native-balances', 'native-effects',
   ].map(name => `src/${name}.js`),
   ...['package.json', 'package-lock.json', 'unsigned-call.js', 'position-queries.js', 'provider-state-diff.js', 'discovery.js', 'native-effects.js', 'sequence-state.js'].map(name => `engines/standard-evm/${name}`),
   ...['package.json', 'sha3.js', '_u64.js', 'utils.js'].map(name => `engines/standard-evm/node_modules/@noble/hashes/${name}`),
@@ -72,7 +72,7 @@ test('independent inventory covers static server imports and the optional engine
   // server reproduction; its dependency closure has its own local loader.
   const runtime = files.filter(file => file.endsWith('.js') && !['src/local-simulation.js', 'src/local-sequence.js'].includes(file));
   assert.deepEqual([...visited].sort(), runtime);
-  assert.equal(files.length, 41);
+  assert.equal(files.length, 43);
 });
 
 test('stable startup loads the real adapter once with the complete immutable disk identity', async t => {
@@ -113,7 +113,7 @@ test('optional dependency absent at startup remains unavailable after installati
   `);
 });
 
-for (const changedFile of ['src/analyze.js', 'src/config.js', 'src/standard-rpc.js', 'engines/standard-evm/sequence-state.js', 'engines/standard-evm/node_modules/@noble/hashes/utils.js']) {
+for (const changedFile of ['src/analyze.js', 'src/config.js', 'src/standard-rpc.js', 'src/native-balances.js', 'src/native-effects.js', 'engines/standard-evm/sequence-state.js', 'engines/standard-evm/node_modules/@noble/hashes/utils.js']) {
   test(`rejects post-startup drift in ${changedFile} before optional import and caches rejection`, async t => {
     const directory = await fixture(t);
     await subprocess(directory, `
