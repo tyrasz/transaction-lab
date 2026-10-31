@@ -1,5 +1,50 @@
 # Transaction Lab
 
+A research preview service for unsigned EVM calls on HyperEVM, Ethereum, Sepolia and Arbitrum. It separates execution, measured balances, events and coverage limits. It does not sign or broadcast transactions, assess transaction security, or establish complete asset coverage.
+
+## Quickstart
+
+Use Node.js 22 or later and npm. Run commands from the repository root.
+
+For the HyperEVM service alone, no external runtime packages are needed:
+
+```sh
+npm start
+```
+
+Open [Transaction Lab](http://127.0.0.1:5174/). Starting the service does not submit a simulation; choosing **Simulate** makes read-only provider requests. Other engines stay unavailable until their dependencies are installed. The server accepts localhost hosts and same-origin requests; a hosted frontend needs an intentionally deployed backend or proxy.
+
+For all preview engines and the development tests, install all four locked dependency trees:
+
+```sh
+npm ci --prefix engines/standard-evm --ignore-scripts --no-audit --no-fund
+npm ci --prefix engines/arbitrum-evm --ignore-scripts --no-audit --no-fund
+npm ci --prefix engines/local-evm --ignore-scripts --no-audit --no-fund
+npm ci --prefix engines/fixture-evm --ignore-scripts --no-audit --no-fund
+npm run prepare:runtime --prefix engines/local-evm
+```
+
+Preparation applies the exact, verified runtime corrections only to `engines/local-evm`. Keep `engines/fixture-evm` unchanged: it is a separate comparison runtime used by tests. Rerun preparation after reinstalling the local engine, then restart the server. There are no root package dependencies to install.
+
+Run the offline checks separately, in sequence:
+
+```sh
+npm test
+npm run test:local
+npm test --prefix engines/standard-evm
+npm test --prefix engines/fixture-evm
+node --test engines/arbitrum-evm/test/*.test.js
+npm run benchmark
+```
+
+These checks use local execution and retained fixtures, without public RPC calls. HTTP tests need permission to bind localhost ports. The benchmark writes an ignored local report; it is fixture interpretation, not a new live accuracy measurement. Commands named `check:live`, `compare:providers`, `check:historical`, `check:permissions` and `check:coverage*` are separate, opt-in network runs that write evidence; review their plans before running them.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the code map, configuration and change workflow, and [STATUS.md](STATUS.md) for evidence and current limitations. A project license has not yet been selected; public repository visibility does not grant an open-source license. Third-party files retain their own notices.
+
+## Development status and history
+
+This checkout includes unreleased development. References below to an installed application describe the maintained local release, not an installation on a contributor's machine. Version-specific paragraphs retain the scope and evidence of their original checkpoints.
+
 Unreleased development adds native HYPE measurements to the HyperEVM current-call API. `nativeBalanceChanges` contains exact per-account balances, explicit omissions and a fee exclusion; failed validation withholds amounts. Native transfers, payable calls and refunds share the existing token context. This is separate from the installed 0.35 app and does not establish universal transaction coverage. See the [native validation plan](research/hype-native-current-v039/PLAN.md).
 
 Unreleased development also adds `POST /api/evm/local-sequence` for two to four local calls from one sender at one selected Ethereum or Sepolia header. Each call starts from the preceding retained result; the first non-success stops later calls. Explicit balance, allowance and position queries run on disposable before/after copies after all originals. This is development functionality, separate from the installed 0.35 app and the public 16-call accuracy sample. See [sequence development evidence](research/local-sequence-v036-work/NOTES.md).
@@ -32,17 +77,9 @@ The long-term objective is to outperform commercial simulation/security provider
 
 ## Run
 
-Requires Node.js 22 or later. Starting the HyperEVM service does not require external runtime packages. Ethereum previews use the optional, isolated pinned dependency under `engines/standard-evm`; install it before running the full main test suite or enabling Ethereum previews. The separate local executor and Arbitrum provider adapter have their own locked dependencies. Install the Arbitrum dependencies for its preview and application controls.
+Follow [Quickstart](#quickstart) for dependency installation, explicit local-runtime preparation and offline checks. Standard Ethereum, independent local execution and Arbitrum have separate optional dependencies; the complete test setup also needs the unmodified fixture runtime.
 
-```sh
-npm ci --prefix engines/standard-evm --ignore-scripts --no-audit --no-fund
-npm ci --prefix engines/arbitrum-evm --ignore-scripts --no-audit --no-fund
-npm test
-npm run benchmark
-npm start
-```
-
-Open http://127.0.0.1:5174/. The existing Dynamic comparison demo remains separate on port 5173.
+Open [Transaction Lab](http://127.0.0.1:5174/). The existing Dynamic comparison demo remains separate on port 5173.
 
 Choose **Sepolia** and its **preview 0.001 test ETH** example for a local execution using current public testnet state. No wallet connection, private key, faucet or signature is needed because no transaction is sent. Its default unpriced profile measures the value transfer without fee debits; explicit fee caps enable the priced profile. Sepolia uses `SEPOLIA_RPC_URL`, defaulting to the public EthPandaOps Sepolia endpoint, independently of `ETHEREUM_RPC_URL`. Proof availability can prevent a preview from completing.
 

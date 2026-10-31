@@ -1,0 +1,49 @@
+name: Offline checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: offline-checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            engines/standard-evm/package-lock.json
+            engines/arbitrum-evm/package-lock.json
+            engines/local-evm/package-lock.json
+            engines/fixture-evm/package-lock.json
+      - name: Install locked dependencies without lifecycle scripts
+        run: |
+          npm ci --ignore-scripts --prefix engines/standard-evm
+          npm ci --ignore-scripts --prefix engines/arbitrum-evm
+          npm ci --ignore-scripts --prefix engines/local-evm
+          npm ci --ignore-scripts --prefix engines/fixture-evm
+      - name: Prepare the local runtime explicitly
+        run: npm run prepare:runtime --prefix engines/local-evm
+      - name: Application checks
+        run: npm test
+      - name: Standard provider engine checks
+        run: npm test --prefix engines/standard-evm
+      - name: Local execution engine checks
+        run: npm run test:local
+      - name: Unmodified fixture engine checks
+        run: npm test --prefix engines/fixture-evm
+      - name: Arbitrum engine checks
+        run: node --test engines/arbitrum-evm/test/*.test.js
+      - name: Saved fixture benchmark
+        run: npm run benchmark
