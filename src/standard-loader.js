@@ -12,7 +12,7 @@ const files = Object.freeze([
   'src/historical-state.js', 'src/lending-balances.js', 'src/lending.js',
   'src/permissions.js', 'src/revert.js',
   'src/standard-loader.js', 'src/standard-rpc.js', 'src/standard-simulation.js',
-  'src/local-loader.js', 'src/local-simulation.js', 'src/proof-rpc.js',
+  'src/local-loader.js', 'src/local-sequence.js', 'src/local-simulation.js', 'src/proof-rpc.js',
   'engines/evm-context.js',
   'engines/local-evm/delegation-runtime-patch.js',
   'src/rpc.js', 'src/state.js', 'src/state-diff.js', 'src/query-validation.js',

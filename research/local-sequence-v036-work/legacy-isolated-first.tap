@@ -1,0 +1,208 @@
+TAP version 13
+# Subtest: real saved proof/code wire replays in an actual fixed worker with exact observed execution and changes
+ok 1 - real saved proof/code wire replays in an actual fixed worker with exact observed execution and changes
+  ---
+  duration_ms: 212.385125
+  type: 'test'
+  ...
+# Subtest: synthetic proven inputs execute real SSTORE/return and native value in the separate worker
+ok 2 - synthetic proven inputs execute real SSTORE/return and native value in the separate worker
+  ---
+  duration_ms: 150.036833
+  type: 'test'
+  ...
+# Subtest: real REVERT rolls back value/storage and retains only the unsigned sender nonce
+ok 3 - real REVERT rolls back value/storage and retains only the unsigned sender nonce
+  ---
+  duration_ms: 140.729917
+  type: 'test'
+  ...
+# Subtest: invalid proof after a local write causes rollback; provider exception details are never copied
+ok 4 - invalid proof after a local write causes rollback; provider exception details are never copied
+  ---
+  duration_ms: 256.780041
+  type: 'test'
+  ...
+# Subtest: parent rejects unbound headers, widened limits and non-call fields before forking or dispatch
+ok 5 - parent rejects unbound headers, widened limits and non-call fields before forking or dispatch
+  ---
+  duration_ms: 1.605375
+  type: 'test'
+  ...
+# Subtest: hard process wall timer kills a nonresponsive actual child independently of cooperative EVM checks
+ok 6 - hard process wall timer kills a nonresponsive actual child independently of cooperative EVM checks
+  ---
+  duration_ms: 102.362459
+  type: 'test'
+  ...
+# Subtest: a child crash is unavailable, not an empty successful execution
+ok 7 - a child crash is unavailable, not an empty successful execution
+  ---
+  duration_ms: 14.186042
+  type: 'test'
+  ...
+# Subtest: cancellation aborts and drains cooperative parent reads before returning
+ok 8 - cancellation aborts and drains cooperative parent reads before returning
+  ---
+  duration_ms: 158.662542
+  type: 'test'
+  ...
+# Subtest: uncooperative late adapter replies cannot restore success or mutate sealed failure evidence
+ok 9 - uncooperative late adapter replies cannot restore success or mutate sealed failure evidence
+  ---
+  duration_ms: 170.382459
+  type: 'test'
+  ...
+# Subtest: RPC deadline, response byte limit and output limit withhold incomplete process results
+ok 10 - RPC deadline, response byte limit and output limit withhold incomplete process results
+  ---
+  duration_ms: 398.265666
+  type: 'test'
+  ...
+# Subtest: call and cumulative byte ceilings do not create replacement reads; pre-aborted calls never fork
+ok 11 - call and cumulative byte ceilings do not create replacement reads; pre-aborted calls never fork
+  ---
+  duration_ms: 234.126208
+  type: 'test'
+  ...
+# Subtest: N-1 BLOCKHASH uses the verified source header commitment without another provider read
+ok 12 - N-1 BLOCKHASH uses the verified source header commitment without another provider read
+  ---
+  duration_ms: 177.391709
+  type: 'test'
+  ...
+# Subtest: parent IPC rejects wrong method, block, IDs, concurrent reads and malformed results without extra dispatch
+ok 13 - parent IPC rejects wrong method, block, IDs, concurrent reads and malformed results without extra dispatch
+  ---
+  duration_ms: 5.606792
+  type: 'test'
+  ...
+# Subtest: diagnostic output is discarded, bounded, and never copied into a result
+ok 14 - diagnostic output is discarded, bounded, and never copied into a result
+  ---
+  duration_ms: 0.981792
+  type: 'test'
+  ...
+# Subtest: actual child preserves access-list occurrence gas and declared blob context without new input kinds
+ok 15 - actual child preserves access-list occurrence gas and declared blob context without new input kinds
+  ---
+  duration_ms: 133.277417
+  type: 'test'
+  ...
+# Subtest: parent rejects actual-child substitutions of optional context, intrinsic gas and gas accounting
+ok 16 - parent rejects actual-child substitutions of optional context, intrinsic gas and gas accounting
+  ---
+  duration_ms: 740.167542
+  type: 'test'
+  ...
+# Subtest: actual child executes non-blob BLOBHASH from proof-only inputs with no blob metadata or extra RPC kinds
+ok 17 - actual child executes non-blob BLOBHASH from proof-only inputs with no blob metadata or extra RPC kinds
+  ---
+  duration_ms: 121.681083
+  type: 'test'
+  ...
+# Subtest: actual isolated worker retains authenticated CREATE code, storage and balances
+ok 18 - actual isolated worker retains authenticated CREATE code, storage and balances
+  ---
+  duration_ms: 153.909167
+  type: 'test'
+  ...
+# Subtest: actual isolated worker retains authenticated CREATE2 code, storage and balances
+ok 19 - actual isolated worker retains authenticated CREATE2 code, storage and balances
+  ---
+  duration_ms: 148.716042
+  type: 'test'
+  ...
+# Subtest: actual isolated worker retains only the sender nonce after creation then root revert
+ok 20 - actual isolated worker retains only the sender nonce after creation then root revert
+  ---
+  duration_ms: 142.37775
+  type: 'test'
+  ...
+# Subtest: disposable preview queries preserve original deployments and do not invent an absent pre-deployment balance
+ok 21 - disposable preview queries preserve original deployments and do not invent an absent pre-deployment balance
+  ---
+  duration_ms: 148.355583
+  type: 'test'
+  ...
+# Subtest: parent rejects substituted code, initial values, creation ancestry and missing deployment rows
+ok 22 - parent rejects substituted code, initial values, creation ancestry and missing deployment rows
+  ---
+  duration_ms: 940.3425
+  type: 'test'
+  ...
+# Subtest: actual isolated child executes original Aave once then returns three proof-backed before/after pairs
+ok 23 - actual isolated child executes original Aave once then returns three proof-backed before/after pairs
+  ---
+  duration_ms: 380.74025
+  type: 'test'
+  ...
+# Subtest: actual child handles eight Morpho queries with 229 required proof/code calls and exact account identities
+ok 24 - actual child handles eight Morpho queries with 229 required proof/code calls and exact account identities
+  ---
+  duration_ms: 1160.919125
+  type: 'test'
+  ...
+# Subtest: actual child preserves a partial preview when an explicitly missing proof poisons later queries
+ok 25 - actual child preserves a partial preview when an explicitly missing proof poisons later queries
+  ---
+  duration_ms: 273.841833
+  type: 'test'
+  ...
+# Subtest: parent rejects bad queries and unbound inputs before fork or any provider dispatch
+ok 26 - parent rejects bad queries and unbound inputs before fork or any provider dispatch
+  ---
+  duration_ms: 1.685833
+  type: 'test'
+  ...
+# Subtest: hard deadline kills an actual stopped child and withholds the entire preview
+ok 27 - hard deadline kills an actual stopped child and withholds the entire preview
+  ---
+  duration_ms: 102.181125
+  type: 'test'
+  ...
+# Subtest: cancellation aborts and drains the actual child proof read before returning no preview
+ok 28 - cancellation aborts and drains the actual child proof read before returning no preview
+  ---
+  duration_ms: 156.987667
+  type: 'test'
+  ...
+# Subtest: late uncooperative read cannot revive measurements or mutate sealed unavailable preview evidence
+ok 29 - late uncooperative read cannot revive measurements or mutate sealed unavailable preview evidence
+  ---
+  duration_ms: 181.287
+  type: 'test'
+  ...
+# Subtest: actual child IPC mutations cannot substitute query identities, amounts, return words or original evidence
+ok 30 - actual child IPC mutations cannot substitute query identities, amounts, return words or original evidence
+  ---
+  duration_ms: 1947.315042
+  type: 'test'
+  ...
+# Subtest: synthetic fake child cannot invent a complete preview without parent proof evidence
+ok 31 - synthetic fake child cannot invent a complete preview without parent proof evidence
+  ---
+  duration_ms: 0.850042
+  type: 'test'
+  ...
+# Subtest: a caught recreated-contract subtree makes a neutral after-query available through the real child
+ok 32 - a caught recreated-contract subtree makes a neutral after-query available through the real child
+  ---
+  duration_ms: 181.562917
+  type: 'test'
+  ...
+# Subtest: a successful getter that leaves recreation behind remains an unavailable measurement
+ok 33 - a successful getter that leaves recreation behind remains an unavailable measurement
+  ---
+  duration_ms: 179.384042
+  type: 'test'
+  ...
+1..33
+# tests 33
+# suites 0
+# pass 33
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4383.557917

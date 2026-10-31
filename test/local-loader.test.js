@@ -9,7 +9,7 @@ import os from 'node:os';
 import { LOCAL_RUNTIME_PATCH } from '../engines/local-evm/delegation-runtime-patch.js';
 
 const execute = promisify(execFile), project = fileURLToPath(new URL('../', import.meta.url));
-const runtime = ['ethereum-call.js', 'ethereum-header.js', 'ethereum-preview.js', 'ethereum-profile.js', 'execute.js',
+const runtime = ['ethereum-call.js', 'ethereum-header.js', 'ethereum-preview.js', 'ethereum-sequence.js', 'ethereum-profile.js', 'execute.js',
   'isolated-call.js', 'isolated-protocol.js', 'isolated-worker.js', 'preview-mutations.js', 'preview-queries.js',
   'proof-state.js', 'rpc-state-inputs.js', 'verified-state-proof.js'];
 const dep = 'engines/local-evm/node_modules/example';
@@ -33,6 +33,15 @@ async function fixture(t, { escaped = false, importDrift = false } = {}) {
       return {status:'complete',execution:{status:'success'},measurements:[{values:['7']}],attempt:{preview:{values:['7']}}};
     }
     export function withholdLocalSimulation(result,code){return Object.assign(result,{status:'unavailable',error:{code},execution:{status:'unavailable'},measurements:[],attempt:{preview:null}});}
+  `);
+  await put('src/local-sequence.js', `import { simulateLocal } from './local-simulation.js';
+    export const LOCAL_SEQUENCE_CAPABILITIES={available:true,limits:{apiOutputBytes:10000000}};
+    export const validateLocalSequence=x=>x;
+    export async function simulateLocalSequence(input,rpc){
+      await simulateLocal(input,rpc);
+      return {status:'complete',steps:[{measurements:[{values:['9']}]}],attempt:{sequence:{steps:[{values:['9']}]}}};
+    }
+    export function withholdLocalSequence(result,code){return Object.assign(result,{status:'unavailable',error:{code},steps:[],attempt:{sequence:null}});}
   `);
   await put('engines/local-evm/package.json', '{"type":"module","version":"test"}');
   await put('engines/local-evm/package-lock.json', '{"lockfileVersion":3}');
@@ -71,7 +80,7 @@ test('local loader binds full static closure, worker entry, entire dependencies,
     assert.equal(identity.runtime.executableSha256,createHash('sha256').update(await readFile(process.execPath)).digest('hex'));
     console.log(JSON.stringify(identity));
   `);
-  for (const name of ['src/server.js', 'src/rpc.js', 'src/validate.js', 'src/local-loader.js', 'engines/local-evm/delegation-runtime-patch.js', ...runtime.map(name => 'engines/local-evm/' + name), dep + '/LICENSE', dep + '/test/control.js', dep + '/index.js.map']) assert.ok(result.sourceFiles.includes(name), name);
+  for (const name of ['src/server.js', 'src/rpc.js', 'src/validate.js', 'src/local-loader.js', 'src/local-sequence.js', 'engines/local-evm/delegation-runtime-patch.js', ...runtime.map(name => 'engines/local-evm/' + name), dep + '/LICENSE', dep + '/test/control.js', dep + '/index.js.map']) assert.ok(result.sourceFiles.includes(name), name);
   assert.deepEqual(result.inventory.find(row => row.kind === 'symlink'), { path: 'engines/local-evm/node_modules/.bin/example', kind: 'symlink', target: '../example/index.js' });
   assert.deepEqual(result.runtimePatches, [{ id: 'local-evm-runtime-fixes-v2',
     package: LOCAL_RUNTIME_PATCH.package, version: LOCAL_RUNTIME_PATCH.version, patches: LOCAL_RUNTIME_PATCH.patches,
@@ -170,6 +179,7 @@ test('cancellation or exhausted deadline after execution is rechecked after fina
     assert.equal(expired.error.code,'LOCAL_PREVIEW_BUDGET');assert.equal(expired.attempt.preview,null);assert.deepEqual(expired.measurements,[]);
     const stable=await api.simulateLocal({},{usage:()=>({remainingWallMs:10000})});
     assert.equal(stable.status,'complete');assert.ok(stable.timing.totalMs>=0);assert.equal(stable.usage.remainingWallMs,10000);
+    assert.equal(stable.timing.totalMsScope,'Adapter execution and source verification; excludes response serialization, persistence and delivery.');
   `);
 });
 
@@ -182,4 +192,81 @@ test('real installed closure contains all current local runtime and complete pin
   for (const name of runtime) assert.ok(result.files.includes('engines/local-evm/' + name), name);
   for (const name of ['@ethereumjs/evm/package.json', '@ethereumjs/common/package.json', '@ethereumjs/statemanager/package.json', '@ethereumjs/util/package.json', '@noble/hashes/LICENSE']) assert.ok(result.files.includes('engines/local-evm/node_modules/' + name), name);
   assert.match(result.sha, /^[a-f0-9]{64}$/);
+});
+
+
+test('sequence wrapper removes nested amounts after source drift during execution', async t => {
+  const directory = await fixture(t);
+  await run(directory, `
+    const {loadLocalApi}=await import(loaderUrl);const api=await loadLocalApi();
+    const result=await api.simulateLocalSequence({mutate:true},{});
+    assert.equal(result.status,'unavailable');assert.equal(result.error.code,'LOCAL_PREVIEW_SOURCE_CHANGED');
+    assert.deepEqual(result.steps,[]);assert.equal(result.attempt.sequence,null);
+    await assert.rejects(api.simulateLocalSequence({},{}),{code:'LOCAL_PREVIEW_SOURCE_CHANGED'});
+  `);
+});
+
+test('sequence wrapper checks cancellation and total deadline after final source hashing', async t => {
+  const directory = await fixture(t);
+  await run(directory, `
+    const {loadLocalApi}=await import(loaderUrl);const api=await loadLocalApi();
+    const controller=new AbortController();
+    const cancelled=await api.simulateLocalSequence({cancel:true},{controller,usage:()=>({remainingWallMs:10000})},{signal:controller.signal});
+    assert.equal(cancelled.error.code,'LOCAL_PREVIEW_CANCELLED');assert.equal(cancelled.attempt.sequence,null);assert.deepEqual(cancelled.steps,[]);
+    const expired=await api.simulateLocalSequence({},{usage:()=>({remainingWallMs:0})});
+    assert.equal(expired.error.code,'LOCAL_PREVIEW_BUDGET');assert.equal(expired.attempt.sequence,null);assert.deepEqual(expired.steps,[]);
+    const stable=await api.simulateLocalSequence({},{usage:()=>({remainingWallMs:10000})});
+    assert.equal(stable.status,'complete');assert.ok(stable.timing.totalMs>=0);assert.equal(stable.usage.remainingWallMs,10000);
+    assert.equal(stable.timing.totalMsScope,'Adapter execution and source verification; excludes response serialization, persistence and delivery.');
+    assert.deepEqual(stable.steps[0].measurements[0].values,['9']);assert.deepEqual(stable.implementation,api.implementation);
+  `);
+});
+
+for (const method of ['simulateLocal', 'simulateLocalSequence']) {
+  for (const boundary of ['deadline', 'cancellation']) {
+    test(`${method} withholds every nested amount when ${boundary} crosses during retained response serialization`, async t => {
+      const directory = await fixture(t);
+      await run(directory, `
+        const {loadLocalApi}=await import(loaderUrl);const api=await loadLocalApi();
+        const controller=new AbortController(),events=[];let remainingWallMs=10000,serializations=0;
+        const stringify=JSON.stringify;
+        JSON.stringify=function(value,...args){
+          const serialized=stringify.call(this,value,...args);
+          // Installed only after loading and identity hashing. Change the fake
+          // budget/signal only after the complete retained response, including
+          // its identity and nested amounts, has actually been serialized.
+          if(value?.implementation===api.implementation){
+            serializations++;events.push('serialized');
+            const retained=JSON.parse(serialized);assert.equal(retained.status,'complete');
+            assert.deepEqual(retained.implementation,api.implementation);
+            assert.ok(serialized.includes('"values"'));assert.equal(remainingWallMs,10000);assert.equal(controller.signal.aborted,false);
+            ${boundary === 'deadline' ? 'remainingWallMs=0;' : 'controller.abort();'}
+          }
+          return serialized;
+        };
+        let result;
+        try{
+          result=await api.${method}({},{usage:()=>{events.push('usage:'+remainingWallMs);return{remainingWallMs};}},{signal:controller.signal});
+        }finally{JSON.stringify=stringify;}
+        assert.equal(serializations,1);
+        assert.deepEqual(events,['usage:10000','serialized','usage:${boundary === 'deadline' ? '0' : '10000'}']);
+        assert.equal(result.status,'unavailable');assert.equal(result.error.code,'${boundary === 'deadline' ? 'LOCAL_PREVIEW_BUDGET' : 'LOCAL_PREVIEW_CANCELLED'}');
+        assert.equal(result.implementation,api.implementation);assert.equal(stringify(result).includes('"values"'),false);
+        ${method === 'simulateLocal' ? "assert.equal(result.execution.status,'unavailable');assert.deepEqual(result.measurements,[]);assert.equal(result.attempt.preview,null);" : "assert.deepEqual(result.steps,[]);assert.equal(result.attempt.sequence,null);"}
+      `);
+    });
+  }
+}
+
+test('final request recheck preserves the complete retained output cap for both wrappers', async t => {
+  const directory = await fixture(t);
+  await run(directory, `
+    const {loadLocalApi}=await import(loaderUrl);const api=await loadLocalApi();
+    for(const [method,capability] of [['simulateLocal','LOCAL_CAPABILITIES'],['simulateLocalSequence','LOCAL_SEQUENCE_CAPABILITIES']]){
+      api[capability].limits.apiOutputBytes=1;
+      const result=await api[method]({},{usage:()=>({remainingWallMs:10000})});
+      assert.equal(result.status,'unavailable');assert.equal(result.error.code,'LOCAL_PREVIEW_OUTPUT');
+      assert.equal(result.attempt,null);assert.equal(JSON.stringify(result).includes('"values"'),false);
+    }
+  `);
 });

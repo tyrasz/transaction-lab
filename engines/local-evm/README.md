@@ -80,6 +80,35 @@ The offline recorded tests reuse the independently captured lending proofs, neve
 
 The internal `executeEthereumPreview` core is also exported for tests, with flat tighten-only `ETHEREUM_PREVIEW_LIMITS`. It has a cooperative deadline and explicitly reports no process isolation. Use the isolated host for process termination and provide a transport that bounds and captures actual wire bytes. The independent API and browser mode expose this preview alongside the provider path. Owned native-asset summaries, automatic query discovery, sequential call previews, security verdicts and a complete economic inventory are not added by this module. The explicit 0.24 profile below adds fee settlement for the original call.
 
+## Ordered local sequences — unreleased
+
+`executeIsolatedEthereumSequence({requests,header,chainId?,rpc,queries,limits?,signal?})`
+executes two to four originals from one normalized sender at one verified header.
+It uses one child and one proof collector, carries the retained state between
+originals, and stops originals at the first non-success. A completed EVM failure
+retains earlier steps and the current fork-selected nonce, authorization and
+fee effects. A host/proof failure must restore the preceding overlay. The
+corresponding API is `POST /api/evm/local-sequence`.
+
+Each original keeps `startingChanges` and `changes` relative to the original
+immutable proofs. The parent requires each starting overlay to equal the
+preceding accepted result. It validates current nonce/authorization/fee context
+without replacing original proof facts, and retains account deletion and whole
+storage-reset provenance across later funding, creation and writes.
+
+All originals finish before queries run. The one shared list of explicit queries
+is measured on disposable copies of each completed original's before/after
+states. Query writes never feed another call or query. Execution, proof, read,
+time, return-byte and trace-byte ceilings are shared across the whole sequence.
+The parent checks cumulative usage and refuses completed outputs beyond those
+ceilings; an over-limit failure counter can remain only as incomplete evidence.
+
+The internal `executeEthereumSequence` has cooperative deadlines and no process
+boundary. Use the isolated entry point for forced termination. Neither entry
+point establishes full signed-transaction admission, consensus, complete effects
+or general accuracy. Synthetic token/vault and lifecycle regression tests are
+separate from independent reference comparisons and public-chain observations.
+
 ## Internal creation result checks
 
 The isolated parent independently reverifies referenced account/storage proofs and code hashes against its joined transport replies, reconstructs the claimed immutable facts, and validates every returned overlay against those facts. Every completed call increments the sender nonce once, then adds accepted self-authorizations and committed creation attempts. Root reverts/failures retain authorization preparation and the outer increment, plus any authenticated RIPEMD160 empty-account cleanup. A retained deployment must have a successful CREATE/CREATE2 frame with no reverted ancestor, a matching runtime-code output, a zero initial nonce and proven empty code. Version 0.35 also admits authenticated old storage: creation clears its entire namespace before initcode, preserves balance, and rolls that clear back with constructor or ancestor failure. Retained creation binds its reset to the original storage root and actual creation observations. Every surviving committed creation must remain represented in final changes. Finalized deletion is an explicit exception, bound to committed SELFDESTRUCT evidence and the header-selected fork; Cancun-or-later additionally requires creation within the same invocation. Disposable getter checks preserve all original creation/code/storage and finalized-deletion rows and allow only their expected sender-nonce increment. These are consistency checks over fixed-worker output, not a second execution engine or a recomputed poststate-root proof.

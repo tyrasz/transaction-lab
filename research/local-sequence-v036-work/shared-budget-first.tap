@@ -1,0 +1,71 @@
+TAP version 13
+# Subtest: IPC rejects coherent shared steps overflow although each original count fits its ceiling
+ok 1 - IPC rejects coherent shared steps overflow although each original count fits its ceiling
+  ---
+  duration_ms: 155.433875
+  type: 'test'
+  ...
+# Subtest: IPC rejects coherent shared frames overflow although each original count fits its ceiling
+ok 2 - IPC rejects coherent shared frames overflow although each original count fits its ceiling
+  ---
+  duration_ms: 144.031333
+  type: 'test'
+  ...
+# Subtest: IPC rejects coherent shared logs overflow although each original count fits its ceiling
+ok 3 - IPC rejects coherent shared logs overflow although each original count fits its ceiling
+  ---
+  duration_ms: 150.00925
+  type: 'test'
+  ...
+# Subtest: IPC rejects coherent shared state-read overflow at a completed original
+ok 4 - IPC rejects coherent shared state-read overflow at a completed original
+  ---
+  duration_ms: 145.659
+  type: 'test'
+  ...
+# Subtest: IPC rejects coherent shared state-read overflow reached by a measured disposable CALL
+ok 5 - IPC rejects coherent shared state-read overflow reached by a measured disposable CALL
+  ---
+  duration_ms: 145.317625
+  type: 'test'
+  ...
+# Subtest: IPC rejects aggregate actual return/trace bytes above the admitted shared cap
+ok 6 - IPC rejects aggregate actual return/trace bytes above the admitted shared cap
+  ---
+  duration_ms: 396.905125
+  type: 'test'
+  ...
+# Subtest: real budget-failure sentinels remain available as incomplete evidence and preserve the accepted prefix
+not ok 7 - real budget-failure sentinels remain available as incomplete evidence and preserve the accepted prefix
+  ---
+  duration_ms: 383.90925
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/isolated-sequence.test.js:300:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    + actual - expected
+    
+    + 'unchanged'
+    - 'rolled_back'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'rolled_back'
+  actual: 'unchanged'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/engines/local-evm/test/isolated-sequence.test.js:310:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 6
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1702.531167

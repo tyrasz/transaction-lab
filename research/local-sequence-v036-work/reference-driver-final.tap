@@ -1,0 +1,104 @@
+TAP version 13
+# {"index":0,"id":"case_0","kind":"product","status":"observed","prepareOnly":false}
+# {"index":1,"id":"case_1","kind":"product","status":"observed","prepareOnly":false}
+# {"index":2,"id":"case_2","kind":"product","status":"observed","prepareOnly":false}
+# {"index":3,"id":"case_3","kind":"product","status":"observed","prepareOnly":false}
+# {"index":0,"id":"case_0","kind":"eels","status":"observed","prepareOnly":false}
+# {"index":1,"id":"case_1","kind":"eels","status":"observed","prepareOnly":false}
+# {"index":2,"id":"case_2","kind":"eels","status":"observed","prepareOnly":false}
+# {"index":3,"id":"case_3","kind":"eels","status":"observed","prepareOnly":false}
+# {"index":0,"id":"case_0","kind":"product","status":"observed","prepareOnly":false}
+# {"index":0,"id":"case_0","kind":"product","status":"observed","prepareOnly":false}
+# Subtest: fixed arguments use CPU wrapper, manifest and explicit preparation separation
+ok 1 - fixed arguments use CPU wrapper, manifest and explicit preparation separation
+  ---
+  duration_ms: 4.933166
+  type: 'test'
+  ...
+# Subtest: only archived driver can dispatch, with explicit flag and one capture location
+ok 2 - only archived driver can dispatch, with explicit flag and one capture location
+  ---
+  duration_ms: 0.876
+  type: 'test'
+  ...
+# Subtest: record validation binds original output bytes and invocation identity
+ok 3 - record validation binds original output bytes and invocation identity
+  ---
+  duration_ms: 1.706125
+  type: 'test'
+  ...
+# Subtest: closed outer worker is insufficient without actual product child closure and broker drain
+ok 4 - closed outer worker is insufficient without actual product child closure and broker drain
+  ---
+  duration_ms: 0.503042
+  type: 'test'
+  ...
+# Subtest: strict wall, CPU, output, group cleanup and direct closure failures withhold packet usability
+ok 5 - strict wall, CPU, output, group cleanup and direct closure failures withhold packet usability
+  ---
+  duration_ms: 0.239958
+  type: 'test'
+  ...
+# Subtest: ledger rejects coherent replacement and membership drift before sealing
+ok 6 - ledger rejects coherent replacement and membership drift before sealing
+  ---
+  duration_ms: 8.034917
+  type: 'test'
+  ...
+# Subtest: preparation gate rederives all eight processes and binds the original-write ledger
+ok 7 - preparation gate rederives all eight processes and binds the original-write ledger
+  ---
+  duration_ms: 21.140875
+  type: 'test'
+  ...
+# Subtest: all four product records are sealed before reference dispatch; fixed eight process rows survive
+ok 8 - all four product records are sealed before reference dispatch; fixed eight process rows survive
+  ---
+  duration_ms: 7.157833
+  type: 'test'
+  ...
+# Subtest: first unbounded attempt stops later targets and retains undispatched rows
+ok 9 - first unbounded attempt stops later targets and retains undispatched rows
+  ---
+  duration_ms: 0.365583
+  type: 'test'
+  ...
+# Subtest: dual-clock reversals and source or original-write drift stop dispatch
+ok 10 - dual-clock reversals and source or original-write drift stop dispatch
+  ---
+  duration_ms: 1.725541
+  type: 'test'
+  ...
+# Subtest: actual inert prepared worker closes and its raw output is sealed
+ok 11 - actual inert prepared worker closes and its raw output is sealed
+  ---
+  duration_ms: 54.547917
+  type: 'test'
+  ...
+# Subtest: actual oversized inert output retains capped prefix and terminates the group
+ok 12 - actual oversized inert output retains capped prefix and terminates the group
+  ---
+  duration_ms: 54.91225
+  type: 'test'
+  ...
+# Subtest: actual stalled inert worker expires and is closed without a later target
+ok 13 - actual stalled inert worker expires and is closed without a later target
+  ---
+  duration_ms: 158.04075
+  type: 'test'
+  ...
+# Subtest: preparation source returns before executor import, reference environment and apply_body
+ok 14 - preparation source returns before executor import, reference environment and apply_body
+  ---
+  duration_ms: 0.330583
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 378.039708

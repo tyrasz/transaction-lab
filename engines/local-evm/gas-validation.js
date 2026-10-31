@@ -36,7 +36,7 @@ function quantities(value, keys, signed = [], boolean = []) {
 
 /** Bind fork-selected gas accounting to the admitted total gas and retained
  * execution fields. Old forks retain their existing scalar output shape. */
-export function deriveVerifiedGas({ request, header, inputs, output, chainId = 1 }) {
+export function deriveVerifiedGas({ request, header, inputs, output, chainId = 1, startingChanges }) {
   const common = ethereumCommon(header, chainId), amsterdam = common.isActivatedEIP(8037);
   const complete = ['success', 'reverted', 'failed'].includes(output?.execution?.status);
   if (!complete) {
@@ -54,7 +54,7 @@ export function deriveVerifiedGas({ request, header, inputs, output, chainId = 1
     need(isDeepStrictEqual(output.gasAccounting, strings(settled)));
     return settled;
   }
-  const authorization = deriveAuthorizationPreparation({ request, header, inputs, common });
+  const authorization = deriveAuthorizationPreparation({ request, header, inputs, common, startingChanges });
   need(isDeepStrictEqual(output.authorizationProcessing, authorization?.processing));
   const accounting = record(output.stateGasAccounting, ['budget', 'counters', 'settled']);
   const budget = quantities(accounting.budget, BUDGET);

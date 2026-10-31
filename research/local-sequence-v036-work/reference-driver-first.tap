@@ -1,0 +1,119 @@
+TAP version 13
+# {"index":0,"id":"case_0","kind":"product","status":"observed","prepareOnly":false}
+# {"index":1,"id":"case_1","kind":"product","status":"observed","prepareOnly":false}
+# {"index":2,"id":"case_2","kind":"product","status":"observed","prepareOnly":false}
+# {"index":3,"id":"case_3","kind":"product","status":"observed","prepareOnly":false}
+# {"index":0,"id":"case_0","kind":"eels","status":"observed","prepareOnly":false}
+# {"index":1,"id":"case_1","kind":"eels","status":"observed","prepareOnly":false}
+# {"index":2,"id":"case_2","kind":"eels","status":"observed","prepareOnly":false}
+# {"index":3,"id":"case_3","kind":"eels","status":"observed","prepareOnly":false}
+# {"index":0,"id":"case_0","kind":"product","status":"observed","prepareOnly":false}
+# {"index":0,"id":"case_0","kind":"product","status":"observed","prepareOnly":false}
+# Subtest: fixed arguments use CPU wrapper, manifest and explicit preparation separation
+ok 1 - fixed arguments use CPU wrapper, manifest and explicit preparation separation
+  ---
+  duration_ms: 4.582958
+  type: 'test'
+  ...
+# Subtest: only archived driver can dispatch, with explicit flag and one capture location
+ok 2 - only archived driver can dispatch, with explicit flag and one capture location
+  ---
+  duration_ms: 0.557208
+  type: 'test'
+  ...
+# Subtest: record validation binds original output bytes and invocation identity
+ok 3 - record validation binds original output bytes and invocation identity
+  ---
+  duration_ms: 2.056666
+  type: 'test'
+  ...
+# Subtest: closed outer worker is insufficient without actual product child closure and broker drain
+ok 4 - closed outer worker is insufficient without actual product child closure and broker drain
+  ---
+  duration_ms: 0.468375
+  type: 'test'
+  ...
+# Subtest: strict wall, CPU, output, group cleanup and direct closure failures withhold packet usability
+ok 5 - strict wall, CPU, output, group cleanup and direct closure failures withhold packet usability
+  ---
+  duration_ms: 0.214
+  type: 'test'
+  ...
+# Subtest: ledger rejects coherent replacement and membership drift before sealing
+ok 6 - ledger rejects coherent replacement and membership drift before sealing
+  ---
+  duration_ms: 8.289292
+  type: 'test'
+  ...
+# Subtest: all four product records are sealed before reference dispatch; fixed eight process rows survive
+ok 7 - all four product records are sealed before reference dispatch; fixed eight process rows survive
+  ---
+  duration_ms: 8.100209
+  type: 'test'
+  ...
+# Subtest: first unbounded attempt stops later targets and retains undispatched rows
+ok 8 - first unbounded attempt stops later targets and retains undispatched rows
+  ---
+  duration_ms: 0.322125
+  type: 'test'
+  ...
+# Subtest: dual-clock reversals and source or original-write drift stop dispatch
+ok 9 - dual-clock reversals and source or original-write drift stop dispatch
+  ---
+  duration_ms: 1.688958
+  type: 'test'
+  ...
+# Subtest: actual inert prepared worker closes and its raw output is sealed
+ok 10 - actual inert prepared worker closes and its raw output is sealed
+  ---
+  duration_ms: 72.822083
+  type: 'test'
+  ...
+# Subtest: actual oversized inert output retains capped prefix and terminates the group
+ok 11 - actual oversized inert output retains capped prefix and terminates the group
+  ---
+  duration_ms: 54.354375
+  type: 'test'
+  ...
+# Subtest: actual stalled inert worker expires and is closed without a later target
+ok 12 - actual stalled inert worker expires and is closed without a later target
+  ---
+  duration_ms: 157.196458
+  type: 'test'
+  ...
+# Subtest: preparation source returns before executor import, reference environment and apply_body
+not ok 13 - preparation source returns before executor import, reference environment and apply_body
+  ---
+  duration_ms: 1.343292
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/local-sequence-v036-reference/run.test.mjs:129:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert(prepare>0&&prepare<e.indexOf('tracked = state_tracker.BlockState'))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/local-sequence-v036-reference/run.test.mjs:132:53)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 12
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 377.164833

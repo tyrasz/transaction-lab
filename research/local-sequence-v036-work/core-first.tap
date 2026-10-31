@@ -1,0 +1,64 @@
+TAP version 13
+# Subtest: osaka: approve → deposit → transfer → withdraw carries actual token and share storage
+ok 1 - osaka: approve → deposit → transfer → withdraw carries actual token and share storage
+  ---
+  duration_ms: 58.390375
+  type: 'test'
+  ...
+# Subtest: amsterdam: approve → deposit → transfer → withdraw carries actual token and share storage
+ok 2 - amsterdam: approve → deposit → transfer → withdraw carries actual token and share storage
+  ---
+  duration_ms: 41.466209
+  type: 'test'
+  ...
+# Subtest: osaka: priced originals retain cumulative sender nonce, charge, and coinbase tip
+ok 3 - osaka: priced originals retain cumulative sender nonce, charge, and coinbase tip
+  ---
+  duration_ms: 8.177
+  type: 'test'
+  ...
+# Subtest: amsterdam: priced originals retain cumulative sender nonce, charge, and coinbase tip
+ok 4 - amsterdam: priced originals retain cumulative sender nonce, charge, and coinbase tip
+  ---
+  duration_ms: 10.008792
+  type: 'test'
+  ...
+# Subtest: depositThenRevert: completed failure rolls back token/share writes, retains approval and fees, then stops
+ok 5 - depositThenRevert: completed failure rolls back token/share writes, retains approval and fees, then stops
+  ---
+  duration_ms: 17.081916
+  type: 'test'
+  ...
+# Subtest: depositThenOutOfGas: completed failure rolls back token/share writes, retains approval and fees, then stops
+ok 6 - depositThenOutOfGas: completed failure rolls back token/share writes, retains approval and fees, then stops
+  ---
+  duration_ms: 90.070917
+  type: 'test'
+  ...
+# Subtest: every original finishes before query-only input is demanded, including a failing query proof
+ok 7 - every original finishes before query-only input is demanded, including a failing query proof
+  ---
+  duration_ms: 7.745792
+  type: 'test'
+  ...
+# Subtest: root-return budget is shared across originals while native probes do not spend execution budget
+ok 8 - root-return budget is shared across originals while native probes do not spend execution budget
+  ---
+  duration_ms: 2.825458
+  type: 'test'
+  ...
+# Subtest: mutating balanceOf-shaped probes are withheld and independent queries retain each original snapshot
+ok 9 - mutating balanceOf-shaped probes are withheld and independent queries retain each original snapshot
+  ---
+  duration_ms: 14.61675
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 434.792208

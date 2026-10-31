@@ -1,0 +1,454 @@
+TAP version 13
+# Subtest: Amsterdam parent binds successful ordered decisions, preparation costs, nonce and code
+ok 1 - Amsterdam parent binds successful ordered decisions, preparation costs, nonce and code
+  ---
+  duration_ms: 4079.077084
+  type: 'test'
+  ...
+# Subtest: authorization preparation OOG cannot acquire an invented entered frame, dropped phase or retained write
+ok 2 - authorization preparation OOG cannot acquire an invented entered frame, dropped phase or retained write
+  ---
+  duration_ms: 3060.596916
+  type: 'test'
+  ...
+# Subtest: recipient preparation OOG binds the separate authorization and entered-root gas debits
+ok 3 - recipient preparation OOG binds the separate authorization and entered-root gas debits
+  ---
+  duration_ms: 2757.310875
+  type: 'test'
+  ...
+# Subtest: entered message REVERT retains authorization state and its nonrefundable state-gas charge
+ok 4 - entered message REVERT retains authorization state and its nonrefundable state-gas charge
+  ---
+  duration_ms: 2060.757792
+  type: 'test'
+  ...
+# Subtest: self-authorization creator chronology cannot absorb an extra prepared or committed sender nonce
+ok 5 - self-authorization creator chronology cannot absorb an extra prepared or committed sender nonce
+  ---
+  duration_ms: 1429.774417
+  type: 'test'
+  ...
+# Subtest: absent sender self-authorization retains its materialization basis only after preparation completes
+ok 6 - absent sender self-authorization retains its materialization basis only after preparation completes
+  ---
+  duration_ms: 1029.4885
+  type: 'test'
+  ...
+# Subtest: Amsterdam clearing binds created/selfdestruct intersection and preserves absent or prefunded native balances
+ok 7 - Amsterdam clearing binds created/selfdestruct intersection and preserves absent or prefunded native balances
+  ---
+  duration_ms: 184.530833
+  type: 'test'
+  ...
+# Subtest: zero residual clearing has exact whole-account removal only for an originally existing target
+ok 8 - zero residual clearing has exact whole-account removal only for an originally existing target
+  ---
+  duration_ms: 80.269584
+  type: 'test'
+  ...
+# Subtest: SELFDESTRUCT followed by a later refill preserves only the reconstructed residual balance
+ok 9 - SELFDESTRUCT followed by a later refill preserves only the reconstructed residual balance
+  ---
+  duration_ms: 77.860084
+  type: 'test'
+  ...
+# Subtest: preexisting self-beneficiary has no burn or clearing and cannot borrow a creation marker
+ok 10 - preexisting self-beneficiary has no burn or clearing and cannot borrow a creation marker
+  ---
+  duration_ms: 4.114208
+  type: 'test'
+  ...
+# Subtest: a pending cleared coinbase retains its fee credit after all native transfers and settlement
+ok 11 - a pending cleared coinbase retains its fee credit after all native transfers and settlement
+  ---
+  duration_ms: 69.596458
+  type: 'test'
+  ...
+# Subtest: missing, duplicated, fabricated or old-fork clearing evidence and surviving namespace fields fail closed
+ok 12 - missing, duplicated, fabricated or old-fork clearing evidence and surviving namespace fields fail closed
+  ---
+  duration_ms: 28.623
+  type: 'test'
+  ...
+# Subtest: root revert retains observed SELFDESTRUCT but cannot fabricate committed clearing
+ok 13 - root revert retains observed SELFDESTRUCT but cannot fabricate committed clearing
+  ---
+  duration_ms: 28.973041
+  type: 'test'
+  ...
+# Subtest: balance-only and zero-empty clearing rows carry through neutral query copies without new lifecycle claims
+ok 14 - balance-only and zero-empty clearing rows carry through neutral query copies without new lifecycle claims
+  ---
+  duration_ms: 68.747125
+  type: 'test'
+  ...
+# Subtest: reset namespace shapes preserve immutable roots and remain neutral only when carried unchanged
+ok 15 - reset namespace shapes preserve immutable roots and remain neutral only when carried unchanged
+  ---
+  duration_ms: 0.402958
+  type: 'test'
+  ...
+# Subtest: actual isolated parent admits clearing and native queries observe preserved balance with no query mutation
+ok 16 - actual isolated parent admits clearing and native queries observe preserved balance with no query mutation
+  ---
+  duration_ms: 1057.564625
+  type: 'test'
+  ...
+# Subtest: an original creation is not newly created by a disposable query, even when it selfdestructs there
+ok 17 - an original creation is not newly created by a disposable query, even when it selfdestructs there
+  ---
+  duration_ms: 483.370167
+  type: 'test'
+  ...
+# Subtest: actual worker reply cannot erase the clearing or replace its residual with a mutually forged balance
+ok 18 - actual worker reply cannot erase the clearing or replace its residual with a mutually forged balance
+  ---
+  duration_ms: 942.0595
+  type: 'test'
+  ...
+# Subtest: inherited static mode rejects the reproduced delegated SELFDESTRUCT clearing forgery in an actual worker reply
+ok 19 - inherited static mode rejects the reproduced delegated SELFDESTRUCT clearing forgery in an actual worker reply
+  ---
+  duration_ms: 464.491709
+  type: 'test'
+  ...
+# Subtest: static ancestry cannot acquire entered CREATE/CREATE2 or a value-bearing CALL by relabeling a normal ancestor
+ok 20 - static ancestry cannot acquire entered CREATE/CREATE2 or a value-bearing CALL by relabeling a normal ancestor
+  ---
+  duration_ms: 23.8965
+  type: 'test'
+  ...
+# Subtest: inherited static mode still permits zero-value CALL and nonzero CALLCODE without balance transfer
+ok 21 - inherited static mode still permits zero-value CALL and nonzero CALLCODE without balance transfer
+  ---
+  duration_ms: 9.432292
+  type: 'test'
+  ...
+# Subtest: canonical Amsterdam arithmetic preserves signed reservoir refills and independently rejects impossible final counters
+ok 22 - canonical Amsterdam arithmetic preserves signed reservoir refills and independently rejects impossible final counters
+  ---
+  duration_ms: 26.362417
+  type: 'test'
+  ...
+# Subtest: accounting rejects noncanonical values, extra keys, hidden fields and hostile objects before coercion
+ok 23 - accounting rejects noncanonical values, extra keys, hidden fields and hostile objects before coercion
+  ---
+  duration_ms: 68.610041
+  type: 'test'
+  ...
+# Subtest: actual Sepolia child binds native transfer, CHAINID, slot number and complete split gas dimensions
+ok 24 - actual Sepolia child binds native transfer, CHAINID, slot number and complete split gas dimensions
+  ---
+  duration_ms: 1585.356542
+  type: 'test'
+  ...
+# Subtest: actual Amsterdam storage allocation/refund and revert retain their separately recomputed gas and fee effects
+ok 25 - actual Amsterdam storage allocation/refund and revert retain their separately recomputed gas and fee effects
+  ---
+  duration_ms: 1913.100458
+  type: 'test'
+  ...
+# Subtest: actual cross-frame storage refill retains a negative reservoir delta without inventing negative final state usage
+ok 26 - actual cross-frame storage refill retains a negative reservoir delta without inventing negative final state usage
+  ---
+  duration_ms: 438.178917
+  type: 'test'
+  ...
+# Subtest: parent rejects changed budgets, counter bindings, settlement, trace accounting and priced charges from actual children
+ok 27 - parent rejects changed budgets, counter bindings, settlement, trace accounting and priced charges from actual children
+  ---
+  duration_ms: 6295.648333
+  type: 'test'
+  ...
+# Subtest: Sepolia native and disposable CALL queries retain chain identity and fresh unpriced Amsterdam gas accounting
+ok 28 - Sepolia native and disposable CALL queries retain chain identity and fresh unpriced Amsterdam gas accounting
+  ---
+  duration_ms: 450.732458
+  type: 'test'
+  ...
+# Subtest: parent independently derives every ordered authority decision and refund
+ok 29 - parent independently derives every ordered authority decision and refund
+  ---
+  duration_ms: 4057.754916
+  type: 'test'
+  ...
+# Subtest: parent requires exact retained code, nonce and materialization for authenticated absent authorities
+ok 30 - parent requires exact retained code, nonce and materialization for authenticated absent authorities
+  ---
+  duration_ms: 2487.574625
+  type: 'test'
+  ...
+# Subtest: message REVERT cannot discard preceding authorization state or retain message writes
+ok 31 - message REVERT cannot discard preceding authorization state or retain message writes
+  ---
+  duration_ms: 1649.36025
+  type: 'test'
+  ...
+# Subtest: parent checks repeated self-authorization before committed sender creation attempts
+ok 32 - parent checks repeated self-authorization before committed sender creation attempts
+  ---
+  duration_ms: 2533.481917
+  type: 'test'
+  ...
+# Subtest: skipped signatures cannot authorize extra code or nonce changes
+ok 33 - skipped signatures cannot authorize extra code or nonce changes
+  ---
+  duration_ms: 1387.506
+  type: 'test'
+  ...
+# Subtest: before/after query sender semantics use original and prepared code separately
+ok 34 - before/after query sender semantics use original and prepared code separately
+  ---
+  duration_ms: 1675.776584
+  type: 'test'
+  ...
+# Subtest: blob parent binds complete fee accounting, authenticated price and declared hashes
+ok 35 - blob parent binds complete fee accounting, authenticated price and declared hashes
+  ---
+  duration_ms: 5923.258875
+  type: 'test'
+  ...
+# Subtest: blob parent rejects omitted burn and invented beneficiary blob credits, including sender alias
+ok 36 - blob parent rejects omitted burn and invented beneficiary blob credits, including sender alias
+  ---
+  duration_ms: 2397.310584
+  type: 'test'
+  ...
+# Subtest: blob parent validates burn and rollback on REVERT and out of gas
+ok 37 - blob parent validates burn and rollback on REVERT and out of gas
+  ---
+  duration_ms: 2651.362542
+  type: 'test'
+  ...
+# Subtest: blob before/after measurements receive no hashes or charges and retain explicit opcode limitations
+ok 38 - blob before/after measurements receive no hashes or charges and retain explicit opcode limitations
+  ---
+  duration_ms: 808.648375
+  type: 'test'
+  ...
+# Subtest: blob count and cap admission happen before proof I/O
+ok 39 - blob count and cap admission happen before proof I/O
+  ---
+  duration_ms: 7.643542
+  type: 'test'
+  ...
+# Subtest: parent requires exact canonical attempt and target records without invoking accessors
+ok 40 - parent requires exact canonical attempt and target records without invoking accessors
+  ---
+  duration_ms: 178.328916
+  type: 'test'
+  ...
+# Subtest: parent binds attempts to opcode, target derivation, current target state and child result
+ok 41 - parent binds attempts to opcode, target derivation, current target state and child result
+  ---
+  duration_ms: 42.75475
+  type: 'test'
+  ...
+# Subtest: each entered creation has one ledger join and every entered frame has an explicit array
+ok 42 - each entered creation has one ledger join and every entered frame has an explicit array
+  ---
+  duration_ms: 4.629792
+  type: 'test'
+  ...
+# Subtest: reentrant creation must observe intermediate nonce updates at its declared child position
+ok 43 - reentrant creation must observe intermediate nonce updates at its declared child position
+  ---
+  duration_ms: 86.394292
+  type: 'test'
+  ...
+# Subtest: delegated creation inherits its parent value as well as caller and execution address
+ok 44 - delegated creation inherits its parent value as well as caller and execution address
+  ---
+  duration_ms: 29.81175
+  type: 'test'
+  ...
+# Subtest: CALLCODE requires affordable value without transferring it, including an immediately failed child
+ok 45 - CALLCODE requires affordable value without transferring it, including an immediately failed child
+  ---
+  duration_ms: 112.702542
+  type: 'test'
+  ...
+# Subtest: enclosing rollback discards descendant attempts and inherited static cannot acquire them
+ok 46 - enclosing rollback discards descendant attempts and inherited static cannot acquire them
+  ---
+  duration_ms: 23.177167
+  type: 'test'
+  ...
+# Subtest: root construction starts target nonce at one without counting outer sender preparation twice
+ok 47 - root construction starts target nonce at one without counting outer sender preparation twice
+  ---
+  duration_ms: 8.682541
+  type: 'test'
+  ...
+# Subtest: query chronology starts from carried nonce/code state and separately increments its caller
+ok 48 - query chronology starts from carried nonce/code state and separately increments its caller
+  ---
+  duration_ms: 24.240166
+  type: 'test'
+  ...
+# Subtest: actual child target-state forgery is withheld even after recounting trace bytes
+ok 49 - actual child target-state forgery is withheld even after recounting trace bytes
+  ---
+  duration_ms: 662.081292
+  type: 'test'
+  ...
+# Subtest: prepared self-authorization supplies code and nonce once for CREATE2 followed by collision
+ok 50 - prepared self-authorization supplies code and nonce once for CREATE2 followed by collision
+  ---
+  duration_ms: 229.123458
+  type: 'test'
+  ...
+# Subtest: prepared chronology rejects altered nonce/code snapshots and fee-bearing overlays
+ok 51 - prepared chronology rejects altered nonce/code snapshots and fee-bearing overlays
+  ---
+  duration_ms: 0.632
+  type: 'test'
+  ...
+# Subtest: prepared chronology debits fees once before creator affordability checks
+ok 52 - prepared chronology debits fees once before creator affordability checks
+  ---
+  duration_ms: 53.092208
+  type: 'test'
+  ...
+# Subtest: parent independently binds fee amounts, declared profile, actual base fee and effective gas price
+ok 53 - parent independently binds fee amounts, declared profile, actual base fee and effective gas price
+  ---
+  duration_ms: 5390.258916
+  type: 'test'
+  ...
+# Subtest: exact balance ledger rejects omitted fees, missing credits and fabricated unrelated funding
+ok 54 - exact balance ledger rejects omitted fees, missing credits and fabricated unrelated funding
+  ---
+  duration_ms: 1896.901375
+  type: 'test'
+  ...
+# Subtest: reverted priced messages retain exact authorization and fee effects only
+ok 55 - reverted priced messages retain exact authorization and fee effects only
+  ---
+  duration_ms: 1712.549041
+  type: 'test'
+  ...
+# Subtest: priced original queries remain fresh unpriced contexts with neutral query-only nonces
+ok 56 - priced original queries remain fresh unpriced contexts with neutral query-only nonces
+  ---
+  duration_ms: 429.7535
+  type: 'test'
+  ...
+# Subtest: fabricated starting view preserves immutable facts, overlays fields and refuses false before labels
+ok 57 - fabricated starting view preserves immutable facts, overlays fields and refuses false before labels
+  ---
+  duration_ms: 23.969542
+  type: 'test'
+  ...
+# Subtest: fabricated deletion rematerialization carries the original namespace root and clears hidden storage
+ok 58 - fabricated deletion rematerialization carries the original namespace root and clears hidden storage
+  ---
+  duration_ms: 1.26175
+  type: 'test'
+  ...
+# Subtest: fabricated second CALL keeps cumulative nonce and preceding storage/code provenance
+ok 59 - fabricated second CALL keeps cumulative nonce and preceding storage/code provenance
+  ---
+  duration_ms: 2.320292
+  type: 'test'
+  ...
+# Subtest: fabricated failed CALL retains its prefix and only this transaction nonce
+ok 60 - fabricated failed CALL retains its prefix and only this transaction nonce
+  ---
+  duration_ms: 67.979417
+  type: 'test'
+  ...
+# Subtest: fabricated incomplete transaction must leave the accepted prefix unchanged
+ok 61 - fabricated incomplete transaction must leave the accepted prefix unchanged
+  ---
+  duration_ms: 0.360458
+  type: 'test'
+  ...
+# Subtest: fabricated inherited storage reset remains valid when a later CALL changes storage and balance
+ok 62 - fabricated inherited storage reset remains valid when a later CALL changes storage and balance
+  ---
+  duration_ms: 0.7065
+  type: 'test'
+  ...
+# Subtest: fabricated root CREATE derives its address from the current sender nonce
+ok 63 - fabricated root CREATE derives its address from the current sender nonce
+  ---
+  duration_ms: 0.647958
+  type: 'test'
+  ...
+# Subtest: pure authorization prefixes use current nonce/existence and retain cumulative provenance
+ok 64 - pure authorization prefixes use current nonce/existence and retain cumulative provenance
+  ---
+  duration_ms: 57.758584
+  type: 'test'
+  ...
+# Subtest: pure Amsterdam prefixes reset paid-write costs while retaining designation state
+ok 65 - pure Amsterdam prefixes reset paid-write costs while retaining designation state
+  ---
+  duration_ms: 24.211417
+  type: 'test'
+  ...
+# Subtest: pure Amsterdam authorization OOG restores the preceding authority state and keeps this outer nonce
+ok 66 - pure Amsterdam authorization OOG restores the preceding authority state and keeps this outer nonce
+  ---
+  duration_ms: 85.424375
+  type: 'test'
+  ...
+# Subtest: pure fee composition settles from preceding balances and preserves unrelated rows
+ok 67 - pure fee composition settles from preceding balances and preserves unrelated rows
+  ---
+  duration_ms: 6.834708
+  type: 'test'
+  ...
+# Subtest: storage-only target facts are proof-bound even when every storage slot is undemanded
+ok 68 - storage-only target facts are proof-bound even when every storage slot is undemanded
+  ---
+  duration_ms: 67.939042
+  type: 'test'
+  ...
+# Subtest: root CREATE storage-only collision cannot pass the empty-frame shortcut on historical or Amsterdam forks
+ok 69 - root CREATE storage-only collision cannot pass the empty-frame shortcut on historical or Amsterdam forks
+  ---
+  duration_ms: 77.66425
+  type: 'test'
+  ...
+# Subtest: historical internal CREATE and CREATE2 storage-only collisions are rejected even under root rollback
+ok 70 - historical internal CREATE and CREATE2 storage-only collisions are rejected even under root rollback
+  ---
+  duration_ms: 122.563083
+  type: 'test'
+  ...
+# Subtest: genuine nonce or code collision predicates remain accepted with nonempty storage
+ok 71 - genuine nonce or code collision predicates remain accepted with nonempty storage
+  ---
+  duration_ms: 106.417833
+  type: 'test'
+  ...
+# Subtest: absent and prefunded empty targets retain accepted successful root creation
+ok 72 - absent and prefunded empty targets retain accepted successful root creation
+  ---
+  duration_ms: 60.187209
+  type: 'test'
+  ...
+# Subtest: Amsterdam no-child ledger cannot authorize storage-only collision with a genuine creator nonce increment
+ok 73 - Amsterdam no-child ledger cannot authorize storage-only collision with a genuine creator nonce increment
+  ---
+  duration_ms: 60.460792
+  type: 'test'
+  ...
+# Subtest: query starting reset masks the old storage root, while carried authorization nonce or code still collides
+ok 74 - query starting reset masks the old storage root, while carried authorization nonce or code still collides
+  ---
+  duration_ms: 47.577667
+  type: 'test'
+  ...
+1..74
+# tests 74
+# suites 0
+# pass 74
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 15264.994

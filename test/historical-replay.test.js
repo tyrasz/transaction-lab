@@ -26,7 +26,7 @@ const freshCapture=JSON.parse(guardedBytes);
 // Ethereum loader/transport and Arbitrum loader. Independently hash that current inventory;
 // the original 0.7.1 capture identity and historical RPC sequence stay untouched.
 const sourceFiles=freshCapture.implementation.sourceFiles.flatMap(name=>name==='analyze.js' ? [name,'arbitrum-loader.js'] : name==='historical-state.js'
- ? ['current-state.js',name] : name==='server.js' ? [name,'standard-loader.js','standard-rpc.js'] : name==='lending-balances.js' ? [name,'local-loader.js','local-simulation.js'] : name==='permissions.js' ? [name,'proof-rpc.js'] : [name]);
+ ? ['current-state.js',name] : name==='server.js' ? [name,'standard-loader.js','standard-rpc.js'] : name==='lending-balances.js' ? [name,'local-loader.js','local-sequence.js','local-simulation.js'] : name==='permissions.js' ? [name,'proof-rpc.js'] : [name]);
 const currentHash=createHash('sha256');
 for(const name of sourceFiles){assert.match(name,/^[a-z-]+\.js$/);currentHash.update(name+'\0').update(await readFile(new URL('../src/'+name,import.meta.url))).update('\0');}
 const currentEngine=currentHash.digest('hex');

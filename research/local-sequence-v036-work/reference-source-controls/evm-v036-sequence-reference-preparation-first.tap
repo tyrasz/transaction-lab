@@ -1,0 +1,111 @@
+TAP version 13
+# Subtest: four fixed JSON-stable declarations retain all three positions and no expected output
+ok 1 - four fixed JSON-stable declarations retain all three positions and no expected output
+  ---
+  duration_ms: 101.590875
+  type: 'test'
+  ...
+# Subtest: twelve signed type2 envelopes preserve exact requests, nonce order, same header and fees
+ok 2 - twelve signed type2 envelopes preserve exact requests, nonce order, same header and fees
+  ---
+  duration_ms: 19.801625
+  type: 'test'
+  ...
+# Subtest: initial roots and four STOP additions preserve exact synthetic token/vault allocation
+ok 3 - initial roots and four STOP additions preserve exact synthetic token/vault allocation
+  ---
+  duration_ms: 3.422084
+  type: 'test'
+  ...
+# Subtest: approval spender and failure selector bind fixture bytecode and declared amounts without execution
+ok 4 - approval spender and failure selector bind fixture bytecode and declared amounts without execution
+  ---
+  duration_ms: 0.083833
+  type: 'test'
+  ...
+# Subtest: all four stock EELS preparation checks bind twelve signatures and initial roots without execution
+not ok 5 - all four stock EELS preparation checks bind twelve signatures and initial roots without execution
+  ---
+  duration_ms: 878.38525
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/local-sequence-v036-reference/cases.test.mjs:110:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Traceback (most recent call last):
+      File "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/local-sequence-v036-reference/eels-worker.py", line 321, in <module>
+        report = main()
+                 ^^^^^^
+      File "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/local-sequence-v036-reference/eels-worker.py", line 192, in main
+        need(set(envelope) == set(fields.values()) | {"type", "to", "data", "accessList"}, "Envelope fields")
+      File "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/local-sequence-v036-reference/eels-worker.py", line 34, in need
+        raise ValueError(message)
+    ValueError: Envelope fields
+    
+    
+    1 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 1
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/local-sequence-v036-reference/cases.test.mjs:112:71)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: input-only refusal catches changed bytes, signed request mismatch, lost positions and product-output injection
+not ok 6 - input-only refusal catches changed bytes, signed request mismatch, lost positions and product-output injection
+  ---
+  duration_ms: 279.55775
+  type: 'test'
+  location: '/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/local-sequence-v036-reference/cases.test.mjs:121:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /Call fields/. Input:
+    
+    'Traceback (most recent call last):\n' +
+      '  File "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/local-sequence-v036-reference/eels-worker.py", line 321, in <module>\n' +
+      '    report = main()\n' +
+      '             ^^^^^^\n' +
+      '  File "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/local-sequence-v036-reference/eels-worker.py", line 192, in main\n' +
+      '    need(set(envelope) == set(fields.values()) | {"type", "to", "data", "accessList"}, "Envelope fields")\n' +
+      '  File "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/local-sequence-v036-reference/eels-worker.py", line 34, in need\n' +
+      '    raise ValueError(message)\n' +
+      'ValueError: Envelope fields\n'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    Traceback (most recent call last):
+      File "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/local-sequence-v036-reference/eels-worker.py", line 321, in <module>
+        report = main()
+                 ^^^^^^
+      File "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/local-sequence-v036-reference/eels-worker.py", line 192, in main
+        need(set(envelope) == set(fields.values()) | {"type", "to", "data", "accessList"}, "Envelope fields")
+      File "/Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/local-sequence-v036-reference/eels-worker.py", line 34, in need
+        raise ValueError(message)
+    ValueError: Envelope fields
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///Users/home/Documents/Codex/2026-10-23/thi/outputs/transaction-lab-v031/research/local-sequence-v036-reference/cases.test.mjs:130:41)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: prepare-only return dominates every execution environment and reference target call in the adapter source
+ok 7 - prepare-only return dominates every execution environment and reference target call in the adapter source
+  ---
+  duration_ms: 0.19075
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 5
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1447.782917

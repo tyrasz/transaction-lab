@@ -10,7 +10,7 @@ import { assertLocalRuntimePatched } from '../engines/local-evm/delegation-runti
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const LOCAL = 'engines/local-evm', DEPS = `${LOCAL}/node_modules`;
-const REQUIRED = ['ethereum-call.js', 'ethereum-header.js', 'ethereum-preview.js', 'ethereum-profile.js', 'execute.js',
+const REQUIRED = ['ethereum-call.js', 'ethereum-header.js', 'ethereum-preview.js', 'ethereum-sequence.js', 'ethereum-profile.js', 'execute.js',
   'isolated-call.js', 'isolated-protocol.js', 'isolated-worker.js', 'preview-mutations.js', 'preview-queries.js',
   'proof-state.js', 'rpc-state-inputs.js', 'verified-state-proof.js'];
 const MAX_FILES = 10000, MAX_FILE = 32 * 1024 * 1024, MAX_TOTAL = 128 * 1024 * 1024;
@@ -45,7 +45,7 @@ async function inventory() {
       else need(path.startsWith(LOCAL + '/') && !specifier.startsWith('/'));
     }
   }
-  await source('src/server.js'); await source('src/local-loader.js'); await source('src/local-simulation.js');
+  await source('src/server.js'); await source('src/local-loader.js'); await source('src/local-simulation.js'); await source('src/local-sequence.js');
   for (const name of REQUIRED) await source(`${LOCAL}/${name}`);
   const localStat = await lstat(join(ROOT, LOCAL)); need(localStat.isDirectory() && !localStat.isSymbolicLink());
   for (const entry of await readdir(join(ROOT, LOCAL), { withFileTypes: true })) if (entry.name.endsWith('.js')) {
@@ -110,7 +110,7 @@ export function loadLocalApi() {
     await assertSourcesUnchanged();
     const localRuntime = assertLocalRuntimePatched();
     let api;
-    try { api = await import('./local-simulation.js'); }
+    try { api = { ...await import('./local-simulation.js'), ...await import('./local-sequence.js') }; }
     catch (error) { if (['ENOENT', 'ERR_MODULE_NOT_FOUND'].includes(error.code)) return null; throw error; }
     await assertSourcesUnchanged();
     const implementation = frozen({ name: 'Transaction Lab isolated proof-backed Ethereum preview', version: VERSION,
@@ -118,35 +118,44 @@ export function loadLocalApi() {
       inventory: startup.value.files, runtime: startup.value.runtime,
       runtimePatches: [{ id: 'local-evm-runtime-fixes-v2', ...localRuntime }],
       identityAlgorithm: 'SHA256(JSON.stringify({files:sorted_complete_inventory,runtime:node_executable_identity}))' });
-    return Object.freeze({ ...api, implementation, assertSourcesUnchanged,
-      async simulateLocal(input, rpc, options) {
+    const guarded = (validate, execute, withhold, capabilities) => async (input, rpc, options) => {
         const began = performance.now();
         // Invalid requests still fail before I/O. Source failures also never
         // become an execution success or a nested measured preview.
-        api.validateLocalSimulation(input);
+        validate(input);
         await assertSourcesUnchanged();
-        const result = await api.simulateLocal(input, rpc, options);
+        const result = await execute(input, rpc, options);
         try { await assertSourcesUnchanged(); }
-        catch { api.withholdLocalSimulation(result, 'LOCAL_PREVIEW_SOURCE_CHANGED'); }
+        catch { withhold(result, 'LOCAL_PREVIEW_SOURCE_CHANGED'); }
         // Hashing the worker/dependency inventory is part of this request too.
         // A result cannot become usable after cancellation or budget expiry
         // merely because execution finished before the last source check.
-        if (options?.signal?.aborted) api.withholdLocalSimulation(result, 'LOCAL_PREVIEW_CANCELLED');
-        if (result.error?.code !== 'LOCAL_PREVIEW_SOURCE_CHANGED') {
-          try {
-            result.usage = rpc.usage();
-            if (!Number.isFinite(result.usage.remainingWallMs) || result.usage.remainingWallMs <= 0) api.withholdLocalSimulation(result, 'LOCAL_PREVIEW_BUDGET');
-          } catch { api.withholdLocalSimulation(result, 'LOCAL_PREVIEW_BUDGET'); }
-        }
-        result.timing = { ...result.timing, totalMs: Math.max(0, performance.now() - began) };
+        const recheckRequest = () => {
+          if (options?.signal?.aborted) withhold(result, 'LOCAL_PREVIEW_CANCELLED');
+          if (result.error?.code !== 'LOCAL_PREVIEW_SOURCE_CHANGED') {
+            try {
+              result.usage = rpc.usage();
+              if (!Number.isFinite(result.usage.remainingWallMs) || result.usage.remainingWallMs <= 0) withhold(result, 'LOCAL_PREVIEW_BUDGET');
+            } catch { withhold(result, 'LOCAL_PREVIEW_BUDGET'); }
+          }
+        };
+        recheckRequest();
+        result.timing = { ...result.timing, totalMs: Math.max(0, performance.now() - began),
+          totalMsScope: 'Adapter execution and source verification; excludes response serialization, persistence and delivery.' };
         result.implementation = implementation;
         // The server attaches this same identity. Count it now so the full
         // retained API response, not just the child result, obeys its cap.
-        if (Buffer.byteLength(JSON.stringify(result)) > api.LOCAL_CAPABILITIES.limits.apiOutputBytes) {
-          api.withholdLocalSimulation(result, 'LOCAL_PREVIEW_OUTPUT'); delete result.audit; result.attempt = null;
+        if (Buffer.byteLength(JSON.stringify(result)) > capabilities.limits.apiOutputBytes) {
+          withhold(result, 'LOCAL_PREVIEW_OUTPUT'); delete result.audit; result.attempt = null;
         }
+        // Serializing the complete retained response also consumes the request
+        // budget. Expiry here must remove nested execution measurements too.
+        recheckRequest();
         return result;
-      },
+    };
+    return Object.freeze({ ...api, implementation, assertSourcesUnchanged,
+      simulateLocal: guarded(api.validateLocalSimulation, api.simulateLocal, api.withholdLocalSimulation, api.LOCAL_CAPABILITIES),
+      simulateLocalSequence: guarded(api.validateLocalSequence, api.simulateLocalSequence, api.withholdLocalSequence, api.LOCAL_SEQUENCE_CAPABILITIES),
     });
   })();
 }

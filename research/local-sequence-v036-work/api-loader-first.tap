@@ -1,0 +1,172 @@
+TAP version 13
+# Subtest: local loader binds full static closure, worker entry, entire dependencies, symlink target and Node bytes
+ok 1 - local loader binds full static closure, worker entry, entire dependencies, symlink target and Node bytes
+  ---
+  duration_ms: 119.075709
+  type: 'test'
+  ...
+# Subtest: stock EVM bytes before loader startup refuse availability; explicitly patched copies pass with bound metadata
+ok 2 - stock EVM bytes before loader startup refuse availability; explicitly patched copies pass with bound metadata
+  ---
+  duration_ms: 198.385375
+  type: 'test'
+  ...
+# Subtest: missing optional worker at startup stays unavailable until a new process
+ok 3 - missing optional worker at startup stays unavailable until a new process
+  ---
+  duration_ms: 148.737
+  type: 'test'
+  ...
+# Subtest: changed source between startup and lazy import rejects, rather than relabeling cached modules
+ok 4 - changed source between startup and lazy import rejects, rather than relabeling cached modules
+  ---
+  duration_ms: 89.097834
+  type: 'test'
+  ...
+# Subtest: changed source during lazy import is rejected
+ok 5 - changed source during lazy import is rejected
+  ---
+  duration_ms: 93.345667
+  type: 'test'
+  ...
+# Subtest: every simulation rechecks added dependency files before invoking its adapter
+ok 6 - every simulation rechecks added dependency files before invoking its adapter
+  ---
+  duration_ms: 96.757416
+  type: 'test'
+  ...
+# Subtest: source changes during a simulation remove all nested preview amounts afterward
+ok 7 - source changes during a simulation remove all nested preview amounts afterward
+  ---
+  duration_ms: 100.60575
+  type: 'test'
+  ...
+# Subtest: escaping dependency symlinks are rejected before import
+ok 8 - escaping dependency symlinks are rejected before import
+  ---
+  duration_ms: 63.326709
+  type: 'test'
+  ...
+# Subtest: cancellation or exhausted deadline after execution is rechecked after final source verification
+ok 9 - cancellation or exhausted deadline after execution is rechecked after final source verification
+  ---
+  duration_ms: 133.780917
+  type: 'test'
+  ...
+# Subtest: real installed closure contains all current local runtime and complete pinned dependency tree without copying it
+ok 10 - real installed closure contains all current local runtime and complete pinned dependency tree without copying it
+  ---
+  duration_ms: 1559.808542
+  type: 'test'
+  ...
+# Subtest: sequence wrapper removes nested amounts after source drift during execution
+ok 11 - sequence wrapper removes nested amounts after source drift during execution
+  ---
+  duration_ms: 103.034333
+  type: 'test'
+  ...
+# Subtest: sequence wrapper checks cancellation and total deadline after final source hashing
+ok 12 - sequence wrapper checks cancellation and total deadline after final source hashing
+  ---
+  duration_ms: 124.627416
+  type: 'test'
+  ...
+# Subtest: HTTP osaka sequence returns measured per-step state and bound implementation
+ok 13 - HTTP osaka sequence returns measured per-step state and bound implementation
+  ---
+  duration_ms: 1814.005333
+  type: 'test'
+  ...
+# Subtest: HTTP amsterdam sequence returns measured per-step state and bound implementation
+ok 14 - HTTP amsterdam sequence returns measured per-step state and bound implementation
+  ---
+  duration_ms: 964.202917
+  type: 'test'
+  ...
+# Subtest: sequence admission and origin rejection happen before proof transport construction
+ok 15 - sequence admission and origin rejection happen before proof transport construction
+  ---
+  duration_ms: 4.048583
+  type: 'test'
+  ...
+# Subtest: missing local engine disables sequence route and capability without constructing transport
+ok 16 - missing local engine disables sequence route and capability without constructing transport
+  ---
+  duration_ms: 1.458125
+  type: 'test'
+  ...
+# Subtest: final header disagreement strips every actionable sequence amount at the HTTP boundary
+ok 17 - final header disagreement strips every actionable sequence amount at the HTTP boundary
+  ---
+  duration_ms: 979.365542
+  type: 'test'
+  ...
+# Subtest: independent inventory covers static server imports and the optional engine import closure
+ok 18 - independent inventory covers static server imports and the optional engine import closure
+  ---
+  duration_ms: 15.276792
+  type: 'test'
+  ...
+# Subtest: stable startup loads the real adapter once with the complete immutable disk identity
+ok 19 - stable startup loads the real adapter once with the complete immutable disk identity
+  ---
+  duration_ms: 85.790333
+  type: 'test'
+  ...
+# Subtest: optional dependency absent at startup remains unavailable after installation until restart
+ok 20 - optional dependency absent at startup remains unavailable after installation until restart
+  ---
+  duration_ms: 121.886542
+  type: 'test'
+  ...
+# Subtest: rejects post-startup drift in src/analyze.js before optional import and caches rejection
+ok 21 - rejects post-startup drift in src/analyze.js before optional import and caches rejection
+  ---
+  duration_ms: 61.605083
+  type: 'test'
+  ...
+# Subtest: rejects post-startup drift in src/config.js before optional import and caches rejection
+ok 22 - rejects post-startup drift in src/config.js before optional import and caches rejection
+  ---
+  duration_ms: 63.223875
+  type: 'test'
+  ...
+# Subtest: rejects post-startup drift in src/standard-rpc.js before optional import and caches rejection
+ok 23 - rejects post-startup drift in src/standard-rpc.js before optional import and caches rejection
+  ---
+  duration_ms: 61.403833
+  type: 'test'
+  ...
+# Subtest: rejects post-startup drift in engines/standard-evm/sequence-state.js before optional import and caches rejection
+ok 24 - rejects post-startup drift in engines/standard-evm/sequence-state.js before optional import and caches rejection
+  ---
+  duration_ms: 62.511584
+  type: 'test'
+  ...
+# Subtest: rejects post-startup drift in engines/standard-evm/node_modules/@noble/hashes/utils.js before optional import and caches rejection
+ok 25 - rejects post-startup drift in engines/standard-evm/node_modules/@noble/hashes/utils.js before optional import and caches rejection
+  ---
+  duration_ms: 61.296375
+  type: 'test'
+  ...
+# Subtest: rejects changes during optional module evaluation after the pre-import check
+ok 26 - rejects changes during optional module evaluation after the pre-import check
+  ---
+  duration_ms: 70.851667
+  type: 'test'
+  ...
+# Subtest: removing an optional source after startup withholds the adapter
+ok 27 - removing an optional source after startup withholds the adapter
+  ---
+  duration_ms: 61.050042
+  type: 'test'
+  ...
+1..27
+# tests 27
+# suites 0
+# pass 27
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7791.848542

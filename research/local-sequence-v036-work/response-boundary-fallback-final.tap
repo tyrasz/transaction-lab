@@ -1,0 +1,136 @@
+TAP version 13
+# Subtest: single: deadline crossed while serializing is withheld before staging
+ok 1 - single: deadline crossed while serializing is withheld before staging
+  ---
+  duration_ms: 6.057541
+  type: 'test'
+  ...
+# Subtest: single: slow staging cannot publish actionable results after deadline
+ok 2 - single: slow staging cannot publish actionable results after deadline
+  ---
+  duration_ms: 0.875125
+  type: 'test'
+  ...
+# Subtest: single: expiry during publication removes the saved actionable result
+ok 3 - single: expiry during publication removes the saved actionable result
+  ---
+  duration_ms: 0.845875
+  type: 'test'
+  ...
+# Subtest: single: cancellation listeners survive publication and invalidate the saved report
+ok 4 - single: cancellation listeners survive publication and invalidate the saved report
+  ---
+  duration_ms: 0.995958
+  type: 'test'
+  ...
+# Subtest: single: successful filesystem publication saves exactly the returned JSON without staging debris
+ok 5 - single: successful filesystem publication saves exactly the returned JSON without staging debris
+  ---
+  duration_ms: 2.253959
+  type: 'test'
+  ...
+# Subtest: single: fallback after failed publication is unavailable before cleanup crosses the deadline
+ok 6 - single: fallback after failed publication is unavailable before cleanup crosses the deadline
+  ---
+  duration_ms: 0.739292
+  type: 'test'
+  ...
+# Subtest: single: cleanup fallback cannot retain a complete result even while the HTTP response remains valid
+ok 7 - single: cleanup fallback cannot retain a complete result even while the HTTP response remains valid
+  ---
+  duration_ms: 0.661375
+  type: 'test'
+  ...
+# Subtest: sequence: deadline crossed while serializing is withheld before staging
+ok 8 - sequence: deadline crossed while serializing is withheld before staging
+  ---
+  duration_ms: 0.837583
+  type: 'test'
+  ...
+# Subtest: sequence: slow staging cannot publish actionable results after deadline
+ok 9 - sequence: slow staging cannot publish actionable results after deadline
+  ---
+  duration_ms: 0.940541
+  type: 'test'
+  ...
+# Subtest: sequence: expiry during publication removes the saved actionable result
+ok 10 - sequence: expiry during publication removes the saved actionable result
+  ---
+  duration_ms: 0.911208
+  type: 'test'
+  ...
+# Subtest: sequence: cancellation listeners survive publication and invalidate the saved report
+ok 11 - sequence: cancellation listeners survive publication and invalidate the saved report
+  ---
+  duration_ms: 0.560833
+  type: 'test'
+  ...
+# Subtest: sequence: successful filesystem publication saves exactly the returned JSON without staging debris
+ok 12 - sequence: successful filesystem publication saves exactly the returned JSON without staging debris
+  ---
+  duration_ms: 1.47425
+  type: 'test'
+  ...
+# Subtest: sequence: fallback after failed publication is unavailable before cleanup crosses the deadline
+ok 13 - sequence: fallback after failed publication is unavailable before cleanup crosses the deadline
+  ---
+  duration_ms: 0.515834
+  type: 'test'
+  ...
+# Subtest: sequence: cleanup fallback cannot retain a complete result even while the HTTP response remains valid
+ok 14 - sequence: cleanup fallback cannot retain a complete result even while the HTTP response remains valid
+  ---
+  duration_ms: 0.480334
+  type: 'test'
+  ...
+# Subtest: missing transport deadline metadata cannot bypass final response validation
+ok 15 - missing transport deadline metadata cannot bypass final response validation
+  ---
+  duration_ms: 0.545917
+  type: 'test'
+  ...
+# Subtest: ordinary persistence failure retains a valid response with the existing warning
+ok 16 - ordinary persistence failure retains a valid response with the existing warning
+  ---
+  duration_ms: 0.488791
+  type: 'test'
+  ...
+# Subtest: OS cleanup refusal remains an unavailable response and explicitly identifies the saved-file risk
+ok 17 - OS cleanup refusal remains an unavailable response and explicitly identifies the saved-file risk
+  ---
+  duration_ms: 0.458667
+  type: 'test'
+  ...
+# Subtest: a failed stage retains its cleanup token and cannot publish after a deadline
+ok 18 - a failed stage retains its cleanup token and cannot publish after a deadline
+  ---
+  duration_ms: 0.504833
+  type: 'test'
+  ...
+# Subtest: refused staging cleanup is identified instead of silently losing a pending complete report
+ok 19 - refused staging cleanup is identified instead of silently losing a pending complete report
+  ---
+  duration_ms: 0.4
+  type: 'test'
+  ...
+# Subtest: HTTP timing includes awaited persistence without adding a self-referential JSON duration
+ok 20 - HTTP timing includes awaited persistence without adding a self-referential JSON duration
+  ---
+  duration_ms: 12.841542
+  type: 'test'
+  ...
+# Subtest: post-publication retention failure removes the saved body before adding the response warning
+ok 21 - post-publication retention failure removes the saved body before adding the response warning
+  ---
+  duration_ms: 0.496083
+  type: 'test'
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 21
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3223.749125

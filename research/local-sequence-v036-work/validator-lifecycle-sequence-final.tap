@@ -1,0 +1,136 @@
+TAP version 13
+# Subtest: retained creation then later writes keep durable provenance and fresh transaction storage baselines
+ok 1 - retained creation then later writes keep durable provenance and fresh transaction storage baselines
+  ---
+  duration_ms: 37.76625
+  type: 'test'
+  ...
+# Subtest: retained Shanghai deletion then direct or nested funding preserves the cleared namespace
+ok 2 - retained Shanghai deletion then direct or nested funding preserves the cleared namespace
+  ---
+  duration_ms: 18.826167
+  type: 'test'
+  ...
+# Subtest: retained Shanghai delete/recreate/getter/delete/recreate binds each new incarnation
+ok 3 - retained Shanghai delete/recreate/getter/delete/recreate binds each new incarnation
+  ---
+  duration_ms: 13.01125
+  type: 'test'
+  ...
+# Subtest: retained deleted namespace survives constructor and ancestor message rollback
+ok 4 - retained deleted namespace survives constructor and ancestor message rollback
+  ---
+  duration_ms: 17.219459
+  type: 'test'
+  ...
+# Subtest: host failure while rematerializing preserves the complete validated prefix
+ok 5 - host failure while rematerializing preserves the complete validated prefix
+  ---
+  duration_ms: 4.30425
+  type: 'test'
+  ...
+# Subtest: retained authority creation then later call and authorization clear use current nonce/code/storage
+ok 6 - retained authority creation then later call and authorization clear use current nonce/code/storage
+  ---
+  duration_ms: 11.4725
+  type: 'test'
+  ...
+# Subtest: fabricated starting view preserves immutable facts, overlays fields and refuses false before labels
+ok 7 - fabricated starting view preserves immutable facts, overlays fields and refuses false before labels
+  ---
+  duration_ms: 2.914959
+  type: 'test'
+  ...
+# Subtest: fabricated deletion rematerialization carries the original namespace root and clears hidden storage
+ok 8 - fabricated deletion rematerialization carries the original namespace root and clears hidden storage
+  ---
+  duration_ms: 0.955334
+  type: 'test'
+  ...
+# Subtest: fabricated second CALL keeps cumulative nonce and preceding storage/code provenance
+ok 9 - fabricated second CALL keeps cumulative nonce and preceding storage/code provenance
+  ---
+  duration_ms: 1.928292
+  type: 'test'
+  ...
+# Subtest: fabricated failed CALL retains its prefix and only this transaction nonce
+ok 10 - fabricated failed CALL retains its prefix and only this transaction nonce
+  ---
+  duration_ms: 7.856292
+  type: 'test'
+  ...
+# Subtest: fabricated incomplete transaction must leave the accepted prefix unchanged
+ok 11 - fabricated incomplete transaction must leave the accepted prefix unchanged
+  ---
+  duration_ms: 0.28625
+  type: 'test'
+  ...
+# Subtest: fabricated inherited storage reset remains valid when a later CALL changes storage and balance
+ok 12 - fabricated inherited storage reset remains valid when a later CALL changes storage and balance
+  ---
+  duration_ms: 0.567292
+  type: 'test'
+  ...
+# Subtest: fabricated root CREATE derives its address from the current sender nonce
+ok 13 - fabricated root CREATE derives its address from the current sender nonce
+  ---
+  duration_ms: 0.529167
+  type: 'test'
+  ...
+# Subtest: fabricated rematerialized sender may increment back to its immutable nonce without a cumulative nonce row
+ok 14 - fabricated rematerialized sender may increment back to its immutable nonce without a cumulative nonce row
+  ---
+  duration_ms: 0.324792
+  type: 'test'
+  ...
+# Subtest: fabricated recreation may restore immutable nonce one while retaining its deletion reset
+ok 15 - fabricated recreation may restore immutable nonce one while retaining its deletion reset
+  ---
+  duration_ms: 0.720416
+  type: 'test'
+  ...
+# Subtest: fabricated unrelated CALL cannot omit a carried deletion of a storage-only account
+ok 16 - fabricated unrelated CALL cannot omit a carried deletion of a storage-only account
+  ---
+  duration_ms: 0.497125
+  type: 'test'
+  ...
+# Subtest: fabricated recreation into a previously reset namespace cannot omit the retained reset
+ok 17 - fabricated recreation into a previously reset namespace cannot omit the retained reset
+  ---
+  duration_ms: 0.4475
+  type: 'test'
+  ...
+# Subtest: pure authorization prefixes use current nonce/existence and retain cumulative provenance
+ok 18 - pure authorization prefixes use current nonce/existence and retain cumulative provenance
+  ---
+  duration_ms: 8.0835
+  type: 'test'
+  ...
+# Subtest: pure Amsterdam prefixes reset paid-write costs while retaining designation state
+ok 19 - pure Amsterdam prefixes reset paid-write costs while retaining designation state
+  ---
+  duration_ms: 9.562584
+  type: 'test'
+  ...
+# Subtest: pure Amsterdam authorization OOG restores the preceding authority state and keeps this outer nonce
+ok 20 - pure Amsterdam authorization OOG restores the preceding authority state and keeps this outer nonce
+  ---
+  duration_ms: 4.199209
+  type: 'test'
+  ...
+# Subtest: pure fee composition settles from preceding balances and preserves unrelated rows
+ok 21 - pure fee composition settles from preceding balances and preserves unrelated rows
+  ---
+  duration_ms: 1.97025
+  type: 'test'
+  ...
+1..21
+# tests 21
+# suites 0
+# pass 21
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 292.710709

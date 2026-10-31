@@ -659,6 +659,8 @@ test('Sepolia selects local-only execution and forwards its chain without loadin
   assert.deepEqual(JSON.parse(ui.elements.get('standard-queries').value), LOCAL_EXAMPLES[0].request.queries);
   assert.match(ui.elements.get('network-heading').textContent, /SEPOLIA TESTNET/); assert.match(ui.elements.get('value-help').textContent, /Test ETH/);
   ui.elements.get('ethereum-engine').value = 'provider'; ui.elements.get('ethereum-call-mode').value = 'sequence';
+  await ui.context.run('simulation'); assert.equal(ui.requests.length, 0, 'Unavailable ordered mode must not silently become a single call');
+  ui.elements.get('ethereum-call-mode').value = 'single';
   await ui.context.run('simulation'); assert.equal(ui.requests.length, 1);
   assert.equal(ui.requests[0].url, '/api/evm/local-preview'); assert.equal(JSON.parse(ui.requests[0].options.body).chainId, 11155111);
   assert.equal(Object.hasOwn(JSON.parse(ui.requests[0].options.body), 'calls'), false);

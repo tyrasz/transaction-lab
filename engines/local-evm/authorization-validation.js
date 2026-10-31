@@ -1,25 +1,24 @@
-// Parent-side preparation over independently verified starting facts. No child
-// state overlay, claimed authority, after-code or refund supplies these inputs.
+// Parent-side preparation over verified facts and a preceding overlay already
+// accepted by the parent. Current child claims never supply the starting state.
 import { normalizeAuthorizationList, recoverAuthorization, authorizationStateDecision } from './authorization-list.js';
 import { existingDelegationTarget } from './sender-delegation.js';
 import { deriveAmsterdamAuthorizationPreparation } from './amsterdam-authorization-validation.js';
+import { createExecutionState, updateExecutionAccounts } from './execution-state.js';
 
 const need = value => { if (!value) throw new Error('Authorization preparation does not match verified starting facts.'); };
-const hex = value => '0x' + value.toString(16);
-const SCOPE = 'Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.';
-
-export function deriveAuthorizationPreparation({ request, header, inputs, common }) {
+export function deriveAuthorizationPreparation({ request, header, inputs, common, startingChanges }) {
   const list = normalizeAuthorizationList(request);
   if (list === undefined) return null;
-  if (common?.isActivatedEIP(8037)) return deriveAmsterdamAuthorizationPreparation({ request, header, inputs, common });
+  if (common?.isActivatedEIP(8037)) return deriveAmsterdamAuthorizationPreparation({ request, header, inputs, common, startingChanges });
   need([1n, 11155111n].includes(common?.chainId()) && common.isActivatedEIP(7702) && !common.isActivatedEIP(7928) && request.to !== null && request.blobVersionedHashes === undefined);
   const accounts = new Map(), applied = new Set(), entries = [];
+  const state = createExecutionState(inputs, startingChanges);
   const sender = request.from.toLowerCase();
+  const values = fact => ({ exists: fact.exists, nonce: BigInt(fact.nonce), code: fact.code });
   function account(address) {
     if (!accounts.has(address)) {
-      const fact = inputs?.accounts?.[address]; need(fact && typeof fact.exists === 'boolean');
-      const current = fact.exists ? { exists: true, nonce: BigInt(fact.nonce), code: fact.code } : { exists: false, nonce: 0n, code: '0x' };
-      accounts.set(address, { initial: { ...current }, current });
+      const initial = values(state.initial(address)), starting = values(state.account(address));
+      accounts.set(address, { initial, starting, current: { ...starting } });
     }
     return accounts.get(address).current;
   }
@@ -40,16 +39,11 @@ export function deriveAuthorizationPreparation({ request, header, inputs, common
     current.exists = true; current.nonce = decision.nonceAfter; current.code = decision.codeAfter;
     applied.add(recovered.authority);
   }
-  const rows = [];
-  for (const [address, { initial, current }] of accounts) {
-    const row = { address };
-    if (!initial.exists && current.exists) row.existence = { before: false, after: true,
-      basis: applied.has(address) ? 'eip7702_authorization_materialization' : 'unsigned_sender_nonce_materialization' };
-    if (initial.nonce !== current.nonce) row.nonce = { before: hex(initial.nonce), after: hex(current.nonce) };
-    if (initial.code !== current.code) row.code = { before: initial.code, after: current.code };
-    if (Object.keys(row).length > 1) rows.push(row);
-  }
-  rows.sort((a, b) => a.address.localeCompare(b.address));
-  return { accounts, applied, snapshot: { scope: SCOPE, accounts: rows },
+  const updates = [...accounts].filter(([, row]) => row.current.exists).map(([address, { current }]) => [address, {
+    exists: true, nonce: current.nonce, code: current.code,
+    ...(applied.has(address) ? { existenceBasis: 'eip7702_authorization_materialization' }
+      : address === sender ? { existenceBasis: 'unsigned_sender_nonce_materialization' } : {}),
+  }]);
+  return { accounts, applied, snapshot: updateExecutionAccounts(inputs, state.changes, updates),
     processing: { entries, gasRefundCounter: gasRefund.toString() } };
 }

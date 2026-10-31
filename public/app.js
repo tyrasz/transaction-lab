@@ -9,12 +9,12 @@ const arbitrumAvailable = () => state.config?.arbitrumEvm?.available === true;
 const sepoliaMode = () => $('chain').value === '11155111';
 const ethereumMode = () => ['1', '11155111'].includes($('chain').value);
 const localMode = () => ethereumMode() && (sepoliaMode() || $('ethereum-engine').value === 'local');
-const creationMode = () => localMode() && $('local-operation').value === 'create';
+const creationMode = () => localMode() && !sequenceMode() && $('local-operation').value === 'create';
 const localAvailable = () => state.config?.localEvm?.available === true && (!sepoliaMode() || state.config.localEvm.capabilities?.chainIds?.includes(11155111));
-const sequenceMode = () => ethereumMode() && !localMode() && $('ethereum-call-mode').value === 'sequence';
+const sequenceMode = () => ethereumMode() && $('ethereum-call-mode').value === 'sequence';
 const standardAvailable = () => !sepoliaMode() && state.config?.standardEvm?.available === true;
-const sequenceAvailable = () => !localMode() && standardAvailable() && state.config?.standardEvm?.sequenceCapabilities?.available === true;
-const manualQueries = () => ethereumMode() && !sequenceMode() && (localMode() || $('standard-manual-queries').checked);
+const sequenceAvailable = () => localMode() ? localAvailable() && state.config?.localEvm?.sequenceCapabilities?.available === true : standardAvailable() && state.config?.standardEvm?.sequenceCapabilities?.available === true;
+const manualQueries = () => ethereumMode() && (localMode() || (!sequenceMode() && $('standard-manual-queries').checked));
 
 function node(tag, className, text) {
   const element = document.createElement(tag);
@@ -31,7 +31,7 @@ function formatTime(value) { if (value === null || value === undefined || value 
 
 async function request(url, body) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), url === '/api/evm/simulate-sequence' ? 300000 : ['/api/evm/simulate', '/api/evm/local-preview', '/api/arbitrum/simulate'].includes(url) ? 180000 : 65000);
+  const timer = setTimeout(() => controller.abort(), url === '/api/evm/simulate-sequence' ? 300000 : ['/api/evm/simulate', '/api/evm/local-preview', '/api/evm/local-sequence', '/api/arbitrum/simulate'].includes(url) ? 180000 : 65000);
   try {
     const response = await fetch(url, { method: body ? 'POST' : 'GET', headers: body ? { 'Content-Type': 'application/json' } : undefined, body: body ? JSON.stringify(body) : undefined, signal: controller.signal });
     const result = await response.json();
@@ -138,6 +138,7 @@ function resetLocalFees(request = {}) {
 }
 
 function currentExamples() {
+  if (localMode() && sequenceMode()) return (state.config?.localEvm?.sequenceExamples || []).filter(example => Number((example.request || example.input)?.chainId) === Number($('chain').value));
   if (sepoliaMode()) return (state.config?.localEvm?.examples || []).filter(example => Number(example.request?.chainId) === 11155111);
   return arbitrumMode() ? state.config?.arbitrumEvm?.examples || [] : sequenceMode() ? state.config?.standardEvm?.sequenceExamples || [] : ethereumMode() ? state.config?.standardEvm?.examples || []
     : (state.config?.examples || []).filter(example => String(example.request?.chainId) === $('chain').value);
@@ -153,7 +154,7 @@ function populateExampleOptions() {
 }
 
 function newSequenceDraft(call = {}) {
-  return { key: state.nextCallKey++, to: call.to || '', data: call.data || '0x', value: call.value ?? '0', manual: false, queriesText: JSON.stringify(call.queries || [], null, 2), contextText: transactionContextText(call) };
+  return { key: state.nextCallKey++, to: call.to === null ? 'null' : call.to || '', data: call.data || '0x', value: call.value ?? '0', manual: false, queriesText: JSON.stringify(call.queries || [], null, 2), contextText: transactionContextText(call, localMode()) };
 }
 
 function renderSequenceEditor() {
@@ -172,7 +173,7 @@ function renderSequenceEditor() {
       input.addEventListener('input', () => { draft[key] = input.value; input.setCustomValidity(''); clearResult({ inputsChanged: true }); });
       controls[key] = input; wrapper.append(caption, input); return wrapper;
     }
-    card.append(field('to', 'Contract / recipient'), field('data', 'Calldata', true), field('value', 'Value · wei'));
+    card.append(field('to', localMode() ? 'Recipient address · or null for deployment' : 'Contract / recipient'), field('data', 'Calldata', true), field('value', 'Value · wei'));
     const advanced = node('details', 'query-settings'), summary = node('summary', '', 'Advanced: balance & position checks');
     const choice = node('label', 'manual-query-choice'), manual = node('input');
     manual.type = 'checkbox'; manual.checked = draft.manual; manual.id = `sequence-${draft.key}-manual`;
@@ -187,7 +188,7 @@ function renderSequenceEditor() {
     queries.addEventListener('input', () => { draft.queriesText = queries.value; queries.setCustomValidity(''); clearResult({ inputsChanged: true }); });
     const contextSettings = node('details', 'query-settings transaction-context-settings'), contextLabel = node('label', '', 'Optional context · JSON'), context = node('textarea', 'mono');
     context.id = `sequence-${draft.key}-context`; context.rows = 4; context.spellcheck = false; context.value = draft.contextText;
-    contextLabel.htmlFor = context.id; contextSettings.append(node('summary', '', 'Advanced: transaction context'), transactionContextHelp(), contextLabel, context);
+    contextLabel.htmlFor = context.id; contextSettings.append(node('summary', '', localMode() ? 'Advanced: gas, fees & transaction context' : 'Advanced: transaction context'), localMode() ? localSequenceContextHelp() : transactionContextHelp(), contextLabel, context);
     context.addEventListener('input', () => { draft.contextText = context.value; context.setCustomValidity(''); clearResult({ inputsChanged: true }); });
     Object.assign(controls, { context, contextSettings }); card.append(contextSettings);
     const actions = node('div', 'sequence-call-actions');
@@ -216,14 +217,15 @@ function updateSequenceControls() {
   for (const [index, row] of state.sequenceControls.entries()) {
     for (const key of ['to', 'data', 'value', 'manual', 'context']) row[key].disabled = locked;
     for (const key of ['to', 'data', 'value']) row[key].required = active;
-    row.queries.disabled = locked || !row.manual.checked; row.queries.required = active && row.manual.checked;
+    row.manual.disabled = locked || localMode(); row.advanced.hidden = localMode();
+    row.queries.disabled = locked || localMode() || !row.manual.checked; row.queries.required = active && !localMode() && row.manual.checked;
     row.manualFields.hidden = !row.manual.checked;
     if (!row.manual.checked) row.queries.setCustomValidity('');
     row.up.disabled = locked || index === 0; row.down.disabled = locked || index === state.sequenceControls.length - 1;
     row.remove.disabled = locked || state.sequenceControls.length <= 2;
   }
   $('add-sequence-call').disabled = locked || state.sequenceControls.length >= 4;
-  $('sequence-call-count').textContent = `${state.sequenceControls.length} of 4 calls · minimum 2. Each step has its own checks; position queries require an explicit manual entry.`;
+  $('sequence-call-count').textContent = `${state.sequenceControls.length} of 4 calls · minimum 2. ${localMode() ? 'The shared query list is measured separately around each completed step.' : 'Each step has its own checks; position queries require an explicit manual entry.'}`;
 }
 
 function selectExample({ initial = false } = {}) {
@@ -234,14 +236,14 @@ function selectExample({ initial = false } = {}) {
   state.example = currentExamples().find((example) => example.id === $('example').value) || null;
   const example = state.example;
   if (example) {
-    const transaction = (sepoliaMode() ? example.request : ethereumMode() ? example.input : arbitrumMode() ? example.request || example.input : example.request) || {};
+    const transaction = (localMode() && sequenceMode() ? example.request || example.input : sepoliaMode() ? example.request : ethereumMode() ? example.input : arbitrumMode() ? example.request || example.input : example.request) || {};
     if (arbitrumMode() && typeof transaction.gas === 'string') resetArbitrumGas(transaction.gas);
     if (localMode() && typeof transaction.gas === 'string') resetLocalGas(transaction.gas);
     if (localMode()) resetLocalFees(transaction);
     $('local-operation').value = localMode() && transaction.to === null ? 'create' : 'call';
     for (const field of sequenceMode() ? ['from'] : ['from', 'to', 'data', 'value']) $(field).value = transaction[field] ?? (field === 'data' ? '0x' : field === 'value' ? '0' : '');
     $('block').value = ethereumMode() ? transaction.block || 'latest' : 'latest';
-    if (sequenceMode()) { state.sequenceDrafts = (transaction.calls || []).map(newSequenceDraft); renderSequenceEditor(); }
+    if (sequenceMode()) { state.sequenceDrafts = (transaction.calls || []).map(newSequenceDraft); renderSequenceEditor(); if (localMode()) $('standard-queries').value = JSON.stringify(transaction.queries || [], null, 2); }
     else if (ethereumMode()) {
       $('standard-queries').value = JSON.stringify(transaction.queries || [], null, 2);
       $('transaction-context').value = transactionContextText(transaction);
@@ -273,7 +275,7 @@ function updateQueryMode() {
   $('ethereum-engine-field').hidden = !standard;
   $('ethereum-engine').disabled = state.busy || !standard || sepoliaMode();
   $('local-engine-option').disabled = !localAvailable();
-  $('local-engine-help').textContent = local ? 'Experimental local execution. Single call, manual queries only; no automatic asset or ETH summaries.' : localAvailable() ? 'Provider preview is the default. The independent local engine is available for explicit query checks.' : state.config?.localEvm?.reason || 'Independent local previews are unavailable in this workspace.';
+  $('local-engine-help').textContent = local ? 'Experimental local execution with explicit queries only; no automatic asset or ETH summaries.' : localAvailable() ? 'Provider preview is the default. The independent local engine is available for explicit query checks.' : state.config?.localEvm?.reason || 'Independent local previews are unavailable in this workspace.';
   if (standard) {
     const available = local ? localAvailable() : standardAvailable();
     $('network-help').textContent = available ? local ? 'Experimental independent Ethereum preview. No connected wallet or signature needed.' : 'Experimental provider Ethereum preview. No connected wallet or signature needed.'
@@ -282,24 +284,24 @@ function updateQueryMode() {
     $('empty-description').textContent = local ? 'Enter a call or deployment and one to eight explicit queries. The local preview reports execution separately from measured raw query values.' : 'Choose an example or enter your own inputs. The preview shows which ETH balances, token balances and allowances could be measured for the selected accounts.';
   }
   $('ethereum-call-mode-field').hidden = !standard;
-  $('ethereum-call-mode').disabled = state.busy || !standard || local;
+  $('ethereum-call-mode').disabled = state.busy || !standard || (local && !sequenceAvailable());
   $('sequence-mode-option').disabled = !sequenceAvailable();
-  $('sequence-availability').hidden = !standard || local || sequenceAvailable();
+  $('sequence-availability').hidden = !standard || sequenceAvailable();
   $('sequence-availability').textContent = 'Ordered-call simulations are unavailable in this workspace.';
   $('single-call-target-fields').hidden = sequence; $('single-value-field').hidden = sequence;
   $('common-state-row').classList.toggle('sequence-state-row', sequence);
   $('value-help').hidden = sequence; $('sequence-editor').hidden = !sequence;
-  $('simulate-label').textContent = local ? 'Run local preview' : sequence ? 'Simulate sequence' : 'Simulate';
+  $('simulate-label').textContent = local ? sequence ? 'Run local sequence' : 'Run local preview' : sequence ? 'Simulate sequence' : 'Simulate';
   for (const id of ['to', 'data', 'value']) { $(id).disabled = state.busy || sequence; $(id).required = !sequence; if (sequence) $(id).setCustomValidity(''); }
-  $('local-operation-field').hidden = !local;
-  $('local-operation').disabled = state.busy || !local;
-  $('local-gas-settings').hidden = !local;
-  $('local-gas').disabled = state.busy || !local;
+  $('local-operation-field').hidden = !local || sequence;
+  $('local-operation').disabled = state.busy || !local || sequence;
+  $('local-gas-settings').hidden = !local || sequence;
+  $('local-gas').disabled = state.busy || !local || sequence;
   if (!local) $('local-gas').setCustomValidity('');
   updateLocalGasSelection();
-  const feesEnabled = local && $('local-fees-enabled').checked;
-  $('local-fee-settings').hidden = !local;
-  $('local-fees-enabled').disabled = state.busy || !local;
+  const feesEnabled = local && !sequence && $('local-fees-enabled').checked;
+  $('local-fee-settings').hidden = !local || sequence;
+  $('local-fees-enabled').disabled = state.busy || !local || sequence;
   $('local-fee-fields').hidden = !feesEnabled;
   for (const id of ['local-max-fee', 'local-priority-fee']) {
     $(id).disabled = state.busy || !feesEnabled; $(id).required = feesEnabled;
@@ -314,7 +316,7 @@ function updateQueryMode() {
   $('recipient-field').hidden = creationMode();
   $('data-label').textContent = creationMode() ? 'Deployment bytecode' : 'Calldata';
   if (creationMode()) { $('to').disabled = true; $('to').required = false; $('to').setCustomValidity(''); }
-  $('standard-query-settings').hidden = !standard || sequence;
+  $('standard-query-settings').hidden = !standard || (sequence && !local);
   $('transaction-context-settings').hidden = !standard || sequence;
   $('transaction-context').disabled = state.busy || !standard || sequence;
   if (!standard || sequence) $('transaction-context').setCustomValidity('');
@@ -324,6 +326,7 @@ function updateQueryMode() {
   $('standard-manual-queries').disabled = state.busy || !standard || sequence || local;
   if (local) { $('standard-manual-queries').checked = true; $('standard-query-settings').open = true; }
   $('query-mode-help').textContent = local ? 'A manual list of one to eight ETH balance, token or position queries combined is required. There is no automatic token selection or ETH balance summary.' : 'Automatic token checks use observed events and calls. Choose a manual list for specific token or position checks instead. ETH account selection remains automatic.';
+  if (local && sequence) $('query-mode-help').textContent = 'One shared list of one to eight explicit ETH balance, token or position queries is required. Each step gets its own before-and-after measurements.';
   $('local-native-query-help').hidden = !local;
   $('standard-checks-help').hidden = !standard;
   $('standard-checks-help').textContent = sequence ? 'Each step checks up to eight observed ETH accounts and eight queries. Automatic queries cover tokens only; position checks require a manual entry. Before and after refer to that step, not the entire sequence.' : manual
@@ -331,6 +334,11 @@ function updateQueryMode() {
     : 'Automatically check up to eight observed ETH accounts and eight token balance or allowance queries. Other changes may be missed; network fees are excluded.';
   if (!manual) $('standard-queries').setCustomValidity('');
   if (local) $('standard-checks-help').textContent = `Checks only the explicitly listed accounts and contracts. ETH balances use exact ETH and wei; token and position values stay raw. ${feesEnabled ? 'ETH changes include simulated transaction fees; measurement queries do not repeat fees. ' : 'ETH changes exclude transaction fees. '}There is no automatic account selection or complete effect coverage.`;
+  if (local && sequence) {
+    $('block-help').textContent = 'All calls start at the same selected block and use the state left by earlier steps. Gas, fees and transaction context can be set separately in each step.';
+    $('standard-checks-help').textContent = 'Only the shared explicit query list is checked, separately around each step. Priced steps include their simulated fees; unpriced steps exclude fees. No automatic discovery or complete effect coverage is claimed.';
+  }
+  $('sequence-editor-help').textContent = local ? 'Separate calls run in order with the same sender and block. Each uses the state left by earlier steps. A failure stops later calls; it does not undo earlier steps. Set gas, fees and context separately below. Nothing is signed or sent.' : 'Each call starts from the simulated state left by the previous call, using the same wallet and block context. A later failure does not undo an earlier simulated call. Network fees and outer signatures are not modeled.';
   if (standard) $('value-help').textContent = `ETH sent with the call, in whole wei. 1 ETH = 1000000000000000000 wei. Use 0 for none; ${feesEnabled ? 'transaction fees are separate from this value.' : 'network fees are excluded.'}`;
   if (sepoliaMode()) {
     $('network-help').textContent = localAvailable() ? 'Sepolia testnet. Preview with test ETH; no connected wallet or signature needed.' : 'Sepolia local previews are unavailable in this workspace.';
@@ -415,8 +423,8 @@ function readStandardQueries(text = $('standard-queries').value) {
   return queries;
 }
 
-function transactionContextText(call) {
-  const context = Object.fromEntries(['accessList', 'blobVersionedHashes'].filter(key => Object.hasOwn(call, key)).map(key => [key, call[key]]));
+function transactionContextText(call, localSequence = false) {
+  const context = Object.fromEntries((localSequence ? ['gas', 'accessList', 'blobVersionedHashes', 'authorizationList', 'executionProfile', 'fees'] : ['accessList', 'blobVersionedHashes']).filter(key => Object.hasOwn(call, key)).map(key => [key, call[key]]));
   return Object.keys(context).length ? JSON.stringify(context, null, 2) : '';
 }
 
@@ -453,6 +461,42 @@ function readTransactionContext(text) {
   return context;
 }
 
+function localSequenceContextHelp() {
+  const help = node('div', 'transaction-context-help');
+  help.append(node('p', 'field-help', 'Blank uses 5,000,000 gas and excludes fees. Optional fields apply only to this step: gas, accessList, blobVersionedHashes, authorizationList, executionProfile and fees. The sender, block and query list are shared.'));
+  help.append(node('pre', '', '{"gas":"100000","executionProfile":"unsigned_eip1559_block_end","fees":{"maxFeePerGas":"10000000000","maxPriorityFeePerGas":"1000000000"}}'));
+  help.append(node('p', 'field-help', 'Blob fees use unsigned_eip4844_block_end and also require maxFeePerBlobGas. Authorization tuples use chainId, address, nonce, yParity, r and s as canonical hex values. These inputs do not sign or send a transaction. Fork and balance checks still apply.'));
+  return help;
+}
+
+function readLocalSequenceContext(text, to) {
+  if (!text.trim()) return {};
+  let value;
+  try { value = JSON.parse(text); } catch { throw new Error('Enter valid JSON for this step’s gas, fees and context, or leave it blank.'); }
+  const record = item => item !== null && typeof item === 'object' && !Array.isArray(item);
+  const fields = ['gas', 'accessList', 'blobVersionedHashes', 'authorizationList', 'executionProfile', 'fees'];
+  if (!record(value) || Object.keys(value).some(key => !fields.includes(key))) throw new Error('Only gas, accessList, blobVersionedHashes, authorizationList, executionProfile and fees are accepted here. Sender, block and queries are shared.');
+  readTransactionContext(JSON.stringify(Object.fromEntries(['accessList', 'blobVersionedHashes'].filter(key => Object.hasOwn(value, key)).map(key => [key, value[key]]))));
+  if (Object.hasOwn(value, 'gas') && (typeof value.gas !== 'string' || readLocalGas(value.gas) !== value.gas)) throw new Error('Gas must be a whole decimal string from 21000 to 5000000.');
+  if (Object.hasOwn(value, 'authorizationList')) {
+    const quantity = (x, bits) => typeof x === 'string' && /^0x(?:0|[1-9a-f][0-9a-f]*)$/i.test(x) && x.length <= 66 && BigInt(x) < (1n << BigInt(bits));
+    if (!Array.isArray(value.authorizationList) || value.authorizationList.length < 1 || value.authorizationList.length > 16 || value.authorizationList.some(tuple => !record(tuple)
+      || Object.keys(tuple).sort().join() !== 'address,chainId,nonce,r,s,yParity' || typeof tuple.address !== 'string' || !/^0x[0-9a-f]{40}$/i.test(tuple.address)
+      || ![['chainId', 256], ['nonce', 64], ['yParity', 8], ['r', 256], ['s', 256]].every(([key, bits]) => quantity(tuple[key], bits)))) throw new Error('Use one to sixteen complete authorization tuples with canonical hex quantities.');
+    if (to === null || value.blobVersionedHashes) throw new Error('Authorization lists require a call recipient without blob hashes.');
+  }
+  if (to === null && value.blobVersionedHashes) throw new Error('Contract deployment cannot carry blob hashes.');
+  if (Object.hasOwn(value, 'executionProfile') || Object.hasOwn(value, 'fees')) {
+    const blob = value.executionProfile === LOCAL_BLOB_FEE_PROFILE;
+    const keys = ['maxFeePerGas', 'maxPriorityFeePerGas', ...(blob ? ['maxFeePerBlobGas'] : [])];
+    if (![LOCAL_FEE_PROFILE, LOCAL_BLOB_FEE_PROFILE].includes(value.executionProfile) || !record(value.fees)
+      || Object.keys(value.fees).sort().join() !== keys.sort().join() || !keys.every(key => decimalWei(value.fees[key]))) throw new Error('Choose a supported priced profile and provide exactly its fee caps as whole decimal wei strings.');
+    if (BigInt(value.fees.maxPriorityFeePerGas) > BigInt(value.fees.maxFeePerGas)) throw new Error('Priority fee cannot exceed the maximum fee per gas.');
+    if (blob !== Boolean(value.blobVersionedHashes) || (blob && value.blobVersionedHashes.length > 9)) throw new Error('Priced blob context requires the blob fee profile and one to nine hashes; the selected fork may impose a lower limit.');
+  }
+  return value;
+}
+
 function clearTransactionContexts() {
   $('transaction-context').value = ''; $('transaction-context').setCustomValidity(''); $('transaction-context-settings').open = false;
   for (const draft of state.sequenceDrafts) draft.contextText = '';
@@ -472,12 +516,13 @@ function readSequenceCalls() {
   const calls = [];
   for (const row of state.sequenceControls) {
     validateWeiField(row.value);
-    const call = { to: row.to.value.trim(), data: row.data.value.trim(), value: row.value.value };
+    if (row.value.validationMessage) { row.value.reportValidity(); return null; }
+    const call = { to: localMode() && row.to.value.trim() === 'null' ? null : row.to.value.trim(), data: row.data.value.trim(), value: row.value.value };
     row.context.setCustomValidity('');
-    try { Object.assign(call, readTransactionContext(row.context.value)); }
+    try { Object.assign(call, localMode() ? readLocalSequenceContext(row.context.value, call.to) : readTransactionContext(row.context.value)); }
     catch (error) { row.contextSettings.open = true; row.context.setCustomValidity(error.message); row.context.reportValidity(); return null; }
     row.queries.setCustomValidity('');
-    if (row.manual.checked) {
+    if (!localMode() && row.manual.checked) {
       try { call.queries = readStandardQueries(row.queries.value); }
       catch (error) { row.advanced.open = true; row.queries.setCustomValidity(error.message); row.queries.reportValidity(); return null; }
     }
@@ -1524,9 +1569,9 @@ function renderArbitrumResult(result) {
   $('timing').textContent = Number.isFinite(result.timing?.totalMs) && result.timing.totalMs >= 0 ? `${(result.timing.totalMs / 1000).toFixed(2)}s total` : '';
 }
 
-function renderLocalResult(result) {
-  beginResult(result, true);
-  $('standard-result').hidden = true; $('hyper-result').hidden = true; $('sequence-result').hidden = true; $('local-result').hidden = false;
+function renderLocalResult(result, sequenceContext = null) {
+  if (!sequenceContext) beginResult(result, true);
+  $('standard-result').hidden = true; $('hyper-result').hidden = true; $('sequence-result').hidden = !sequenceContext; $('local-result').hidden = false;
   const rows = localMeasurementRows(result), measured = rows.filter(row => row.measured).length;
   const nativeSymbol = result.apiRequest?.chainId === 11155111 ? 'test ETH' : 'ETH';
   $('result-label').textContent = result.apiRequest?.chainId === 11155111 ? 'Sepolia local preview · experimental' : 'Independent local preview · experimental';
@@ -1568,7 +1613,7 @@ function renderLocalResult(result) {
   $('warnings-section').hidden = false;
   $('warnings-list').replaceChildren(...[
     'Only the explicit query list is checked. There is no automatic asset discovery, ETH balance summary or total portfolio value.',
-    'Before and after refer to this unsigned call from the selected block-end state, not the original historical transaction position.',
+    sequenceContext ? 'Before and after refer to this step. Earlier completed steps remain in its starting state; a later failure does not undo them. Separate transactions are not guaranteed to execute together.' : 'Before and after refer to this unsigned call from the selected block-end state, not the original historical transaction position.',
     'State proofs and code are checked against the selected header. Consensus, finality, contract identity and complete economic effects are not established.',
     'On Cancun or later, local KZG proof checking applies only when a point-evaluation call (0x0a) executes. This preview does not provide a blanket proof verdict or validate blob sidecars, whole-blob validity or inclusion.',
     feeRequested ? 'Fee amounts are shown only for a complete validated simulation. Measurement queries do not repeat fees. Outer transaction signatures are not validated.' : 'Network fees and outer transaction signatures are not validated. Execution is not a security verdict.',
@@ -1722,6 +1767,62 @@ function renderSequenceStep(sequence, step) {
   $('timing').textContent = '';
 }
 
+// Local sequence projections must agree with their retained originals. This is
+// display validation, not an independent execution or proof replay.
+function sameLocalValue(a, b) {
+  if (a === b) return true;
+  if (!a || !b || typeof a !== 'object' || typeof b !== 'object' || Array.isArray(a) !== Array.isArray(b)) return false;
+  const keys = Object.keys(a);
+  return keys.length === Object.keys(b).length && keys.every(key => Object.hasOwn(b, key) && sameLocalValue(a[key], b[key]));
+}
+function localSequenceStepView(result, index) {
+  const api = result.apiRequest || {}, call = api.calls?.[index], step = result.steps?.[index], raw = result.attempt?.sequence?.steps?.[index];
+  const expected = call && { from: api.from, ...call }, profile = call?.executionProfile ?? 'unsigned_unpriced_block_end';
+  const valid = result.kind === 'local_proof_sequence' && result.schemaVersion === '1.0' && [1, 11155111].includes(api.chainId)
+    && Array.isArray(api.calls) && api.calls.length >= 2 && api.calls.length <= 4 && result.steps?.length === api.calls.length
+    && result.attempt?.sequence?.steps?.length === api.calls.length && ['complete', 'partial'].includes(result.status)
+    && result.source?.chainId === api.chainId && result.source?.profile === 'ordered_unsigned_same_header_sequence'
+    && result.source?.canonicalStatus === 'verified' && result.source?.executionProfiles?.[index] === profile
+    && result.attempt?.status === 'completed' && result.attempt.sequence.status === result.status
+    && step?.index === index && raw?.index === index && step.status === 'completed' && raw.status === 'completed'
+    && sameLocalValue(step.request, expected) && sameLocalValue(raw.request, expected)
+    && sameLocalValue(step.execution, raw.original?.output?.execution)
+    && Array.isArray(step.measurements) && step.measurements.length === api.queries?.length
+    && raw.measurements?.length === step.measurements.length && step.measurements.every((row, i) => {
+      const retained = raw.measurements[i];
+      return row.index === i && retained && ['descriptor', 'query', 'identity', 'returnBytes', 'status', 'reason', 'values'].every(key => sameLocalValue(row[key], retained[key]));
+    });
+  return { ...result, kind: 'local_proof_preview', apiRequest: { chainId: api.chainId, from: api.from, block: api.block, ...call, queries: api.queries },
+    status: valid ? result.status : 'unavailable', error: valid ? result.error : result.error || { message: step?.reason || 'This step has no verified execution and measurements.' },
+    execution: valid ? step.execution : { status: step?.status === 'not_attempted' ? 'not_attempted' : 'unavailable' },
+    measurements: valid ? step.measurements : [], source: { ...result.source, profile, canonicalStatus: valid ? 'verified' : 'unverified' },
+    attempt: valid ? { ...result.attempt, preview: { original: raw.original } } : null };
+}
+function renderLocalSequenceStep(result, index) {
+  for (const entry of state.sequenceStepButtons) entry.button.setAttribute('aria-pressed', String(entry.index === index));
+  const view = localSequenceStepView(result, index);
+  renderLocalResult(view, { index });
+  $('result-label').textContent = `${view.apiRequest.chainId === 11155111 ? 'Sepolia' : 'Ethereum'} local sequence · step ${index + 1}`;
+  $('execution-label').textContent = `Step ${index + 1} execution`;
+  $('sequence-step-notice').textContent = 'Before and after belong only to this step. Amounts from different steps are not combined. The full sequence remains available in JSON.';
+}
+function renderLocalSequenceResult(result) {
+  beginResult(result, true);
+  $('sequence-result').hidden = false;
+  const calls = Array.isArray(result.apiRequest?.calls) ? result.apiRequest.calls.slice(0, 4) : [];
+  $('sequence-result-status').textContent = titleCase(['complete', 'partial'].includes(result.status) && result.source?.canonicalStatus === 'verified' ? result.status : 'unavailable');
+  $('sequence-result-description').textContent = 'Separate calls run in order with one sender and block. A failure stops later calls without undoing earlier steps. Each step has separate before-and-after checks and its own fee settings. Calls are not atomic or guaranteed to execute together. Only explicit queries are checked; missing amounts are unknown.';
+  state.sequenceStepButtons = [];
+  $('sequence-step-list').replaceChildren(...calls.map((call, index) => {
+    const view = localSequenceStepView(result, index), rows = localMeasurementRows(view), item = node('li'), button = node('button', 'sequence-step-button'); button.type = 'button';
+    button.append(node('strong', '', `Step ${index + 1} · ${titleCase(view.execution.status)}`), node('span', 'sequence-step-address', call?.to === null ? 'Contract deployment' : call?.to),
+      node('span', 'sequence-step-counts', `${rows.filter(row => row.measured).length}/${rows.length} requested checks measured`));
+    button.addEventListener('click', () => renderLocalSequenceStep(result, index));
+    state.sequenceStepButtons.push({ index, button }); item.append(button); return item;
+  }));
+  renderLocalSequenceStep(result, 0);
+}
+
 function renderSequenceResult(result) {
   beginResult(result, true);
   $('sequence-result').hidden = false;
@@ -1843,7 +1944,7 @@ async function run(mode) {
     try { gas = readArbitrumGas(); }
     catch (error) { $('arbitrum-gas-settings').open = true; $('arbitrum-gas').setCustomValidity(error.message); $('arbitrum-gas').reportValidity(); return; }
   }
-  if (localMode()) {
+  if (localMode() && !sequence) {
     $('local-gas').setCustomValidity('');
     try { gas = readLocalGas(); }
     catch (error) { $('local-gas-settings').open = true; $('local-gas').setCustomValidity(error.message); $('local-gas').reportValidity(); return; }
@@ -1856,7 +1957,7 @@ async function run(mode) {
     }
     catch (error) { $('transaction-context-settings').open = true; $('transaction-context').setCustomValidity(error.message); $('transaction-context').reportValidity(); return; }
   }
-  if (localMode()) {
+  if (localMode() && !sequence) {
     for (const id of ['local-max-fee', 'local-priority-fee', 'local-max-blob-fee']) $(id).setCustomValidity('');
     try { feeContext = readLocalFees(context); }
     catch (error) { $('local-fee-settings').open = true; $('local-max-fee').setCustomValidity(error.message); $('local-max-fee').reportValidity(); return; }
@@ -1876,25 +1977,25 @@ async function run(mode) {
   setBusy(true, mode);
   try {
     const fingerprint = requestFingerprint();
-    const body = sequence ? { chainId: 1, from: $('from').value.trim(), block: $('block').value.trim(), calls }
+    const body = sequence ? { chainId: Number($('chain').value), from: $('from').value.trim(), block: $('block').value.trim(), calls }
       : mode === 'historical_trace' ? { chainId: Number(state.example.request.chainId), transactionHash: state.example.transactionHash } : { chainId: Number($('chain').value), from: $('from').value.trim(), to: creationMode() ? null : $('to').value.trim(), data: $('data').value.trim(), value: $('value').value.trim(), block: $('block').value.trim() };
     if (standard && queries !== undefined) body.queries = queries;
     if ((localMode() || arbitrum) && gas !== undefined) body.gas = gas;
     if (localMode() && feeContext) Object.assign(body, feeContext);
     if (context !== undefined) Object.assign(body, context);
-    const result = await request(arbitrum ? '/api/arbitrum/simulate' : localMode() ? '/api/evm/local-preview' : sequence ? '/api/evm/simulate-sequence' : standard ? '/api/evm/simulate' : mode === 'historical_trace' ? '/api/replay' : '/api/simulate', body);
+    const result = await request(arbitrum ? '/api/arbitrum/simulate' : localMode() ? sequence ? '/api/evm/local-sequence' : '/api/evm/local-preview' : sequence ? '/api/evm/simulate-sequence' : standard ? '/api/evm/simulate' : mode === 'historical_trace' ? '/api/replay' : '/api/simulate', body);
     if (fingerprint !== requestFingerprint()) {
       setBusy(false);
       clearResult({ inputsChanged: true });
       return;
     }
     if (arbitrum) renderArbitrumResult(result);
-    else if (localMode()) renderLocalResult(result);
+    else if (localMode()) sequence ? renderLocalSequenceResult(result) : renderLocalResult(result);
     else if (sequence) renderSequenceResult(result);
     else if (standard) renderStandardResult(result);
     else renderResult(result);
     setBusy(false);
-    $('run-status').textContent = arbitrum ? 'Provider preview returned. Review execution separately from incomplete asset observations. Destination credit and network fees are not verified.' : localMode() ? 'Local preview returned. Review execution and each requested check separately; unavailable values are not zero.' : sequence
+    $('run-status').textContent = arbitrum ? 'Provider preview returned. Review execution separately from incomplete asset observations. Destination credit and network fees are not verified.' : localMode() && sequence ? 'Local sequence returned. Review each step separately; later failures do not undo earlier steps and missing measurements are unknown.' : localMode() ? 'Local preview returned. Review execution and each requested check separately; unavailable values are not zero.' : sequence
       ? result.sequence?.status === 'completed' ? 'Sequence completed. Select each step to review its balances and allowances. Network fees are excluded.'
         : 'The sequence stopped or could not be established. Review the attempted steps and explicitly skipped calls below.'
       : standard
@@ -2019,6 +2120,7 @@ $('ethereum-engine').addEventListener('change', () => {
   const wasSequence = $('ethereum-call-mode').value === 'sequence';
   $('ethereum-call-mode').value = 'single';
   $('standard-manual-queries').checked = localMode();
+  renderSequenceEditor();
   if (wasSequence) { populateExampleOptions(); selectExample(); }
   else { updateQueryMode(); clearResult({ inputsChanged: true }); }
   setBusy(false);

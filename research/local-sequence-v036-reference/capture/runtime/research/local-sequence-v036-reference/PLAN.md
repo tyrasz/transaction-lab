@@ -1,0 +1,60 @@
+# Synthetic local sequence reference preparation
+
+Status: preparation only. No product sequence, EELS transaction, freeze or reference capture is authorized by this document. The actual runner and saved-artifact comparator still need implementation/review and an explicit dispatch release. Do not reuse an existing capture directory.
+
+## Fixed inputs
+
+Four sequences, three ordered positions each; the denominator is always **4 sequences / 12 positions**. Inputs are defined in `cases.mjs` before any reference outcomes:
+
+| Case | Fork/network context | Position 0 | Position 1 | Position 2 |
+| --- | --- | --- | --- | --- |
+| 001 | Osaka, chain 1 | approve vault, 100 | deposit, 100 | withdraw, 40 |
+| 002 | Amsterdam, chain 11155111 | approve vault, 100 | deposit, 100 | withdraw, 40 |
+| 003 | Osaka, chain 1 | approve vault, 100 | depositThenRevert, 100 | withdraw, 40; attempt only if preceding calls succeed |
+| 004 | Amsterdam, chain 11155111 | approve vault, 100 | depositThenRevert, 100 | withdraw, 40; attempt only if preceding calls succeed |
+
+These are the synthetic ERC20-shaped token and one-to-one vault in `engines/local-evm/test/sequence-fixture.js`, **not Aave, Morpho, ERC-4626, or public deployed contracts**. Initial sender tokens are 1,000; vault assets, shares and allowance are zero. Approval names the vault as spender. The deliberate failure occurs after token transfer and share writes in the synthetic program. Names describe inputs, not acceptance requirements for observed outcomes.
+
+Every request is priced, value zero, gas limit 5,000,000, fee caps 13/3 with base fee 7. The public development key is the existing `0x01` repeated 32 times; its sender is `0x1a642f0e3c3af545e7acbd38b07251b3990914f1`. The three signed type-2 counterparts are fixed at nonce 1/2/3 and preserve the exact unsigned request bytes. Position 2 remains declared and signed even when it is not attempted. No real-wallet key, broadcast or network is used.
+
+Each sequence keeps one immutable header/environment. The original allocation/root and the effective allocation/root are both retained. The effective allocation adds exactly the four existing inert system STOP accounts used in prior EELS adapters (nonce 1, balance 0, code `0x00`, empty storage), identically on both sides. No original row changes. This is disclosed synthetic prestate, not a claimed chain state.
+
+## Reference state and transaction boundary
+
+`eels-worker.py` accepts **only the declaration, pinned toolchain manifest and declaration SHA**. It rejects additional top-level fields, including product outputs. Before dispatch it decodes all three signed envelopes with official EELS, recovers the sender, checks fields/nonces/intrinsic gas, rebuilds both initial MPT roots, hashes the complete header RLP, and binds environment fields. `--prepare-only` returns here, before any BlockState/BlockEnvironment, system transaction or EVM call.
+
+For actual execution, one worker owns a sequence. At each attempted position it reconstructs a fresh EELS MPT from only the preceding EELS full allocation (initial allocation at position 0), checks the carried root and actual sender nonce/funding, and creates fresh BlockState, BlockEnvironment, block output, transaction context and Amsterdam BAL builder. It calls unmodified official `apply_body` with exactly one signed transaction and empty withdrawals, retaining the same declared environmental scalars. It independently applies the EELS state diff, enumerates the full post-allocation, and rebuilds its root before that allocation may feed the next position.
+
+This is a sequence of transaction transitions under the same block environment, **not a claim that three new blocks share the same header, a consensus-valid block replay, or a cumulative block-capacity test**. Single-transaction `apply_body` repeats its system processing; the four STOP accounts must remain exactly unchanged after each step and requests must remain empty. No earlier block hashes beyond the declared parent are supplied. The fixed bytecode does not use BLOCKHASH. Fresh reconstruction prevents access-list warmth, refunds, transient storage and creation markers from leaking across transactions.
+
+On the first unsuccessful receipt, its settled full state, nonce, fees, receipt, committed logs and return/error evidence are retained, and later positions remain `not_attempted`. An adapter exception keeps completed-prefix observations and marks the current row `unavailable`, later rows `not_attempted`, with a nonzero process exit. An externally killed worker may have only retained raw bytes; the runner must preserve all three positions as unavailable/unattempted without fabricating observations.
+
+Official `TransactionEnd` is filtered by exact signed transaction hash and depth zero; system events cannot supply the return value. Missing terminal evidence produces null return/status detail, never an invented value. Its gas is labelled pre-refund/floor message accounting and is **not** treated as charged receipt gas. Osaka charged gas is single-transaction `block_gas_used`. Amsterdam receipt charged gas is `cumulative_gas_used`; its single-transaction block dimension is `max(block_gas_used, block_state_gas_used)` and both components are retained separately.
+
+## Later product/comparison contract
+
+Use the actual isolated sequence API against initial-proof-only synthetic RPC fixtures. Carry one product manager across requests; no reference allocation or expected poststate may enter it. Retain raw output, input proofs/code/header, each original's starting/cumulative changes, all stop rows, usage, child closure and drain evidence. The current sequence API requires at least one query: the declaration includes only a disposable native-sender query. Retain it if emitted, but **exclude all query outputs and measured-native channels from this comparison**. Native fees and balances are nevertheless part of the compared full state root.
+
+Reconstruct each product original's cumulative changes against the same immutable complete initial allocation in a third MPT, not against the previous cumulative delta. Bind the starting overlay to the preceding completed original. The ordinary delta helper must reject unsupported reset/deletion/code replacement shapes rather than silently flattening them. This fixture has no contract creation/destruction. Compare each mutually completed position across six channels: execution status, exact return bytes, charged gas, ordered committed logs, complete poststate root, and single-transaction block gas dimension. Retain Amsterdam regular/state components as diagnostics. Independently bind receipt/log/transaction roots and initial/signed/header identities.
+
+Never count `not_attempted` as an execution match. If either side stops differently or lacks a channel, keep the fixed position with explicit mismatch or null/unavailable channels. The failed middle transaction is a normal comparable execution outcome if both sides expose sufficient evidence. Do not require planned method names to produce a particular outcome. Report attempted/completed/non-success/not-attempted counts separately; no 12/12 accuracy claim from expected stop rows.
+
+## Later capture bounds and order
+
+Before targets, archive the reviewed adapters, declarations, tests, product fixture/engine dependency closure, patched local runtime plus stock fixture dependencies, exact header/input bytes, toolchain manifest and source inventory. Reverify all 5,080 entries of the newly inventoried current EELS environment, not only selected imports. `source-notes.json` records interpretation-source pins; it is not a frozen capture manifest.
+
+The future archived-only driver must retain every attempt and use an original-write identity ledger plus exact final inventory. Run and seal all four product workers **before** starting any of the four EELS workers. One worker per sequence, at most three transaction transitions per worker; no retries, dynamic case replacement, outcome-dependent new case, or extra reference engine. Each worker: 15 seconds wall timeout, 15 seconds CPU, 2 MiB per stdout/stderr stream enforced during writing, 4 MiB combined; aggregate raw-process output <=32 MiB and a dual-clock execution-and-verification budget <=180 seconds, measured from `executeMatrix` entry through its terminal source and original-write-ledger checks. This interval excludes preparation/freezing, final result/manifest serialization and sealing, saved-artifact comparison, and output delivery. CPU limits are inherited per process, not a group-wide CPU or memory bound. Product inner wall/execution/drain/kill budgets must fit inside the outer deadline with margin. Require actual child closure/drain even for unavailable attempts; timeout, overflow, clock violation, ledger/inventory drift or unproven closure must stop further dispatch and withhold packet usability while preserving all positions and raw failures. Revalidate source, input and previously written evidence before each process and final seal.
+
+Source preparation checks may sign/decode inputs, hash source, and construct tries, but must not call either execution branch. No production API or dependency changes are included here. Preserve initial preparation failures alongside the final controls. Freeze and actual target execution remain separate root-authorized steps.
+
+## Pinned source basis
+
+Official EELS commit `e27f097ec7b3e6e8ee9c2c1873c183e8f7da7a6e`, externally acquired source under `outputs/evm-toolchains/eels-e27f097ec7/source`. The old toolchain manifest SHA256 `5e67873833811992160173737d5c6f229dad327281e7e915ecce206cac4cb005` remains unchanged. A full read-only audit found the 1,145 EELS source files and 2,995 regular venv files unchanged, but the current CPython runtime differs: executable, libpython, 187 stdlib `.pyc` files, three native stdlib extensions and three interpreter symlink resolutions. Exact paths/old/new hashes are in `toolchain-drift.json`. The new current manifest `toolchain.json` is SHA256 `3c69ebf10c2650c6f5ad29bcc7bf738766f72fd9b7ff01424f3cc2227b3aca19`, with CPython 3.12.14 and all 5,080 entries re-inventoried. The earlier runtime was not restored; this packet must not claim identical runtime bytes to earlier captures. These are byte-inventory bindings, not Git-object or consensus attestations.
+
+- Osaka `fork.py:727–790`: apply_body/system processing and transaction loop; `829–979`: fresh TransactionState, nonce/fee processing, receipt and transaction commit.
+- Amsterdam `fork.py:783–852`: apply_body/BAL and system processing; `1004–1095`: transaction processing, fee settlement, receipts and finalization.
+- Osaka `state_tracker.py:684–714` and Amsterdam `state_tracker.py:799–845`: transaction commit clears created-account/transient tracking. The adapter additionally reconstructs full state between steps.
+- Osaka `vm/interpreter.py:137–153` and Amsterdam `vm/interpreter.py:293–310`: official TransactionEnd emission; `ethereum/trace.py:38` defines that event.
+- The prior frozen adapters under `research/storage-creation-lifecycle-v035/capture/runtime/research/` supplied the full-allocation, typed-receipt and trace interpretation pattern. They are read-only provenance references; this sequence adapter is a new file and performs no queries.
+
+Run the offline preparation controls with `node --test research/local-sequence-v036-reference/cases.test.mjs`. Do not invoke the worker without `--prepare-only` until the later driver/source review and explicit release.

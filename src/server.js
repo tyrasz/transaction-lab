@@ -1,5 +1,5 @@
 import http from 'node:http';
-import { readFile, writeFile, mkdir, readdir, unlink } from 'node:fs/promises';
+import { readFile, writeFile, mkdir, readdir, unlink, rename } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { randomUUID, createHash } from 'node:crypto';
@@ -23,7 +23,7 @@ import { loadLocalApi } from './local-loader.js';
 import { loadArbitrumApi } from './arbitrum-loader.js';
 
 const ROOT = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
-const engineFiles = ['account-effects.js','affected-balances.js','allowances.js','analyze.js','arbitrum-loader.js','balances.js','config.js','current-state.js','historical-state.js','lending.js','lending-balances.js','local-loader.js','local-simulation.js','permissions.js','proof-rpc.js','query-validation.js','revert.js','rpc.js','server.js','standard-loader.js','standard-rpc.js','state-diff.js','state.js','validate.js'];
+const engineFiles = ['account-effects.js','affected-balances.js','allowances.js','analyze.js','arbitrum-loader.js','balances.js','config.js','current-state.js','historical-state.js','lending.js','lending-balances.js','local-loader.js','local-sequence.js','local-simulation.js','permissions.js','proof-rpc.js','query-validation.js','revert.js','rpc.js','server.js','standard-loader.js','standard-rpc.js','state-diff.js','state.js','validate.js'];
 const engineHash = createHash('sha256');
 for (const name of engineFiles) engineHash.update(name+'\0').update(await readFile(path.join(ROOT,'src',name))).update('\0');
 const implementation = Object.freeze({name:'Transaction Lab',version:VERSION,sourceSha256:engineHash.digest('hex'),sourceFiles:engineFiles});
@@ -114,8 +114,11 @@ async function readJson(req, maxKiB = 128) {
 }
 
 function json(res, status, body) {
-  res.writeHead(status, { 'content-type':'application/json; charset=utf-8', 'cache-control':'no-store', 'x-content-type-options':'nosniff' });
-  res.end(JSON.stringify(body));
+  return jsonText(res, status, JSON.stringify(body));
+}
+function jsonText(res, status, text, headers = {}) {
+  res.writeHead(status, { 'content-type':'application/json; charset=utf-8', 'cache-control':'no-store', 'x-content-type-options':'nosniff', ...headers });
+  res.end(text);
 }
 
 async function persistReport(report, reportDir) {
@@ -128,6 +131,121 @@ async function persistReport(report, reportDir) {
     items.sort((a,b)=>String(a.at).localeCompare(String(b.at)));
     for (const item of items.slice(0, items.length-40)) await unlink(path.join(dir,item.name));
   }
+}
+
+// Local results are staged outside the published UUID.json inventory. Slow
+// writes/retention complete before publication, while request cancellation and
+// the proof transport's original deadline remain observable. Filesystem calls
+// are awaited, not represented as force-cancellable operations.
+function localReportStore(reportDir) {
+  const dir = path.join(reportDir, 'simulations');
+  return {
+    async stage(report, text) {
+      await mkdir(dir, { recursive: true });
+      const token = { pending: path.join(dir, `.${report.id}.${randomUUID()}.pending`),
+        published: path.join(dir, `${report.id}.json`), didPublish: false };
+      try {
+        await writeFile(token.pending, text + '\n', { mode: 0o600, flag: 'wx' });
+        const files = (await readdir(dir)).filter(name => /^[0-9a-f-]{36}\.json$/.test(name) && name !== `${report.id}.json`);
+        if (files.length >= 40) {
+          const items = [{ name: `${report.id}.json`, at: report.createdAt }];
+          // Retain only metadata between reads instead of loading many large
+          // prior reports concurrently. Do not remove one for an unpublished
+          // new report whose deadline might already have expired.
+          for (const name of files) {
+            try { const value = JSON.parse(await readFile(path.join(dir, name), 'utf8')); items.push({ name, at: value.createdAt }); }
+            catch { items.push({ name, at: '' }); }
+          }
+          items.sort((a, b) => String(a.at).localeCompare(String(b.at)));
+          token.prune = items.slice(0, items.length - 40).map(item => path.join(dir, item.name));
+        }
+        return token;
+      } catch (error) {
+        try { await unlink(token.pending); }
+        catch (cleanup) {
+          if (cleanup.code !== 'ENOENT') throw Object.assign(new Error('Local report staging and cleanup failed.'), { localReportToken: token });
+        }
+        throw error;
+      }
+    },
+    async publish(token) {
+      token.publishAttempted = true; await rename(token.pending, token.published); token.didPublish = true;
+      for (const file of token.prune ?? []) {
+        // Concurrent accepted requests may identify the same oldest report.
+        try { await unlink(file); } catch (error) { if (error.code !== 'ENOENT') throw error; }
+      }
+    },
+    async discard(token, withheldText) {
+      let pendingError = null;
+      try { await unlink(token.pending); } catch (error) { if (error.code !== 'ENOENT') pendingError = error; }
+      if (token.publishAttempted || token.didPublish) {
+        try { await unlink(token.published); }
+        catch (error) {
+          if (error.code !== 'ENOENT') {
+            // A directory may become non-writable after publication while the
+            // existing owned file remains writable. Replace it with the same
+            // withheld response if removal is unavailable; never call that a
+            // successful cleanup if both operations fail.
+            await writeFile(token.published, withheldText + '\n', { mode: 0o600 });
+          }
+        }
+      }
+      if (pendingError) throw pendingError;
+    },
+  };
+}
+
+async function finishLocalResponse({ res, report, context, persist, store }) {
+  let token = null, staged = false, publicationFailed = false, lateFailure = null;
+  const warning = message => { report.warnings = [...(report.warnings ?? []), message]; };
+  const serialize = () => {
+    let text = JSON.stringify(report);
+    if (Buffer.byteLength(text) > context.outputBytes) {
+      context.withhold(report, 'LOCAL_PREVIEW_OUTPUT'); delete report.audit; report.attempt = null;
+      text = JSON.stringify(report);
+    }
+    // Check after the complete retained body has been serialized. Sending this
+    // exact string avoids an unchecked second serialization at the HTTP edge.
+    const failure = context.failure();
+    if (failure) {
+      lateFailure ??= failure; context.withhold(report, lateFailure);
+      text = JSON.stringify(report);
+    }
+    return text;
+  };
+  let text = serialize();
+  if (persist && !lateFailure) {
+    try { token = await store.stage(report, text); staged = true; }
+    catch (error) { token = error?.localReportToken ?? null; warning('The local report could not be saved. Download this response to preserve it.'); }
+    text = serialize();
+    if (token && staged && !lateFailure) {
+      try { await store.publish(token); }
+      catch { publicationFailed = true; warning('The local report could not be saved. Download this response to preserve it.'); }
+      text = serialize();
+    }
+  }
+  if (token && (lateFailure || publicationFailed || !token.didPublish)) {
+    // Cleanup may itself cross the deadline. Any replacement for a file that
+    // cannot be removed must already be unavailable, even if publication failed
+    // while the HTTP result was still valid. Do not mutate that valid response.
+    const discardedReport = JSON.parse(text);
+    context.withhold(discardedReport, lateFailure ?? 'LOCAL_PREVIEW_OUTPUT');
+    const discardedText = JSON.stringify(discardedReport);
+    try { await store.discard(token, discardedText); }
+    catch {
+      warning('The saved report could not be removed or replaced after final validation failed; do not use that file as a verified result.');
+      // The response remains unavailable even if the operating system refuses
+      // both cleanup paths. Do not describe uncancellable filesystem I/O as an
+      // atomic or guaranteed rollback.
+      if (!lateFailure) context.withhold(report, 'LOCAL_PREVIEW_OUTPUT');
+    }
+    text = serialize();
+  }
+  if (res.destroyed) return;
+  // Keep this duration outside the saved JSON: inserting it there would require
+  // another write and move the measurement boundary again. It includes awaited
+  // persistence and the final full-body check, but not response delivery.
+  return jsonText(res, 200, text, { 'server-timing': `local_response;dur=${context.elapsed().toFixed(3)};desc="Adapter through final response check; excludes delivery"` });
 }
 
 export async function simulate(input, rpc) {
@@ -230,7 +348,7 @@ export async function replay(input, rpc) {
   };
 }
 
-export function createAppServer({rpcFactory=()=>new RpcClient(),standardRpcFactory=options=>new StandardRpcClient(options),standardLoader=loadStandardApi,proofRpcFactory=options=>new ProofRpcClient(options),localLoader=loadLocalApi,arbitrumLoader=loadArbitrumApi,arbitrumOptions=()=>({}),reportDir=path.join(ROOT,'reports'),persist=true}={}) {
+export function createAppServer({rpcFactory=()=>new RpcClient(),standardRpcFactory=options=>new StandardRpcClient(options),standardLoader=loadStandardApi,proofRpcFactory=options=>new ProofRpcClient(options),localLoader=loadLocalApi,arbitrumLoader=loadArbitrumApi,arbitrumOptions=()=>({}),reportDir=path.join(ROOT,'reports'),persist=true,localReportStore:localStore}={}) {
   let inFlight=0;
   return http.createServer(async(req,res)=>{
     try {
@@ -248,7 +366,7 @@ export function createAppServer({rpcFactory=()=>new RpcClient(),standardRpcFacto
         const [standard, local, arbitrum] = await Promise.all([standardLoader(), localLoader(), arbitrumLoader()]);
         return json(res,200,{chains:[{chainId:999,name:'HyperEVM'},{chainId:1,name:'Ethereum',experimental:true},{chainId:11155111,name:'Sepolia',experimental:true,localOnly:true},{chainId:42161,name:'Arbitrum',experimental:true}],examples:EXAMPLES,capabilities:CAPABILITIES,
           standardEvm:standard?{available:true,examples:standard.STANDARD_EXAMPLES,capabilities:standard.STANDARD_CAPABILITIES,sequenceExamples:standard.STANDARD_SEQUENCE_EXAMPLES,sequenceCapabilities:standard.STANDARD_SEQUENCE_CAPABILITIES}:{available:false,examples:[],capabilities:null,sequenceExamples:[],sequenceCapabilities:{available:false},reason:'Install the standard EVM experiment dependencies and restart the service to enable Ethereum previews.'},
-          localEvm:local?{available:true,capabilities:local.LOCAL_CAPABILITIES,examples:local.LOCAL_EXAMPLES??[]}:{available:false,capabilities:null,examples:[],reason:'Install the local EVM experiment dependencies and restart the service to enable independent previews.'},
+          localEvm:local?{available:true,capabilities:local.LOCAL_CAPABILITIES,sequenceCapabilities:local.LOCAL_SEQUENCE_CAPABILITIES,examples:local.LOCAL_EXAMPLES??[]}:{available:false,capabilities:null,sequenceCapabilities:null,examples:[],reason:'Install the local EVM experiment dependencies and restart the service to enable independent previews.'},
           arbitrumEvm:arbitrum?{available:true,examples:arbitrum.ARBITRUM_EXAMPLES,capabilities:arbitrum.ARBITRUM_CAPABILITIES}:{available:false,examples:[],capabilities:null,reason:'Install the Arbitrum engine dependencies and restart the service to enable this preview.'},
           projectStatus:'Research preview · correctness and coverage under active development'});
       }
@@ -256,13 +374,14 @@ export function createAppServer({rpcFactory=()=>new RpcClient(),standardRpcFacto
         try { return json(res,200,JSON.parse(await readFile(path.join(reportDir,'latest-benchmark.json'),'utf8'))); }
         catch(error) { if(error.code==='ENOENT')return json(res,200,{status:'not_run'}); throw error; }
       }
-      if(req.method==='POST' && ['/api/simulate','/api/replay','/api/evm/simulate','/api/evm/simulate-sequence','/api/evm/local-preview','/api/arbitrum/simulate'].includes(url.pathname)) {
+      if(req.method==='POST' && ['/api/simulate','/api/replay','/api/evm/simulate','/api/evm/simulate-sequence','/api/evm/local-preview','/api/evm/local-sequence','/api/arbitrum/simulate'].includes(url.pathname)) {
         if(req.headers.origin && req.headers.origin!=='http://'+host) return json(res,403,{error:{code:'ORIGIN_NOT_ALLOWED',message:'Cross-origin requests are not accepted.'}});
         const isSequence=url.pathname==='/api/evm/simulate-sequence';
         const isStandard=isSequence||url.pathname==='/api/evm/simulate';
-        const isLocal=url.pathname==='/api/evm/local-preview';
+        const isLocalSequence=url.pathname==='/api/evm/local-sequence';
+        const isLocal=isLocalSequence||url.pathname==='/api/evm/local-preview';
         const isArbitrum=url.pathname==='/api/arbitrum/simulate';
-        const input=await readJson(req,isSequence?384:128);
+        const input=await readJson(req,isLocalSequence?768:isSequence?384:128);
         if(inFlight>=2)return json(res,429,{error:{code:'BUSY',message:'Two simulations are already running. Try again shortly.'}});
         // Validate before constructing a provider client or making any network request.
         const standard = isStandard ? await standardLoader() : null;
@@ -272,11 +391,12 @@ export function createAppServer({rpcFactory=()=>new RpcClient(),standardRpcFacto
         if(isLocal && !local) return json(res,503,{error:{code:'LOCAL_EVM_UNAVAILABLE',message:'Install the local EVM experiment dependencies and restart the service to enable independent previews.'}});
         if(isArbitrum && !arbitrum) return json(res,503,{error:{code:'ARBITRUM_EVM_UNAVAILABLE',message:'Install the Arbitrum engine dependencies and restart the service to enable this preview.'}});
         let localInput;
-        if(arbitrum)arbitrum.validateArbitrumSimulation(input);else if(local)localInput=local.validateLocalSimulation(input);else if(standard)(isSequence?standard.validateStandardSequence:standard.validateStandardSimulation)(input);else if(url.pathname==='/api/simulate')validateSimulation(input);else validateReplay(input);
+        if(arbitrum)arbitrum.validateArbitrumSimulation(input);else if(local)localInput=(isLocalSequence?local.validateLocalSequence:local.validateLocalSimulation)(input);else if(standard)(isSequence?standard.validateStandardSequence:standard.validateStandardSimulation)(input);else if(url.pathname==='/api/simulate')validateSimulation(input);else validateReplay(input);
         // Loading the optional engine yields; reserve the shared slot only
         // after another check so concurrent imports cannot bypass the limit.
         if(inFlight>=2)return json(res,429,{error:{code:'BUSY',message:'Two simulations are already running. Try again shortly.'}});
         inFlight++;
+        let localContext;
         try {
           let report;
           if(arbitrum) {
@@ -293,16 +413,27 @@ export function createAppServer({rpcFactory=()=>new RpcClient(),standardRpcFacto
             if(res.destroyed)return;
           } else if(local) {
             const rpc=proofRpcFactory({chainId:localInput.chainId}), controller=new AbortController();
+            const began=performance.now(), capabilities=isLocalSequence?local.LOCAL_SEQUENCE_CAPABILITIES:local.LOCAL_CAPABILITIES;
             const disconnected=()=>{ if(!res.writableEnded){controller.abort();rpc.cancel();} };
             req.once('aborted',disconnected);res.once('close',disconnected);
             if(req.aborted||res.destroyed)disconnected();
-            try {
-              report=await local.simulateLocal(input,rpc,{signal:controller.signal});
-              report.implementation=local.implementation;
-            } finally {
-              req.removeListener('aborted',disconnected);res.removeListener('close',disconnected);
-              controller.abort();rpc.cancel();
-            }
+            localContext={
+              withhold: isLocalSequence?local.withholdLocalSequence:local.withholdLocalSimulation,
+              outputBytes: capabilities?.limits?.apiOutputBytes ?? 96*1024*1024,
+              elapsed: () => Math.max(0, performance.now()-began),
+              failure() {
+                if(controller.signal.aborted||req.aborted||res.destroyed)return 'LOCAL_PREVIEW_CANCELLED';
+                if(performance.now()-began >= (capabilities?.limits?.wallMs ?? 145000))return 'LOCAL_PREVIEW_BUDGET';
+                if(typeof rpc.usage!=='function')return 'LOCAL_PREVIEW_BUDGET';
+                try { const usage=rpc.usage();
+                  if(usage.clockValid===false||!Number.isFinite(usage.remainingWallMs)||usage.remainingWallMs<=0)return 'LOCAL_PREVIEW_BUDGET';
+                }catch{return 'LOCAL_PREVIEW_BUDGET';}
+                return null;
+              },
+              dispose(){req.removeListener('aborted',disconnected);res.removeListener('close',disconnected);controller.abort();rpc.cancel();},
+            };
+            report=await (isLocalSequence?local.simulateLocalSequence:local.simulateLocal)(input,rpc,{signal:controller.signal});
+            report.implementation=local.implementation;
             if(res.destroyed)return;
           } else if(standard) {
             const rpc=standardRpcFactory({profile:isSequence?'sequence':'single'});
@@ -310,9 +441,10 @@ export function createAppServer({rpcFactory=()=>new RpcClient(),standardRpcFacto
             report.implementation=standard.implementation;
             report.transportEvidence=typeof rpc.snapshotEvidence==='function'?rpc.snapshotEvidence():[];
           } else report=await (url.pathname==='/api/simulate'?simulate(input,rpcFactory()):replay(input,rpcFactory()));
+          if(localContext)return await finishLocalResponse({res,report,context:localContext,persist,store:localStore??localReportStore(reportDir)});
           if(persist){try{await persistReport(report,reportDir);}catch{report.warnings=[...(report.warnings||[]),'The local report could not be saved. Download this response to preserve it.'];}}
           return json(res,200,report);
-        }finally{inFlight--;}
+        }finally{localContext?.dispose();inFlight--;}
       }
       return json(res,404,{error:{code:'NOT_FOUND',message:'Endpoint not found.'}});
     }catch(error){

@@ -5,7 +5,7 @@ import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createAppServer } from '../src/server.js';
-import { validateLocalSimulation, LOCAL_CAPABILITIES } from '../src/local-simulation.js';
+import { validateLocalSimulation, withholdLocalSimulation, LOCAL_CAPABILITIES } from '../src/local-simulation.js';
 
 const A = '0x' + '11'.repeat(20), B = '0x' + '22'.repeat(20);
 const input = () => ({ chainId: 1, from: A, to: B, data: '0x', value: '0', queries: [{ to: B, data: '0x70a08231' + A.slice(2).padStart(64, '0') }] });
@@ -17,7 +17,8 @@ async function bounded(promise) {
   finally { clearTimeout(timer); }
 }
 const report = () => ({ kind: 'local_proof_preview', id: '11111111-1111-4111-8111-111111111111', createdAt: '2026-10-27T00:00:00.000Z', status: 'partial', execution: { status: 'reverted' }, measurements: [{ status: 'unavailable', values: null }], attempt: null, transportEvidence: [] });
-const api = simulateLocal => ({ validateLocalSimulation, LOCAL_CAPABILITIES, implementation: identity, simulateLocal: simulateLocal ?? (async () => report()) });
+const usage = () => ({ remainingWallMs: 10000, clockValid: true });
+const api = simulateLocal => ({ validateLocalSimulation, withholdLocalSimulation, LOCAL_CAPABILITIES, implementation: identity, simulateLocal: simulateLocal ?? (async () => report()) });
 async function start(t, options = {}) {
   const server = createAppServer({ persist: false, standardLoader: async () => null, localLoader: async () => api(), ...options });
   const listening = once(server, 'listening'); server.listen(0, '127.0.0.1'); await listening;
@@ -61,7 +62,7 @@ test('missing owned dependencies disable only this route and create no proof tra
 test('actual HTTP retains core statuses and raw result, attaches implementation and saves the same JSON', async t => {
   const reportDir = await mkdtemp(join(tmpdir(), 'local-preview-http-')); t.after(() => rm(reportDir, { recursive: true, force: true }));
   let constructed = 0, cancelled = 0, signal;
-  const rpc = { cancel() { cancelled++; } };
+  const rpc = { usage, cancel() { cancelled++; } };
   const original = report(); original.syntheticRoutingOnly = true;
   const base = await start(t, { persist: true, reportDir, proofRpcFactory() { constructed++; return rpc; }, localLoader: async () => api(async (request, received, options) => {
     assert.deepEqual(request, input()); assert.equal(received, rpc); signal = options.signal; assert.equal(signal.aborted, false); return structuredClone(original);
@@ -77,7 +78,7 @@ test('local imports cannot bypass shared two-simulation limit and slots release 
   let loads = 0, constructed = 0, running = 0;
   t.after(() => { loaded.resolve(); finish.resolve(); });
   const implementation = api(async () => { if (++running === 2) twoRunning.resolve(); await finish.promise; return report(); });
-  const base = await start(t, { localLoader: async () => { if (++loads === 3) allEntered.resolve(); await loaded.promise; return implementation; }, proofRpcFactory() { constructed++; return { cancel() {} }; }, rpcFactory() { assert.fail('Busy legacy route must not construct a provider.'); } });
+  const base = await start(t, { localLoader: async () => { if (++loads === 3) allEntered.resolve(); await loaded.promise; return implementation; }, proofRpcFactory() { constructed++; return { usage, cancel() {} }; }, rpcFactory() { assert.fail('Busy legacy route must not construct a provider.'); } });
   const requests = [post(base), post(base), post(base)];
   await bounded(allEntered.promise); assert.equal(constructed, 0); loaded.resolve(); await bounded(twoRunning.promise);
   assert.equal((await bounded(Promise.race(requests))).status, 429); assert.equal(constructed, 2);
@@ -90,7 +91,7 @@ test('local imports cannot bypass shared two-simulation limit and slots release 
 test('client disconnect aborts the running owned request and cancels transport before releasing its slot', async t => {
   const entered = deferred(), cancelled = deferred(), completed = deferred(); let calls = 0, transportCancels = 0;
   t.after(() => cancelled.resolve());
-  const base = await start(t, { proofRpcFactory: () => ({ cancel() { transportCancels++; } }), localLoader: async () => api(async (_request, _rpc, { signal }) => {
+  const base = await start(t, { proofRpcFactory: () => ({ usage, cancel() { transportCancels++; } }), localLoader: async () => api(async (_request, _rpc, { signal }) => {
     if (++calls === 1) {
       signal.addEventListener('abort', () => cancelled.resolve(), { once: true }); entered.resolve();
       await cancelled.promise; assert.equal(signal.aborted, true); completed.resolve();

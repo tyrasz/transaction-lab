@@ -26,6 +26,7 @@ const WORKER = fileURLToPath(new URL('./isolated-worker.js', import.meta.url));
 const sha = text => createHash('sha256').update(text).digest('hex');
 const EMPTY = { output: null, inputs: null, inputEvidence: null, inputUsage: null, inputReads: null, stateReads: null, changes: null };
 const safe = (code, message) => ({ code, message });
+const EMPTY_CHANGES = { scope: 'Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.', accounts: [] };
 
 /** Executes one unsigned call on an explicitly admitted Ethereum network in a fixed Node child. rpc.call is a trusted
  * bounded parent adapter; raw transport evidence remains its responsibility.
@@ -43,28 +44,43 @@ export async function executeIsolatedEthereumPreview(options) {
   return executeIsolated(options, true);
 }
 
-async function executeIsolated(options, previewMode) {
-  let request, header, limits, rpc, signal, headerVerification, compiledQueries, previewLimits, chainId = 1;
-  const emptyResult = previewMode ? { preview: null } : EMPTY;
+/** Ordered calls share one child, proof collector and bounded state manager. */
+export async function executeIsolatedEthereumSequence(options) {
+  return executeIsolated(options, true, true);
+}
+
+async function executeIsolated(options, previewMode, sequenceMode = false) {
+  let request, requests, header, limits, rpc, signal, headerVerification, compiledQueries, previewLimits, startPayload, chainId = 1;
+  const startBytes = sequenceMode ? 768 * 1024 : 256 * 1024;
+  const emptyResult = sequenceMode ? { sequence: null } : previewMode ? { preview: null } : EMPTY;
   try {
-    fields(options, ['request', 'header', 'rpc', 'limits', 'signal', 'chainId', ...(previewMode ? ['queries'] : [])], ['request', 'header', 'rpc', ...(previewMode ? ['queries'] : [])]);
+    const requestKey = sequenceMode ? 'requests' : 'request';
+    fields(options, [requestKey, 'header', 'rpc', 'limits', 'signal', 'chainId', ...(previewMode ? ['queries'] : [])], [requestKey, 'header', 'rpc', ...(previewMode ? ['queries'] : [])]);
     chainId = options.chainId === undefined ? 1 : options.chainId; need(chainId === 1 || chainId === 11155111);
     ({ rpc, signal } = options); need(typeof rpc?.call === 'function');
     need(signal === undefined || (typeof signal.aborted === 'boolean' && typeof signal.addEventListener === 'function' && typeof signal.removeEventListener === 'function'));
     limits = normalizeLimits(options.limits);
     if (previewMode) compiledQueries = compilePreviewQueries(options.queries, { chainId });
-    request = decode(encode(options.request, 128 * 1024), 128 * 1024); fields(request, ['from', 'to', 'data', 'value', 'gas', 'accessList', 'blobVersionedHashes', 'authorizationList', 'executionProfile', 'fees'], ['from', 'to', 'data', 'value', 'gas']);
-    Object.assign(request, normalizeEvmContext(request), normalizeEthereumFees(request));
-    const authorizations = normalizeAuthorizationList(request);
-    if (authorizations !== undefined) request.authorizationList = authorizations;
-    need(typeof request.from === 'string' && /^0x[0-9a-f]{40}$/i.test(request.from));
-    need(request.to === null || (typeof request.to === 'string' && /^0x[0-9a-f]{40}$/i.test(request.to)));
-    ethereumQuantity(request.value); const gas = ethereumQuantity(request.gas);
     header = decode(encode(options.header, 128 * 1024), 128 * 1024);
     headerVerification = verifyEthereumHeader({ header, expectedHash: header.hash, chainId });
-    ethereumContextProfile(request, header, ethereumCommon(header, chainId)); ethereumFeePlan(request, header, chainId);
-    need(gas <= 5000000n && gas >= ethereumCallGas(request.data, ethereumCommon(header, chainId), request).minimum);
     header.hash = header.hash.toLowerCase();
+    const admitted = decode(encode(sequenceMode ? options.requests : [options.request], sequenceMode ? 512 * 1024 : 128 * 1024), sequenceMode ? 512 * 1024 : 128 * 1024);
+    need(Array.isArray(admitted) && admitted.length >= (sequenceMode ? 2 : 1) && admitted.length <= (sequenceMode ? 4 : 1));
+    requests = admitted.map(call => {
+      fields(call, ['from', 'to', 'data', 'value', 'gas', 'accessList', 'blobVersionedHashes', 'authorizationList', 'executionProfile', 'fees'], ['from', 'to', 'data', 'value', 'gas']);
+      Object.assign(call, normalizeEvmContext(call), normalizeEthereumFees(call));
+      const authorizations = normalizeAuthorizationList(call);
+      if (authorizations !== undefined) call.authorizationList = authorizations;
+      need(typeof call.from === 'string' && /^0x[0-9a-f]{40}$/i.test(call.from));
+      need(call.to === null || (typeof call.to === 'string' && /^0x[0-9a-f]{40}$/i.test(call.to)));
+      if (sequenceMode) { call.from = call.from.toLowerCase(); call.to = call.to === null ? null : call.to.toLowerCase(); call.data = call.data.toLowerCase(); }
+      ethereumQuantity(call.value); const gas = ethereumQuantity(call.gas);
+      ethereumContextProfile(call, header, ethereumCommon(header, chainId)); ethereumFeePlan(call, header, chainId);
+      need(gas <= 5000000n && gas >= ethereumCallGas(call.data, ethereumCommon(header, chainId), call).minimum);
+      return call;
+    });
+    request = requests[0];
+    if (sequenceMode) need(requests.every(call => call.from === request.from));
     if (previewMode) previewLimits = {
       wallMs: Math.min(limits.wallMs, limits.inputs.wallMs, limits.execution.wallMs), requestMs: limits.requestMs,
       calls: limits.calls, responseBytes: limits.responseBytes, totalBytes: limits.totalResponseBytes,
@@ -72,6 +88,8 @@ async function executeIsolated(options, previewMode) {
       ...Object.fromEntries(['steps', 'frames', 'logs', 'traceBytes', 'gas', 'depth', 'memoryBytes', 'calldataBytes'].map(key => [key, limits.execution[key]])),
       rootReturnBytes: limits.execution.returnBytes,
     };
+    startPayload = { ...(sequenceMode ? { requests } : { request }), header, limits, ...(chainId === 1 ? {} : { chainId }), ...(previewMode ? { mode: sequenceMode ? 'sequence' : 'preview', queries: compiledQueries.map(row => row.descriptor) } : {}) };
+    encode({ v: 1, type: 'start', id: 1, payload: startPayload }, startBytes);
   } catch {
     return { status: 'unavailable', error: safe('LOCAL_ISOLATED_INPUT', previewMode ? 'The fixed call, header, queries or limits are invalid.' : 'The fixed call, header or limits are invalid.'), ...emptyResult, headerVerification: null, isolation: null, broker: { calls: 0, records: [], pendingAtReturn: 0 } };
   }
@@ -159,7 +177,7 @@ async function executeIsolated(options, previewMode) {
     const initial = inputs?.accounts?.[call.from.toLowerCase()];
     const prior = startingChanges?.accounts?.find(row => row.address === call.from.toLowerCase());
     let code = prior?.existence?.after === false ? '0x' : prior?.code?.after ?? (initial?.exists === true ? initial.code : initial?.exists === false ? '0x' : null);
-    const preparation = complete ? deriveAuthorizationPreparation({ request: call, header, inputs, common }) : null;
+    const preparation = complete ? deriveAuthorizationPreparation({ request: call, header, inputs, common, startingChanges }) : null;
     if (preparation) {
       need(isDeepStrictEqual(output.authorizationProcessing, preparation.processing));
       code = preparation.accounts.get(call.from.toLowerCase()).current.code;
@@ -208,8 +226,8 @@ async function executeIsolated(options, previewMode) {
       need(error === null || (typeof error === 'string' && error.length > 0));
       need(output.execution.status === (error === null ? 'success' : error === 'revert' ? 'reverted' : 'failed'));
     }
-    deriveVerifiedGas({ request: call, header, inputs, output, chainId });
-    deriveVerifiedFees({ request: call, header, inputs, output, chainId });
+    deriveVerifiedGas({ request: call, header, inputs, output, chainId, startingChanges });
+    deriveVerifiedFees({ request: call, header, inputs, output, chainId, startingChanges });
     if (complete || output.semantics !== undefined) {
       need(output.semantics?.gasPrice === (feePlan?.effectiveGasPrice.toString() ?? '0'));
       need(output.semantics?.feeSettlement === Boolean(feePlan && complete));
@@ -221,7 +239,7 @@ async function executeIsolated(options, previewMode) {
       const trace = output.trace;
       const preparedGas = preparation?.processing.preparation?.authorizationGasUsed ?? '0';
       const entryGas = !complete && call.authorizationList !== undefined && common.isActivatedEIP(8037)
-        ? deriveAmsterdamAuthorizationEntryGas({ request: call, header, inputs, common })
+        ? deriveAmsterdamAuthorizationEntryGas({ request: call, header, inputs, common, startingChanges })
         : gas - costs.intrinsic - BigInt(preparedGas);
       need(typeof entryGas === 'bigint');
       need(trace?.type === (call.to === null ? 'CREATE' : 'CALL') && trace.from === call.from.toLowerCase() && trace.caller === call.from.toLowerCase() && trace.input === call.data.toLowerCase() && trace.value === '0x' + ethereumQuantity(call.value).toString(16) && trace.gas === '0x' + entryGas.toString(16));
@@ -237,40 +255,23 @@ async function executeIsolated(options, previewMode) {
     }
   }
 
-  function validateCallResult(result, count = records.length, allowNullOutput = false) {
+  function validateCallResult(result, count = records.length, allowNullOutput = false, call = request, startingChanges) {
     fields(result, Object.keys(EMPTY));
     need((allowNullOutput && result.output === null) || (result.output && ['success', 'reverted', 'failed', 'unsupported', 'unavailable', 'invalid'].includes(result.output.execution?.status)));
     validateInputs(result, count);
-    executionContext(result.output, request, ['success', 'reverted', 'failed'].includes(result.output?.execution?.status), result.inputs);
-    validateExecutionChanges({ changes: result.changes, inputs: result.inputs, output: result.output, sender: request.from, destination: request.to, selfdestructOnlyCreated: ethereumCommon(header, chainId).isActivatedEIP(6780), common: ethereumCommon(header, chainId), request, header, chainId });
+    executionContext(result.output, call, ['success', 'reverted', 'failed'].includes(result.output?.execution?.status), result.inputs, startingChanges);
+    validateExecutionChanges({ changes: result.changes, inputs: result.inputs, output: result.output, sender: call.from, destination: call.to, selfdestructOnlyCreated: ethereumCommon(header, chainId).isActivatedEIP(6780), common: ethereumCommon(header, chainId), request: call, header, chainId, startingChanges });
     for (const reads of [result.stateReads, result.inputReads]) validateReads(reads);
     return result;
   }
-  function validatePreviewResult(result) {
-    fields(result, ['preview']); const value = result.preview;
-    fields(value, ['status', 'error', 'headerVerification', 'original', 'measurements', 'inputs', 'inputEvidence', 'inputUsage', 'inputReads', 'usage', 'scope']);
-    need(['complete', 'partial', 'unavailable'].includes(value.status) && isDeepStrictEqual(value.headerVerification, headerVerification));
-    validateInputs(value, records.length); validateReads(value.inputReads);
-    need(value.original && Number.isSafeInteger(value.original.inputUsage?.calls) && value.original.inputUsage.calls <= records.length);
-    validateCallResult(value.original, value.original.inputUsage.calls, true);
-    need(isDeepStrictEqual(value.original.inputEvidence, value.inputEvidence.slice(0, value.original.inputEvidence.length)));
-    const hasNative = compiledQueries.some(query => query.query === null);
-    need(value.scope?.chainId === chainId && value.scope.queries === (hasNative ? 'explicit_calls_and_native_account_balance_reads' : 'explicit_only_same_sender_zero_value_disposable_CALLs') && value.scope.queryGas === '1000000' && value.scope.processIsolation === false);
-    need(['consensusVerified', 'contractIdentityVerified', 'originalTransactionReplay'].every(key => value.scope[key] === false));
-    if (hasNative) {
-      need(value.scope.nativeBalanceCoverage === 'explicit_accounts_only' && value.scope.queryGasScope === 'CALL_only');
-      need(value.scope.queryPurity === 'CALL_net_changes_except_expected_sender_nonce_no_committed_logs_native_reads_no_changes');
-    } else need(value.scope.nativeBalanceCoverage === undefined && value.scope.queryGasScope === undefined && value.scope.nativeEffectsMeasured === false);
-    need(value.usage && isDeepStrictEqual(value.usage.limits, previewLimits));
+  function validateMeasurements(value, call, startingChanges, evidenceFloor) {
+    const originalComplete = ['success', 'reverted', 'failed'].includes(value.original?.output?.execution?.status);
     need(Array.isArray(value.measurements) && value.measurements.length === compiledQueries.length);
-    const originalComplete = ['success', 'reverted', 'failed'].includes(value.original.output?.execution?.status);
-    need(value.scope.execution === (request.executionProfile ?? 'unsigned_unpriced_block_end'));
-    need(value.scope.feesSettled === Boolean(request.executionProfile && originalComplete));
     function sideQuery(side, compiled, phase) {
       need(side && ['measured', 'unavailable'].includes(side.status));
       const native = compiled.query === null;
       fields(side, ['status', 'reason', 'output', 'values', 'changesBefore', 'changesAfter', ...(native ? ['readMethod'] : ['mutationValidation']), 'inputEvidenceIds', 'stateReads'], ['status', 'reason', 'output', 'values', ...(native ? ['readMethod'] : [])]);
-      if (side.inputEvidenceIds !== undefined) need(Array.isArray(side.inputEvidenceIds) && side.inputEvidenceIds.length <= records.length && side.inputEvidenceIds.every((id, i, ids) => Number.isSafeInteger(id) && id > value.original.inputEvidence.length && id <= records.length && (i === 0 || id === ids[i - 1] + 1)));
+      if (side.inputEvidenceIds !== undefined) need(Array.isArray(side.inputEvidenceIds) && side.inputEvidenceIds.length <= records.length && side.inputEvidenceIds.every((id, i, ids) => Number.isSafeInteger(id) && id > evidenceFloor && id <= records.length && (i === 0 || id === ids[i - 1] + 1)));
       if (side.stateReads !== undefined) validateReads(side.stateReads);
       if (native) need(side.readMethod === 'proof_state_account_balance' && side.output === null);
       if (side.status === 'unavailable') { need(side.values === null && typeof side.reason === 'string'); return; }
@@ -281,26 +282,24 @@ async function executeIsolated(options, previewMode) {
         // These facts are independently re-proven against the pinned state root
         // before the broker releases any result. Absence is never a default.
         const before = initial.exists ? BigInt(initial.balance) : 0n;
-        const change = phase === 'after' ? value.original.changes.accounts.find(row => row.address === account) : undefined;
+        const change = (phase === 'after' ? value.original.changes : startingChanges).accounts.find(row => row.address === account);
         // Original deltas were already checked against the complete native
         // transfer/fee/deletion ledger by validateCallResult, including omitted
         // deltas. A fresh read cannot supply or modify that poststate.
         const balance = change?.existence?.after === false ? 0n : change?.balance ? BigInt(change.balance.after) : before;
         need(isDeepStrictEqual(side.values, nativeBalanceValues(compiled, balance, { chainId })));
         need(isDeepStrictEqual(side.changesBefore, side.changesAfter));
-        if (phase === 'before') need(canonicalStateChanges(side.changesBefore).accounts.length === 0);
-        else need(isDeepStrictEqual(side.changesBefore, value.original.changes));
+        need(isDeepStrictEqual(side.changesBefore, phase === 'before' ? startingChanges : value.original.changes));
         need(isDeepStrictEqual(side.stateReads, { total: 1, distinct: 1, reads: [{ kind: 'account', address: account }] }));
         return;
       }
       need(originalComplete && side.reason === null && side.output?.execution?.status === 'success' && side.output.stateDisposition === 'message_result_retained_in_supplied_manager' && Array.isArray(side.output.logs) && side.output.logs.length === 0);
-      const trace = side.output.trace, queryRequest = { from: request.from.toLowerCase(), ...compiled.query, value: '0', gas: '1000000' };
+      const trace = side.output.trace, queryRequest = { from: call.from.toLowerCase(), ...compiled.query, value: '0', gas: '1000000' };
       executionContext(side.output, queryRequest, true, value.inputs, side.changesBefore); need(trace.error === null);
       validateExecutionLifecycle({ output: side.output, inputs: value.inputs, destination: queryRequest.to, changes: side.changesAfter, startingChanges: side.changesBefore, selfdestructOnlyCreated: ethereumCommon(header, chainId).isActivatedEIP(6780), common: ethereumCommon(header, chainId) });
       need(isDeepStrictEqual(side.values, decodePreviewValues(compiled, side.output.execution.returnData, { chainId })));
       need(side.changesBefore && side.changesAfter);
-      if (phase === 'before') need(side.changesBefore.accounts?.length === 0);
-      else need(isDeepStrictEqual(side.changesBefore, value.original.changes));
+      need(isDeepStrictEqual(side.changesBefore, phase === 'before' ? startingChanges : value.original.changes));
       const current = side.changesBefore.accounts.find(row => row.address === queryRequest.from), initial = value.inputs.accounts?.[queryRequest.from];
       need(initial && typeof initial.exists === 'boolean');
       const nonceBefore = current?.nonce ? BigInt(current.nonce.after).toString() : initial.exists ? initial.nonce : '0';
@@ -323,13 +322,9 @@ async function executeIsolated(options, previewMode) {
         if (row.status === 'not_attempted') need(row.before === null && row.after === null);
       }
     }
-    need(value.scope.nativeEffectsMeasured === value.measurements.some(row => row.query === null && row.status === 'measured'));
-    if (value.error !== null) {
-      fields(value.error, ['code', 'message']); need(value.error.code === 'LOCAL_PREVIEW_INTEGRITY' && value.status === 'unavailable');
-      need(value.measurements.every(row => row.status === 'unavailable' && row.values === null && ['before', 'after'].every(side => row[side] === null || row[side].values === null)));
-    } else need(value.status === (!originalComplete ? 'unavailable' : value.measurements.every(row => row.status === 'measured') ? 'complete' : 'partial'));
+  }
+  function validateUsage(usage, outputs, stateReads) {
     const totals = { executions: 0, steps: 0, frames: 0, logs: 0, rootReturnBytes: 0, traceBytes: 0 };
-    const outputs = [value.original.output, ...value.measurements.flatMap(row => ['before', 'after'].map(side => row[side]?.output ?? null))].filter(output => output !== null);
     for (const output of outputs) {
       totals.executions++;
       for (const [name, field] of [['steps', 'steps'], ['frames', 'frames'], ['logs', 'logOpcodes'], ['traceBytes', 'retainedTraceBytes']]) {
@@ -337,10 +332,131 @@ async function executeIsolated(options, previewMode) {
       }
       const returned = output.execution?.returnData;
       if (returned !== null) { need(typeof returned === 'string' && /^0x(?:[0-9a-f]{2})*$/.test(returned)); totals.rootReturnBytes += (returned.length - 2) / 2; }
+      // A resource failure can retain the first over-limit counter as audit
+      // evidence. It cannot be followed by another completed execution, or
+      // relabeled as a completed execution within the shared sequence budget.
+      if (['success', 'reverted', 'failed'].includes(output.execution?.status)) {
+        for (const name of ['steps', 'frames', 'logs', 'rootReturnBytes', 'traceBytes']) need(totals[name] <= previewLimits[name]);
+      }
     }
-    fields(value.usage, [...Object.keys(totals), 'wallMs', 'limits']);
-    for (const [name, count] of Object.entries(totals)) need(Number.isSafeInteger(count) && Number.isSafeInteger(value.usage[name]) && value.usage[name] === count);
-    need(typeof value.usage.wallMs === 'number' && Number.isFinite(value.usage.wallMs) && value.usage.wallMs >= 0);
+    if (stateReads !== undefined) totals.stateReads = stateReads;
+    fields(usage, [...Object.keys(totals), 'wallMs', 'limits']);
+    need(isDeepStrictEqual(usage.limits, previewLimits));
+    for (const [name, count] of Object.entries(totals)) need(Number.isSafeInteger(count) && Number.isSafeInteger(usage[name]) && usage[name] === count);
+    need(typeof usage.wallMs === 'number' && Number.isFinite(usage.wallMs) && usage.wallMs >= 0);
+  }
+  function validatePreviewResult(result) {
+    fields(result, ['preview']); const value = result.preview;
+    fields(value, ['status', 'error', 'headerVerification', 'original', 'measurements', 'inputs', 'inputEvidence', 'inputUsage', 'inputReads', 'usage', 'scope']);
+    need(['complete', 'partial', 'unavailable'].includes(value.status) && isDeepStrictEqual(value.headerVerification, headerVerification));
+    validateInputs(value, records.length); validateReads(value.inputReads);
+    need(value.original && Number.isSafeInteger(value.original.inputUsage?.calls) && value.original.inputUsage.calls <= records.length);
+    validateCallResult(value.original, value.original.inputUsage.calls, true);
+    need(isDeepStrictEqual(value.original.inputEvidence, value.inputEvidence.slice(0, value.original.inputEvidence.length)));
+    const hasNative = compiledQueries.some(query => query.query === null);
+    need(value.scope?.chainId === chainId && value.scope.queries === (hasNative ? 'explicit_calls_and_native_account_balance_reads' : 'explicit_only_same_sender_zero_value_disposable_CALLs') && value.scope.queryGas === '1000000' && value.scope.processIsolation === false);
+    need(['consensusVerified', 'contractIdentityVerified', 'originalTransactionReplay'].every(key => value.scope[key] === false));
+    if (hasNative) {
+      need(value.scope.nativeBalanceCoverage === 'explicit_accounts_only' && value.scope.queryGasScope === 'CALL_only');
+      need(value.scope.queryPurity === 'CALL_net_changes_except_expected_sender_nonce_no_committed_logs_native_reads_no_changes');
+    } else need(value.scope.nativeBalanceCoverage === undefined && value.scope.queryGasScope === undefined && value.scope.nativeEffectsMeasured === false);
+    need(value.usage && isDeepStrictEqual(value.usage.limits, previewLimits));
+    need(Array.isArray(value.measurements) && value.measurements.length === compiledQueries.length);
+    const originalComplete = ['success', 'reverted', 'failed'].includes(value.original.output?.execution?.status);
+    need(value.scope.execution === (request.executionProfile ?? 'unsigned_unpriced_block_end'));
+    need(value.scope.feesSettled === Boolean(request.executionProfile && originalComplete));
+    validateMeasurements(value, request, canonicalStateChanges(EMPTY_CHANGES), value.original.inputEvidence.length);
+    need(value.scope.nativeEffectsMeasured === value.measurements.some(row => row.query === null && row.status === 'measured'));
+    if (value.error !== null) {
+      fields(value.error, ['code', 'message']); need(value.error.code === 'LOCAL_PREVIEW_INTEGRITY' && value.status === 'unavailable');
+      need(value.measurements.every(row => row.status === 'unavailable' && row.values === null && ['before', 'after'].every(side => row[side] === null || row[side].values === null)));
+    } else need(value.status === (!originalComplete ? 'unavailable' : value.measurements.every(row => row.status === 'measured') ? 'complete' : 'partial'));
+    validateUsage(value.usage, [value.original.output, ...value.measurements.flatMap(row => ['before', 'after'].map(side => row[side]?.output ?? null))].filter(output => output !== null));
+    return result;
+  }
+  function validateSequenceResult(result) {
+    fields(result, ['sequence']); const value = result.sequence;
+    fields(value, ['status', 'error', 'headerVerification', 'steps', 'inputs', 'inputEvidence', 'inputUsage', 'inputReads', 'usage', 'scope']);
+    need(['complete', 'partial', 'unavailable'].includes(value.status) && isDeepStrictEqual(value.headerVerification, headerVerification));
+    validateInputs(value, records.length); validateReads(value.inputReads);
+    need(Array.isArray(value.steps) && value.steps.length === requests.length);
+    let preceding = canonicalStateChanges(EMPTY_CHANGES), stopped = false, lastInputCount = 0, stateReads = 0;
+    const outputs = [], completed = [], feesSettled = [];
+    for (const [index, step] of value.steps.entries()) {
+      fields(step, ['index', 'request', 'status', 'reason', 'original', 'measurements']);
+      need(step.index === index && isDeepStrictEqual(step.request, requests[index]));
+      need(['completed', 'unavailable', 'not_attempted'].includes(step.status));
+      if (step.original === null) {
+        need(step.status === 'not_attempted' && typeof step.reason === 'string');
+        stopped = true; completed.push(false); feesSettled.push(false); continue;
+      }
+      need(!stopped && step.status !== 'not_attempted');
+      fields(step.original, [...Object.keys(EMPTY), 'startingChanges']);
+      // The accepted preceding result is the only transaction-start overlay.
+      // All before-values still refer to the immutable header-bound proofs.
+      need(isDeepStrictEqual(step.original.startingChanges, preceding));
+      const { startingChanges, ...original } = step.original;
+      const count = original.inputUsage?.calls;
+      need(Number.isSafeInteger(count) && count >= lastInputCount && count <= records.length);
+      validateCallResult(original, count, true, requests[index], preceding);
+      need(isDeepStrictEqual(original.inputEvidence, value.inputEvidence.slice(0, count)));
+      need(original.stateReads.total >= stateReads);
+      lastInputCount = count; stateReads = original.stateReads.total;
+      const complete = ['success', 'reverted', 'failed'].includes(original.output?.execution?.status);
+      if (complete) need(stateReads <= previewLimits.reads);
+      completed.push(complete); feesSettled.push(Boolean(complete && requests[index].executionProfile));
+      need(step.status === (complete ? 'completed' : 'unavailable'));
+      const success = complete && original.output.execution.status === 'success';
+      need(success ? step.reason === null : typeof step.reason === 'string');
+      if (!complete) need(isDeepStrictEqual(original.changes, preceding));
+      preceding = original.changes;
+      if (original.output !== null) outputs.push(original.output);
+      if (!success) stopped = true;
+    }
+    let evidenceCursor = lastInputCount;
+    for (const [index, step] of value.steps.entries()) {
+      validateMeasurements({ original: step.original, measurements: step.measurements, inputs: value.inputs }, requests[index], step.original?.startingChanges ?? preceding, lastInputCount);
+      if (!completed[index]) need(step.measurements.every(row => row.status !== 'measured' && row.before === null && row.after === null));
+      for (const row of step.measurements) for (const side of [row.before, row.after]) if (side !== null) {
+        // Queries occur only after all originals; every new input read belongs
+        // to exactly one query phase in the saved execution order.
+        need(Array.isArray(side.inputEvidenceIds) && side.stateReads);
+        need(side.inputEvidenceIds.every((id, offset) => id === evidenceCursor + offset + 1));
+        evidenceCursor += side.inputEvidenceIds.length;
+        stateReads += side.stateReads.total;
+        if (side.status === 'measured') need(stateReads <= previewLimits.reads);
+        if (side.output !== null) outputs.push(side.output);
+      }
+    }
+    need(evidenceCursor === records.length);
+    validateUsage(value.usage, outputs, stateReads);
+    if (value.status === 'complete') need(stateReads <= previewLimits.reads);
+    const hasNative = compiledQueries.some(query => query.query === null);
+    const scope = value.scope;
+    need(scope?.chainId === chainId && scope.execution === 'ordered_unsigned_same_header_sequence');
+    need(isDeepStrictEqual(scope.executionProfiles, requests.map(call => call.executionProfile ?? 'unsigned_unpriced_block_end')));
+    need(isDeepStrictEqual(scope.feesSettled, feesSettled));
+    need(scope.sameHeader === true && scope.atomic === false && scope.stopOn === 'first_original_non_success');
+    need(scope.ordering === 'all_originals_before_disposable_queries' && scope.stateFeeds === 'originals_only');
+    need(scope.initialState === 'verified_proofs_and_code_against_hash_bound_header');
+    need(['consensusVerified', 'contractIdentityVerified', 'originalTransactionReplay', 'processIsolation'].every(key => scope[key] === false));
+    need(scope.allEffectsCoverage === 'not_established' && scope.security === 'not_assessed');
+    need(scope.queryGas === '1000000' && scope.queries === (hasNative ? 'explicit_calls_and_native_account_balance_reads' : 'explicit_only_same_sender_zero_value_disposable_CALLs'));
+    need(scope.queryPurity === (hasNative ? 'CALL_net_changes_except_expected_sender_nonce_no_committed_logs_native_reads_no_changes' : 'net_changes_except_expected_sender_nonce_no_committed_logs'));
+    if (hasNative) need(scope.nativeBalanceCoverage === 'explicit_accounts_only' && scope.queryGasScope === 'CALL_only');
+    else need(scope.nativeBalanceCoverage === undefined && scope.queryGasScope === undefined);
+    need(scope.nativeEffectsMeasured === value.steps.some(step => step.measurements.some(row => row.query === null && row.status === 'measured')));
+    const everyMeasured = value.steps.every(step => step.measurements.every(row => row.status === 'measured'));
+    const everySuccess = value.steps.every(step => step.original?.output?.execution?.status === 'success');
+    const expired = value.usage.wallMs >= previewLimits.wallMs;
+    if (value.error !== null) {
+      fields(value.error, ['code', 'message']); need(typeof value.error.message === 'string');
+      need(['LOCAL_SEQUENCE_INTEGRITY', 'LOCAL_SEQUENCE_LIMIT'].includes(value.error.code));
+      if (value.error.code === 'LOCAL_SEQUENCE_INTEGRITY') {
+        need(value.status === 'unavailable');
+        need(value.steps.every(step => step.measurements.every(row => row.status === 'unavailable' && row.values === null && [row.before, row.after].every(side => side === null || side.values === null))));
+      } else need(expired && value.status === (completed.some(Boolean) ? 'partial' : 'unavailable'));
+    } else need(value.status === (!completed.some(Boolean) ? 'unavailable' : everySuccess && everyMeasured && !expired ? 'complete' : 'partial'));
     return result;
   }
   const cancel = () => fail('LOCAL_ISOLATED_CANCELLED', 'The isolated call was cancelled.');
@@ -371,7 +487,7 @@ async function executeIsolated(options, previewMode) {
             validateRpcRequest(message, header.hash, records.length + 1, ancestry.nextHash()); pendingId = message.id;
             void broker(message);
           } else if (message.type === 'result') {
-            envelope(message, 'result', ['result']); need(message.id === 1 && pendingId === null); candidate = previewMode ? validatePreviewResult(message.result) : validateCallResult(message.result);
+            envelope(message, 'result', ['result']); need(message.id === 1 && pendingId === null); candidate = sequenceMode ? validateSequenceResult(message.result) : previewMode ? validatePreviewResult(message.result) : validateCallResult(message.result);
           } else if (message.type === 'rpc_cancel') {
             envelope(message, 'rpc_cancel', []); need(message.id === pendingId);
             fail('LOCAL_ISOLATED_RPC_CANCELLED', 'The worker cancelled its required pinned read.');
@@ -382,13 +498,13 @@ async function executeIsolated(options, previewMode) {
         } catch { fail('LOCAL_ISOLATED_PROTOCOL', 'The isolated worker protocol was invalid.'); }
       });
       timer = setTimeout(() => fail('LOCAL_ISOLATED_TIMEOUT', 'The isolated process exceeded its wall-time budget.'), Math.max(1, limits.wallMs - (performance.now() - began)));
-      send({ v: 1, type: 'start', id: 1, payload: { request, header, limits, ...(chainId === 1 ? {} : { chainId }), ...(previewMode ? { mode: 'preview', queries: compiledQueries.map(row => row.descriptor) } : {}) } }, 256 * 1024);
+      send({ v: 1, type: 'start', id: 1, payload: startPayload }, startBytes);
     }
     await finished;
     if (!failure && candidate) {
       try {
         const cache = new Map(), check = () => need(!expired() && !signal?.aborted);
-        const views = previewMode ? [candidate.preview.original, candidate.preview] : [candidate];
+        const views = sequenceMode ? [...candidate.sequence.steps.map(step => step.original).filter(Boolean), candidate.sequence] : previewMode ? [candidate.preview.original, candidate.preview] : [candidate];
         for (const view of views) {
           check();
           await validateInputFacts({ inputs: view.inputs, inputEvidence: view.inputEvidence, stateRoot: header.stateRoot.toLowerCase(), cache, check, chainId });

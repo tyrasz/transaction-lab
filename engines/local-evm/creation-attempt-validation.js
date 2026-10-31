@@ -8,6 +8,7 @@ import { keccak_256 } from '@noble/hashes/sha3.js';
 import { canonicalStateChanges } from './preview-mutations.js';
 import { EMPTY_CODE_HASH, EMPTY_STORAGE_ROOT } from './verified-state-proof.js';
 import { existingDelegationTarget } from './sender-delegation.js';
+import { createExecutionState } from './execution-state.js';
 
 const ADDRESS=/^0x[0-9a-f]{40}$/, WORD=/^0x[0-9a-f]{64}$/, DATA=/^0x(?:[0-9a-f]{2})*$/;
 const UINT64=(1n<<64n)-1n, UINT256=(1n<<256n)-1n;
@@ -32,7 +33,7 @@ function data(value,max){need(typeof value==='string'&&DATA.test(value)&&value.l
 const address=value=>{need(typeof value==='string'&&ADDRESS.test(value));return value;};
 const clone=map=>new Map([...map].map(([key,value])=>[key,{...value}]));
 
-export function validateCreationAttempts({output,inputs,startingChanges,rootNoncePrepared=false,fees=null,common}) {
+export function validateCreationAttempts({output,inputs,startingChanges,precedingChanges,rootNoncePrepared=false,fees=null,common}) {
   need(common?.isActivatedEIP(7928)===true&&[1n,11155111n].includes(common.chainId()));
   need(typeof rootNoncePrepared==='boolean');
   const root=read(output,'trace'), sender=address(read(root,'from'));
@@ -158,11 +159,18 @@ export function validateCreationAttempts({output,inputs,startingChanges,rootNonc
     // preparation may select this path. Its overlay contains nonce/code
     // preparation, never fee debits or message writes. Fees remain applied
     // exactly once below, and the prepared outer nonce must not advance again.
-    const row=prior.get(sender),initial=inputs.accounts[sender];
-    const initialNonce=initial.exists?BigInt(initial.nonce):0n;
-    need(row?.nonce&&initialNonce<UINT64&&BigInt(row.nonce.before)===initialNonce&&
-      caller.exists&&caller.nonce>initialNonce&&BigInt(row.nonce.after)===caller.nonce);
-    need([...prior.values()].every(item=>item.balance===undefined&&item.storage===undefined&&item.reset===undefined));
+    const preceding=createExecutionState(inputs,precedingChanges),prepared=createExecutionState(inputs,startingChanges);
+    const initialNonce=BigInt(preceding.account(sender).nonce);
+    need(initialNonce<UINT64&&caller.exists&&caller.nonce>initialNonce&&BigInt(prepared.account(sender).nonce)===caller.nonce);
+    // The prepared snapshot may carry earlier message writes. Only this
+    // transaction's independently derived nonce/code preparation is new here;
+    // fees and storage changes must not be charged or applied a second time.
+    for(const key of new Set([...preceding.rows.keys(),...prior.keys()])){
+      need(prepared.account(key).balance===preceding.account(key).balance);
+      need(isDeepStrictEqual(prior.get(key)?.storage,preceding.rows.get(key)?.storage));
+      const before=preceding.rows.get(key),after=prior.get(key);
+      need(isDeepStrictEqual(after?.reset,before?.reset)||before?.existence?.after===false&&after?.reset?.basis===before.existence.basis);
+    }
   }else{need(caller.nonce<UINT64);caller.nonce++;caller.exists=true;}
   if(fees){const debit=fees.plan.totalUpfrontDebit??fees.plan.upfrontGasDebit;need(caller.balance>=debit);caller.balance-=debit;}
   walk(root);

@@ -22,10 +22,11 @@ process.on('disconnect', () => { if (!terminal) process.exit(1); });
 process.on('uncaughtException', fatal); process.on('unhandledRejection', fatal);
 process.on('message', raw => {
   try {
-    const message = decode(raw, started ? limits.responseBytes + 1024 : 256 * 1024);
+    const message = decode(raw, started ? limits.responseBytes + 1024 : 768 * 1024);
     if (!started) {
       envelope(message, 'start', ['payload']); need(message.id === 1);
-      if (message.payload?.mode === 'preview') fields(message.payload, ['request', 'header', 'limits', 'mode', 'queries', 'chainId'], ['request', 'header', 'limits', 'mode', 'queries']);
+      if (message.payload?.mode === 'sequence') fields(message.payload, ['requests', 'header', 'limits', 'mode', 'queries', 'chainId'], ['requests', 'header', 'limits', 'mode', 'queries']);
+      else if (message.payload?.mode === 'preview') fields(message.payload, ['request', 'header', 'limits', 'mode', 'queries', 'chainId'], ['request', 'header', 'limits', 'mode', 'queries']);
       else fields(message.payload, ['request', 'header', 'limits', 'chainId'], ['request', 'header', 'limits']);
       need(message.payload.chainId === undefined || message.payload.chainId === 1 || message.payload.chainId === 11155111);
       started = true; limits = normalizeLimits(message.payload.limits);
@@ -39,7 +40,7 @@ process.on('message', raw => {
   } catch { fatal(); }
 });
 
-async function run({ request, header, mode, queries, chainId = 1 }) {
+async function run({ request, requests, header, mode, queries, chainId = 1 }) {
   const rpc = { call(method, params, { signal } = {}) {
     return new Promise((resolve, reject) => {
       need(!pending && !terminal); const id = nextId++;
@@ -56,7 +57,16 @@ async function run({ request, header, mode, queries, chainId = 1 }) {
     });
   } };
   let result;
-  if (mode === 'preview') {
+  if (mode === 'sequence') {
+    const { executeEthereumSequence } = await import('./ethereum-sequence.js');
+    result = { sequence: await executeEthereumSequence({ requests, header, chainId, rpc, queries, limits: {
+      wallMs: Math.min(limits.wallMs, limits.inputs.wallMs, limits.execution.wallMs), requestMs: limits.requestMs,
+      calls: limits.calls, responseBytes: limits.responseBytes, totalBytes: limits.totalResponseBytes,
+      ...Object.fromEntries(['accounts', 'slots', 'codeBytes', 'reads'].map(key => [key, limits.inputs[key]])),
+      ...Object.fromEntries(['steps', 'frames', 'logs', 'traceBytes', 'gas', 'depth', 'memoryBytes', 'calldataBytes'].map(key => [key, limits.execution[key]])),
+      rootReturnBytes: limits.execution.returnBytes,
+    } }) };
+  } else if (mode === 'preview') {
     const { executeEthereumPreview } = await import('./ethereum-preview.js');
     result = { preview: await executeEthereumPreview({ request, header, chainId, rpc, queries, limits: {
       wallMs: Math.min(limits.wallMs, limits.inputs.wallMs, limits.execution.wallMs), requestMs: limits.requestMs,

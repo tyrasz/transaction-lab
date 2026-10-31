@@ -18,7 +18,7 @@ const failedInputCapture = await pinnedJson('reports/current-validated-compariso
 const capability = await pinnedJson('reports/current-query-capability/capture.json', '3c11faec39109a330d91428d9ad359ee1601fc3820f5ae17b9971c61e7ddfae2');
 const CORE_SHA = '2205334781a09baf98c3f5cb05a546bcca7d4946aea33b510d1963c8eb561a0f';
 const sourceFiles = ['account-effects.js','affected-balances.js','allowances.js','analyze.js','balances.js','config.js','current-state.js','historical-state.js','lending.js','lending-balances.js','permissions.js','query-validation.js','revert.js','rpc.js','server.js','state-diff.js','state.js','validate.js'];
-const currentSourceFiles = sourceFiles.flatMap(name => name === 'analyze.js' ? [name, 'arbitrum-loader.js'] : name === 'server.js' ? [name, 'standard-loader.js', 'standard-rpc.js'] : name === 'lending-balances.js' ? [name, 'local-loader.js', 'local-simulation.js'] : name === 'permissions.js' ? [name, 'proof-rpc.js'] : [name]);
+const currentSourceFiles = sourceFiles.flatMap(name => name === 'analyze.js' ? [name, 'arbitrum-loader.js'] : name === 'server.js' ? [name, 'standard-loader.js', 'standard-rpc.js'] : name === 'lending-balances.js' ? [name, 'local-loader.js', 'local-sequence.js', 'local-simulation.js'] : name === 'permissions.js' ? [name, 'proof-rpc.js'] : [name]);
 const engineHash = createHash('sha256');
 for (const name of currentSourceFiles) engineHash.update(name + '\0').update(await readFile(new URL('../src/' + name, import.meta.url))).update('\0');
 const actualSourceHash = engineHash.digest('hex');

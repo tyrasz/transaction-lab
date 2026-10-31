@@ -1,5 +1,5 @@
-// Parent-only preparation derivation from separately reverified immutable
-// accounts. Child authority, costs, phase and after-state never supply inputs.
+// Parent-only preparation from verified immutable accounts and an accepted
+// preceding overlay. Current child claims never supply the starting state.
 // Geth 1df30b18 core/state_transition.go:887-901,1009-1038,1112-1236;
 // retained source SHA b85812dfd250889b4c9f63b1f752281fbcce08cc9e4dd43946aed4c01f7bdb94.
 // Signature recovery is shared; the ordered state/cost fold is independent of
@@ -11,13 +11,12 @@ import { normalizeEvmContext } from '../evm-context.js';
 import { ethereumCallGas, ethereumCommon, ethereumQuantity } from './ethereum-profile.js';
 import { ethereumStateGasBudget } from './ethereum-state-gas.js';
 import { ethereumFeePlan } from './ethereum-fees.js';
+import { createExecutionState, updateExecutionAccounts } from './execution-state.js';
 
 const ADDRESS = /^0x[0-9a-f]{40}$/, DESIGNATION = /^0xef0100[0-9a-f]{40}$/;
 const UINT64 = (1n << 64n) - 1n, UINT256 = (1n << 256n) - 1n;
 const WRITE = 9000n, ACCOUNT = 120n * 1530n, INDICATOR = 23n * 1530n, COLD = 3000n, WARM = 100n;
-const SCOPE = 'Demanded proof-verified inputs and local overlay writes only; no recomputed post-state root or complete-effect proof.';
 const need = ok => { if (!ok) throw new Error('Amsterdam authorization preparation does not match verified starting facts.'); };
-const hex = n => '0x' + n.toString(16);
 function record(value) {
   need(value !== null && typeof value === 'object' && !types.isProxy(value) && !Array.isArray(value)
     && [Object.prototype, null].includes(Object.getPrototypeOf(value)));
@@ -29,15 +28,15 @@ function record(value) {
 function address(value) { need(typeof value === 'string' && /^0x[0-9a-f]{40}$/i.test(value)); return value.toLowerCase(); }
 function raw(value,max) { need(typeof value === 'string' && value.length <= 78 && /^(?:0|[1-9][0-9]*)$/.test(value)); const n = BigInt(value); need(n <= max); return n; }
 const strings = row => Object.fromEntries(Object.entries(row).map(([key,value]) => [key,typeof value === 'bigint' ? value.toString() : value]));
-const copyAccounts = accounts => new Map([...accounts].map(([key,row]) => [key,{initial:{...row.initial},current:{...row.current}}]));
+const copyAccounts = accounts => new Map([...accounts].map(([key,row]) => [key,{initial:{...row.initial},starting:{...row.starting},current:{...row.current}}]));
 
 /** No-list calls preserve the separate pre-Amsterdam path. The caller must
  * validate input proofs before supplying inputs; this helper does not establish
  * proof provenance or network membership. Its snapshot deliberately excludes
- * fee balance deltas: the existing native/creation validators apply those once.
+ * this transaction's fee balance deltas; preceding balance writes are retained.
  * accounts.current includes prepayment only for eligibility and nonce/code use.
  * Attempted writes/entries and retained writes are intentionally distinct. */
-function derive({request,header,inputs,common}, entryGasOnly) {
+function derive({request,header,inputs,common,startingChanges}, entryGasOnly) {
   const list = normalizeAuthorizationList(request);
   if (list === undefined) return null;
   const r = record(request), h = record(header), chainId = common?.chainId();
@@ -51,6 +50,7 @@ function derive({request,header,inputs,common}, entryGasOnly) {
   const budget = ethereumStateGasBudget({gasLimit,intrinsicRegular:costs.intrinsic,floor:costs.floor},trusted);
   const feePlan = ethereumFeePlan(r,h,Number(chainId)), prepaidGasDebit = feePlan?.upfrontGasDebit ?? 0n;
   const facts = record(record(inputs).accounts), accounts = new Map(), tracking = new Map();
+  const state = createExecutionState(inputs, startingChanges);
   const applied = new Set(), entries = [], accesses = [], writes = [];
   function account(key) {
     if (!accounts.has(key)) {
@@ -60,7 +60,10 @@ function derive({request,header,inputs,common}, entryGasOnly) {
         const code = fact.code; need(typeof code === 'string' && code.length <= 2+131072*2 && /^0x(?:[0-9a-f]{2})*$/.test(code));
         initial = {exists:true,nonce:raw(fact.nonce,UINT64),balance:raw(fact.balance,UINT256),code};
       } else need(Object.keys(fact).length === 1);
-      accounts.set(key,{initial,current:{...initial}});
+      const effective = record(state.account(key));
+      const code = effective.code; need(typeof effective.exists === 'boolean' && typeof code === 'string' && code.length <= 2+131072*2 && /^0x(?:[0-9a-f]{2})*$/.test(code));
+      const starting = {exists:effective.exists,nonce:raw(effective.nonce,UINT64),balance:raw(effective.balance,UINT256),code};
+      accounts.set(key,{initial,starting,current:{...starting}});
     }
     return accounts.get(key).current;
   }
@@ -126,23 +129,20 @@ function derive({request,header,inputs,common}, entryGasOnly) {
   }
   const retained = phase === 'message';
   if (!retained) {
-    for (const [key,row] of accounts) row.current = key === sender ? {...initialSender} : {...row.initial};
+    for (const [key,row] of accounts) row.current = key === sender ? {...initialSender} : {...row.starting};
     applied.clear();
   }
-  const rows = [];
-  for (const [key,{initial,current}] of accounts) {
-    const row = {address:key};
-    if (!initial.exists && current.exists) row.existence = {before:false,after:true,
-      basis:applied.has(key)?'eip7702_authorization_materialization':'unsigned_sender_nonce_materialization'};
-    if (initial.nonce !== current.nonce) row.nonce = {before:hex(initial.nonce),after:hex(current.nonce)};
-    if (initial.code !== current.code) row.code = {before:initial.code,after:current.code};
-    if (Object.keys(row).length > 1) rows.push(row);
-  }
-  rows.sort((a,b)=>a.address.localeCompare(b.address));
+  // Only nonce/code preparation is composed here. Current balances include this
+  // transaction's prepayment for eligibility, which the fee validator adds once.
+  const updates = [...accounts].filter(([,row])=>row.current.exists).map(([key,{current}])=>[key,{
+    exists:true,nonce:current.nonce,code:current.code,
+    ...(applied.has(key)?{existenceBasis:'eip7702_authorization_materialization'}
+      :key===sender?{existenceBasis:'unsigned_sender_nonce_materialization'}:{}),
+  }]);
   const preparation = {phase,retained,failedIndex,authorizationGasUsed:phase==='authorization_out_of_gas'?budget.messageGasLimit:attempt.authorizationGasUsed,
     stateGasReservoir:retained?reservoir:budget.stateGasReservoirInitial,executionStateGasUsed:retained?stateUsed:0n,
     stateGasSpilled:retained?spilled:0n,senderAuthorizationIncrements:retained?senderIncrements:0n};
-  return {accounts,applied,snapshot:{scope:SCOPE,accounts:rows},budget,feePlan,prepaidGasDebit,attempt,retained,recipient,
+  return {accounts,applied,snapshot:updateExecutionAccounts(inputs,state.changes,updates),budget,feePlan,prepaidGasDebit,attempt,retained,recipient,
     recipientPreparationGasLimit:phase==='authorization_out_of_gas'?null:gas,
     processing:{entries,gasRefundCounter:'0',preparation:strings(preparation)}};
 }
@@ -150,7 +150,7 @@ function derive({request,header,inputs,common}, entryGasOnly) {
 export function deriveAmsterdamAuthorizationPreparation(args) { return derive(args, false); }
 
 /** For an entered but incomplete root only. This independently folds every
- * tuple over authenticated initial facts, and needs no recipient-only read.
+ * tuple over the trusted transaction-start view, needing no recipient-only read.
  * It authorizes a trace gas value, never a completed preparation or poststate. */
 export function deriveAmsterdamAuthorizationEntryGas(args) { return derive(args, true); }
 
