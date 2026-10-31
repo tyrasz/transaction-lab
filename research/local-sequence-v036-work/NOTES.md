@@ -117,8 +117,13 @@ The independent bounded adapter review passed **21/21** input/artifact controls
 without running either client. Its exact log is `reference-v2-peer-review.tap`,
 with SHA256 `dd4d0b6386f35271227ff7019efec2cd56bbf6906c2d28544136cecdaa6d583a`
 also retained in `reference-v2-peer-review.tap.sha256`.
-The separate independent audit of the completed capture is pending; these
-counts are the frozen comparator's saved results.
+The separate [saved-artifact audit](../local-sequence-v036-reference-v2/audit/NOTES.md)
+passed without target execution. It checked both complete inventories and
+process closure, rebuilt 28 allocation roots and 10 receipt/transaction trie
+roots, checked signed envelopes and fee/nonce carry, and revalidated 44 proof
+records using the shared archived proof validator. Its independently written
+state reconstruction agrees with the frozen comparator. Shared crypto/parser
+dependencies and the selected synthetic scope remain explicit.
 
 The repeat corrects only Python typed-integer admission arithmetic and the
 comparator's omitted-storage handling. It is not a new case population and

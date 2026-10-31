@@ -17,8 +17,9 @@ their **12 channel values remain null**, not matches. No measured mismatch or
 stop-disposition disagreement was recorded. The execution-and-verification
 interval was 8.400 seconds and retained process output was 856,555 bytes;
 final artifact sealing and delivery are outside that interval.
-These are the frozen comparator's saved results; the separate independent
-audit of this completed capture is pending.
+The [saved-artifact audit](audit/NOTES.md) passed without target execution,
+independently reconstructing allocations, receipts and fee/nonce carry while
+retaining its documented shared parser, cryptography and proof-validator limits.
 
 The first packet remains unchanged: four product observations, four EELS
 adapter failures before transaction execution, and a frozen comparator that
