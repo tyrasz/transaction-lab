@@ -1,8 +1,10 @@
 // Pure ledger/matrix controls and harmless child programs only, no network/API execution.
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import path from 'node:path';
-import {PREFIX,ORDER,LIMITS,SCOPE,invocation,validateReport,executeMatrix,processOnce,run,OWN,validateProcessRecord,validateWireDirectory,selectionFailureResult,AGGREGATE_LIMITS,validateSelection} from './run.mjs';
+import {PREFIX,ROOT,ORDER,LIMITS,SCOPE,invocation,validateReport,executeMatrix,processOnce,run,OWN,validateProcessRecord,validateWireDirectory,selectionFailureResult,AGGREGATE_LIMITS,validateSelection,validateProfileTemplates,templateBytes,prepare,sourceRows,TEMPLATE_PROFILES} from './run.mjs';
 import {sha,entry,createLedger,verifyPacket} from './archive.mjs';
 import {captureHeaderSelection} from './select-current-header.mjs';
+import {deriveTemplateProfile} from './declarations.mjs';
+import {FUNDED_PROVENANCE_FILES} from './funded-profile.mjs';
 const temp=t=>{const p=fs.mkdtempSync('/private/tmp/lending-sequence-control-');t.after(()=>fs.rmSync(p,{recursive:true,force:true}));return p;};
 const plan={runtimePath:'/frozen/runtime',inputBase:'/frozen',node:{executable:process.execPath},inputs:[0,1].map(i=>({id:'case'+i,path:`inputs/00${i+1}.json`,sha256:'a'.repeat(64)}))};
 function report(kind='local',prepareOnly=false){return{schemaVersion:1,id:'case0',kind,inputSha256:'a'.repeat(64),workerPid:123,implementation:{sourceSha256:'b'.repeat(64)},status:prepareOnly?'prepared_no_execution':'returned',...(!prepareOnly?{report:{synthetic:true},error:null}:{}),executionInvoked:false,networkCalls:0,sourceUnchanged:true,
@@ -127,4 +129,54 @@ test('mocked selection joins original raw bytes, native dispatch, paired clocks 
   const bad=await mockedSelection(t,mutate);assert.throws(()=>validateSelection(bad.directory,bad.pin,bad.sourceBinding));
  }
  const late=await mockedSelection(t,r=>{r.elapsed.nativeMs=60001;});assert.equal(validateSelection(late.directory,late.pin,late.sourceBinding).usable,false);
+});
+
+// Template controls exercise exact saved byte representations without invoking
+// prepare, a guarded API, a VM, a selector or any transport.
+function profilePacket(t,profile){
+ const directory=temp(t),base=templateBytes(),derived=deriveTemplateProfile({templateBytes:base,profile});
+ const save=(prefix,bytes,cases)=>bytes.map((value,index)=>{const p=`${prefix}/00${index+1}.json`,f=path.join(directory,p);fs.mkdirSync(path.dirname(f),{recursive:true});fs.writeFileSync(f,value);return{...entry(directory,p),id:cases[index].id};});
+ const record={profile,amendment:derived.amendment,baseTemplates:save('base-templates',base,derived.baseTemplates),templates:save('templates',derived.bytes,derived.templates)};
+ return{directory,record,base,derived};
+}
+test('both fixed profiles retain exact historical base bytes and independently derived profile bytes',t=>{
+ assert.deepEqual(TEMPLATE_PROFILES,['original_fixed','selected_100_usdc_v1']);
+ for(const profile of TEMPLATE_PROFILES){const p=profilePacket(t,profile),out=validateProfileTemplates(p.directory,p.record);
+  assert.deepEqual(out.templateBytes,p.base);assert.deepEqual(out.profileTemplateBytes,p.derived.bytes);assert.deepEqual(out.templates,p.derived.templates);assert.deepEqual(out.amendment,p.derived.amendment);
+  if(profile==='original_fixed'){assert.deepEqual(out.profileTemplateBytes,out.templateBytes);assert.equal(out.amendment,null);}
+  else{assert.notDeepEqual(out.profileTemplateBytes,out.templateBytes);assert(out.amendment);assert(out.templates.every(c=>c.amounts.depositRaw==='100000000'&&c.amounts.withdrawRaw==='50000000'));}
+ }
+});
+test('profile metadata cannot substitute supplied amendments, reordered rows, duplicate paths or extra metadata',t=>{
+ const p=profilePacket(t,'selected_100_usdc_v1');
+ for(const mutate of[
+  r=>{r.profile='original_fixed';},r=>{r.profile='arbitrary';},r=>{r.amendment=null;},r=>{r.amendment.extra='not derived';},
+  r=>{r.baseTemplates.reverse();},r=>{r.templates.reverse();},r=>{r.baseTemplates.pop();},r=>{r.templates.push(r.templates[0]);},
+  r=>{r.baseTemplates[0].id='changed';},r=>{r.templates[1].id=r.templates[0].id;},r=>{r.templates[1].path=r.templates[0].path;},
+  r=>{r.templates[0].path='../escape.json';},r=>{r.templates[0].extra=true;}
+ ]){const record=structuredClone(p.record);mutate(record);assert.throws(()=>validateProfileTemplates(p.directory,record));}
+});
+test('resealed byte changes cannot replace original base inputs or the fixed profile serialization',t=>{
+ for(const profile of TEMPLATE_PROFILES)for(const kind of['baseTemplates','templates']){
+  const p=profilePacket(t,profile),row=p.record[kind][0],f=path.join(p.directory,row.path),raw=fs.readFileSync(f);
+  // Even semantically identical JSON is not an allowed replacement byte form.
+  fs.writeFileSync(f,Buffer.concat([raw,Buffer.from(' ')]));p.record[kind][0]={...entry(p.directory,row.path),id:row.id};
+  assert.throws(()=>validateProfileTemplates(p.directory,p.record));
+ }
+ const p=profilePacket(t,'selected_100_usdc_v1'),row=p.record.templates[0],f=path.join(p.directory,row.path),changed=JSON.parse(fs.readFileSync(f));
+ changed.localInput.calls[0].gas='4999999';fs.writeFileSync(f,JSON.stringify(changed,null,2)+'\n');p.record.templates[0]={...entry(p.directory,row.path),id:row.id};
+ assert.throws(()=>validateProfileTemplates(p.directory,p.record));
+});
+test('unknown or caller-shaped profile refuses before directory creation or worker dispatch',async t=>{
+ for(const profile of['unknown','selected_100_usdc_v2','',null,{},['original_fixed']]){
+  const directory=path.join(temp(t),'must-not-exist');await assert.rejects(prepare(directory,profile),/Unknown fixed template profile/);assert.equal(fs.existsSync(directory),false);
+ }
+});
+test('source closure pins profile sources and exact rationale bytes without using them as input state',async t=>{
+ const rows=await sourceRows();for(const name of['funded-profile.mjs','funded-profile.test.mjs'])assert(rows.some(r=>r.path===`${PREFIX}/${name}`));
+ for(const pin of FUNDED_PROVENANCE_FILES){const row=rows.find(r=>r.path===pin.path);assert(row);assert.equal(row.kind,'file');assert.equal(row.bytes,pin.bytes);assert.equal(row.sha256,pin.sha256);}
+ assert(rows.reduce((sum,r)=>sum+(r.bytes??0),0)<128*1024*1024);
+ // Same-size provenance drift is rejected before any inventory/archive action.
+ const directory=temp(t),pin=FUNDED_PROVENANCE_FILES[0],f=path.join(directory,pin.path),raw=Buffer.from(fs.readFileSync(path.join(ROOT,pin.path)));raw[0]^=1;
+ fs.mkdirSync(path.dirname(f),{recursive:true});fs.writeFileSync(f,raw);await assert.rejects(sourceRows(directory));
 });

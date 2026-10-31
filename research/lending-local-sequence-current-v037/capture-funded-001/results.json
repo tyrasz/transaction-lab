@@ -1,0 +1,169 @@
+{
+  "intentSha256": "764b3bc67d9f27693513294bc7721345685d9fc067f9b915c63020013917b7c9",
+  "planSha256": "67fee713c49a295074152edf4aab9fd7150e3d6edd40b452f2f64c377e1e9985",
+  "selectionManifestSha256": "bbf591de9ff9ad0e2bcdb5e3e2f1340aa8cae6005ec9a219cb62fe92b5ad350f",
+  "phase": "target_matrix",
+  "coordinatorStarted": {
+    "wallMs": 1793439449543,
+    "monotonicMs": 456.791917
+  },
+  "selectionUsage": {
+    "calls": 3,
+    "observedBytes": 33861,
+    "retainedBytes": 33861,
+    "savedWires": 3,
+    "wireJoins": [
+      {
+        "id": 1,
+        "path": "wire/0001.json",
+        "dispatched": true,
+        "requestSha256": "09fabe0af56b7726f1666ddd147482df4d951f86f66124b936716c53ab0e8471",
+        "responseSha256": "79226432df73e05966f20e4d291fb5048bfef1138d7078f8feab534126df1aa5",
+        "retainedBytes": 39,
+        "observedBytes": 39,
+        "saved": true
+      },
+      {
+        "id": 2,
+        "path": "wire/0002.json",
+        "dispatched": true,
+        "requestSha256": "ea099c30d3683d74a056405807b4ab857a06189f3e4702981d75935407ac986e",
+        "responseSha256": "f94ec9ff88a276c4a87a457cbf1183224c65db5ec194fa1049e44be278748e64",
+        "retainedBytes": 16911,
+        "observedBytes": 16911,
+        "saved": true
+      },
+      {
+        "id": 3,
+        "path": "wire/0003.json",
+        "dispatched": true,
+        "requestSha256": "5f9ec98f56fb83c8e98a3bfa5584e26971534a0c50d2e5205addef7b2f87120a",
+        "responseSha256": "ba009f30c4156f1bc08092db9aa59a578ec0d2636863c2b3f9c2cb6500b150c2",
+        "retainedBytes": 16911,
+        "observedBytes": 16911,
+        "saved": true
+      }
+    ],
+    "limits": {
+      "requests": 3,
+      "responseBytes": 2097152,
+      "totalBytes": 6291456,
+      "requestMs": 15000,
+      "phaseMs": 60000,
+      "drainMs": 10000,
+      "headerAgeMs": 120000,
+      "headerFutureMs": 30000,
+      "firstTargetMs": 180000
+    }
+  },
+  "selectionElapsed": {
+    "started": {
+      "wallMs": 1793439449651,
+      "monotonicMs": 563.993417
+    },
+    "finished": {
+      "wallMs": 1793439449865,
+      "monotonicMs": 778.712584
+    },
+    "wallMs": 214,
+    "monotonicMs": 214.71916699999997,
+    "nativeMs": 214.972167
+  },
+  "denominator": {
+    "sequences": 2,
+    "originalPositions": 6,
+    "originalChannels": 30,
+    "queryPositions": 39,
+    "queryChannels": 117
+  },
+  "rows": [
+    {
+      "kind": "local",
+      "index": 0,
+      "id": "aave-usdc-selected-100-supply-50-withdraw",
+      "status": "returned",
+      "bounded": true,
+      "calls": 59,
+      "networkBytes": 745074,
+      "process": "processes/local-001-process.json",
+      "seal": "processes/local-001-seal.json",
+      "workerManifestSha256": "a1dc6e2573a646c952a3f7f323c8452bb3d4b638550f44763f837d656bce05f6"
+    },
+    {
+      "kind": "local",
+      "index": 1,
+      "id": "kiln-usdc-selected-100-deposit-50-withdraw",
+      "status": "returned",
+      "bounded": true,
+      "calls": 233,
+      "networkBytes": 2752575,
+      "process": "processes/local-002-process.json",
+      "seal": "processes/local-002-seal.json",
+      "workerManifestSha256": "d238d465b870abc31819c9e92b8e48f368666b7c6c77054f82cb1da42a2e6673"
+    },
+    {
+      "kind": "provider",
+      "index": 0,
+      "id": "aave-usdc-selected-100-supply-50-withdraw",
+      "status": "returned",
+      "bounded": true,
+      "calls": 103,
+      "networkBytes": 267534,
+      "process": "processes/provider-001-process.json",
+      "seal": "processes/provider-001-seal.json",
+      "workerManifestSha256": "77d6c2cd7c8d260e50373c5575d7439500cc075830cca6b38dbf26847accde38"
+    },
+    {
+      "kind": "provider",
+      "index": 1,
+      "id": "kiln-usdc-selected-100-deposit-50-withdraw",
+      "status": "returned",
+      "bounded": true,
+      "calls": 142,
+      "networkBytes": 934322,
+      "process": "processes/provider-002-process.json",
+      "seal": "processes/provider-002-seal.json",
+      "workerManifestSha256": "d0b610a39a5e7fb197cbbd442575435b85a5a467abe51b10c14f077a8bd79198"
+    }
+  ],
+  "fatal": null,
+  "sourceUnchanged": true,
+  "elapsed": {
+    "wallMs": 159314,
+    "monotonicMs": 159313.981375,
+    "reversed": false
+  },
+  "targetPhaseStarted": {
+    "wallMs": 1793439450735,
+    "monotonicMs": 1648.490792
+  },
+  "networkCalls": 537,
+  "networkBytes": 4699505,
+  "knownBoundedNetworkCalls": 537,
+  "knownBoundedNetworkBytes": 4699505,
+  "evidenceUsable": true,
+  "scope": {
+    "endpoint": "https://eth.drpc.org",
+    "adapter": "current_guarded_local_and_current_standard_sequence_APIs",
+    "httpApi": false,
+    "ui": false,
+    "retries": 0,
+    "providerFallback": false,
+    "broadcast": false,
+    "sharedProviderInfrastructure": true,
+    "independentConsensus": false,
+    "fullRealTransactionReplay": false,
+    "originalGas": 5000000,
+    "originalPricing": "unsigned_unpriced_block_end",
+    "localQueryGas": 1000000,
+    "providerQueryGas": 300000,
+    "queryTiming": "local_all_originals_then_disposable_queries_provider_between_originals",
+    "queryGasEquivalent": false,
+    "selection": "one_fresh_header_then_fixed_hash_no_reselection",
+    "freshAtSelectionOnly": true,
+    "denominator": "two_fixed_sequences_three_declared_positions_each_failures_and_unattempted_retained"
+  },
+  "prepareOnly": false,
+  "totalNetworkCalls": 540,
+  "totalNetworkBytes": 4733366
+}

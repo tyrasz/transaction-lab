@@ -3,7 +3,8 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import path from 'node:path';
 import {createLedger,sha} from './archive.mjs';import {invocation} from './run.mjs';
 import {validateSavedAttempt,compareFixedCases,comparisonCounts,validateSavedTimeline} from './adjudicate.mjs';
-import {readPinnedTemplates,HISTORICAL_TEMPLATES} from './declarations.mjs';
+import {readPinnedTemplates,deriveTemplateProfile,HISTORICAL_TEMPLATES} from './declarations.mjs';
+import {FUNDED_PROFILE} from './funded-profile.mjs';
 import {createHeaderSelection,assertFirstTargetFresh} from './selection.mjs';
 const fixedTemplates=()=>readPinnedTemplates(HISTORICAL_TEMPLATES.files.map(r=>fs.readFileSync(new URL('../../'+r.path,import.meta.url))));
 const temp=t=>{const p=fs.mkdtempSync('/private/tmp/lending-adjudicator-control-');t.after(()=>fs.rmSync(p,{recursive:true,force:true}));return p;};
@@ -53,6 +54,15 @@ test('unknown packet bounds preserve all fixed 30 original and 117 query channel
  const cases=fixedTemplates();const r=await compareFixedCases(cases,[{},{}],false);
  assert.equal(r.rows.length,2);assert.deepEqual(r.counts,{originalChannels:{matched:0,mismatched:0,unavailable:30},queryChannels:{matched:0,mismatched:0,unavailable:117}});assert.equal(r.metrics,null);
  assert.deepEqual(comparisonCounts(r.rows),r.counts);assert.deepEqual(r.rows.map(x=>x.steps.length),[3,3]);assert.deepEqual(r.rows.map(x=>x.steps[0].queries.length),[5,8]);
+});
+
+test('new selected funded cases retain their own IDs and full unknown denominator on unavailable evidence',async()=>{
+ const bytes=HISTORICAL_TEMPLATES.files.map(r=>fs.readFileSync(new URL('../../'+r.path,import.meta.url)));
+ const cases=deriveTemplateProfile({templateBytes:bytes,profile:FUNDED_PROFILE}).templates;
+ const r=await compareFixedCases(cases,[{},{}],false);
+ assert.deepEqual(r.rows.map(x=>x.id),['aave-usdc-selected-100-supply-50-withdraw','kiln-usdc-selected-100-deposit-50-withdraw']);
+ assert.deepEqual(r.counts,{originalChannels:{matched:0,mismatched:0,unavailable:30},queryChannels:{matched:0,mismatched:0,unavailable:117}});
+ assert.equal(r.metrics,null);
 });
 
 test('extra successful client row without a saved wire cannot remain a bounded attempt',t=>{

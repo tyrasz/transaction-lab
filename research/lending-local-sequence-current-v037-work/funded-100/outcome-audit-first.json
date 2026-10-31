@@ -1,0 +1,2074 @@
+{
+  "kind": "independent_saved_funded_outcome_audit",
+  "intentSha256": "764b3bc67d9f27693513294bc7721345685d9fc067f9b915c63020013917b7c9",
+  "planSha256": "67fee713c49a295074152edf4aab9fd7150e3d6edd40b452f2f64c377e1e9985",
+  "manifestSha256": "02802ff6b0fae693fc405ef39fbaa366f3f1af658b1aa6c3d19032671f3eda2a",
+  "checkerSha256": "e860d6c54ba219c24dff14bd01c4872b8da02602ba8d267e12c4365bb2bfb049",
+  "savedComparisonSha256": "c267d54ce748beb25c1be1e47bab262c217383a798c4d31d963e48f416d6e1e5",
+  "integrity": {
+    "manifestEntries": 4665,
+    "manifestFilesRehashed": true,
+    "hashedFileBytes": 92955486,
+    "originalWriteLedgerRowsMatchManifest": true,
+    "rawWiresVerified": 537,
+    "evidenceWireJoins": 607
+  },
+  "counts": {
+    "independentlyCheckedOriginalChannels": {
+      "matched": 18,
+      "mismatched": 0,
+      "unavailable": 0
+    },
+    "independentlyDecodedQueryChannels": {
+      "matched": 117,
+      "mismatched": 0,
+      "unavailable": 0
+    },
+    "savedAdjudicatorAllChannels": {
+      "originalChannels": {
+        "matched": 30,
+        "mismatched": 0,
+        "unavailable": 0
+      },
+      "queryChannels": {
+        "matched": 117,
+        "mismatched": 0,
+        "unavailable": 0
+      }
+    }
+  },
+  "cases": [
+    {
+      "id": "aave-usdc-selected-100-supply-50-withdraw",
+      "header": {
+        "hash": "0x2ffbb9cac864cffa0b2236ef9ef1d571f755377c877f8523a97d447fff9e20d0",
+        "number": "0x1917cd6",
+        "stateRoot": "0xa6302410713c645df0507bdf8330dd85cf9f60ab69759889edac27baadb105ee"
+      },
+      "sender": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+      "steps": [
+        {
+          "index": 0,
+          "operation": "approve",
+          "localStatus": "success",
+          "providerStatus": "success",
+          "localChargedGas": "55558",
+          "providerChargedGas": "55558",
+          "independentChannels": {
+            "executionStatus": true,
+            "returnData": true,
+            "chargedGas": true
+          },
+          "queries": [
+            {
+              "index": 0,
+              "id": "owner-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "112952478562",
+                  "afterRaw": "112952478562",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "112952478562",
+                  "afterRaw": "112952478562",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/001/wire/0014.json"
+                ],
+                "after": [
+                  "provider/001/wire/0016.json",
+                  "provider/001/wire/0048.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": false
+            },
+            {
+              "index": 1,
+              "id": "beneficiary-aethusdc",
+              "subject": {
+                "asset": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/001/wire/0018.json"
+                ],
+                "after": [
+                  "provider/001/wire/0020.json",
+                  "provider/001/wire/0052.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": false
+            },
+            {
+              "index": 2,
+              "id": "reserve-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "92905165621223",
+                  "afterRaw": "92905165621223",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "92905165621223",
+                  "afterRaw": "92905165621223",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/001/wire/0022.json"
+                ],
+                "after": [
+                  "provider/001/wire/0024.json",
+                  "provider/001/wire/0056.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": false
+            },
+            {
+              "index": 3,
+              "id": "owner-pool-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+                "kind": "allowance",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "0",
+                  "afterRaw": "100000000",
+                  "deltaRaw": "100000000"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "0",
+                  "afterRaw": "100000000",
+                  "deltaRaw": "100000000"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/001/wire/0026.json"
+                ],
+                "after": [
+                  "provider/001/wire/0028.json",
+                  "provider/001/wire/0060.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": false
+            },
+            {
+              "index": 4,
+              "id": "aave-account-data",
+              "subject": {
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "contract": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+                "kind": "aave_v3_user_account_data",
+                "units": "oracle_base_units_unknown_currency_and_scale_plus_bps_and_1e18_health_factor"
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "totalCollateralBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "totalDebtBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "availableBorrowsBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "currentLiquidationThreshold",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "ltv",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "healthFactor",
+                  "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+                  "afterRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "totalCollateralBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "totalDebtBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "availableBorrowsBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "currentLiquidationThreshold",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "ltv",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "healthFactor",
+                  "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+                  "afterRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/001/wire/0030.json"
+                ],
+                "after": [
+                  "provider/001/wire/0032.json",
+                  "provider/001/wire/0064.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": false
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "operation": "supply",
+          "localStatus": "success",
+          "providerStatus": "success",
+          "localChargedGas": "178305",
+          "providerChargedGas": "178305",
+          "independentChannels": {
+            "executionStatus": true,
+            "returnData": true,
+            "chargedGas": true
+          },
+          "queries": [
+            {
+              "index": 0,
+              "id": "owner-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "112952478562",
+                  "afterRaw": "112852478562",
+                  "deltaRaw": "-100000000"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "112952478562",
+                  "afterRaw": "112852478562",
+                  "deltaRaw": "-100000000"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/001/wire/0016.json",
+                  "provider/001/wire/0048.json"
+                ],
+                "after": [
+                  "provider/001/wire/0050.json",
+                  "provider/001/wire/0082.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 1,
+              "id": "beneficiary-aethusdc",
+              "subject": {
+                "asset": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "0",
+                  "afterRaw": "99999999",
+                  "deltaRaw": "99999999"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "0",
+                  "afterRaw": "99999999",
+                  "deltaRaw": "99999999"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/001/wire/0020.json",
+                  "provider/001/wire/0052.json"
+                ],
+                "after": [
+                  "provider/001/wire/0054.json",
+                  "provider/001/wire/0086.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 2,
+              "id": "reserve-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "92905165621223",
+                  "afterRaw": "92905265621223",
+                  "deltaRaw": "100000000"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "92905165621223",
+                  "afterRaw": "92905265621223",
+                  "deltaRaw": "100000000"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/001/wire/0024.json",
+                  "provider/001/wire/0056.json"
+                ],
+                "after": [
+                  "provider/001/wire/0058.json",
+                  "provider/001/wire/0090.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 3,
+              "id": "owner-pool-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+                "kind": "allowance",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "100000000",
+                  "afterRaw": "0",
+                  "deltaRaw": "-100000000"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "100000000",
+                  "afterRaw": "0",
+                  "deltaRaw": "-100000000"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/001/wire/0028.json",
+                  "provider/001/wire/0060.json"
+                ],
+                "after": [
+                  "provider/001/wire/0062.json",
+                  "provider/001/wire/0094.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 4,
+              "id": "aave-account-data",
+              "subject": {
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "contract": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+                "kind": "aave_v3_user_account_data",
+                "units": "oracle_base_units_unknown_currency_and_scale_plus_bps_and_1e18_health_factor"
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "totalCollateralBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "totalDebtBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "availableBorrowsBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "currentLiquidationThreshold",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "ltv",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "healthFactor",
+                  "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+                  "afterRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "totalCollateralBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "totalDebtBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "availableBorrowsBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "currentLiquidationThreshold",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "ltv",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "healthFactor",
+                  "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+                  "afterRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/001/wire/0032.json",
+                  "provider/001/wire/0064.json"
+                ],
+                "after": [
+                  "provider/001/wire/0066.json",
+                  "provider/001/wire/0098.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "operation": "withdraw",
+          "localStatus": "success",
+          "providerStatus": "success",
+          "localChargedGas": "160035",
+          "providerChargedGas": "160035",
+          "independentChannels": {
+            "executionStatus": true,
+            "returnData": true,
+            "chargedGas": true
+          },
+          "queries": [
+            {
+              "index": 0,
+              "id": "owner-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "112852478562",
+                  "afterRaw": "112902478562",
+                  "deltaRaw": "50000000"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "112852478562",
+                  "afterRaw": "112902478562",
+                  "deltaRaw": "50000000"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/001/wire/0050.json",
+                  "provider/001/wire/0082.json"
+                ],
+                "after": [
+                  "provider/001/wire/0084.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 1,
+              "id": "beneficiary-aethusdc",
+              "subject": {
+                "asset": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "99999999",
+                  "afterRaw": "49999998",
+                  "deltaRaw": "-50000001"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "99999999",
+                  "afterRaw": "49999998",
+                  "deltaRaw": "-50000001"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/001/wire/0054.json",
+                  "provider/001/wire/0086.json"
+                ],
+                "after": [
+                  "provider/001/wire/0088.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 2,
+              "id": "reserve-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "92905265621223",
+                  "afterRaw": "92905215621223",
+                  "deltaRaw": "-50000000"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "92905265621223",
+                  "afterRaw": "92905215621223",
+                  "deltaRaw": "-50000000"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/001/wire/0058.json",
+                  "provider/001/wire/0090.json"
+                ],
+                "after": [
+                  "provider/001/wire/0092.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 3,
+              "id": "owner-pool-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+                "kind": "allowance",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/001/wire/0062.json",
+                  "provider/001/wire/0094.json"
+                ],
+                "after": [
+                  "provider/001/wire/0096.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 4,
+              "id": "aave-account-data",
+              "subject": {
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "contract": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+                "kind": "aave_v3_user_account_data",
+                "units": "oracle_base_units_unknown_currency_and_scale_plus_bps_and_1e18_health_factor"
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "totalCollateralBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "totalDebtBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "availableBorrowsBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "currentLiquidationThreshold",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "ltv",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "healthFactor",
+                  "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+                  "afterRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "totalCollateralBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "totalDebtBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "availableBorrowsBase",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "currentLiquidationThreshold",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "ltv",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "healthFactor",
+                  "beforeRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+                  "afterRaw": "115792089237316195423570985008687907853269984665640564039457584007913129639935",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/001/wire/0066.json",
+                  "provider/001/wire/0098.json"
+                ],
+                "after": [
+                  "provider/001/wire/0100.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kiln-usdc-selected-100-deposit-50-withdraw",
+      "header": {
+        "hash": "0x2ffbb9cac864cffa0b2236ef9ef1d571f755377c877f8523a97d447fff9e20d0",
+        "number": "0x1917cd6",
+        "stateRoot": "0xa6302410713c645df0507bdf8330dd85cf9f60ab69759889edac27baadb105ee"
+      },
+      "sender": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+      "steps": [
+        {
+          "index": 0,
+          "operation": "approve",
+          "localStatus": "success",
+          "providerStatus": "success",
+          "localChargedGas": "55558",
+          "providerChargedGas": "55558",
+          "independentChannels": {
+            "executionStatus": true,
+            "returnData": true,
+            "chargedGas": true
+          },
+          "queries": [
+            {
+              "index": 0,
+              "id": "owner-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "112952478562",
+                  "afterRaw": "112952478562",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "112952478562",
+                  "afterRaw": "112952478562",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0015.json"
+                ],
+                "after": [
+                  "provider/002/wire/0017.json",
+                  "provider/002/wire/0062.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": false
+            },
+            {
+              "index": 1,
+              "id": "beneficiary-wrapper-shares",
+              "subject": {
+                "asset": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0019.json"
+                ],
+                "after": [
+                  "provider/002/wire/0021.json",
+                  "provider/002/wire/0066.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": false
+            },
+            {
+              "index": 2,
+              "id": "wrapper-vault-shares",
+              "subject": {
+                "asset": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "balanceOf",
+                "decimals": 18
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "25339327410554439022677175",
+                  "afterRaw": "25339327410554439022677175",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "25339327410554439022677175",
+                  "afterRaw": "25339327410554439022677175",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0023.json"
+                ],
+                "after": [
+                  "provider/002/wire/0025.json",
+                  "provider/002/wire/0070.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": false
+            },
+            {
+              "index": 3,
+              "id": "wrapper-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "20083625",
+                  "afterRaw": "20083625",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "20083625",
+                  "afterRaw": "20083625",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0027.json"
+                ],
+                "after": [
+                  "provider/002/wire/0029.json",
+                  "provider/002/wire/0074.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": false
+            },
+            {
+              "index": 4,
+              "id": "vault-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "6011",
+                  "afterRaw": "6011",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "6011",
+                  "afterRaw": "6011",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0031.json"
+                ],
+                "after": [
+                  "provider/002/wire/0033.json",
+                  "provider/002/wire/0078.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": false
+            },
+            {
+              "index": 5,
+              "id": "blue-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "97452197615624",
+                  "afterRaw": "97452197615624",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "97452197615624",
+                  "afterRaw": "97452197615624",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0035.json"
+                ],
+                "after": [
+                  "provider/002/wire/0037.json",
+                  "provider/002/wire/0082.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": false
+            },
+            {
+              "index": 6,
+              "id": "owner-wrapper-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "spender": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "allowance",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "0",
+                  "afterRaw": "100000000",
+                  "deltaRaw": "100000000"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "0",
+                  "afterRaw": "100000000",
+                  "deltaRaw": "100000000"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0039.json"
+                ],
+                "after": [
+                  "provider/002/wire/0041.json",
+                  "provider/002/wire/0086.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": false
+            },
+            {
+              "index": 7,
+              "id": "inner-vault-blue-position",
+              "subject": {
+                "account": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "contract": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+                "marketId": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
+                "kind": "morpho_blue_position",
+                "units": "raw_supply_shares_borrow_shares_and_collateral_without_asset_conversion"
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "supplyShares",
+                  "beforeRaw": "6785698245891760885",
+                  "afterRaw": "6785698245891760885",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "borrowShares",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "collateral",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "supplyShares",
+                  "beforeRaw": "6785698245891760885",
+                  "afterRaw": "6785698245891760885",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "borrowShares",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "collateral",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0043.json"
+                ],
+                "after": [
+                  "provider/002/wire/0045.json",
+                  "provider/002/wire/0090.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": false
+            }
+          ]
+        },
+        {
+          "index": 1,
+          "operation": "deposit",
+          "localStatus": "success",
+          "providerStatus": "success",
+          "localChargedGas": "1430190",
+          "providerChargedGas": "1430190",
+          "independentChannels": {
+            "executionStatus": true,
+            "returnData": true,
+            "chargedGas": true
+          },
+          "queries": [
+            {
+              "index": 0,
+              "id": "owner-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "112952478562",
+                  "afterRaw": "112852478562",
+                  "deltaRaw": "-100000000"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "112952478562",
+                  "afterRaw": "112852478562",
+                  "deltaRaw": "-100000000"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0017.json",
+                  "provider/002/wire/0062.json"
+                ],
+                "after": [
+                  "provider/002/wire/0064.json",
+                  "provider/002/wire/0109.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 1,
+              "id": "beneficiary-wrapper-shares",
+              "subject": {
+                "asset": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "0",
+                  "afterRaw": "94368282",
+                  "deltaRaw": "94368282"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "0",
+                  "afterRaw": "94368282",
+                  "deltaRaw": "94368282"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0021.json",
+                  "provider/002/wire/0066.json"
+                ],
+                "after": [
+                  "provider/002/wire/0068.json",
+                  "provider/002/wire/0113.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 2,
+              "id": "wrapper-vault-shares",
+              "subject": {
+                "asset": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "balanceOf",
+                "decimals": 18
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "25339327410554439022677175",
+                  "afterRaw": "25339414650074077884498139",
+                  "deltaRaw": "87239519638861820964"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "25339327410554439022677175",
+                  "afterRaw": "25339414650074077884498139",
+                  "deltaRaw": "87239519638861820964"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0025.json",
+                  "provider/002/wire/0070.json"
+                ],
+                "after": [
+                  "provider/002/wire/0072.json",
+                  "provider/002/wire/0117.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 3,
+              "id": "wrapper-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "20083625",
+                  "afterRaw": "20083625",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "20083625",
+                  "afterRaw": "20083625",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0029.json",
+                  "provider/002/wire/0074.json"
+                ],
+                "after": [
+                  "provider/002/wire/0076.json",
+                  "provider/002/wire/0121.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 4,
+              "id": "vault-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "6011",
+                  "afterRaw": "6011",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "6011",
+                  "afterRaw": "6011",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0033.json",
+                  "provider/002/wire/0078.json"
+                ],
+                "after": [
+                  "provider/002/wire/0080.json",
+                  "provider/002/wire/0125.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 5,
+              "id": "blue-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "97452197615624",
+                  "afterRaw": "97452297615624",
+                  "deltaRaw": "100000000"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "97452197615624",
+                  "afterRaw": "97452297615624",
+                  "deltaRaw": "100000000"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0037.json",
+                  "provider/002/wire/0082.json"
+                ],
+                "after": [
+                  "provider/002/wire/0084.json",
+                  "provider/002/wire/0129.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 6,
+              "id": "owner-wrapper-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "spender": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "allowance",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "100000000",
+                  "afterRaw": "0",
+                  "deltaRaw": "-100000000"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "100000000",
+                  "afterRaw": "0",
+                  "deltaRaw": "-100000000"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0041.json",
+                  "provider/002/wire/0086.json"
+                ],
+                "after": [
+                  "provider/002/wire/0088.json",
+                  "provider/002/wire/0133.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 7,
+              "id": "inner-vault-blue-position",
+              "subject": {
+                "account": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "contract": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+                "marketId": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
+                "kind": "morpho_blue_position",
+                "units": "raw_supply_shares_borrow_shares_and_collateral_without_asset_conversion"
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "supplyShares",
+                  "beforeRaw": "6785698245891760885",
+                  "afterRaw": "6785789306611294091",
+                  "deltaRaw": "91060719533206"
+                },
+                {
+                  "name": "borrowShares",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "collateral",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "supplyShares",
+                  "beforeRaw": "6785698245891760885",
+                  "afterRaw": "6785789306611294091",
+                  "deltaRaw": "91060719533206"
+                },
+                {
+                  "name": "borrowShares",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "collateral",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0045.json",
+                  "provider/002/wire/0090.json"
+                ],
+                "after": [
+                  "provider/002/wire/0092.json",
+                  "provider/002/wire/0137.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            }
+          ]
+        },
+        {
+          "index": 2,
+          "operation": "withdraw",
+          "localStatus": "success",
+          "providerStatus": "success",
+          "localChargedGas": "1678187",
+          "providerChargedGas": "1678187",
+          "independentChannels": {
+            "executionStatus": true,
+            "returnData": true,
+            "chargedGas": true
+          },
+          "queries": [
+            {
+              "index": 0,
+              "id": "owner-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "112852478562",
+                  "afterRaw": "112902478562",
+                  "deltaRaw": "50000000"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "112852478562",
+                  "afterRaw": "112902478562",
+                  "deltaRaw": "50000000"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0064.json",
+                  "provider/002/wire/0109.json"
+                ],
+                "after": [
+                  "provider/002/wire/0111.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 1,
+              "id": "beneficiary-wrapper-shares",
+              "subject": {
+                "asset": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "94368282",
+                  "afterRaw": "47184140",
+                  "deltaRaw": "-47184142"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "94368282",
+                  "afterRaw": "47184140",
+                  "deltaRaw": "-47184142"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0068.json",
+                  "provider/002/wire/0113.json"
+                ],
+                "after": [
+                  "provider/002/wire/0115.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 2,
+              "id": "wrapper-vault-shares",
+              "subject": {
+                "asset": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "balanceOf",
+                "decimals": 18
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "25339414650074077884498139",
+                  "afterRaw": "25339371030314258453587656",
+                  "deltaRaw": "-43619759819430910483"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "25339414650074077884498139",
+                  "afterRaw": "25339371030314258453587656",
+                  "deltaRaw": "-43619759819430910483"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0072.json",
+                  "provider/002/wire/0117.json"
+                ],
+                "after": [
+                  "provider/002/wire/0119.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 3,
+              "id": "wrapper-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "20083625",
+                  "afterRaw": "20083625",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "20083625",
+                  "afterRaw": "20083625",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0076.json",
+                  "provider/002/wire/0121.json"
+                ],
+                "after": [
+                  "provider/002/wire/0123.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 4,
+              "id": "vault-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "6011",
+                  "afterRaw": "6011",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "6011",
+                  "afterRaw": "6011",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0080.json",
+                  "provider/002/wire/0125.json"
+                ],
+                "after": [
+                  "provider/002/wire/0127.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 5,
+              "id": "blue-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+                "kind": "balanceOf",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "97452297615624",
+                  "afterRaw": "97452247615624",
+                  "deltaRaw": "-50000000"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "balance",
+                  "beforeRaw": "97452297615624",
+                  "afterRaw": "97452247615624",
+                  "deltaRaw": "-50000000"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0084.json",
+                  "provider/002/wire/0129.json"
+                ],
+                "after": [
+                  "provider/002/wire/0131.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 6,
+              "id": "owner-wrapper-usdc",
+              "subject": {
+                "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+                "spender": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+                "kind": "allowance",
+                "decimals": 6
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "allowance",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0088.json",
+                  "provider/002/wire/0133.json"
+                ],
+                "after": [
+                  "provider/002/wire/0135.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            },
+            {
+              "index": 7,
+              "id": "inner-vault-blue-position",
+              "subject": {
+                "account": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+                "contract": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+                "marketId": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
+                "kind": "morpho_blue_position",
+                "units": "raw_supply_shares_borrow_shares_and_collateral_without_asset_conversion"
+              },
+              "channels": {
+                "beforeReturnData": true,
+                "afterReturnData": true,
+                "rawValues": true
+              },
+              "error": null,
+              "localValues": [
+                {
+                  "name": "supplyShares",
+                  "beforeRaw": "6785789306611294091",
+                  "afterRaw": "6785743776251527487",
+                  "deltaRaw": "-45530359766604"
+                },
+                {
+                  "name": "borrowShares",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "collateral",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerValues": [
+                {
+                  "name": "supplyShares",
+                  "beforeRaw": "6785789306611294091",
+                  "afterRaw": "6785743776251527487",
+                  "deltaRaw": "-45530359766604"
+                },
+                {
+                  "name": "borrowShares",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                },
+                {
+                  "name": "collateral",
+                  "beforeRaw": "0",
+                  "afterRaw": "0",
+                  "deltaRaw": "0"
+                }
+              ],
+              "providerTraceWires": {
+                "before": [
+                  "provider/002/wire/0092.json",
+                  "provider/002/wire/0137.json"
+                ],
+                "after": [
+                  "provider/002/wire/0139.json"
+                ]
+              },
+              "continuityWithPreviousMeasuredStep": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "No VM/API imports, execution, network, source changes or capture writes.",
+    "Proof cryptography, state-overlay composition, ordered-log semantics and process/source semantic gates rely on the archived adjudicator; this audit independently rehashes its saved inputs and checks selected raw joins.",
+    "Original independent channels are status, return data and charged gas only; query words, arithmetic, continuity and raw provider trace joins are decoded independently.",
+    "Both paths share provider infrastructure. Queries have different gas budgets/scheduling. Aave account-data zeros do not by themselves explain collateral settings; Blue position belongs to the inner vault.",
+    "Selected fixed-case evidence does not replace prior failures or establish representative accuracy, complete economic coverage, current funding, HTTP or frontend behavior."
+  ],
+  "targetsExecuted": 0
+}

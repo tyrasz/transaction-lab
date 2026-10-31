@@ -1,0 +1,262 @@
+{
+  "kind": "independent_input_only_funded_design_review",
+  "scope": {
+    "networkCalls": 0,
+    "evmExecutions": 0,
+    "captureMutations": 0,
+    "sourceMutations": 0
+  },
+  "source": {
+    "path": "research/lending-local-sequence-current-v037/funded-profile.mjs",
+    "sha256": "9c59c18466da0eaca48259987c9928d3a16e3e52e03799193e8b283d4008046a"
+  },
+  "baseFiles": [
+    {
+      "path": "research/lending-local-sequence-v037/capture/inputs/001.json",
+      "sha256": "c50936237fed1d59740521b1928f2a4bef74e496ec308f5f65d02281164e3f5c"
+    },
+    {
+      "path": "research/lending-local-sequence-v037/capture/inputs/002.json",
+      "sha256": "3b09b2898f5b5c7b1d9f758b793f5e6f3246ca0f241cc20b71cc89637171737c"
+    }
+  ],
+  "sourcePins": [
+    {
+      "path": "reports/standard-evm-positions-v3/aave-approval-position-sequence-response.json",
+      "bytes": 852108,
+      "sha256": "3aa4be56a2f97ef115b2dd2f90e158e57442be39808ef3503d38391a957c41af"
+    },
+    {
+      "path": "reports/standard-evm-discovery/raw/028.body",
+      "bytes": 382510,
+      "sha256": "1fb51175d15fe55c0bf13e446cb079bc4af84302c7356684fca573a093209870"
+    },
+    {
+      "path": "reports/standard-evm-discovery/raw/028.json",
+      "bytes": 1792,
+      "sha256": "2f436f5d4c8125c2c9582d9bab508976e4c9e041cbaad9b07b2db4f7fed6f8e4"
+    },
+    {
+      "path": "reports/standard-evm-deposits-v2/plan.json",
+      "bytes": 31120,
+      "sha256": "d458f18ebd659998296a05283e6987f945bb54d7fe5786551abf70c9d7640f8f"
+    },
+    {
+      "path": "reports/standard-evm-positions-v3/plan.json",
+      "bytes": 48296,
+      "sha256": "5f08851552e8210ab8ad88493feb40f11de46d64b18207b87880d21811e04c86"
+    },
+    {
+      "path": "reports/ethereum-lending-local-reference/plan.json",
+      "bytes": 449126,
+      "sha256": "f9fb0e1b465bcf191185e1790204bf64a324634d98436ebb4a17f4cb6cd83288"
+    },
+    {
+      "path": "reports/standard-evm-discovery/raw/027.body",
+      "bytes": 8820,
+      "sha256": "e335351dc80f49372b08d1870528963e34cb55a7956d876b47835a0770ed8501"
+    },
+    {
+      "path": "reports/standard-evm-discovery/raw/027.json",
+      "bytes": 1774,
+      "sha256": "c55fbe2799e282c7df55d0dcc3a73e6ee2823ce587fe9d6071234eccd9fbf9ab"
+    },
+    {
+      "path": "research/lending-local-sequence-current-v037/capture/local/002/report.json",
+      "bytes": 15121636,
+      "sha256": "85410cd1267711f4d11937672fc63cf1629e20de46666923617a219d5927d2e2"
+    }
+  ],
+  "checks": 33,
+  "amendmentReconstructsExactly": true,
+  "cases": [
+    {
+      "id": "aave-usdc-selected-100-supply-50-withdraw",
+      "calldata": [
+        {
+          "signature": "approve(address,uint256)",
+          "request": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x095ea7b300000000000000000000000087870bca3f3fd6335c3f4ce8392d69350b4fa4e20000000000000000000000000000000000000000000000000000000005f5e100",
+            "value": "0"
+          }
+        },
+        {
+          "signature": "supply(address,uint256,address,uint16)",
+          "request": {
+            "to": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+            "data": "0x617ba037000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb480000000000000000000000000000000000000000000000000000000005f5e10000000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb6680000000000000000000000000000000000000000000000000000000000000000",
+            "value": "0"
+          }
+        },
+        {
+          "signature": "withdraw(address,uint256,address)",
+          "request": {
+            "to": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+            "data": "0x69328dec000000000000000000000000a0b86991c6218b36c1d19d4a2e9eb0ce3606eb480000000000000000000000000000000000000000000000000000000002faf08000000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+            "value": "0"
+          }
+        }
+      ],
+      "queryIdentities": [
+        {
+          "kind": "balanceOf",
+          "chainId": "1",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "contractIdentityVerified": false
+        },
+        {
+          "kind": "balanceOf",
+          "chainId": "1",
+          "token": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+          "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "contractIdentityVerified": false
+        },
+        {
+          "kind": "balanceOf",
+          "chainId": "1",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+          "contractIdentityVerified": false
+        },
+        {
+          "kind": "allowance",
+          "chainId": "1",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "owner": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "spender": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+          "contractIdentityVerified": false
+        },
+        {
+          "kind": "aave_v3_user_account_data",
+          "contract": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2",
+          "user": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "chainId": "1",
+          "contractIdentityVerified": false
+        }
+      ],
+      "metadata": {
+        "profile": "selected_100_usdc_v1",
+        "baseTemplate": {
+          "path": "research/lending-local-sequence-v037/capture/inputs/001.json",
+          "sha256": "c50936237fed1d59740521b1928f2a4bef74e496ec308f5f65d02281164e3f5c",
+          "canonicalJsonSha256": "fa435e96301c62b70f239c2029ad3c0f57d2bf9f54a3fc6c31264824f6310a7d",
+          "caseId": "aave-usdc-approve-supply-withdraw-half"
+        },
+        "selectedSequenceIsOriginalHistory": false,
+        "newlyConstructedCalls": true,
+        "abiAndQuerySourcesAreHistorical": true,
+        "headerPendingFreshSelection": true,
+        "priorResultsInstalledAsState": false
+      }
+    },
+    {
+      "id": "kiln-usdc-selected-100-deposit-50-withdraw",
+      "calldata": [
+        {
+          "signature": "approve(address,uint256)",
+          "request": {
+            "to": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "data": "0x095ea7b3000000000000000000000000334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b0000000000000000000000000000000000000000000000000000000005f5e100",
+            "value": "0"
+          }
+        },
+        {
+          "signature": "deposit(uint256,address)",
+          "request": {
+            "to": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+            "data": "0x6e553f650000000000000000000000000000000000000000000000000000000005f5e10000000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+            "value": "0"
+          }
+        },
+        {
+          "signature": "withdraw(uint256,address,address)",
+          "request": {
+            "to": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+            "data": "0xb460af940000000000000000000000000000000000000000000000000000000002faf08000000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb66800000000000000000000000044c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+            "value": "0"
+          }
+        }
+      ],
+      "queryIdentities": [
+        {
+          "kind": "balanceOf",
+          "chainId": "1",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "contractIdentityVerified": false
+        },
+        {
+          "kind": "balanceOf",
+          "chainId": "1",
+          "token": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "account": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "contractIdentityVerified": false
+        },
+        {
+          "kind": "balanceOf",
+          "chainId": "1",
+          "token": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+          "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "contractIdentityVerified": false
+        },
+        {
+          "kind": "balanceOf",
+          "chainId": "1",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "contractIdentityVerified": false
+        },
+        {
+          "kind": "balanceOf",
+          "chainId": "1",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+          "contractIdentityVerified": false
+        },
+        {
+          "kind": "balanceOf",
+          "chainId": "1",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "account": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+          "contractIdentityVerified": false
+        },
+        {
+          "kind": "allowance",
+          "chainId": "1",
+          "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          "owner": "0x44c3a96181af9e295ce8e188fa8fcdd72d1eb668",
+          "spender": "0x334f5d28a71432f8fc21c7b2b6f5dbbcd8b32a7b",
+          "contractIdentityVerified": false
+        },
+        {
+          "kind": "morpho_blue_position",
+          "contract": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+          "user": "0xbeef01735c132ada46aa9aa4c54623caa92a64cb",
+          "marketId": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
+          "chainId": "1",
+          "contractIdentityVerified": false
+        }
+      ],
+      "metadata": {
+        "profile": "selected_100_usdc_v1",
+        "baseTemplate": {
+          "path": "research/lending-local-sequence-v037/capture/inputs/002.json",
+          "sha256": "3b09b2898f5b5c7b1d9f758b793f5e6f3246ca0f241cc20b71cc89637171737c",
+          "canonicalJsonSha256": "d2f451ad675983f3669af5b55b193d72b68e5b59ef01a91ea34ec30472a119d4",
+          "caseId": "morpho-kiln-usdc-approve-deposit-withdraw-half"
+        },
+        "selectedSequenceIsOriginalHistory": false,
+        "newlyConstructedCalls": true,
+        "abiAndQuerySourcesAreHistorical": true,
+        "headerPendingFreshSelection": true,
+        "priorResultsInstalledAsState": false
+      }
+    }
+  ],
+  "notes": [
+    "This pure review checks derivation, ABI identities and source pins only; it supplies no expected execution outcomes.",
+    "headerPendingFreshSelection metadata is under owner correction to static historical-template flags."
+  ]
+}

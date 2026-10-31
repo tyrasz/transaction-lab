@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { deriveCurrentDeclarations, validateCurrentDeclarations, readPinnedTemplates, HISTORICAL_TEMPLATES, CURRENT_DENOMINATOR } from './declarations.mjs';
+import { deriveCurrentDeclarations, validateCurrentDeclarations, deriveTemplateProfile, validateTemplateProfile, readPinnedTemplates, HISTORICAL_TEMPLATES, CURRENT_DENOMINATOR } from './declarations.mjs';
+import { FUNDED_PROFILE } from './funded-profile.mjs';
 import { createHeaderSelection } from './selection.mjs';
 
 const root = new URL('../../', import.meta.url);
@@ -73,4 +74,54 @@ test('failed selection cannot produce target declarations or silently reuse hist
   const s = createHeaderSelection({ sourceBinding: { intentPlanSha256: 'a'.repeat(64), sourceManifestSha256: 'b'.repeat(64), nodeSha256: 'c'.repeat(64) }, started: start });
   const failed = s.fail('No selected header', start);
   assert.throws(() => deriveCurrentDeclarations({ templateBytes: bytes, selection: failed }), /completed/);
+});
+
+test('fixed profiles bind exact prepared bytes and cannot accept an arbitrary sender or amount profile', () => {
+  const original = deriveTemplateProfile({ templateBytes: bytes });
+  assert.equal(original.profile, 'original_fixed'); assert.equal(original.amendment, null);
+  assert.deepEqual(original.bytes, bytes); assert.deepEqual(original.templates, templates);
+  const funded = deriveTemplateProfile({ templateBytes: bytes, profile: FUNDED_PROFILE });
+  assert.equal(funded.profile, FUNDED_PROFILE); assert(funded.amendment);
+  assert.deepEqual(funded.baseTemplates, templates);
+  for (let i = 0; i < 2; i++) {
+    assert.deepEqual(funded.bytes[i], Buffer.from(JSON.stringify(funded.templates[i], null, 2) + '\n'));
+    assert.notDeepEqual(funded.bytes[i], bytes[i]);
+  }
+  for (const profile of ['funded_1', 'latest', '', null, {}, ['original_fixed']]) {
+    assert.throws(() => validateTemplateProfile(profile));
+    assert.throws(() => deriveTemplateProfile({ templateBytes: bytes, profile }));
+  }
+});
+
+test('funded profile is amended before selection; only header and block selectors change afterward', () => {
+  const selected = selection(), prepared = deriveTemplateProfile({ templateBytes: bytes, profile: FUNDED_PROFILE });
+  const result = deriveCurrentDeclarations({ templateBytes: bytes, selection: selected, profile: FUNDED_PROFILE });
+  assert.equal(result.profile, FUNDED_PROFILE); assert.deepEqual(result.amendment, prepared.amendment);
+  assert.equal(result.scope.priorObservationsInformedInputSelection, true);
+  assert.equal(result.scope.historicalResultsUsedAsExecutionState, false);
+  for (let i = 0; i < 2; i++) {
+    const restored = structuredClone(result.cases[i]);
+    assert.deepEqual(restored.header, selected.header);
+    assert.equal(restored.localInput.block, selected.header.hash); assert.equal(restored.providerInput.block, selected.header.hash);
+    restored.header = prepared.templates[i].header;
+    restored.localInput.block = prepared.templates[i].localInput.block;
+    restored.providerInput.block = prepared.templates[i].providerInput.block;
+    assert.deepEqual(restored, prepared.templates[i]);
+    assert.equal(result.preparedTemplates[i].id, prepared.templates[i].id);
+    assert.equal(result.preparedTemplates[i].bytes, prepared.bytes[i].length);
+  }
+  assert.deepEqual(validateCurrentDeclarations({ declarations: result, templateBytes: bytes, selection: selected, profile: FUNDED_PROFILE }), result);
+  assert.throws(() => validateCurrentDeclarations({ declarations: result, templateBytes: bytes, selection: selected }));
+  for (const mutate of [
+    d => { d.profile = 'original_fixed'; },
+    d => { d.amendment = null; },
+    d => { d.preparedTemplates[0].sha256 = '0'.repeat(64); },
+    d => { d.cases[0].localInput.from = templates[0].localInput.from; },
+    d => { d.cases[0].queryRoles = templates[0].queryRoles; },
+    d => { d.cases[0].amounts.depositRaw = '1'; },
+    d => { d.cases[1].providerInput.calls[0].data += '00'; },
+  ]) {
+    const changed = structuredClone(result); mutate(changed);
+    assert.throws(() => validateCurrentDeclarations({ declarations: changed, templateBytes: bytes, selection: selected, profile: FUNDED_PROFILE }));
+  }
 });

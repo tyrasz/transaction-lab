@@ -14,13 +14,16 @@ const plan=json(planPath),index=Number(indexText);assert(Number.isSafeInteger(in
 if(!prepareOnly)assert.equal(fileURLToPath(import.meta.url),path.join(plan.runtimePath,PREFIX,'worker.mjs'),'Archived worker required');
 assert.deepEqual(nodeIdentity(),plan.node);checkRows(plan.runtimePath,plan.files);
 const inputPath=path.join(plan.inputBase,plan.inputs[index].path),inputBytes=read(inputPath);assert.equal(sha(inputBytes),plan.inputs[index].sha256);const input=JSON.parse(inputBytes);
-const {readPinnedTemplates,deriveCurrentDeclarations,HISTORICAL_TEMPLATES}=await import(pathToFileURL(path.join(plan.runtimePath,PREFIX,'declarations.mjs')));
-const templates=HISTORICAL_TEMPLATES.files.map(r=>read(path.join(plan.runtimePath,r.path)));readPinnedTemplates(templates);
-if(prepareOnly){assert.equal(plan.phase,'offline_preparation');assert.deepEqual(input,readPinnedTemplates(templates)[index]);}
+const {deriveTemplateProfile,deriveCurrentDeclarations,HISTORICAL_TEMPLATES}=await import(pathToFileURL(path.join(plan.runtimePath,PREFIX,'declarations.mjs')));
+const baseBytes=HISTORICAL_TEMPLATES.files.map(r=>read(path.join(plan.runtimePath,r.path))),profile=deriveTemplateProfile({templateBytes:baseBytes,profile:plan.profile});
+const {validateProfileTemplates}=await import(pathToFileURL(path.join(plan.runtimePath,PREFIX,'run.mjs'))),stored=validateProfileTemplates(plan.inputBase,plan);
+assert.deepEqual(stored.templateBytes,baseBytes);assert.deepEqual(stored.profileTemplateBytes,profile.bytes);assert.deepEqual(plan.amendment,profile.amendment);
+if(prepareOnly){assert.equal(plan.phase,'offline_preparation');assert.deepEqual(plan.inputs,plan.templates);assert.deepEqual(inputBytes,profile.bytes[index]);assert.deepEqual(input,profile.templates[index]);}
 else{
  const {validateIntent,validateSelection}=await import(pathToFileURL(path.join(plan.runtimePath,PREFIX,'run.mjs')));
  const frozen=validateIntent(plan.inputBase,plan.intentSha256),selected=validateSelection(path.join(plan.inputBase,'selection'),plan.selectionManifestSha256,frozen.sourceBinding);assert(selected.usable);assert.equal(plan.phase,'selected_inputs_frozen');assert.deepEqual(plan.files,frozen.intent.files);assert.deepEqual(plan.node,frozen.intent.node);
- assert.deepEqual(frozen.templateBytes,templates);const bundle=deriveCurrentDeclarations({templateBytes:templates,selection:selected.report.selection});assert.deepEqual(json(path.join(plan.inputBase,'declarations.json')),bundle);assert.deepEqual(input,bundle.cases[index]);
+ assert.equal(plan.profile,frozen.intent.profile);assert.deepEqual(plan.amendment,frozen.intent.amendment);assert.deepEqual(plan.baseTemplates,frozen.intent.baseTemplates);assert.deepEqual(plan.templates,frozen.intent.templates);
+ assert.deepEqual(frozen.templateBytes,baseBytes);assert.deepEqual(frozen.profileTemplateBytes,profile.bytes);const bundle=deriveCurrentDeclarations({templateBytes:baseBytes,selection:selected.report.selection,profile:plan.profile});assert.deepEqual(json(path.join(plan.inputBase,'declarations.json')),bundle);assert.deepEqual(input,bundle.cases[index]);
 }
 assert.equal(input.id,plan.inputs[index].id);
 const api=kind==='local'?await (await import(pathToFileURL(path.join(plan.runtimePath,'src/local-loader.js')))).loadLocalApi():await (await import(pathToFileURL(path.join(plan.runtimePath,'src/standard-loader.js')))).loadStandardApi();assert(api,'Current API unavailable');

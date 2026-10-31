@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { replayHeaderSelection } from './selection.mjs';
 import { validateLocalSequence } from '../../src/local-sequence.js';
 import { validateStandardSequence } from '../../src/standard-simulation.js';
+import { FUNDED_PROFILE, deriveFundedTemplates } from './funded-profile.mjs';
 
 const freeze = value => { if (value && typeof value === 'object') { Object.values(value).forEach(freeze); Object.freeze(value); } return value; };
 export const HISTORICAL_TEMPLATES = freeze({
@@ -15,6 +16,11 @@ export const HISTORICAL_TEMPLATES = freeze({
   ],
 });
 export const CURRENT_DENOMINATOR = Object.freeze({ sequences: 2, originalPositions: 6, originalChannels: 30, queryPositions: 39, queryChannels: 117 });
+export const TEMPLATE_PROFILES = Object.freeze(['original_fixed', FUNDED_PROFILE]);
+export function validateTemplateProfile(profile) {
+  assert(TEMPLATE_PROFILES.includes(profile), 'Unknown fixed template profile.');
+  return profile;
+}
 const copy = value => JSON.parse(JSON.stringify(value));
 const digest = bytes => createHash('sha256').update(bytes).digest('hex');
 export function readPinnedTemplates(templateBytes) {
@@ -26,8 +32,23 @@ export function readPinnedTemplates(templateBytes) {
     return JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes));
   });
 }
-export function deriveCurrentDeclarations({ templateBytes, selection }) {
-  const templates = readPinnedTemplates(templateBytes), selected = replayHeaderSelection(selection);
+export function deriveTemplateProfile({ templateBytes, profile = 'original_fixed' }) {
+  validateTemplateProfile(profile);
+  const baseTemplates = readPinnedTemplates(templateBytes);
+  const amended = profile === FUNDED_PROFILE ? deriveFundedTemplates(baseTemplates) : { profile, amendment: null, cases: copy(baseTemplates) };
+  assert.equal(amended.profile, profile); assert.equal(amended.cases.length, 2);
+  const templates = amended.cases;
+  for (const input of templates) {
+    validateLocalSequence(copy(input.localInput));
+    validateStandardSequence(copy(input.providerInput));
+  }
+  const bytes = profile === 'original_fixed' ? templateBytes.map(b => Buffer.from(b))
+    : templates.map(t => Buffer.from(JSON.stringify(t, null, 2) + '\n'));
+  assert(bytes.every(b => b.length <= 2 * 1024 * 1024));
+  return { profile, baseTemplates, templates, bytes, amendment: copy(amended.amendment) };
+}
+export function deriveCurrentDeclarations({ templateBytes, selection, profile = 'original_fixed' }) {
+  const prepared = deriveTemplateProfile({ templateBytes, profile }), { templates, baseTemplates } = prepared, selected = replayHeaderSelection(selection);
   assert.equal(selected.status, 'selected', 'A completed, replay-validated selection is required.');
   const cases = templates.map(template => {
     const input = copy(template);
@@ -41,18 +62,19 @@ export function deriveCurrentDeclarations({ templateBytes, selection }) {
     return input;
   });
   return {
-    schemaVersion: '1.0', kind: 'current_state_lending_sequence_declarations', denominator: { ...CURRENT_DENOMINATOR },
+    schemaVersion: '1.0', kind: 'current_state_lending_sequence_declarations', profile, amendment: prepared.amendment, denominator: { ...CURRENT_DENOMINATOR },
     selection: { sourceBinding: copy(selected.sourceBinding), blockHash: selected.header.hash,
       headerVerification: copy(selected.headerVerification), latestReceived: copy(selected.latestReceived), finished: copy(selected.finished) },
-    historicalTemplates: { ...copy(HISTORICAL_TEMPLATES), headers: templates.map(t => copy(t.header)), retainedNotesAreHistorical: true },
+    historicalTemplates: { ...copy(HISTORICAL_TEMPLATES), headers: baseTemplates.map(t => copy(t.header)), retainedNotesAreHistorical: true },
+    preparedTemplates: prepared.bytes.map((bytes, index) => ({ path: `templates/${String(index + 1).padStart(3, '0')}.json`, sha256: digest(bytes), bytes: bytes.length, id: templates[index].id })),
     cases,
     scope: { unchangedSelectedCalls: true, oneSharedSelectedHeader: true, freshAtSelectionOnly: true,
       targetExecutionPerformedHere: false, externallyVerifiedSourceAndWireJoinsRequired: true,
-      historicalResultsUsedAsInputs: false, representativeAccuracyClaimed: false },
+      historicalResultsUsedAsExecutionState: false, priorObservationsInformedInputSelection: profile === FUNDED_PROFILE, representativeAccuracyClaimed: false },
   };
 }
-export function validateCurrentDeclarations({ declarations, templateBytes, selection }) {
-  const expected = deriveCurrentDeclarations({ templateBytes, selection });
+export function validateCurrentDeclarations({ declarations, templateBytes, selection, profile = 'original_fixed' }) {
+  const expected = deriveCurrentDeclarations({ templateBytes, selection, profile });
   assert.deepEqual(declarations, expected, 'Only the shared header and both block selectors may differ from immutable templates.');
   return expected;
 }

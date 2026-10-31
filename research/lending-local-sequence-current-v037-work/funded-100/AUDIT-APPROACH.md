@@ -1,0 +1,11 @@
+# Saved-only funded-call outcome audit
+
+Await the terminal manifest for `capture-funded-001`. The externally supplied intent is `764b3bc67d9f27693513294bc7721345685d9fc067f9b915c63020013917b7c9`. Do not inspect an incomplete capture, repeat a target, import an execution/API module, or write inside the capture.
+
+After completion, check the external intent/manifest and the saved input/report identities used for the findings. Read the six fixed original positions, keeping failed and stopped positions. Recompute local charged-gas arithmetic and join provider status/return/gas to its retained original trace. The existing saved adjudicator supplies the full source, process, proof, state-overlay and transport gate; this narrow audit does not independently re-execute or prove those components.
+
+Independently decode ABI words from local raw before/after getter return data and provider retained getter callTracer output. Bind each provider measurement through its evidence IDs to the saved native wire, exact request, selected block and corresponding override object. Compare the decoded words with projected values, calculate signed differences, and check continuity from each after-snapshot to the next before-snapshot where measurements exist. Keep missing, failed or malformed measurements unknown, never zero.
+
+Inspect the sender's USDC and allowance, Aave aEthUSDC and account-data fields, Kiln wrapper shares and custody, wrapper-owned inner-vault shares, and the inner vault's Blue position. Blue's user remains the vault; it does not measure sender-owned Blue shares. Do not infer a 1:1 asset/share conversion, fresh funding, approval necessity, or that withdrawal burns only newly minted shares. Local/provider queries differ in gas and scheduling, so any agreement remains observational.
+
+Reconcile these observations with all thirty original and 117 query comparison channels. A valid disagreement stays a mismatch; an unavailable state/measurement stays null. Retain the earlier insufficient-balance experiment separately. This selected supplement cannot establish representative accuracy, independent consensus, complete economic coverage, signed transaction replay, HTTP delivery or frontend behavior.

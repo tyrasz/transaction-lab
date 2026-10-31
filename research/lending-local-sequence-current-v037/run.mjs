@@ -9,9 +9,11 @@ import {fileURLToPath,pathToFileURL} from 'node:url';
 import {read,json,sha,walk,entry,checkRows,copyRows,nodeIdentity,createLedger,verifyPacket} from './archive.mjs';
 export const PREFIX='research/lending-local-sequence-current-v037';
 export const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
-import {readPinnedTemplates,deriveCurrentDeclarations,validateCurrentDeclarations,HISTORICAL_TEMPLATES,CURRENT_DENOMINATOR} from './declarations.mjs';
+import {readPinnedTemplates,deriveTemplateProfile,validateTemplateProfile,TEMPLATE_PROFILES,deriveCurrentDeclarations,validateCurrentDeclarations,HISTORICAL_TEMPLATES,CURRENT_DENOMINATOR} from './declarations.mjs';
+import {FUNDED_PROVENANCE_FILES} from './funded-profile.mjs';
 import {replayHeaderSelection,assertFirstTargetFresh,HEADER_SELECTION_POLICY} from './selection.mjs';
-export const OWN=['PLAN.md','declarations.mjs','declarations.test.mjs','selection.mjs','selection.test.mjs','strict-json.mjs','strict-json.test.mjs','select-current-header.mjs','select-current-header.test.mjs',
+export {TEMPLATE_PROFILES,validateTemplateProfile};
+export const OWN=['PLAN.md','declarations.mjs','declarations.test.mjs','funded-profile.mjs','funded-profile.test.mjs','selection.mjs','selection.test.mjs','strict-json.mjs','strict-json.test.mjs','select-current-header.mjs','select-current-header.test.mjs',
  'adjudicate.mjs','adjudicate.test.mjs','run.mjs','run.test.mjs','archive.mjs','capture.mjs','capture.test.mjs','worker.mjs'];
 export const SHARED=['research/standard-evm/cohort-http.mjs','reports/ethereum-lending-local-reference/compare.mjs',
  ...['observations.mjs','state-observations.mjs','context-validation.mjs'].map(n=>'research/lending-local-sequence-v037/'+n)];
@@ -27,7 +29,10 @@ export const SCOPE=Object.freeze({endpoint:'https://eth.drpc.org',adapter:'curre
  selection:'one_fresh_header_then_fixed_hash_no_reselection',freshAtSelectionOnly:true,denominator:'two_fixed_sequences_three_declared_positions_each_failures_and_unattempted_retained'});
 const id=i=>String(i+1).padStart(3,'0');
 export async function sourceRows(root=ROOT){
- const paths=['package.json',...OWN.map(n=>PREFIX+'/'+n),...SHARED,...HISTORICAL_TEMPLATES.files.map(r=>r.path)];
+ // These archived observations bind why the fixed profile was chosen. They
+ // never supply execution state or participate in template derivation.
+ for(const pin of FUNDED_PROVENANCE_FILES){const actual=entry(root,pin.path);assert.equal(actual.kind,'file');assert.equal(actual.bytes,pin.bytes);assert.equal(actual.sha256,pin.sha256);}
+ const paths=['package.json',...OWN.map(n=>PREFIX+'/'+n),...SHARED,...HISTORICAL_TEMPLATES.files.map(r=>r.path),...FUNDED_PROVENANCE_FILES.map(r=>r.path)];
  for(const name of fs.readdirSync(path.join(root,'src')))if(/\.(js|json)$/.test(name))paths.push('src/'+name);
  for(const name of fs.readdirSync(path.join(root,'engines')))if(fs.lstatSync(path.join(root,'engines',name)).isFile())paths.push('engines/'+name);
  for(const engine of ['local-evm','standard-evm','fixture-evm']){const dir='engines/'+engine;for(const name of fs.readdirSync(path.join(root,dir)))if(/\.(js|json)$/.test(name))paths.push(dir+'/'+name);paths.push(...walk(root,dir+'/node_modules'));}
@@ -35,9 +40,9 @@ export async function sourceRows(root=ROOT){
 }
 export function invocation(plan,index,kind,outDir,prepareOnly=false){assert([0,1].includes(index)&&['local','provider'].includes(kind));return{executable:plan.node.executable,args:['--max-old-space-size=768',path.join(plan.runtimePath,PREFIX,'worker.mjs'),path.join(plan.inputBase,'plan.json'),String(index),kind,outDir,...(prepareOnly?['--prepare-only']:[])]};}
 export async function checkIdentity(plan){assert.deepEqual(nodeIdentity(),plan.node);assert.deepEqual(walk(plan.runtimePath),plan.files.map(r=>r.path));checkRows(plan.runtimePath,plan.files);checkRows(plan.inputBase,plan.inputs.map(({id,...r})=>r));
- if(plan.intentSha256){const frozen=validateIntent(plan.inputBase,plan.intentSha256);assert.deepEqual(frozen.intent.files,plan.files);assert.deepEqual(frozen.intent.node,plan.node);
+ if(plan.intentSha256){const frozen=validateIntent(plan.inputBase,plan.intentSha256);assert.deepEqual(frozen.intent.files,plan.files);assert.deepEqual(frozen.intent.node,plan.node);assert.equal(plan.profile,frozen.intent.profile);assert.deepEqual(plan.amendment,frozen.intent.amendment);assert.deepEqual(plan.baseTemplates,frozen.intent.baseTemplates);assert.deepEqual(plan.templates,frozen.intent.templates);
   const selected=validateSelection(path.join(plan.inputBase,'selection'),plan.selectionManifestSha256,frozen.sourceBinding);assert(selected.usable,'Selection unavailable');
-  const declared=deriveCurrentDeclarations({templateBytes:frozen.templateBytes,selection:selected.report.selection});assert.deepEqual(json(path.join(plan.inputBase,'declarations.json')),declared);
+  const declared=deriveCurrentDeclarations({templateBytes:frozen.templateBytes,selection:selected.report.selection,profile:plan.profile});assert.deepEqual(json(path.join(plan.inputBase,'declarations.json')),declared);
   for(let i=0;i<2;i++)assert.deepEqual(json(path.join(plan.inputBase,plan.inputs[i].path)),declared.cases[i]);
  }}
 export function validateReport(report,{plan,index,kind,prepareOnly=false,pid}){
@@ -121,15 +126,28 @@ export async function executeMatrix(plan,writer,prepareOnly,{identity=checkIdent
  return{rows,fatal,sourceUnchanged,elapsed,targetPhaseStarted:{wallMs:began,monotonicMs:start},networkCalls:fatal?null:calls,networkBytes:fatal?null:networkBytes,knownBoundedNetworkCalls:calls,knownBoundedNetworkBytes:networkBytes,evidenceUsable:fatal===null&&sourceUnchanged,scope:SCOPE,prepareOnly};
 }
 export function templateBytes(root=ROOT){const bytes=HISTORICAL_TEMPLATES.files.map(r=>read(path.join(root,r.path)));readPinnedTemplates(bytes);return bytes;}
-export async function prepare(directory){
- directory=path.resolve(directory);fs.mkdirSync(directory);const bytes=templateBytes(),templates=readPinnedTemplates(bytes),files=await sourceRows(),writer=createLedger(directory);
- const inputs=templates.map((c,i)=>{const p=`templates/${id(i)}.json`;writer.write(p,bytes[i]);return{...entry(directory,p),id:c.id};});writer.save('templates.json',templates);
- const plan={schemaVersion:1,phase:'offline_preparation',createdAt:new Date().toISOString(),runtimePath:ROOT,inputBase:directory,node:nodeIdentity(),limits:LIMITS,scope:SCOPE,files,inputs};writer.save('plan.json',plan);
+// Read-only validation of both byte representations. Derivation starts only
+// from immutable base bytes, never from a supplied amendment or target output.
+export function validateProfileTemplates(directory,record){
+ validateTemplateProfile(record.profile);assert(Array.isArray(record.baseTemplates)&&record.baseTemplates.length===2);assert(Array.isArray(record.templates)&&record.templates.length===2);
+ const load=(rows,prefix)=>rows.map((r,i)=>{assert.equal(r.path,`${prefix}/${id(i)}.json`);checkRows(directory,[Object.fromEntries(Object.entries(r).filter(([k])=>k!=='id'))]);return read(path.join(directory,r.path));});
+ const baseBytes=load(record.baseTemplates,'base-templates'),profileBytes=load(record.templates,'templates');
+ const derived=deriveTemplateProfile({templateBytes:baseBytes,profile:record.profile});assert.equal(derived.profile,record.profile);assert.deepEqual(record.amendment,derived.amendment);
+ assert.deepEqual(profileBytes,derived.bytes.map(b=>Buffer.from(b)));assert.deepEqual(record.baseTemplates.map(r=>r.id),derived.baseTemplates.map(c=>c.id));assert.deepEqual(record.templates.map(r=>r.id),derived.templates.map(c=>c.id));
+ return{templateBytes:baseBytes,profileTemplateBytes:profileBytes,templates:derived.templates,baseTemplates:derived.baseTemplates,amendment:derived.amendment};
+}
+export async function prepare(directory,profile='original_fixed'){
+ validateTemplateProfile(profile);const baseBytes=templateBytes(),derived=deriveTemplateProfile({templateBytes:baseBytes,profile}),files=await sourceRows();
+ directory=path.resolve(directory);fs.mkdirSync(directory);const writer=createLedger(directory);
+ const baseTemplates=derived.baseTemplates.map((c,i)=>{const p=`base-templates/${id(i)}.json`;writer.write(p,baseBytes[i]);return{...entry(directory,p),id:c.id};});
+ const templates=derived.templates.map((c,i)=>{const p=`templates/${id(i)}.json`;writer.write(p,Buffer.from(derived.bytes[i]));return{...entry(directory,p),id:c.id};});const inputs=templates;writer.save('templates.json',derived.templates);
+ const plan={schemaVersion:1,phase:'offline_preparation',createdAt:new Date().toISOString(),runtimePath:ROOT,inputBase:directory,node:nodeIdentity(),limits:LIMITS,scope:SCOPE,files,profile,amendment:derived.amendment,baseTemplates,templates,inputs};writer.save('plan.json',plan);
  for(const kind of ['local','provider'])fs.mkdirSync(path.join(directory,kind));
- const identity=async p=>{assert.deepEqual(await sourceRows(),p.files);assert.deepEqual(nodeIdentity(),p.node);checkRows(directory,inputs.map(({id,...r})=>r));};
+ const identity=async p=>{assert.deepEqual(await sourceRows(),p.files);assert.deepEqual(nodeIdentity(),p.node);assert.deepEqual(p.inputs,p.templates);validateProfileTemplates(directory,p);};
  const result=await executeMatrix(plan,writer,true,{identity});writer.save('results.json',result);const manifestSha256=writer.seal();return{directory,manifestSha256,allPrepared:result.evidenceUsable&&result.rows.every(r=>r.status==='prepared'),rows:result.rows};
 }
 export function validatePreparation(directory,pin){const m=verifyPacket(directory,pin),p=json(path.join(directory,'plan.json')),r=json(path.join(directory,'results.json'));assert.deepEqual(p.limits,LIMITS);assert.deepEqual(p.scope,SCOPE);assert.equal(r.prepareOnly,true);assert.equal(r.evidenceUsable,true);assert.equal(r.networkCalls,0);assert.equal(r.networkBytes,0);assert.deepEqual(r.rows.map(x=>({kind:x.kind,index:x.index})),ORDER);
+ const derived=validateProfileTemplates(directory,p);assert.deepEqual(p.inputs,p.templates);assert.deepEqual(json(path.join(directory,'templates.json')),derived.templates);
  for(const row of r.rows){assert.equal(row.status,'prepared');const out=path.join(directory,row.kind,id(row.index)),seal=json(path.join(directory,row.seal)),rec=json(path.join(directory,row.process));assert.equal(sha(read(path.join(directory,row.process))),seal.processSha256);assert.equal(rec.status,0);assert.equal(rec.signal,null);assert.equal(rec.closed,true);assert.equal(rec.error,null);assert.equal(rec.limitFailure,null);assert.equal(rec.cleanupSignalAccepted,true);verifyPacket(out,seal.workerManifestSha256);
   assert.deepEqual({executable:rec.executable,args:rec.args},invocation(p,row.index,row.kind,path.join(p.inputBase,row.kind,id(row.index)),true));for(const k of ['stdout','stderr'])assert.equal(sha(read(path.join(directory,rec[k].path))),rec[k].sha256);assert.equal(rec.stderr.bytes,0);validateProcessRecord(rec,{plan:p,index:row.index,kind:row.kind,outDir:path.join(p.inputBase,row.kind,id(row.index)),prepareOnly:true,stdout:read(path.join(directory,rec.stdout.path)),stderr:read(path.join(directory,rec.stderr.path))});validateReport(json(path.join(out,'report.json')),{plan:p,index:row.index,kind:row.kind,prepareOnly:true,pid:rec.pid});}
  return{manifest:m,plan:p,result:r};}
@@ -138,15 +156,15 @@ export function validateIntent(capture,intentPin,{exact=false}={}){
  const intent=json(path.join(capture,'intent.json'));assert.equal(intent.phase,'frozen_before_selection');assert.deepEqual(intent.limits,LIMITS);assert.deepEqual(intent.scope,SCOPE);assert.deepEqual(intent.selectionPolicy,HEADER_SELECTION_POLICY);assert.deepEqual(intent.aggregateLimits,AGGREGATE_LIMITS);
  assert.deepEqual(nodeIdentity(),intent.node);assert.equal(sha(read(path.join(capture,'source-manifest.json'))),intent.sourceManifestSha256);assert.deepEqual(json(path.join(capture,'source-manifest.json')),{schemaVersion:1,files:intent.files,node:intent.node});
  const runtime=path.join(capture,'runtime');assert.deepEqual(walk(runtime),intent.files.map(r=>r.path));checkRows(runtime,intent.files);
- const prep=validatePreparation(path.join(capture,'preparation'),intent.preparationManifestSha256);assert.deepEqual(prep.plan.files,intent.files);assert.deepEqual(prep.plan.node,intent.node);assert.deepEqual(prep.plan.inputs,intent.templates);
- const bytes=intent.templates.map((r,i)=>{assert.equal(r.path,`templates/${id(i)}.json`);checkRows(capture,[Object.fromEntries(Object.entries(r).filter(([k])=>k!=='id'))]);return read(path.join(capture,r.path));});const templates=readPinnedTemplates(bytes);assert.equal(intent.templates.length,2);assert.deepEqual(intent.templates.map(r=>r.id),templates.map(c=>c.id));
+ const prep=validatePreparation(path.join(capture,'preparation'),intent.preparationManifestSha256);assert.deepEqual(prep.plan.files,intent.files);assert.deepEqual(prep.plan.node,intent.node);assert.deepEqual(prep.plan.inputs,intent.templates);assert.deepEqual(prep.plan.templates,intent.templates);assert.deepEqual(prep.plan.baseTemplates,intent.baseTemplates);assert.equal(prep.plan.profile,intent.profile);assert.deepEqual(prep.plan.amendment,intent.amendment);
+ const derived=validateProfileTemplates(capture,intent),bytes=derived.templateBytes,templates=derived.templates;
  for(let i=0;i<2;i++)assert.deepEqual(read(path.join(runtime,HISTORICAL_TEMPLATES.files[i].path)),bytes[i]);assert.deepEqual(json(path.join(capture,'preparation/templates.json')),templates);
  const manifestPin=sha(read(path.join(capture,'intent-manifest.json'))),manifest=verifyPacket(capture,manifestPin,{ledgerName:'intent-write-ledger.json',manifestName:'intent-manifest.json',exact});
  assert.equal(manifest.intentSha256,intentPin);assert.equal(manifest.sourceManifestSha256,intent.sourceManifestSha256);
  const pre=[...intent.files.map(r=>'runtime/'+r.path),...walk(path.join(capture,'preparation')).map(p=>'preparation/'+p)];
- const expected=[...pre,...intent.templates.map(r=>r.path),'source-manifest.json','intent.json','intent-write-ledger.json'].sort();assert.deepEqual(manifest.files.map(r=>r.path).sort(),expected);
+ const expected=[...pre,...intent.baseTemplates.map(r=>r.path),...intent.templates.map(r=>r.path),'source-manifest.json','intent.json','intent-write-ledger.json'].sort();assert.deepEqual(manifest.files.map(r=>r.path).sort(),expected);
  const l=json(path.join(capture,'intent-write-ledger.json'));assert.deepEqual(l.files,manifest.files.filter(r=>r.path!=='intent-write-ledger.json').map(r=>({...r,origin:pre.includes(r.path)?'preexisting':'written'})));
- return{intent,manifest,intentManifestSha256:manifestPin,templateBytes:bytes,templates,sourceBinding:{intentPlanSha256:intentPin,sourceManifestSha256:intent.sourceManifestSha256,nodeSha256:intent.node.sha256}};
+ return{intent,manifest,intentManifestSha256:manifestPin,templateBytes:bytes,profileTemplateBytes:derived.profileTemplateBytes,templates,sourceBinding:{intentPlanSha256:intentPin,sourceManifestSha256:intent.sourceManifestSha256,nodeSha256:intent.node.sha256}};
 }
 export function validateSelection(directory,pin,sourceBinding){
  const manifest=verifyPacket(directory,pin),report=json(path.join(directory,'report.json')),ledger=json(path.join(directory,'write-ledger.json'));
@@ -175,10 +193,10 @@ export function validateSelection(directory,pin,sourceBinding){
 export async function freeze(prepared,preparationPin,capture){
  prepared=path.resolve(prepared);capture=path.resolve(capture);const prep=validatePreparation(prepared,preparationPin);assert.deepEqual(await sourceRows(),prep.plan.files);assert.deepEqual(nodeIdentity(),prep.plan.node);
  fs.mkdirSync(capture);copyRows(ROOT,path.join(capture,'runtime'),prep.plan.files);copyRows(prepared,path.join(capture,'preparation'),[...prep.manifest.files,entry(prepared,'manifest.json')]);
- const writer=createLedger(capture);for(const r of prep.plan.inputs)writer.write(r.path,read(path.join(prepared,r.path)));
+ const writer=createLedger(capture);for(const r of [...prep.plan.baseTemplates,...prep.plan.templates])writer.write(r.path,read(path.join(prepared,r.path)));
  const sourceManifestSha256=writer.save('source-manifest.json',{schemaVersion:1,files:prep.plan.files,node:prep.plan.node});
  const intent={schemaVersion:1,phase:'frozen_before_selection',createdAt:new Date().toISOString(),runtimePath:path.join(capture,'runtime'),inputBase:capture,sourceRoot:ROOT,node:prep.plan.node,
-  limits:LIMITS,selectionPolicy:HEADER_SELECTION_POLICY,aggregateLimits:AGGREGATE_LIMITS,scope:SCOPE,files:prep.plan.files,templates:prep.plan.inputs,sourceManifestSha256,preparationManifestSha256:preparationPin};
+  limits:LIMITS,selectionPolicy:HEADER_SELECTION_POLICY,aggregateLimits:AGGREGATE_LIMITS,scope:SCOPE,files:prep.plan.files,profile:prep.plan.profile,amendment:prep.plan.amendment,baseTemplates:prep.plan.baseTemplates,templates:prep.plan.templates,sourceManifestSha256,preparationManifestSha256:preparationPin};
  const intentSha256=writer.save('intent.json',intent),intentManifestSha256=writer.seal({intentSha256,sourceManifestSha256},{ledgerName:'intent-write-ledger.json',manifestName:'intent-manifest.json'});validateIntent(capture,intentSha256,{exact:true});
  return{capture,intentSha256,intentManifestSha256,sourceManifestSha256,files:intent.files.length};
 }
@@ -199,7 +217,7 @@ export async function run(intentPin,flag){
   const report=await captureHeaderSelection({sourceBinding:frozen.sourceBinding,save:(p,v)=>selectionWriter.save(p,v),clock});selectionWriter.save('report.json',report);
   selectionManifestSha256=selectionWriter.seal();const sm=verifyPacket(directory,selectionManifestSha256);writer.adopt('selection',[...sm.files,entry(directory,'manifest.json')].sort((a,b)=>a.path.localeCompare(b.path)));
   selection=validateSelection(directory,selectionManifestSha256,frozen.sourceBinding);validateIntent(capture,intentPin);writer.verify();sourceUnchanged=true;assert(selection.usable,'Header selection, actual I/O drainage or byte/clock bounds unavailable');
-  const declarations=deriveCurrentDeclarations({templateBytes:frozen.templateBytes,selection:selection.report.selection});writer.save('declarations.json',declarations);
+  const declarations=deriveCurrentDeclarations({templateBytes:frozen.templateBytes,selection:selection.report.selection,profile:intent.profile});writer.save('declarations.json',declarations);
   const inputs=declarations.cases.map((c,i)=>{const p=`inputs/${id(i)}.json`;writer.save(p,c);return{...entry(capture,p),id:c.id};});
   const plan={...intent,phase:'selected_inputs_frozen',createdAt:new Date().toISOString(),intentSha256:intentPin,selectionManifestSha256,selectionReportPath:'selection/report.json',inputs};planPin=writer.save('plan.json',plan);
   await checkIdentity(plan);writer.verify();for(const kind of ['local','provider'])fs.mkdirSync(path.join(capture,kind));
@@ -216,4 +234,4 @@ export async function run(intentPin,flag){
  if(result.evidenceUsable){assert(result.totalNetworkCalls<=AGGREGATE_LIMITS.networkCalls);assert(result.totalNetworkBytes<=AGGREGATE_LIMITS.networkBytes);}
  writer.save('results.json',result);const manifestSha256=writer.seal({intentSha256:intentPin,planSha256:result.planSha256});return{manifestSha256,...result};
 }
-if(process.argv[1]===fileURLToPath(import.meta.url)){const[action,...args]=process.argv.slice(2);let out;if(action==='prepare'&&args.length===1)out=await prepare(args[0]);else if(action==='freeze'&&args.length===3)out=await freeze(...args);else if(action==='run'&&args.length===2)out=await run(...args);else throw Error('prepare DIR | freeze PREP_DIR PREP_MANIFEST_SHA CAPTURE_DIR | archived run INTENT_SHA --execute-frozen-readonly');console.log(JSON.stringify(out,null,2));}
+if(process.argv[1]===fileURLToPath(import.meta.url)){const[action,...args]=process.argv.slice(2);let out;if(action==='prepare'&&(args.length===1||args.length===2))out=await prepare(args[0],args[1]);else if(action==='freeze'&&args.length===3)out=await freeze(...args);else if(action==='run'&&args.length===2)out=await run(...args);else throw Error('prepare DIR [original_fixed|selected_100_usdc_v1] | freeze PREP_DIR PREP_MANIFEST_SHA CAPTURE_DIR | archived run INTENT_SHA --execute-frozen-readonly');console.log(JSON.stringify(out,null,2));}

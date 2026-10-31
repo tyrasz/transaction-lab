@@ -1,0 +1,115 @@
+{
+  "kind": "read_only_profile_binding_source_review",
+  "baseCommit": "ae806825ccef197339e4fda4c4ab7347a780f1de",
+  "profile": "selected_100_usdc_v1",
+  "sources": [
+    {
+      "path": "research/lending-local-sequence-current-v037/declarations.mjs",
+      "bytes": 5523,
+      "sha256": "debfbf27e7adf49ed97b0d74dc41590d704ac08a393c6515279845a01fd5c44d"
+    },
+    {
+      "path": "research/lending-local-sequence-current-v037/run.mjs",
+      "bytes": 36727,
+      "sha256": "2f33f71b2d9f563cf5a1204016c2e340f091a2cdfdf3b4f79275ab0e844f0a27"
+    },
+    {
+      "path": "research/lending-local-sequence-current-v037/worker.mjs",
+      "bytes": 6897,
+      "sha256": "851a064c7f622b3ae17a8bb24d2aff9149effa0220c92f2d49c1ca6805e5ef3d"
+    },
+    {
+      "path": "research/lending-local-sequence-current-v037/adjudicate.mjs",
+      "bytes": 19516,
+      "sha256": "0598deb2f347f82ccb45cc088d9f26b74dcb77e670060e81b36277904f9ca771"
+    },
+    {
+      "path": "research/lending-local-sequence-current-v037/funded-profile.mjs",
+      "bytes": 12628,
+      "sha256": "3e6e046dfeaaaab2409943daa0d9632d957a9cdc25cebdbe58c145fd2d2f2a8b"
+    },
+    {
+      "path": "research/lending-local-sequence-current-v037/archive.mjs",
+      "bytes": 4610,
+      "sha256": "9451079db37835e9f0b440364d749e690e723d494fbe598b0baaa44781c6eb81"
+    }
+  ],
+  "blockers": [],
+  "findings": [
+    {
+      "path": "research/lending-local-sequence-current-v037/declarations.mjs",
+      "lines": [
+        24,
+        35,
+        51
+      ],
+      "finding": "Exact raw historical byte hashes precede parsing and fixed-profile derivation. Only an enumerated profile is accepted. Amended bytes use a fixed serialization. Selection replaces only header and both block selectors."
+    },
+    {
+      "path": "research/lending-local-sequence-current-v037/run.mjs",
+      "lines": [
+        131,
+        139,
+        154
+      ],
+      "finding": "Preparation preserves base and amended bytes separately. validateProfileTemplates independently derives the expected amendment and exact amended bytes, checks row paths/hashes/ids, and never applies caller-supplied amendment operations. Frozen intent joins profile, amendment and both inventories to the prepared packet."
+    },
+    {
+      "path": "research/lending-local-sequence-current-v037/run.mjs",
+      "lines": [
+        193,
+        209,
+        220
+      ],
+      "finding": "Freeze requires a new destination directory and exclusive writes; original captured rationale files are read/hash-checked and copied. Archived run validates the frozen source inventory before selection, writes new selected inputs and plan, and rechecks input/source identity before each worker."
+    },
+    {
+      "path": "research/lending-local-sequence-current-v037/worker.mjs",
+      "lines": [
+        17,
+        21,
+        24,
+        30,
+        41
+      ],
+      "finding": "Worker independently derives the profile from archived pinned base bytes; preparation compares exact amended bytes, execution binds profile/amendment/inventories to intent and compares selected declarations before creating the RPC client. Only localInput/providerInput enter the execution APIs."
+    },
+    {
+      "path": "research/lending-local-sequence-current-v037/adjudicate.mjs",
+      "lines": [
+        92,
+        99,
+        115,
+        120,
+        131
+      ],
+      "finding": "Saved adjudication delegates to the archived source closure, validates intent and source inventory, rederives selected declarations from the frozen profile, demands exact selected-plan shape, and binds saved requests to those derived declarations."
+    },
+    {
+      "path": "research/lending-local-sequence-current-v037/funded-profile.mjs",
+      "lines": [
+        107,
+        115,
+        152
+      ],
+      "finding": "Derivation uses only fixed input constants and pinned historical input structure. Previous observed balances/proofs are not read or installed into execution state. Rationale is represented by source path/hash/pointers and explicit selection-bias scope."
+    }
+  ],
+  "independentPeer": {
+    "scope": "worker/adjudicator profile bindings",
+    "blockers": [],
+    "method": "read-only source inspection"
+  },
+  "limitations": [
+    "Source review of the profile amendment only; it is not a fresh runtime, preparation, execution, full archive-integrity or security audit.",
+    "Root owns the separately run pure controls and preparation. No test pass count is claimed by this review."
+  ],
+  "activity": {
+    "sourceEdits": 0,
+    "captureEdits": 0,
+    "testsRun": 0,
+    "preparationsRun": 0,
+    "rpcCalls": 0,
+    "evmExecutions": 0
+  }
+}

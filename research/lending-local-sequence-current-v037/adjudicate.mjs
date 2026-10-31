@@ -112,7 +112,7 @@ export async function adjudicateSavedCapture(capture,intentPin,manifestPin){
  }
  let declarations=null,plan=null;const selectedFiles=[];
  if(selection?.usable){
-  declarations=deriveCurrentDeclarations({templateBytes:frozen.templateBytes,selection:selection.report.selection});
+  declarations=deriveCurrentDeclarations({templateBytes:frozen.templateBytes,selection:selection.report.selection,profile:intent.profile});
   if(fs.existsSync(path.join(capture,'declarations.json'))){assert.deepEqual(json(path.join(capture,'declarations.json')),declarations);selectedFiles.push('declarations.json');}
   for(let i=0;i<2;i++){const p='inputs/'+n(i)+'.json';if(fs.existsSync(path.join(capture,p))){assert.deepEqual(json(path.join(capture,p)),declarations.cases[i]);selectedFiles.push(p);}}
  }
@@ -155,12 +155,12 @@ export async function adjudicateSavedCapture(capture,intentPin,manifestPin){
  if(usable){assert(results.totalNetworkCalls<=AGGREGATE_LIMITS.networkCalls);assert(results.totalNetworkBytes<=AGGREGATE_LIMITS.networkBytes);}
  const comparison=await compareFixedCases(declarations?.cases??frozen.templates,records,usable);
  checkRows(runtime,intent.files);verifyPacket(capture,manifestPin);assert.deepEqual(nodeIdentity(),intent.node);
- return{kind:'saved_current_lending_sequence_API_comparison',intentSha256:intentPin,planSha256:results.planSha256,manifestSha256:manifestPin,sourceManifestSha256:intent.sourceManifestSha256,
+ return{kind:'saved_current_lending_sequence_API_comparison',profile:intent.profile,amendment:intent.amendment,intentSha256:intentPin,planSha256:results.planSha256,manifestSha256:manifestPin,sourceManifestSha256:intent.sourceManifestSha256,
   evidenceUsable:usable,denominator:CURRENT_DENOMINATOR,selection:{status:selection?.report.selection?.status??'unavailable',usable:selection?.usable??false,blockHash:selection?.report.selection?.header?.hash??null,networkCalls:selection?.calls??null,networkBytes:selection?.networkBytes??null},
   firstTarget:timeline.firstTarget,retainedAttempts:attempts,networkCalls:results.networkCalls,networkBytes:results.networkBytes,totalNetworkCalls:results.totalNetworkCalls,totalNetworkBytes:results.totalNetworkBytes,
   elapsed:results.elapsed??null,rows:comparison.rows,counts:comparison.counts,metrics:comparison.metrics,
   integrity:{manifestFiles:manifest.files.length,runtimeFiles:intent.files.length,allRegisteredFileIdentitiesVerified:true,workerLoaderIdentitiesReconstructed:loaderIdentities,allLocalAttemptsBeforeProviderAttempts:results.phase==='target_matrix'},
-  limitations:['Direct current API adapter evidence, not HTTP or UI execution.','Two predeclared non-atomic unsigned sequences at one freshly selected block-end state, not representative coverage or signed historical replay.','Later targets use the frozen hash; only first dispatch has the declared freshness gate.','Both sides use eth.drpc.org infrastructure; provider state/execution is not independently consensus authenticated.',
+  limitations:['Direct current API adapter evidence, not HTTP or UI execution.','Two predeclared non-atomic unsigned sequences at one freshly selected block-end state, not representative coverage or signed historical replay.','The funded profile deliberately selects its sender and amounts using prior observations; it does not replace or reclassify previous failed cases.','Later targets use the frozen hash; only first dispatch has the declared freshness gate.','Both sides use eth.drpc.org infrastructure; provider state/execution is not independently consensus authenticated.',
    'Local getters use 1M gas after all originals; provider getters use 300k gas between originals. Query comparison is observational only.','State comparison is observed cumulative net changes, not complete public-chain poststate roots.','Saved validators and query compiler are shared with the product; this checker does not execute another EVM.','Frozen control flow and sampled clocks are not independently trusted timestamps.','Direct-worker closure and cleanup signalling do not independently attest OS process-tree extinction.'],targetsExecuted:0};
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){assert.equal(process.argv.length,5);console.log(JSON.stringify(await adjudicateSavedCapture(...process.argv.slice(2)),null,2));}
